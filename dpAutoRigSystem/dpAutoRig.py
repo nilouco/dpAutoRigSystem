@@ -876,7 +876,6 @@ class DP_AutoRig_UI(object):
         self.selectedModuleInstanceList = []
         selectedGuideNodeList = []
         selectedList = []
-
         # get selected items:
         selectedList = cmds.ls(selection=True, long=True)
         if selectedList:
@@ -893,27 +892,25 @@ class DP_AutoRig_UI(object):
             if needUpdateSelect:
                 self.refreshMainUI()
                 cmds.select(updatedGuideNodeList)
-
-        # re-create module layout:
-        if selectedGuideNodeList:
-            for moduleInstance in self.moduleInstancesList:
-                if moduleInstance.selectButton:
-                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
+        # update UI
+        for m, moduleInstance in enumerate(self.moduleInstancesList):
+            if moduleInstance.selectButton:
+                currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
+                cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
+                if selectedGuideNodeList:
                     for selectedGuide in selectedGuideNodeList:
                         selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
                         if selectedGuideInfo == str(moduleInstance):
                             cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                             self.selectedModuleInstanceList.append(moduleInstance)
-                            #moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
         # delete module layout:
-        else:
+        if not selectedGuideNodeList:
             try:
                 cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.lang['i011_editSelected']+" "+self.lang['i143_module'])
                 cmds.deleteUI("selectedModuleColumn")
-                for moduleInstance in self.moduleInstancesList:
-                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
                 pass
+        # re-create module layout:
         if self.selectedModuleInstanceList:
             self.selectedModuleInstanceList[-1].reCreateEditSelectedModuleLayout(bSelect=False)
         # call reload the geometries in skin UI:

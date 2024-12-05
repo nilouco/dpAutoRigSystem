@@ -664,15 +664,6 @@ class LayoutClass(object):
             cmds.setAttr(self.moduleGrp+".deformedBy", int(item[0]))
 
 
-    def getGuideRGBColorList(self, *args):
-        """ Return the guide RGB color list.
-        """
-        currentRGBList = []
-        for attr in ['R', 'G', 'B']:
-            currentRGBList.append(cmds.getAttr(self.moduleGrp+".guideColor"+attr))
-        return currentRGBList
-    
-
     def plusInfoWin(self, instance=None, *args):
         """ Open plus info attributes to each module
         """
@@ -713,10 +704,9 @@ class LayoutClass(object):
             guideInstance.radiusSizeFSG = cmds.floatSliderGrp(label=guideInstance.dpUIinst.lang['c067_radius'].capitalize(), field=True, width=widthSize, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.radiusCtrl+".translateX"), changeCommand=guideInstance.changeRadiusSize, dragCommand=guideInstance.changeRadiusSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
             guideInstance.shapeSizeFSG = cmds.floatSliderGrp(label=guideInstance.dpUIinst.lang['m067_shape']+" "+guideInstance.dpUIinst.lang['i115_size'], width=widthSize, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.moduleGrp+'.shapeSize'), changeCommand=guideInstance.changeShapeSize, dragCommand=guideInstance.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
-            cmds.separator(style='none', height=5, parent=plusSL)
-            currentGuideColorList = guideInstance.getGuideRGBColorList()
-            cmds.separator(style='none', height=5, parent=plusSL)
-            guideInstance.colorButton = cmds.button(label=guideInstance.dpUIinst.lang['m013_color'], annotation=guideInstance.dpUIinst.lang['m013_color'], width=widthSize, align="center", command=partial(guideInstance.ctrls.colorizeUI, guideInstance), backgroundColor=currentGuideColorList, parent=plusSL)
+            cmds.separator(style='none', height=10, parent=plusSL)
+            currentRGBGuideColor = guideInstance.dpUIinst.ctrls.getGuideRGBColorList(guideInstance)
+            guideInstance.colorButton = cmds.button(label=guideInstance.dpUIinst.lang['m013_color'], annotation=guideInstance.dpUIinst.lang['m013_color'], width=widthSize, align="center", command=partial(guideInstance.ctrls.colorizeUI, guideInstance), backgroundColor=currentRGBGuideColor, parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
             cmds.separator(style='in', height=10, width=widthSize, parent=plusSL)
         # call Info Window:

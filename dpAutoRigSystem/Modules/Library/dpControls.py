@@ -177,11 +177,13 @@ class ControlClass(object):
                 cmds.setAttr(item+".overrideColorB", color[2])
                 if instance:
                     cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
+                    cmds.button(instance.selectButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
                 if instance:
                     cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
+                    cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
 
 
     def removeColor(self, itemList, *args):
@@ -196,13 +198,22 @@ class ControlClass(object):
                 cmds.setAttr(item+".useOutlinerColor", 0)
 
 
-#    def getCurrentRGBColor(self, instance=None, *args):
-#        """ Return the current guide RGB color.
-#        """
-#        if not instance:
-#            instance = self
+    def getCurrentRGBColor(self, item, outliner=False, *args):
+        """ Return the current guide RGB color or outliner override color.
+        """
+        if outliner:
+            return [cmds.getAttr(item+".outlinerColor.outlinerColor"+attr) for attr in ['R', 'G', 'B']]
+        else:
+            return [cmds.getAttr(item+".overrideColor"+attr) for attr in ['R', 'G', 'B']]
         
 
+    def getGuideRGBColorList(self, instance, *args):
+        """ Return the guide RGB color list.
+        """
+        currentRGBList = []
+        for attr in ['R', 'G', 'B']:
+            currentRGBList.append(cmds.getAttr(instance.moduleGrp+".guideColor"+attr))
+        return currentRGBList
 
 
     def setColorRGBByUI(self, itemList=None, slider=None, instance=None, *args, **kwargs):
@@ -229,9 +240,9 @@ class ControlClass(object):
         """ Show a little window to choose the color of the button and the override the guide.
             From the old dpColorOverride extra tool. Thanks!
         """
+        currentRBGColor = self.getCurrentRGBColor(self.moduleGrp)
+        currentRBGOutlinerColor = self.getCurrentRGBColor(self.moduleGrp, True)
         self.dpUIinst.utils.closeUI(self.dpUIinst.colorOverrideWinName)
-#        self.getCurrentRGBColor()
-#        self.getCurrentRGBOutlinerColor()
         # creating colorOverride Window:
         colorOverride_winWidth  = 170
         colorOverride_winHeight = 115
@@ -246,12 +257,12 @@ class ControlClass(object):
         # RGB layout:
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorRGBLayout)
-        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.setColorRGBByUI, [self.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
+        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [self.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
         cmds.button("removeOverrideColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
         # Outliner layout:
         colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
-        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.setColorOutlinerByUI, itemList=[self.moduleGrp], slider='colorOutlinerSlider'), parent=colorOutlinerLayout)
+        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [self.moduleGrp], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
         cmds.button("removeOutlinerColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
         # renaming tabLayouts:
         cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))
