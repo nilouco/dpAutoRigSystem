@@ -312,6 +312,7 @@ class DP_AutoRig_UI(object):
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
         self.refreshMainUI()
+        self.jobSelectedGuide()
 
 
     def deleteExistWindow(self, *args):
@@ -848,6 +849,7 @@ class DP_AutoRig_UI(object):
         """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
         """
         # run the UI part:
+        self.selectedModuleInstanceList = []
         selectedGuideNodeList = []
         selectedList = []
 
@@ -876,7 +878,9 @@ class DP_AutoRig_UI(object):
                     for selectedGuide in selectedGuideNodeList:
                         selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
                         if selectedGuideInfo == str(moduleInstance):
-                            moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
+                            cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
+                            self.selectedModuleInstanceList.append(moduleInstance)
+                            #moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
         # delete module layout:
         else:
             try:
@@ -886,7 +890,8 @@ class DP_AutoRig_UI(object):
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
                 pass
-
+        if self.selectedModuleInstanceList:
+            self.selectedModuleInstanceList[-1].reCreateEditSelectedModuleLayout(bSelect=False)
         # call reload the geometries in skin UI:
         self.reloadPopulatedGeoms()
     
@@ -2160,7 +2165,7 @@ class DP_AutoRig_UI(object):
             if self.masterGrp == self.prefix+sAllGrp:
                 cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
                 cmds.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
-        cmds.select(None)
+        cmds.select(clear=True)
 
         #Hide Models and FX groups
         try:
@@ -2235,7 +2240,7 @@ class DP_AutoRig_UI(object):
                 cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
 
         cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
-        cmds.select(None)
+        cmds.select(clear=True)
 
         #Base joint
         self.baseRootJnt = self.prefix+"BaseRoot_Jnt"
@@ -3238,17 +3243,12 @@ class DP_AutoRig_UI(object):
         # reload the jointSkinList:
         self.populateJoints()
         
-        # select the MasterCtrl:
-        try:
-            cmds.select(self.masterCtrl)
-        except:
-            pass
-        
         if not self.rebuilding:
             # call log window:
             self.logger.logWin()
             # close progress window
             self.utils.setProgress(endIt=True)
         
+        cmds.select(clear=True)
     
     ###################### End: Rigging Modules Instances.
