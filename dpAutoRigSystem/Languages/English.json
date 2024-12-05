@@ -551,7 +551,7 @@
     "m045_order"                 : "Order",
     "m046_publisher"             : "Publisher",
     "m047_colorOver"             : "Color Override",
-    "m048_coloOverDesc"          : "Show a window to change\nshape color overriding.",
+    "m048_00000"          : "",
     "m049_matchMesh"             : "Match Mesh",
     "m050_matchMeshDesc"         : "Useful tool to transfer mesh information.\nYou can use it to update\na Blend Shape target.",
     "m051_headDef"               : "Head Deformer",

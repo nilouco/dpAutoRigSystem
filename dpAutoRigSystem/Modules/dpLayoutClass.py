@@ -36,58 +36,12 @@ class LayoutClass(object):
         # plus icon
         path = self.utils.findPath("dpAutoRig.py")
         self.iconPlus = path.replace("Modules", "/Icons/dp_plusInfo.png")
-
         # BASIC MODULE LAYOUT:
         self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
         # create basic module UI:
         self.selectButton = cmds.button(label=" ", annotation=self.dpUIinst.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.dpUIinst.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
-        cmds.iconTextButton(image=self.iconPlus, height=30, width=17, style='iconOnly', command=self.plusInfoWin, parent=self.basicColumn)
-        
-        # declaring the index color list to override and background color of buttons:
-        # Manually add the "none" color
-        self.colorList = [[0.627, 0.627, 0.627]]
-        #WARNING --> color index in maya start to 1
-        self.colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
-
-        '''
-        self.colorList = [  [0.627, 0.627, 0.627],
-                            [0, 0, 0],
-                            [0.247, 0.247, 0.247],
-                            [0.498, 0.498, 0.498],
-                            [0.608, 0, 0.157],
-                            [0, 0.016, 0.373],
-                            [0, 0, 1],
-                            [0, 0.275, 0.094],
-                            [0.145, 0, 0.263],
-                            [0.780, 0, 0.78],
-                            [0.537, 0.278, 0.2],
-                            [0.243, 0.133, 0.122],
-                            [0.600, 0.145, 0],
-                            [1, 0, 0],
-                            [0, 1, 0],
-                            [0, 0.255, 0.6],
-                            [1, 1, 1],
-                            [1, 1, 0],
-                            [0.388, 0.863, 1],
-                            [0.263, 1, 0.635],
-                            [1, 0.686, 0.686],
-                            [0.890, 0.675, 0.475],
-                            [1, 1, 0.384],
-                            [0, 0.6, 0.325],
-                            [0.627, 0.412, 0.188],
-                            [0.620, 0.627, 0.188],
-                            [0.408, 0.627, 0.188],
-                            [0.188, 0.627, 0.365],
-                            [0.188, 0.627, 0.627],
-                            [0.188, 0.404, 0.627],
-                            [0.435, 0.188, 0.627],
-                            [0.627, 0.188, 0.412] ]
-        '''
-        
-        # edit current colorIndex:
-        currentIndexColor = cmds.getAttr(self.moduleGrp+'.guideColor')
-        self.setColorModule(currentIndexColor)
+        cmds.iconTextButton(image=self.iconPlus, height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
         self.reCreateEditSelectedModuleLayout(self)
     
     
@@ -442,54 +396,6 @@ class LayoutClass(object):
                 pass
     
     
-    def colorizeModuleUI(self, colorIndex, *args):
-        """ Show a little window to choose the color of the button and the override the guide.
-        """
-        # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
-            # creating colorIndex Window:
-            if cmds.window('dpColorIndexWindow', query=True, exists=True):
-                cmds.deleteUI('dpColorIndexWindow', window=True)
-            colorIndex_winWidth  = 160
-            colorIndex_winHeight = 80
-            self.dpColorIndexWin = cmds.window('dpColorIndexWindow', title='Color Index', iconName='dpColorIndex', widthHeight=(colorIndex_winWidth, colorIndex_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
-            # creating layout:
-            colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20))
-            # creating buttons:
-            for colorIndex, colorValues in enumerate(self.colorList):
-                cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.setColorModule, colorIndex), parent=colorIndexLayout)
-            # call colorIndex Window:
-            cmds.showWindow(self.dpColorIndexWin)
-    
-    
-    def setColorModule(self, colorIndex, *args):
-        """ Receives the colorIndex to set the backgroudColor of the module layout and set the overrideColor attribute of the moduleGrp.
-        """
-        # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
-            # set color override of the guideModule:
-            cmds.setAttr(self.moduleGrp+'.overrideEnabled', 1)
-            cmds.setAttr(self.moduleGrp+'.overrideColor', colorIndex)
-            cmds.setAttr(self.moduleGrp+'.guideColor', colorIndex)
-            # set the backGround of the button in UI:
-            try:
-                cmds.button(self.colorButton, edit=True, backgroundColor=self.colorList[colorIndex])
-                cmds.deleteUI(self.dpColorIndexWin, window=True)
-            except:
-                pass
-            # disable colorOverride of all shapes inside of the moduleGrp:
-            childrenModuleList = cmds.listRelatives(self.moduleGrp, allDescendents=True)
-            if childrenModuleList:
-                if colorIndex != 0:
-                    for child in childrenModuleList:
-                        if cmds.getAttr(child+'.overrideEnabled') == 1:
-                            cmds.setAttr(child+'.overrideEnabled', 0)
-                else:
-                    for child in childrenModuleList:
-                        if cmds.getAttr(child+'.overrideColor') != 0:
-                            cmds.setAttr(child+'.overrideEnabled', 1)
-    
-    
     def displayAnnotation(self, value, *args):
         """ Get the current display setting from interface to show or hide the Annotation for this module.
         """
@@ -704,7 +610,7 @@ class LayoutClass(object):
                 cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
                 cmds.delete(cmds.listRelatives(self.previewMirrorGuide, shapes=True, type="nurbsCurve"))
                 
-                # clean up old module attributes in order to avoide numbering issue:
+                # clean up old module attributes in order to avoid numbering issue:
                 if cmds.objExists(self.previewMirrorGuide+".customName"):
                     customNameMirror = "_Mirror"
                     currentCustomName = cmds.getAttr(self.previewMirrorGuide+".customName")
@@ -758,7 +664,16 @@ class LayoutClass(object):
             cmds.setAttr(self.moduleGrp+".deformedBy", int(item[0]))
 
 
-    def plusInfoWin(self, *args):
+    def getGuideRGBColorList(self, *args):
+        """ Return the guide RGB color list.
+        """
+        currentRGBList = []
+        for attr in ['R', 'G', 'B']:
+            currentRGBList.append(cmds.getAttr(self.moduleGrp+".guideColor"+attr))
+        return currentRGBList
+    
+
+    def plusInfoWin(self, instance=None, *args):
         """ Open plus info attributes to each module
         """
         # declaring variables:
@@ -766,6 +681,7 @@ class LayoutClass(object):
         plus_winHeight = 180
         widthSize = (0.8*plus_winWidth)
         # creating Plus Info Window:
+        self.dpUIinst.utils.closeUI(self.dpUIinst.colorOverrideWinName)
         if cmds.window(self.dpUIinst.plusInfoWinName, query=True, exists=True):
             cmds.deleteUI('plusFL')
             self.dpPlusInfo = self.dpUIinst.plusInfoWinName
@@ -778,6 +694,9 @@ class LayoutClass(object):
         guideInstanceList = self.dpUIinst.selectedModuleInstanceList.copy()
         if not guideInstanceList:
             guideInstanceList = [self]
+        if instance:
+            if not instance in guideInstanceList:
+                guideInstanceList.insert(0, instance)
         for guideInstance in guideInstanceList:
             guideName = guideInstance.guideNamespace.split("__")[-1]
             customName = cmds.getAttr(guideInstance.moduleGrp+".customName")
@@ -795,9 +714,9 @@ class LayoutClass(object):
             cmds.separator(style='none', height=5, parent=plusSL)
             guideInstance.shapeSizeFSG = cmds.floatSliderGrp(label=guideInstance.dpUIinst.lang['m067_shape']+" "+guideInstance.dpUIinst.lang['i115_size'], width=widthSize, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.moduleGrp+'.shapeSize'), changeCommand=guideInstance.changeShapeSize, dragCommand=guideInstance.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
-            currentGuideColorList = guideInstance.colorList[(cmds.getAttr(guideInstance.moduleGrp+".guideColor"))]
+            currentGuideColorList = guideInstance.getGuideRGBColorList()
             cmds.separator(style='none', height=5, parent=plusSL)
-            guideInstance.colorButton = cmds.button(label=guideInstance.dpUIinst.lang['m013_color'], annotation=guideInstance.dpUIinst.lang['m013_color'], width=widthSize, align="center", command=guideInstance.colorizeModuleUI, backgroundColor=currentGuideColorList, parent=plusSL)
+            guideInstance.colorButton = cmds.button(label=guideInstance.dpUIinst.lang['m013_color'], annotation=guideInstance.dpUIinst.lang['m013_color'], width=widthSize, align="center", command=partial(guideInstance.ctrls.colorizeUI, guideInstance), backgroundColor=currentGuideColorList, parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
             cmds.separator(style='in', height=10, width=widthSize, parent=plusSL)
         # call Info Window:

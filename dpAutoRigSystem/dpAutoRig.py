@@ -161,6 +161,7 @@ TEMP_GRP = "dpAR_Temp_Grp"
 GUIDEMIRROR_GRP = "dpAR_GuideMirror_Grp"
 INFO_ICON = "dp_info.png"
 PLUSINFOWIN_NAME = "dpPlusInfoWindow"
+COLOROVERRIDEWIN_NAME = 'dpColorOverrideWindow'
 DPAR_SITE = "https://nilouco.blogspot.com"
 DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
 DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
@@ -204,6 +205,7 @@ class DP_AutoRig_UI(object):
         self.tempGrp = TEMP_GRP
         self.guideMirrorGrp = GUIDEMIRROR_GRP
         self.plusInfoWinName = PLUSINFOWIN_NAME
+        self.colorOverrideWinName = COLOROVERRIDEWIN_NAME
         self.userDefAutoCheckUpdate = 1
         self.userDefAgreeTerms = 1
         self.dpData = DPDATA
@@ -319,6 +321,7 @@ class DP_AutoRig_UI(object):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
         """
         self.utils.closeUI(self.plusInfoWinName)
+        self.utils.closeUI(self.colorOverrideWinName)
         self.utils.closeUI('dpAutoRigWindow')
         if cmds.dockControl('dpAutoRigSystem', query=True, exists=True):
             cmds.deleteUI('dpAutoRigSystem', control=True)
@@ -606,6 +609,27 @@ class DP_AutoRig_UI(object):
         self.allUIs["controlMainLayout"] = cmds.scrollLayout('controlMainLayout', parent=self.allUIs["controlTabLayout"])
         self.allUIs["controlLayout"] = cmds.columnLayout('controlLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['controlMainLayout'])
         
+        # colorControl - frameLayout:
+        self.allUIs["colorControlFL"] = cmds.frameLayout('colorControlFL', label=self.lang['m047_colorOver'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["colorTabLayout"] = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["colorControlFL"])
+        # Index layout:
+        self.allUIs["colorIndexLayout"] = cmds.gridLayout('colorIndexLayout', numberOfColumns=16, cellWidthHeight=(20, 20), parent=self.allUIs["colorTabLayout"])
+        # creating buttons
+        for colorIndex, colorValues in enumerate(self.ctrls.getColorList()):
+            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.ctrls.colorShape, color=colorIndex), parent=self.allUIs["colorIndexLayout"])
+        # RGB layout:
+        self.allUIs["colorRGBLayout"] = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=self.allUIs["colorTabLayout"])
+        cmds.separator(height=10, style='none', parent=self.allUIs["colorRGBLayout"])
+        self.allUIs["colorRGBSlider"] = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ctrls.setColorRGBByUI, slider='colorRGBSlider'), parent=self.allUIs["colorRGBLayout"])
+        cmds.button("removeOverrideColorBT", label=self.lang['i046_remove'], command=self.ctrls.removeColor, parent=self.allUIs["colorRGBLayout"])
+        # Outliner layout:
+        self.allUIs["colorOutlinerLayout"] = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=self.allUIs["colorTabLayout"])
+        cmds.separator(height=10, style='none', parent=self.allUIs["colorOutlinerLayout"])
+        self.allUIs["colorOutlinerSlider"] = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ctrls.setColorOutlinerByUI, slider='colorOutlinerSlider'), parent=self.allUIs["colorOutlinerLayout"])
+        cmds.button("removeOutlinerColorBT", label=self.lang['i046_remove'], command=self.ctrls.removeColor, parent=self.allUIs["colorOutlinerLayout"])
+        # renaming tabLayouts:
+        cmds.tabLayout(self.allUIs["colorTabLayout"], edit=True, tabLabel=((self.allUIs["colorIndexLayout"], "Index"), (self.allUIs["colorRGBLayout"], "RGB"), (self.allUIs["colorOutlinerLayout"], "Outliner")))
+
         # setupControl - frameLayout:
         self.allUIs["defaultValuesControlFL"] = cmds.frameLayout('defaultValuesControlFL', label=self.lang['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
         self.allUIs["defaultValuesControl3Layout"] = cmds.paneLayout("defaultValuesControl3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["defaultValuesControlFL"])

@@ -551,7 +551,7 @@
     "m045_order"                 : "Ordem",
     "m046_publisher"             : "Publicador",
     "m047_colorOver"             : "Sobrescrever Cores",
-    "m048_coloOverDesc"          : "Mostra uma janela para\nsobrescrever as cores dos shapes.",
+    "m048_00000"          : "",
     "m049_matchMesh"             : "Match Mesh",
     "m050_matchMeshDesc"         : "Ferramenta util para transferir informaçoes de mesh.\nVoce pode usar isso para atualizar\numa Blend Shape target.",
     "m051_headDef"               : "Deformador de Cabeça",

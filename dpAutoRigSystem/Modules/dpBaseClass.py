@@ -83,10 +83,6 @@ class StartClass(object):
             cmds.addAttr(self.moduleGrp, longName=baseBooleanAttr, attributeType='bool')
             cmds.setAttr(self.moduleGrp+"."+baseBooleanAttr, 1)
         
-        baseIntegerAttrList = ['guideColor']
-        for baseIntegerAttr in baseIntegerAttrList:
-            cmds.addAttr(self.moduleGrp, longName=baseIntegerAttr, attributeType='long')
-        
         baseStringAttrList  = ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
@@ -110,6 +106,13 @@ class StartClass(object):
             cmds.addAttr(self.moduleGrp, longName=baseIntAttr, attributeType='short')
         cmds.setAttr(self.moduleGrp+".degree", self.dpUIinst.degreeOption)
         
+        baseIntegerAttrList = ['guideColorIndex']
+        for baseIntegerAttr in baseIntegerAttrList:
+            cmds.addAttr(self.moduleGrp, longName=baseIntegerAttr, attributeType='long')
+        for c, guideColorAttr in enumerate(['guideColorR', 'guideColorG', 'guideColorB']):
+            cmds.addAttr(self.moduleGrp, longName=guideColorAttr, attributeType='float')
+            cmds.setAttr(self.moduleGrp+"."+guideColorAttr, self.dpUIinst.ctrls.colorList[0][c])
+
         # create annotation to this module:
         self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
         self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]

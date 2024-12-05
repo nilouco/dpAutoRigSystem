@@ -12,26 +12,11 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-dic_colors = {
-    "yellow": 17,
-    "red": 13,
-    "blue": 6,
-    "cyan": 18,
-    "green": 7,
-    "darkRed": 4,
-    "darkBlue": 15,
-    "white": 16,
-    "black": 1,
-    "gray": 3,
-    "bonina": [0.38, 0, 0.15],
-    "none": 0,
-}
-
-DP_CONTROLS_VERSION = 2.7
+DP_CONTROLS_VERSION = 2.8
 
 
 class ControlClass(object):
-    def __init__(self, dpUIinst, moduleGrp=None, *args):
+    def __init__(self, dpUIinst, moduleGrp=None, *args, **kwargs):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
@@ -41,23 +26,104 @@ class ControlClass(object):
         self.utils = dpUIinst.utils
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
+        self.shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
         self.doingName = self.dpUIinst.lang['m094_doing']
+        self.declareColors()
+
+
+    def declareColors(self, *args):
+        """ Just declare color lists and dictionary to use as override color data.
+        self.colorList = [  [0.627, 0.627, 0.627],
+                            [0, 0, 0],
+                            [0.247, 0.247, 0.247],
+                            [0.498, 0.498, 0.498],
+                            [0.608, 0, 0.157],
+                            [0, 0.016, 0.373],
+                            [0, 0, 1],
+                            [0, 0.275, 0.094],
+                            [0.145, 0, 0.263],
+                            [0.780, 0, 0.78],
+                            [0.537, 0.278, 0.2],
+                            [0.243, 0.133, 0.122],
+                            [0.600, 0.145, 0],
+                            [1, 0, 0],
+                            [0, 1, 0],
+                            [0, 0.255, 0.6],
+                            [1, 1, 1],
+                            [1, 1, 0],
+                            [0.388, 0.863, 1],
+                            [0.263, 1, 0.635],
+                            [1, 0.686, 0.686],
+                            [0.890, 0.675, 0.475],
+                            [1, 1, 0.384],
+                            [0, 0.6, 0.325],
+                            [0.627, 0.412, 0.188],
+                            [0.620, 0.627, 0.188],
+                            [0.408, 0.627, 0.188],
+                            [0.188, 0.627, 0.365],
+                            [0.188, 0.627, 0.627],
+                            [0.188, 0.404, 0.627],
+                            [0.435, 0.188, 0.627],
+                            [0.627, 0.188, 0.412] ]
+        """
+        self.colorList = self.getColorList()
+        self.dic_colors = {
+                            "none": 0,
+                            "yellow": 17,
+                            "red": 13,
+                            "blue": 6,
+                            "cyan": 18,
+                            "green": 7,
+                            "darkRed": 4,
+                            "darkBlue": 15,
+                            "white": 16,
+                            "black": 1,
+                            "gray": 3,
+                            "bonina": [0.38, 0, 0.15]
+                        }
+    
+
+    def getColorList(self, *args):
+        """ Return a list of Maya's colors.
+        """
+        #Manually add the "none" color
+        colorList = [[0.627, 0.627, 0.627]]
+        #WARNING --> color index in maya start to 1
+        colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
+        return colorList
+
+
+    def getGuideListByAttr(self, item, attr="guideColorIndex", *args):
+        """ Return the guide children list if it is a guide node.
+        """
+        guideList = []
+        if attr in cmds.listAttr(item):
+            guideList.append(item)
+            if "__" in item and ":" in item and item.endswith("Guide_Base"):
+                spaceName = item.split(":")[0]
+                childrenList = cmds.listRelatives(item, children=True, allDescendents=True, noIntermediate=True, type=self.shapeTypeList)
+                if childrenList:
+                    for child in childrenList:
+                        if child.startswith(spaceName):
+                            guideList.append(child)
+        return guideList
 
 
     # CONTROLS functions:
-    def colorShape(self, objList, color, rgb=False, outliner=False, *args):
+    def colorShape(self, objList, color, rgb=False, outliner=False, instance=None, *args):
         """ Create a color override for all shapes from the objList.
         """
+        # define colorIndex value
         iColorIdx = color
         if rgb:
-            if color in list(dic_colors):
-                color = dic_colors[color]
-        elif color in list(dic_colors):
-            iColorIdx = dic_colors[color]
-
+            if color in list(self.dic_colors):
+                color = self.dic_colors[color]
+        elif color in list(self.dic_colors):
+            iColorIdx = self.dic_colors[color]
+        if not objList:
+            objList = cmds.ls(selection=True)
         # find shapes and apply the color override:
-        shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         if objList:
             for objName in objList:
                 if outliner:
@@ -65,18 +131,32 @@ class ControlClass(object):
                 else:
                     objType = cmds.objectType(objName)
                     # verify if the object is the shape type:
-                    if objType in shapeTypeList:
-                        self.setColorOverride(objName, color, iColorIdx, rgb)
+                    if objType in self.shapeTypeList:
+                        self.setColorOverride(objName, color, iColorIdx, rgb, instance=instance)
                     # verify if the object is a transform type:
                     elif objType == "transform":
-                        # find all shapes children of the transform object:
-                        shapeList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
-                        if shapeList:
-                            for shape in shapeList:
-                                self.setColorOverride(shape, color, iColorIdx, rgb)
+                        # try get guide shape list
+                        itemList = self.getGuideListByAttr(objName)
+                        if itemList:
+                            if rgb:
+                                cmds.setAttr(objName+".guideColorIndex", -1)
+                                cmds.setAttr(objName+".guideColorR", color[0])
+                                cmds.setAttr(objName+".guideColorG", color[1])
+                                cmds.setAttr(objName+".guideColorB", color[2])
+                            else:
+                                cmds.setAttr(objName+".guideColorIndex", iColorIdx)
+                                cmds.setAttr(objName+".guideColorR", self.colorList[iColorIdx][0])
+                                cmds.setAttr(objName+".guideColorG", self.colorList[iColorIdx][1])
+                                cmds.setAttr(objName+".guideColorB", self.colorList[iColorIdx][2])
+                        else:
+                            # find all shapes children of the transform object:
+                            itemList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
+                        if itemList:
+                            for shape in itemList:
+                                self.setColorOverride(shape, color, iColorIdx, rgb, instance=instance)
 
 
-    def setColorOverride(self, item, color, iColorIdx, rgb, outliner=False, *args):
+    def setColorOverride(self, item, color, iColorIdx, rgb, outliner=False, instance=None, *args):
         """ Set the color for the given node and color data.
         """
         if outliner:
@@ -95,9 +175,13 @@ class ControlClass(object):
                 cmds.setAttr(item+".overrideColorR", color[0])
                 cmds.setAttr(item+".overrideColorG", color[1])
                 cmds.setAttr(item+".overrideColorB", color[2])
+                if instance:
+                    cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
+                if instance:
+                    cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
 
 
     def removeColor(self, itemList, *args):
@@ -110,6 +194,69 @@ class ControlClass(object):
                 cmds.setAttr(item+".overrideEnabled", 0)
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".useOutlinerColor", 0)
+
+
+#    def getCurrentRGBColor(self, instance=None, *args):
+#        """ Return the current guide RGB color.
+#        """
+#        if not instance:
+#            instance = self
+        
+
+
+
+    def setColorRGBByUI(self, itemList=None, slider=None, instance=None, *args, **kwargs):
+        """ Read from UI the rgb color to set override of given list or selected nodes.
+        """
+        if not itemList:
+            itemList = cmds.ls(selection=True)
+        if itemList:
+            if slider:
+                self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), rgb=True, instance=instance)
+
+
+    def setColorOutlinerByUI(self, itemList=None, slider=None, *args):
+        """ Read from UI the rgb color to set override of given list or selected nodes.
+        """
+        if not itemList:
+            itemList = cmds.ls(selection=True)
+        if itemList:
+            if slider:
+                self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
+
+
+    def colorizeUI(self, instance=None, *args, **kwargs):
+        """ Show a little window to choose the color of the button and the override the guide.
+            From the old dpColorOverride extra tool. Thanks!
+        """
+        self.dpUIinst.utils.closeUI(self.dpUIinst.colorOverrideWinName)
+#        self.getCurrentRGBColor()
+#        self.getCurrentRGBOutlinerColor()
+        # creating colorOverride Window:
+        colorOverride_winWidth  = 170
+        colorOverride_winHeight = 115
+        dpColorOverrideWin = cmds.window(self.dpUIinst.colorOverrideWinName, title=self.dpUIinst.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        # creating layout:
+        colorTabLayout = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=dpColorOverrideWin)
+        # Index layout:
+        colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20), parent=colorTabLayout)
+        # creating buttons
+        for colorIndex, colorValues in enumerate(self.colorList):
+            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [self.moduleGrp], colorIndex, instance=instance), parent=colorIndexLayout)
+        # RGB layout:
+        colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
+        cmds.separator(height=10, style='none', parent=colorRGBLayout)
+        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.setColorRGBByUI, [self.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
+        cmds.button("removeOverrideColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
+        # Outliner layout:
+        colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
+        cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
+        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.setColorOutlinerByUI, itemList=[self.moduleGrp], slider='colorOutlinerSlider'), parent=colorOutlinerLayout)
+        cmds.button("removeOutlinerColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
+        # renaming tabLayouts:
+        cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))
+        # call colorIndex Window:
+        cmds.showWindow(dpColorOverrideWin)
 
 
     def renameShape(self, transformList, *args):
@@ -174,13 +321,12 @@ class ControlClass(object):
         """
         # declare a list of attributes for render:
         renderAttrList = ["castsShadows", "receiveShadows", "motionBlur", "primaryVisibility", "smoothShading", "visibleInReflections", "visibleInRefractions", "doubleSided", "miTransparencyCast", "miTransparencyReceive", "miReflectionReceive", "miRefractionReceive", "miFinalGatherCast", "miFinalGatherReceive"]
-        shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         # find all children shapes:
         if objList:
             for obj in objList:
                 objType = cmds.objectType(obj)
                 # verify if the object is the shape type:
-                if objType in shapeTypeList:
+                if objType in self.shapeTypeList:
                     # set attributes as not renderable:
                     for attr in renderAttrList:
                         try:
@@ -887,7 +1033,7 @@ class ControlClass(object):
         """ Set the color override for pinned guide shapes.
         """
         cmds.setAttr(ctrlName+".overrideEnabled", status)
-        cmds.setAttr(ctrlName+".overrideColor", dic_colors[color])
+        cmds.setAttr(ctrlName+".overrideColor", self.dic_colors[color])
         shapeList = cmds.listRelatives(ctrlName, children=True, fullPath=False, shapes=True)
         if shapeList:
             for shapeNode in shapeList:
