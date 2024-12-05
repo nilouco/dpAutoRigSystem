@@ -29,6 +29,8 @@ class JointDisplay(object):
         self.selectionUiList = []
         self.selectedBoard = []
         self.allBoardList = ['boneFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn', 'jointFieldcolumn']
+        self.destinationBoard = ''
+        
         # call main function
         if self.ui:
             self.dpJointDisplayUI(self)
@@ -193,20 +195,21 @@ class JointDisplay(object):
         # Get active selection of button list
         print(f'Move to Right Pressed')
         selectedJoints = self.activeSelection(self.selectedBoard)
-        print(selectedJoints)
+        print(f'Move to Right Selected Board ---------{self.selectedBoard}')
         if selectedJoints:
             for jnt in selectedJoints:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
                 if currentDrawStyle < 3:
                     print(f'DrawStyle atual {currentDrawStyle}')
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
+                    print (f' Returned Seach BOARD {self.searchBoardIndex()}')
+                    self.destinationBoard = self.searchBoardIndex() + 1
                 else: 
                     currentDrawStyle = 0
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
+                    self.destinationBoard = 0
             self.refreshLists(self)
             self.keepSelectedObj(self)
-
-            
     
     
     def moveToLeft(self, *args, **kwargs):
@@ -229,8 +232,15 @@ class JointDisplay(object):
             self.keepSelectedObj(self)  
 
 
+    def searchBoardIndex(self, *args):
+        index = 0
+        for board in self.allBoardList:
+            if board == self.selectedBoard:
+                return index
+            index += 1
 
-    
+        print( f'Active Index Board {index}')
+
     
     def keepSelectedObj(self, *args):
         """Mantain ative selected joints"""
@@ -238,46 +248,18 @@ class JointDisplay(object):
         # selectedUIJoints = self.selectionUiList
         # selectedUIBoard = self.selectedBoard
         # allboards = self.allBoardList
-        selectedItems = []
+        selectedItems = self.selectionUiList
+        print(f'keepSelectedObj Called________!!!!!!!')
+        # for board in self.allBoardList:
 
-        for board in self.allBoardList:
-            #Existe algum objeto da lista selectedUIJoints?
-            if self.selectionUiList:
-                selectedItems.append(cmds.textScrollList(board, query=True, selectItem=True))
-                for item in selectedItems:
-                    cmds.textScrollList(board, edit=True, selectItem=item)
-                # selectedItems = []
+            # selList = cmds.textScrollList(self.boneFieldcolumn, query=True, selectItem=True)
+            # self.moveToLeft()
+            # cmds.textScrollList(self.jointFieldcolumn, edit=True, selectItem=selList)
+        print(f'DESTINATION BOARD >>>>>> {self.destinationBoard}')
+        if selectedItems:
+            cmds.textScrollList(self.destinationBoard, edit=True, selectItem=selectedItems)
 
-            # Se existe, seleciona ele.
-            # Se algum objeto contem no em algum board. Seleciona o objeto no respectivo board.
-            
-
-                
-                
-        
-        # selectedList = cmds.textScrollList(obj, query=True, selectItem=True)
-        # toSelectList = []
-        # boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
-        # print(f'KEEP SELECTED OBJ FUNCTION selectedUIJoints ======{selectedUIJoints}')
-        # print(f'KEEP SELECTED OBJ FUNCTION selectedUIBoard ======{selectedUIBoard}')
-        
-        # for obj in boardList:
-        #     for uiItem in selectedList:
-        #         selectedList.append(uiItem)
-
-                    
-        #         print(f'Selected JOINTS KEEP SELECTED Function______{toSelectList}')
-
-
-            
-
-        # print(cmds.textScrollList(selectedUIBoard, edit=True, selectItem=selectedUIJoints))
-
-        
-        # if selectedUIJoints:
-        #     print(f'Selected Joints UI ++++++++++++++{selectedUIJoints}')
-
-        # If selected joint
+ 
 
 
 
@@ -300,8 +282,9 @@ class JointDisplay(object):
         """Get the active selection"""
         print(f'BOARD SELECIONADO {selectedBoard[selectedBoard.rfind("|")+1:]}')
         
-        self.selectedBoard = selectedBoard
-        self.deselectOtherBoards(board= self.selectedBoard)
+        self.selectedBoard = selectedBoard[selectedBoard.rfind("|")+1:]
+        print(f'self.selectedBoard {self.selectedBoard}')
+        self.deselectOtherBoards(board=self.selectedBoard)
         self.selectionUiList = cmds.textScrollList(selectedBoard, query=True, selectItem=True)
         print(f'SELECAO ATIVA ______ {self.selectionUiList}')
         return self.selectionUiList
