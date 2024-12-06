@@ -1027,10 +1027,15 @@ class Utils(object):
     def multVectors(self, u, v):
         return [u[i]*v[i] for i in range(len(u))]
 
+
     def multiScalarVector(self, u, scalar):
-        """
-        """
         return [u[i]*scalar for i in range(len(u))]
+
+
+    def averageValue(self, valueList, *args):
+        """ Return the average value for the given value list.
+        """
+        return sum(valueList)/len(valueList)
 
 
     def jointChainLength(self, jointList):

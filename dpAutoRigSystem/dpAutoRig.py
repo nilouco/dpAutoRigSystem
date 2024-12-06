@@ -2085,7 +2085,7 @@ class DP_AutoRig_UI(object):
     def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree=1):
         nCtrl = sCtrlName
         self.ctrlCreated = False
-        if not cmds.objExists(self.masterGrp+"."+sAttrName):
+        if not sAttrName in cmds.listAttr(self.masterGrp):
             cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
         if not cmds.objExists(sCtrlName):
             if (sCtrlName != (self.prefix + "Option_Ctrl")):

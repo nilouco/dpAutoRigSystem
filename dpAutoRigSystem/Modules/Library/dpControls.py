@@ -586,7 +586,7 @@ class ControlClass(object):
         """ Create and return a curve to be used as a control.
         """
         # get radius by checking linear unit
-        r = self.dpCheckLinearUnit(r)
+        #r = self.dpCheckLinearUnit(r)
         curve = self.cvControl(ctrlType, ctrlName, r, d, dir, rot)
         # edit a minime curve:
         cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True, minValue=0.001)
@@ -643,7 +643,7 @@ class ControlClass(object):
             Returns the main control (circle) and the radius control in a list.
         """
         # get radius by checking linear unit
-        r = self.dpCheckLinearUnit(r)
+        #r = self.dpCheckLinearUnit(r)
         # create a simple circle curve:
         circle = cmds.circle(n=ctrlName, ch=True, o=True, nr=(0, 0, 1), d=3, s=8, radius=r)[0]
         radiusCtrl = cmds.circle(n=ctrlName+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
@@ -985,7 +985,7 @@ class ControlClass(object):
         return resultString
 
 
-    def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):
+    def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", boundingBox=True, *args):
         """ Verify if the Maya linear unit is in Centimeter.
             Return the radius to the new unit size.
 
@@ -1008,8 +1008,23 @@ class ControlClass(object):
     #        newRadius = origRadius*0.032808
     #    elif linearUnit == "yard":
     #        newRadius = origRadius*0.010936
+        # adapt radius to geometry meshes size
+        if boundingBox:
+            meshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            if meshList:
+                tempList = []
+                for item in meshList:
+                    if not "_DeformerCube_Geo" in item:
+                        fatherNode = item[:item[1:].find("|")+1]
+                        if fatherNode:
+                            if not fatherNode in tempList:
+                                tempList.append(fatherNode)
+                if tempList:
+                    bbList = cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0]
+                    bbAverage = self.dpUIinst.utils.averageValue(bbList)
+                    return self.dpUIinst.utils.averageValue([bbAverage, origRadius])
         return newRadius
-
+        
 
     #@dpUtils.profiler
     def shapeSizeSetup(self, transformNode, *args):

@@ -101,7 +101,7 @@ class HeadDeformer(object):
 
         if not hdList:
             # get a list of selected items
-            hdList = cmds.ls(selection=True)       
+            hdList = cmds.ls(selection=True)
         if hdList:
             cmds.select(hdList)
             # lattice deformer
