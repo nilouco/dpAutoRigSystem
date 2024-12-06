@@ -894,15 +894,16 @@ class DP_AutoRig_UI(object):
                 cmds.select(updatedGuideNodeList)
         # update UI
         for m, moduleInstance in enumerate(self.moduleInstancesList):
-            if moduleInstance.selectButton:
-                currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
-                cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
-                if selectedGuideNodeList:
-                    for selectedGuide in selectedGuideNodeList:
-                        selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
-                        if selectedGuideInfo == str(moduleInstance):
-                            cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
-                            self.selectedModuleInstanceList.append(moduleInstance)
+            if cmds.objExists(moduleInstance.moduleGrp):
+                if moduleInstance.selectButton:
+                    currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
+                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
+                    if selectedGuideNodeList:
+                        for selectedGuide in selectedGuideNodeList:
+                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
+                            if selectedGuideInfo == str(moduleInstance):
+                                cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
+                                self.selectedModuleInstanceList.append(moduleInstance)
         # delete module layout:
         if not selectedGuideNodeList:
             try:

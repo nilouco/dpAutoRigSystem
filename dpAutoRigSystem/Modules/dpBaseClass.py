@@ -96,11 +96,11 @@ class StartClass(object):
         cmds.setAttr(self.moduleGrp+".rigType", self.rigType, type='string')
         cmds.setAttr(self.moduleGrp+".dpARVersion", self.dpUIinst.dpARVersion, type='string')
         
-        baseFloatAttrList = ['shapeSize']
+        baseFloatAttrList = ['shapeSize', 'worldSize']
         for baseFloatAttr in baseFloatAttrList:
-            cmds.addAttr(self.moduleGrp, longName=baseFloatAttr, attributeType='float')
-        cmds.setAttr(self.moduleGrp+".shapeSize", 1)
-        
+            cmds.addAttr(self.moduleGrp, longName=baseFloatAttr, attributeType='float', defaultValue=1)
+        cmds.setAttr(self.moduleGrp+".worldSize", keyable=True)
+
         baseIntegerAttrList = ['degree']
         for baseIntAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntAttr, attributeType='short')
@@ -120,6 +120,9 @@ class StartClass(object):
         cmds.parent(self.annotation, self.moduleGrp)
         cmds.setAttr(self.annotation+'.text', self.moduleGrp[self.moduleGrp.find("__")+2:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
+        # setup worldSize
+        self.dpUIinst.ctrls.getDPARTempGrp()
+        self.createWorldSize()
         # prepare guide to serialization
         self.createGuideNetwork()
     
@@ -156,8 +159,10 @@ class StartClass(object):
             cmds.delete(self.moduleGrp[:self.moduleGrp.find(":")]+"_MirrorGrp")
         except:
             pass
+        if cmds.objExists(self.moduleGrp+"_WorldSize_Ref"):
+            cmds.delete(self.moduleGrp+"_WorldSize_Ref")
         # delete the guide module:
-        self.utils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
+        self.utils.clearNodeGrp(self.moduleGrp, 'guideBase', unparent=True)
         # clear default 'dpAR_GuideMirror_Grp':
         self.utils.clearNodeGrp()
         # remove the namespaces:
@@ -710,6 +715,20 @@ class StartClass(object):
                 unitConversionList = list(set(unitConversionList)-set(self.oldUnitConversionList))
             if unitConversionList:
                 self.utils.nodeRenamingTreatment(unitConversionList)
+
+
+    def createWorldSize(self, *args):
+        """ Create a null transform and use it as worldSize reference setup to scale the moduleGrp by offsetTransformMatrix.
+        """
+        cmds.namespace(set=self.guideNamespace, force=True)
+        wsRef = cmds.createNode("transform", name="Guide_Base_WorldSize_Ref")
+        cmds.namespace(set=":")
+        for attr in ["X", "Y", "Z"]:
+            cmds.connectAttr(self.moduleGrp+".worldSize", wsRef+".scale"+attr)
+        cmds.connectAttr(wsRef+".worldMatrix[0]", self.moduleGrp+".offsetParentMatrix", force=True)
+        cmds.setAttr(wsRef+".visibility", False)
+        cmds.setAttr(wsRef+".template", 1)
+        cmds.parent(wsRef, self.dpUIinst.tempGrp)
 
 
     # Getters:

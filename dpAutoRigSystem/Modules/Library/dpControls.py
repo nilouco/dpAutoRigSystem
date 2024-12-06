@@ -32,6 +32,20 @@ class ControlClass(object):
         self.declareColors()
 
 
+    def getDPARTempGrp(self, tempGrp=None, *args):
+        """ Create the dpAR temp group if it doesn't exists.
+        """
+        if not tempGrp:
+            tempGrp = self.dpUIinst.tempGrp
+        if not cmds.objExists(tempGrp):
+            cmds.group(name=tempGrp, empty=True)
+            cmds.setAttr(tempGrp+".visibility", 0)
+            cmds.setAttr(tempGrp+".template", 1)
+            cmds.setAttr(tempGrp+".hiddenInOutliner", 1)
+            self.setLockHide([tempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+        return tempGrp
+
+
     def declareColors(self, *args):
         """ Just declare color lists and dictionary to use as override color data.
         self.colorList = [  [0.627, 0.627, 0.627],
@@ -1025,14 +1039,7 @@ class ControlClass(object):
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
         # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
-        self.dpARTempGrp = 'dpAR_Temp_Grp'
-        if not cmds.objExists(self.dpARTempGrp):
-            cmds.group(name=self.dpARTempGrp, empty=True)
-            cmds.setAttr(self.dpARTempGrp+".visibility", 0)
-            cmds.setAttr(self.dpARTempGrp+".template", 1)
-            cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
-            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
-        cmds.parent(clusterHandle, self.dpARTempGrp)
+        cmds.parent(clusterHandle, self.dpUIinst.tempGrp)
 
 
     def addGuideAttrs(self, ctrlName, color="blue", *args):

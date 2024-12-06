@@ -8,7 +8,7 @@ TITLE = "v076_outlinerCleaner"
 DESCRIPTION = "v077_outlinerCleanerDesc"
 ICON = "/Icons/dp_outlinerCleaner.png"
 
-DP_OUTLINERCLEANER_VERSION = 1.1
+DP_OUTLINERCLEANER_VERSION = 1.2
 
 
 class OutlinerCleaner(dpBaseActionClass.ActionStartClass):
@@ -38,7 +38,7 @@ class OutlinerCleaner(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        hiddenList = ["dpAR_Temp_Grp", "dpAR_GuideMirror_Grp"]
+        hiddenList = [self.dpUIinst.tempGrp, self.dpUIinst.guideMirrorGrp]
         if not objList:
             objList = cmds.ls(selection=False, type="transform")
         if objList:

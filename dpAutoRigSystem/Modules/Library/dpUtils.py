@@ -519,24 +519,22 @@ class Utils(object):
                 return [resultPos, middleLoc]
             return[resultPos]
 
-            
+
     def clearNodeGrp(self, nodeGrpName='dpAR_GuideMirror_Grp', attrFind='guideBaseMirror', unparent=False):
         """ Check if there is any node with the attribute attrFind in the nodeGrpName and then unparent its children and delete it.
         """
         if cmds.objExists(nodeGrpName):
-            foundChildrenList = []
-            childrenList = cmds.listRelatives(nodeGrpName, children=True, type="transform")
-            if childrenList:
-                for child in childrenList:
-                    if cmds.objExists(child+"."+attrFind) and cmds.getAttr(child+"."+attrFind) == 1:
-                        foundChildrenList.append(child)
-            if len(foundChildrenList) != 0:
+            foundChildrenList = [child for child in cmds.listRelatives(nodeGrpName, children=True, allDescendents=True, type="transform") if attrFind in cmds.listAttr(child) and cmds.getAttr(child+"."+attrFind) == 1]
+            if foundChildrenList:
                 if unparent:
-                    for item in foundChildrenList:
-                        cmds.parent(item, world=True)
-                    cmds.delete(nodeGrpName)
-            else:
-                cmds.delete(nodeGrpName)
+                    fatherList = cmds.listRelatives(nodeGrpName, parent=True)
+                    for child in foundChildrenList:
+                        if nodeGrpName.split(":")[0] in cmds.listRelatives(child, parent=True)[0]:
+                            if fatherList:
+                                cmds.parent(child, fatherList[0])
+                            else:
+                                cmds.parent(child, world=True)
+            cmds.delete(nodeGrpName)
 
 
     def getGuideChildrenList(self, nodeName):
@@ -623,6 +621,8 @@ class Utils(object):
         if (parentList):
             for parent in parentList:
                 radius *= cmds.getAttr(parent+'.scaleX')
+                if "worldSize" in cmds.listAttr(parent):
+                    radius *= cmds.getAttr(parent+".worldSize")
         return radius
 
 
