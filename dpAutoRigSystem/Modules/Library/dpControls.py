@@ -177,13 +177,15 @@ class ControlClass(object):
                 cmds.setAttr(item+".overrideColorB", color[2])
                 if instance:
                     cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
-                    cmds.button(instance.selectButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
+                    if not instance.moduleGrp in cmds.ls(selection=True):
+                        cmds.button(instance.selectButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
                 if instance:
                     cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
-                    cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
+                    if not instance.moduleGrp in cmds.ls(selection=True):
+                        cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
 
 
     def removeColor(self, itemList, *args):
@@ -193,9 +195,31 @@ class ControlClass(object):
             itemList = cmds.ls(selection=True)
         if itemList:
             for item in itemList:
-                cmds.setAttr(item+".overrideEnabled", 0)
-                cmds.setAttr(item+".overrideRGBColors", 0)
-                cmds.setAttr(item+".useOutlinerColor", 0)
+                guideList = self.getGuideListByAttr(item)
+                if guideList:
+                    for guide in guideList:
+                        if not guide in itemList:
+                            itemList.append(guide)
+            for item in itemList:
+                isGuide = False
+                if "Guide" in item:
+                    self.colorShape([item], "blue")
+                    isGuide = True
+                if "Guide_Base" in item:
+                    self.colorShape([item], "yellow")
+                    isGuide = True
+                if "Guide_Base_RadiusCtrl" in item:
+                    self.colorShape([item], "cyan")
+                    isGuide = True
+                if not isGuide or not cmds.objectType(item) in self.shapeTypeList:
+                    cmds.setAttr(item+".overrideEnabled", 0)
+                    cmds.setAttr(item+".overrideRGBColors", 0)
+                    cmds.setAttr(item+".useOutlinerColor", 0)
+                if "guideColorIndex" in cmds.listAttr(item):
+                    cmds.setAttr(item+".guideColorIndex", 0)
+                    cmds.setAttr(item+".guideColorR", self.colorList[0][0])
+                    cmds.setAttr(item+".guideColorG", self.colorList[0][1])
+                    cmds.setAttr(item+".guideColorB", self.colorList[0][2])
 
 
     def getCurrentRGBColor(self, item, outliner=False, *args):

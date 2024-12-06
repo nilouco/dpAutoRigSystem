@@ -2351,6 +2351,7 @@ class DP_AutoRig_UI(object):
         # Starting progress window
         self.utils.setProgress(self.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
         self.utils.closeUI(self.plusInfoWinName)
+        self.utils.closeUI(self.colorOverrideWinName)
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.rebuilding:
