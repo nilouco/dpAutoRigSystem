@@ -1557,21 +1557,22 @@ class DP_AutoRig_UI(object):
         self.clearGuideLayout()
         # if exists any guide module in the scene, recreate its instance as objectClass:
         if self.allGuidesList:
+            sortedAllGuidesList = sorted(self.allGuidesList, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
             guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
             # this list will be used to rig all modules pressing the RIG button:
-            for module in self.allGuidesList:
+            for module in sortedAllGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
                 reload(mod)
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
                 dpUIinst = self
-                if cmds.attributeQuery("rigType", node=module[2], ex=True):
-                    curRigType = cmds.getAttr(module[2] + ".rigType")
+                if "rigType" in cmds.listAttr(module[2]):
+                    curRigType = cmds.getAttr(module[2]+".rigType")
                     moduleInst = moduleClass(dpUIinst, module[1], curRigType)
                 else:
-                    if cmds.attributeQuery("Style", node=module[2], ex=True):
-                        iStyle = cmds.getAttr(module[2] + ".Style")
+                    if "Style" in cmds.listAttr(module[2]):
+                        iStyle = cmds.getAttr(module[2]+".Style")
                         if (iStyle == 0 or iStyle == 1):
                             moduleInst = moduleClass(dpUIinst, module[1], dpBaseClass.RigType.biped)
                         else:
@@ -1583,7 +1584,7 @@ class DP_AutoRig_UI(object):
                 self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.lang['i005_footerA'])
+        cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerA'])
     
 
     def checkImportedGuides(self, askUser=True, *args):
