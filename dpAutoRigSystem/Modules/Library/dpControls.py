@@ -992,6 +992,7 @@ class ControlClass(object):
             WIP!
             Changing to shapeSize cluster setup
         """
+        magicNumber = 0.085
         newRadius = origRadius
     #    newRadius = 1
     #    linearUnit = cmds.currentUnit(query=True, linear=True, fullName=True)
@@ -1020,9 +1021,10 @@ class ControlClass(object):
                             if not fatherNode in tempList:
                                 tempList.append(fatherNode)
                 if tempList:
-                    bbList = cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0]
+                    bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
+                    bbList[1] *= 0.5 #less importance to height
                     bbAverage = self.dpUIinst.utils.averageValue(bbList)
-                    return self.dpUIinst.utils.averageValue([bbAverage, origRadius])
+                    return magicNumber*bbAverage*origRadius
         return newRadius
         
 

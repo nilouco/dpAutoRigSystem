@@ -345,21 +345,21 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         if not cmds.objExists(drivenGrp):
             drivenGrp = cmds.group(attrCtrl, name=drivenGrp)
             self.utils.addCustomAttr([drivenGrp], self.utils.ignoreTransformIOAttr)
-        if not cmds.objExists(self.jawCtrl+"."+startRotName):
+        if not startRotName in cmds.listAttr(self.jawCtrl):
             if positiveRotation: #open
                 cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=5, minValue=0, keyable=True)
             else: #close
                 cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=0, maxValue=0, keyable=True)
             cmds.setAttr(self.jawCtrl+"."+startRotName, keyable=False, channelBox=True)
-        if not cmds.objExists(attrCtrl+"."+unitFixAttrName):
+        if not unitFixAttrName in cmds.listAttr(attrCtrl):
             if positiveRotation: #open
                 cmds.addAttr(attrCtrl, longName=unitFixAttrName, attributeType='float', defaultValue=fixValue)
             else:
                 cmds.addAttr(attrCtrl, longName=unitFixAttrName, attributeType='float', defaultValue=-fixValue)
             cmds.setAttr(attrCtrl+"."+unitFixAttrName, lock=True)
-        if not cmds.objExists(attrCtrl+"."+calibAttrName):
+        if not calibAttrName in cmds.listAttr(attrCtrl):
             cmds.addAttr(attrCtrl, longName=calibAttrName, attributeType='float', defaultValue=1)
-        if not cmds.objExists(attrCtrl+"."+intAttrName):
+        if not intAttrName in cmds.listAttr(attrCtrl):
             cmds.addAttr(attrCtrl, longName=intAttrName, attributeType='float', defaultValue=1, keyable=True)
             cmds.setAttr(attrCtrl+"."+intAttrName, keyable=False, channelBox=True)
         
@@ -413,7 +413,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             
         # output to a blendShape target value setup:
         if createOutput:
-            if not cmds.objExists(self.jawCtrl+"."+outputAttrName):
+            if not outputAttrName in cmds.listAttr(self.jawCtrl):
                 cmds.addAttr(self.jawCtrl, longName=calibOutputAttrName, attributeType='float', defaultValue=1)
                 cmds.addAttr(self.jawCtrl, longName=outputAttrName, attributeType='float', defaultValue=1)
             jawOutputRmV = cmds.createNode('remapValue', name=jawOutputRmVName)
@@ -591,9 +591,9 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.headSubCtrl = self.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree, guideSource=self.guideName+"_Head")
                 self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperJaw")
                 self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperHead")
-                self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Jaw")
-                self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chin")
-                self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.15), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chew")
+                self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.ctrlRadius *0.5), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Jaw")
+                self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.13), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chin")
+                self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.08), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chew")
                 self.lCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LCornerLip")
                 self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip")
                 self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
@@ -642,15 +642,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 tempHeadCluster = cmds.cluster(self.headCtrl, self.headSubCtrl)[1]
                 cmds.setAttr(tempHeadCluster+".translateY", -0.5)
                 tempJawCluster = cmds.cluster(self.jawCtrl)[1]
-                cmds.setAttr(tempJawCluster+".translateY", -2)
-                cmds.setAttr(tempJawCluster+".translateZ", 2.1)
+                cmds.setAttr(tempJawCluster+".translateY", -1*self.ctrlRadius)
+                cmds.setAttr(tempJawCluster+".translateZ", self.ctrlRadius)
                 tempChinCluster = cmds.cluster(self.chinCtrl)[1]
-                cmds.setAttr(tempChinCluster+".translateY", -1.4)
-                cmds.setAttr(tempChinCluster+".translateZ", 3.6)
+                cmds.setAttr(tempChinCluster+".translateY", -0.75*self.ctrlRadius)
+                cmds.setAttr(tempChinCluster+".translateZ", 1.45*self.ctrlRadius)
                 cmds.setAttr(tempChinCluster+".rotateX", 22)
                 tempChewCluster = cmds.cluster(self.chewCtrl)[1]
-                cmds.setAttr(tempChewCluster+".translateY", -1.35)
-                cmds.setAttr(tempChewCluster+".translateZ", 3.6)
+                cmds.setAttr(tempChewCluster+".translateY", -0.75*self.ctrlRadius)
+                cmds.setAttr(tempChewCluster+".translateZ", 1.47*self.ctrlRadius)
                 cmds.setAttr(tempChewCluster+".rotateX", 22)
                 cmds.delete([self.headCtrl, self.headSubCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl], constructionHistory=True)
                 
@@ -1215,7 +1215,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         if guideList:
             allList = cmds.ls(selection=False, type="transform")
             for node in allList:
-                if cmds.objExists(node+".guideSource"):
+                if "guideSource" in cmds.listAttr(node):
                     guideSource = cmds.getAttr(node+".guideSource")
                     if guideSource.split(":")[0] in guideList:
                         if not node in resultList:
