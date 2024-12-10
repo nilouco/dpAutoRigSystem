@@ -271,7 +271,7 @@
     "i105_cubic"                : "Cubique",
     "i106_direction"            : "Direction",
     "i107_addShape"             : "Ajouter la forme",
-    "i108_newControl"           : "Nouveau controlleur",
+    "i108_newController"        : "Nouveau contrôleurs",
     "i109_action"               : "Action",
     "i110_transferShapes"       : "Remplacer\nde Formes",
     "i111_controller"           : "Controlleur",
@@ -503,6 +503,8 @@
     "i339_any"                  : "any",
     "i340_reveal"               : "Révéler",
     "i341_date"                 : "Date",
+    "i342_controllers"          : "Contrôleurs",
+    "i343_tools"                : "Outils",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

@@ -2,7 +2,7 @@
 from maya import cmds
 import json
 from ... import dpBaseActionClass
-from ....Extras import dpRivet
+from ....Tools import dpRivet
 
 # global variables to this module:
 CLASS_NAME = "RivetIO"

@@ -89,9 +89,9 @@ try:
     from .Modules.Library import dpControls
     from .Modules import dpBaseClass
     from .Modules import dpLayoutClass
-    from .Extras import dpUpdateRigInfo
-    from .Extras import dpReorderAttr
-    from .Extras import dpCustomAttr
+    from .Tools import dpUpdateRigInfo
+    from .Tools import dpReorderAttr
+    from .Tools import dpCustomAttr
     from .Languages.Translator import dpTranslator
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
@@ -127,7 +127,7 @@ SCRIPTS = "Scripts"
 CONTROLS = "Controls"
 COMBINED = "Controls/Combined"
 CONTROLS_PRESETS = "Controls/Presets"
-EXTRAS = "Extras"
+TOOLS = "Tools"
 LANGUAGES = "Languages"
 VALIDATOR = "Pipeline/Validator"
 CHECKIN = "Pipeline/Validator/CheckIn"
@@ -188,7 +188,7 @@ class DP_AutoRig_UI(object):
         self.loadedScripts = False
         self.loadedControls = False
         self.loadedCombined = False
-        self.loadedExtras = False
+        self.loadedTools = False
         self.loadedCheckIn = False
         self.loadedCheckOut = False
         self.loadedAddOns = False
@@ -479,9 +479,9 @@ class DP_AutoRig_UI(object):
         self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.lang['i011_editSelected']+" "+self.lang['i143_module'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["selectedModuleLayout"] = cmds.columnLayout('selectedModuleLayout', adjustableColumn=True, parent=self.allUIs["editSelectedModuleLayoutA"])
         
-        #optionsA - frameLayout:
-        self.allUIs["optionsA"] = cmds.frameLayout('optionsA', label=self.lang['i002_options'], collapsable=True, collapse=True, parent=self.allUIs["riggingTabLayout"])
-        self.allUIs["rigOptionsLayout"] = cmds.columnLayout('rigOptionsLayout', adjustableColumn=True, columnOffset=('left', 5), parent=self.allUIs["optionsA"])
+        #optionsMainFL - frameLayout:
+        self.allUIs["optionsMainFL"] = cmds.frameLayout('optionsMainFL', label=self.lang['i002_options'], collapsable=True, collapse=True, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["rigOptionsLayout"] = cmds.columnLayout('rigOptionsLayout', adjustableColumn=True, columnOffset=('left', 5), parent=self.allUIs["optionsMainFL"])
         self.allUIs["prefixLayout"] = cmds.rowColumnLayout('prefixLayout', numberOfColumns=2, columnWidth=[(1, 40), (2, 100)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["prefixTextField"] = cmds.textField('prefixTextField', text="", parent= self.allUIs["prefixLayout"], changeCommand=self.setPrefix)
         self.allUIs["prefixText"] = cmds.text('prefixText', align='left', label=self.lang['i003_prefix'], parent=self.allUIs["prefixLayout"])
@@ -516,8 +516,8 @@ class DP_AutoRig_UI(object):
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["riggingTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["colTopLeftA"], 'top', 5), (self.allUIs["colTopLeftA"], 'left', 5), (self.allUIs["colTopRightA"], 'top', 5), (self.allUIs["colTopRightA"], 'right', 5), (self.allUIs["colMiddleLeftA"], 'left', 5), (self.allUIs["colMiddleRightA"], 'right', 5), (self.allUIs["optionsA"], 'left', 5), (self.allUIs["optionsA"], 'right', 5), (self.allUIs["editSelectedModuleLayoutA"], 'left', 5), (self.allUIs["editSelectedModuleLayoutA"], 'right', 5), (self.allUIs["footerA"], 'left', 5), (self.allUIs["footerA"], 'bottom', 5), (self.allUIs["footerA"], 'right', 5)],
-                        attachControl=[(self.allUIs["colMiddleLeftA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colTopRightA"], 'left', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleLeftA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleRightA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'left', 5, self.allUIs["colMiddleLeftA"]), (self.allUIs["editSelectedModuleLayoutA"], 'bottom', 5, self.allUIs["optionsA"]), (self.allUIs["optionsA"], 'bottom', 5, self.allUIs["footerA"])],
+                        attachForm=[(self.allUIs["colTopLeftA"], 'top', 5), (self.allUIs["colTopLeftA"], 'left', 5), (self.allUIs["colTopRightA"], 'top', 5), (self.allUIs["colTopRightA"], 'right', 5), (self.allUIs["colMiddleLeftA"], 'left', 5), (self.allUIs["colMiddleRightA"], 'right', 5), (self.allUIs["optionsMainFL"], 'left', 5), (self.allUIs["optionsMainFL"], 'right', 5), (self.allUIs["editSelectedModuleLayoutA"], 'left', 5), (self.allUIs["editSelectedModuleLayoutA"], 'right', 5), (self.allUIs["footerA"], 'left', 5), (self.allUIs["footerA"], 'bottom', 5), (self.allUIs["footerA"], 'right', 5)],
+                        attachControl=[(self.allUIs["colMiddleLeftA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colTopRightA"], 'left', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleLeftA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleRightA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'left', 5, self.allUIs["colMiddleLeftA"]), (self.allUIs["editSelectedModuleLayoutA"], 'bottom', 5, self.allUIs["optionsMainFL"]), (self.allUIs["optionsMainFL"], 'bottom', 5, self.allUIs["footerA"])],
                         #attachPosition=[(self.allUIs["colTopLeftA"], 'right', 5, 50), (self.allUIs["colTopRightA"], 'left', 0, 50)],
                         attachNone=[(self.allUIs["footerA"], 'top')]
                         )
@@ -603,14 +603,14 @@ class DP_AutoRig_UI(object):
         
         # --
         
-        # interface of Control tab - formLayout:
-        self.allUIs["controlTabLayout"] = cmds.formLayout('controlTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # controlMainLayout - scrollLayout:
-        self.allUIs["controlMainLayout"] = cmds.scrollLayout('controlMainLayout', parent=self.allUIs["controlTabLayout"])
-        self.allUIs["controlLayout"] = cmds.columnLayout('controlLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['controlMainLayout'])
+        # interface of Controllers tab - formLayout:
+        self.allUIs["controllerTabLayout"] = cmds.formLayout('controllerTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # controllerMainLayout - scrollLayout:
+        self.allUIs["controllerMainLayout"] = cmds.scrollLayout('controllerMainLayout', parent=self.allUIs["controllerTabLayout"])
+        self.allUIs["controllerLayout"] = cmds.columnLayout('controllerLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['controllerMainLayout'])
         
         # colorControl - frameLayout:
-        self.allUIs["colorControlFL"] = cmds.frameLayout('colorControlFL', label=self.lang['m047_colorOver'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["colorControlFL"] = cmds.frameLayout('colorControlFL', label=self.lang['m047_colorOver'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["colorTabLayout"] = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["colorControlFL"])
         # Index layout:
         self.allUIs["colorIndexLayout"] = cmds.gridLayout('colorIndexLayout', numberOfColumns=16, cellWidthHeight=(20, 20), parent=self.allUIs["colorTabLayout"])
@@ -630,24 +630,24 @@ class DP_AutoRig_UI(object):
         # renaming tabLayouts:
         cmds.tabLayout(self.allUIs["colorTabLayout"], edit=True, tabLabel=((self.allUIs["colorIndexLayout"], "Index"), (self.allUIs["colorRGBLayout"], "RGB"), (self.allUIs["colorOutlinerLayout"], "Outliner")))
 
-        # setupControl - frameLayout:
-        self.allUIs["defaultValuesControlFL"] = cmds.frameLayout('defaultValuesControlFL', label=self.lang['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        # setupController - frameLayout:
+        self.allUIs["defaultValuesControlFL"] = cmds.frameLayout('defaultValuesControlFL', label=self.lang['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["defaultValuesControl3Layout"] = cmds.paneLayout("defaultValuesControl3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["defaultValuesControlFL"])
         self.allUIs["resetToDefaultValuesButton"] = cmds.button("resetToDefaultValuesButton", label=self.lang['i271_reset'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ctrls.setupDefaultValues, True), parent=self.allUIs["defaultValuesControl3Layout"])
         self.allUIs["setDefaultValuesButton"] = cmds.button("setDefaultValuesButton", label=self.lang['i272_set'], backgroundColor=(1.0, 0.8, 0.5), height=30, command=partial(self.ctrls.setupDefaultValues, False), parent=self.allUIs["defaultValuesControl3Layout"])
         self.allUIs["setupDefaultValuesButton"] = cmds.button("setupDefaultValuesButton", label=self.lang['i274_editor'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=self.ctrls.defaultValueEditor, parent=self.allUIs["defaultValuesControl3Layout"])
 
-        # createControl - frameLayout:
-        self.allUIs["createControlLayout"] = cmds.frameLayout('createControlLayout', label=self.lang['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["optionsB"] = cmds.frameLayout('optionsB', label=self.lang['i002_options'], collapsable=True, collapse=False, marginWidth=10, parent=self.allUIs["createControlLayout"])
-        self.allUIs["controlOptionsLayout"] = cmds.columnLayout('controlOptionsLayout', adjustableColumn=True, width=50, rowSpacing=5, parent=self.allUIs["optionsB"])
-        self.allUIs["controlNameTFG"] = cmds.textFieldGrp('controlNameTFG', text="", label=self.lang['i101_customName'], columnAlign2=("right", "left"), adjustableColumn2=2, columnAttach=((1, "right", 5), (2, "left", 5)), parent=self.allUIs["controlOptionsLayout"])
-        self.allUIs["controlActionRBG"] = cmds.radioButtonGrp("controlActionRBG", label=self.lang['i109_action'], labelArray3=[self.lang['i108_newControl'], self.lang['i107_addShape'], self.lang['i102_replaceShape']], vertical=True, numberOfRadioButtons=3, parent=self.allUIs["controlOptionsLayout"])
-        cmds.radioButtonGrp(self.allUIs["controlActionRBG"], edit=True, select=1) #new control
-        self.allUIs["degreeRBG"] = cmds.radioButtonGrp("degreeRBG", label=self.lang['i103_degree'], labelArray2=[self.lang['i104_linear'], self.lang['i105_cubic']], vertical=True, numberOfRadioButtons=2, parent=self.allUIs["controlOptionsLayout"])
+        # createController - frameLayout:
+        self.allUIs["createControllerLayout"] = cmds.frameLayout('createControllerLayout', label=self.lang['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent=self.allUIs["controllerLayout"])
+        self.allUIs["optionsControllerFL"] = cmds.frameLayout('optionsControllerFL', label=self.lang['i002_options'], collapsable=True, collapse=True, marginWidth=10, parent=self.allUIs["createControllerLayout"])
+        self.allUIs["controllerOptionsLayout"] = cmds.columnLayout('controllerOptionsLayout', adjustableColumn=True, width=50, rowSpacing=5, parent=self.allUIs["optionsControllerFL"])
+        self.allUIs["controlNameTFG"] = cmds.textFieldGrp('controlNameTFG', text="", label=self.lang['i101_customName'], columnAlign2=("right", "left"), adjustableColumn2=2, columnAttach=((1, "right", 5), (2, "left", 5)), parent=self.allUIs["controllerOptionsLayout"])
+        self.allUIs["controlActionRBG"] = cmds.radioButtonGrp("controlActionRBG", label=self.lang['i109_action'], labelArray3=[self.lang['i108_newController'], self.lang['i107_addShape'], self.lang['i102_replaceShape']], vertical=True, numberOfRadioButtons=3, parent=self.allUIs["controllerOptionsLayout"])
+        cmds.radioButtonGrp(self.allUIs["controlActionRBG"], edit=True, select=1) #new controller
+        self.allUIs["degreeRBG"] = cmds.radioButtonGrp("degreeRBG", label=self.lang['i103_degree'], labelArray2=[self.lang['i104_linear'], self.lang['i105_cubic']], vertical=True, numberOfRadioButtons=2, parent=self.allUIs["controllerOptionsLayout"])
         cmds.radioButtonGrp(self.allUIs["degreeRBG"], edit=True, select=1) #linear
-        self.allUIs["controlSizeFSG"] = cmds.floatSliderGrp("controlSizeFSG", label=self.lang['i115_size'], field=True, minValue=0.01, maxValue=10.0, fieldMinValue=0, fieldMaxValue=100.0, precision=2, value=1.0, parent=self.allUIs["controlOptionsLayout"])
-        self.allUIs["directionOMG"] = cmds.optionMenuGrp("directionOMG", label=self.lang['i106_direction'], parent=self.allUIs["controlOptionsLayout"])
+        self.allUIs["controlSizeFSG"] = cmds.floatSliderGrp("controlSizeFSG", label=self.lang['i115_size'], field=True, minValue=0.01, maxValue=10.0, fieldMinValue=0, fieldMaxValue=100.0, precision=2, value=1.0, parent=self.allUIs["controllerOptionsLayout"])
+        self.allUIs["directionOMG"] = cmds.optionMenuGrp("directionOMG", label=self.lang['i106_direction'], parent=self.allUIs["controllerOptionsLayout"])
         cmds.menuItem(label='-X')
         cmds.menuItem(label='+X')
         cmds.menuItem(label='-Y')
@@ -657,18 +657,18 @@ class DP_AutoRig_UI(object):
         cmds.optionMenuGrp(self.allUIs["directionOMG"], edit=True, value='+Y')
         
         # curveShapes - frameLayout:
-        self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.lang['i100_curveShapes'], collapsable=True, collapse=False, parent=self.allUIs["createControlLayout"])
+        self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.lang['i100_curveShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
         self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
         # here we populate the control module layout with the items from Controls folder:
         self.controlModuleList = self.startGuideModules(CONTROLS, "start", "controlModuleLayout")
         
-        self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.lang['i118_combinedShapes'], collapsable=True, collapse=False, parent=self.allUIs["createControlLayout"])
+        self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.lang['i118_combinedShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
         self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
         # here we populate the control module layout with the items from Controls folder:
         self.combinedControlModuleList = self.startGuideModules(COMBINED, "start", "combinedControlModuleLayout")
         
         # editSeletedController - frameLayout:
-        self.allUIs["editSelectedControllerFL"] = cmds.frameLayout('editSelectedControllerFL', label=self.lang['i011_editSelected']+" "+self.lang['i111_controller'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["editSelectedControllerFL"] = cmds.frameLayout('editSelectedControllerFL', label=self.lang['i011_editSelected']+" "+self.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["editSelectedController3Layout"] = cmds.paneLayout("editSelectedController3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
         self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.lang['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelectedController3Layout"])
         self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.lang['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelectedController3Layout"])
@@ -680,12 +680,12 @@ class DP_AutoRig_UI(object):
         self.allUIs["selectAllControls"] = cmds.button("selectAllControls", label=self.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ctrls.selectAllControls), parent=self.allUIs["editSelectedControllerFL"])
 
         # calibrationControls - frameLayout:
-        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
         self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.lang['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration2Layout"])
         self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.lang['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration2Layout"])
         # mirror calibration - layout:
-        self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.lang['m010_mirror']+" "+self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
+        self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.lang['m010_mirror']+" "+self.lang['i193_calibration'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
         self.allUIs["mirrorCalibrationLayout"] = cmds.rowColumnLayout('mirrorCalibrationLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorCalibrationFL" )
         self.allUIs["prefixT"] = cmds.text("prefixT", label=self.lang['i144_prefix'], parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["fromPrefixT"] = cmds.text("fromPrefixT", label=self.lang['i036_from'], parent=self.allUIs["mirrorCalibrationLayout"])
@@ -695,12 +695,12 @@ class DP_AutoRig_UI(object):
         self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.lang['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ctrls.mirrorCalibration, parent=self.allUIs["mirrorCalibrationLayout"])
         
         # ControlShapeIO - frameLayout:
-        self.allUIs["shapeIOFL"] = cmds.frameLayout('shapeIOFL', label=self.lang['m067_shape']+" "+self.lang['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["shapeIOFL"] = cmds.frameLayout('shapeIOFL', label=self.lang['m067_shape']+" "+self.lang['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["shapeIO4Layout"] = cmds.paneLayout("shapeIO4Layout", configuration="vertical4", separatorThickness=2.0, parent=self.allUIs["shapeIOFL"])
         self.allUIs["exportShapeButton"] = cmds.button("exportShapeButton", label=self.lang['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ctrls.exportShape, parent=self.allUIs["shapeIO4Layout"])
         self.allUIs["importShapeButton"] = cmds.button("importShapeButton", label=self.lang['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ctrls.importShape, parent=self.allUIs["shapeIO4Layout"])
         # mirror control shape - layout:
-        self.allUIs["mirrorShapeFL"] = cmds.frameLayout('mirrorShapeFL', label=self.lang['m010_mirror']+" "+self.lang['m067_shape'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["shapeIOFL"])
+        self.allUIs["mirrorShapeFL"] = cmds.frameLayout('mirrorShapeFL', label=self.lang['m010_mirror']+" "+self.lang['m067_shape'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["shapeIOFL"])
         self.allUIs["mirrorShapeLayout"] = cmds.rowColumnLayout('mirrorShapeLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorShapeFL" )
         self.allUIs["axisShapeMenu"] = cmds.optionMenu("axisShapeMenu", label='', parent=self.allUIs["mirrorShapeLayout"])
         mirrorShapeMenuItemList = ['X', 'Y', 'Z']
@@ -712,21 +712,21 @@ class DP_AutoRig_UI(object):
         self.allUIs["toPrefixShapeTF"] = cmds.textField('toPrefixShapeTF', text=self.lang['p003_right']+"_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.lang['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.resetMirrorShape, parent=self.allUIs["mirrorShapeLayout"])
         # edit formLayout in order to get a good scalable window:
-        cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["controlMainLayout"], 'top', 20), (self.allUIs["controlMainLayout"], 'left', 5), (self.allUIs["controlMainLayout"], 'right', 5), (self.allUIs["controlMainLayout"], 'bottom', 5)]
+        cmds.formLayout( self.allUIs["controllerTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["controllerMainLayout"], 'top', 20), (self.allUIs["controllerMainLayout"], 'left', 5), (self.allUIs["controllerMainLayout"], 'right', 5), (self.allUIs["controllerMainLayout"], 'bottom', 5)]
                         )
         
         # --
         
-        # interface of Extra tab - formLayout:
-        self.allUIs["extraTabLayout"] = cmds.formLayout('extraTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # extraMainLayout - scrollLayout:
-        self.allUIs["extraMainLayout"] = cmds.scrollLayout("extraMainLayout", parent=self.allUIs["extraTabLayout"])
-        self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
-        self.extraModuleList = self.startGuideModules(EXTRAS, "start", "extraLayout")
+        # interface of Tools tab - formLayout:
+        self.allUIs["toolsTabLayout"] = cmds.formLayout('toolsTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # toolsMainLayout - scrollLayout:
+        self.allUIs["toolsMainLayout"] = cmds.scrollLayout("toolsMainLayout", parent=self.allUIs["toolsTabLayout"])
+        self.allUIs["toolsLayout"] = cmds.columnLayout("toolsLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["toolsMainLayout"])
+        self.extraModuleList = self.startGuideModules(TOOLS, "start", "toolsLayout")
         # edit formLayout in order to get a good scalable window:
-        cmds.formLayout( self.allUIs["extraTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["extraMainLayout"], 'top', 20), (self.allUIs["extraMainLayout"], 'left', 5), (self.allUIs["extraMainLayout"], 'right', 5), (self.allUIs["extraMainLayout"], 'bottom', 5)]
+        cmds.formLayout( self.allUIs["toolsTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["toolsMainLayout"], 'top', 20), (self.allUIs["toolsMainLayout"], 'left', 5), (self.allUIs["toolsMainLayout"], 'right', 5), (self.allUIs["toolsMainLayout"], 'bottom', 5)]
                         )
         
         # --
@@ -814,7 +814,7 @@ class DP_AutoRig_UI(object):
         
         # --
         # call tabLayouts:
-        cmds.tabLayout(self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], self.lang['v000_validator']), (self.allUIs["rebuilderTabLayout"], self.lang['r000_rebuilder'])))
+        cmds.tabLayout(self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controllerTabLayout"], self.lang['i342_controllers']), (self.allUIs["toolsTabLayout"], self.lang['i343_tools']), (self.allUIs["validatorTabLayout"], self.lang['v000_validator']), (self.allUIs["rebuilderTabLayout"], self.lang['r000_rebuilder'])))
         self.selList = cmds.ls(selection=True)
     
 
@@ -1340,9 +1340,9 @@ class DP_AutoRig_UI(object):
             if guideDir == COMBINED and not self.loadedCombined:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCombined = True
-            if guideDir == EXTRAS and not self.loadedExtras:
+            if guideDir == TOOLS and not self.loadedTools:
                 print(guideDir+" : "+str(guideModuleList))
-                self.loadedExtras = True
+                self.loadedTools = True
             if guideDir == CHECKIN and not self.loadedCheckIn:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckIn = True
@@ -1407,7 +1407,7 @@ class DP_AutoRig_UI(object):
         # creating a basic layout for guide buttons:
         if guideDir == CONTROLS or guideDir == COMBINED.replace("/", "."):
             controlInstance = self.initExtraModule(guideModule, guideDir)
-            cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
+            cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, controlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(controlInstance)
         else:
             moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
@@ -1422,7 +1422,7 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, dpBaseClass.RigType.biped), parent=moduleLayout)
             elif guideDir == SCRIPTS:
                 cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == EXTRAS:
+            elif guideDir == TOOLS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
@@ -1495,8 +1495,8 @@ class DP_AutoRig_UI(object):
         return guideInstance
     
     
-    def installControlModule(self, controlInstance, useUI, *args):
-        """  Start the creation of this Control module using the UI info.
+    def installControllerModule(self, controlInstance, useUI, *args):
+        """  Start the creation of this Controller module using the UI info.
         """
         controlInstance.cvMain(useUI)
     
@@ -1642,7 +1642,7 @@ class DP_AutoRig_UI(object):
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         for item in self.modulesToBeRiggedList:
             if not item.guideNet:
-                self.initExtraModule("dpUpdateGuides", EXTRAS)
+                self.initExtraModule("dpUpdateGuides", TOOLS)
                 break
 
 
@@ -2166,7 +2166,7 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
         cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
-        #Get or create all the needed group
+        # Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
         self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.prefix+"Ctrls_Grp")
         self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.prefix+"Ctrls_Visibility_Grp")
@@ -2183,21 +2183,21 @@ class DP_AutoRig_UI(object):
         self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
         self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True) #orange
 
-        #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
+        # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
             if self.masterGrp == self.prefix+sAllGrp:
                 cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
                 cmds.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
         cmds.select(clear=True)
 
-        #Hide Models and FX groups
+        # Hide Models and FX groups
         try:
             cmds.setAttr(self.modelsGrp+".visibility", 0)
             cmds.setAttr(self.fxGrp+".visibility", 0)
         except:
             pass
 
-        #Lock and Hide attributes
+        # Lock and Hide attributes
         aToLock = [self.masterGrp,
                    self.modelsGrp,
                    self.ctrlsGrp,
@@ -2209,7 +2209,7 @@ class DP_AutoRig_UI(object):
                    self.ctrlsVisGrp]
         self.ctrls.setLockHide(aToLock, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
 
-        #Control Setup
+        # Controllers Setup
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
@@ -2256,7 +2256,7 @@ class DP_AutoRig_UI(object):
         self.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
         self.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
 
-        # root pivot control setup
+        # root pivot controller setup
         if needConnectPivotAttr:
             for axis in ["X", "Y", "Z"]:
                 cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
@@ -2383,7 +2383,7 @@ class DP_AutoRig_UI(object):
                     if userChoose == btNo:
                         return
                     elif userChoose == btUpdateGuides:
-                        self.initExtraModule("dpUpdateGuides", EXTRAS)
+                        self.initExtraModule("dpUpdateGuides", TOOLS)
                         return
                     else:
                         break
@@ -2408,7 +2408,7 @@ class DP_AutoRig_UI(object):
                 if self.prefix[len(self.prefix)-1] != "_":
                     self.prefix = self.prefix + "_"
 
-            #Check if we need to colorize control shapes
+            #Check if we need to colorize controller shapes
             #Check integrate option
             bColorize = False
             bAddAttr = False
@@ -2693,7 +2693,7 @@ class DP_AutoRig_UI(object):
                                             self.toIDList.append(oc)
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
-                                    # hide this control shape
+                                    # hide this controller shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add attributes and connect from ikCtrl to revFootCtrl:
                                     userAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, userDefined=True)
@@ -3206,10 +3206,10 @@ class DP_AutoRig_UI(object):
                     cmds.addAttr(self.optionCtrl, longName="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
                     cmds.connectAttr(self.optionCtrl+".proxy", self.proxyGrp+".visibility", force=True)
                 
-                if not cmds.objExists(self.optionCtrl+".control"):
-                    cmds.addAttr(self.optionCtrl, longName="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                    cmds.connectAttr(self.optionCtrl+".control", self.ctrlsVisGrp+".visibility", force=True)
-                    cmds.setAttr(self.optionCtrl+".control", channelBox=True)
+                if not cmds.objExists(self.optionCtrl+".controllers"):
+                    cmds.addAttr(self.optionCtrl, longName="controllers", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                    cmds.connectAttr(self.optionCtrl+".controllers", self.ctrlsVisGrp+".visibility", force=True)
+                    cmds.setAttr(self.optionCtrl+".controllers", channelBox=True)
 
                 if not cmds.objExists(self.optionCtrl+".rootPivot"):
                     cmds.addAttr(self.optionCtrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
@@ -3246,12 +3246,12 @@ class DP_AutoRig_UI(object):
                 'dpAR_000Fk', 'dpAR_000Dyn', 'dpAR_001Fk', 'dpAR_001Dyn', 'dpAR_002Fk', 'dpAR_002Dyn', 
                 'dpAR_000Fk1', 'dpAR_000Dyn1', leftAttr+'dpAR_000Fk', leftAttr+'dpAR_000Fk1', rightAttr+'dpAR_000Fk', rightAttr+'dpAR_000Fk1', leftAttr+'dpAR_000Dyn', leftAttr+'dpAR_000Dyn1', rightAttr+'dpAR_000Dyn', rightAttr+'dpAR_000Dyn1',
                 'dpAR_001Fk1', 'dpAR_001Dyn1', leftAttr+'dpAR_001Fk', leftAttr+'dpAR_001Fk1', rightAttr+'dpAR_001Fk', rightAttr+'dpAR_001Fk1', leftAttr+'dpAR_001Dyn', leftAttr+'dpAR_001Dyn1', rightAttr+'dpAR_001Dyn', rightAttr+'dpAR_001Dyn1',
-                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
+                'display', 'mesh', 'proxy', 'controllers', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
             #Try add hand follow (space switch attribute) on bipeds:
-            self.initExtraModule("dpLimbSpaceSwitch", EXTRAS)
+            self.initExtraModule("dpLimbSpaceSwitch", TOOLS)
 
             # show dialogBox if detected a bug:
             if integrate == 1:

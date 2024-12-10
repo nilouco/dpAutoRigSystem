@@ -2,8 +2,8 @@
 from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
-from ..Extras import dpFacialConnection
-from ..Extras import dpHeadDeformer
+from ..Tools import dpFacialConnection
+from ..Tools import dpHeadDeformer
 
 # global variables to this module:    
 CLASS_NAME = "Head"

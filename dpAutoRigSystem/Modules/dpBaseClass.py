@@ -2,7 +2,7 @@
 from maya import cmds
 from maya import mel
 from .Library import dpControls
-from ..Extras import dpCorrectionManager
+from ..Tools import dpCorrectionManager
 
 class RigType(object):
     biped = "biped"

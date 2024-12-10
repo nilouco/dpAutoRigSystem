@@ -4,7 +4,7 @@ from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpSoftIk
 from .Library import dpIkFkSnap
-from ..Extras import dpCorrectionManager
+from ..Tools import dpCorrectionManager
 from functools import partial
 from importlib import reload
 from maya.api import OpenMaya as om
