@@ -1026,7 +1026,10 @@ class ControlClass(object):
                     bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
                     bbList[1] *= 0.5 #less importance to height
                     bbAverage = self.dpUIinst.utils.averageValue(bbList)
-                    return magicNumber*bbAverage*origRadius
+                    resultValue = magicNumber*bbAverage*origRadius
+                    if resultValue:
+                        return resultValue
+                    return origRadius
         return newRadius
         
 

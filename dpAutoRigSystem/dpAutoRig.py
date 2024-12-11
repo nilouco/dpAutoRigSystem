@@ -2095,7 +2095,7 @@ class DP_AutoRig_UI(object):
         if not sAttrName in cmds.listAttr(self.masterGrp):
             cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
         if not cmds.objExists(sCtrlName):
-            if (sCtrlName != (self.prefix + "Option_Ctrl")):
+            if (sCtrlName != (self.prefix+"Option_Ctrl")):
                 nCtrl = self.ctrls.cvControl(sCtrlType, sCtrlName, r=fRadius, d=iDegree, dir="+X")
             else:
                 nCtrl = self.ctrls.cvCharacter(sCtrlType, sCtrlName, r=(fRadius*0.2))
