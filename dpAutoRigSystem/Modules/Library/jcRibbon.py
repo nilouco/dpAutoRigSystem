@@ -15,7 +15,6 @@
 
 # importing libraries:
 from maya import cmds
-from . import dpControls
 
 DP_RIBBONCLASS_VERSION = 2.6
 

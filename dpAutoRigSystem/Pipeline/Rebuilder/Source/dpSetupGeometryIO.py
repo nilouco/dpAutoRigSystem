@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = "SetupGeometryIO"
@@ -11,7 +11,7 @@ ICON = "/Icons/dp_setupGeometryIO.png"
 DP_SETUPGEOMETRYIO_VERSION = 1.0
 
 
-class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
+class SetupGeometryIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -19,7 +19,7 @@ class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_SETUPGEOMETRYIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_setupGeometryIO"
         self.startName = "dpSetupGeometry"

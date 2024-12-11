@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 import json
 import os
 
@@ -15,7 +15,7 @@ HIERARCHY_PATH = "dpHierarchy"
 DP_CONTROLSHIERARCHY_VERSION = 1.5
 
 
-class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
+class ControlsHierarchy(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -23,7 +23,7 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_CONTROLSHIERARCHY_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.hierarchyPath = self.dpUIinst.dpData+"/"+HIERARCHY_PATH
 
     def checkNurbs(self, transform):

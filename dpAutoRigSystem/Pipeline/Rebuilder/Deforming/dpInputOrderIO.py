@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
-from .... Deforms import dpWeights #do we need it or can we just use dpUIinst.skin instead?
+from ....Modules.Base import dpBaseAction
+from ....Modules.Library import dpWeights #do we need it or can we just use dpUIinst.skin instead?
 
 # global variables to this module:
 CLASS_NAME = "InputOrderIO"
@@ -12,7 +12,7 @@ ICON = "/Icons/dp_inputOrderIO.png"
 DP_INPUTORDERIO_VERSION = 1.0
 
 
-class InputOrderIO(dpBaseActionClass.ActionStartClass):
+class InputOrderIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -20,7 +20,7 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_INPUTORDERIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_inputOrderIO"
         self.startName = "dpInputOrder"

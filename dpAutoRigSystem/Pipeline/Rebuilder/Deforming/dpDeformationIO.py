@@ -1,8 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ... import dpBaseActionClass
-from .... Deforms import dpWeights
+from ....Modules.Base import dpBaseAction
+from ....Modules.Library import dpWeights
 
 # global variables to this module:
 CLASS_NAME = "DeformationIO"
@@ -13,7 +13,7 @@ ICON = "/Icons/dp_deformationIO.png"
 DP_DEFORMATIONIO_VERSION = 1.0
 
 
-class DeformationIO(dpBaseActionClass.ActionStartClass):
+class DeformationIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -21,7 +21,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_DEFORMATIONIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_deformationIO"
         self.startName = "dpDeformation"

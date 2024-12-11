@@ -154,7 +154,7 @@ class Utils(object):
             If find a dpOrderList.txt file it will order the list for priority proporses.
             Return a list of all module names (without '.py' extension).
         """
-        baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseActionClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
+        baseClassList = ["dpBaseStandard", "dpBaseLayout", "dpBaseCurve", "dpBaseAction", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
         allPyFilesList = self.findAllFiles(path, dir, ".py")
         moduleList = []
         for file in allPyFilesList:
@@ -190,7 +190,7 @@ class Utils(object):
         validModules = self.findAllModules(path, dir)
         validModuleNames = []
         #guideFolder = (path+"/"+dir).partition("/Modules/")[2]
-        guideFolder = self.findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules"
+        guideFolder = self.findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules.Standard"
         for m in validModules:
             mod = __import__(guideFolder+"."+m, {}, {}, [m])
             reload(mod)
@@ -524,16 +524,17 @@ class Utils(object):
         """ Check if there is any node with the attribute attrFind in the nodeGrpName and then unparent its children and delete it.
         """
         if cmds.objExists(nodeGrpName):
-            foundChildrenList = [child for child in cmds.listRelatives(nodeGrpName, children=True, allDescendents=True, type="transform") if attrFind in cmds.listAttr(child) and cmds.getAttr(child+"."+attrFind) == 1]
-            if foundChildrenList:
-                if unparent:
-                    fatherList = cmds.listRelatives(nodeGrpName, parent=True)
-                    for child in foundChildrenList:
-                        if nodeGrpName.split(":")[0] in cmds.listRelatives(child, parent=True)[0]:
-                            if fatherList:
-                                cmds.parent(child, fatherList[0])
-                            else:
-                                cmds.parent(child, world=True)
+            if cmds.listRelatives(nodeGrpName, children=True, allDescendents=True, type="transform"):
+                foundChildrenList = [child for child in cmds.listRelatives(nodeGrpName, children=True, allDescendents=True, type="transform") if attrFind in cmds.listAttr(child) and cmds.getAttr(child+"."+attrFind) == 1]
+                if foundChildrenList:
+                    if unparent:
+                        fatherList = cmds.listRelatives(nodeGrpName, parent=True)
+                        for child in foundChildrenList:
+                            if nodeGrpName.split(":")[0] in cmds.listRelatives(child, parent=True)[0]:
+                                if fatherList:
+                                    cmds.parent(child, fatherList[0])
+                                else:
+                                    cmds.parent(child, world=True)
             cmds.delete(nodeGrpName)
 
 

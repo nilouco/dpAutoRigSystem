@@ -604,7 +604,7 @@
     "m096_isolateDesc"           : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés\nou il va utiliser le Root_Ctrl.",
     "m097_dynamic"               : "Dynamique",
     "m098_confirmSelectAny"      : "Il existe de nombreux types de nœuds dans la scène.\nIl faudra peut-être un certain temps pour les sélectionner tous.\nVoulez-vous continuer?",
-    "m099_cvControlDesc"         : "Il va créer une curve\npour être utilisé comme controleur.",
+    "m099_cvControlDesc"         : "Il va créer une curve\npour être utilisé comme controlêur.",
     "m100_square"                : "Carré",
     "m101_smile"                 : "Sourire",
     "m102_triangle"              : "Triangle",

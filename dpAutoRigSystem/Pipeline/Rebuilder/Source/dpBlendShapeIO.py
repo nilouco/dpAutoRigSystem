@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = "BlendShapeIO"
@@ -12,7 +12,7 @@ ICON = "/Icons/dp_blendShapeIO.png"
 DP_BLENDSHAPEIO_VERSION = 1.0
 
 
-class BlendShapeIO(dpBaseActionClass.ActionStartClass):
+class BlendShapeIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -20,7 +20,7 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_BLENDSHAPEIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_blendShapeIO"
         self.startName = "dpBlendShape"

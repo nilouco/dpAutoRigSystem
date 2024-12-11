@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = "ProxyCreator"
@@ -14,7 +14,7 @@ NO_PROXY = "dpDoNotProxyIt"
 DP_PROXYCREATOR_VERSION = 1.4
 
 
-class ProxyCreator(dpBaseActionClass.ActionStartClass):
+class ProxyCreator(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -22,7 +22,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_PROXYCREATOR_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.repeatedNameList = []
     
 

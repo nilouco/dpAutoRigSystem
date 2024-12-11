@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 import json
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 from ....Tools import dpRivet
 
 # global variables to this module:
@@ -13,7 +13,7 @@ ICON = "/Icons/dp_rivetIO.png"
 DP_RIVETIO_VERSION = 1.0
 
 
-class RivetIO(dpBaseActionClass.ActionStartClass):
+class RivetIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -21,7 +21,7 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_RIVETIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_rivetIO"

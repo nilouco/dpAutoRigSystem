@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 import ast
 
 # global variables to this module:
@@ -9,12 +9,12 @@ TITLE = "r012_guideIO"
 DESCRIPTION = "r013_guideIODesc"
 ICON = "/Icons/dp_guideIO.png"
 
-MODULES = "Modules"
+MODULES = "Modules/Standard"
 
 DP_GUIDEIO_VERSION = 1.0
 
 
-class GuideIO(dpBaseActionClass.ActionStartClass):
+class GuideIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -22,7 +22,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_GUIDEIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_guideIO"
         self.startName = "dpGuide"

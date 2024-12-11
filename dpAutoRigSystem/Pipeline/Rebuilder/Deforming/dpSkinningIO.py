@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 import os
 
 # global variables to this module:
@@ -12,7 +12,7 @@ ICON = "/Icons/dp_skinningIO.png"
 DP_SKINNINGIO_VERSION = 1.0
 
 
-class SkinningIO(dpBaseActionClass.ActionStartClass):
+class SkinningIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -20,7 +20,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_SKINNINGIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_skinningIO"
         self.startName = "dpSkinning"

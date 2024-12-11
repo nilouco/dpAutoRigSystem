@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 import os
 
 # global variables to this module:
@@ -12,7 +12,7 @@ ICON = "/Icons/dp_vaccineCleaner.png"
 DP_VACCINECLEANER_VERSION = 1.2
 
 
-class VaccineCleaner(dpBaseActionClass.ActionStartClass):
+class VaccineCleaner(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -20,7 +20,7 @@ class VaccineCleaner(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_VACCINECLEANER_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

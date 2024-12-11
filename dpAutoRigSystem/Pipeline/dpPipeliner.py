@@ -19,7 +19,7 @@ class Pipeliner(object):
         # define variables
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
-        self.settingsFile = "_dpPipelineSettings.json"
+        self.settingsFile = "dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.webhookFile = "dpWebhook.json"
         self.hookFile = "dpHook.json"
@@ -59,7 +59,7 @@ class Pipeliner(object):
         """ Returns the json path for the pipeline settings file.
         """
         basePath = self.utils.findPath("dpAutoRig.py")
-        basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]
+        basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]+"/Pipeline"
         return os.path.join(basePath, self.settingsFile).replace("\\", "/")
 
 
@@ -482,6 +482,7 @@ class Pipeliner(object):
         """
         if path and file:
             jsonPath = self.getJsonSettingsPath()
+            print("jasonPath =", jsonPath)
             if os.path.exists(jsonPath):
                 settingsDic = self.getJsonContent(jsonPath)
                 settingsDic['path'] = self.pipeData['path']
@@ -546,10 +547,15 @@ class Pipeliner(object):
             if pathDataFromUI.endswith(".json"):
                 self.infoFile = pathDataFromUI[pathDataFromUI.rfind("/")+1:]
         if self.pipeData['path'] and self.infoFile:
+            print("here 0000")
             self.makeDirIfNotExists(self.pipeData['path'])
+            print("here 00001")
             self.setPipelineInfoFile()
+            print("here 00002")
             self.createPipelineInfoSubFolders()
+            print("here 00003")
             self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
+            print("here 00004")
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         self.utils.closeUI('dpPipelinerWindow')

@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
-from .... Deforms import dpWeights
+from ....Modules.Base import dpBaseAction
+from ....Modules.Library import dpWeights
 
 # global variables to this module:
 CLASS_NAME = "ComponentTagIO"
@@ -12,7 +12,7 @@ ICON = "/Icons/dp_componentTagIO.png"
 DP_COMPONENTTAGIO_VERSION = 1.0
 
 
-class ComponentTagIO(dpBaseActionClass.ActionStartClass):
+class ComponentTagIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -20,7 +20,7 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_COMPONENTTAGIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_componentTagIO"
         self.startName = "dpComponentTag"

@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = 'UnlockAttributes'
@@ -11,7 +11,7 @@ ICON = '/Icons/dp_unlockAttributes.png'
 DP_UNLOCKATTRIBUTES_VERSION = 1.1
 
 
-class UnlockAttributes(dpBaseActionClass.ActionStartClass):
+class UnlockAttributes(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs['CLASS_NAME'] = CLASS_NAME
@@ -19,7 +19,7 @@ class UnlockAttributes(dpBaseActionClass.ActionStartClass):
         kwargs['DESCRIPTION'] = DESCRIPTION
         kwargs['ICON'] = ICON
         self.version = DP_UNLOCKATTRIBUTES_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
 
 
     def runAction(self, firstMode=True, objList=None, *args):

@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseActionClass
+from ...Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = "NewSceneIO"
@@ -11,7 +11,7 @@ ICON = "/Icons/dp_newSceneIO.png"
 DP_NEWSCENEIO_VERSION = 1.0
 
 
-class NewSceneIO(dpBaseActionClass.ActionStartClass):
+class NewSceneIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -19,7 +19,7 @@ class NewSceneIO(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_NEWSCENEIO_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.startName = "dpNewScene"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']

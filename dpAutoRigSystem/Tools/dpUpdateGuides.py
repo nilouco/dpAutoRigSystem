@@ -358,7 +358,7 @@ class UpdateGuides(object):
         for guide in self.updateData:
             guideType = self.updateData[guide]['guideModuleName']
             # create the new guide
-            currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules")
+            currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules/Standard")
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
             currentNewGuide.editUserName(guideName)

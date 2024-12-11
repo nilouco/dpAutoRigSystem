@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ... import dpBaseActionClass
+from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = "HideCorrectives"
@@ -11,7 +11,7 @@ ICON = "/Icons/dp_hideCorrectives.png"
 DP_HIDECORRECTIVES_VERSION = 1.3
 
 
-class HideCorrectives(dpBaseActionClass.ActionStartClass):
+class HideCorrectives(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -19,7 +19,7 @@ class HideCorrectives(dpBaseActionClass.ActionStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_HIDECORRECTIVES_VERSION
-        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
