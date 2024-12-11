@@ -1674,7 +1674,6 @@ class ControlClass(object):
                 for item in nodeToRunList:
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
                     if attrList:
-                        print("attrList =", attrList)
                         for attr in attrList:
                             # hack to avoid Maya limitation to edit boolean attributes
                             if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
