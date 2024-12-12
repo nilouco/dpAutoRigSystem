@@ -1008,7 +1008,7 @@ class DP_AutoRig_UI(object):
         thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
         thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
         moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
-        moduleDir = moduleDir[moduleDir.rfind(".")+1:]
+        moduleDir = moduleDir[moduleDir.find(".")+1:]
 
         # initializing a new module instance
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
@@ -1090,6 +1090,7 @@ class DP_AutoRig_UI(object):
             cmds.parent(newGuideName, parentList[0])
 
         cmds.delete(selectedItem)
+        print(self.lang['r006_wellDone']+" "+newGuideName)
         return newGuideName
 
         
