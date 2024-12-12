@@ -8,7 +8,7 @@ TITLE = "v076_outlinerCleaner"
 DESCRIPTION = "v077_outlinerCleanerDesc"
 ICON = "/Icons/dp_outlinerCleaner.png"
 
-DP_OUTLINERCLEANER_VERSION = 1.2
+DP_OUTLINERCLEANER_VERSION = 1.3
 
 
 class OutlinerCleaner(dpBaseAction.ActionStartClass):
@@ -42,27 +42,26 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
         if not objList:
             objList = cmds.ls(selection=False, type="transform")
         if objList:
-            self.utils.setProgress(max=len(objList), addOne=False, addNumber=False)
-            for i, item in enumerate(objList):
-                if cmds.objExists(item):
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    for hidden in hiddenList:
-                        self.checkedObjList.append(item)
-                        if hidden in item:
-                            self.foundIssueList.append(True)
-                            if self.firstMode:
+            self.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
+            for item in hiddenList:
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                if item in objList:
+                    self.checkedObjList.append(item)
+                    if cmds.objExists(item):
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
+                            self.resultOkList.append(False)
+                        else: #fix
+                            try:    
+                                cmds.delete(item)
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            except:
                                 self.resultOkList.append(False)
-                            else: #fix
-                                try:    
-                                    cmds.delete(item)
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                                except:
-                                    self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                        else:
-                            self.foundIssueList.append(False)
-                            self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                    else:
+                        self.foundIssueList.append(False)
+                        self.resultOkList.append(True)
         else:
             self.notFoundNodes()
         # --- validator code --- end
