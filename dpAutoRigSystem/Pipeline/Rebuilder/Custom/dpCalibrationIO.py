@@ -68,7 +68,7 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
         # ---
 
         # finishing
-        self.updateButtonColors()
+        self.updateActionButtons()
         self.reportLog()
         self.endProgress()
         self.refreshView()

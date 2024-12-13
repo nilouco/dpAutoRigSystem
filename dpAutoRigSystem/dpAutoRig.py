@@ -161,6 +161,7 @@ MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
 TEMP_GRP = "dpAR_Temp_Grp"
 GUIDEMIRROR_GRP = "dpAR_GuideMirror_Grp"
 INFO_ICON = "dp_info.png"
+XDELETE_ICON = "dp_xDelete.png"
 PLUSINFOWIN_NAME = "dpPlusInfoWindow"
 COLOROVERRIDEWIN_NAME = 'dpColorOverrideWindow'
 DPAR_SITE = "https://nilouco.blogspot.com"
@@ -847,6 +848,8 @@ class DP_AutoRig_UI(object):
         if not self.rebuilding:
             self.resetAllButtonColors()
             self.pipeliner.refreshAssetData()
+            for rebuildInstance in self.rebuilderInstanceList:
+                rebuildInstance.updateActionButtons(color=False)
         try:
             self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
         except:
@@ -1409,6 +1412,7 @@ class DP_AutoRig_UI(object):
             path = self.utils.findPath("dpAutoRig.py")
         iconDir = path+icon
         iconInfo = self.utils.findPath("dpAutoRig.py")+"/Icons/"+INFO_ICON
+        iconX = self.utils.findPath("dpAutoRig.py")+"/Icons/"+XDELETE_ICON
         guideName = guide.CLASS_NAME
         
         # creating a basic layout for guide buttons:
@@ -1417,7 +1421,12 @@ class DP_AutoRig_UI(object):
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, ctrlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(ctrlInstance)
         else:
-            moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
+            isRebuilder = False
+            if guideDir == REBUILDER.replace("/", ".") or guideDir == SOURCE.replace("/", ".") or guideDir == SETUP.replace("/", ".") or guideDir == DEFORMING.replace("/", ".") or guideDir == CUSTOM.replace("/", "."):
+                isRebuilder = True
+                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=self.allUIs[layout])
+            else:
+                moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
             cmds.image(image=iconDir, width=32, parent=moduleLayout)
 
             if guideDir == STANDARD.replace("/", "."):
@@ -1445,14 +1454,17 @@ class DP_AutoRig_UI(object):
                     if validatorInstance.customName:
                         cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
                         #validatorInstance.title = validatorInstance.customName
-            elif guideDir == REBUILDER.replace("/", ".") or guideDir == SOURCE.replace("/", ".") or guideDir == SETUP.replace("/", ".") or guideDir == DEFORMING.replace("/", ".") or guideDir == CUSTOM.replace("/", "."):
+            if isRebuilder:
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
+                self.rebuilderInstanceList.append(rebuilderInstance)
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
-                self.rebuilderInstanceList.append(rebuilderInstance)
-
-            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                rebuilderInstance.infoITB = cmds.iconTextButton(image=iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=iconX, height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.lang['r058_deleteDataAnn'], parent=moduleLayout)
+                rebuilderInstance.updateActionButtons(color=False)
+            else:
+                cmds.iconTextButton(image=iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     
@@ -1917,13 +1929,7 @@ class DP_AutoRig_UI(object):
                         sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
                         destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
                         # if the file exists (we expect that yes) then delete it:
-                        if os.path.exists(destFile):
-                            try:
-                                os.remove(destFile)
-                            except PermissionError as exc:
-                                # use a brute force to delete without permission:
-                                os.chmod(destFile, stat.S_IWUSR)
-                                os.remove(destFile)
+                        self.utils.deleteFile(destFile)
                         # copy the dpAR_File:
                         shutil.copy2(sourceFile, destDir)
                         self.utils.setProgress('Installing')

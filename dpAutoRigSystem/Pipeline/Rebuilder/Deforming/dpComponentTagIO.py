@@ -85,7 +85,7 @@ class ComponentTagIO(dpBaseAction.ActionStartClass):
 
         # finishing
         cmds.select(clear=True)
-        self.updateButtonColors()
+        self.updateActionButtons()
         self.reportLog()
         self.endProgress()
         self.refreshView()

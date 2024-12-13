@@ -3,6 +3,8 @@ from maya import cmds
 from maya import mel
 import os
 import getpass
+import shutil
+from functools import partial
 
 # global variables to this module:
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
@@ -11,7 +13,7 @@ WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
-DP_ACTIONSTARTCLASS_VERSION = 2.3
+DP_ACTIONSTARTCLASS_VERSION = 2.4
 
 
 class ActionStartClass(object):
@@ -32,13 +34,17 @@ class ActionStartClass(object):
         self.actionCB = None
         self.firstBT = None
         self.secondBT = None
+        self.deleteDataITB = None
         self.actionType = "v000_validator" #or r000_rebuilder
         self.firstBTEnable = True
         self.secondBTEnable = True
+        self.deleteDataBTEnable = False
         self.firstBTLabel = None
         self.secondBTLabel = None
         self.firstBTCustomLabel = None
         self.secondBTCustomLabel = None
+        self.ioDir = None
+        self.infoText = self.dpUIinst.lang['i305_none']
         self.dpID = self.dpUIinst.dpID
         # returned lists
         self.checkedObjList = []
@@ -141,6 +147,32 @@ class ActionStartClass(object):
                         cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
     
 
+    def updateInfoDataButton(self, *args):
+        """ Just get the latest exported data and edit the info button text.
+        """
+        self.infoText = "\n\n"+self.dpUIinst.lang['r060_latestExportedData']+"\n"+self.getLatestExportedData()
+        cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250))
+
+
+    def getLatestExportedData(self, *args):
+        """ Returns the latest exported data or "None".
+        """
+        latestData = self.dpUIinst.lang['i305_none']
+        exportedList = self.getExportedList()
+        if exportedList:
+            latestData = exportedList[-1]
+        return latestData
+
+
+    def updateActionButtons(self, running=False, color=True, *args):
+        """ Update buttons colors and enable.
+        """
+        if color:
+            self.updateButtonColors(running)
+        self.updateDeleteDataButton()
+        self.updateInfoDataButton()
+
+
     def getTitle(self, *args):
         """ Check if there's a key in the dictionary with the current title.
             Returns its value or the current title text only.
@@ -222,40 +254,45 @@ class ActionStartClass(object):
         self.messageList.append(self.dpUIinst.lang['r005_notWorkedWell']+": "+item)
 
 
-    def wellDoneIO(self, item="", *args):
+    def wellDoneIO(self, item="", text="r006_wellDone", *args):
         """ Set dataLog when rebuilder IO worked well.
         """
         self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
-        self.messageList.append(self.dpUIinst.lang['r006_wellDone']+": "+item)
+        self.messageList.append(self.dpUIinst.lang[text]+": "+item)
 
 
     def getIOPath(self, ioDir, *args):
         """ Returns the IO path for the current scene.
         """
-        return self.pipeliner.pipeData['assetPath']+"/"+self.pipeliner.pipeData[ioDir]
+        if "assetPath" in self.pipeliner.pipeData.keys() and ioDir:
+            return self.pipeliner.pipeData['assetPath']+"/"+self.pipeliner.pipeData[ioDir]
 
 
-    def getExportedList(self, objList=None, subFolder="", *args):
+    def getExportedList(self, objList=None, subFolder="", askHasData=False, *args):
         """ Returns the exported file list in the current asset folder IO or the given objList.
         """
         exportedList = None
         resultList = []
-        if objList:
-            exportedList = objList
-            if not type(objList) == list:
-                exportedList = [objList]
-        else:
-            if os.path.exists(self.ioPath+"/"+subFolder):
-                exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
-        if exportedList:
-            if subFolder:
-                return exportedList
-            assetName = self.pipeliner.pipeData["assetName"]
-            for item in exportedList:
-                if assetName in item:
-                    resultList.append(item)
+        self.ioPath = self.getIOPath(self.ioDir)
+        if self.ioPath:
+            if askHasData:
+                return os.path.exists(self.ioPath)
+            if objList:
+                exportedList = objList
+                if not type(objList) == list:
+                    exportedList = [objList]
+            else:
+                if os.path.exists(self.ioPath+"/"+subFolder):
+                    exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
+            if exportedList:
+                if subFolder:
+                    return exportedList
+                assetName = self.pipeliner.pipeData["assetName"]
+                for item in exportedList:
+                    if assetName in item:
+                        resultList.append(item)
         return resultList
 
 
@@ -435,3 +472,33 @@ class ActionStartClass(object):
             return self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
         else:
             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+
+
+    def updateDeleteDataButton(self, *args):
+        """ Check if there's some exported data for this module and update the delete data button as enable or disable.
+        """
+        if self.ioDir:
+            if self.getExportedList(askHasData=True):
+                cmds.iconTextButton(self.deleteDataITB, edit=True, enable=True)
+            else:
+                cmds.iconTextButton(self.deleteDataITB, edit=True, enable=False)
+
+
+    def deleteData(self, *args):
+        """ Confirm if the user really want to delete the rebuilding exported data, then delete its folder.
+        """
+        # to confirm before delete data
+        confirm = cmds.confirmDialog(title=self.dpUIinst.lang[self.title], icon="question", message=self.dpUIinst.lang['r059_deleteData'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i072_no'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
+        if confirm == self.dpUIinst.lang['i071_yes']:
+            oldFirstBTLabel = self.firstBTLabel
+            self.firstMode = True
+            self.firstBTLabel = self.dpUIinst.lang['i344_deleted']
+            try:
+                shutil.rmtree(self.ioPath, ignore_errors=False)
+                self.updateDeleteDataButton()
+                self.updateInfoDataButton()
+                self.wellDoneIO(self.ioPath, 'i344_deleted')
+            except:
+                self.notWorkedWellIO(self.ioPath)
+            self.reportLog()
+            self.firstBTLabel = oldFirstBTLabel

@@ -214,7 +214,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
             self.foundIssueList.append(False)
             self.resultOkList.append(True)
             self.messageList.append(self.dpUIinst.lang['v062_globalMissing'])
-            self.updateButtonColors()
+            self.updateActionButtons()
             self.reportLog()
             self.utils.setProgress(endIt=True)
             return self.dataLogDic
@@ -252,7 +252,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
                 self.resultOkList.append(False)
                 self.messageList.append(self.dpUIinst.lang['v005_cantFix']+" "+self.dpUIinst.lang['v064_hierarchy'])
                 self.messageList.append(self.dpUIinst.lang['i201_saveScene'])
-                self.updateButtonColors()
+                self.updateActionButtons()
                 self.reportLog()
                 self.utils.setProgress(endIt=True)
                 return self.dataLogDic
@@ -262,7 +262,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
         # ---
 
         # finishing
-        self.updateButtonColors()
+        self.updateActionButtons()
         self.reportLog()
         self.endProgress()
         return self.dataLogDic

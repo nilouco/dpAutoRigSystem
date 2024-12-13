@@ -106,7 +106,7 @@ class TargetCleaner(dpBaseAction.ActionStartClass):
         # ---
 
         # finishing
-        self.updateButtonColors()
+        self.updateActionButtons()
         self.reportLog()
         self.endProgress()
         return self.dataLogDic

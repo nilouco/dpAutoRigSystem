@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-12-09",
+    "_updated"       : "2024-12-12",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -505,6 +505,7 @@
     "i341_date"                 : "Date",
     "i342_controllers"          : "Contrôleurs",
     "i343_tools"                : "Outils",
+    "i344_deleted"              : "Effacé",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -809,6 +810,9 @@
     "r055_utilityIODesc"        : "Cet action va travailler des nodes des utilitaires\nl'export et l'import de ces infos pour les réconstruire.",
     "r056_renameIO"             : "Renomer",
     "r057_renameIODesc"         : "Cet action va travailler des nodes renomés\nl'export et l'import de ces infos pour les réconstruire.",
+    "r058_deleteDataAnn"        : "Effacer les donnés exportés.",
+    "r059_deleteData"           : "Ça va effacer les donnés exportés du reconstrueur.\nOn ne peut pas le refaire para undo, désolé.\nEst-ce que tu veux continuer?",
+    "r060_latestExportedData"   : "Dernier donné exporté:",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

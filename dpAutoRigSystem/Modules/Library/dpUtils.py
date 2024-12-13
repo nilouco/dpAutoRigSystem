@@ -12,6 +12,8 @@ import json
 import time
 import getpass
 import datetime
+import stat
+import shutil
 from io import TextIOWrapper
 from importlib import reload
 
@@ -1438,3 +1440,15 @@ class Utils(object):
                 else:
                     shortName = name[1:]
         return shortName
+
+
+    def deleteFile(self, filePath, *args):
+        """ Force delete given file.
+        """
+        if os.path.exists(filePath):
+            try:
+                os.remove(filePath)
+            except PermissionError as exc:
+                # use a brute force to delete without permission:
+                os.chmod(filePath, stat.S_IWUSR)
+                os.remove(filePath)
