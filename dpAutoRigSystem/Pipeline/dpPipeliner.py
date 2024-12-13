@@ -9,7 +9,7 @@ import shutil
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.11
+DP_PIPELINER_VERSION = 1.12
 
 
 class Pipeliner(object):
@@ -147,7 +147,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2024-11-26",
+        "updated" : "2024-12-13",
         
         "f_drive"            : "",
         "f_studio"           : "",
@@ -178,6 +178,7 @@ class Pipeliner(object):
         "s_drivenKeyIO"      : self.dpUIinst.dpData+"/dpDrivenKey",
         "s_utilityIO"        : self.dpUIinst.dpData+"/dpUtility",
         "s_renameIO"         : self.dpUIinst.dpData+"/dpRename",
+        "s_offsetMatrixIO"   : self.dpUIinst.dpData+"/dpOffsetMatrix",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
         "s_webhook"          : "",
@@ -251,6 +252,7 @@ class Pipeliner(object):
         "s_drivenKeyIO"      : "i330_sDrivenKeyIOAnn",
         "s_utilityIO"        : "i337_sUtilityIOAnn",
         "s_renameIO"         : "i338_sRenameIOAnn",
+        "s_offsetMatrixIO"   : "i345_soffsetMatrixIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
         "s_prefix"           : "i239_sPrefixAnn",
