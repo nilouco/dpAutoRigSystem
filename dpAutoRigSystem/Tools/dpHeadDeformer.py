@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpControls
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -11,15 +10,16 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 3.3
+DP_HEADDEFORMER_VERSION = 4.0
 
 
 class HeadDeformer(object):
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # defining variables:
+        self.headDeformerName = CLASS_NAME
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ctrls = dpUIinst.ctrls
         self.ui = ui
         self.headCtrl = None
         self.wellDone = True
@@ -62,7 +62,7 @@ class HeadDeformer(object):
                 return deformerName+"_"
             
 
-    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, *args):
+    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, guideNet=None, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         if self.ui:
@@ -98,6 +98,7 @@ class HeadDeformer(object):
             bottomCtrlName = bottomCtrlName+numbering
             middleCtrlName = middleCtrlName+numbering
             topCtrlName = topCtrlName+numbering
+        netName = "dp"+deformerName+"_Net"
 
         if not hdList:
             # get a list of selected items
@@ -354,7 +355,6 @@ class HeadDeformer(object):
                 headCtrlPosList = cmds.xform(self.headCtrl, query=True, rotatePivot=True, worldSpace=True)
                 cmds.xform(dataGrp, translation=(headCtrlPosList[0], headCtrlPosList[1], headCtrlPosList[2]), worldSpace=True)
                 cmds.parent(mainCtrlGrp, self.headCtrl)
-
             else:
                 mel.eval("warning" + "\"" + self.dpUIinst.lang["e020_notFoundHeadCtrl"] + "\"" + ";")
                 self.wellDone = False
@@ -379,7 +379,25 @@ class HeadDeformer(object):
             if self.dpUIinst.lang["c025_jaw"] in mainCtrl:
                 cmds.setAttr(mainCtrlGrp+".rotateX", 145)
                 cmds.delete(clusterGrp, subCtrlGrpList, symmetryCtrlZeroList)
-            
+
+            # serialize network node
+            self.net = cmds.createNode("network", name=netName)
+            self.toIDList.append(self.net)
+            # add
+            cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool", defaultValue=1)
+            cmds.addAttr(self.net, longName="dpHeadDeformerNet", attributeType="bool", defaultValue=1)
+            cmds.addAttr(self.net, longName="guideNet", attributeType="message")
+            cmds.addAttr(self.net, longName="linkedNode", attributeType="message")
+            cmds.addAttr(self.net, longName="netData", dataType="string")
+            cmds.addAttr(arrowCtrl, longName="hdNet", attributeType="message")
+            # set
+            cmds.setAttr(self.net+".netData", self.getNetData(deformerName, hdList), type="string")
+            # connect
+            if guideNet:
+                cmds.connectAttr(guideNet+".message", self.net+".guideNet", force=True)
+            cmds.connectAttr(arrowCtrl+".message", self.net+".linkedNode", force=True)
+            cmds.connectAttr(self.net+".message", arrowCtrl+".hdNet", force=True)
+
             # calibration attributes:
             hdCalibrationList = [
                                     calibrateName+"X",
@@ -402,6 +420,16 @@ class HeadDeformer(object):
             cmds.select(arrowCtrl)
             if self.wellDone:
                 print(self.dpUIinst.lang["i179_addedHeadDef"])
-        
+            return self.net
         else:
             mel.eval("warning" + "\"" + self.dpUIinst.lang["i034_notSelHeadDef"] + "\"" + ";")
+
+
+    def getNetData(self, deformerName, hdList, *args):
+        """ Collect all headDeformer data and return it as a dictionary.
+        """
+        dataDic = {}
+        dataDic["hdName"] = deformerName
+        dataDic["hdList"] = hdList
+        dataDic["moduleType"] = CLASS_NAME
+        return dataDic

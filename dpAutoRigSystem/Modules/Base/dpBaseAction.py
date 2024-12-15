@@ -352,14 +352,14 @@ class ActionStartClass(object):
                         value = dic[node]
                     resultDic[node] = cmds.getAttr(node+".nodeState")
                     lockAttrStatus = cmds.getAttr(node+".nodeState", lock=True)
-                    lockNodeStatus = cmds.lockNode(node, query=True, lock=True)
+                    lockNodeStatus = cmds.lockNode(node, query=True, lock=True)[0]
                     cmds.lockNode(node, lock=False)
                     cmds.setAttr(node+".nodeState", lock=False)
                     # set nodeState attribute value
                     cmds.setAttr(node+".nodeState", value)
                     cmds.setAttr(node+".nodeState", lock=lockAttrStatus)
                     if lockNodeStatus:
-                        cmds.lockNode(node, lock=1)
+                        cmds.lockNode(node, lock=True)
         return resultDic
     
 

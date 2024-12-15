@@ -1016,7 +1016,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if cmds.getAttr(self.moduleGrp+".deformer"):
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
-                    self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList)
+                    hdNet = self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet)
+                    self.addNodeToGuideNet([hdNet], ["hdNet"])
                 elif cmds.objExists(self.guideName+"_DeformerCube_MD"):
                     cmds.delete(self.guideName+"_DeformerCube_MD")
 

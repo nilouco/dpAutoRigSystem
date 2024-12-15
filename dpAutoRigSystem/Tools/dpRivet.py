@@ -765,8 +765,8 @@ class Rivet(object):
                 self.toIDList.append(self.net)
                 self.netList.append(self.net)
                 # add
-                cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
-                cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool")
+                cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool", defaultValue=1)
+                cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool", defaultValue=1)
                 cmds.addAttr(self.net, longName="itemNode", attributeType="message")
                 cmds.addAttr(self.net, longName="rivet", attributeType="message")
                 cmds.addAttr(self.net, longName="follicle", attributeType="message")
@@ -778,8 +778,6 @@ class Rivet(object):
                 cmds.addAttr(self.net, longName="pacNode", attributeType="message")
                 cmds.addAttr(self.net, longName="rivetData", dataType="string")
                 # set
-                cmds.setAttr(self.net+".dpNetwork", 1)
-                cmds.setAttr(self.net+".dpRivetNet", 1)
                 cmds.setAttr(self.net+".rivetData", json.dumps(self.getRivetData(itemList[r], geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset)), type="string")
                 # connect
                 cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)

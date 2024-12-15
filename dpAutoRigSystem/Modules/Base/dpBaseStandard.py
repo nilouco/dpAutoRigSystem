@@ -596,6 +596,8 @@ class BaseStandard(object):
         """
         for node, messageAttr in zip(nodeList, messageAttrList):
             if not cmds.objExists(self.guideNet+"."+messageAttr):
+                self.lockNodeStatus = cmds.lockNode(self.guideNet, query=True, lock=True)[0]
+                cmds.lockNode(self.guideNet, lock=False)
                 cmds.addAttr(self.guideNet, longName=messageAttr, attributeType="message")
             cmds.connectAttr(node+".message", self.guideNet+"."+messageAttr, force=True)
             self.addAttrToBeforeData(messageAttr)
@@ -619,6 +621,8 @@ class BaseStandard(object):
         beforeString = cmds.getAttr(self.guideNet+".beforeData") or ""
         beforeString = beforeString + attr + ";"
         cmds.setAttr(self.guideNet+".beforeData", beforeString, type="string")
+        if self.lockNodeStatus:
+            cmds.lockNode(self.guideNet, lock=True)
         return beforeString
 
 

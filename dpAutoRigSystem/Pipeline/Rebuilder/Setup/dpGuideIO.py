@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
+from ....Tools import dpHeadDeformer
 import ast
 
 # global variables to this module:
@@ -11,7 +12,7 @@ ICON = "/Icons/dp_guideIO.png"
 
 MODULES = "Modules.Standard"
 
-DP_GUIDEIO_VERSION = 1.1
+DP_GUIDEIO_VERSION = 1.2
 
 
 class GuideIO(dpBaseAction.ActionStartClass):
@@ -26,6 +27,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_guideIO"
         self.startName = "dpGuide"
+        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.dpUIinst, ui=False)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -53,6 +55,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         netList = objList
                     else:
                         netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
+                        netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet"))
                     if netList:
                         self.exportDicToJsonFile(self.getGuideDataDic(netList))
                     else:
@@ -65,6 +68,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         cmds.modelEditor(mp, edit=True, xray=True)
                     guideDic = self.importLatestJsonFile(self.getExportedList())
                     if guideDic:
+                        wellImported = False
                         try:
                             wellImported = self.importGuide(guideDic)
                             self.setupGuideBaseParenting(guideDic)
@@ -105,14 +109,17 @@ class GuideIO(dpBaseAction.ActionStartClass):
         for net in netList:
             self.utils.setProgress(self.dpUIinst.lang[self.title])
             # mount a dic with all data 
-            if cmds.objExists(net+".afterData"):
-                if cmds.getAttr(net+".rawGuide"): 
+            if "afterData" in cmds.listAttr(net):
+                if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
                     moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
                     for moduleInstance in self.dpUIinst.moduleInstancesList:
                         if str(moduleInstance) == moduleInstanceInfoString:
                             moduleInstance.serializeGuide(False) #serialize it without build it
                 toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
+            elif "dpHeadDeformerNet" in cmds.listAttr(net):
+                if not cmds.listConnections(net+".guideNet", source=True, destination=False):
+                    toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".netData"))
         return toExportDataDic
 
 
@@ -179,12 +186,13 @@ class GuideIO(dpBaseAction.ActionStartClass):
         """
         for net in guideDic.keys():
             netDic = guideDic[net]
-            for item in list(netDic["GuideData"]):
-                if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
-                    fatherNodeData = netDic["GuideData"][item]['FatherNode']
-                    if fatherNodeData:
-                        if cmds.objExists(fatherNodeData):
-                            cmds.parent(item, fatherNodeData)
+            if "GuideData" in netDic.keys():
+                for item in list(netDic["GuideData"]):
+                    if "guideBase" in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
+                        fatherNodeData = netDic["GuideData"][item]['FatherNode']
+                        if fatherNodeData:
+                            if cmds.objExists(fatherNodeData):
+                                cmds.parent(item, fatherNodeData)
 
 
     def importGuide(self, guideDic, *args):
@@ -193,24 +201,34 @@ class GuideIO(dpBaseAction.ActionStartClass):
         wellImported = True
         self.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
         for net in guideDic.keys():
-            toInitializeGuide = True
-            if cmds.objExists(net):
-                if cmds.getAttr(net+".rawGuide"):
-                    toInitializeGuide = False
-                else:
-                    cmds.lockNode(net, lock=False)
-                    cmds.delete(net)
-            if toInitializeGuide:
-                try:
-                    #self.netDic = json.loads(guideDic[net])
-                    self.netDic = guideDic[net]
-                    self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+guideDic[net]['ModuleType'])
-                    # create a module instance:
-                    self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
-                    self.setupInstanceChanges()
-                    self.setupGuideTransformations()
-                except Exception as e:
-                    wellImported = False
-                    self.notWorkedWellIO(net+": "+str(e))
-                    break
+            if "moduleType" in guideDic[net].keys():
+                if guideDic[net]["moduleType"] == self.dpHeadDeformer.headDeformerName:
+                    wellImported = self.importHeadDeformer(guideDic[net])
+            else:
+                toInitializeGuide = True
+                if cmds.objExists(net):
+                    if cmds.getAttr(net+".rawGuide"):
+                        toInitializeGuide = False
+                    else:
+                        cmds.lockNode(net, lock=False)
+                        cmds.delete(net)
+                if toInitializeGuide:
+                    try:
+                        #self.netDic = json.loads(guideDic[net])
+                        self.netDic = guideDic[net]
+                        self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+guideDic[net]['ModuleType'])
+                        # create a module instance:
+                        self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                        self.setupInstanceChanges()
+                        self.setupGuideTransformations()
+                    except Exception as e:
+                        wellImported = False
+                        self.notWorkedWellIO(net+": "+str(e))
+                        break
         return wellImported
+
+
+    def importHeadDeformer(self, hdNet, *args):
+        """ Process the headDeformer importing.
+        """
+        return self.dpHeadDeformer.dpHeadDeformer(hdNet["hdName"], hdNet["hdList"])
