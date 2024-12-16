@@ -8,7 +8,7 @@ TITLE = "m081_tweaks"
 DESCRIPTION = "m082_tweaksDesc"
 ICON = "/Icons/dp_tweaks.png"
 
-DP_TWEAKS_VERSION = 2.1
+DP_TWEAKS_VERSION = 2.2
 
 
 def getUserDetail(opt1, opt2, cancel, default, userMessage):
@@ -40,6 +40,7 @@ def Tweaks(dpUIinst):
         middleName = dpUIinst.lang['c029_middle']
         eyebrowName = dpUIinst.lang['c041_eyebrow']
         eyelidName = dpUIinst.lang['c042_eyelid']
+        eyeSocketName = dpUIinst.lang['c127_eyeSocket']
         cornerName = dpUIinst.lang['c043_corner']
         upperName = dpUIinst.lang['c044_upper']
         lowerName = dpUIinst.lang['c045_lower']
@@ -56,6 +57,7 @@ def Tweaks(dpUIinst):
         eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
         eyebrowName2 = tweaksName+"_"+eyebrowName+"_02"
         eyebrowName3 = tweaksName+"_"+eyebrowName+"_03"
+        eyebrowName4 = tweaksName+"_"+eyebrowName+"_04"
         # eyelids names:
         eyelidMainName = tweaksName+"_"+eyelidName+"_"+mainName
         upperEyelidName0 = tweaksName+"_"+upperName+"_"+eyelidName+"_00"
@@ -66,6 +68,13 @@ def Tweaks(dpUIinst):
         lowerEyelidName2 = tweaksName+"_"+lowerName+"_"+eyelidName+"_02"
         eyelidCornerName0 = tweaksName+"_"+cornerName+"_"+eyelidName+"_00"
         eyelidCornerName1 = tweaksName+"_"+cornerName+"_"+eyelidName+"_01"
+        # eyeSockets names:
+        upperEyeSocketName0 = tweaksName+"_"+upperName+"_"+eyeSocketName+"_00"
+        upperEyeSocketName1 = tweaksName+"_"+upperName+"_"+eyeSocketName+"_01"
+        upperEyeSocketName2 = tweaksName+"_"+upperName+"_"+eyeSocketName+"_02"
+        lowerEyeSocketName0 = tweaksName+"_"+lowerName+"_"+eyeSocketName+"_00"
+        lowerEyeSocketName1 = tweaksName+"_"+lowerName+"_"+eyeSocketName+"_01"
+        lowerEyeSocketName2 = tweaksName+"_"+lowerName+"_"+eyeSocketName+"_02"
         # squints names:
         squintMainName = tweaksName+"_"+squintName+"_"+mainName
         squintName1 = tweaksName+"_"+squintName+"_01"
@@ -73,6 +82,7 @@ def Tweaks(dpUIinst):
         squintName3 = tweaksName+"_"+squintName+"_03"
         # cheeks names:
         cheekName1 = tweaksName+"_"+cheekName+"_01"
+        cheekName2 = tweaksName+"_"+cheekName+"_02"
         # lip names:
         lipMainName = tweaksName+"_"+lipName+"_"+mainName
         upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
@@ -101,7 +111,7 @@ def Tweaks(dpUIinst):
             if userDetail == simple:
                 maxProcess = 3
             else:
-                maxProcess = 5
+                maxProcess = 6
             
             # getting Indirect Skinning user prefer:
             userIndirectSkin = getUserDetail(indSkin, faceJoint, cancel, indSkin, faceMessage)
@@ -179,7 +189,11 @@ def Tweaks(dpUIinst):
 
                     eyebrowMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
                     eyebrowMiddleInstance.editUserName(eyebrowMiddleName)
-                
+
+                    eyebrowInstance4 = dpUIinst.initGuide('dpSingle', guideDir)
+                    eyebrowInstance4.editUserName(eyebrowName4)
+                    eyebrowInstance4.changeMirror("X")
+
                     if userIndirectSkin == indSkin:
                         eyelidMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                         eyelidMainInstance.editUserName(eyelidMainName)
@@ -218,6 +232,35 @@ def Tweaks(dpUIinst):
                         eyelidCornerInstance1.editUserName(eyelidCornerName1)
                         eyelidCornerInstance1.changeMirror("X")
 
+                        upperEyeSocketInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyeSocketInstance0.editUserName(upperEyeSocketName0)
+                        upperEyeSocketInstance0.changeMirror("X")
+                        
+                        upperEyeSocketInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyeSocketInstance1.editUserName(upperEyeSocketName1)
+                        upperEyeSocketInstance1.changeMirror("X")
+                        
+                        upperEyeSocketInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyeSocketInstance2.editUserName(upperEyeSocketName2)
+                        upperEyeSocketInstance2.changeMirror("X")
+                        
+                        lowerEyeSocketInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyeSocketInstance0.editUserName(lowerEyeSocketName0)
+                        lowerEyeSocketInstance0.changeMirror("X")
+                        
+                        lowerEyeSocketInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyeSocketInstance1.editUserName(lowerEyeSocketName1)
+                        lowerEyeSocketInstance1.changeMirror("X")
+                        
+                        lowerEyeSocketInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyeSocketInstance2.editUserName(lowerEyeSocketName2)
+                        lowerEyeSocketInstance2.changeMirror("X")
+
+                    cmds.refresh()                    
+                    dpUIinst.utils.setProgress(doingName+eyeSocketName)
+
+
+
                     cmds.refresh()                    
                     dpUIinst.utils.setProgress(doingName+squintMainName)
                     
@@ -241,6 +284,10 @@ def Tweaks(dpUIinst):
                     cheekInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
                     cheekInstance1.editUserName(cheekName1)
                     cheekInstance1.changeMirror("X")
+
+                    cheekInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                    cheekInstance2.editUserName(cheekName2)
+                    cheekInstance2.changeMirror("X")
                 
                 # woking with Single indirect skinning setup:
                 # declaring a instanceList in order to clear the code a little:
@@ -250,12 +297,12 @@ def Tweaks(dpUIinst):
                 
                 if userDetail == complete:
                     if userIndirectSkin == indSkin:
-                        instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                        sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
+                        instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, upperEyeSocketInstance0, upperEyeSocketInstance1, upperEyeSocketInstance2, lowerEyeSocketInstance0, lowerEyeSocketInstance1, lowerEyeSocketInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
+                        sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, upperEyeSocketInstance0, upperEyeSocketInstance1, upperEyeSocketInstance2, lowerEyeSocketInstance0, lowerEyeSocketInstance1, lowerEyeSocketInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
                         mainInstanceList = [eyebrowMainInstance, eyelidMainInstance, squintMainInstance, lipMainInstance]
                     else:
-                        instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                        sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
+                        instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
+                        sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
                         mainInstanceList = [eyebrowMainInstance, squintMainInstance, lipMainInstance]
                 
                 # turn on indirectSkinning:
@@ -283,21 +330,27 @@ def Tweaks(dpUIinst):
                 
                 # working on hierarchy
                 cmds.parent([eyebrowMainInstance.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
-                cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp, ], eyebrowMainInstance.moduleGrp, absolute=True)
                 cmds.parent([upperLipMiddleInstance.moduleGrp, upperLipInstance1.moduleGrp, upperLipInstance2.moduleGrp, lowerLipMiddleInstance.moduleGrp, lowerLipInstance1.moduleGrp, lowerLipInstance2.moduleGrp, lipCornerInstance.moduleGrp], lipMainInstance.moduleGrp, absolute=True)
                 
                 if userDetail == complete:
                     if userIndirectSkin == indSkin:
-                        cmds.parent([eyebrowMiddleInstance.moduleGrp, eyelidMainInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
-                        cmds.parent([upperEyelidInstance0.moduleGrp, upperEyelidInstance1.moduleGrp, upperEyelidInstance2.moduleGrp, lowerEyelidInstance0.moduleGrp, lowerEyelidInstance1.moduleGrp, lowerEyelidInstance2.moduleGrp, eyelidCornerInstance0.moduleGrp, eyelidCornerInstance1.moduleGrp], eyelidMainInstance.moduleGrp, absolute=True)
+                        cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp, eyebrowInstance4.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
+                        cmds.parent([eyebrowMiddleInstance.moduleGrp, eyelidMainInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, cheekInstance2.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
+                        cmds.parent([upperEyelidInstance0.moduleGrp, upperEyelidInstance1.moduleGrp, upperEyelidInstance2.moduleGrp, lowerEyelidInstance0.moduleGrp, lowerEyelidInstance1.moduleGrp, lowerEyelidInstance2.moduleGrp, eyelidCornerInstance0.moduleGrp, eyelidCornerInstance1.moduleGrp, upperEyeSocketInstance0.moduleGrp, upperEyeSocketInstance1.moduleGrp, upperEyeSocketInstance2.moduleGrp, lowerEyeSocketInstance0.moduleGrp, lowerEyeSocketInstance1.moduleGrp, lowerEyeSocketInstance2.moduleGrp], eyelidMainInstance.moduleGrp, absolute=True)
                         cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
                     else:
-                        cmds.parent([eyebrowMiddleInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
+                        cmds.parent([eyebrowMiddleInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, cheekInstance2.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
                         cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
+                else:
+                    cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
                         
                 # try to parent to HEAD guide or control
-                if cmds.objExists("*__*:Guide_Upper"):
-                    cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Upper")[0], relative=True)
+                if cmds.objExists("*__*:Guide_Head"):
+                    if cmds.objExists("*__*:Guide_UpperJaw"):
+                        cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Head")[0], relative=True)
+                        cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_UpperJaw")[0], relative=False)
+                    else:
+                        cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Head")[0], relative=True)
                 elif cmds.objExists("Head_UpperJaw_Ctrl"):
                     cmds.parent(holderMainInstance.moduleGrp, "Head_UpperJaw_Ctrl", relative=True)
                     
@@ -347,6 +400,10 @@ def Tweaks(dpUIinst):
                     
                     cmds.setAttr(eyebrowMiddleInstance.moduleGrp+".translateY", 2.8)
                     cmds.setAttr(eyebrowMiddleInstance.moduleGrp+".translateZ", 2)
+
+                    cmds.setAttr(eyebrowInstance4.moduleGrp+".translateX", 0.4)
+                    cmds.setAttr(eyebrowInstance4.moduleGrp+".translateY", -0.1)
+                    cmds.setAttr(eyebrowInstance4.moduleGrp+".translateZ", 0.1)
                     
                     cmds.setAttr(squintMainInstance.moduleGrp+".translateX", 0.5)
                     cmds.setAttr(squintMainInstance.moduleGrp+".translateY", 1.4)
@@ -367,6 +424,10 @@ def Tweaks(dpUIinst):
                     cmds.setAttr(cheekInstance1.moduleGrp+".translateX", 1.1)
                     cmds.setAttr(cheekInstance1.moduleGrp+".translateY", 0.9)
                     cmds.setAttr(cheekInstance1.moduleGrp+".translateZ", 2.1)
+                    
+                    cmds.setAttr(cheekInstance2.moduleGrp+".translateX", 0.8)
+                    cmds.setAttr(cheekInstance2.moduleGrp+".translateY", 1.15)
+                    cmds.setAttr(cheekInstance2.moduleGrp+".translateZ", 2.3)
                     
                     if userIndirectSkin == indSkin:
                         cmds.setAttr(eyelidMainInstance.moduleGrp+".translateX", 0.5)
@@ -400,7 +461,28 @@ def Tweaks(dpUIinst):
                         
                         cmds.setAttr(eyelidCornerInstance1.moduleGrp+".translateX", 0.3)
                         cmds.setAttr(eyelidCornerInstance1.moduleGrp+".translateZ", 0.5)
-                
+
+                        cmds.setAttr(upperEyeSocketInstance0.moduleGrp+".translateX", -0.25)
+                        cmds.setAttr(upperEyeSocketInstance0.moduleGrp+".translateY", 0.25)
+                        cmds.setAttr(upperEyeSocketInstance0.moduleGrp+".translateZ", 0.5)
+                        
+                        cmds.setAttr(upperEyeSocketInstance1.moduleGrp+".translateY", 0.3)
+                        cmds.setAttr(upperEyeSocketInstance1.moduleGrp+".translateZ", 0.5)
+                        
+                        cmds.setAttr(upperEyeSocketInstance2.moduleGrp+".translateX", 0.25)
+                        cmds.setAttr(upperEyeSocketInstance2.moduleGrp+".translateY", 0.25)
+                        cmds.setAttr(upperEyeSocketInstance2.moduleGrp+".translateZ", 0.5)
+                        
+                        cmds.setAttr(lowerEyeSocketInstance0.moduleGrp+".translateX", -0.25)
+                        cmds.setAttr(lowerEyeSocketInstance0.moduleGrp+".translateY", -0.25)
+                        cmds.setAttr(lowerEyeSocketInstance0.moduleGrp+".translateZ", 0.5)
+                        
+                        cmds.setAttr(lowerEyeSocketInstance1.moduleGrp+".translateY", -0.3)
+                        cmds.setAttr(lowerEyeSocketInstance1.moduleGrp+".translateZ", 0.5)
+                        
+                        cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateX", 0.25)
+                        cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateY", -0.25)
+                        cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateZ", 0.5)
                 
                 # Close progress window
                 dpUIinst.utils.setProgress(endIt=True)
