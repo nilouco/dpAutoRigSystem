@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
-from ....Modules.Library import dpWeights #do we need it or can we just use dpUIinst.skin instead?
 
 # global variables to this module:
 CLASS_NAME = "InputOrderIO"
@@ -9,7 +8,7 @@ TITLE = "r035_inputOrderIO"
 DESCRIPTION = "r036_inputOrderIODesc"
 ICON = "/Icons/dp_inputOrderIO.png"
 
-DP_INPUTORDERIO_VERSION = 1.0
+DP_INPUTORDERIO_VERSION = 1.1
 
 
 class InputOrderIO(dpBaseAction.ActionStartClass):
@@ -24,7 +23,6 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_inputOrderIO"
         self.startName = "dpInputOrder"
-        self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -51,7 +49,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                     if objList:
                         deformedList = objList
                     else:
-                        deformedList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                        deformedList = self.dpUIinst.skin.getDeformedModelList(deformerTypeList=self.dpUIinst.skin.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if deformedList:
                         self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
                     else:
@@ -84,7 +82,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
         self.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
         for item in deformedList:
             self.utils.setProgress(self.dpUIinst.lang[self.title])
-            orderDic[item] = self.defWeights.getOrderList(item)
+            orderDic[item] = self.dpUIinst.skin.getOrderList(item)
         return orderDic
     
 
@@ -109,7 +107,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                     deformerList = orderDic[item]
                     if deformerList:
                         if len(deformerList) > 1:
-                            self.defWeights.setOrderList(item, deformerList)
+                            self.dpUIinst.skin.setOrderList(item, deformerList)
                 except Exception as e:
                     wellImported = False
                     self.notWorkedWellIO(self.latestDataFile)
