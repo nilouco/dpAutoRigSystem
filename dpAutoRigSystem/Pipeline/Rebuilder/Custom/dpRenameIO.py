@@ -57,7 +57,7 @@ class RenameIO(dpBaseAction.ActionStartClass):
                         if nodeIDDic:
                             self.importNodeIDData(nodeIDDic)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:

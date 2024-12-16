@@ -58,9 +58,9 @@ class AttributeIO(dpBaseAction.ActionStartClass):
                         if attrDic:
                             self.importAttributeData(attrDic)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO("Ctrls_Grp")
+                    self.maybeDoneIO("Ctrls_Grp")
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

@@ -10,10 +10,10 @@ from functools import partial
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
 CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
-ISSUE_COLOR = (1.0, 0.7, 0.7)
+ISSUE_COLOR = (1.0, 0.65, 0.65)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
-DP_ACTIONSTARTCLASS_VERSION = 2.4
+DP_ACTIONSTARTCLASS_VERSION = 2.5
 
 
 class ActionStartClass(object):
@@ -44,6 +44,7 @@ class ActionStartClass(object):
         self.firstBTCustomLabel = None
         self.secondBTCustomLabel = None
         self.ioDir = None
+        self.maybeDone = False
         self.infoText = self.dpUIinst.lang['i305_none']
         self.dpID = self.dpUIinst.dpID
         # returned lists
@@ -123,22 +124,35 @@ class ActionStartClass(object):
                     else: #fix/import
                         cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
                         cmds.button(self.secondBT, edit=True, backgroundColor=RUNNING_COLOR)
-                elif self.checkedObjList:
+                elif self.maybeDone:
+                    if self.firstMode: #verify/export
+                        cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
+                        cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                    else: #fix/import
+                        cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
+                elif self.checkedObjList: #ran
                     if self.firstMode: #verify/export
                         if True in self.foundIssueList:
                             cmds.button(self.firstBT, edit=True, backgroundColor=ISSUE_COLOR)
-                            cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
+                            if self.actionType == "v000_validator":
+                                cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
+                            else:
+                                cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
                         else:
                             cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix/import
                         if False in self.resultOkList:
-                            cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
+                            if self.actionType == "v000_validator":
+                                cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
+                            else:
+                                cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=ISSUE_COLOR)
                         else:
                             cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
-                else:
+                else: #wellDone
                     if self.firstMode: #verify/export
                         cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
                         cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
@@ -169,8 +183,9 @@ class ActionStartClass(object):
         """
         if color:
             self.updateButtonColors(running)
-        self.updateDeleteDataButton()
-        self.updateInfoDataButton()
+        if self.actionType == "r000_rebuilder":
+            self.updateDeleteDataButton()
+            self.updateInfoDataButton()
 
 
     def getTitle(self, *args):
@@ -261,6 +276,16 @@ class ActionStartClass(object):
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
         self.messageList.append(self.dpUIinst.lang[text]+": "+item)
+
+
+    def maybeDoneIO(self, item="", *args):
+        """ Set dataLog when IO possible worked well for rebuilders, maybe.
+        """
+        self.maybeDone = True
+        self.checkedObjList.append(item)
+        self.foundIssueList.append(False)
+        self.resultOkList.append(True)
+        self.messageList.append(self.dpUIinst.lang['r063_maybeDoneIO']+": "+item)
 
 
     def getIOPath(self, ioDir, *args):
@@ -405,7 +430,7 @@ class ActionStartClass(object):
             except Exception as e:
                 self.notWorkedWellIO(jsonName+": "+str(e))
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
 
 
     def exportAlembicFile(self, meshList, path=None, startName=None, fileName=None, attr=True, *args):
@@ -457,7 +482,7 @@ class ActionStartClass(object):
             except Exception as e:
                 self.notWorkedWellIO(self.latestDataFile+": "+str(e))
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
 
 
     def importLatestJsonFile(self, exportedList, path=None, *args):
@@ -471,7 +496,7 @@ class ActionStartClass(object):
             self.latestDataFile = exportedList[-1]
             return self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
 
 
     def updateDeleteDataButton(self, *args):

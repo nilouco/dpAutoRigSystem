@@ -66,13 +66,13 @@ class DeformationIO(dpBaseAction.ActionStartClass):
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" deformers")
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
                 else: #import
                     deformerDic = self.importLatestJsonFile(self.getExportedList())
                     if deformerDic:
                         self.importDeformationData(deformerDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

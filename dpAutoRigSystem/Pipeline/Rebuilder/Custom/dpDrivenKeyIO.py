@@ -53,12 +53,14 @@ class DrivenKeyIO(dpBaseAction.ActionStartClass):
                 if self.firstMode: #export
                     if nodeList:
                         self.exportDicToJsonFile(self.getDrivenKeyDataDic(nodeList))
+                    else:
+                        self.maybeDoneIO("Set Driven Keys")
                 else: #import
                     drivenKeyDic = self.importLatestJsonFile(self.getExportedList())
                     if drivenKeyDic:
                         self.importDrivenKeyData(drivenKeyDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

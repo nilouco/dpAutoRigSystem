@@ -60,9 +60,9 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
                         if connectDic:
                             self.importConnectionData(connectDic)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO("Ctrls_Grp")
+                    self.maybeDoneIO("Ctrls_Grp")
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

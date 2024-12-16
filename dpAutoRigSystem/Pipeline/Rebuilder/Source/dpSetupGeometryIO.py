@@ -56,7 +56,7 @@ class SetupGeometryIO(dpBaseAction.ActionStartClass):
                             self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
                             self.exportAlembicFile(meshList, attr=False)
                         else:
-                            self.notWorkedWellIO("Geometries")
+                            self.maybeDoneIO("Geometries")
                     else: #import
                         self.importLatestAlembicFile(self.getExportedList())
                 else:

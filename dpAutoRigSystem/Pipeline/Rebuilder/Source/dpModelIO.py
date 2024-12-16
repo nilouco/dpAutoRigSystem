@@ -56,7 +56,7 @@ class ModelIO(dpBaseAction.ActionStartClass):
                             self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
                             self.exportAlembicFile(meshList)
                         else:
-                            self.notWorkedWellIO("Render_Grp")
+                            self.maybeDoneIO("Render_Grp")
                     else: #import
                         self.importLatestAlembicFile(self.getExportedList())
                 else:

@@ -52,12 +52,14 @@ class UtilityIO(dpBaseAction.ActionStartClass):
                 if self.firstMode: #export
                     if utilityList:
                         self.exportDicToJsonFile(self.getUtilityDataDic(utilityList))
+                    else:
+                        self.maybeDoneIO("Utility nodes.")
                 else: #import
                     utilityDic = self.importLatestJsonFile(self.getExportedList())
                     if utilityDic:
                         self.importUtilityData(utilityDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

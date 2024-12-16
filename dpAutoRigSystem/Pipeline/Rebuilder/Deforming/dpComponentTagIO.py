@@ -67,15 +67,15 @@ class ComponentTagIO(dpBaseAction.ActionStartClass):
                                             }
                             self.exportDicToJsonFile(self.tagDataDic)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" componentTag")
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" componentTag")
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh, lattice")
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh, lattice")
                 else: #import
                     tagDataDic = self.importLatestJsonFile(self.getExportedList())
                     if tagDataDic:
                         self.importTag(tagDataDic, nodeList)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

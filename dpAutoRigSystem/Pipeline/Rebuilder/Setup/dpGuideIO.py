@@ -59,7 +59,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                     if netList:
                         self.exportDicToJsonFile(self.getGuideDataDic(netList))
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
                         cmds.select(clear=True)
                 else: #import
                     # apply viewport xray
@@ -81,7 +81,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         if wellImported:
                             self.wellDoneIO(self.latestDataFile)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                     cmds.select(clear=True)
                     # remove viewport xray
                     for mp in modelPanelList:

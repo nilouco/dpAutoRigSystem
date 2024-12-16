@@ -56,14 +56,14 @@ class RivetIO(dpBaseAction.ActionStartClass):
                     if netList:
                         self.exportDicToJsonFile(self.getRivetDataDic(netList))
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
                         cmds.select(clear=True)
                 else: #import
                     rivetDic = self.importLatestJsonFile(self.getExportedList())
                     if rivetDic:
                         self.importRivet(rivetDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                     cmds.select(clear=True)
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])

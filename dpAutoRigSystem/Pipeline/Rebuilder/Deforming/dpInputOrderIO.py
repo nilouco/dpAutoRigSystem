@@ -55,13 +55,13 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                     if deformedList:
                         self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
                 else: #import
                     orderDic = self.importLatestJsonFile(self.getExportedList())
                     if orderDic:
                         self.importInputOrder(orderDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

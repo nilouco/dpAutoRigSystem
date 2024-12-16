@@ -65,7 +65,7 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                     if shaderList:
                         self.exportDicToJsonFile(self.getShaderDataDic(shaderList))
                     else:
-                        self.notWorkedWellIO("Render_Grp")
+                        self.maybeDoneIO("Shading")
                 else: #import
                     shaderDic = self.importLatestJsonFile(self.getExportedList())
                     if shaderDic:
@@ -74,7 +74,7 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                         except Exception as e:
                             self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

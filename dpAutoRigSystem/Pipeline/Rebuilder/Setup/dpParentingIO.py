@@ -57,7 +57,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                         parentDic.update(self.getBrokenIDDataDic())
                         self.exportDicToJsonFile(parentDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else: #import
                     parentDic = self.importLatestJsonFile(self.getExportedList())
                     if parentDic:
@@ -68,7 +68,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                         except Exception as e:
                             self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

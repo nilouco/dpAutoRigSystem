@@ -53,12 +53,14 @@ class ConstraintIO(dpBaseAction.ActionStartClass):
                 if self.firstMode: #export
                     if constraintList:
                         self.exportDicToJsonFile(self.getConstraintDataDic(constraintList))
+                    else:
+                        self.maybeDoneIO("Constraints")
                 else: #import
                     constDic = self.importLatestJsonFile(self.getExportedList())
                     if constDic:
                         self.importConstraintData(constDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

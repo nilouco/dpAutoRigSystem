@@ -59,9 +59,9 @@ class OffsetMatrixIO(dpBaseAction.ActionStartClass):
                         if toImportDic:
                             self.importOffsetMatrixData(toImportDic)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                    self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

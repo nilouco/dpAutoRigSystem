@@ -53,13 +53,13 @@ class TransformationIO(dpBaseAction.ActionStartClass):
                     if transformList:
                         self.exportDicToJsonFile(self.getTransformDataDic(transformList))
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else: #import
                     transformDic = self.importLatestJsonFile(self.getExportedList())
                     if transformDic:
                         self.importTransformation(transformDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

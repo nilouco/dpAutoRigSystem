@@ -69,9 +69,9 @@ class ControlShapeIO(dpBaseAction.ActionStartClass):
                             except Exception as e:
                                 self.notWorkedWellIO(exportedList[-1]+": "+str(e))
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO("Ctrls_Grp")
+                    self.maybeDoneIO("Ctrls_Grp")
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

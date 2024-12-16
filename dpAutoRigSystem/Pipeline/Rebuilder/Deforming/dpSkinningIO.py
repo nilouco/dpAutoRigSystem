@@ -55,13 +55,13 @@ class SkinningIO(dpBaseAction.ActionStartClass):
                     if meshList:
                         self.exportDicToJsonFile(self.dpUIinst.skin.getSkinWeightData(meshList))
                     else:
-                        self.notWorkedWellIO("Render_Grp")
+                        self.maybeDoneIO("Render_Grp")
                 else: #import
                     skinWeightDic = self.importLatestJsonFile(self.getExportedList())
                     if skinWeightDic:
                         self.importSkinning(skinWeightDic)
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

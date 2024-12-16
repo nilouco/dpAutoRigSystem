@@ -66,13 +66,13 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                                 self.exportAlembicFile(transformList, self.originalPath, self.originalName, bsNode, False)
                             self.exportDicToJsonFile(bsDic)
                         else:
-                            self.notWorkedWellIO("BlendShapes_Grp")
+                            self.maybeDoneIO("BlendShapes_Grp")
                     else: #import
                         bsDic = self.importLatestJsonFile(self.getExportedList())
                         if bsDic:
                             self.importBlendShapes(bsDic)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
                     self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
