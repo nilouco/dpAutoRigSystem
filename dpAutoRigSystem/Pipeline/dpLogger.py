@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import time
+from functools import partial
 
 DP_LOGGER_VERSION = 1.1
 
@@ -17,7 +18,7 @@ class Logger(object):
         self.utils = dpUIinst.utils
         
 
-    def infoWin(self, title, description, text, align, width, height, *args):
+    def infoWin(self, title, description, text, align, width, height, buttonList=False, *args):
         """ Create a window showing the text info with the description about any module.
         """
         # declaring variables:
@@ -39,6 +40,11 @@ class Logger(object):
             infoDesc = cmds.text(self.lang[self.info_description], align=self.info_align, parent=infoLayout)
         if self.info_text:
             infoText = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
+            if buttonList:
+                if not buttonList[0] == "None":
+                    cmds.button(label=buttonList[0], command=partial(buttonList[1], buttonList[2]), parent=infoLayout)
+                else:
+                    noneText = cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow(dpInfoWin)
 

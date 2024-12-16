@@ -164,8 +164,11 @@ class ActionStartClass(object):
     def updateInfoDataButton(self, *args):
         """ Just get the latest exported data and edit the info button text.
         """
-        self.infoText = "\n\n"+self.dpUIinst.lang['r060_latestExportedData']+"\n"+self.getLatestExportedData()
-        cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250))
+        self.infoText = "\n\n"+self.dpUIinst.lang['r060_latestExportedData']+"\n"
+        buttonLabel = self.getLatestExportedData()
+        buttonCommand = self.dpUIinst.packager.openFolder
+        buttonArgument = self.ioPath
+        cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument]))
 
 
     def getLatestExportedData(self, *args):
