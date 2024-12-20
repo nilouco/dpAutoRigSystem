@@ -244,7 +244,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
                                 if not item in wellImportedList:
                                     wellImportedList.append(item)
             else:
-                notFoundNodesList.append(item+"."+attr)
+                notFoundNodesList.append(item)
         if notFoundNodesList:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:

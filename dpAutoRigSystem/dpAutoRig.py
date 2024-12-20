@@ -18,173 +18,129 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.26"
+DPAR_VERSION_2025 = "5.00.00"
 DPAR_UPDATELOG = "N790 - Rebuilder."
 
 
-
-###################### Start: Loading.
-
+# Import libraries
 import os
 import random
+import json
+import re
+import time
+import getpass
+import urllib.request
+import shutil
+import zipfile
+import datetime
+import io
+import sys
+import socket
+import platform
 from maya import cmds
-
-def clearDPARLoadingWindow():
-    if cmds.window('dpARLoadWin', query=True, exists=True):
-        cmds.deleteUI('dpARLoadWin', window=True)
-
-def dpARLoadingWindow():
-    """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
-    """
-    print("\n----------")
-    loadingString = "Loading dpAutoRigSystem v%s ... " %DPAR_VERSION_PY3
-    print(loadingString)
-    path = os.path.dirname(__file__)
-    randImage = random.randint(0,7)
-    clearDPARLoadingWindow()
-    cmds.window('dpARLoadWin', title='dpAutoRigSystem', iconName='dpAutoRig', widthHeight=(285, 203), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
-    cmds.columnLayout('dpARLoadLayout')
-    cmds.image('loadingImage', image=(path+"/Icons/dp_loading_0%i.png" %randImage), backgroundColor=(0.8, 0.8, 0.8), parent='dpARLoadLayout')
-    cmds.text('versionText', label=loadingString, parent='dpARLoadLayout')
-    cmds.showWindow('dpARLoadWin')
-    cmds.window('dpARLoadWin', edit=True, widthHeight=(285, 203))
-
-dpARLoadingWindow()
-
-###################### End: Loading.
+from maya import mel
+from functools import partial
+from importlib import reload
+from .Modules.Library import dpUtils
+from .Modules.Library import dpControls
+from .Modules.Library import dpSkinning
+from .Modules.Base import dpBaseStandard
+from .Modules.Base import dpBaseLayout
+from .Tools import dpUpdateRigInfo
+from .Tools import dpReorderAttr
+from .Tools import dpCustomAttr
+from .Languages.Translator import dpTranslator
+from .Pipeline import dpPipeliner
+from .Pipeline import dpPublisher
+from .Pipeline import dpPackager
+from .Pipeline import dpLogger
 
 
-###################### Start: Download master.
-
-def dpARDownloadMaster():
-    """ Help user to download a dpAutoRigSystem master file from GitHub to reinstall it
-    """
-    confirm = cmds.confirmDialog(title="Reinstall", message="There's an unexpected issue, sorry!\nPlease reinstall the dpAutoRigSystem.\nRemember to delete the current folder before install a new one from:\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/", button="Download", dismissString="No")
-    if confirm == "Download":
-        if os.name == "nt":
-            DOWNLOAD_FOLDER = f"{os.getenv('USERPROFILE')}\\Downloads"
-        else:  # PORT: For *Nix systems
-            DOWNLOAD_FOLDER = f"{os.getenv('HOME')}/Downloads"
-        urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", DOWNLOAD_FOLDER+"/dpAutoRigSystem-master.zip")
-
-###################### End: Download master.
+class Start(object):
+    def __init__(self, dev=False, *args, **kwargs):
+        self.dev = dev
+        self.dpARVersion = DPAR_VERSION_2025
+        self.dpARLoadingWindow()
+        self.loadVariables()
+        if self.dev:
+            self.reloadModules()
+        #self.ui()
 
 
-# importing libraries:
-try:
-    import json
-    import re
-    import time
-    import getpass
-    import urllib.request
-    import shutil
-    import zipfile
-    import datetime
-    import io
-    import sys
-    import socket
-    import platform
-    from maya import mel
-    from functools import partial
-    from .Modules.Library import dpUtils
-    from .Modules.Library import dpControls
-    from .Modules.Library import dpSkinning
-    from .Modules.Base import dpBaseStandard
-    from .Modules.Base import dpBaseLayout
-    from .Tools import dpUpdateRigInfo
-    from .Tools import dpReorderAttr
-    from .Tools import dpCustomAttr
-    from .Languages.Translator import dpTranslator
-    from .Pipeline import dpPipeliner
-    from .Pipeline import dpPublisher
-    from .Pipeline import dpPackager
-    from .Pipeline import dpLogger
-    from importlib import reload
-    reload(dpUtils)
-    reload(dpControls)
-    reload(dpUpdateRigInfo)
-    reload(dpBaseStandard)
-    reload(dpBaseLayout)
-    reload(dpPublisher)
-    reload(dpPipeliner)
-    reload(dpPackager)
-    reload(dpLogger)
-    reload(dpCustomAttr)
-    reload(dpSkinning)
-except Exception as e:
-    print("Error: importing python modules!!!\n")
-    print(e)
-    dpARDownloadMaster()
-    try:
-        clearDPARLoadingWindow()
-        self.jobWinClose()
-    except:
-        pass
-
-# declaring member variables
-ENGLISH = "English"
-STANDARD = "Modules/Standard"
-INTEGRATED = "Modules/Integrated"
-CURVES_SIMPLE = "Modules/Curves/Simple"
-CURVES_COMBINED = "Modules/Curves/Combined"
-CURVES_PRESETS = "Modules/Curves/Presets"
-TOOLS = "Tools"
-LANGUAGES = "Languages"
-VALIDATOR = "Pipeline/Validator"
-CHECKIN = "Pipeline/Validator/CheckIn"
-CHECKOUT = "Pipeline/Validator/CheckOut"
-VALIDATOR_PRESETS = "Pipeline/Validator/Presets"
-REBUILDER =  "Pipeline/Rebuilder"
-SOURCE =  "Pipeline/Rebuilder/Source"
-SETUP =  "Pipeline/Rebuilder/Setup"
-DEFORMING =  "Pipeline/Rebuilder/Deforming"
-CUSTOM =  "Pipeline/Rebuilder/Custom"
-BASE_NAME = "dpAR_"
-EYE = "Eye"
-HEAD = "Head"
-SPINE = "Spine"
-LIMB = "Limb"
-FOOT = "Foot"
-FINGER = "Finger"
-ARM = "Arm"
-LEG = "Leg"
-SINGLE = "Single"
-WHEEL = "Wheel"
-STEERING = "Steering"
-SUSPENSION = "Suspension"
-NOSE = "Nose"
-CHAIN = "Chain"
-GUIDE_BASE_NAME = "Guide_Base"
-GUIDE_BASE_ATTR = "guideBase"
-MODULE_NAMESPACE_ATTR = "moduleNamespace"
-MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
-TEMP_GRP = "dpAR_Temp_Grp"
-GUIDEMIRROR_GRP = "dpAR_GuideMirror_Grp"
-INFO_ICON = "dp_info.png"
-XDELETE_ICON = "dp_xDelete.png"
-PLUSINFOWIN_NAME = "dpPlusInfoWindow"
-COLOROVERRIDEWIN_NAME = 'dpColorOverrideWindow'
-DPAR_SITE = "https://nilouco.blogspot.com"
-DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
-DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
-DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
-DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
-DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
-LOCATION_URL = "https://ipinfo.io/json"
-MASTER_ATTR = "masterGrp"
-DPDATA = "dpData"
-DPLOG = "dpLog"
-DPID = "dpID"
+    def reloadModules(self, *args):
+        """ DEV reloading modules.
+        """ 
+        print("DEV mode = True")
+        reload(dpUtils)
+        reload(dpControls)
+        reload(dpUpdateRigInfo)
+        reload(dpBaseStandard)
+        reload(dpBaseLayout)
+        reload(dpPublisher)
+        reload(dpPipeliner)
+        reload(dpPackager)
+        reload(dpLogger)
+        reload(dpCustomAttr)
+        reload(dpSkinning)
 
 
-class DP_AutoRig_UI(object):
-
-    ###################### Start: UI
-    
-    def __init__(self):
-        """ Start the window, menus and main layout for dpAutoRig UI.
+    def loadVariables(self, *args):
+        """ Just load class variables here.
         """
-        self.dpARVersion = DPAR_VERSION_PY3
+        print("Loading variables ...")
+        self.englishName = "English"
+        self.baseName = "dpAR_"
+        self.eyeName = "Eye"
+        self.headName = "Head"
+        self.spineName = "Spine"
+        self.limbName = "Limb"
+        self.footName = "Foot"
+        self.fingerName = "Finger"
+        self.armName = "Arm"
+        self.legName = "Leg"
+        self.singleName = "Single"
+        self.wheelName = "Wheel"
+        self.steeringName = "Steering"
+        self.suspensionName = "Suspension"
+        self.noseName = "Nose"
+        self.chainName = "Chain"
+        self.guideBaseName = "Guide_Base"
+        self.plusInfoWinName = "dpPlusInfoWindow"
+        self.colorOverrideWinName = "dpColorOverrideWindow"
+        self.toolsFolder = "Tools"
+        self.languagesFolder = "Languages"
+        self.standardFolder = "Modules/Standard"
+        self.integratedFolder = "Modules/Integrated"
+        self.curvesSimpleFolder = "Modules/Curves/Simple"
+        self.curvesCombinedFolder = "Modules/Curves/Combined"
+        self.curvesPresetsFolder = "Modules/Curves/Presets"
+        self.validatorFolder = "Pipeline/Validator"
+        self.checkInFolder = "Pipeline/Validator/CheckIn"
+        self.checkOutFolder = "Pipeline/Validator/CheckOut"
+        self.validatorPresetsFolder = "Pipeline/Validator/Presets"
+        self.rebuilderFolder =  "Pipeline/Rebuilder"
+        self.sourceFolder =  "Pipeline/Rebuilder/Source"
+        self.setupFolder =  "Pipeline/Rebuilder/Setup"
+        self.deformingFolder =  "Pipeline/Rebuilder/Deforming"
+        self.customFolder =  "Pipeline/Rebuilder/Custom"
+        self.guideBaseAttr = "guideBase"
+        self.masterAttr = "masterGrp"
+        self.moduleNamespaceAttr = "moduleNamespace"
+        self.moduleInstanceInfoAttr = "moduleInstanceInfo"
+        self.infoIcon = "dp_info.png"
+        self.xDeleteIcon = "dp_xDelete.png"
+        self.dpARWebSiteURL = "https://nilouco.blogspot.com"
+        self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
+        self.gitHubURL = "https://github.com/nilouco/dpAutoRigSystem"
+        self.masterURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
+        self.whatsChangedURL = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
+        self.donateURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
+        self.locationURL = "https://ipinfo.io/json"
+        self.tempGrp = "dpAR_Temp_Grp"
+        self.guideMirrorGrp = "dpAR_GuideMirror_Grp"
+        self.dpData = "dpData"
+        self.dpLog = "dpLog"
+        self.dpID = "dpID"
         self.loadedPath = False
         self.loadedStandard = False
         self.loadedIntegrated = False
@@ -199,139 +155,104 @@ class DP_AutoRig_UI(object):
         self.loadedSetup = False
         self.loadedDeforming = False
         self.loadedCustom = False
-        self.dpID = DPID
+        self.rebuilding = False
         self.toIDList = []
         self.controlInstanceList = []
         self.checkInInstanceList = []
         self.checkOutInstanceList = []
         self.checkAddOnsInstanceList = []
         self.rebuilderInstanceList = []
-        self.rebuilding = False
         self.degreeOption = 0
-        self.tempGrp = TEMP_GRP
-        self.guideMirrorGrp = GUIDEMIRROR_GRP
-        self.plusInfoWinName = PLUSINFOWIN_NAME
-        self.colorOverrideWinName = COLOROVERRIDEWIN_NAME
-        self.curvesDir = CURVES_SIMPLE
         self.userDefAutoCheckUpdate = 1
         self.userDefAgreeTerms = 1
-        self.dpData = DPDATA
-        self.dpLog = DPLOG
         self.optionCtrl = None
         self.utils = dpUtils.Utils(self)
         self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager(self)
-        
-        try:
-            # store all UI elements in a dictionary:
-            self.allUIs = {}
-            self.iDeleteJobId = 0
-            self.iSelChangeJobId = 0
-            # creating User Interface (UI) Window:
-            self.deleteExistWindow()
-            dpAR_winWidth  = 305
-            dpAR_winHeight = 605
-            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(self.dpARVersion)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
-            
-            # creating menus:
-            self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
-            # language menu:
-            self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
-            cmds.radioMenuItemCollection('languageRadioMenuCollection')
-            # create a language list:
-            self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
-            # create menuItems from language list:
-            if self.langList:
-                # verify if there is an optionVar of last choosen by user in Maya system:
-                lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
-                # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
-                for idiom in self.langList:
-                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
-                # load the last language from optionVar value:
-                cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
-            else:
-                print("Error: Cannot load json language files!\n")
-                return
-            
-            # preset menu:
-            self.allUIs["controlsPresetMenu"] = cmds.menuItem('controlsPresetMenu', label='Controllers Preset', parent='settingsMenu', subMenu=True)
-            cmds.radioMenuItemCollection('presetRadioMenuCollection')
-            # create a preset list:
-            self.presetList, self.presetDic = self.getJsonFileInfo(CURVES_PRESETS)
-            # create menuItems from preset list:
-            if self.presetList:
-                # verify if there is an optionVar of last choosen by user in Maya system:
-                lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
-                # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
-                for preset in self.presetList:
-                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI())\", lowestPriority=True)')
-                # load the last preset from optionVar value:
-                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='controlsPresetMenu')
-            else:
-                print("Error: Cannot load json preset files!\n")
-                return
-            
-            # validator preset menu:
-            self.allUIs["validatorPresetMenu"] = cmds.menuItem('validatorPresetMenu', label='Validator Preset', parent='settingsMenu', subMenu=True)
-            cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
-            # create a validator preset list:
-            self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
-            if self.pipeliner.pipeData['presetsPath']:
-                self.loadPipelineValidatorPresets()
-            # create menuItems from validator preset list:
-            if self.validatorPresetList:
-                # create menuItems with the validator presets
-                for validatorPreset in self.validatorPresetList:
-                    cmds.menuItem( validatorPreset+"_MI", label=validatorPreset, radioButton=False, collection='validatorPresetRadioMenuCollection', command=self.setValidatorPreset)
-                # load the first validator preset, expected to be the pipeline studio item if it exists:
-                cmds.menuItem(self.validatorPresetList[0]+"_MI", edit=True, radioButton=True, collection='validatorPresetRadioMenuCollection', parent='validatorPresetMenu')
-            else:
-                print("Error: Cannot load json validator preset files!\n")
-                return
-            
-            # create the main layout:
-            self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
-            # here we will populate with layout from mainUI based in the choose language.
-            
-            # call mainUI in order to populate the main layout:
-            self.mainUI()
-            
-            # check if we need to automatically check for update:
-            self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
-            # also check for agreement of terms and conditions
-            self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
+        self.allUIs = {}
+        self.iDeleteJobId = 0
+        self.iSelChangeJobId = 0
 
-        except Exception as e:
-            print("Error: dpAutoRig UI window !!!\n")
-            print("Exception:", e)
-            try:
-                # error logging
-                self.packager.toDiscord(self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), self.dpARVersion+": "+str(e))
-            except:
-                pass
-            print(self.langDic[self.langName]['i008_errorUI'])
-            dpARDownloadMaster()
-            clearDPARLoadingWindow()
-            return
-        
-        # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
-        self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
-        self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
-        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystem', killWithScene=True, compressUndo=True)
+
+    def ui(self, *args):
+        """ Start the main UI, menus and layouts for dpAutoRigSystem.
+        """
+        if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
+            cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
+        self.labelText = "dpAutoRigSystem"
+        self.labelText += " - "+self.dpARVersion
+        if self.dev:
+            self.labelText += " ~ dev"
+        cmds.workspaceControl("dpAutoRigSystemWC", retain=False, floating=False, label=self.labelText, uiScript="autoRig.mainUI()")
+        self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
+        self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
         self.ctrls.startCorrectiveEditMode()
-        clearDPARLoadingWindow()
         self.refreshMainUI()
+        self.startScriptJobs()
+        cmds.select(clear=True)
+        self.utils.closeUI("dpARLoadWin")
+        print("dpAutoRigSystem "+self.lang['i346_loadedSucess']+"\n----------")
+        
+
+    def startScriptJobs(self, *args):
+        """ Create scriptJobs to read:
+            - NewSceneOpened (or not?)
+            - SceneSaved
+            - deleteAll = new scene
+            - quitApplication = Maya closes
+            - SelectionChanged
+        """
+        #self.refreshAssetNewSceneJob = cmds.scriptJob(event=('NewSceneOpened', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        self.refreshAssetSaveJob     = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        self.iDeleteJobId            = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        self.iQuitAppJobId           = cmds.scriptJob(event=('quitApplication', self.deleteExistWindow), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        self.iSelChangeJobId         = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         self.jobSelectedGuide()
 
 
     def deleteExistWindow(self, *args):
-        """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
+        """ Check if there are the dpAutoRigWindow and a control element to delete the UI.
         """
+        if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
+            cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
+            #cmds.deleteUI("dpAutoRigSystemWC", control=True)
+        self.utils.closeUI("dpARLoadWin")
         self.utils.closeUI(self.plusInfoWinName)
         self.utils.closeUI(self.colorOverrideWinName)
-        self.utils.closeUI('dpAutoRigWindow')
-        if cmds.dockControl('dpAutoRigSystem', query=True, exists=True):
-            cmds.deleteUI('dpAutoRigSystem', control=True)
+
+
+    def clearDPARLoadingWindow(self, *args):
+        if cmds.window('dpARLoadWin', query=True, exists=True):
+            cmds.deleteUI('dpARLoadWin', window=True)
+
+
+    def dpARLoadingWindow(self, *args):
+        """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
+        """
+        print("\n----------")
+        loadingString = "Loading dpAutoRigSystem v%s ... " %self.dpARVersion
+        print(loadingString)
+        path = os.path.dirname(__file__)
+        randImage = random.randint(0,7)
+        self.clearDPARLoadingWindow()
+        cmds.window('dpARLoadWin', title='dpAutoRigSystem', iconName='dpAutoRig', widthHeight=(285, 203), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        cmds.columnLayout('dpARLoadLayout')
+        cmds.image('loadingImage', image=(path+"/Icons/dp_loading_0%i.png" %randImage), backgroundColor=(0.8, 0.8, 0.8), parent='dpARLoadLayout')
+        cmds.text('versionText', label=loadingString, parent='dpARLoadLayout')
+        cmds.showWindow('dpARLoadWin')
+        cmds.window('dpARLoadWin', edit=True, widthHeight=(285, 203))
+    
+
+    def dpARDownloadMaster(self, *args):
+        """ Help user to download a dpAutoRigSystem master file from GitHub to reinstall it
+        """
+        confirm = cmds.confirmDialog(title="Reinstall", message="There's an unexpected issue, sorry!\nPlease reinstall the dpAutoRigSystem.\nRemember to delete the current folder before install a new one from:\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/", button="Download", dismissString="No")
+        if confirm == "Download":
+            if os.name == "nt":
+                self.downloadFolder = f"{os.getenv('USERPROFILE')}\\Downloads"
+            else:  # PORT: For *Nix systems
+                self.downloadFolder = f"{os.getenv('HOME')}/Downloads"
+            urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", self.downloadFolder+"/dpAutoRigSystem-master.zip")
     
     
     def getJsonFileInfo(self, dir, absolute=False):
@@ -394,7 +315,7 @@ class DP_AutoRig_UI(object):
     
     def getCurrentMenuValue(self, itemList, *args):
         for item in itemList:
-            if cmds.menuItem( item+"_MI", query=True, radioButton=True ):
+            if cmds.menuItem(item+"_MI", query=True, radioButton=True):
                 return item
     
     
@@ -408,28 +329,86 @@ class DP_AutoRig_UI(object):
     def mainUI(self):
         """ Create the layouts inside of the mainLayout. Here will be the entire User Interface.
         """
-        # get current language choose UI from menu:
+        # -- Creating menus:
+
+        self.allUIs["mainMenuBarLayout"] = cmds.menuBarLayout("mainMenuBarLayout")
+        self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
+        # language menu:
+        self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
+        cmds.radioMenuItemCollection('languageRadioMenuCollection')
+        # create a language list:
+        self.langList, self.langDic = self.getJsonFileInfo(self.languagesFolder)
+        # create menuItems from language list:
+        if self.langList:
+            # verify if there is an optionVar of last choosen by user in Maya system:
+            lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", self.englishName, self.langList)
+            # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
+            for idiom in self.langList:
+                cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command=partial(self.reloadMainUI, idiom))
+            # load the last language from optionVar value:
+            cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
+        else:
+            print("Error: Cannot load json language files!\n")
+            return
+        
+        # preset menu:
+        self.allUIs["controlsPresetMenu"] = cmds.menuItem('controlsPresetMenu', label='Controllers Preset', parent='settingsMenu', subMenu=True)
+        cmds.radioMenuItemCollection('presetRadioMenuCollection')
+        # create a preset list:
+        self.presetList, self.presetDic = self.getJsonFileInfo(self.curvesPresetsFolder)
+        # create menuItems from preset list:
+        if self.presetList:
+            # verify if there is an optionVar of last choosen by user in Maya system:
+            lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
+            # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
+            for preset in self.presetList:
+                cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].Start())\", lowestPriority=True)')
+            # load the last preset from optionVar value:
+            cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='controlsPresetMenu')
+        else:
+            print("Error: Cannot load json preset files!\n")
+            return
+        
+        # validator preset menu:
+        self.allUIs["validatorPresetMenu"] = cmds.menuItem('validatorPresetMenu', label='Validator Preset', parent='settingsMenu', subMenu=True)
+        cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
+        # create a validator preset list:
+        self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(self.validatorPresetsFolder)
+        if self.pipeliner.pipeData['presetsPath']:
+            self.loadPipelineValidatorPresets()
+        # create menuItems from validator preset list:
+        if self.validatorPresetList:
+            # create menuItems with the validator presets
+            for validatorPreset in self.validatorPresetList:
+                cmds.menuItem( validatorPreset+"_MI", label=validatorPreset, radioButton=False, collection='validatorPresetRadioMenuCollection', command=self.setValidatorPreset)
+            # load the first validator preset, expected to be the pipeline studio item if it exists:
+            cmds.menuItem(self.validatorPresetList[0]+"_MI", edit=True, radioButton=True, collection='validatorPresetRadioMenuCollection', parent='validatorPresetMenu')
+        else:
+            print("Error: Cannot load json validator preset files!\n")
+            return
+        
+        # -- Language, Preset choose UI from menu
+
         self.langName = self.getCurrentMenuValue(self.langList)
-        # get current preset choose UI from menu:
         self.presetName = self.getCurrentMenuValue(self.presetList)
         # optimize dictionaries
         self.lang = self.langDic[self.langName]
         self.ctrlPreset = self.presetDic[self.presetName]
         
-        # initialize some objects here:
+        # -- Initialize some objects here:
+
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
         self.customAttr = dpCustomAttr.CustomAttr(self, False)
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
-        # --
 
         # create menu:
         self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
         cmds.menuItem('translator_MI', label='Translator', command=self.translator)
         cmds.menuItem('pipeliner_MI', label='Pipeliner', command=partial(self.pipeliner.mainUI, self))
-        cmds.menuItem('createControlPreset_MI', label='Controllers Preset', command=partial(self.createPreset, "controls", CURVES_PRESETS, True))
-        cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
+        cmds.menuItem('createControlPreset_MI', label='Controllers Preset', command=partial(self.createPreset, "controls", self.curvesPresetsFolder, True))
+        cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", self.validatorPresetsFolder, False))
         # window menu:
         self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
         cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.reloadMainUI)
@@ -438,54 +417,51 @@ class DP_AutoRig_UI(object):
         self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
         cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
         cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
-        cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+        cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[self.englishName]['_collaborators'], 'center', 305, 250))
         cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
         cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
         cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
         cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-        cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, DPAR_SITE))
+        cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, self.dpARWebSiteURL))
         
+        # -- Layout
+        
+        # create the main layout:
+        self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')        
         # creating tabs - mainTabLayout:
         self.allUIs["mainTabLayout"] = cmds.tabLayout('mainTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
         cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["mainTabLayout"], 'top', 0), (self.allUIs["mainTabLayout"], 'left', 0), (self.allUIs["mainTabLayout"], 'bottom', 0), (self.allUIs["mainTabLayout"], 'right', 0)) )
         
-        # --
+        # -- Rigging tag
         
-        # interface of Rigging tab - formLayout:
         self.allUIs["riggingTabLayout"] = cmds.formLayout('riggingTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        
         #colTopLefA - columnLayout:
         self.allUIs["colTopLeftA"] = cmds.columnLayout('colTopLeftA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["i000_guides"] = cmds.text(self.lang['i000_guides'], font="boldLabelFont", width=150, align='center', parent=self.allUIs["colTopLeftA"])
         cmds.setParent(self.allUIs["riggingTabLayout"])
-        
         #colTopRightA - columnLayout:
         self.allUIs["colTopRightA"] = cmds.columnLayout('colTopRightA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["i001_modules"] = cmds.text(self.lang['i001_modules'], font="boldLabelFont", width=150, align='center', parent=self.allUIs["colTopRightA"])
         cmds.setParent(self.allUIs["riggingTabLayout"])
-        
         #colMiddleLeftA - scrollLayout - guidesLayout:
         self.allUIs["colMiddleLeftA"] = cmds.scrollLayout("colMiddleLeftA", width=160, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["guidesLayoutA"] = cmds.columnLayout("guidesLayoutA", adjustableColumn=True, width=140, rowSpacing=3, parent=self.allUIs["colMiddleLeftA"])
         # here will be populated by guides of modules and scripts...
         self.allUIs["i030_standard"] = cmds.text(self.lang['i030_standard'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.guideModuleList = self.startGuideModules(STANDARD, "start", "guidesLayoutA")
+        self.guideModuleList = self.startGuideModules(self.standardFolder, "start", "guidesLayoutA")
         cmds.separator(style='doubleDash', height=10, parent=self.allUIs["guidesLayoutA"])
         self.allUIs["i031_integrated"] = cmds.text(self.lang['i031_integrated'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.startGuideModules(INTEGRATED, "start", "guidesLayoutA")
+        self.startGuideModules(self.integratedFolder, "start", "guidesLayoutA")
         cmds.setParent(self.allUIs["riggingTabLayout"])
-        
         #colMiddleRightA - scrollLayout - modulesLayout:
         self.allUIs["colMiddleRightA"] = cmds.scrollLayout("colMiddleRightA", width=120, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=120, parent=self.allUIs["colMiddleRightA"])
         # here will be populated by created instances of modules...
         # after footerA we will call the function to populate here, because it edits the footerAText
         cmds.setParent(self.allUIs["riggingTabLayout"])
-        
         #editSelectedModuleLayoutA - frameLayout:
         self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.lang['i011_editSelected']+" "+self.lang['i143_module'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["selectedModuleLayout"] = cmds.columnLayout('selectedModuleLayout', adjustableColumn=True, parent=self.allUIs["editSelectedModuleLayoutA"])
-        
         #optionsMainFL - frameLayout:
         self.allUIs["optionsMainFL"] = cmds.frameLayout('optionsMainFL', label=self.lang['i002_options'], collapsable=True, collapse=True, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["rigOptionsLayout"] = cmds.columnLayout('rigOptionsLayout', adjustableColumn=True, columnOffset=('left', 5), parent=self.allUIs["optionsMainFL"])
@@ -510,9 +486,7 @@ class DP_AutoRig_UI(object):
         cmds.optionMenu(self.degreeOptionMenu, edit=True, value=lastDegreeOption)
         cmds.text(self.lang['i128_optionDegree'], parent=self.allUIs["degreeLayout"])
         self.degreeOption = int(lastDegreeOption[0])
-
         cmds.setParent(self.allUIs["riggingTabLayout"])
-        
         #footerA - columnLayout:
         self.allUIs["footerA"] = cmds.columnLayout('footerA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["rigAllButton"] = cmds.button(label=self.lang['i020_rigAll'], annotation=self.lang['i021_rigAllDesc'], backgroundColor=(0.6, 1.0, 0.6), command=self.rigAll, parent=self.allUIs["footerA"])
@@ -520,7 +494,6 @@ class DP_AutoRig_UI(object):
         # this text will be actualized by the number of module instances created in the scene...
         self.allUIs["footerAText"] = cmds.text('footerAText', align='center', label="# "+self.lang['i005_footerA'], parent=self.allUIs["footerA"])
         cmds.setParent( self.allUIs["mainTabLayout"] )
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["riggingTabLayout"], edit=True,
                         attachForm=[(self.allUIs["colTopLeftA"], 'top', 5), (self.allUIs["colTopLeftA"], 'left', 5), (self.allUIs["colTopRightA"], 'top', 5), (self.allUIs["colTopRightA"], 'right', 5), (self.allUIs["colMiddleLeftA"], 'left', 5), (self.allUIs["colMiddleRightA"], 'right', 5), (self.allUIs["optionsMainFL"], 'left', 5), (self.allUIs["optionsMainFL"], 'right', 5), (self.allUIs["editSelectedModuleLayoutA"], 'left', 5), (self.allUIs["editSelectedModuleLayoutA"], 'right', 5), (self.allUIs["footerA"], 'left', 5), (self.allUIs["footerA"], 'bottom', 5), (self.allUIs["footerA"], 'right', 5)],
@@ -529,20 +502,13 @@ class DP_AutoRig_UI(object):
                         attachNone=[(self.allUIs["footerA"], 'top')]
                         )
         
-        # create the job of selected guide module and when new scene is created:
-        self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        # -- Skinning tab
         
-        # --
-        
-        # interface of Skinning tab:
         self.allUIs["skinningTabLayout"] = cmds.formLayout('skinningTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # skinMainLayout - scrollLayout:
         self.allUIs["skinMainLayout"] = cmds.scrollLayout('skinMainLayout', parent=self.allUIs["skinningTabLayout"])
         self.allUIs["skinLayout"] = cmds.columnLayout('skinLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['skinMainLayout'])
         self.allUIs["skinCreateFL"] = cmds.frameLayout('skinCreateFL', label=self.lang['i158_create']+" SkinCluster", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
         self.allUIs["skinLists2Layout"] = cmds.paneLayout("skinLists2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCreateFL"])
-        
         #colSkinLeftA - columnLayout:
         self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         # radio buttons:
@@ -559,7 +525,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinLeftA"] )
         cmds.radioCollection(self.allUIs["jntCollection"], edit=True, select=dpARJoints)
         cmds.setParent(self.allUIs["skinCreateFL"])
-        
         #colSkinRightA - columnLayout:
         self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
@@ -572,7 +537,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinRightA"] )
         cmds.radioCollection(self.allUIs["geomCollection"], edit=True, select=selGeoms)
         cmds.setParent(self.allUIs["skinCreateFL"])
-        
         #footerB - columnLayout:
         self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinCreateFL"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
@@ -583,7 +547,6 @@ class DP_AutoRig_UI(object):
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.lang['i025_joints']+" 0 "+self.lang['i024_geometries'], parent=self.allUIs["footerB"])
-        
         #skinCopy - layout
         self.allUIs["skinCopyFL"] = cmds.frameLayout('skinCopyFL', label=self.lang['i287_copy']+" Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
         self.allUIs['skinCopyRowLayout'] = cmds.rowLayout('skinCopyRowLayout', numberOfColumns=3, columnWidth3=(90, 90, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs["skinCopyFL"])
@@ -595,27 +558,22 @@ class DP_AutoRig_UI(object):
         self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.copySkinSameName, None, True), annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
         cmds.radioCollection(self.allUIs["skinSurfAssociationCollection"], edit=True, select=closestPoint)
         cmds.setParent( self.allUIs["mainTabLayout"] )
-
         #skinWeightsIO - layout
         self.allUIs["skinWeightsIOFL"] = cmds.frameLayout('skinWeightsIOFL', label="SkinCluster weights IO", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
         self.allUIs["skinWeightsIOLayout"] = cmds.paneLayout("skinWeightsIOLayout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinWeightsIOFL"])
         self.allUIs["skinWeightsExportBT"] = cmds.button("skinWeightsExportBT", label=self.lang['i164_export'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.skin.ioSkinWeightsByUI, True), annotation=self.lang['i266_selected'], parent=self.allUIs["skinWeightsIOLayout"])
         self.allUIs["skinWeightsImportBT"] = cmds.button("skinWeightsImportBT", label=self.lang['i196_import'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.ioSkinWeightsByUI, False), annotation=self.lang['i266_selected'], parent=self.allUIs["skinWeightsIOLayout"])
         cmds.setParent( self.allUIs["mainTabLayout"] )
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["skinningTabLayout"], edit=True,
                         attachForm=[(self.allUIs["skinMainLayout"], 'top', 20), (self.allUIs["skinMainLayout"], 'left', 5), (self.allUIs["skinMainLayout"], 'right', 5), (self.allUIs["skinMainLayout"], 'bottom', 5)]
                         )
         
-        # --
-        
-        # interface of Controllers tab - formLayout:
+        # -- Controllers tab
+
         self.allUIs["controllerTabLayout"] = cmds.formLayout('controllerTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # controllerMainLayout - scrollLayout:
         self.allUIs["controllerMainLayout"] = cmds.scrollLayout('controllerMainLayout', parent=self.allUIs["controllerTabLayout"])
         self.allUIs["controllerLayout"] = cmds.columnLayout('controllerLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['controllerMainLayout'])
-        
         # colorControl - frameLayout:
         self.allUIs["colorControlFL"] = cmds.frameLayout('colorControlFL', label=self.lang['m047_colorOver'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["colorTabLayout"] = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["colorControlFL"])
@@ -636,14 +594,12 @@ class DP_AutoRig_UI(object):
         cmds.button("removeOutlinerColorBT", label=self.lang['i046_remove'], command=self.ctrls.removeColor, parent=self.allUIs["colorOutlinerLayout"])
         # renaming tabLayouts:
         cmds.tabLayout(self.allUIs["colorTabLayout"], edit=True, tabLabel=((self.allUIs["colorIndexLayout"], "Index"), (self.allUIs["colorRGBLayout"], "RGB"), (self.allUIs["colorOutlinerLayout"], "Outliner")))
-
         # setupController - frameLayout:
         self.allUIs["defaultValuesControlFL"] = cmds.frameLayout('defaultValuesControlFL', label=self.lang['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["defaultValuesControl3Layout"] = cmds.paneLayout("defaultValuesControl3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["defaultValuesControlFL"])
         self.allUIs["resetToDefaultValuesButton"] = cmds.button("resetToDefaultValuesButton", label=self.lang['i271_reset'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ctrls.setupDefaultValues, True), parent=self.allUIs["defaultValuesControl3Layout"])
         self.allUIs["setDefaultValuesButton"] = cmds.button("setDefaultValuesButton", label=self.lang['i272_set'], backgroundColor=(1.0, 0.8, 0.5), height=30, command=partial(self.ctrls.setupDefaultValues, False), parent=self.allUIs["defaultValuesControl3Layout"])
         self.allUIs["setupDefaultValuesButton"] = cmds.button("setupDefaultValuesButton", label=self.lang['i274_editor'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=self.ctrls.defaultValueEditor, parent=self.allUIs["defaultValuesControl3Layout"])
-
         # createController - frameLayout:
         self.allUIs["createControllerLayout"] = cmds.frameLayout('createControllerLayout', label=self.lang['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["optionsControllerFL"] = cmds.frameLayout('optionsControllerFL', label=self.lang['i002_options'], collapsable=True, collapse=True, marginWidth=10, parent=self.allUIs["createControllerLayout"])
@@ -662,18 +618,15 @@ class DP_AutoRig_UI(object):
         cmds.menuItem(label='-Z')
         cmds.menuItem(label='+Z')
         cmds.optionMenuGrp(self.allUIs["directionOMG"], edit=True, value='+Y')
-        
         # curveShapes - frameLayout:
         self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.lang['i100_curveShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
         self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
         # here we populate the control module layout with the items from Controllers folder:
-        self.controlModuleList = self.startGuideModules(CURVES_SIMPLE, "start", "controlModuleLayout")
-        
+        self.controlModuleList = self.startGuideModules(self.curvesSimpleFolder, "start", "controlModuleLayout")
         self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.lang['i118_combinedShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
         self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
         # here we populate the control module layout with the items from Controllers folder:
-        self.combinedControlModuleList = self.startGuideModules(CURVES_COMBINED, "start", "combinedControlModuleLayout")
-        
+        self.combinedControlModuleList = self.startGuideModules(self.curvesCombinedFolder, "start", "combinedControlModuleLayout")
         # editSeletedController - frameLayout:
         self.allUIs["editSelectedControllerFL"] = cmds.frameLayout('editSelectedControllerFL', label=self.lang['i011_editSelected']+" "+self.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["editSelectedController3Layout"] = cmds.paneLayout("editSelectedController3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
@@ -685,7 +638,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=self.utils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
         self.allUIs["selectAllControls"] = cmds.button("selectAllControls", label=self.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ctrls.selectAllControls), parent=self.allUIs["editSelectedControllerFL"])
-
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
@@ -700,7 +652,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["toPrefixT"] = cmds.text("toPrefixT", label=self.lang['i037_to'], parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["toPrefixTF"] = cmds.textField('toPrefixTF', text=self.lang['p003_right']+"_", parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.lang['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ctrls.mirrorCalibration, parent=self.allUIs["mirrorCalibrationLayout"])
-        
         # ControlShapeIO - frameLayout:
         self.allUIs["shapeIOFL"] = cmds.frameLayout('shapeIOFL', label=self.lang['m067_shape']+" "+self.lang['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["shapeIO4Layout"] = cmds.paneLayout("shapeIO4Layout", configuration="vertical4", separatorThickness=2.0, parent=self.allUIs["shapeIOFL"])
@@ -723,29 +674,25 @@ class DP_AutoRig_UI(object):
                         attachForm=[(self.allUIs["controllerMainLayout"], 'top', 20), (self.allUIs["controllerMainLayout"], 'left', 5), (self.allUIs["controllerMainLayout"], 'right', 5), (self.allUIs["controllerMainLayout"], 'bottom', 5)]
                         )
         
-        # --
+        # --Tools tab
         
-        # interface of Tools tab - formLayout:
         self.allUIs["toolsTabLayout"] = cmds.formLayout('toolsTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # toolsMainLayout - scrollLayout:
         self.allUIs["toolsMainLayout"] = cmds.scrollLayout("toolsMainLayout", parent=self.allUIs["toolsTabLayout"])
         self.allUIs["toolsLayout"] = cmds.columnLayout("toolsLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["toolsMainLayout"])
-        self.extraModuleList = self.startGuideModules(TOOLS, "start", "toolsLayout")
+        self.extraModuleList = self.startGuideModules(self.toolsFolder, "start", "toolsLayout")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["toolsTabLayout"], edit=True,
                         attachForm=[(self.allUIs["toolsMainLayout"], 'top', 20), (self.allUIs["toolsMainLayout"], 'left', 5), (self.allUIs["toolsMainLayout"], 'right', 5), (self.allUIs["toolsMainLayout"], 'bottom', 5)]
                         )
         
-        # --
+        # -- Validator tab
         
-        # interface of Validator tab - formLayout:
         self.allUIs["validatorTabLayout"] = cmds.formLayout('validatorTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # validatorMainLayout - scrollLayout:
         self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
         self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
         self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label=self.lang['i208_checkin'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
         # check-in
-        self.validatorCheckInModuleList = self.startGuideModules(CHECKIN, "start", "validatorCheckInLayout")
+        self.validatorCheckInModuleList = self.startGuideModules(self.checkInFolder, "start", "validatorCheckInLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectAllCheckinCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=False, changeCommand=partial(self.changeActiveAllModules, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
@@ -754,7 +701,7 @@ class DP_AutoRig_UI(object):
         cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
         # check-out
         self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.lang['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-        self.validatorCheckOutModuleList = self.startGuideModules(CHECKOUT, "start", "validatorCheckOutLayout")
+        self.validatorCheckOutModuleList = self.startGuideModules(self.checkOutFolder, "start", "validatorCheckOutLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectAllCheckoutCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
@@ -783,11 +730,9 @@ class DP_AutoRig_UI(object):
                         )
         self.setValidatorPreset()
 
-        # --
+        # -- Rebuilder tab
 
-        # interface of Rebuilder tab - formLayout:
         self.allUIs["rebuilderTabLayout"] = cmds.formLayout('rebuilderTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
-        # rebuilderMainLayout - scrollLayout:
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
         # asset
@@ -798,16 +743,16 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper()+" IO", collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
-        self.rebuilderModuleList = self.startGuideModules(REBUILDER, "start", "rebuilderProcessLayout")
+        self.rebuilderModuleList = self.startGuideModules(self.rebuilderFolder, "start", "rebuilderProcessLayout")
         cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["rebuilderSourceLayout"] = cmds.frameLayout('rebuilderSourceLayout', label=self.lang['i331_source'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(SOURCE, "start", "rebuilderSourceLayout")
+        self.rebuilderModuleList = self.startGuideModules(self.sourceFolder, "start", "rebuilderSourceLayout")
         self.allUIs["rebuilderSetupLayout"] = cmds.frameLayout('rebuilderSetupLayout', label=self.lang['i332_setup'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(SETUP, "start", "rebuilderSetupLayout")
+        self.rebuilderModuleList = self.startGuideModules(self.setupFolder, "start", "rebuilderSetupLayout")
         self.allUIs["rebuilderDeformingLayout"] = cmds.frameLayout('rebuilderDeformingLayout', label=self.lang['i333_deforming'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(DEFORMING, "start", "rebuilderDeformingLayout")
+        self.rebuilderModuleList = self.startGuideModules(self.deformingFolder, "start", "rebuilderDeformingLayout")
         self.allUIs["rebuilderCustomLayout"] = cmds.frameLayout('rebuilderCustomLayout', label=self.lang['i334_custom'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(CUSTOM, "start", "rebuilderCustomLayout")
+        self.rebuilderModuleList = self.startGuideModules(self.customFolder, "start", "rebuilderCustomLayout")
         cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
@@ -816,7 +761,7 @@ class DP_AutoRig_UI(object):
         cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 55)]
+                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 10)]
                         )
         
         # --
@@ -825,12 +770,12 @@ class DP_AutoRig_UI(object):
         self.selList = cmds.ls(selection=True)
     
 
-    def reloadMainUI(self, *args):
-        """ This scriptJob active when we got one new scene in order to reload the UI.
+    def reloadMainUI(self, idiom='ENGLISH', *args):
+        """ This method will set the language optionVar and reload the dpAutoRigSystem UI.
         """
-        from maya import cmds
-        cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
-        self.refreshMainUI()
+        cmds.optionVar(remove="dpAutoRigLastLanguage")
+        cmds.optionVar(stringValue=("dpAutoRigLastLanguage", idiom))
+        cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
     
     
     def refreshMainUI(self, savedScene=None, *args):
@@ -861,23 +806,6 @@ class DP_AutoRig_UI(object):
         self.rebuilding = False
 
 
-    def jobWinClose(self, *args):
-        #This job will ensure that the dock control is killed correctly
-        if self.pDockCtrl:
-            if cmds.objExists(self.pDockCtrl):
-                if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
-                    if cmds.dockControl('dpAutoRigSystem', exists=True):
-                        cmds.deleteUI('dpAutoRigSystem', control=True)
-    
-    
-    def jobDockVisChange(self, *args):
-        #Force focus
-        try:
-            cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
-        except:
-            pass
-    
-    
     def jobSelectedGuide(self):
         """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
         """
@@ -891,7 +819,7 @@ class DP_AutoRig_UI(object):
             updatedGuideNodeList = []
             needUpdateSelect = False
             for selectedItem in selectedList:
-                if cmds.objExists(selectedItem+"."+GUIDE_BASE_ATTR) and cmds.getAttr(selectedItem+"."+GUIDE_BASE_ATTR) == 1:
+                if cmds.objExists(selectedItem+"."+self.guideBaseAttr) and cmds.getAttr(selectedItem+"."+self.guideBaseAttr) == 1:
                     if not ":" in selectedItem[selectedItem.rfind("|"):]:
                         newGuide = self.setupDuplicatedGuide(selectedItem)
                         updatedGuideNodeList.append(newGuide)
@@ -909,7 +837,7 @@ class DP_AutoRig_UI(object):
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
                     if selectedGuideNodeList:
                         for selectedGuide in selectedGuideNodeList:
-                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
+                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.moduleInstanceInfoAttr)
                             if selectedGuideInfo == str(moduleInstance):
                                 cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                                 self.selectedModuleInstanceList.append(moduleInstance)
@@ -960,7 +888,7 @@ class DP_AutoRig_UI(object):
         self.translatorInst.dpTranslatorMain()
         
 
-    def createPreset(self, type="controls", presetDir=CURVES_PRESETS, setOptionVar=True, *args):
+    def createPreset(self, type="controls", presetDir="Modules/Curves/Presets", setOptionVar=True, *args):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
         if type == "controls":
@@ -1003,10 +931,10 @@ class DP_AutoRig_UI(object):
             selectedItem = selectedItem[selectedItem.rfind("|"):]
 
         # getting duplicated item values
-        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+MODULE_NAMESPACE_ATTR)
-        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+MODULE_INSTANCE_INFO_ATTR)
+        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+self.moduleNamespaceAttr)
+        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+self.moduleInstanceInfoAttr)
         # generating naming values
-        origGuideName = moduleNamespaceValue+":"+GUIDE_BASE_NAME
+        origGuideName = moduleNamespaceValue+":"+self.guideBaseName
         thatClassName = moduleNamespaceValue.partition("__")[0]
         thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
         thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
@@ -1016,18 +944,18 @@ class DP_AutoRig_UI(object):
         # initializing a new module instance
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
-        newGuideNamespace = cmds.getAttr(newGuideName+"."+MODULE_NAMESPACE_ATTR)
+        newGuideNamespace = cmds.getAttr(newGuideName+"."+self.moduleNamespaceAttr)
         
         # reset radius as original
-        origRadius = cmds.getAttr(moduleNamespaceValue+":"+GUIDE_BASE_NAME+"_RadiusCtrl.translateX")
+        origRadius = cmds.getAttr(moduleNamespaceValue+":"+self.guideBaseName+"_RadiusCtrl.translateX")
         cmds.setAttr(newGuideName+"_RadiusCtrl.translateX", origRadius)
         
         # getting a good attribute list
         toSetAttrList = cmds.listAttr(selectedItem)
-        guideBaseAttrIdx = toSetAttrList.index(GUIDE_BASE_ATTR)
+        guideBaseAttrIdx = toSetAttrList.index(self.guideBaseAttr)
         toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
-        toSetAttrList.remove(GUIDE_BASE_ATTR)
-        toSetAttrList.remove(MODULE_NAMESPACE_ATTR)
+        toSetAttrList.remove(self.guideBaseAttr)
+        toSetAttrList.remove(self.moduleNamespaceAttr)
         toSetAttrList.remove(customNameAttr)
         toSetAttrList.remove(mirrorAxisAttr)
         
@@ -1126,7 +1054,7 @@ class DP_AutoRig_UI(object):
             displayJcr = cmds.checkBox(self.allUIs["_JcrCB"], query=True, value=True)
             displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
             for jointNode in allJointList:
-                if cmds.objExists(jointNode+'.'+BASE_NAME+'joint'):
+                if cmds.objExists(jointNode+'.'+self.baseName+'joint'):
                     if displayJnt:
                         if jointNode.endswith("_Jnt"):
                             jointList.append(jointNode)
@@ -1277,7 +1205,7 @@ class DP_AutoRig_UI(object):
         print("\n", self.lang['i084_checkUpdate'])
         
         # compare current version with GitHub master
-        rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, DPAR_RAWURL)
+        rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, self.rawURL)
         
         # call Update Window about rawRsult:
         if rawResult[0] == 0:
@@ -1338,40 +1266,40 @@ class DP_AutoRig_UI(object):
             elif action == "exists":
                 return guideModuleList
             # avoid print again the same message:
-            if guideDir == STANDARD and not self.loadedStandard:
+            if guideDir == self.standardFolder and not self.loadedStandard:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedStandard = True
-            if guideDir == INTEGRATED and not self.loadedIntegrated:
+            if guideDir == self.integratedFolder and not self.loadedIntegrated:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedIntegrated = True
-            if guideDir == CURVES_SIMPLE and not self.loadedCurveShape:
+            if guideDir == self.curvesSimpleFolder and not self.loadedCurveShape:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCurveShape = True
-            if guideDir == CURVES_COMBINED and not self.loadedCombined:
+            if guideDir == self.curvesCombinedFolder and not self.loadedCombined:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCombined = True
-            if guideDir == TOOLS and not self.loadedTools:
+            if guideDir == self.toolsFolder and not self.loadedTools:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedTools = True
-            if guideDir == CHECKIN and not self.loadedCheckIn:
+            if guideDir == self.checkInFolder and not self.loadedCheckIn:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckIn = True
-            if guideDir == CHECKOUT and not self.loadedCheckOut:
+            if guideDir == self.checkOutFolder and not self.loadedCheckOut:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckOut = True
-            if guideDir == REBUILDER and not self.loadedRebuilder:
+            if guideDir == self.rebuilderFolder and not self.loadedRebuilder:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedRebuilder = True
-            if guideDir == SOURCE and not self.loadedSource:
+            if guideDir == self.sourceFolder and not self.loadedSource:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedSource = True
-            if guideDir == SETUP and not self.loadedSetup:
+            if guideDir == self.setupFolder and not self.loadedSetup:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedSetup = True
-            if guideDir == DEFORMING and not self.loadedDeforming:
+            if guideDir == self.deformingFolder and not self.loadedDeforming:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedDeforming = True
-            if guideDir == CUSTOM and not self.loadedCustom:
+            if guideDir == self.customFolder and not self.loadedCustom:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCustom = True
             if guideDir == "" and not self.loadedAddOns:
@@ -1393,10 +1321,10 @@ class DP_AutoRig_UI(object):
             if guideDir:
                 guideDir = guideDir.replace("/", ".")
                 guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-                reload(guide)
             else:
                 sys.path.append(path)
                 guide = __import__(guideModule, {}, {}, [guideModule])
+            if self.dev:
                 reload(guide)
         except Exception as e:
             errorString = self.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
@@ -1411,43 +1339,43 @@ class DP_AutoRig_UI(object):
             # find path where 'dpAutoRig.py' is been executed to get the icon:
             path = self.utils.findPath("dpAutoRig.py")
         iconDir = path+icon
-        iconInfo = self.utils.findPath("dpAutoRig.py")+"/Icons/"+INFO_ICON
-        iconX = self.utils.findPath("dpAutoRig.py")+"/Icons/"+XDELETE_ICON
+        iconInfo = self.utils.findPath("dpAutoRig.py")+"/Icons/"+self.infoIcon
+        iconX = self.utils.findPath("dpAutoRig.py")+"/Icons/"+self.xDeleteIcon
         guideName = guide.CLASS_NAME
         
         # creating a basic layout for guide buttons:
-        if guideDir == CURVES_SIMPLE.replace("/", ".") or guideDir == CURVES_COMBINED.replace("/", "."):
+        if guideDir == self.curvesSimpleFolder.replace("/", ".") or guideDir == self.curvesCombinedFolder.replace("/", "."):
             ctrlInstance = self.initExtraModule(guideModule, guideDir)
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, ctrlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(ctrlInstance)
         else:
             isRebuilder = False
-            if guideDir == REBUILDER.replace("/", ".") or guideDir == SOURCE.replace("/", ".") or guideDir == SETUP.replace("/", ".") or guideDir == DEFORMING.replace("/", ".") or guideDir == CUSTOM.replace("/", "."):
+            if guideDir == self.rebuilderFolder.replace("/", ".") or guideDir == self.sourceFolder.replace("/", ".") or guideDir == self.setupFolder.replace("/", ".") or guideDir == self.deformingFolder.replace("/", ".") or guideDir == self.customFolder.replace("/", "."):
                 isRebuilder = True
                 moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=self.allUIs[layout])
             else:
                 moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
             cmds.image(image=iconDir, width=32, parent=moduleLayout)
 
-            if guideDir == STANDARD.replace("/", "."):
+            if guideDir == self.standardFolder.replace("/", "."):
                 '''
                 We need to passe the rigType parameters because the cmds.button command will send a False parameter that
                 will be stock in the rigType if we don't pass the parameter
                 https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
                 '''
                 cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, dpBaseStandard.RigType.biped), parent=moduleLayout)
-            elif guideDir == INTEGRATED.replace("/", "."):
+            elif guideDir == self.integratedFolder.replace("/", "."):
                 cmds.button(label=title, height=32, command=partial(self.execIntegratedGuide, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == TOOLS:
+            elif guideDir == self.toolsFolder:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
+            elif guideDir == self.checkInFolder.replace("/", ".") or guideDir == self.checkOutFolder.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
                 validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
                 validatorInstance.firstBT = cmds.button(label=validatorInstance.firstBTLabel, width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
                 validatorInstance.secondBT = cmds.button(label=validatorInstance.secondBTLabel.capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
-                if guideDir == CHECKIN.replace("/", "."):
+                if guideDir == self.checkInFolder.replace("/", "."):
                     self.checkInInstanceList.append(validatorInstance)
-                elif guideDir == CHECKOUT.replace("/", "."):
+                elif guideDir == self.checkOutFolder.replace("/", "."):
                     self.checkOutInstanceList.append(validatorInstance)
                 else: #addOns
                     self.checkAddOnsInstanceList.append(validatorInstance)
@@ -1477,13 +1405,14 @@ class DP_AutoRig_UI(object):
         cmds.namespace(setNamespace=":")
         # generate the current moduleName added the next new number suffix:
         if number:
-            userSpecName = BASE_NAME + str(number)
+            userSpecName = self.baseName + str(number)
         else:
-            userSpecName = BASE_NAME + self.utils.findLastNumber()
+            userSpecName = self.baseName + self.utils.findLastNumber()
         # especific import command for guides storing theses guides modules in a variable:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        reload(self.guide)
+        if self.dev:
+            reload(self.guide)
         # get the CLASS_NAME from guideModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
@@ -1506,7 +1435,8 @@ class DP_AutoRig_UI(object):
             self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         else:
             self.guide = __import__(guideModule, {}, {}, [guideModule])
-        reload(self.guide)
+        if self.dev:
+            reload(self.guide)
         # get the CLASS_NAME from extraModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this extraModule as an Instance:
@@ -1523,14 +1453,24 @@ class DP_AutoRig_UI(object):
     def execIntegratedGuide(self, guideModule, guideDir, *args):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
+
+
+        start = time.time()
+
+
         # import this scripted module:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        reload(guide)
+        if self.dev:
+            reload(guide)
         # get the CLASS_NAME from guideModule:
         startScriptFunction = getattr(guide, guide.CLASS_NAME)
         # execute this scriptedGuideModule:
         startScriptFunction(self)
+
+        
+        end = time.time()
+        print(end - start)
     
     
     def clearGuideLayout(self, *args):
@@ -1554,7 +1494,7 @@ class DP_AutoRig_UI(object):
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find path where 'dpAutoRig.py' is been executed:
         path = self.utils.findPath("dpAutoRig.py")
-        guideDir = STANDARD
+        guideDir = self.standardFolder
         # find all module names:
         moduleNameInfo = self.utils.findAllModuleNames(path, guideDir)
         validModules = moduleNameInfo[0]
@@ -1569,7 +1509,7 @@ class DP_AutoRig_UI(object):
                 if module in validModuleNames:
                     index = validModuleNames.index(module)
                     # check if there is this module guide base in the scene:
-                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+GUIDE_BASE_NAME
+                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.guideBaseName
                     if cmds.objExists(curGuideName):
                         self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
 
@@ -1578,11 +1518,12 @@ class DP_AutoRig_UI(object):
         if self.allGuidesList:
             sortedAllGuidesList = sorted(self.allGuidesList, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
-            guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+STANDARD.replace("/", ".")
+            guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.standardFolder.replace("/", ".")
             # this list will be used to rig all modules pressing the RIG button:
             for module in sortedAllGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
-                reload(mod)
+                if self.dev:
+                    reload(mod)
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
                 dpUIinst = self
@@ -1661,7 +1602,7 @@ class DP_AutoRig_UI(object):
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         for item in self.modulesToBeRiggedList:
             if not item.guideNet:
-                self.initExtraModule("dpUpdateGuides", TOOLS)
+                self.initExtraModule("dpUpdateGuides", self.toolsFolder)
                 break
 
 
@@ -1781,8 +1722,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
         infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
-        brPaypalButton = cmds.button('brlPaypalButton', label=self.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(self.utils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
-        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(self.utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
+        brPaypalButton = cmds.button('brlPaypalButton', label=self.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(self.utils.visitWebSite, self.donateURL+"BRL"), parent=donateColumnLayout)
+        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(self.utils.visitWebSite, self.donateURL+"USD"), parent=donateColumnLayout)
         # call Donate Window:
         cmds.showWindow(dpDonateWin)
     
@@ -1814,10 +1755,10 @@ class DP_AutoRig_UI(object):
                 cmds.text(self.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
                 cmds.text(remoteLog, align="left", parent=updateLayout)
                 cmds.separator(height=30)
-            whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
-            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
-            downloadButton = cmds.button('downloadButton', label=self.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
-            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
+            whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.whatsChangedURL), parent=updateLayout)
+            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.gitHubURL), parent=updateLayout)
+            downloadButton = cmds.button('downloadButton', label=self.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.masterURL, "zip"), parent=updateLayout)
+            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.masterURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
         cmds.separator(height=30)
         self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.lang['i092_autoCheckUpdate'], align="left", value=self.userDefAutoCheckUpdate, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
@@ -1900,8 +1841,8 @@ class DP_AutoRig_UI(object):
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
 
                 # store custom presets in order to avoid overwrite them when installing the update:
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CURVES_PRESETS, dpAR_TempDir+"/"+CURVES_PRESETS)
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.languagesFolder, dpAR_TempDir+"/"+self.languagesFolder)
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.curvesPresetsFolder, dpAR_TempDir+"/"+self.curvesPresetsFolder)
                 # keep dpPipelineInfo data
                 if os.path.exists(dpAR_DestFolder+"/Pipeline/dpPipelineSettings.json"):
                     shutil.copy2(os.path.join(dpAR_DestFolder, "Pipeline/dpPipelineSettings.json"), dpAR_TempDir)
@@ -2012,7 +1953,7 @@ class DP_AutoRig_UI(object):
         """
         locDic = False
         try:
-            locResponse = urllib.request.urlopen(LOCATION_URL)
+            locResponse = urllib.request.urlopen(self.locationURL)
             locDic = json.loads(locResponse.read())
         except:
             pass
@@ -2064,7 +2005,7 @@ class DP_AutoRig_UI(object):
         allTransformList = cmds.ls(selection=False, type="transform")
         #Get all the masterGrp nodes and ensure it isn't referenced
         for item in allTransformList:
-            if cmds.objExists(item+"."+MASTER_ATTR):
+            if cmds.objExists(item+"."+self.masterAttr):
                 if not cmds.referenceQuery(item, isNodeReferenced=True):
                     masterGrpList.append(item)
         if masterGrpList:
@@ -2128,7 +2069,7 @@ class DP_AutoRig_UI(object):
             self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
             self.customAttr.addAttr(0, [self.masterGrp]) #dpID
             # adding All_Grp attributes
-            cmds.addAttr(self.masterGrp, longName=MASTER_ATTR, attributeType="bool")
+            cmds.addAttr(self.masterGrp, longName=self.masterAttr, attributeType="bool")
             cmds.addAttr(self.masterGrp, longName="dpAutoRigSystem", dataType="string")
             cmds.addAttr(self.masterGrp, longName="date", dataType="string")
             # system:
@@ -2144,8 +2085,8 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="prefix", dataType="string")
             cmds.addAttr(self.masterGrp, longName="name", dataType="string")
             # setting All_Grp data
-            cmds.setAttr(self.masterGrp+"."+MASTER_ATTR, True)
-            cmds.setAttr(self.masterGrp+".dpAutoRigSystem", DPAR_GITHUB, type="string")
+            cmds.setAttr(self.masterGrp+"."+self.masterAttr, True)
+            cmds.setAttr(self.masterGrp+".dpAutoRigSystem", self.gitHubURL, type="string")
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
             cmds.setAttr(self.masterGrp+".system", self.dpARVersion, type="string")
@@ -2312,9 +2253,9 @@ class DP_AutoRig_UI(object):
         masterGroupAttrList = ["modelsGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
         for masterGroupAttr in masterGroupAttrList:
             if not cmds.objExists(nodeGrp+"."+masterGroupAttr):
-                cmds.setAttr(nodeGrp+"."+MASTER_ATTR, 0)
+                cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)
                 return False
-        return cmds.getAttr(nodeGrp+"."+MASTER_ATTR)
+        return cmds.getAttr(nodeGrp+"."+self.masterAttr)
 
 
     def reorderAttributes(self, objList, attrList, verbose=True, *args):
@@ -2396,7 +2337,7 @@ class DP_AutoRig_UI(object):
                     if userChoose == btNo:
                         return
                     elif userChoose == btUpdateGuides:
-                        self.initExtraModule("dpUpdateGuides", TOOLS)
+                        self.initExtraModule("dpUpdateGuides", self.toolsFolder)
                         return
                     else:
                         break
@@ -2621,10 +2562,10 @@ class DP_AutoRig_UI(object):
                             pass
 
                         # footGuide parented in the extremGuide of the limbModule:
-                        if moduleType == FOOT:
+                        if moduleType == self.footName:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == LIMB and fatherGuideLoc == 'Extrem':
+                            if fatherModule == self.limbName and fatherGuideLoc == 'Extrem':
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                                 self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                                 # working with item guide mirror:
@@ -2665,7 +2606,7 @@ class DP_AutoRig_UI(object):
                                     cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
                                     self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
-                                    if limbTypeName == LEG:
+                                    if limbTypeName == self.legName:
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
                                         cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
@@ -2741,7 +2682,7 @@ class DP_AutoRig_UI(object):
                                     self.customAttr.updateID([revFootCtrlOld])
                         
                         # worldRef of extremGuide from limbModule controlled by optionCtrl:
-                        if moduleType == LIMB:
+                        if moduleType == self.limbName:
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
@@ -2804,7 +2745,7 @@ class DP_AutoRig_UI(object):
                                 scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                 self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
 
-                                if fatherModule == SPINE:
+                                if fatherModule == self.spineName:
                                     # getting limb data:
                                     limbTypeName         = self.integratedTaskDic[moduleDic]['limbTypeName']
                                     ikCtrlZero           = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
@@ -2819,7 +2760,7 @@ class DP_AutoRig_UI(object):
 
                                     cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                     # verifying what part will be used, the hips or chest:
-                                    if limbTypeName == LEG:
+                                    if limbTypeName == self.legName:
                                         # do task actions in order to integrate the limb of leg type to rootCtrl:
                                         cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
                                     else:
@@ -2853,7 +2794,7 @@ class DP_AutoRig_UI(object):
                                     self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScC"))
                             
                         # integrate the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
-                        if moduleType == SPINE:
+                        if moduleType == self.spineName:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2894,7 +2835,7 @@ class DP_AutoRig_UI(object):
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
                         
                         # integrate the head orient from the masterCtrl:
-                        if moduleType == HEAD:
+                        if moduleType == self.headName:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2913,7 +2854,7 @@ class DP_AutoRig_UI(object):
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                         
                         # integrate the Eye with the Head setup:
-                        if moduleType == EYE:
+                        if moduleType == self.eyeName:
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
                             eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
                             upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
@@ -2921,7 +2862,7 @@ class DP_AutoRig_UI(object):
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == HEAD:
+                            if fatherModule == self.headName:
                                 # getting head data:
                                 fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                 upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
@@ -2960,7 +2901,7 @@ class DP_AutoRig_UI(object):
                                         self.ctrls.colorShape([pupilCtrl], "yellow")
                         
                         # integrate the Finger module:
-                        if moduleType == FINGER:
+                        if moduleType == self.fingerName:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2977,17 +2918,17 @@ class DP_AutoRig_UI(object):
                                 # get father guide data:
                                 fatherModule   = self.hookDic[moduleDic]['fatherModule']
                                 fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                                if fatherModule == LIMB and fatherGuideLoc == 'Extrem':
+                                if fatherModule == self.limbName and fatherGuideLoc == 'Extrem':
                                     # getting limb type:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     limbTypeName = self.integratedTaskDic[fatherGuide]['limbTypeName']
-                                    if limbTypeName == ARM:
+                                    if limbTypeName == self.armName:
                                         origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
                                         origFrom = origFromList[-1]
                                         self.toIDList.extend(cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True, name=scalableGrp+"_PaC"))
                 
                         # integrate the Single module with another Single as a father:
-                        if moduleType == SINGLE:
+                        if moduleType == self.singleName:
                             # connect Option_Ctrl display attribute to the visibility:
                             if not cmds.objExists(self.optionCtrl+"."+self.lang['m081_tweaks'].lower()):
                                 cmds.addAttr(self.optionCtrl, longName=self.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
@@ -3004,7 +2945,7 @@ class DP_AutoRig_UI(object):
                                 cmds.connectAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            if fatherModule == SINGLE:
+                            if fatherModule == self.singleName:
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     # getting child Single Static_Grp:
                                     staticGrp = self.integratedTaskDic[moduleDic]["staticGrpList"][s]
@@ -3019,7 +2960,7 @@ class DP_AutoRig_UI(object):
                                     self.toIDList.extend(cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_ScC"))
                                     
                         # integrate the Wheel module with another Option_Ctrl:
-                        if moduleType == WHEEL:
+                        if moduleType == self.wheelName:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -3034,7 +2975,7 @@ class DP_AutoRig_UI(object):
                                     cmds.connectAttr(self.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
                                 # get father module:
                                 fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                                if fatherModule == STEERING:
+                                if fatherModule == self.steeringName:
                                     # getting Steering data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     try:
@@ -3048,7 +2989,7 @@ class DP_AutoRig_UI(object):
                                     cmds.parent(wheelHookCtrlGrp, self.ctrlsVisGrp)
                         
                         # integrate the Suspension module with Wheel:
-                        if moduleType == SUSPENSION:
+                        if moduleType == self.suspensionName:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -3097,7 +3038,7 @@ class DP_AutoRig_UI(object):
                                             self.toIDList.extend(cmds.scaleConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
                                 # get father module:
                                 fatherModule = self.hookDic[moduleDic]['fatherModule']
-                                if fatherModule == WHEEL:
+                                if fatherModule == self.wheelName:
                                     # getting spine data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     # parent suspension control group to wheel Main_Ctrl
@@ -3107,7 +3048,7 @@ class DP_AutoRig_UI(object):
                                     self.toIDList.extend(cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScC"))
 
                         # integrate the nose control colors:
-                        if moduleType == NOSE:
+                        if moduleType == self.noseName:
                             self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
                             if self.itemGuideMirrorAxis == "off":
                                 if bColorize:
@@ -3115,7 +3056,7 @@ class DP_AutoRig_UI(object):
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][0], "red")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][0], "blue")
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            if fatherModule == HEAD:
+                            if fatherModule == self.headName:
                                 fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                 upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
                                 upperJawCtrl = self.integratedTaskDic[fatherGuide]['upperJawCtrlList'][0]
@@ -3130,7 +3071,7 @@ class DP_AutoRig_UI(object):
                                 self.toIDList.extend([pac, revNode])
                         
                         # worldRef of chain controlled by optionCtrl:
-                        if moduleType == CHAIN:
+                        if moduleType == self.chainName:
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
@@ -3264,7 +3205,7 @@ class DP_AutoRig_UI(object):
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
             #Try add hand follow (space switch attribute) on bipeds:
-            self.initExtraModule("dpLimbSpaceSwitch", TOOLS)
+            self.initExtraModule("dpLimbSpaceSwitch", self.toolsFolder)
 
             # show dialogBox if detected a bug:
             if integrate == 1:

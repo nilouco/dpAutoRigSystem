@@ -155,43 +155,44 @@ class ConstraintIO(dpBaseAction.ActionStartClass):
                 toNodeList = constDic[item]["constraintParentInverseMatrix"]
                 # create the missing constraint
                 if targetList and toNodeList:
-                    if constType == "parentConstraint":
-                        const = cmds.parentConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "pointConstraint":
-                        const = cmds.pointConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "orientConstraint":
-                        const = cmds.orientConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "scaleConstraint":
-                        const = cmds.scaleConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "aimConstraint":
-                        const = cmds.aimConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "pointOnPolyConstraint":
-                        const = cmds.pointOnPolyConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "geometryConstraint":
-                        const = cmds.geometryConstraint(targetList, toNodeList[0], name=item)[0]
-                    elif constType == "normalConstraint":
-                        const = cmds.normalConstraint(targetList, toNodeList[0], name=item)[0]
-                    elif constType == "poleVectorConstraint":
-                        const = cmds.poleVectorConstraint(targetList, toNodeList[0], name=item)[0]
-                    elif constType == "tangentConstraint":
-                        const = cmds.tangentConstraint(targetList, toNodeList[0], name=item)[0]
-                    # set attribute values
-                    if constDic[item]["attributes"]:
-                        for attr in constDic[item]["attributes"].keys():
-                            cmds.setAttr(const+"."+attr, constDic[item]["attributes"][attr])
-                    # set weight values
-                    for v, value in enumerate(valueList):
-                        cmds.setAttr(item+"."+targetList[v]+"W"+str(v), value)
-                    if constDic[item]["worldUpMatrix"]:
-                        cmds.connectAttr(constDic[item]["worldUpMatrix"][0]+".worldMatrix", const+".worldUpMatrix", force=True)
-                    # disconnect to keep the same exported skip option
-                    for outAttr in constDic[item]["output"].keys():
-                        if cmds.objExists(const+"."+outAttr):
-                            if not constDic[item]["output"][outAttr]:
-                                connectedList = cmds.listConnections(const+"."+outAttr, source=False, destination=True, plugs=True)
-                                if connectedList:
-                                    cmds.disconnectAttr(const+"."+outAttr, connectedList[0])
-                    wellImportedList.append(const)
+                    if cmds.objExists(toNodeList[0]) and not [tgt for tgt in targetList if not cmds.objExists(tgt)]:
+                        if constType == "parentConstraint":
+                            const = cmds.parentConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                        elif constType == "pointConstraint":
+                            const = cmds.pointConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                        elif constType == "orientConstraint":
+                            const = cmds.orientConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                        elif constType == "scaleConstraint":
+                            const = cmds.scaleConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                        elif constType == "aimConstraint":
+                            const = cmds.aimConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                        elif constType == "pointOnPolyConstraint":
+                            const = cmds.pointOnPolyConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                        elif constType == "geometryConstraint":
+                            const = cmds.geometryConstraint(targetList, toNodeList[0], name=item)[0]
+                        elif constType == "normalConstraint":
+                            const = cmds.normalConstraint(targetList, toNodeList[0], name=item)[0]
+                        elif constType == "poleVectorConstraint":
+                            const = cmds.poleVectorConstraint(targetList, toNodeList[0], name=item)[0]
+                        elif constType == "tangentConstraint":
+                            const = cmds.tangentConstraint(targetList, toNodeList[0], name=item)[0]
+                        # set attribute values
+                        if constDic[item]["attributes"]:
+                            for attr in constDic[item]["attributes"].keys():
+                                cmds.setAttr(const+"."+attr, constDic[item]["attributes"][attr])
+                        # set weight values
+                        for v, value in enumerate(valueList):
+                            cmds.setAttr(item+"."+targetList[v]+"W"+str(v), value)
+                        if constDic[item]["worldUpMatrix"]:
+                            cmds.connectAttr(constDic[item]["worldUpMatrix"][0]+".worldMatrix", const+".worldUpMatrix", force=True)
+                        # disconnect to keep the same exported skip option
+                        for outAttr in constDic[item]["output"].keys():
+                            if cmds.objExists(const+"."+outAttr):
+                                if not constDic[item]["output"][outAttr]:
+                                    connectedList = cmds.listConnections(const+"."+outAttr, source=False, destination=True, plugs=True)
+                                    if connectedList:
+                                        cmds.disconnectAttr(const+"."+outAttr, connectedList[0])
+                        wellImportedList.append(const)
                 else:
                     cmds.createNode(constType, name=item) #broken node
                     self.notWorkedWellIO(self.dpUIinst.lang['i329_broken']+" node - "+item)

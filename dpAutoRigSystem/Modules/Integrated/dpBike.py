@@ -107,7 +107,7 @@ def Bike(dpUIinst):
             cmds.parent(forkInstance.moduleGrp, handlebarInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # working with PEDAL WHEEL system:
+            # working with PEDAL self.wheelName system:
             dpUIinst.utils.setProgress(doingName+pedalName)
             # create pedal wheel module instance:
             pedalInstance = dpUIinst.initGuide('dpWheel', guideDir)
@@ -150,7 +150,7 @@ def Bike(dpUIinst):
             cmds.parent(rightPedalInstance.moduleGrp, pedalInstance.cvCenterLoc, absolute=True)
             cmds.refresh()
             
-            # working with FRONT WHEEL system:
+            # working with FRONT self.wheelName system:
             dpUIinst.utils.setProgress(doingName+frontWheelName)
             # create wheel module instance:
             frontWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
@@ -168,7 +168,7 @@ def Bike(dpUIinst):
             cmds.parent(frontWheelInstance.moduleGrp, forkInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # working with BACK WHEEL system:
+            # working with BACK self.wheelName system:
             dpUIinst.utils.setProgress(doingName+backWheelName)
             # create wheel module instance:
             backWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
@@ -223,7 +223,7 @@ def Bike(dpUIinst):
                 cmds.parent(hornInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 cmds.refresh()
                 
-                # create FRONT SUSPENSION module instance:
+                # create FRONT self.suspensionName module instance:
                 dpUIinst.utils.setProgress(doingName+frontSuspensionName)
                 frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
                 frontSuspensionInstance.editUserName(frontSuspensionName)
@@ -238,7 +238,7 @@ def Bike(dpUIinst):
                 cmds.parent(frontSuspensionInstance.moduleGrp, frontWheelInstance.moduleGrp, absolute=True)
                 cmds.refresh()
                 
-                # create BACK SUSPENSION module instance:
+                # create BACK self.suspensionName module instance:
                 dpUIinst.utils.setProgress(doingName+backSuspensionName)
                 backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
                 backSuspensionInstance.editUserName(backSuspensionName)

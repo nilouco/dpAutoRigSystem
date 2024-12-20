@@ -13,7 +13,6 @@ import time
 import getpass
 import datetime
 import stat
-import shutil
 from io import TextIOWrapper
 from importlib import reload
 
@@ -195,7 +194,8 @@ class Utils(object):
         guideFolder = self.findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules.Standard"
         for m in validModules:
             mod = __import__(guideFolder+"."+m, {}, {}, [m])
-            reload(mod)
+            if self.dpUIinst.dev:
+                reload(mod)
             validModuleNames.append(mod.CLASS_NAME)
         return(validModules, validModuleNames)
 
@@ -734,7 +734,7 @@ class Utils(object):
         return filteredList
         
         
-    def checkRawURLForUpdate(self, DPAR_VERSION, DPAR_RAWURL, *args):
+    def checkRawURLForUpdate(self, DPAR_VERSION, rawURL, *args):
         """ Check for update using raw url.
             Compares the remote version from GitHub to the current version.
             
@@ -755,14 +755,14 @@ class Utils(object):
         try:
             gotRemoteFile = False
             # getting dpAutoRig.py file from GitHub website using the Raw URL:
-            remoteSource = urllib.request.urlopen(DPAR_RAWURL)
+            remoteSource = urllib.request.urlopen(rawURL)
             remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
             # find the line with the version and compare them:
             for line in remoteContents:
                 if "DPAR_VERSION_PY3 = " in line:
                     gotRemoteFile = True
                     remoteVersion = line[20:-2] #these magic numbers filter only the version XX.YY.ZZ
-                    if remoteVersion == DPAR_VERSION:
+                    if remoteVersion == self.dpUIinst.dpARVersion:
                         # 0 - the current version is up to date
                         return [0, None, None]
                     else:

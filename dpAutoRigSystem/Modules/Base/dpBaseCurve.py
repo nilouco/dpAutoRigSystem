@@ -25,7 +25,7 @@ class BaseCurve(object):
         self.cvKnotList = None
         self.cvPeriodic = None
         self.suffix = "Ctrl"
-        self.curvesDir = dpUIinst.curvesDir
+        self.curvesSimpleFolder = dpUIinst.curvesSimpleFolder
         self.utils = dpUIinst.utils
         self.ctrls = dpUIinst.ctrls
     

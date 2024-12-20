@@ -270,10 +270,10 @@ class UpdateGuides(object):
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
                 currentInstance.changeAimDirection(aimMenuItemList[value])
-            # NOSE ATTRIBUTES
+            # self.noseName ATTRIBUTES
             elif attr == 'nostril':
                 self.setNostrilGuideAttribute(dpGuide, value)
-            # SUSPENSION ATTRIBUTES AND WHEEL ATTRIBUTES
+            # self.suspensionName ATTRIBUTES AND self.wheelName ATTRIBUTES
             elif attr == 'fatherB' or attr == 'geo':
                 self.checkSetNewGuideToAttr(dpGuide, attr, value)
             else:

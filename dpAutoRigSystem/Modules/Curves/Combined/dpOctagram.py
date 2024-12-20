@@ -29,7 +29,7 @@ class Octagram(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.dpUIinst.startGuideModules(self.curvesDir, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.dpUIinst.startGuideModules(self.curvesSimpleFolder, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -43,7 +43,7 @@ class Octagram(dpBaseCurve.BaseCurve):
         """ Combine controls in order to return it.
         """
         # load module instance
-        squareInstance = self.dpUIinst.initExtraModule('dpSquare', self.curvesDir.replace("/", "."))
+        squareInstance = self.dpUIinst.initExtraModule('dpSquare', self.curvesSimpleFolder.replace("/", "."))
         # creating curve shapes:
         curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

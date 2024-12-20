@@ -17,8 +17,6 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
 # declaring member variables
-ARM = "Arm"
-LEG = "Leg"
 
 DP_LIMB_VERSION = 3.3
 
@@ -29,6 +27,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.armName = "Arm"
+        self.legName = "Leg"
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst)
         self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
@@ -195,7 +195,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc+".visibility", force=True)
 
         # lock undesirable translate and rotate axis for corner guides:
-        self.setLockCornerAttr(ARM)
+        self.setLockCornerAttr(self.armName)
 
         # re orient guides:
         self.reOrientGuide()
@@ -235,9 +235,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.cvMainLocGrp = self.utils.zeroOut([self.cvMainLoc])[0]
 
         # checking limbType to create correctly up vector values:
-        if  self.getLimbType()==ARM:
+        if  self.getLimbType()==self.armName:
             upVectorValues = (0.0, -1.0, 0.0)
-        if  self.getLimbType()==LEG:
+        if  self.getLimbType()==self.legName:
             upVectorValues = (1.0, 0.0, 0.0)
 
         # deleting point constraint to change to the new null grp:
@@ -336,14 +336,14 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         crossProduct = vectorMainToCorner ^ vectorMainToExtrem
 
         # check position of crossProduct depending on the limbType:
-        if limbType == ARM:
+        if limbType == self.armName:
             # if the limbType is arm the crossProduct will look for the axis y:
             if crossProduct.y <= 0:
                 offsetValue = 1
             else:
                 offsetValue = -1
 
-        if limbType == LEG:
+        if limbType == self.legName:
             # if the limbtype is leg the crossProduct will look for the axis X
             if crossProduct.x <= 0:
                 offsetValue = -1
@@ -359,14 +359,14 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.cvCornerLoc = self.guideName+"_Corner"
         
         # when the limbType is arm, it will call the crossProduct function to get the right offset for X
-        if self.getLimbType()==ARM:
+        if self.getLimbType()==self.armName:
             offsetAxis = ".offsetX"
-            offsetValue = self.crossProduct(ARM)
+            offsetValue = self.crossProduct(self.armName)
         
         # when the limbType is arm, it will call the crossProduct function to get the right offset for Y:
-        if self.getLimbType()==LEG:
+        if self.getLimbType()==self.legName:
             offsetAxis = ".offsetY"
-            offsetValue = self.crossProduct(LEG)
+            offsetValue = self.crossProduct(self.legName)
 
         # set the aimConstraint's offset according to limbType:
         cmds.setAttr(aimConstraint+offsetAxis, offsetValue)
@@ -383,9 +383,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
 
         # Adjust offset when it's arm or leg. Using diferent axis for arm or leg.
-        if self.getLimbType()==ARM:
+        if self.getLimbType()==self.armName:
             beforeTranslateAxis = ".translateY"
-        if self.getLimbType()==LEG:
+        if self.getLimbType()==self.legName:
             beforeTranslateAxis = ".translateX"
 
         # re-orient clavicle rotations:
@@ -418,7 +418,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.reOrientGuide()
         
         # re-orient extremLoc to align with cornerLoc. 
-        if self.getLimbType()==ARM:
+        if self.getLimbType()==self.armName:
             toUnparentList = []
             extremChildrenList = cmds.listRelatives(self.cvExtremLoc, children=True, type="transform")
             if extremChildrenList:
@@ -442,7 +442,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.setAimConstraintOffset(self.mainAic)
                 
         # setup to reorient the ankle guide to point to the ground when rotate mainGuide
-        if self.getLimbType()==LEG:
+        if self.getLimbType()==self.legName:
             ankleToAimNull = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
             cmds.matchTransform(ankleToAimNull, self.cvExtremLoc, position=True)
             cmds.setAttr(ankleToAimNull+".translateY", -10)
@@ -597,7 +597,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             cmds.setAttr(self.cvUpVectorLoc+".translateY", -10)
             cmds.delete(self.cornerAIC)
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
-            self.setLockCornerAttr(ARM)
+            self.setLockCornerAttr(self.armName)
             self.recreateAutoAim()
             
         # for Leg type:
@@ -617,7 +617,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             cmds.setAttr(self.cvUpVectorLoc+".translateY", 0.75)
             cmds.delete(self.cornerAIC)
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
-            self.setLockCornerAttr(LEG)
+            self.setLockCornerAttr(self.legName)
             self.recreateAutoAim()
     
     
@@ -627,10 +627,10 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         enumType = cmds.getAttr(self.moduleGrp+'.type')
         if enumType == 0:
             self.limbType = self.dpUIinst.lang['m028_arm']
-            self.limbTypeName = ARM
+            self.limbTypeName = self.armName
         elif enumType == 1:
             self.limbType = self.dpUIinst.lang['m030_leg']
-            self.limbTypeName = LEG
+            self.limbTypeName = self.legName
         return self.limbTypeName
 
 
@@ -656,7 +656,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """
         trAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']
         cornerAttrList = ['tx', 'ry', 'rz'] #arm
-        if limbType == LEG:
+        if limbType == self.legName:
             cornerAttrList = ['ty', 'rx', 'rz'] #leg
         for attr in trAttrList:
             if attr in cornerAttrList:
@@ -746,7 +746,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
 
                 # getting names from dic:
-                if self.limbTypeName == ARM:
+                if self.limbTypeName == self.armName:
                     beforeName = self.dpUIinst.lang['c000_arm_before']
                     mainName = self.dpUIinst.lang['c001_arm_main']
                     cornerName = self.dpUIinst.lang['c002_arm_corner']
@@ -809,15 +809,15 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # Setup axis order
                     if jName == beforeName:  # Clavicle and hip
                         cmds.setAttr(fkCtrl+".rotateOrder", 3)
-                    elif jName == extremName and self.limbTypeName == LEG:  # Ankle
+                    elif jName == extremName and self.limbTypeName == self.legName:  # Ankle
                         cmds.setAttr(fkCtrl+".rotateOrder", 4)
-                    elif jName == extremName and self.limbTypeName == ARM:  # Hand
+                    elif jName == extremName and self.limbTypeName == self.armName:  # Hand
                         cmds.setAttr(fkCtrl+".rotateOrder", 4)
                     elif jName == mainName:  # Leg and Shoulder
                         cmds.setAttr(fkCtrl+".rotateOrder", 1)
-                    elif self.limbTypeName == LEG:  # Other legs ctrl
+                    elif self.limbTypeName == self.legName:  # Other legs ctrl
                         cmds.setAttr(fkCtrl+".rotateOrder", 2)
-                    elif self.limbTypeName == ARM:  # Other arm ctrl
+                    elif self.limbTypeName == self.armName:  # Other arm ctrl
                         cmds.setAttr(fkCtrl+".rotateOrder", 5)
                     else:
                         # Let the default axis order for other ctrl (Should not happen)
@@ -909,9 +909,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # parenting fkControls from 2 hierarchies (before and limb) using constraint, attention to fkIsolated shoulder:
                 # creating a shoulder_ref group in order to use it as position relative, joint articulation origin and aim constraint target to self.quadExtraCtrl:
                 self.shoulderRefGrp = cmds.group(empty=True, name=self.skinJointList[1]+"_Ref_Grp")
-                # ask if the module is ARM and turn default value to 1 if true.
+                # ask if the module is self.armName and turn default value to 1 if true.
                 self.isolateDefaultValue = 0
-                if self.limbTypeName == ARM:
+                if self.limbTypeName == self.armName:
                     self.isolateDefaultValue = 1  
                 cmds.parent(self.shoulderRefGrp, self.skinJointList[1], relative=True)
                 cmds.parent(self.shoulderRefGrp, self.skinJointList[0], relative=False)
@@ -941,7 +941,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
                 cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
                 
-                if self.limbTypeName == ARM:
+                if self.limbTypeName == self.armName:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Corner")
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 2) #zxy
                     cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 2) #zxy
@@ -974,7 +974,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateOrder", cmds.getAttr(self.ikExtremCtrl+".rotateOrder"))
 
                 # orient ik controls properly:
-                if s == 0 or self.limbTypeName == ARM:
+                if s == 0 or self.limbTypeName == self.armName:
                     cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateX", -90)
                     cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateZ", -90)
 
@@ -985,7 +985,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         if self.mirrorAxis != 'off':
                             for axis in self.mirrorAxis:
                                 if axis == "X":
-                                    if self.limbTypeName == ARM:
+                                    if self.limbTypeName == self.armName:
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateX", -90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateY", 90)
                                         if self.getAlignWorld():
@@ -1093,7 +1093,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     if s == 0:
                         self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
                     elif self.limbStyle == self.dpUIinst.lang['m042_default']:
-                        if self.limbTypeName == ARM:
+                        if self.limbTypeName == self.armName:
                             # get right side to alignWorld. It'll be a little glitch, but it seems be accordilly with the mirror using arm default setting. Recommended use biped limbStyle instead.
                             self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
                     for a, axis in enumerate(self.axisList):
@@ -1231,7 +1231,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 # working with autoOrient of poleVector:
                 cmds.addAttr(self.ikCornerCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
-                if self.limbTypeName == ARM:
+                if self.limbTypeName == self.armName:
                     cmds.setAttr(self.ikCornerCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], 0)
                     cmds.addAttr(self.ikCornerCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], edit=True, defaultValue=0)
                 upLocOrientConst = cmds.parentConstraint(self.ikExtremCtrl, self.rootCtrlRef, poleVectorUpLocGrp, skipTranslate=["x", "y", "z"], maintainOffset=True, name=poleVectorUpLocGrp+"_OrC")[0]
@@ -1292,7 +1292,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # (James) if we use the ribbon controls we won't implement the forearm control
 
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
-                if self.limbTypeName == ARM and self.getHasBend() == False:
+                if self.limbTypeName == self.armName and self.getHasBend() == False:
                     # create forearm joint:
                     forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.dpUIinst.lang[ 'c030_forearm']+self.jSufixList[0])[0]
                     self.utils.setJointLabel(forearmJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang[ 'c030_forearm'])
@@ -1412,7 +1412,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # create a masterModuleGrp to be checked if this rig exists:
                 ctrlHookList = [self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef]
-                if self.limbTypeName == ARM:
+                if self.limbTypeName == self.armName:
                     # (James) not implementing the forearm control if we use ribbons (yet)
                     if not self.getHasBend():
                         # use forearm control
@@ -1425,7 +1425,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if self.getHasBend():
                     try:
                         from ..Library import jcRibbon
-                        reload(jcRibbon)
+                        if self.dpUIinst.dev:
+                            reload(jcRibbon)
                         RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self)
                         loadedRibbon = True
                     except Exception as e:
@@ -1457,7 +1458,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         else:
                             cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
-                        if self.limbTypeName == ARM:
+                        if self.limbTypeName == self.armName:
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, cornerJxt, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         else:
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
@@ -1539,7 +1540,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(acLocGrp+".inheritsTransform", 0) #important to calculate world space matrix to extract rotations correctlly
                     cmds.setAttr(acLocGrp+".visibility", 0)
                     cmds.setAttr(acRefMainLoc+".visibility", 0)
-                    if self.limbTypeName == ARM:
+                    if self.limbTypeName == self.armName:
                         cmds.setAttr(acIkUpLoc+".translateY", 1)
                     else:
                         cmds.setAttr(acIkUpLoc+".translateZ", 1)
@@ -1552,7 +1553,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.parentConstraint(acIkMainLoc, acIkUpLoc, maintainOffset=True, name=acIkUpLoc+"_PaC")
                     
                     # aim constraint: (edited in order to point to limb corner (elbow/knee) outside of clavicle hierarchy to avoid cycle error).
-                    if self.limbTypeName == ARM:
+                    if self.limbTypeName == self.armName:
                         if s == 0: #left
                             cmds.aimConstraint(acIkCornerLoc, acIkAimLoc, maintainOffset=True, weight=1, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AiC")
                         else: #right
@@ -1581,11 +1582,11 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.addAttr(self.fkCtrlList[0], longName=ikFkRotAttr, attributeType="float", minValue=-1, defaultValue=1, maxValue=1)
                     # set values of ik and fk rotates:
                     if s == 0: #left side
-                        if self.limbTypeName == LEG:
+                        if self.limbTypeName == self.legName:
                             cmds.setAttr(self.fkCtrlList[0]+".ikRotateY", -1)
                             cmds.setAttr(self.fkCtrlList[0]+".fkRotateX", -1)
                     else: #right side
-                        if self.limbTypeName == ARM:
+                        if self.limbTypeName == self.armName:
                             cmds.setAttr(self.fkCtrlList[0]+".ikRotateY", -1)
                         else: #leg
                             cmds.setAttr(self.fkCtrlList[0]+".fkRotateX", -1)
@@ -1616,7 +1617,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(acFkDM+".outputQuatZ", acFkQtE+".inputQuatZ", force=True)
                     cmds.connectAttr(acFkDM+".outputQuatW", acFkQtE+".inputQuatW", force=True)
                     # fk to auto clavicle blend colors:
-                    if self.limbTypeName == ARM:
+                    if self.limbTypeName == self.armName:
                         cmds.connectAttr(acFkQtE+".outputRotate.outputRotateX", acBC+".color1G", force=True)
                         cmds.connectAttr(acFkQtE+".outputRotate.outputRotateY", acBC+".color1B", force=True)
                         cmds.connectAttr(acFkQtE+".outputRotate.outputRotateZ", acBC+".color1R", force=True)
@@ -1642,7 +1643,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.lang['c032_follow'], acMD+".input2X", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.lang['c032_follow'], acMD+".input2Y", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.lang['c032_follow'], acMD+".input2Z", force=True)
-                    if self.limbTypeName == ARM:
+                    if self.limbTypeName == self.armName:
                         cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateX", force=True)
                         cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
@@ -1704,7 +1705,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.cornerJntList = self.utils.articulationJoint(self.skinJointList[1], self.skinJointList[2])
                     # fixing jar rotations
                     if s == 0:
-                        if self.limbType == ARM:
+                        if self.limbType == self.armName:
                             cmds.setAttr(self.cornerJntList[0]+".rotateY", -90)
                             cmds.setAttr(self.cornerJntList[0]+".rotateZ", -90)
                         else:
@@ -1719,7 +1720,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.setAttr(self.cornerJntList[0]+".rotateX", -90)
                                 cmds.setAttr(self.cornerJntList[0]+".rotateZ", 90)
                     else:
-                        if self.limbType == ARM:
+                        if self.limbType == self.armName:
                             cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
                             cmds.setAttr(self.cornerJntList[0]+".rotateY", 90)
                             cmds.setAttr(self.cornerJntList[0]+".rotateZ", 90)
@@ -1737,7 +1738,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 isLeg = False
                 mainJarYValue = 0.3
                 mainAxisOrder = 0
-                if self.limbType == LEG:
+                if self.limbType == self.legName:
                     isLeg = True
                     mainJarYValue = -0.3
                     mainAxisOrder = 3
@@ -1891,7 +1892,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.aimConstraint(self.ikExtremCtrl, softIkOrientLoc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=softIkOrientLoc+"_AiC")
                 cmds.orientConstraint(softIkOrientLoc, ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
                 # leg with softIk on and stretchable equals to zero reverser foot issue fix:
-                if self.limbType == LEG:
+                if self.limbType == self.legName:
                     rfDistBetList = self.utils.distanceBet(self.ikNSJointList[3], self.ikExtremCtrl, name=side+self.userGuideName+"_"+kNameList[1]+"_RF_DistBet", keep=True)
                     cmds.delete(rfDistBetList[4])
                     cmds.parent(rfDistBetList[2:4], distBetGrp)
@@ -1913,7 +1914,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 dpIkFkSnap.IkFkSnapClass(self.dpUIinst, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'])
                 
                 # calibration attribute:
-                if self.limbTypeName == ARM:
+                if self.limbTypeName == self.armName:
                     ikExtremCalibrationList = [
                                             self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(),
                                             "softIk_"+self.dpUIinst.lang['c111_calibrate']

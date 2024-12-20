@@ -7,7 +7,6 @@ import re
 DPT_VERSION = 1.5
 
 
-LANGUAGES = "Languages"
 
 class Translator(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
@@ -15,6 +14,7 @@ class Translator(object):
         """
         # declaring variables
         self.dpUIinst = dpUIinst
+        self.languagesFolder = dpUIinst.languagesFolder
         self.langDic = langDic
         self.langName = langName
         self.translatorString = "dpAutoRigSystem - "+self.dpUIinst.lang['t000_translator']
@@ -133,7 +133,7 @@ class Translator(object):
         self.resultString = self.resultString.replace("\n", "\\n")
         
         # create json file:
-        resultDict = self.dpUIinst.createJsonFile(self.resultString, LANGUAGES, '_language')
+        resultDict = self.dpUIinst.createJsonFile(self.resultString, self.languagesFolder, '_language')
         # set this new lang as userDefined language:
         self.dpUIinst.langDic[resultDict['_language']] = resultDict
         self.dpUIinst.langName = resultDict['_language']

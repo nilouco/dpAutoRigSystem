@@ -296,6 +296,7 @@ class Packager(object):
             if not self.callback:
                 #import dpPublishCallback
                 dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
+                #if self.dpUIinst.dev:
                 reload(dpCallback)
                 self.callback = dpCallback.Callback()
             return self.callback.main(data)

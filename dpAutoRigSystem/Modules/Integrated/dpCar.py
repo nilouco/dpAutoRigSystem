@@ -101,7 +101,7 @@ def Car(dpUIinst):
             cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 12)
             cmds.refresh()
             
-            # woking with STEERING HANDLE system:
+            # woking with self.steeringName HANDLE system:
             dpUIinst.utils.setProgress(doingName+sterringHandleName)
             # create fkLine module instance:
             steeringHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -116,7 +116,7 @@ def Car(dpUIinst):
             cmds.parent(steeringHandleInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # woking with STEERING system:
+            # woking with self.steeringName system:
             dpUIinst.utils.setProgress(doingName+sterringName)
             # create steering module instance:
             steeringInstance = dpUIinst.initGuide('dpSteering', guideDir)
@@ -131,7 +131,7 @@ def Car(dpUIinst):
             cmds.parent(steeringInstance.moduleGrp, steeringHandleInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # working with FRONT WHEEL system:
+            # working with FRONT self.wheelName system:
             dpUIinst.utils.setProgress(doingName+frontWheelName)
             # create wheel module instance:
             frontWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
@@ -154,7 +154,7 @@ def Car(dpUIinst):
             cmds.parent(frontWheelInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # working with BACK WHEEL system:
+            # working with BACK self.wheelName system:
             dpUIinst.utils.setProgress(doingName+backWheelName)
             # create wheel module instance:
             backWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
@@ -177,9 +177,9 @@ def Car(dpUIinst):
             cmds.parent(backWheelInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # working with FRONT SUSPENSION system:
+            # working with FRONT self.suspensionName system:
             dpUIinst.utils.setProgress(doingName+frontSuspensionName)
-            # create FRONT SUSPENSION module instance:
+            # create FRONT self.suspensionName module instance:
             frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
             frontSuspensionInstance.editUserName(frontSuspensionName)
             # setting X mirror:
@@ -198,9 +198,9 @@ def Car(dpUIinst):
             cmds.parent(frontSuspensionInstance.moduleGrp, frontWheelInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
-            # working with BACK SUSPENSION system:
+            # working with BACK self.suspensionName system:
             dpUIinst.utils.setProgress(doingName+backSuspensionName)
-            # create BACK SUSPENSION module instance:
+            # create BACK self.suspensionName module instance:
             backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
             backSuspensionInstance.editUserName(backSuspensionName)
             # setting X mirror:
