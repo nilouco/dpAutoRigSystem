@@ -174,16 +174,10 @@ class Start(object):
         self.iSelChangeJobId = 0
 
 
-    def ui(self, *args):
-        """ Start the main UI, menus and layouts for dpAutoRigSystem.
+    def showUI(self, *args):
+        """ Call mainUI method and the following instructions to check optionVars, refresh UI elements, start the scriptJobs and close loading window.
         """
-        if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
-            cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
-        self.labelText = "dpAutoRigSystem"
-        self.labelText += " - "+self.dpARVersion
-        if self.dev:
-            self.labelText += " ~ dev"
-        cmds.workspaceControl("dpAutoRigSystemWC", retain=False, floating=False, label=self.labelText, uiScript="autoRig.mainUI()")
+        self.mainUI()
         self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
         self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
         self.ctrls.startCorrectiveEditMode()
@@ -192,6 +186,20 @@ class Start(object):
         cmds.select(clear=True)
         self.utils.closeUI("dpARLoadWin")
         print("dpAutoRigSystem "+self.lang['i346_loadedSucess']+"\n----------")
+
+
+    def ui(self, *args):
+        """ Start the main UI, menus and layouts for dpAutoRigSystem through workspaceControl.
+        """
+        if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
+            cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
+            #cmds.deleteUI("dpAutoRigSystemWC", control=True)
+        self.labelText = "dpAutoRigSystem"
+        self.labelText += " - "+self.dpARVersion
+        if self.dev:
+            self.labelText += " ~ dev"
+        uiCallScript = "import dpAutoRigSystem;from dpAutoRigSystem import dpAutoRig;autoRig = dpAutoRig.Start();autoRig.showUI();"
+        cmds.workspaceControl("dpAutoRigSystemWC", retain=False, floating=False, label=self.labelText, uiScript=uiCallScript)
         
 
     def startScriptJobs(self, *args):
@@ -203,10 +211,10 @@ class Start(object):
             - SelectionChanged
         """
         #self.refreshAssetNewSceneJob = cmds.scriptJob(event=('NewSceneOpened', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
-        self.refreshAssetSaveJob     = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
-        self.iDeleteJobId            = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        self.iQuitAppJobId           = cmds.scriptJob(event=('quitApplication', self.deleteExistWindow), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        self.iSelChangeJobId         = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        self.iDeleteJobId        = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        #self.iQuitAppJobId       = cmds.scriptJob(event=('quitApplication', self.deleteExistWindow), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        self.iSelChangeJobId     = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         self.jobSelectedGuide()
 
 
@@ -331,7 +339,7 @@ class Start(object):
         """
         # -- Creating menus:
 
-        self.allUIs["mainMenuBarLayout"] = cmds.menuBarLayout("mainMenuBarLayout")
+        self.allUIs["mainMenuBarLayout"] = cmds.menuBarLayout("mainMenuBarLayout", parent="dpAutoRigSystemWC")
         self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
         # language menu:
         self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
