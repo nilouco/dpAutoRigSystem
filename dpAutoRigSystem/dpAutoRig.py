@@ -198,8 +198,18 @@ class Start(object):
         self.labelText += " - "+self.dpARVersion
         if self.dev:
             self.labelText += " ~ dev"
-        uiCallScript = "import dpAutoRigSystem;from dpAutoRigSystem import dpAutoRig;autoRig = dpAutoRig.Start();autoRig.showUI();"
-        cmds.workspaceControl("dpAutoRigSystemWC", retain=False, floating=False, label=self.labelText, uiScript=uiCallScript)
+        uiCallScript = "import dpAutoRigSystem;from dpAutoRigSystem import dpAutoRig;autoRig = dpAutoRig.Start("+str(self.dev)+");autoRig.showUI();"
+        cmds.workspaceControl("dpAutoRigSystemWC", 
+                            retain=False,
+                            floating=False,
+                            minimumWidth=415,
+                            initialWidth=415,
+                            initialHeight=715,
+                            widthProperty="preferred",
+                            visible=True,
+                            loadImmediately=True,
+                            label=self.labelText,
+                            uiScript=uiCallScript)
         
 
     def startScriptJobs(self, *args):
