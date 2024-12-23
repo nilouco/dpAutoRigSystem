@@ -862,7 +862,7 @@ class Utils(object):
         return nodeName
 
 
-    def articulationJoint(self, fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcrRotList=None, dist=1, jarRadius=1.5, doScale=True, *args):
+    def articulationJoint(self, fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcrRotList=None, dist=1, jarRadius=1.5, doScale=True, orientCtrl=None, *args):
         """ Create a simple joint to help skinning with a half rotation value.
             Receives the number of corrective joints to be created. Zero by default.
             Place these corrective joints with the given vector list.
@@ -898,7 +898,10 @@ class Utils(object):
                         cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
                     jointList.append(jcr)
                 cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
-                oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
+                if orientCtrl:
+                    oc = cmds.orientConstraint(fatherNode, orientCtrl, jax, maintainOffset=True, name=jarName+"_OrC")[0]
+                else:
+                    oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
                 cmds.setAttr(oc+".interpType", 2) #shortest
                 if doScale:
                     cmds.scaleConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_ScC")

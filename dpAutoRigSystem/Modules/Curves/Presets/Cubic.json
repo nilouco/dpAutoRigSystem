@@ -2,7 +2,7 @@
     "_preset"     : "Cubic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2024-04-17",
+    "_updated"    : "2024-12-22",
 
     "id_000_Base"                : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"             : {"type" : "Cube", "degree" : 1},
@@ -104,6 +104,7 @@
     "id_097_HeadDeformerMain"    : {"type" : "Cube", "degree" : 1},
     "id_098_HeadDeformerSub"     : {"type" : "Cube", "degree" : 1},
     "id_099_RootPivot"           : {"type" : "Cube", "degree" : 1},
-    "id_100_HeadDeformerRadius"  : {"type" : "Cube", "degree" : 1}
+    "id_100_HeadDeformerRadius"  : {"type" : "Cube", "degree" : 1},
+    "id_101_LimbExtremOrient"    : {"type" : "Cube", "degree" : 1}
 
 }

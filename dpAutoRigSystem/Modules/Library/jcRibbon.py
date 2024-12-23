@@ -34,7 +34,7 @@ class RibbonClass(object):
         self.limbLengthAttr   = self.dpUIinst.lang['c113_length']
         
         
-    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
+    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
@@ -296,30 +296,6 @@ class RibbonClass(object):
         if downLimb['bottomTwistBoneMD']:
             cmds.connectAttr(downctrlCtrl+".autoRotate", downLimb['bottomTwistBoneMD']+".input1Z", force=True)
             cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downLimb['twistAutoRotMD']+".input2X", force=True)
-
-        # WIP: not used this mirror by dpAR system because each module guide will create each own mirror
-        if mirror:
-            jnt = None
-            if cmds.objExists(iniJnt.replace('Jxt', 'Jnt').replace('L_', 'R_')):
-                jnt = iniJnt.replace('Jxt', 'Jnt').replace('L_', 'R_')
-            else:
-                jnt = iniJnt.replace('L_', 'R_')
-            newOri = cmds.duplicate(oriLoc, rr=True)
-            auxgrp = cmds.group(em=True, name='MirrorAux_Grp')
-            
-            cmds.parent(newOri, auxgrp)
-            
-            cmds.setAttr(auxgrp+'.sx', -1)
-            cmds.parent(newOri, w=True)
-            cmds.delete(auxgrp)
-            grp = cmds.group(em=True, n='MirrorAuxGrp')
-            cmds.delete(cmds.parentConstraint(newOri, grp, mo=False, w=1))
-            cmds.parent(newOri, grp)
-            cmds.makeIdentity(newOri, a=1, s=1)
-            
-            #addRibbonToLimb(prefix=prefix.replace('L_', 'R_'), myName=myName, oriLoc=newOri, iniJnt=jnt, num=num, mirror=False)
-            
-            cmds.delete(grp)
 
         self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
