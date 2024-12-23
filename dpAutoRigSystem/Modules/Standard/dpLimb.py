@@ -937,7 +937,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # creating ik controls:
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
                 self.ikExtremSubCtrl = self.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
-                self.ikExtremOrientCtrl = self.ctrls.cvControl("id_101_LimbExtremOrient", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Orient_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
+                self.ikExtremOrientCtrl = self.ctrls.cvControl("id_101_LimbExtremOrient", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Orient_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
                 self.ctrls.setLockHide([self.ikExtremSubCtrl], ["sx", "sy", "sz", "v"])
                 self.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
                 cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
@@ -1019,6 +1019,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', self.zeroFkCtrlList[1]+".visibility", force=True)
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikCornerCtrlZero+".visibility", force=True)
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikExtremCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikExtremOrientCtrlZero+".visibility", force=True)
                 self.ctrls.setLockHide([self.ikCornerCtrl], ['v'], l=False)
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz', 'v'])
 
@@ -1334,10 +1335,10 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(forearmCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], forearmMD+'.input1X')
                     cmds.connectAttr(self.skinJointList[3]+'.rotateZ', forearmMD+'.input2X')
                     cmds.connectAttr(forearmMD+'.outputX', forearmGrp+'.rotateZ')
-                    ikExtremOrientPaC = cmds.parentConstraint(forearmCtrl, self.skinJointList[-2], self.ikExtremOrientCtrlZero, maintainOffset=True, name=self.ikExtremOrientCtrlZero+"_PaC")[0]
+                    ikExtremOrientPaC = cmds.parentConstraint(forearmCtrl, self.ikExtremSubCtrl, self.ikExtremOrientCtrlZero, maintainOffset=True, name=self.ikExtremOrientCtrlZero+"_PaC")[0]
                     ikExtremOrientPacW0 = forearmCtrl+"W0"
                 elif self.limbTypeName == self.legName and self.getHasBend() == False:
-                    ikExtremOrientPaC = cmds.parentConstraint(self.skinJointList[-3], self.skinJointList[-2], self.ikExtremOrientCtrlZero, maintainOffset=True, name=self.ikExtremOrientCtrlZero+"_PaC")[0]
+                    ikExtremOrientPaC = cmds.parentConstraint(self.skinJointList[-3], self.ikExtremSubCtrl, self.ikExtremOrientCtrlZero, maintainOffset=True, name=self.ikExtremOrientCtrlZero+"_PaC")[0]
                     ikExtremOrientPacW0 = self.skinJointList[-3]+"W0"
 
                 # creating a group to receive the reverseFootCtrlGrp (if module integration is on):
@@ -1477,7 +1478,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
                         
-                        ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.skinJointList[-2], self.ikExtremOrientCtrlZero, maintainOffset=True, name=self.ikExtremOrientCtrlZero+"_PaC")[0]
+                        ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.ikExtremSubCtrl, self.ikExtremOrientCtrlZero, maintainOffset=True, name=self.ikExtremOrientCtrlZero+"_PaC")[0]
                         ikExtremOrientPacW0 = self.bendGrps["extraCtrlList"][-1]+"W0"
 
                         cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
@@ -1527,7 +1528,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 orientRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_"+extremName+"_Ik_Orient_Rev")
                 self.toIDList.append(orientRevNode)
                 cmds.connectAttr(self.ikExtremCtrl+".orient", orientRevNode+".inputX")
-                cmds.connectAttr(self.ikExtremCtrl+".orient", ikExtremOrientPaC+"."+self.skinJointList[-2]+"W1")
+                cmds.connectAttr(self.ikExtremCtrl+".orient", ikExtremOrientPaC+"."+self.ikExtremSubCtrl+"W1")
                 cmds.connectAttr(orientRevNode+".outputX", ikExtremOrientPaC+"."+ikExtremOrientPacW0)
 
                 # auto clavicle:
