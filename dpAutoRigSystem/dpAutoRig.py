@@ -204,6 +204,7 @@ class Start(object):
                             floating=False,
                             minimumWidth=415,
                             initialWidth=415,
+                            minimumHeight=415,
                             initialHeight=715,
                             widthProperty="preferred",
                             visible=True,
@@ -1471,11 +1472,6 @@ class Start(object):
     def execIntegratedGuide(self, guideModule, guideDir, *args):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
-
-
-        start = time.time()
-
-
         # import this scripted module:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
@@ -1485,10 +1481,6 @@ class Start(object):
         startScriptFunction = getattr(guide, guide.CLASS_NAME)
         # execute this scriptedGuideModule:
         startScriptFunction(self)
-
-        
-        end = time.time()
-        print(end - start)
     
     
     def clearGuideLayout(self, *args):

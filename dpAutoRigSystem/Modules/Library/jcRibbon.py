@@ -247,7 +247,7 @@ class RibbonClass(object):
             cornerAutoRotateInvPinMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Pin_Inv_MD"))
             cornerAutoRotateInvMidMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Mid_Inv_MD"))
             self.toIDList.extend([cornerAutoRotateMD, cornerAutoRotateMM, cornerAutoRotateDM, cornerAutoRotateQtE, cornerAutoRotateRev, cornerAutoRotateInvPinMD, cornerAutoRotateInvMidMD])
-            extremLoc = cmds.spaceLocator(name=lista[2].replace("Jnt", "AutoRotate_Loc"))[0]
+            extremLoc = cmds.spaceLocator(name=lista[2]+"_AutoRotate_Loc")[0]
             cmds.delete(cmds.parentConstraint(lista[2], extremLoc, maintainOffset=False))
             cornerAutoRotGrp = cmds.group(extremLoc, name=extremLoc+"_Grp")
             extremOrigLoc = cmds.duplicate(extremLoc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
