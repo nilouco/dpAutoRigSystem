@@ -10,7 +10,7 @@ ICON = "/Icons/dp_targetCleaner.png"
 
 DPKEEPITATTR = "dpKeepIt"
 
-DP_TARGETCLEANER_VERSION = 1.8
+DP_TARGETCLEANER_VERSION = 1.9
 
 
 class TargetCleaner(dpBaseAction.ActionStartClass):
@@ -51,7 +51,7 @@ class TargetCleaner(dpBaseAction.ActionStartClass):
             self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             # get exception list to keep nodes in the scene
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
-            exceptionList = self.keepGrp(["renderGrp", "proxyGrp"])
+            exceptionList = self.keepGrp(["supportGrp", "renderGrp", "proxyGrp"])
             for item in toCheckList:
                 if cmds.objExists(item):
                     if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):

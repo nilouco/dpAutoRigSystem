@@ -383,7 +383,7 @@ class Zipper(object):
     
     def dpCreateDeformMesh(self, *args):
         """ Generate a final deformable mesh from original loaded mesh.
-            Parent old original model to Model_Grp and rename it to _Geo.
+            Parent old original model to Support_Grp and rename it to _Geo.
             Rename the new final dformable mesh as _Def_Mesh and put it inside Render_Grp.
         """
         # store old mesh name:
@@ -396,10 +396,10 @@ class Zipper(object):
         self.toIDList.extend([self.origModel, self.deformMesh])
         cmds.setAttr(self.origModel+".visibility", 0)
         # parent if need:
-        modelGrp = self.utils.getNodeByMessage("modelsGrp")
-        if modelGrp:
-            cmds.parent(self.origModel, modelGrp)
-            self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
+        supportGrp = self.utils.getNodeByMessage("supportGrp")
+        if supportGrp:
+            cmds.parent(self.origModel, supportGrp)
+            self.ctrls.colorShape([supportGrp], [0.51, 1, 0.667], outliner=True) #green
         renderGrp = self.utils.getNodeByMessage("renderGrp")
         if renderGrp:
             # avoid reparent deformMesh if already inside RenderGrp:

@@ -2131,13 +2131,13 @@ class Start(object):
         cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
         # Get or create all the needed group
-        self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
         self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.prefix+"Ctrls_Grp")
         self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.prefix+"Ctrls_Visibility_Grp")
         self.dataGrp        = self.getBaseGrp("dataGrp", self.prefix+"Data_Grp")
         self.renderGrp      = self.getBaseGrp("renderGrp", self.prefix+"Render_Grp")
         self.proxyGrp       = self.getBaseGrp("proxyGrp", self.prefix+"Proxy_Grp")
         self.fxGrp          = self.getBaseGrp("fxGrp", self.prefix+"FX_Grp")
+        self.supportGrp     = self.getBaseGrp("supportGrp", self.prefix+"Support_Grp")
         self.staticGrp      = self.getBaseGrp("staticGrp", self.prefix+"Static_Grp")
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
@@ -2150,20 +2150,19 @@ class Start(object):
         # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
             if self.masterGrp == self.prefix+sAllGrp:
-                cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-                cmds.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
+                cmds.parent(self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
+                cmds.parent(self.supportGrp, self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
         cmds.select(clear=True)
 
-        # Hide Models and FX groups
+        # Hide FX groups
         try:
-            cmds.setAttr(self.modelsGrp+".visibility", 0)
             cmds.setAttr(self.fxGrp+".visibility", 0)
         except:
             pass
 
         # Lock and Hide attributes
         aToLock = [self.masterGrp,
-                   self.modelsGrp,
+                   self.supportGrp,
                    self.ctrlsGrp,
                    self.renderGrp,
                    self.dataGrp,
@@ -2260,7 +2259,7 @@ class Start(object):
     def validateMasterGrp(self, nodeGrp, *args):
         """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
         """
-        masterGroupAttrList = ["modelsGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
+        masterGroupAttrList = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
         for masterGroupAttr in masterGroupAttrList:
             if not cmds.objExists(nodeGrp+"."+masterGroupAttr):
                 cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)

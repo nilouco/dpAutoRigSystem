@@ -8,7 +8,7 @@ TITLE = "r023_setupGeometryIO"
 DESCRIPTION = "r024_setupGeometryIODesc"
 ICON = "/Icons/dp_setupGeometryIO.png"
 
-DP_SETUPGEOMETRYIO_VERSION = 1.0
+DP_SETUPGEOMETRYIO_VERSION = 1.1
 
 
 class SetupGeometryIO(dpBaseAction.ActionStartClass):
@@ -80,7 +80,7 @@ class SetupGeometryIO(dpBaseAction.ActionStartClass):
         """ Returns a list of the first children node in geometry groups.
         """
         geoList = []
-        geoGrpList = ["modelsGrp", "blendShapesGrp", "wipGrp"]
+        geoGrpList = ["blendShapesGrp", "wipGrp"]
         for geoGrp in geoGrpList:
             grp = self.utils.getNodeByMessage(geoGrp)
             if grp:

@@ -34,7 +34,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.5
+DP_RIVET_VERSION = 2.6
 
 
 class Rivet(object):
@@ -590,16 +590,16 @@ class Rivet(object):
             if self.scalableGrp:
                 cmds.parent(self.rivetGrp, self.scalableGrp)
             
-        # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
+        # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Support_Grp
         if faceToRivet:
             if reuseFaceToRivet and cmds.objExists(reuseFaceToRivet):
                 geoToAttach = reuseFaceToRivet
             else:
                 geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4)
             self.deformFaceToRivet(geoToAttach, self.originedGeo)
-            modelGrp = self.utils.getNodeByMessage("modelsGrp")
-            if modelGrp:
-                self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
+            supportGrp = self.utils.getNodeByMessage("supportGrp")
+            if supportGrp:
+                self.ctrls.colorShape([supportGrp], [0.51, 1, 0.667], outliner=True) #green
 
         # get shape to attach:
         if cmds.objExists(geoToAttach):
@@ -1000,7 +1000,7 @@ class Rivet(object):
                     
     def applyMorphDeformer(self, morphGeo, targetGeo, *args):
         """ Apply morphDeform from morphGeo(FaceToRivet) to targetGeo(Source)
-            Rename and Parent to Models_Grp
+            Rename and Parent to Support_Grp
             Return morph geometry and deformer node
         """
         targetList = cmds.ls(targetGeo, dag=True, shapes=True)
@@ -1030,14 +1030,14 @@ class Rivet(object):
         componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
         componentMatchNode = cmds.rename(componentMatchNode, toRivetName+"_CpM")
         self.toIDList.extend([morphGeo, morphNode, componentMatchNode])
-        # Parent in modelsGrp
-        self.parentToTransform([morphGeo], self.utils.getNodeByMessage("modelsGrp"))
+        # Parent in supportGrp
+        self.parentToTransform([morphGeo], self.utils.getNodeByMessage("supportGrp"))
         return morphGeo, morphNode
 
 
     def applyWrapDeformer(self, wrapGeo, targetGeo, *args):
         """ Apply wrapDeformer from wrapGeo(FaceToRivet) to targetGeo(Source)
-            Rename and Parent to Models_Grp
+            Rename and Parent to Support_Grp
             Return wrap geometry and wrap deformer
         """
         cmds.select([wrapGeo, targetGeo])
@@ -1055,8 +1055,8 @@ class Rivet(object):
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         self.toIDList.extend([wrapGeo, wrapNode, baseShape])
-        # Parent in modelsGrp
-        self.parentToTransform([wrapGeo, baseShape], self.utils.getNodeByMessage("modelsGrp"))
+        # Parent in supportGrp
+        self.parentToTransform([wrapGeo, baseShape], self.utils.getNodeByMessage("supportGrp"))
         return wrapGeo, wrapNode
 
 

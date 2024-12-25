@@ -1,4 +1,4 @@
 dpGuideIO
 dpRigItIO
-dpParentingIO
 dpRivetIO
+dpParentingIO
