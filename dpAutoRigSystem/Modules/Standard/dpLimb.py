@@ -838,6 +838,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.utils.originedFrom(objName=self.origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__")+1:].replace(":", "_"))
                         if self.getHasBend():
                             toCornerBendList.append(self.cvLocList[n][self.cvLocList[n].find("__")+1:].replace(":", "_"))
+                    cmds.parentConstraint(self.skinJointList[n], self.origGrp, maintainOffset=False, name=self.origGrp+"_PaC")
                     if n > 1:
                         cmds.parent(fkCtrl, self.fkCtrlList[n - 1])
                         cmds.parent(self.origGrp, self.origFromList[n - 1])
@@ -954,12 +955,12 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.extremOrientCtrlZero = self.utils.zeroOut([self.extremOrientCtrl])[0]
                     cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.extremOrientCtrlZero, maintainOffset=False))
                     self.ctrls.setLockHide([self.extremOrientCtrl], ["tx", "ty", "tz", "sx", "sy", "sz", "v"])
-                    self.origFromGrpPaC = cmds.parentConstraint(self.extremOrientCtrl, self.origGrp, maintainOffset=False, name=self.origGrp+"_PaC")
+                    cmds.delete(self.origGrp+"_PaC")
+                    cmds.parentConstraint(self.extremOrientCtrl, self.origGrp, maintainOffset=False, name=self.origGrp+"_PaC")
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Corner")
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 3) #xzy
                     cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 3) #xzy
-                    self.origFromGrpPaC = cmds.parentConstraint(self.skinJointList[n], self.origGrp, maintainOffset=False, name=self.origGrp+"_PaC")
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 self.utils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
 
@@ -1726,9 +1727,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                         self.cornerJntList.append(renamedJcr)
                             if toCornerBendList:
                                 self.utils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
-                                if self.limbType == self.legName:
-                                    cmds.delete(self.origFromGrpPaC)
-                                    cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                                cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                                cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
                 else:
                     if self.addCorrective:
                         self.cornerJntList = self.utils.articulationJoint(self.skinJointList[1], self.skinJointList[2], 3, [(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
