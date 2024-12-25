@@ -1056,7 +1056,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # declaring variables:
         fCtrl = None
         fCtrlGrp = None
-        calibrationList = []
+        calibrationList = ["scaleFactor"]
         transfList = ["tx", "tx", "ty", "ty", "tz", "tz"]
         # naming:
         ctrlName = side+self.userGuideName+"_"+ctrlName
