@@ -23,7 +23,6 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_connectionIO"
         self.startName = "dpConnection"
-        self.defaultAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -87,7 +86,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         for item in itemList:
             self.utils.setProgress(self.dpUIinst.lang[self.title])
             if cmds.objExists(item):
-                attrList = self.defaultAttrList
+                attrList = self.dpUIinst.transformAttrList
                 userDefList = cmds.listAttr(item, userDefined=True)
                 if userDefList:
                     attrList.extend(userDefList)

@@ -156,6 +156,7 @@ class AttributeIO(dpBaseAction.ActionStartClass):
                             self.notWorkedWellIO(item+" - "+str(e))
                     else:
                         wellImportedList.append(item)
+                        # TODO: should we set the attribute value here?
                 # reorder attr
                 self.dpUIinst.reorderAttributes([item], attrDic[item]["order"], False)
             else:

@@ -352,7 +352,7 @@ class ControlClass(object):
 
 
     def setNonKeyable(self, objList, attrList, *args):
-        """Set nonKeyable to attributes for objects in lists.
+        """Set as nonKeyable to attributes for the given object list.
         """
         if objList and attrList:
             for obj in objList:
@@ -1111,7 +1111,6 @@ class ControlClass(object):
     def jobPinGuide(self, ctrlName, *args):
         """ Pin temporally the guide by scriptJob.
         """
-        transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
         if cmds.objExists(ctrlName+".pinGuide"):
             # extracting namespace... need to find an ellegant way using message or stored attribute instead:
             nameSpaceName = None
@@ -1130,17 +1129,17 @@ class ControlClass(object):
                         self.storeLockedList(ctrlName)
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
-                        for attr in transformAttrList:
+                        for attr in self.dpUIinst.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=False)
                         pc = cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)[0]
                         cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
-                        for attr in transformAttrList:
+                        for attr in self.dpUIinst.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=True)
             else:
                 pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
                 if pcNodeList:
                     cmds.delete(pcNodeList[0])
-                    for attr in transformAttrList:
+                    for attr in self.dpUIinst.transformAttrList:
                         cmds.setAttr(ctrlName+"."+attr, lock=False)
                     self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)

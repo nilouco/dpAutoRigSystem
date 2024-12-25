@@ -554,7 +554,6 @@ class Rivet(object):
         self.shapeToAttachList = None
         self.shapeToAttach = None
         self.cpNode = None
-        attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         self.rivetList, togetherList = [], []
         isComponent = None
         self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
@@ -583,7 +582,7 @@ class Rivet(object):
             createdRivetGrp = True
             self.rivetGrp = cmds.group(name=rivetGrpName, empty=True)
             self.toIDList.append(self.rivetGrp)
-            for attr in attrList:
+            for attr in self.dpUIinst.transformAttrList[:-1]:
                 cmds.setAttr(self.rivetGrp+"."+attr, lock=True, keyable=False, channelBox=False)
             cmds.addAttr(self.rivetGrp, longName="dpRivetGrp", attributeType='bool')
             cmds.setAttr(self.rivetGrp+".dpRivetGrp", 1)
@@ -655,7 +654,7 @@ class Rivet(object):
                         cancelProcess = True
                         break
                     # animated:
-                    for attr in attrList:
+                    for attr in self.dpUIinst.transformAttrList[:-1]:
                         if cmds.listConnections(rivet+"."+attr, source=True, destination=False):
                             cancelProcess = True
                             break
@@ -674,8 +673,7 @@ class Rivet(object):
             # then we need to duplicate, unlock attributes and freezeTransformation:
             dupGeo = cmds.duplicate(geoToAttach, name=geoToAttach+"_dpRivet_TEMP_Geo")[0]
             # unlock attr:
-            for attr in attrList:
-                cmds.setAttr(dupGeo+"."+attr, lock=False)
+            self.utils.unlockAttr([dupGeo])
             # parent to world:
             if cmds.listRelatives(dupGeo, allParents=True):
                 cmds.parent(dupGeo, world=True)
@@ -878,10 +876,10 @@ class Rivet(object):
                 if cmds.listRelatives(toRivetGeo, allParents=True):
                     cmds.parent(toRivetGeo, world=True)
                 # Unlock attributes and apply initialShading
-                self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
+                self.dpUIinst.ctrls.setLockHide([toRivetGeo], self.dpUIinst.transformAttrList, False, True, True)
                 cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
                 cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
-                self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
+                self.dpUIinst.ctrls.setLockHide([toRivetGeo], self.dpUIinst.transformAttrList[:-1], True, False, True)
                 # Renaming
                 cmds.rename(toRivetGeo, faceToRivetGeoName)
                 # Turning on nodes
@@ -1051,7 +1049,7 @@ class Rivet(object):
         wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
         baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
         baseShape = cmds.rename(baseShape, toRivetName+"_Base")
-        self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
+        self.dpUIinst.ctrls.setLockHide([baseShape], self.dpUIinst.transformAttrList[:-1], True, False, True)
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         self.toIDList.extend([wrapGeo, wrapNode, baseShape])

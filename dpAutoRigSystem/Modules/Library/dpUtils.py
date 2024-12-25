@@ -1065,10 +1065,9 @@ class Utils(object):
 
 
     def unlockAttr(self, nodeList):
-        attrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
         for node in nodeList:
             if cmds.objExists(node):
-                for attr in attrList:
+                for attr in self.dpUIinst.transformAttrList:
                     cmds.setAttr(node+"."+attr, lock=False)
 
 

@@ -26,7 +26,6 @@ class MatchMesh(object):
         """
         # declaring variables
         fromTransformDic, toTransformDic = {}, {}
-        attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         
         # get a list of selected items
         selList = cmds.ls(selection=True)
@@ -73,7 +72,7 @@ class MatchMesh(object):
             
             if gotMeshes:
                 # storing transformation data
-                for attr in attrList:
+                for attr in self.dpUIinst.transformAttrList[:-1]:
                     fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
                     toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
                 
@@ -103,7 +102,7 @@ class MatchMesh(object):
                     # put fromTransform in the same location then toTransform
                     if fromFather != None:
                         cmds.parent(fromTransform, world=True)
-                    for attr in attrList:
+                    for attr in self.dpUIinst.transformAttrList[:-1]:
                         cmds.setAttr(fromTransform+"."+attr, lock=False)
                         cmds.setAttr(toTransform+"."+attr, lock=False)
                         if not "s" in attr:
@@ -140,7 +139,7 @@ class MatchMesh(object):
                     if fromFather != None:
                         cmds.parent(fromTransform, fromFather)
                     # restore transformation data
-                    for attr in attrList:
+                    for attr in self.dpUIinst.transformAttrList[:-1]:
                         cmds.setAttr(fromTransform+"."+attr, fromTransformDic[attr])
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
                     

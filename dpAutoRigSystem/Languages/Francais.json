@@ -509,6 +509,7 @@
     "i344_deleted"              : "Effacé",
     "i345_soffsetMatrixIOAnn"   : "Le dossier ou on va importer et exporter les donnés des connexions des parent offset matrix.",
     "i346_loadedSucess"         : "chargé avec succès, merci.",
+    "i347_channelIOAnn"         : "Le dossier ou on va importer et exporter les donnés des states pour les attributes de tranform du channelBox.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -819,6 +820,8 @@
     "r061_offsetMatrixIO"       : "Offset Matrix",
     "r062_offsetMatrixIODesc"   : "Cet action va travailler des parent offset matrix\nl'export et l'import de ces infos de connexions.",
     "r063_maybeDoneIO"          : "Peut-être que ce module n'a pas bien fonctionné.\nIl n'est pas possible de le définir avec certitude, désolé",
+    "r064_channelIO"            : "Canal",
+    "r065_channelIODesc"        : "Cette action va travailler avec les attributs de transforms\nen les exportant et en les important comme locked, hidden ou non keyable\npour les attributs par défaut tels que la translation, la rotation, l'échelle et la visibilité.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

@@ -509,6 +509,7 @@
     "i344_deleted"              : "Deleted",
     "i345_soffsetMatrixIOAnn"   : "The folder to export and import parent offset matrix conection data.",
     "i346_loadedSucess"         : "loaded with sucess, thanks.",
+    "i347_channelIOAnn"         : "The folder to export and import the transform channelBox attribute states data.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -819,6 +820,8 @@
     "r061_offsetMatrixIO"       : "Offset Matrix",
     "r062_offsetMatrixIODesc"   : "This action will work with offset parent matrix\nexporting and importing them connections info.",
     "r063_maybeDoneIO"          : "Maybe this module didn't worked well.\nNot possible to surely define it, sorry",
+    "r064_channelIO"            : "Channel",
+    "r065_channelIODesc"        : "This action will work with the tranform attributes\nexporting and importing them info as locked, hidden or non keyable\nfor default attributes as translate, rotate, scale and visibility.",
 
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

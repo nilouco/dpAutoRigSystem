@@ -170,11 +170,10 @@ class GuideIO(dpBaseAction.ActionStartClass):
     def setupGuideTransformations(self, *args):
         """ Work with guide transformations to put the transform as imported data.
         """
-        transformAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ', 'visibility']
         for item in list(self.netDic["GuideData"]):
             if self.netDic["GuideData"][item]:
                 for attr in list(self.netDic["GuideData"][item]):
-                    if attr in transformAttrList:
+                    if attr in self.dpUIinst.transformAttrList:
                         if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
                             if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
                                 cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])

@@ -577,8 +577,7 @@ class BaseLayout(object):
                                     dupRenamed = cmds.rename(dup, self.moduleGrp[:self.moduleGrp.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
                                     originalGuide = self.moduleGrp[:self.moduleGrp.find(":")+1]+dup[dup.rfind("|")+1:]
                                     # unlock and unhide all attributes and connect original guide node transformations to the mirror guide node:
-                                    attrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
-                                    for attr in attrList:
+                                    for attr in self.dpUIinst.transformAttrList:
                                         cmds.setAttr(dupRenamed+"."+attr, lock=False, keyable=True)
                                         cmds.connectAttr(originalGuide+'.'+attr, dupRenamed+'.'+attr, force=True)
                                     

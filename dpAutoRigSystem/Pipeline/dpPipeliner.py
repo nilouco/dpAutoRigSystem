@@ -147,7 +147,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2024-12-13",
+        "updated" : "2024-12-25",
         
         "f_drive"            : "",
         "f_studio"           : "",
@@ -179,6 +179,7 @@ class Pipeliner(object):
         "s_utilityIO"        : self.dpUIinst.dpData+"/dpUtility",
         "s_renameIO"         : self.dpUIinst.dpData+"/dpRename",
         "s_offsetMatrixIO"   : self.dpUIinst.dpData+"/dpOffsetMatrix",
+        "s_channelIO"        : self.dpUIinst.dpData+"/dpChannel",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
         "s_webhook"          : "",
@@ -221,7 +222,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2024-11-20",
+        "updated" : "2024-12-25",
         
         "f_drive"            : "i228_fDriveAnn",
         "f_studio"           : "i229_fStudioAnn",
@@ -253,6 +254,7 @@ class Pipeliner(object):
         "s_utilityIO"        : "i337_sUtilityIOAnn",
         "s_renameIO"         : "i338_sRenameIOAnn",
         "s_offsetMatrixIO"   : "i345_soffsetMatrixIOAnn",
+        "s_channelIO"        : "i347_channelIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
         "s_prefix"           : "i239_sPrefixAnn",

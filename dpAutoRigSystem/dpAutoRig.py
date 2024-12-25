@@ -141,6 +141,7 @@ class Start(object):
         self.dpData = "dpData"
         self.dpLog = "dpLog"
         self.dpID = "dpID"
+        self.transformAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
         self.loadedPath = False
         self.loadedStandard = False
         self.loadedIntegrated = False
@@ -658,7 +659,7 @@ class Start(object):
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=self.utils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
         self.allUIs["selectAllControls"] = cmds.button("selectAllControls", label=self.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ctrls.selectAllControls), parent=self.allUIs["editSelectedControllerFL"])
         # calibrationControls - frameLayout:
-        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
+        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
         self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.lang['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration2Layout"])
         self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.lang['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration2Layout"])
@@ -677,7 +678,7 @@ class Start(object):
         self.allUIs["exportShapeButton"] = cmds.button("exportShapeButton", label=self.lang['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ctrls.exportShape, parent=self.allUIs["shapeIO4Layout"])
         self.allUIs["importShapeButton"] = cmds.button("importShapeButton", label=self.lang['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ctrls.importShape, parent=self.allUIs["shapeIO4Layout"])
         # mirror control shape - layout:
-        self.allUIs["mirrorShapeFL"] = cmds.frameLayout('mirrorShapeFL', label=self.lang['m010_mirror']+" "+self.lang['m067_shape'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["shapeIOFL"])
+        self.allUIs["mirrorShapeFL"] = cmds.frameLayout('mirrorShapeFL', label=self.lang['m010_mirror']+" "+self.lang['m067_shape'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["shapeIOFL"])
         self.allUIs["mirrorShapeLayout"] = cmds.rowColumnLayout('mirrorShapeLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorShapeFL" )
         self.allUIs["axisShapeMenu"] = cmds.optionMenu("axisShapeMenu", label='', parent=self.allUIs["mirrorShapeLayout"])
         mirrorShapeMenuItemList = ['X', 'Y', 'Z']
@@ -936,7 +937,6 @@ class Start(object):
         print(self.lang['i067_duplicating'])
 
         # declaring variables
-        transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         nSegmentsAttr = "nJoints"
         customNameAttr = "customName"
         mirrorAxisAttr = "mirrorAxis"
@@ -1013,7 +1013,7 @@ class Start(object):
             for child in childrenList:
                 if not "|Guide_Base|Guide_Base" in child:
                     newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
-                    for transfAttr in transformAttrList:
+                    for transfAttr in self.transformAttrList:
                         try:
                             isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
                             cmds.setAttr(newChild+"."+transfAttr, lock=False)
@@ -1024,7 +1024,7 @@ class Start(object):
                             pass
         
         # set transformation for Guide_Base
-        for transfAttr in transformAttrList:
+        for transfAttr in self.transformAttrList:
             cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
         
         # setting new guide attributes

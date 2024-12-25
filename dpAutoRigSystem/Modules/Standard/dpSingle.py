@@ -166,8 +166,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
-                    attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
-                    for attr in attrList:
+                    for attr in self.dpUIinst.transformAttrList[:-1]:
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
@@ -205,7 +204,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
                                 cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
                                 cmds.setAttr(sdkLoc+".visibility", lock=True)
-                                for attr in attrList:
+                                for attr in self.dpUIinst.transformAttrList[:-1]:
                                     cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
                                 cmds.setAttr(sdkLocGrp+".rotateX", 0)
                                 cmds.setAttr(sdkLocGrp+".rotateY", 0)
