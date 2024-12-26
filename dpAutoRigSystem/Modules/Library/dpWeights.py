@@ -480,7 +480,10 @@ class Weights(object):
             # pair up the deformer list properly
             orderedDeformerPairs = self.getPairsFromList(desiredList)
             for pair in orderedDeformerPairs:
-                cmds.reorderDeformers(pair[0], pair[1], node)
+                try:
+                    cmds.reorderDeformers(pair[0], pair[1], node)
+                except:
+                    pass
 
 
     def getPairsFromList(self, lst, *args):

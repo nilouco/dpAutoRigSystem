@@ -110,6 +110,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                             self.dpUIinst.skin.setOrderList(item, deformerList)
                 except Exception as e:
                     wellImported = False
+                    print(e)
                     self.notWorkedWellIO(self.latestDataFile)
             cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
             if wellImported:

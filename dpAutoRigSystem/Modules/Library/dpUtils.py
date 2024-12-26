@@ -1272,7 +1272,7 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, verbose=True, title="Rigging", *args):
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, verbose=True, title="Rigging", *args):
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
         cameraList = ["|persp", "|top", "|side", "|front"]
@@ -1312,6 +1312,9 @@ class Utils(object):
                     toRemoveList.append(item)
             if filterBaseNode:
                 if item in self.baseNodeList:
+                    toRemoveList.append(item)
+            if filterBaseName:
+                if item.endswith("Base"):
                     toRemoveList.append(item)
         if toRemoveList:
             toRemoveList = list(set(toRemoveList))

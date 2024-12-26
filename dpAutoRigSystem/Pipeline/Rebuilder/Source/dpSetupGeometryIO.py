@@ -80,11 +80,11 @@ class SetupGeometryIO(dpBaseAction.ActionStartClass):
         """ Returns a list of the first children node in geometry groups.
         """
         geoList = []
-        geoGrpList = ["blendShapesGrp", "wipGrp"]
+        geoGrpList = ["supportGrp", "blendShapesGrp", "wipGrp"]
         for geoGrp in geoGrpList:
             grp = self.utils.getNodeByMessage(geoGrp)
             if grp:
                 meshList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
                 if meshList:
-                    geoList.extend(cmds.listRelatives(grp, children=True, type="transform"))
+                    geoList.extend(n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not n.endswith("Base"))
         return geoList

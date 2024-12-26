@@ -96,18 +96,25 @@ class RenameIO(dpBaseAction.ActionStartClass):
         # define lists to check result
         wellImportedList = []
         notFoundNodesList = []
+        maybeList = []
         for item in nodeIDDic.keys():
             self.utils.setProgress(self.dpUIinst.lang[self.title])
-            # check attributes
+            # check item
             if not cmds.objExists(item):
                 oldIDList = self.utils.getDecomposedIDList(nodeIDDic[item])
                 if oldIDList:
                     if cmds.objExists(oldIDList[1]):
                         cmds.rename(oldIDList[1], item)
                         wellImportedList.append(item)
+                    elif item.endswith("Shape"):
+                        maybeList.append(item)
                     else:
                         notFoundNodesList.append(item)
         if wellImportedList:
             self.wellDoneIO(self.latestDataFile)
         elif notFoundNodesList:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+        elif maybeList:
+            self.maybeDoneIO(self.dpUIinst.lang['r066_shapeToReplace']+" "+', '.join(maybeList))
+        else:
+            self.maybeDoneIO(self.dpUIinst.lang['r032_notImportedData'])
