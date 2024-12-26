@@ -1163,11 +1163,13 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if limitList[i]:
                     if i == 0: #X
                         cmds.transformLimits(fCtrl, enableTranslationX=(1, 1))
+                        self.dpLimitTranslate(fCtrl, ctrlName, axis)
                     elif i == 1: #Y
                         cmds.transformLimits(fCtrl, enableTranslationY=(1, 1))
+                        self.dpLimitTranslate(fCtrl, ctrlName, axis, limitMinY)
                     else: #Z
                         cmds.transformLimits(fCtrl, enableTranslationZ=(1, 1))
-                    self.dpLimitTranslate(fCtrl, ctrlName, axis, limitMinY)
+                        self.dpLimitTranslate(fCtrl, ctrlName, axis)
 
     
     def dpLimitTranslate(self, fCtrl, ctrlName, axis, limitMinY=False, *args):
@@ -1175,18 +1177,19 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             Resuming it's just divide 1 by the calibrate value.
         """
         hyperboleTLimitMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_MD")
-        hyperboleInvMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_Inv_MD")
-        self.toIDList.extend([hyperboleTLimitMD, hyperboleInvMD])
+        self.toIDList.append(hyperboleTLimitMD)
         cmds.setAttr(hyperboleTLimitMD+".input1X", 1)
         cmds.setAttr(hyperboleTLimitMD+".operation", 2)
-        cmds.setAttr(hyperboleInvMD+".input2X", -1)
         cmds.connectAttr(fCtrl+"."+self.calibrateName+"T"+axis, hyperboleTLimitMD+".input2X", force=True)
         cmds.connectAttr(hyperboleTLimitMD+".outputX", fCtrl+".maxTransLimit.maxTrans"+axis+"Limit", force=True)
-        cmds.connectAttr(hyperboleTLimitMD+".outputX", hyperboleInvMD+".input1X", force=True)
-        if not limitMinY:
-            cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
-        else:
+        if limitMinY:
             cmds.transformLimits(fCtrl, translationY=(0, 1))
+        else:
+            hyperboleInvMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_Inv_MD")
+            self.toIDList.append(hyperboleInvMD)
+            cmds.setAttr(hyperboleInvMD+".input2X", -1)
+            cmds.connectAttr(hyperboleTLimitMD+".outputX", hyperboleInvMD+".input1X", force=True)
+            cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
     
 
     def dpChangeType(self, *args):
