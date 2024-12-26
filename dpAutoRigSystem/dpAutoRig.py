@@ -979,31 +979,31 @@ class Start(object):
         toSetAttrList.remove(mirrorAxisAttr)
         
         # check for special attributes
-        if cmds.objExists(selectedItem+"."+nSegmentsAttr):
+        if nSegmentsAttr in cmds.listAttr(selectedItem):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
             if nJointsValue > 0:
                 newGuideInstance.changeJointNumber(nJointsValue)
-        if cmds.objExists(selectedItem+"."+customNameAttr):
+        if customNameAttr in cmds.listAttr(selectedItem):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
             if customNameValue != "" and customNameValue != None:
                 newGuideInstance.editUserName(customNameValue)
-        if cmds.objExists(selectedItem+"."+mirrorAxisAttr):
+        if mirrorAxisAttr in cmds.listAttr(selectedItem):
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
             if mirroirAxisValue != "off":
                 newGuideInstance.changeMirror(mirroirAxisValue)
-        if cmds.objExists(selectedItem+"."+dispAnnotAttr):
+        if dispAnnotAttr in cmds.listAttr(selectedItem):
             toSetAttrList.remove(dispAnnotAttr)
             currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
             newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
-        if cmds.objExists(selectedItem+"."+netAttr):
+        if netAttr in cmds.listAttr(selectedItem):
             toSetAttrList.remove(netAttr)
         
         # TODO: change to unify style and type attributes        
-        if cmds.objExists(selectedItem+".type"):
+        if "type" in cmds.listAttr(selectedItem):
             typeValue = cmds.getAttr(selectedItem+'.type')
             newGuideInstance.changeType(typeValue)
-        if cmds.objExists(selectedItem+".style"):
+        if "style" in cmds.listAttr(selectedItem):
             styleValue = cmds.getAttr(selectedItem+'.style')
             newGuideInstance.changeStyle(styleValue)
         

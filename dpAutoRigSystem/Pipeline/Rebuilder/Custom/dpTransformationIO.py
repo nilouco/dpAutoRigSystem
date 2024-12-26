@@ -169,7 +169,9 @@ class TransformationIO(dpBaseAction.ActionStartClass):
             #if not cmds.objExists(item):
             #    item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
+                ran = False
                 if "transform" in transformDic[item].keys():
+                    ran = True
                     for attr in transformDic[item]["transform"].keys():
                         if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                             # unlock attribute
@@ -186,6 +188,7 @@ class TransformationIO(dpBaseAction.ActionStartClass):
                                 self.notWorkedWellIO(item+" - "+str(e))
                     cmds.xform(item, worldSpace=False, matrix=transformDic[item]["matrix"])
                 if "limit" in transformDic[item].keys():
+                    ran = True
                     for limitAttr in transformDic[item]["limit"].keys():
                         try:
                             if limitAttr == "enableTranslationX":
@@ -208,7 +211,7 @@ class TransformationIO(dpBaseAction.ActionStartClass):
                                 cmds.transformLimits(item, enableScaleZ=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], scaleZ=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
                         except Exception as e:
                             self.notWorkedWellIO(item+" - "+str(e))
-                else:
+                if not ran:
                     self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
             else:
                 notFoundNodesList.append(item)

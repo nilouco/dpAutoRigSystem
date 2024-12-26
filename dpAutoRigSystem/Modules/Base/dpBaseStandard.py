@@ -190,7 +190,7 @@ class BaseStandard(object):
         cmds.duplicate(self.moduleGrp)
 
     
-    def editUserName(self, checkText=None, *args):
+    def editUserName(self, checkText=None, pad=1, *args):
         """ Edit the userGuideName to use the userName from module UI.
         """
         # verify integrity of the guideModule:
@@ -215,39 +215,29 @@ class BaseStandard(object):
                 cmds.setAttr(self.moduleGrp+".customName", "", type='string')
                 self.userGuideName = self.guideNamespace.split("__")[-1]
             else:
+                baseName = self.customName
+                suffixNumberList = self.utils.getSuffixNumberList(self.customName)
+                if suffixNumberList[1]:
+                    baseName = suffixNumberList[1]
+                dpAR_nameList = []
                 allTransformList = cmds.ls(selection=False, transforms=True)
-                if allTransformList:
-                    dpAR_nameList = []
-                    for transform in allTransformList:
-                        if cmds.objExists(transform+".dpAR_name"):
-                            currentName = cmds.getAttr(transform+".dpAR_name")
+                for transform in allTransformList:
+                    if "dpAR_name" in cmds.listAttr(transform):
+                        currentName = cmds.getAttr(transform+".dpAR_name")
+                        if baseName == self.utils.getSuffixNumberList(currentName)[1]:
                             dpAR_nameList.append(currentName)
-                        if cmds.objExists(transform+".customName"):
-                            currentName = cmds.getAttr(transform+".customName")
-                            if currentName:
+                    if "customName" in cmds.listAttr(transform):
+                        currentName = cmds.getAttr(transform+".customName")
+                        if currentName:
+                            if baseName == self.utils.getSuffixNumberList(currentName)[1]:
                                 if not currentName in dpAR_nameList:
                                     dpAR_nameList.append(currentName)
-                    if dpAR_nameList:
-                        dpAR_nameList.sort()
-                        for currentName in dpAR_nameList:
-                            if currentName == self.customName:
-                                # getting the index of the last digit in the name:
-                                n = len(currentName)+1
-                                hasDigit = False
-                                for i in reversed(range(len(currentName))):
-                                    if currentName[i].isdigit():
-                                        n = i
-                                        hasDigit = True
-                                    else:
-                                        break
-                                # adding a sequential number:
-                                if hasDigit:
-                                    moduleDigit = int(currentName[n:])
-                                    self.customName = self.customName[:n] + str(moduleDigit+1)
-                                # adding 1 at the name end:
-                                else:
-                                    self.customName = self.customName + str(1)
-                                
+                if dpAR_nameList:
+                    if self.customName in dpAR_nameList:
+                        for n in range(1, len(dpAR_nameList)+2):
+                            if not baseName+str(n).zfill(pad) in dpAR_nameList:
+                                self.customName = baseName+str(n).zfill(pad)
+                                break
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField(self.userName, edit=True, text=self.customName)

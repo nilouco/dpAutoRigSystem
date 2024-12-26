@@ -200,21 +200,21 @@ class Utils(object):
         return(validModules, validModuleNames)
 
 
-    def findLastNumber(self, name="dpGuideNet", attr="guideNumber", *args):
-        """ Returns a padding 3 string of the number of network node in the scene or zero.
+    def findLastNumber(self, name="dpGuideNet", attr="guideNumber", pad=3, *args):
+        """ Returns a padding string of the number of network node in the scene or zero.
         """
         nodeList = self.getNetworkNodeByAttr(name)
         if not nodeList:
-            return "000"
+            return str(0).zfill(pad)
         else:
             numberList = []
             for node in nodeList:
                 if cmds.objExists(node+"."+attr):
                     numberList.append(int(cmds.getAttr(node+"."+attr)))
             if not numberList:
-                return "000"
+                return str(0).zfill(pad)
             else:
-                return str(max(numberList)+1).zfill(3)
+                return str(max(numberList)+1).zfill(pad)
 
 
     def findModuleLastNumber(self, className, typeName):
@@ -258,6 +258,16 @@ class Utils(object):
                 if enteredText[m] != " " and enteredText[m] != "_":
                     normalText = enteredText[:m+1]
         return normalText
+
+
+    def getSuffixNumberList(self, name, *args):
+        """ Returns a list of [index, baseName, suffixTrailingNumber]
+        """
+        idx = name.rfind(next(filter(lambda x: not x.isdigit(), name[::-1])))
+        if idx:
+            return [idx, name[:idx+1], name[idx+1:]]
+        else:
+            return [None, None, None]
 
 
     def useDefaultRenderLayer(self):

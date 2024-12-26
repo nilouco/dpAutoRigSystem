@@ -86,7 +86,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         for item in itemList:
             self.utils.setProgress(self.dpUIinst.lang[self.title])
             if cmds.objExists(item):
-                attrList = self.dpUIinst.transformAttrList
+                attrList = self.dpUIinst.transformAttrList.copy()
                 userDefList = cmds.listAttr(item, userDefined=True)
                 if userDefList:
                     attrList.extend(userDefList)
@@ -194,7 +194,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
             if cmds.objExists(item):
                 # check connections
                 for attr in connectDic[item].keys():
-                    #if attr in cmds.listAttr(item): #can have this conditional because multiIndices doesn't exists before connect them
+                    #if attr in cmds.listAttr(item): #can't have this conditional because multiIndices doesn't exists before connect them
                     for i, io in enumerate(["in", "out"]): #input and output
                         if connectDic[item][attr][io]: #there's connection
                             for ioInfo in connectDic[item][attr][io]:
@@ -226,20 +226,23 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
                                                     cmds.setAttr(ioInfo[plug][0], lock=True)
                                     else: #there is a not connected unitConversion node
                                         self.notWorkedWellIO(self.dpUIinst.lang['r047_notConnectedUC']+": "+uc)
-                                elif i == 0: #in
-                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
-                                        isLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                        cmds.setAttr(item+"."+attr, lock=False)
-                                        cmds.connectAttr(ioInfo, item+"."+attr, force=True)
-                                        if isLocked:
-                                            cmds.setAttr(item+"."+attr, lock=True)
-                                else: #out
-                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True):
-                                        isLocked = cmds.getAttr(ioInfo, lock=True)
-                                        cmds.setAttr(ioInfo, lock=False)
-                                        cmds.connectAttr(item+"."+attr, ioInfo, force=True)
-                                        if isLocked:
-                                            cmds.setAttr(ioInfo, lock=True)
+                                elif cmds.objExists(ioInfo[:ioInfo.find(".")]):
+                                    if i == 0: #in
+                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
+                                            isLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                            cmds.setAttr(item+"."+attr, lock=False)
+                                            cmds.connectAttr(ioInfo, item+"."+attr, force=True)
+                                            if isLocked:
+                                                cmds.setAttr(item+"."+attr, lock=True)
+                                    else: #out
+                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True):
+                                            isLocked = cmds.getAttr(ioInfo, lock=True)
+                                            cmds.setAttr(ioInfo, lock=False)
+                                            cmds.connectAttr(item+"."+attr, ioInfo, force=True)
+                                            if isLocked:
+                                                cmds.setAttr(ioInfo, lock=True)
+                                else:
+                                     self.maybeDoneIO(ioInfo[:ioInfo.find(".")])
                                 if not item in wellImportedList:
                                     wellImportedList.append(item)
             else:
