@@ -33,15 +33,12 @@ class BaseLayout(object):
         self.bsType = "bsType"
         self.jointsType = "jointsType"
         self.facialUserType = self.bsType
-        # plus icon
-        path = self.utils.findPath("dpAutoRig.py")
-        self.iconPlus = path.replace("Modules/Base", "/Icons/dp_plusInfo.png")
         # BASIC MODULE LAYOUT:
         self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
         # create basic module UI:
         self.selectButton = cmds.button(label=" ", annotation=self.dpUIinst.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.dpUIinst.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
-        cmds.iconTextButton(image=self.iconPlus, height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
+        cmds.iconTextButton(image=self.dpUIinst.iconPlusInfo, height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
         self.reCreateEditSelectedModuleLayout(self)
     
     

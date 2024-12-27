@@ -62,9 +62,12 @@ class BaseStandard(object):
         """ Create the Module Layout, so it will exists in the right as a new options to editModules.
         """
         # MODULE LAYOUT:
-        self.moduleLayout = self.dpUIinst.lang[self.title]+" - "+self.userGuideName
-        self.moduleFrameLayout = cmds.frameLayout(self.moduleLayout , label=self.moduleLayout, collapsable=True, collapse=False, parent="modulesLayoutA")
-        self.topColumn = cmds.columnLayout(self.moduleLayout+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
+        layoutName = cmds.getAttr(self.moduleGrp+".customName")
+        if not layoutName:
+            layoutName = self.userGuideName
+        self.moduleLayoutName = self.dpUIinst.lang[self.title]+" - "+layoutName
+        self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="modulesLayoutA")
+        self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
         # here we have just the column layouts to be populated by modules.
     
     
@@ -175,8 +178,8 @@ class BaseStandard(object):
             cmds.deleteUI(self.moduleFrameLayout)
             self.clearSelectedModuleLayout()
             # edit the footer A text:
-            self.currentText = cmds.text("footerAText", query=True, label=True)
-            cmds.text("footerAText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.dpUIinst.lang['i005_footerA'])
+            self.currentText = cmds.text("footerRiggingText", query=True, label=True)
+            cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.dpUIinst.lang['i005_footerRigging'])
         except:
             pass
         # clear module from instance list (clean dpUI list):

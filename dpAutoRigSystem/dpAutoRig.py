@@ -73,15 +73,17 @@ class Start(object):
         print("DEV mode = True")
         reload(dpUtils)
         reload(dpControls)
-        reload(dpUpdateRigInfo)
+        reload(dpSkinning)
         reload(dpBaseStandard)
         reload(dpBaseLayout)
-        reload(dpPublisher)
+        reload(dpUpdateRigInfo)
+        reload(dpReorderAttr)
+        reload(dpCustomAttr)
+        reload(dpTranslator)
         reload(dpPipeliner)
+        reload(dpPublisher)
         reload(dpPackager)
         reload(dpLogger)
-        reload(dpCustomAttr)
-        reload(dpSkinning)
 
 
     def loadVariables(self, *args):
@@ -127,8 +129,6 @@ class Start(object):
         self.masterAttr = "masterGrp"
         self.moduleNamespaceAttr = "moduleNamespace"
         self.moduleInstanceInfoAttr = "moduleInstanceInfo"
-        self.infoIcon = "dp_info.png"
-        self.xDeleteIcon = "dp_xDelete.png"
         self.dpARWebSiteURL = "https://nilouco.blogspot.com"
         self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
         self.gitHubURL = "https://github.com/nilouco/dpAutoRigSystem"
@@ -157,6 +157,7 @@ class Start(object):
         self.loadedDeforming = False
         self.loadedCustom = False
         self.rebuilding = False
+        self.moduleFLCollapseStatus = False
         self.toIDList = []
         self.controlInstanceList = []
         self.checkInInstanceList = []
@@ -168,11 +169,17 @@ class Start(object):
         self.userDefAgreeTerms = 1
         self.optionCtrl = None
         self.utils = dpUtils.Utils(self)
+        self.dpARpath = self.utils.findPath("dpAutoRig.py")
         self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager(self)
         self.allUIs = {}
         self.iDeleteJobId = 0
         self.iSelChangeJobId = 0
+        self.iconInfo = self.dpARpath+"/Icons/dp_info.png"
+        self.iconPlusInfo = self.dpARpath+"/Icons/dp_plusInfo.png"
+        self.iconX = self.dpARpath+"/Icons/dp_xDelete.png"
+        self.triRightIcon = self.dpARpath+"/Icons/dp_triRight.png"
+        self.triDownIcon = self.dpARpath+"/Icons/dp_triDown.png"
 
 
     def showUI(self, *args):
@@ -194,7 +201,6 @@ class Start(object):
         """
         if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
             cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
-            #cmds.deleteUI("dpAutoRigSystemWC", control=True)
         self.labelText = "dpAutoRigSystem"
         self.labelText += " - "+self.dpARVersion
         if self.dev:
@@ -216,17 +222,15 @@ class Start(object):
 
     def startScriptJobs(self, *args):
         """ Create scriptJobs to read:
-            - NewSceneOpened (or not?)
+            - NewSceneOpened
             - SceneSaved
             - deleteAll = new scene
-            - quitApplication = Maya closes
             - SelectionChanged
         """
-        #self.refreshAssetNewSceneJob = cmds.scriptJob(event=('NewSceneOpened', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        self.refreshAssetNewSceneJob = cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
         self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
-        self.iDeleteJobId        = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        #self.iQuitAppJobId       = cmds.scriptJob(event=('quitApplication', self.deleteExistWindow), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        self.iSelChangeJobId     = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         self.jobSelectedGuide()
 
 
@@ -457,12 +461,13 @@ class Start(object):
         
         self.allUIs["riggingTabLayout"] = cmds.formLayout('riggingTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
         #colTopLefA - columnLayout:
-        self.allUIs["colTopLeftA"] = cmds.columnLayout('colTopLeftA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["colTopLeftA"] = cmds.columnLayout('colTopLeftA', adjustableColumn=True, height=20, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["i000_guides"] = cmds.text(self.lang['i000_guides'], font="boldLabelFont", width=150, align='center', parent=self.allUIs["colTopLeftA"])
         cmds.setParent(self.allUIs["riggingTabLayout"])
         #colTopRightA - columnLayout:
-        self.allUIs["colTopRightA"] = cmds.columnLayout('colTopRightA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["colTopRightA"] = cmds.rowColumnLayout('colTopRightA', numberOfColumns=2, adjustableColumn=1, columnWidth=(120, 50), parent=self.allUIs["riggingTabLayout"])
         self.allUIs["i001_modules"] = cmds.text(self.lang['i001_modules'], font="boldLabelFont", width=150, align='center', parent=self.allUIs["colTopRightA"])
+        self.allUIs["triCollapseITB"] = cmds.iconTextButton("triCollapseITB", image=self.triDownIcon, annotation=self.lang['i348_triangleIconAnn'], command=self.collapseModulesFL, width=17, height=17, style='iconOnly', align='right', parent=self.allUIs["colTopRightA"])
         cmds.setParent(self.allUIs["riggingTabLayout"])
         #colMiddleLeftA - scrollLayout - guidesLayout:
         self.allUIs["colMiddleLeftA"] = cmds.scrollLayout("colMiddleLeftA", width=160, parent=self.allUIs["riggingTabLayout"])
@@ -478,7 +483,7 @@ class Start(object):
         self.allUIs["colMiddleRightA"] = cmds.scrollLayout("colMiddleRightA", width=120, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=120, parent=self.allUIs["colMiddleRightA"])
         # here will be populated by created instances of modules...
-        # after footerA we will call the function to populate here, because it edits the footerAText
+        # after footerRigging we will call the function to populate here, because it edits the footerRiggingText
         cmds.setParent(self.allUIs["riggingTabLayout"])
         #editSelectedModuleLayoutA - frameLayout:
         self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.lang['i011_editSelected']+" "+self.lang['i143_module'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
@@ -508,19 +513,19 @@ class Start(object):
         cmds.text(self.lang['i128_optionDegree'], parent=self.allUIs["degreeLayout"])
         self.degreeOption = int(lastDegreeOption[0])
         cmds.setParent(self.allUIs["riggingTabLayout"])
-        #footerA - columnLayout:
-        self.allUIs["footerA"] = cmds.columnLayout('footerA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
-        self.allUIs["rigAllButton"] = cmds.button(label=self.lang['i020_rigAll'], annotation=self.lang['i021_rigAllDesc'], backgroundColor=(0.6, 1.0, 0.6), command=self.rigAll, parent=self.allUIs["footerA"])
-        cmds.separator(style='none', height=5, parent=self.allUIs["footerA"])
+        #footerRigging - columnLayout:
+        self.allUIs["footerRigging"] = cmds.columnLayout('footerRigging', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["rigAllButton"] = cmds.button(label=self.lang['i020_rigAll'], annotation=self.lang['i021_rigAllDesc'], backgroundColor=(0.6, 1.0, 0.6), command=self.rigAll, parent=self.allUIs["footerRigging"])
+        cmds.separator(style='none', height=5, parent=self.allUIs["footerRigging"])
         # this text will be actualized by the number of module instances created in the scene...
-        self.allUIs["footerAText"] = cmds.text('footerAText', align='center', label="# "+self.lang['i005_footerA'], parent=self.allUIs["footerA"])
+        self.allUIs["footerRiggingText"] = cmds.text('footerRiggingText', align='center', label="# "+self.lang['i005_footerRigging'], parent=self.allUIs["footerRigging"])
         cmds.setParent( self.allUIs["mainTabLayout"] )
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["riggingTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["colTopLeftA"], 'top', 5), (self.allUIs["colTopLeftA"], 'left', 5), (self.allUIs["colTopRightA"], 'top', 5), (self.allUIs["colTopRightA"], 'right', 5), (self.allUIs["colMiddleLeftA"], 'left', 5), (self.allUIs["colMiddleRightA"], 'right', 5), (self.allUIs["optionsMainFL"], 'left', 5), (self.allUIs["optionsMainFL"], 'right', 5), (self.allUIs["editSelectedModuleLayoutA"], 'left', 5), (self.allUIs["editSelectedModuleLayoutA"], 'right', 5), (self.allUIs["footerA"], 'left', 5), (self.allUIs["footerA"], 'bottom', 5), (self.allUIs["footerA"], 'right', 5)],
-                        attachControl=[(self.allUIs["colMiddleLeftA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colTopRightA"], 'left', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleLeftA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleRightA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'left', 5, self.allUIs["colMiddleLeftA"]), (self.allUIs["editSelectedModuleLayoutA"], 'bottom', 5, self.allUIs["optionsMainFL"]), (self.allUIs["optionsMainFL"], 'bottom', 5, self.allUIs["footerA"])],
+                        attachForm=[(self.allUIs["colTopLeftA"], 'top', 7), (self.allUIs["colTopLeftA"], 'left', 5), (self.allUIs["colTopRightA"], 'top', 5), (self.allUIs["colTopRightA"], 'right', 5), (self.allUIs["colMiddleLeftA"], 'left', 5), (self.allUIs["colMiddleRightA"], 'right', 5), (self.allUIs["optionsMainFL"], 'left', 5), (self.allUIs["optionsMainFL"], 'right', 5), (self.allUIs["editSelectedModuleLayoutA"], 'left', 5), (self.allUIs["editSelectedModuleLayoutA"], 'right', 5), (self.allUIs["footerRigging"], 'left', 5), (self.allUIs["footerRigging"], 'bottom', 5), (self.allUIs["footerRigging"], 'right', 5)],
+                        attachControl=[(self.allUIs["colMiddleLeftA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colTopRightA"], 'left', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleLeftA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'top', 5, self.allUIs["colTopLeftA"]), (self.allUIs["colMiddleRightA"], 'bottom', 5, self.allUIs["editSelectedModuleLayoutA"]), (self.allUIs["colMiddleRightA"], 'left', 5, self.allUIs["colMiddleLeftA"]), (self.allUIs["editSelectedModuleLayoutA"], 'bottom', 5, self.allUIs["optionsMainFL"]), (self.allUIs["optionsMainFL"], 'bottom', 5, self.allUIs["footerRigging"])],
                         #attachPosition=[(self.allUIs["colTopLeftA"], 'right', 5, 50), (self.allUIs["colTopRightA"], 'left', 0, 50)],
-                        attachNone=[(self.allUIs["footerA"], 'top')]
+                        attachNone=[(self.allUIs["footerRigging"], 'top')]
                         )
         
         # -- Skinning tab
@@ -562,9 +567,9 @@ class Start(object):
         self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinCreateFL"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
         self.allUIs["skinButton"] = cmds.button("skinButton", label=self.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skin.skinFromUI), parent=self.allUIs["footerB"])
-        self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["footerB"])
-        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skin.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
-        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skin.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["footerRiggingddRem"] = cmds.paneLayout("footerRiggingddRem", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["footerB"])
+        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skin.skinFromUI, "Add"), parent=self.allUIs["footerRiggingddRem"])
+        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skin.skinFromUI, "Remove"), parent=self.allUIs["footerRiggingddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.lang['i025_joints']+" 0 "+self.lang['i024_geometries'], parent=self.allUIs["footerB"])
@@ -746,7 +751,7 @@ class Start(object):
         cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 55), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
+                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 60), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
                         attachNone=[(self.allUIs["footerPublish"], 'top')]
                         )
         self.setValidatorPreset()
@@ -775,14 +780,19 @@ class Start(object):
         self.allUIs["rebuilderCustomLayout"] = cmds.frameLayout('rebuilderCustomLayout', label=self.lang['i334_custom'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
         self.rebuilderModuleList = self.startGuideModules(self.customFolder, "start", "rebuilderCustomLayout")
         cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
+        # rebuilder
+        self.allUIs["footerRebuilder"] = cmds.columnLayout('footerRebuilder', adjustableColumn=True, parent=self.allUIs["rebuilderTabLayout"])
+        cmds.separator(style='in', height=20, parent=self.allUIs["footerRebuilder"])
+        self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["footerRebuilder"])
+        cmds.separator(style='none', height=10, parent=self.allUIs["footerRebuilder"])
+        self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["footerRebuilder"])
         self.allUIs["splitDataSelectProcessBT"] = cmds.button("splitDataSelectProcessBT", label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
         self.allUIs["rebuildSelectProcessBT"] = cmds.button("rebuildSelectProcessBT", label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
-        cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
+        cmds.separator(style='none', height=10, parent=self.allUIs["footerRebuilder"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 10)]
+                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 80), (self.allUIs["footerRebuilder"], 'left', 5), (self.allUIs["footerRebuilder"], 'right', 5), (self.allUIs["footerRebuilder"], 'bottom', 5)],
+                        attachNone=[(self.allUIs["footerRebuilder"], 'top')]
                         )
         
         # --
@@ -1264,7 +1274,7 @@ class Start(object):
         """
         if not path:
             # find path where 'dpAutoRig.py' is been executed:
-            path = self.utils.findPath("dpAutoRig.py")
+            path = self.dpARpath
         if not self.loadedPath:
             print("dpAutoRigPath: "+path)
             self.loadedPath = True
@@ -1357,10 +1367,8 @@ class Start(object):
         icon = guide.ICON
         if guideDir:
             # find path where 'dpAutoRig.py' is been executed to get the icon:
-            path = self.utils.findPath("dpAutoRig.py")
+            path = self.dpARpath
         iconDir = path+icon
-        iconInfo = self.utils.findPath("dpAutoRig.py")+"/Icons/"+self.infoIcon
-        iconX = self.utils.findPath("dpAutoRig.py")+"/Icons/"+self.xDeleteIcon
         guideName = guide.CLASS_NAME
         
         # creating a basic layout for guide buttons:
@@ -1408,11 +1416,11 @@ class Start(object):
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
-                rebuilderInstance.infoITB = cmds.iconTextButton(image=iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
-                rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=iconX, height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.lang['r058_deleteDataAnn'], parent=moduleLayout)
+                rebuilderInstance.infoITB = cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.iconX, height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.lang['r058_deleteDataAnn'], parent=moduleLayout)
                 rebuilderInstance.updateActionButtons(color=False)
             else:
-                cmds.iconTextButton(image=iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     
@@ -1441,7 +1449,7 @@ class Start(object):
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.lang['i005_footerA'])
+        cmds.text(self.allUIs["footerRiggingText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.lang['i005_footerRigging'])
         return guideInstance
     
     
@@ -1504,7 +1512,7 @@ class Start(object):
         cmds.namespace(setNamespace=":")
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find path where 'dpAutoRig.py' is been executed:
-        path = self.utils.findPath("dpAutoRig.py")
+        path = self.dpARpath
         guideDir = self.standardFolder
         # find all module names:
         moduleNameInfo = self.utils.findAllModuleNames(path, guideDir)
@@ -1555,8 +1563,23 @@ class Start(object):
                 self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerA'])
+        cmds.text(self.allUIs["footerRiggingText"], edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerRigging'])
     
+    
+    def collapseModulesFL(self, *args):
+        """ Edit the current module frame layout collapse and icon.
+        """
+        collapseValue = True
+        imageIcon = self.triRightIcon
+        if self.moduleFLCollapseStatus:
+            collapseValue = False
+            imageIcon = self.triDownIcon
+        if self.moduleInstancesList:
+            for modInst in self.moduleInstancesList:
+                cmds.frameLayout(modInst.moduleFrameLayout, edit=True, collapse=collapseValue)
+        cmds.iconTextButton(self.allUIs['triCollapseITB'], edit=True, image=imageIcon)
+        self.moduleFLCollapseStatus = collapseValue
+
 
     def checkImportedGuides(self, askUser=True, *args):
         """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
@@ -1828,7 +1851,7 @@ class Start(object):
             print(self.lang['i098_installing'])
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
-            dpAR_DestFolder = self.utils.findPath("dpAutoRig.py")
+            dpAR_DestFolder = self.dpARpath
             self.utils.setProgress('Installing: 0%', self.lang['i098_installing'])
             
             try:

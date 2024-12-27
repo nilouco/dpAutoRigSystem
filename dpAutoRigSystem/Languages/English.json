@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-12-26",
+    "_updated"       : "2024-12-27",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -169,7 +169,7 @@
     "i002_options"              : "Options",
     "i003_prefix"               : "Prefix for all nodes.",
     "i004_defaultRL"            : "Use Default Render Layer (masterLayer).",
-    "i005_footerA"              : "modules will be created in this Rig",
+    "i005_footerRigging"        : "modules will be created in this Rig",
     "i006_aboutDesc"            : "\nAbout dpAutoRig System:\n\nThis script is a Python program to\nautomate the Rigging process.\n\nIt was write in order to help you to develop\nmany types of rigs by yourself.\nIts arquitecture is modular, multilingual and object oriented\nthat means you can create any type of Rigging parts\nand combine them as you want...\n\nIf you have any suggestion or comment, please contact me.\nI hope you enjoy it   :)\n\nIt is FREE !!!",
     "i007_authorDesc"           : "\nAuthor: Danilo Pinheiro (nilouco)\n\nHe's a simple person who likes 3D\nand really want the best of all...\n\nContact information:\ne-mail: nilouco@gmail.com\nportfolio: https://nilouco.blogspot.com\n\nPlease, any feedback will be very appreciated   :)\n\nThank you very much!",
     "i008_errorUI"              : "Cannot load dpAutoRig UI window..., please try save the dpAutoRigSystem folder in MAYA_PATH directory and verify if you did not changed any file.",
@@ -509,7 +509,8 @@
     "i344_deleted"              : "Deleted",
     "i345_sOffsetMatrixIOAnn"   : "The folder to export and import parent offset matrix conection data.",
     "i346_loadedSucess"         : "loaded with sucess, thanks.",
-    "i347_sChannelIOAnn"         : "The folder to export and import the transform channelBox attribute states data.",
+    "i347_sChannelIOAnn"        : "The folder to export and import the transform channelBox attribute states data.",
+    "i348_triangleIconAnn"      : "Collapse or expand all module frame layouts.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

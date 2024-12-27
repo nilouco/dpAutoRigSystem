@@ -58,7 +58,7 @@ class Pipeliner(object):
     def getJsonSettingsPath(self, *args):
         """ Returns the json path for the pipeline settings file.
         """
-        basePath = self.utils.findPath("dpAutoRig.py")
+        basePath = self.dpUIinst.dpARpath
         basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]+"/Pipeline"
         return os.path.join(basePath, self.settingsFile).replace("\\", "/")
 

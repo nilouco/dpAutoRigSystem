@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-12-26",
+    "_updated"       : "2024-12-27",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -169,7 +169,7 @@
     "i002_options"              : "Opções",
     "i003_prefix"               : "Prefixo para todos os nodes.",
     "i004_defaultRL"            : "Usar Render Layer Padrão (masterLayer).",
-    "i005_footerA"              : "modulos serão criados nesse Rig",
+    "i005_footerRigging"        : "modulos serão criados nesse Rig",
     "i006_aboutDesc"            : "\nSobre dpAutoRig System:\n\nEsse script é um programa em Python para\nautomatizar o processo de Rigging.\n\nEle foi escrito para ajudar você a deselvolver\nvários tipos de Rigs por você mesmo.\nSua arquitetura é modular, multilingue e orientada à objeto\nque significa que você pode criar qualquer tipo de Rig em partes\ne combinar como quiser...\n\nSe você tiver qualquer sugestão ou comentario, por favor entre em contato.\nEu espero que goste   :)\n\nEle é GRATUITO!!!",
     "i007_authorDesc"           : "\nAutor: Danilo Pinheiro (nilouco)\n\nÉ uma pessoa simples que gosta do 3D\ne realmente quer o melhor para todos...\n\nInformações para contato:\ne-mail: nilouco@gmail.com\nportfolio: https://nilouco.blogspot.com\n\nPor favor, qualquer feedback será bem vindo   :)\n\nMuito Obrigado!",
     "i008_errorUI"              : "Não pode carregar a janela dpAutoRig UI..., por favor tente salvar a pasta dpAutoRigSystem em um diretorio do MAYA_PATH e verifique se você não mudou nenhum arquivo.",
@@ -509,7 +509,8 @@
     "i344_deleted"              : "Apagado",
     "i345_sOffsetMatrixIOAnn"   : "O diretório onde será exportado ou importado os dados de conexões de parent offset matrix.",
     "i346_loadedSucess"         : "carregado com sucesso, obrigado.",
-    "i347_sChannelIOAnn"         : "O diretório onde será exportado ou importado os dados de estados dos atributos de tranform da channelBox.",
+    "i347_sChannelIOAnn"        : "O diretório onde será exportado ou importado os dados de estados dos atributos de tranform da channelBox.",
+    "i348_triangleIconAnn"      : "Colapsar ou expandir todos os frame layouts de módulos.",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
