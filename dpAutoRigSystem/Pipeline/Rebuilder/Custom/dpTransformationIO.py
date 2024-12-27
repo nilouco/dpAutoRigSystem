@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
-from functools import partial
 
 # global variables to this module:
 CLASS_NAME = "TransformationIO"

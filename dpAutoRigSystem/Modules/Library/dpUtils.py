@@ -1314,7 +1314,7 @@ class Utils(object):
                 if item in self.baseNodeList:
                     toRemoveList.append(item)
             if filterBaseName:
-                if item.endswith("Base"):
+                if self.getSuffixNumberList(item)[1].endswith("Base"):
                     toRemoveList.append(item)
         if toRemoveList:
             toRemoveList = list(set(toRemoveList))

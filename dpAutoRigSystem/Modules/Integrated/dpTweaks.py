@@ -333,14 +333,12 @@ def Tweaks(dpUIinst):
                 cmds.parent([upperLipMiddleInstance.moduleGrp, upperLipInstance1.moduleGrp, upperLipInstance2.moduleGrp, lowerLipMiddleInstance.moduleGrp, lowerLipInstance1.moduleGrp, lowerLipInstance2.moduleGrp, lipCornerInstance.moduleGrp], lipMainInstance.moduleGrp, absolute=True)
                 
                 if userDetail == complete:
+                    cmds.parent([eyebrowMiddleInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, cheekInstance2.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
+                    cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
+                    cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp, eyebrowInstance4.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
                     if userIndirectSkin == indSkin:
-                        cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp, eyebrowInstance4.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
-                        cmds.parent([eyebrowMiddleInstance.moduleGrp, eyelidMainInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, cheekInstance2.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
+                        cmds.parent(eyelidMainInstance.moduleGrp, holderMainInstance.moduleGrp, absolute=True)
                         cmds.parent([upperEyelidInstance0.moduleGrp, upperEyelidInstance1.moduleGrp, upperEyelidInstance2.moduleGrp, lowerEyelidInstance0.moduleGrp, lowerEyelidInstance1.moduleGrp, lowerEyelidInstance2.moduleGrp, eyelidCornerInstance0.moduleGrp, eyelidCornerInstance1.moduleGrp, upperEyeSocketInstance0.moduleGrp, upperEyeSocketInstance1.moduleGrp, upperEyeSocketInstance2.moduleGrp, lowerEyeSocketInstance0.moduleGrp, lowerEyeSocketInstance1.moduleGrp, lowerEyeSocketInstance2.moduleGrp], eyelidMainInstance.moduleGrp, absolute=True)
-                        cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
-                    else:
-                        cmds.parent([eyebrowMiddleInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, cheekInstance2.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
-                        cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
                 else:
                     cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
                         

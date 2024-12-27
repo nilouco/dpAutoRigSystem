@@ -57,6 +57,8 @@ class TargetCleaner(dpBaseAction.ActionStartClass):
                     if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                         if not item in exceptionList:
                             exceptionList.append(item)
+                    elif self.utils.getSuffixNumberList(item)[1].endswith("Base"):
+                        exceptionList.append(item)
                     else:
                         try:
                             inputDeformerList = cmds.findDeformers(item)

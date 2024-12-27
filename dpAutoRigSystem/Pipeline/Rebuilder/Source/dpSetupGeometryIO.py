@@ -86,5 +86,5 @@ class SetupGeometryIO(dpBaseAction.ActionStartClass):
             if grp:
                 meshList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
                 if meshList:
-                    geoList.extend(n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not n.endswith("Base"))
+                    geoList.extend(n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.utils.getSuffixNumberList(n)[1].endswith("Base"))
         return geoList

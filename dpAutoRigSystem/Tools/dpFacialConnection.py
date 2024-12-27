@@ -88,17 +88,9 @@ class FacialConnection(object):
             Return the presetContent
         """
         # load json file:
-        presetContent = None
-        file = FACIALPRESET+".json"
-        # find current path:
         path = os.path.dirname(__file__)
-        # hack in order to avoid "\\" from os.sep, then we need to use the replace string method:
         jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
-        fileDictionary = open(jsonPath + file, "r", encoding='utf-8')
-        # read the json file content and store it in a dictionary:
-        presetContent = json.loads(fileDictionary.read())
-        # close the json file:
-        fileDictionary.close()
+        presetContent = self.dpUIinst.pipeliner.getJsonContent(jsonPath+FACIALPRESET+".json")
         if presetContent:
             # rebuild dictionary using object variables:
             for storedAttr in list(presetContent):
