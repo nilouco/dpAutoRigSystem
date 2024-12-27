@@ -177,6 +177,7 @@ class ActionStartClass(object):
         latestData = self.dpUIinst.lang['i305_none']
         exportedList = self.getExportedList()
         if exportedList:
+            exportedList.sort()
             latestData = exportedList[-1]
         return latestData
 

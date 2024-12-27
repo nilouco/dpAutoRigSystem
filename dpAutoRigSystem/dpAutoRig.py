@@ -237,6 +237,7 @@ class Start(object):
             cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
             #cmds.deleteUI("dpAutoRigSystemWC", control=True)
         self.utils.closeUI("dpARLoadWin")
+        self.utils.closeUI("dpInfoWindow")
         self.utils.closeUI(self.plusInfoWinName)
         self.utils.closeUI(self.colorOverrideWinName)
 

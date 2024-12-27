@@ -218,7 +218,7 @@ class Pipeliner(object):
     def declarePipelineAnnotation(self, *args):
         """ Just declare a member variable to get the pipeline annotation data to search the values in the language dictionary.
         """
-        self.pipelineAnnotaion = {
+        self.pipelineAnnotation = {
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
@@ -233,28 +233,28 @@ class Pipeliner(object):
         "s_presets"          : "i234_sPresetsAnn",
         "s_addOns"           : "i235_sAddOnsAnn",
         "s_hist"             : "i236_sHistAnn",
-        "s_modelIO"          : "dpData/dpModel",
-        "s_setupGeometryIO"  : "dpData/dpSetupGeometry",
-        "s_blendShapeIO"     : "dpData/dpBlendShape",
-        "s_shaderIO"         : "dpData/dpShader",
-        "s_guideIO"          : "dpData/dpGuide",
-        "s_rivetIO"          : "dpData/dpRivet",
-        "s_parentingIO"      : "dpData/dpParenting",
-        "s_skinningIO"       : "dpData/dpSkinning",
-        "s_deformationIO"    : "dpData/dpDeformation",
-        "s_componentTagIO"   : "dpData/dpComponentTag",
-        "s_inputOrderIO"     : "dpData/dpInputOrder",
-        "s_renameIO"         : "dpData/dpRename",
-        "s_transformationIO" : "dpData/dpTransformation",
-        "s_controlShapeIO"   : "dpData/dpControlShape",
-        "s_attributeIO"      : "dpData/dpAttribute",
-        "s_constraintIO"     : "dpData/dpConstraint",
-        "s_utilityIO"        : "dpData/dpUtility",
-        "s_drivenKeyIO"      : "dpData/dpDrivenKey",
-        "s_offsetMatrixIO"   : "dpData/dpOffsetMatrix",
-        "s_connectionIO"     : "dpData/dpConnection",
-        "s_calibrationIO"    : "dpData/dpCalibration",
-        "s_channelIO"        : "dpData/dpChannel",
+        "s_modelIO"          : "i293_sModelIOAnn",
+        "s_setupGeometryIO"  : "i302_sSetupGeometryIOAnn",
+        "s_blendShapeIO"     : "i309_sBlendShapeIOAnn",
+        "s_shaderIO"         : "i294_sShaderIOAnn",
+        "s_guideIO"          : "i295_sGuideIOAnn",
+        "s_rivetIO"          : "i323_sRivetIOAnn",
+        "s_parentingIO"      : "i300_sParentingIOAnn",
+        "s_skinningIO"       : "i297_sSkinningIOAnn",
+        "s_deformationIO"    : "i310_sDeformationIOAnn",
+        "s_componentTagIO"   : "i326_sComponentTagIOAnn",
+        "s_inputOrderIO"     : "i311_sInputOrderIOAnn",
+        "s_renameIO"         : "i338_sRenameIOAnn",
+        "s_transformationIO" : "i312_sTransformationIOAnn",
+        "s_controlShapeIO"   : "i296_sControlShapeIOAnn",
+        "s_attributeIO"      : "i325_sAttributeIOAnn",
+        "s_constraintIO"     : "i328_sConstraintIOAnn",
+        "s_utilityIO"        : "i337_sUtilityIOAnn",
+        "s_drivenKeyIO"      : "i330_sDrivenKeyIOAnn",
+        "s_offsetMatrixIO"   : "i345_sOffsetMatrixIOAnn",
+        "s_connectionIO"     : "i327_sConnectionIOAnn",
+        "s_calibrationIO"    : "i324_sCalibrationIOAnn",
+        "s_channelIO"        : "i347_sChannelIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
         "s_prefix"           : "i239_sPrefixAnn",
@@ -405,13 +405,13 @@ class Pipeliner(object):
             for key in list(self.pipeInfo):
                 if "_" in key:
                     if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotaion[key]], buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
                     elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotaion[key]], numberOfFields=1, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], numberOfFields=1, parent=self.pipelineDataLayout)
                     elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotaion[key]], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
                     elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotaion[key]], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
             # try to force loading empty data info
             try:
                 if self.pipeData['sceneName']:

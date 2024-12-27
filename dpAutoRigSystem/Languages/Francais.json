@@ -507,9 +507,9 @@
     "i342_controllers"          : "Contrôleurs",
     "i343_tools"                : "Outils",
     "i344_deleted"              : "Effacé",
-    "i345_soffsetMatrixIOAnn"   : "Le dossier ou on va importer et exporter les donnés des connexions des parent offset matrix.",
+    "i345_sOffsetMatrixIOAnn"   : "Le dossier ou on va importer et exporter les donnés des connexions des parent offset matrix.",
     "i346_loadedSucess"         : "chargé avec succès, merci.",
-    "i347_channelIOAnn"         : "Le dossier ou on va importer et exporter les donnés des states pour les attributes de tranform du channelBox.",
+    "i347_sChannelIOAnn"         : "Le dossier ou on va importer et exporter les donnés des states pour les attributes de tranform du channelBox.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

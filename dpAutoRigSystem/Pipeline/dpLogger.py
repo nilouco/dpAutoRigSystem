@@ -29,8 +29,7 @@ class Logger(object):
         self.info_winHeight   = height
         self.info_align       = align
         # creating Info Window:
-        if cmds.window('dpInfoWindow', query=True, exists=True):
-            cmds.deleteUI('dpInfoWindow', window=True)
+        self.dpUIinst.utils.closeUI("dpInfoWindow")
         dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.dpUIinst.dpARVersion+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpInfoWin)
@@ -80,4 +79,4 @@ class Logger(object):
         logText += '\n' + self.lang['i018_thanks']
         
         # creating a info window to show the log:
-        self.infoWin( 'i019_log', None, logText, 'center', 250, min((350, 150+(nRiggedModule*13))) )
+        self.infoWin('i019_log', None, logText, 'center', 250, min((350, 150+(nRiggedModule*13))))

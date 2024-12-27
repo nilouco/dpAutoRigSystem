@@ -507,9 +507,9 @@
     "i342_controllers"          : "Controllers",
     "i343_tools"                : "Tools",
     "i344_deleted"              : "Deleted",
-    "i345_soffsetMatrixIOAnn"   : "The folder to export and import parent offset matrix conection data.",
+    "i345_sOffsetMatrixIOAnn"   : "The folder to export and import parent offset matrix conection data.",
     "i346_loadedSucess"         : "loaded with sucess, thanks.",
-    "i347_channelIOAnn"         : "The folder to export and import the transform channelBox attribute states data.",
+    "i347_sChannelIOAnn"         : "The folder to export and import the transform channelBox attribute states data.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
