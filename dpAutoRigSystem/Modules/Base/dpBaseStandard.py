@@ -193,8 +193,8 @@ class BaseStandard(object):
         cmds.duplicate(self.moduleGrp)
 
     
-    def editUserName(self, checkText=None, pad=1, *args):
-        """ Edit the userGuideName to use the userName from module UI.
+    def editGuideModuleName(self, checkText=None, pad=1, *args):
+        """ Edit the userGuideName to use the user custom name from module UI.
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
@@ -244,6 +244,7 @@ class BaseStandard(object):
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField(self.userName, edit=True, text=self.customName)
+                    cmds.frameLayout(self.moduleFrameLayout, edit=True, label=self.dpUIinst.lang[self.title]+" - "+self.customName)
                 except:
                     pass
                 cmds.setAttr(self.moduleGrp+".customName", self.customName, type='string')

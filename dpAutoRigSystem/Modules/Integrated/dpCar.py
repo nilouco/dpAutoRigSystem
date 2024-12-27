@@ -32,6 +32,7 @@ def Car(dpUIinst):
     checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        dpUIinst.collapseEditSelModFL = True
         # defining naming:
         doingName = dpUIinst.lang['m094_doing']
         # part names:
@@ -95,7 +96,7 @@ def Car(dpUIinst):
             # create fkLine module instance:
             chassisInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing chassis base guide informations:
-            chassisInstance.editUserName(chassisName)
+            chassisInstance.editGuideModuleName(chassisName)
             cmds.setAttr(chassisInstance.moduleGrp+".translateY", 12)
             cmds.setAttr(chassisInstance.annotation+".translateY", 16)
             cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 12)
@@ -106,7 +107,7 @@ def Car(dpUIinst):
             # create fkLine module instance:
             steeringHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing steering base guide informations:
-            steeringHandleInstance.editUserName(sterringHandleName)
+            steeringHandleInstance.editGuideModuleName(sterringHandleName)
             cmds.setAttr(steeringHandleInstance.moduleGrp+".translateX", 4.5)
             cmds.setAttr(steeringHandleInstance.moduleGrp+".translateY", 11.2)
             cmds.setAttr(steeringHandleInstance.moduleGrp+".translateZ", 9.7)
@@ -121,7 +122,7 @@ def Car(dpUIinst):
             # create steering module instance:
             steeringInstance = dpUIinst.initGuide('dpSteering', guideDir)
             # editing steering base guide informations:
-            steeringInstance.editUserName(sterringName)
+            steeringInstance.editGuideModuleName(sterringName)
             cmds.setAttr(steeringInstance.moduleGrp+".translateX", 4.5)
             cmds.setAttr(steeringInstance.moduleGrp+".translateY", 12.1)
             cmds.setAttr(steeringInstance.moduleGrp+".translateZ", 6.8)
@@ -136,7 +137,7 @@ def Car(dpUIinst):
             # create wheel module instance:
             frontWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
             # change name to frontWheel:
-            frontWheelInstance.editUserName(frontWheelName)        
+            frontWheelInstance.editGuideModuleName(frontWheelName)        
             # setting X mirror:
             frontWheelInstance.changeMirror("X")
             # editing frontWheel base guide informations:
@@ -159,7 +160,7 @@ def Car(dpUIinst):
             # create wheel module instance:
             backWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
             # change name to frontWheel:
-            backWheelInstance.editUserName(backWheelName)        
+            backWheelInstance.editGuideModuleName(backWheelName)        
             # setting X mirror:
             backWheelInstance.changeMirror("X")
             # editing frontWheel base guide informations:
@@ -181,7 +182,7 @@ def Car(dpUIinst):
             dpUIinst.utils.setProgress(doingName+frontSuspensionName)
             # create FRONT self.suspensionName module instance:
             frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
-            frontSuspensionInstance.editUserName(frontSuspensionName)
+            frontSuspensionInstance.editGuideModuleName(frontSuspensionName)
             # setting X mirror:
             frontSuspensionInstance.changeMirror("X")
             # editing front suspension base guide informations:
@@ -202,7 +203,7 @@ def Car(dpUIinst):
             dpUIinst.utils.setProgress(doingName+backSuspensionName)
             # create BACK self.suspensionName module instance:
             backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
-            backSuspensionInstance.editUserName(backSuspensionName)
+            backSuspensionInstance.editGuideModuleName(backSuspensionName)
             # setting X mirror:
             backSuspensionInstance.changeMirror("X")
             # editing back suspension base guide informations:
@@ -223,7 +224,7 @@ def Car(dpUIinst):
             dpUIinst.utils.setProgress(doingName+frontDoorName)
             # create fkLine module instance:
             frontDoorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-            frontDoorInstance.editUserName(frontDoorName)
+            frontDoorInstance.editGuideModuleName(frontDoorName)
             # setting X mirror:
             frontDoorInstance.changeMirror("X")
             # editing front door base guide informations:
@@ -240,7 +241,7 @@ def Car(dpUIinst):
             dpUIinst.utils.setProgress(doingName+backDoorName)
             # create fkLine module instance:
             backDoorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-            backDoorInstance.editUserName(backDoorName)
+            backDoorInstance.editGuideModuleName(backDoorName)
             # setting X mirror:
             backDoorInstance.changeMirror("X")
             # editing back door base guide informations:
@@ -263,7 +264,7 @@ def Car(dpUIinst):
                 # create fkLine module instance:
                 hornInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing eyeLookAt base guide informations:
-                hornInstance.editUserName(hornName)
+                hornInstance.editGuideModuleName(hornName)
                 cmds.setAttr(hornInstance.moduleGrp+".translateX", 4.5)
                 cmds.setAttr(hornInstance.moduleGrp+".translateY", 12.3)
                 cmds.setAttr(hornInstance.moduleGrp+".translateZ", 6.5)
@@ -277,7 +278,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+frontDoorHandleName)
                 # create fkLine module instance:
                 frontDoorHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                frontDoorHandleInstance.editUserName(frontDoorHandleName)
+                frontDoorHandleInstance.editGuideModuleName(frontDoorHandleName)
                 # setting X mirror:
                 frontDoorHandleInstance.changeMirror("X")
                 # editing front door base guide informations:
@@ -294,7 +295,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+backDoorHandleName)
                 # create fkLine module instance:
                 backDoorHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                backDoorHandleInstance.editUserName(backDoorHandleName)
+                backDoorHandleInstance.editGuideModuleName(backDoorHandleName)
                 # setting X mirror:
                 backDoorHandleInstance.changeMirror("X")
                 # editing back door handle base guide informations:
@@ -311,7 +312,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+frontWiperAName)
                 # create fkLine module instance:
                 frontWiperAInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                frontWiperAInstance.editUserName(frontWiperAName)
+                frontWiperAInstance.editGuideModuleName(frontWiperAName)
                 # editing front wiper A base guide informations:
                 cmds.setAttr(frontWiperAInstance.moduleGrp+".translateX", 5.5)
                 cmds.setAttr(frontWiperAInstance.moduleGrp+".translateY", 13.7)
@@ -332,7 +333,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+frontWiperBName)
                 # create fkLine module instance:
                 frontWiperBInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                frontWiperBInstance.editUserName(frontWiperBName)
+                frontWiperBInstance.editGuideModuleName(frontWiperBName)
                 # editing front wiper B base guide informations:
                 cmds.setAttr(frontWiperBInstance.moduleGrp+".translateX", 0.7)
                 cmds.setAttr(frontWiperBInstance.moduleGrp+".translateY", 13.7)
@@ -354,7 +355,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+trunkName)
                 # create fkLine module instance:
                 trunkInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                trunkInstance.editUserName(trunkName)
+                trunkInstance.editGuideModuleName(trunkName)
                 # editing trunk base guide informations:
                 cmds.setAttr(trunkInstance.moduleGrp+".translateY", 19.4)
                 cmds.setAttr(trunkInstance.moduleGrp+".translateZ", -18.7)
@@ -368,7 +369,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+backWiperName)
                 # create fkLine module instance:
                 backWiperInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                backWiperInstance.editUserName(backWiperName)
+                backWiperInstance.editGuideModuleName(backWiperName)
                 # editing back wiper base guide informations:
                 cmds.setAttr(backWiperInstance.moduleGrp+".translateY", 14.8)
                 cmds.setAttr(backWiperInstance.moduleGrp+".translateZ", -24.7)
@@ -387,7 +388,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+gasName)
                 # create fkLine module instance:
                 gasInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                gasInstance.editUserName(gasName)
+                gasInstance.editGuideModuleName(gasName)
                 # editing gas base guide informations:
                 cmds.setAttr(gasInstance.moduleGrp+".translateX", -10)
                 cmds.setAttr(gasInstance.moduleGrp+".translateY", 13)
@@ -401,7 +402,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+hoodName)
                 # create fkLine module instance:
                 hoodInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                hoodInstance.editUserName(hoodName)
+                hoodInstance.editGuideModuleName(hoodName)
                 # editing hood base guide informations:
                 cmds.setAttr(hoodInstance.moduleGrp+".translateY", 13.5)
                 cmds.setAttr(hoodInstance.moduleGrp+".translateZ", 12.5)
@@ -415,7 +416,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+sunRoofName)
                 # create fkLine module instance:
                 sunroofInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                sunroofInstance.editUserName(sunRoofName)
+                sunroofInstance.editGuideModuleName(sunRoofName)
                 # editing sun roof base guide informations:
                 cmds.setAttr(sunroofInstance.moduleGrp+".translateY", 19)
                 cmds.setAttr(sunroofInstance.moduleGrp+".translateZ", -2.5)
@@ -427,7 +428,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+antennaName)
                 # create fkLine module instance:
                 antennaInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                antennaInstance.editUserName(antennaName)
+                antennaInstance.editGuideModuleName(antennaName)
                 # editing antenna base guide informations:
                 cmds.setAttr(antennaInstance.moduleGrp+".translateY", 18.8)
                 cmds.setAttr(antennaInstance.moduleGrp+".translateZ", 3.7)
@@ -442,7 +443,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+leftTurnHandleName)
                 # create fkLine module instance:
                 leftTurnHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                leftTurnHandleInstance.editUserName(leftTurnHandleName)
+                leftTurnHandleInstance.editGuideModuleName(leftTurnHandleName)
                 # editing left turn handle base guide informations:
                 cmds.setAttr(leftTurnHandleInstance.moduleGrp+".translateX", 5.5)
                 cmds.setAttr(leftTurnHandleInstance.moduleGrp+".translateY", 11.5)
@@ -457,7 +458,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+rightTurnHandleName)
                 # create fkLine module instance:
                 rightTurnHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                rightTurnHandleInstance.editUserName(rightTurnHandleName)
+                rightTurnHandleInstance.editGuideModuleName(rightTurnHandleName)
                 # editing right turn handle base guide informations:
                 cmds.setAttr(rightTurnHandleInstance.moduleGrp+".translateX", 3.4)
                 cmds.setAttr(rightTurnHandleInstance.moduleGrp+".translateY", 11.5)
@@ -472,7 +473,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+gearLeverName)
                 # create fkLine module instance:
                 gearLeverInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                gearLeverInstance.editUserName(gearLeverName)
+                gearLeverInstance.editGuideModuleName(gearLeverName)
                 # editing gear lever base guide informations:
                 cmds.setAttr(gearLeverInstance.moduleGrp+".translateY", 7.5)
                 cmds.setAttr(gearLeverInstance.moduleGrp+".translateZ", 7.9)
@@ -485,7 +486,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+handBreakName)
                 # create fkLine module instance:
                 handBreakInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                handBreakInstance.editUserName(handBreakName)
+                handBreakInstance.editGuideModuleName(handBreakName)
                 # editing hand break base guide informations:
                 cmds.setAttr(handBreakInstance.moduleGrp+".translateY", 7.9)
                 cmds.setAttr(handBreakInstance.moduleGrp+".translateZ", 2.3)
@@ -498,7 +499,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+breakName)
                 # create fkLine module instance:
                 breakInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                breakInstance.editUserName(breakName)
+                breakInstance.editGuideModuleName(breakName)
                 # editing break base guide informations:
                 cmds.setAttr(breakInstance.moduleGrp+".translateX", 4.3)
                 cmds.setAttr(breakInstance.moduleGrp+".translateY", 7.3)
@@ -512,7 +513,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+acceleratorName)
                 # create fkLine module instance:
                 acceleratorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                acceleratorInstance.editUserName(acceleratorName)
+                acceleratorInstance.editGuideModuleName(acceleratorName)
                 # editing accelerator base guide informations:
                 cmds.setAttr(acceleratorInstance.moduleGrp+".translateX", 3.2)
                 cmds.setAttr(acceleratorInstance.moduleGrp+".translateY", 7.3)
@@ -526,7 +527,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+clutchName)
                 # create fkLine module instance:
                 clutchInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                clutchInstance.editUserName(clutchName)
+                clutchInstance.editGuideModuleName(clutchName)
                 # editing clutch base guide informations:
                 cmds.setAttr(clutchInstance.moduleGrp+".translateX", 5.4)
                 cmds.setAttr(clutchInstance.moduleGrp+".translateY", 7.3)
@@ -540,7 +541,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+dashboardAName)
                 # create fkLine module instance:
                 dashboardAInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                dashboardAInstance.editUserName(dashboardAName)
+                dashboardAInstance.editGuideModuleName(dashboardAName)
                 # editing dashboard A base guide informations:
                 cmds.setAttr(dashboardAInstance.moduleGrp+".translateX", 5.2)
                 cmds.setAttr(dashboardAInstance.moduleGrp+".translateY", 12.8)
@@ -555,7 +556,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+dashboardBName)
                 # create fkLine module instance:
                 dashboardBInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                dashboardBInstance.editUserName(dashboardBName)
+                dashboardBInstance.editGuideModuleName(dashboardBName)
                 # editing dashboard B base guide informations:
                 cmds.setAttr(dashboardBInstance.moduleGrp+".translateX", 3.7)
                 cmds.setAttr(dashboardBInstance.moduleGrp+".translateY", 12.8)
@@ -570,7 +571,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+frontSeatName)
                 # create fkLine module instance:
                 frontSeatInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                frontSeatInstance.editUserName(frontSeatName)
+                frontSeatInstance.editGuideModuleName(frontSeatName)
                 # setting X mirror:
                 frontSeatInstance.changeMirror("X")
                 # editing front seat base guide informations:
@@ -593,7 +594,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+backSeatName)
                 # create fkLine module instance:
                 backSeatInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                backSeatInstance.editUserName(backSeatName)
+                backSeatInstance.editGuideModuleName(backSeatName)
                 # editing back seat base guide informations:
                 cmds.setAttr(backSeatInstance.moduleGrp+".translateY", 7.7)
                 cmds.setAttr(backSeatInstance.moduleGrp+".translateZ", -6)
@@ -608,7 +609,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+frontDoorInsideHandleName)
                 # create fkLine module instance:
                 frontDoorInsideHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                frontDoorInsideHandleInstance.editUserName(frontDoorInsideHandleName)
+                frontDoorInsideHandleInstance.editGuideModuleName(frontDoorInsideHandleName)
                 # setting X mirror:
                 frontDoorInsideHandleInstance.changeMirror("X")
                 # editing front door inside handle base guide informations:
@@ -625,7 +626,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+backDoorInsideHandleName)
                 # create fkLine module instance:
                 backDoorInsideHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                backDoorInsideHandleInstance.editUserName(backDoorInsideHandleName)
+                backDoorInsideHandleInstance.editGuideModuleName(backDoorInsideHandleName)
                 # setting X mirror:
                 backDoorInsideHandleInstance.changeMirror("X")
                 # editing back door inside handle base guide informations:
@@ -642,7 +643,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+frontDoorWindowName)
                 # create fkLine module instance:
                 frontDoorWindowInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                frontDoorWindowInstance.editUserName(frontDoorWindowName)
+                frontDoorWindowInstance.editGuideModuleName(frontDoorWindowName)
                 # setting X mirror:
                 frontDoorWindowInstance.changeMirror("X")
                 # editing front door window base guide informations:
@@ -659,7 +660,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+backDoorWindowName)
                 # create fkLine module instance:
                 backDoorWindowInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                backDoorWindowInstance.editUserName(backDoorWindowName)
+                backDoorWindowInstance.editGuideModuleName(backDoorWindowName)
                 # setting X mirror:
                 backDoorWindowInstance.changeMirror("X")
                 # editing back door window base guide informations:
@@ -676,7 +677,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+mirrorName)
                 # create fkLine module instance:
                 mirrorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                mirrorInstance.editUserName(mirrorName)
+                mirrorInstance.editGuideModuleName(mirrorName)
                 # setting X mirror:
                 mirrorInstance.changeMirror("X")
                 # editing mirror base guide informations:
@@ -696,7 +697,7 @@ def Car(dpUIinst):
                 dpUIinst.utils.setProgress(doingName+insideMirrorName)
                 # create fkLine module instance:
                 insideMirrorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                insideMirrorInstance.editUserName(insideMirrorName)
+                insideMirrorInstance.editGuideModuleName(insideMirrorName)
                 # editing inside mirror base guide informations:
                 cmds.setAttr(insideMirrorInstance.moduleGrp+".translateY", 18)
                 cmds.setAttr(insideMirrorInstance.moduleGrp+".translateZ", 3.5)
@@ -708,6 +709,7 @@ def Car(dpUIinst):
             dpUIinst.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
+            dpUIinst.collapseEditSelModFL = False
             cmds.select(chassisInstance.moduleGrp)
             print(dpUIinst.lang['m167_createdCar'])
     else:

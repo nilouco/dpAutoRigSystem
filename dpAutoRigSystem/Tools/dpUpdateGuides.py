@@ -361,7 +361,7 @@ class UpdateGuides(object):
             currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules/Standard")
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
-            currentNewGuide.editUserName(guideName)
+            currentNewGuide.editGuideModuleName(guideName)
             self.updateData[guide]['newGuide'] = currentNewGuide.moduleGrp
             self.newGuidesInstanceList.append(currentNewGuide)
             if self.ui:
@@ -372,9 +372,9 @@ class UpdateGuides(object):
         for guide in self.updateData:
             currentCustomName = self.updateData[guide]['attributes']['customName']
             if currentCustomName == '' or currentCustomName == None:
-                self.updateData[guide]['instance'].editUserName(self.updateData[guide]['instance'].moduleGrp.split(':')[0]+'_OLD')
+                self.updateData[guide]['instance'].editGuideModuleName(self.updateData[guide]['instance'].moduleGrp.split(':')[0]+'_OLD')
             else:
-                self.updateData[guide]['instance'].editUserName(currentCustomName+'_OLD')
+                self.updateData[guide]['instance'].editGuideModuleName(currentCustomName+'_OLD')
 
 
     def retrieveNewParent(self, currentParent):

@@ -33,6 +33,7 @@ def Quadruped(dpUIinst):
     checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        dpUIinst.collapseEditSelModFL = True
         # defining naming:
         doingName = dpUIinst.lang['m094_doing']
         bipedStyleName = dpUIinst.lang['m026_biped']
@@ -84,7 +85,7 @@ def Quadruped(dpUIinst):
             # create spine module instance:
             spineInstance = dpUIinst.initGuide('dpSpine', guideDir, RigType.quadruped)
             # editing spine base guide informations:
-            spineInstance.editUserName(spineName)
+            spineInstance.editGuideModuleName(spineName)
             cmds.setAttr(spineInstance.moduleGrp+".translateY", 10)
             cmds.setAttr(spineInstance.moduleGrp+".translateZ", -5)
             cmds.setAttr(spineInstance.moduleGrp+".rotateX", 0)
@@ -101,7 +102,7 @@ def Quadruped(dpUIinst):
             # create head module instance:
             headInstance = dpUIinst.initGuide('dpHead', guideDir, RigType.quadruped)
             # editing head base guide informations:
-            headInstance.editUserName(headName)
+            headInstance.editGuideModuleName(headName)
             cmds.setAttr(headInstance.moduleGrp+".translateY", 9.5)
             cmds.setAttr(headInstance.moduleGrp+".translateZ", 5.5)
             cmds.setAttr(headInstance.moduleGrp+".rotateX", 0)
@@ -133,7 +134,7 @@ def Quadruped(dpUIinst):
             # create eyeLookAt module instance:
             eyeInstance = dpUIinst.initGuide('dpEye', guideDir, RigType.quadruped)
             # editing eyeLookAt base guide informations:
-            eyeInstance.editUserName(eyeName)
+            eyeInstance.editGuideModuleName(eyeName)
             # setting X mirror:
             eyeInstance.changeMirror("X")
             cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
@@ -156,7 +157,7 @@ def Quadruped(dpUIinst):
             # change limb guide to back leg style (quadruped):
             backLegLimbInstance.changeStyle(quadrupedStyleName)
             # change name to back leg:
-            backLegLimbInstance.editUserName(legName+backName)
+            backLegLimbInstance.editGuideModuleName(legName+backName)
             cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
             # editing back leg base guide informations:
             backLegBaseGuide = backLegLimbInstance.moduleGrp
@@ -187,7 +188,7 @@ def Quadruped(dpUIinst):
             dpUIinst.utils.setProgress(doingName+footName)
             # create BACK FOOT (B) module instance:
             backFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
-            backFootInstance.editUserName(footName+backName)
+            backFootInstance.editGuideModuleName(footName+backName)
             cmds.setAttr(backFootInstance.annotation+".translateY", -3)
             cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
             cmds.setAttr(backFootInstance.moduleGrp+".translateZ", -6.5)
@@ -209,7 +210,7 @@ def Quadruped(dpUIinst):
             # change limb guide to front leg style (biped):
             frontLegLimbInstance.changeStyle(quadrupedStyleName)
             # change name to front leg:
-            frontLegLimbInstance.editUserName(legName+frontName)
+            frontLegLimbInstance.editGuideModuleName(legName+frontName)
             cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
             # editing front leg base guide informations:
             frontLegBaseGuide = frontLegLimbInstance.moduleGrp
@@ -243,7 +244,7 @@ def Quadruped(dpUIinst):
             dpUIinst.utils.setProgress(doingName+footName)
             # create FRONT FOOT (A) module instance:
             frontFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
-            frontFootInstance.editUserName(footName+frontName)
+            frontFootInstance.editGuideModuleName(footName+frontName)
             cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
             cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
             cmds.setAttr(frontFootInstance.moduleGrp+".translateZ", 5.5)
@@ -261,7 +262,7 @@ def Quadruped(dpUIinst):
             # create FkLine module instance:
             tailInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
             # editing tail base guide informations:
-            tailInstance.editUserName(tailName)
+            tailInstance.editGuideModuleName(tailName)
             cmds.setAttr(tailInstance.moduleGrp+".translateY", 9.8)
             cmds.setAttr(tailInstance.moduleGrp+".translateZ", -7.6)
             cmds.setAttr(tailInstance.moduleGrp+".rotateX", 180)
@@ -288,7 +289,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 tailBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing tail base guide informations:
-                tailBaseInstance.editUserName(tailName+baseName)
+                tailBaseInstance.editGuideModuleName(tailName+baseName)
                 cmds.setAttr(tailBaseInstance.moduleGrp+".translateY", 10.0)
                 cmds.setAttr(tailBaseInstance.moduleGrp+".translateZ", -7)
                 cmds.setAttr(tailBaseInstance.moduleGrp+".rotateX", 180)
@@ -312,7 +313,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 earBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear base guide informations:
-                earBaseInstance.editUserName(earName+baseName)
+                earBaseInstance.editGuideModuleName(earName+baseName)
                 cmds.setAttr(earBaseInstance.moduleGrp+".translateX", 0.11)
                 cmds.setAttr(earBaseInstance.moduleGrp+".translateY", 14)
                 cmds.setAttr(earBaseInstance.moduleGrp+".translateZ", 10)
@@ -328,7 +329,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear base guide informations:
-                earInstance.editUserName(earName)
+                earInstance.editGuideModuleName(earName)
                 cmds.setAttr(earInstance.moduleGrp+".translateX", 0.8)
                 cmds.setAttr(earInstance.moduleGrp+".translateY", 14.5)
                 cmds.setAttr(earInstance.moduleGrp+".translateZ", 10)
@@ -351,7 +352,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 earUpperInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear upper guide informations:
-                earUpperInstance.editUserName(upperName+earName)
+                earUpperInstance.editGuideModuleName(upperName+earName)
                 cmds.setAttr(earUpperInstance.moduleGrp+".translateX", 1.401)
                 cmds.setAttr(earUpperInstance.moduleGrp+".translateY", 15.365)
                 cmds.setAttr(earUpperInstance.moduleGrp+".translateZ", 9.88)
@@ -370,7 +371,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 earLowerInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear upper guide informations:
-                earLowerInstance.editUserName(lowerName+earName)
+                earLowerInstance.editGuideModuleName(lowerName+earName)
                 cmds.setAttr(earLowerInstance.moduleGrp+".translateX", 1.796)
                 cmds.setAttr(earLowerInstance.moduleGrp+".translateY", 14.839)
                 cmds.setAttr(earLowerInstance.moduleGrp+".translateZ", 10.12)
@@ -400,7 +401,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 upperTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeeth base guide informations:
-                upperTeethInstance.editUserName(upperTeethName)
+                upperTeethInstance.editGuideModuleName(upperTeethName)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".translateY", 12.5)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".translateZ", 12.7)
                 cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
@@ -410,7 +411,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
-                upperTeethMiddleInstance.editUserName(upperTeethMiddleName)
+                upperTeethMiddleInstance.editGuideModuleName(upperTeethMiddleName)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 12.3)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateZ", 12.7)
                 cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
@@ -423,7 +424,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 upperTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethSide base guide informations:
-                upperTeethSideInstance.editUserName(upperTeethSideName)
+                upperTeethSideInstance.editGuideModuleName(upperTeethSideName)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 12.3)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 12.3)
@@ -439,7 +440,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 lowerTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing lowerTeeth base guide informations:
-                lowerTeethInstance.editUserName(lowerTeethName)
+                lowerTeethInstance.editGuideModuleName(lowerTeethName)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 11.7)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".translateZ", 12.7)
                 cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
@@ -451,7 +452,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 lowerTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethMiddle base guide informations:
-                lowerTeethMiddleInstance.editUserName(lowerTeethMiddleName)
+                lowerTeethMiddleInstance.editGuideModuleName(lowerTeethMiddleName)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 11.9)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateZ", 12.7)
                 cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
@@ -464,7 +465,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 lowerTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethSide base guide informations:
-                lowerTeethSideInstance.editUserName(lowerTeethSideName)
+                lowerTeethSideInstance.editGuideModuleName(lowerTeethSideName)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 11.9)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 12.3)
@@ -484,7 +485,7 @@ def Quadruped(dpUIinst):
                 # create FkLine module instance:
                 tongueInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing tongue base guide informations:
-                tongueInstance.editUserName(tongueName)
+                tongueInstance.editGuideModuleName(tongueName)
                 cmds.setAttr(tongueInstance.moduleGrp+".translateY", 12)
                 cmds.setAttr(tongueInstance.moduleGrp+".translateZ", 12)
                 cmds.setAttr(tongueInstance.radiusCtrl+".translateX", 0.35)
@@ -506,7 +507,7 @@ def Quadruped(dpUIinst):
                 # create Nose module instance:
                 noseInstance = dpUIinst.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
-                noseInstance.editUserName(noseName)
+                noseInstance.editGuideModuleName(noseName)
                 cmds.setAttr(noseInstance.moduleGrp+".translateY", 13)
                 cmds.setAttr(noseInstance.moduleGrp+".translateZ", 11.5)
                 cmds.setAttr(noseInstance.radiusCtrl+".translateX", 0.3)
@@ -528,7 +529,7 @@ def Quadruped(dpUIinst):
                 # create toe1 module instance:
                 toe1FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe1FrontInstance.editUserName(toeName+frontName+"_1")
+                toe1FrontInstance.editGuideModuleName(toeName+frontName+"_1")
                 # editing toe base guide informations:
                 cmds.setAttr(toe1FrontInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe1FrontInstance.moduleGrp+".translateX", 2)
@@ -550,7 +551,7 @@ def Quadruped(dpUIinst):
                 # create toe2 module instance:
                 toe2FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe2FrontInstance.editUserName(toeName+frontName+"_2")
+                toe2FrontInstance.editGuideModuleName(toeName+frontName+"_2")
                 # editing toe base guide informations:
                 cmds.setAttr(toe2FrontInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe2FrontInstance.moduleGrp+".translateX", 2.35)
@@ -572,7 +573,7 @@ def Quadruped(dpUIinst):
                 # create toe3 module instance:
                 toe3FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe3FrontInstance.editUserName(toeName+frontName+"_3")
+                toe3FrontInstance.editGuideModuleName(toeName+frontName+"_3")
                 # editing toe base guide informations:
                 cmds.setAttr(toe3FrontInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe3FrontInstance.moduleGrp+".translateX", 2.65)
@@ -594,7 +595,7 @@ def Quadruped(dpUIinst):
                 # create toe4 module instance:
                 toe4FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe4FrontInstance.editUserName(toeName+frontName+"_4")
+                toe4FrontInstance.editGuideModuleName(toeName+frontName+"_4")
                 # editing toe base guide informations:
                 cmds.setAttr(toe4FrontInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe4FrontInstance.moduleGrp+".translateX", 2.95)
@@ -616,7 +617,7 @@ def Quadruped(dpUIinst):
                 # create toe1 module instance:
                 toe1BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe1BackInstance.editUserName(toeName+backName+"_1")
+                toe1BackInstance.editGuideModuleName(toeName+backName+"_1")
                 # editing toe base guide informations:
                 cmds.setAttr(toe1BackInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe1BackInstance.moduleGrp+".translateX", 2.5)
@@ -638,7 +639,7 @@ def Quadruped(dpUIinst):
                 # create toe2 module instance:
                 toe2BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe2BackInstance.editUserName(toeName+backName+"_2")
+                toe2BackInstance.editGuideModuleName(toeName+backName+"_2")
                 # editing toe base guide informations:
                 cmds.setAttr(toe2BackInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe2BackInstance.moduleGrp+".translateX", 2.85)
@@ -660,7 +661,7 @@ def Quadruped(dpUIinst):
                 # create toe3 module instance:
                 toe3BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe3BackInstance.editUserName(toeName+backName+"_3")
+                toe3BackInstance.editGuideModuleName(toeName+backName+"_3")
                 # editing toe base guide informations:
                 cmds.setAttr(toe3BackInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe3BackInstance.moduleGrp+".translateX", 3.15)
@@ -682,7 +683,7 @@ def Quadruped(dpUIinst):
                 # create toe4 module instance:
                 toe4BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe4BackInstance.editUserName(toeName+backName+"_4")
+                toe4BackInstance.editGuideModuleName(toeName+backName+"_4")
                 # editing toe base guide informations:
                 cmds.setAttr(toe4BackInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe4BackInstance.moduleGrp+".translateX", 3.45)
@@ -704,7 +705,7 @@ def Quadruped(dpUIinst):
                 # create breath module instance:
                 breathInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # change name to breath:
-                breathInstance.editUserName(breathName)
+                breathInstance.editGuideModuleName(breathName)
                 # editing breath base guide informations:
                 cmds.setAttr(breathInstance.radiusCtrl+".translateX", 0.8)
                 cmds.setAttr(breathInstance.moduleGrp+".translateY", 7)
@@ -718,7 +719,7 @@ def Quadruped(dpUIinst):
                 # create belly module instance:
                 bellyInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # change name to belly:
-                bellyInstance.editUserName(bellyName)
+                bellyInstance.editGuideModuleName(bellyName)
                 # editing belly base guide informations:
                 cmds.setAttr(bellyInstance.radiusCtrl+".translateX", 0.8)
                 cmds.setAttr(bellyInstance.moduleGrp+".translateY", 8.5)
@@ -731,6 +732,7 @@ def Quadruped(dpUIinst):
             dpUIinst.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
+            dpUIinst.collapseEditSelModFL = False
             cmds.select(spineInstance.moduleGrp)
             print(dpUIinst.lang['m090_createdQuadruped'])
     else:

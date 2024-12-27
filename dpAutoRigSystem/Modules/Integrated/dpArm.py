@@ -21,6 +21,7 @@ def Arm(dpUIinst):
     checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        dpUIinst.collapseEditSelModFL = True
         # defining naming:
         doingName = dpUIinst.lang['m094_doing']
         # part names:
@@ -40,18 +41,18 @@ def Arm(dpUIinst):
         # creating module instances:
         armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
         # change name to arm:
-        armLimbInstance.editUserName(armName.capitalize())
+        armLimbInstance.editGuideModuleName(armName.capitalize())
         # create finger instances:
         thumbFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
-        thumbFingerInstance.editUserName(fingerThumbName)
+        thumbFingerInstance.editGuideModuleName(fingerThumbName)
         indexFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
-        indexFingerInstance.editUserName(fingerIndexName)
+        indexFingerInstance.editGuideModuleName(fingerIndexName)
         middleFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
-        middleFingerInstance.editUserName(fingerMiddleName)
+        middleFingerInstance.editGuideModuleName(fingerMiddleName)
         ringFingerInstance   = dpUIinst.initGuide('dpFinger', guideDir)
-        ringFingerInstance.editUserName(fingerRingName)
+        ringFingerInstance.editGuideModuleName(fingerRingName)
         pinkyFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
-        pinkyFingerInstance.editUserName(fingerPinkyName)
+        pinkyFingerInstance.editGuideModuleName(fingerPinkyName)
         
         # edit arm limb guide:
         armBaseGuide = armLimbInstance.moduleGrp
@@ -89,6 +90,7 @@ def Arm(dpUIinst):
         dpUIinst.utils.setProgress(endIt=True)
 
         # select the armGuide_Base:
+        dpUIinst.collapseEditSelModFL = False
         cmds.select(armBaseGuide)
         print(dpUIinst.lang['m091_createdArm'])
     else:

@@ -158,6 +158,7 @@ class Start(object):
         self.loadedCustom = False
         self.rebuilding = False
         self.moduleFLCollapseStatus = False
+        self.collapseEditSelModFL = False
         self.toIDList = []
         self.controlInstanceList = []
         self.checkInInstanceList = []
@@ -486,7 +487,7 @@ class Start(object):
         # after footerRigging we will call the function to populate here, because it edits the footerRiggingText
         cmds.setParent(self.allUIs["riggingTabLayout"])
         #editSelectedModuleLayoutA - frameLayout:
-        self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.lang['i011_editSelected']+" "+self.lang['i143_module'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.lang['i011_editSelected']+" "+self.lang['i143_module'], collapsable=True, collapse=self.collapseEditSelModFL, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["selectedModuleLayout"] = cmds.columnLayout('selectedModuleLayout', adjustableColumn=True, parent=self.allUIs["editSelectedModuleLayoutA"])
         #optionsMainFL - frameLayout:
         self.allUIs["optionsMainFL"] = cmds.frameLayout('optionsMainFL', label=self.lang['i002_options'], collapsable=True, collapse=True, parent=self.allUIs["riggingTabLayout"])
@@ -875,7 +876,7 @@ class Start(object):
         # delete module layout:
         if not selectedGuideNodeList:
             try:
-                cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.lang['i011_editSelected']+" "+self.lang['i143_module'])
+                cmds.frameLayout(self.allUIs['editSelectedModuleLayoutA'], edit=True, label=self.lang['i011_editSelected']+" "+self.lang['i143_module'])
                 cmds.deleteUI("selectedModuleColumn")
             except:
                 pass
@@ -998,7 +999,7 @@ class Start(object):
         if customNameAttr in cmds.listAttr(selectedItem):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
             if customNameValue != "" and customNameValue != None:
-                newGuideInstance.editUserName(customNameValue)
+                newGuideInstance.editGuideModuleName(customNameValue)
         if mirrorAxisAttr in cmds.listAttr(selectedItem):
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
             if mirroirAxisValue != "off":
@@ -1495,7 +1496,7 @@ class Start(object):
     def clearGuideLayout(self, *args):
         """ Clear current guide layout before reload modules.
         """
-        self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.lang['i011_editSelected'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
+        cmds.frameLayout(self.allUIs['editSelectedModuleLayoutA'], edit=True, label=self.lang['i011_editSelected'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
         cmds.deleteUI(self.allUIs["modulesLayoutA"])
         cmds.deleteUI(self.allUIs["selectedModuleLayout"])
         self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])

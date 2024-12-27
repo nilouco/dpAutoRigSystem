@@ -32,6 +32,7 @@ def Leg(dpUIinst):
     checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        dpUIinst.collapseEditSelModFL = True
         # defining naming:
         doingName = dpUIinst.lang['m094_doing']
         # part names:
@@ -62,7 +63,7 @@ def Leg(dpUIinst):
             # change limb guide to leg type:
             legLimbInstance.changeType(legName)
             # change name to leg:
-            legLimbInstance.editUserName(legName)
+            legLimbInstance.editGuideModuleName(legName)
             # editing leg base guide informations:
             legBaseGuide = legLimbInstance.moduleGrp
             cmds.setAttr(legBaseGuide+".type", 1)
@@ -78,7 +79,7 @@ def Leg(dpUIinst):
             dpUIinst.utils.setProgress(doingName+footName)
             # create foot module instance:
             footInstance = dpUIinst.initGuide('dpFoot', guideDir)
-            footInstance.editUserName(footName)
+            footInstance.editGuideModuleName(footName)
             cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
             cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
             # parent foot guide to leg ankle guide:
@@ -94,7 +95,7 @@ def Leg(dpUIinst):
                 # create toe1 module instance:
                 toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe1Instance.editUserName(toeName+"_1")
+                toe1Instance.editGuideModuleName(toeName+"_1")
                 # editing toe base guide informations:
                 cmds.setAttr(toe1Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe1Instance.moduleGrp+".translateX", 1)
@@ -116,7 +117,7 @@ def Leg(dpUIinst):
                 # create toe2 module instance:
                 toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe2Instance.editUserName(toeName+"_2")
+                toe2Instance.editGuideModuleName(toeName+"_2")
                 # editing toe base guide informations:
                 cmds.setAttr(toe2Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe2Instance.moduleGrp+".translateX", 1.35)
@@ -138,7 +139,7 @@ def Leg(dpUIinst):
                 # create toe3 module instance:
                 toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe3Instance.editUserName(toeName+"_3")
+                toe3Instance.editGuideModuleName(toeName+"_3")
                 # editing toe base guide informations:
                 cmds.setAttr(toe3Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe3Instance.moduleGrp+".translateX", 1.65)
@@ -160,7 +161,7 @@ def Leg(dpUIinst):
                 # create toe4 module instance:
                 toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe4Instance.editUserName(toeName+"_4")
+                toe4Instance.editGuideModuleName(toeName+"_4")
                 # editing toe base guide informations:
                 cmds.setAttr(toe4Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe4Instance.moduleGrp+".translateX", 1.95)
@@ -182,7 +183,7 @@ def Leg(dpUIinst):
                 # create toe5 module instance:
                 toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe5Instance.editUserName(toeName+"_5")
+                toe5Instance.editGuideModuleName(toeName+"_5")
                 # editing toe base guide informations:
                 cmds.setAttr(toe5Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe5Instance.moduleGrp+".translateX", 2.25)
@@ -203,6 +204,7 @@ def Leg(dpUIinst):
             dpUIinst.utils.setProgress(endIt=True)
 
             # select the legGuide_Base:
+            dpUIinst.collapseEditSelModFL = False
             cmds.select(legBaseGuide)
             print(dpUIinst.lang['m092_createdLeg'])
     else:

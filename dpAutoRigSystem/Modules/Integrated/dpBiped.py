@@ -32,6 +32,7 @@ def Biped(dpUIinst):
     checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        dpUIinst.collapseEditSelModFL = True
         # defining naming:
         doingName = dpUIinst.lang['m094_doing']
         bipedStyleName = dpUIinst.lang['m026_biped']
@@ -83,7 +84,7 @@ def Biped(dpUIinst):
             # create spine module instance:
             spineInstance = dpUIinst.initGuide('dpSpine', guideDir)
             # editing spine base guide informations:
-            spineInstance.editUserName(spineName)
+            spineInstance.editGuideModuleName(spineName)
             spineInstance.changeStyle(bipedStyleName)
             cmds.setAttr(spineInstance.moduleGrp+".translateY", 11)
             cmds.setAttr(spineInstance.annotation+".translateY", -6)
@@ -95,7 +96,7 @@ def Biped(dpUIinst):
             # create head module instance:
             headInstance = dpUIinst.initGuide('dpHead', guideDir)
             # editing head base guide informations:
-            headInstance.editUserName(headName)
+            headInstance.editGuideModuleName(headName)
             headInstance.changeJointNumber(2)
             cmds.setAttr(headInstance.moduleGrp+".translateY", 17)
             cmds.setAttr(headInstance.annotation+".translateY", 3.5)
@@ -108,7 +109,7 @@ def Biped(dpUIinst):
             # create eye module instance:
             eyeInstance = dpUIinst.initGuide('dpEye', guideDir)
             # editing eyeLookAt base guide informations:
-            eyeInstance.editUserName(eyeName)
+            eyeInstance.editGuideModuleName(eyeName)
             # setting X mirror:
             eyeInstance.changeMirror("X")
             cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
@@ -127,7 +128,7 @@ def Biped(dpUIinst):
             # create leg module instance:
             legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
             # change name to leg:
-            legLimbInstance.editUserName(legName)
+            legLimbInstance.editGuideModuleName(legName)
             # setting X mirror:
             legLimbInstance.changeMirror("X")
             # change limb guide to leg type:
@@ -152,7 +153,7 @@ def Biped(dpUIinst):
             dpUIinst.utils.setProgress(doingName+footName)
             # create foot module instance:
             footInstance = dpUIinst.initGuide('dpFoot', guideDir)
-            footInstance.editUserName(footName)
+            footInstance.editGuideModuleName(footName)
             cmds.setAttr(footInstance.annotation+".translateY", -3)
             cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
             cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
@@ -165,7 +166,7 @@ def Biped(dpUIinst):
             # creating module instances:
             armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
             # change name to arm:
-            armLimbInstance.editUserName(armName)
+            armLimbInstance.editGuideModuleName(armName)
             # setting X mirror:
             armLimbInstance.changeMirror("X")
             # change limb style to biped:
@@ -187,15 +188,15 @@ def Biped(dpUIinst):
             dpUIinst.utils.setProgress(doingName+dpUIinst.lang['m007_finger'])
             # create finger instances:
             thumbFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
-            thumbFingerInstance.editUserName(fingerThumbName)
+            thumbFingerInstance.editGuideModuleName(fingerThumbName)
             indexFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
-            indexFingerInstance.editUserName(fingerIndexName)
+            indexFingerInstance.editGuideModuleName(fingerIndexName)
             middleFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
-            middleFingerInstance.editUserName(fingerMiddleName)
+            middleFingerInstance.editGuideModuleName(fingerMiddleName)
             ringFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
-            ringFingerInstance.editUserName(fingerRingName)
+            ringFingerInstance.editGuideModuleName(fingerRingName)
             pinkyFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
-            pinkyFingerInstance.editUserName(fingerPinkyName)
+            pinkyFingerInstance.editGuideModuleName(fingerPinkyName)
             # edit finger guides:
             fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
             fingerTZList       = [0.72, 0.6, 0.2, -0.2, -0.6]
@@ -234,7 +235,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing ear base guide informations:
-                earInstance.editUserName(earName)
+                earInstance.editGuideModuleName(earName)
                 cmds.setAttr(earInstance.moduleGrp+".translateX", 1)
                 cmds.setAttr(earInstance.moduleGrp+".translateY", 21)
                 cmds.setAttr(earInstance.moduleGrp+".rotateY", 110)
@@ -255,7 +256,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 upperTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeeth base guide informations:
-                upperTeethInstance.editUserName(upperTeethName)
+                upperTeethInstance.editGuideModuleName(upperTeethName)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".translateY", 20.3)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".translateZ", 2.2)
                 cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
@@ -267,7 +268,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
-                upperTeethMiddleInstance.editUserName(upperTeethMiddleName)
+                upperTeethMiddleInstance.editGuideModuleName(upperTeethMiddleName)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 20.1)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateZ", 2.2)
                 cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
@@ -280,7 +281,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 upperTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethSide base guide informations:
-                upperTeethSideInstance.editUserName(upperTeethSideName)
+                upperTeethSideInstance.editGuideModuleName(upperTeethSideName)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 20.1)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 2)
@@ -296,7 +297,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 lowerTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing lowerTeeth base guide informations:
-                lowerTeethInstance.editUserName(lowerTeethName)
+                lowerTeethInstance.editGuideModuleName(lowerTeethName)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 19.5)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".translateZ", 2.2)
                 cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
@@ -308,7 +309,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 lowerTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethMiddle base guide informations:
-                lowerTeethMiddleInstance.editUserName(lowerTeethMiddleName)
+                lowerTeethMiddleInstance.editGuideModuleName(lowerTeethMiddleName)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 19.7)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateZ", 2.2)
                 cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
@@ -321,7 +322,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 lowerTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethSide base guide informations:
-                lowerTeethSideInstance.editUserName(lowerTeethSideName)
+                lowerTeethSideInstance.editGuideModuleName(lowerTeethSideName)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 19.7)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 2)
@@ -341,7 +342,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 noseInstance = dpUIinst.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
-                noseInstance.editUserName(noseName)
+                noseInstance.editGuideModuleName(noseName)
                 cmds.setAttr(noseInstance.moduleGrp+".translateY", 21.2)
                 cmds.setAttr(noseInstance.moduleGrp+".translateZ", 2)
                 cmds.setAttr(noseInstance.radiusCtrl+".translateX", 0.3)
@@ -355,7 +356,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 tongueInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing tongue base guide informations:
-                tongueInstance.editUserName(tongueName)
+                tongueInstance.editGuideModuleName(tongueName)
                 cmds.setAttr(tongueInstance.moduleGrp+".translateY", 19.85)
                 cmds.setAttr(tongueInstance.moduleGrp+".translateZ", 1.45)
                 cmds.setAttr(tongueInstance.radiusCtrl+".translateX", 0.35)
@@ -377,7 +378,7 @@ def Biped(dpUIinst):
                 # create toe1 module instance:
                 toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe1Instance.editUserName(toeName+"_1")
+                toe1Instance.editGuideModuleName(toeName+"_1")
                 # editing toe base guide informations:
                 cmds.setAttr(toe1Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe1Instance.moduleGrp+".translateX", 1)
@@ -399,7 +400,7 @@ def Biped(dpUIinst):
                 # create toe2 module instance:
                 toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe2Instance.editUserName(toeName+"_2")
+                toe2Instance.editGuideModuleName(toeName+"_2")
                 # editing toe base guide informations:
                 cmds.setAttr(toe2Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe2Instance.moduleGrp+".translateX", 1.35)
@@ -421,7 +422,7 @@ def Biped(dpUIinst):
                 # create toe3 module instance:
                 toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe3Instance.editUserName(toeName+"_3")
+                toe3Instance.editGuideModuleName(toeName+"_3")
                 # editing toe base guide informations:
                 cmds.setAttr(toe3Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe3Instance.moduleGrp+".translateX", 1.65)
@@ -443,7 +444,7 @@ def Biped(dpUIinst):
                 # create toe4 module instance:
                 toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe4Instance.editUserName(toeName+"_4")
+                toe4Instance.editGuideModuleName(toeName+"_4")
                 # editing toe base guide informations:
                 cmds.setAttr(toe4Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe4Instance.moduleGrp+".translateX", 1.95)
@@ -465,7 +466,7 @@ def Biped(dpUIinst):
                 # create toe5 module instance:
                 toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
-                toe5Instance.editUserName(toeName+"_5")
+                toe5Instance.editGuideModuleName(toeName+"_5")
                 # editing toe base guide informations:
                 cmds.setAttr(toe5Instance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(toe5Instance.moduleGrp+".translateX", 2.25)
@@ -488,7 +489,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 breathInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # editing breath base guide informations:
-                breathInstance.editUserName(breathName)
+                breathInstance.editGuideModuleName(breathName)
                 cmds.setAttr(breathInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(breathInstance.moduleGrp+".translateY", 14.5)
                 cmds.setAttr(breathInstance.moduleGrp+".translateZ", 0.3)
@@ -505,7 +506,7 @@ def Biped(dpUIinst):
                 # create FkLine module instance:
                 bellyInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # editing belly base guide informations:
-                bellyInstance.editUserName(bellyName)
+                bellyInstance.editGuideModuleName(bellyName)
                 cmds.setAttr(bellyInstance.moduleGrp+".shapeSize", 0.3)
                 cmds.setAttr(bellyInstance.moduleGrp+".translateY", 11.75)
                 cmds.setAttr(bellyInstance.moduleGrp+".translateZ", 0.75)
@@ -520,6 +521,7 @@ def Biped(dpUIinst):
             dpUIinst.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
+            dpUIinst.collapseEditSelModFL = False
             cmds.select(spineInstance.moduleGrp)
             print(dpUIinst.lang['m089_createdBiped'])
     else:

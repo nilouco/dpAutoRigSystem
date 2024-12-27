@@ -134,7 +134,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                     if baseAttr == "customName":
                         customNameData = self.netDic["GuideData"][item]["customName"]
                         if customNameData:
-                            self.instance.editUserName(customNameData)
+                            self.instance.editGuideModuleName(customNameData)
                     elif baseAttr == "mirrorAxis":
                         cmds.setAttr(item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
                         cmds.setAttr(item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")                                                        
