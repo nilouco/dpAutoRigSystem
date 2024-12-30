@@ -302,13 +302,13 @@ class Pipeliner(object):
             self.pipeData['publishPath'] = False
             self.pipeData['addOnsPath'] = False
             self.pipeData['presetsPath'] = False
-            self.pipeData['wipPath'] = False
             # getting pipeline settings
             self.pipeData['path'] = self.getPipelinePath()
         self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
         self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
-        self.pipeData['mayaProject'] = cmds.workspace(query=True, openWorkspace=True)
+        self.pipeData['mayaProject'] = cmds.workspace(query=True, fullName=True)
         self.pipeData['projectPath'] = self.pipeData['mayaProject']
+        self.pipeData['wipPath'] = self.pipeData['mayaProject']+"/"+self.pipeData['f_wip']
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
             if self.pipeData['sceneName']:
@@ -326,7 +326,10 @@ class Pipeliner(object):
                     self.pipeData['f_wipPath'] = ""
                     self.pipeData['projectPath'] = ""
                     self.pipeData['path'] = ""
+                    self.pipeData['wipPath'] = self.pipeData['mayaProject']+"/"+self.pipeData['f_wip']
                     loaded = False
+                if not os.path.exists(self.pipeData['projectPath']):
+                    self.pipeData['projectPath'] = self.pipeData['mayaProject']
             else:
                 loaded = False
         if loaded:
@@ -788,6 +791,7 @@ class Pipeliner(object):
         try:
             cmds.textFieldGrp(self.dpUIinst.allUIs["mayaProjectText"], edit=True, text=self.pipeData['mayaProject'])
             cmds.textFieldGrp(self.dpUIinst.allUIs["pipelineText"], edit=True, text=self.pipeData['projectPath'])
+            cmds.button(self.dpUIinst.allUIs['openAssetFolderBT'], edit=True, command=partial(self.dpUIinst.packager.openFolder, self.pipeData['projectPath']))
         except:
             pass
 
@@ -799,9 +803,15 @@ class Pipeliner(object):
         if "wipPath" in list(self.pipeData.keys()):
             if self.pipeData['wipPath']:
                 print("wipFolder =", self.pipeData['wipPath'])
-                assetList = next(os.walk(self.pipeData['wipPath']))[1]
-                print("assetList =", assetList)
-                print("mayaProj =", self.pipeData['mayaProject'])
+                if os.path.exists(self.pipeData['wipPath']):
+                    assetList = next(os.walk(self.pipeData['wipPath']))[1]
+                    if assetList:
+                        print("assetList =", assetList)
+                    else:
+                        print("no asset list here.")
+                    print("mayaProj =", self.pipeData['mayaProject'])
+                else:
+                    print("theres no wipPath, no exists...")
             
             
             

@@ -770,10 +770,11 @@ class Start(object):
         self.allUIs["mayaProjectText"] = cmds.textFieldGrp("mayaProjectText", label="Maya "+self.lang['i301_project']+":", text=self.pipeliner.pipeData['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
         self.allUIs["pipelineText"] = cmds.textFieldGrp("pipelineText", label="Pipeline:", text=self.pipeliner.pipeData['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
         self.allUIs["assetText"] = cmds.textFieldGrp("assetText", label=self.lang['i303_asset']+":", text=self.pipeliner.pipeData['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
-        self.allUIs["assetLayout"] = cmds.paneLayout("assetLayout", configuration="vertical3", separatorThickness=7.0, parent=self.allUIs["assetLayout"])
+        self.allUIs["assetLayout"] = cmds.paneLayout("assetLayout", configuration="vertical4", separatorThickness=7.0, parent=self.allUIs["assetLayout"])
         # asset buttons
         self.allUIs['loadAssetBT'] = cmds.button("loadAssetBT", label=self.lang['i187_load'], command=self.pipeliner.loadAsset, parent=self.allUIs["assetLayout"])
         self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["assetLayout"])
+        self.allUIs['openAssetFolderBT'] = cmds.button("openAssetFolderBT", label=self.lang['c108_open']+" "+self.lang['i298_folder'], command=partial(self.packager.openFolder, self.pipeliner.pipeData['projectPath']), parent=self.allUIs["assetLayout"])
         self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=self.pipeliner.replaceDPData, parent=self.allUIs["assetLayout"])
         cmds.separator(style='in', height=20, width=370, parent=self.allUIs["assetMainLayout"])
         # processes
