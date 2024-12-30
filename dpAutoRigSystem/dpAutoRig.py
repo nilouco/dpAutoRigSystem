@@ -121,6 +121,7 @@ class Start(object):
         self.checkOutFolder = "Pipeline/Validator/CheckOut"
         self.validatorPresetsFolder = "Pipeline/Validator/Presets"
         self.rebuilderFolder =  "Pipeline/Rebuilder"
+        self.startFolder =  "Pipeline/Rebuilder/Start"
         self.sourceFolder =  "Pipeline/Rebuilder/Source"
         self.setupFolder =  "Pipeline/Rebuilder/Setup"
         self.deformingFolder =  "Pipeline/Rebuilder/Deforming"
@@ -152,12 +153,14 @@ class Start(object):
         self.loadedCheckOut = False
         self.loadedAddOns = False
         self.loadedRebuilder = False
+        self.loadedStart = False
         self.loadedSource = False
         self.loadedSetup = False
         self.loadedDeforming = False
         self.loadedCustom = False
         self.rebuilding = False
         self.moduleFLCollapseStatus = False
+        self.rebuilderFLCollapseStatus = False
         self.collapseEditSelModFL = False
         self.toIDList = []
         self.controlInstanceList = []
@@ -210,9 +213,9 @@ class Start(object):
         cmds.workspaceControl("dpAutoRigSystemWC", 
                             retain=False,
                             floating=False,
-                            minimumWidth=415,
-                            initialWidth=415,
-                            minimumHeight=415,
+                            minimumWidth=400,
+                            initialWidth=400,
+                            minimumHeight=515,
                             initialHeight=715,
                             widthProperty="preferred",
                             visible=True,
@@ -227,11 +230,13 @@ class Start(object):
             - SceneSaved
             - deleteAll = new scene
             - SelectionChanged
+            - WorkspaceChanged
         """
-        self.refreshAssetNewSceneJob = cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
-        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
         self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        cmds.scriptJob(event=('workspaceChanged', self.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
         self.jobSelectedGuide()
 
 
@@ -241,10 +246,9 @@ class Start(object):
         if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
             cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
             #cmds.deleteUI("dpAutoRigSystemWC", control=True)
-        self.utils.closeUI("dpARLoadWin")
-        self.utils.closeUI("dpInfoWindow")
-        self.utils.closeUI(self.plusInfoWinName)
-        self.utils.closeUI(self.colorOverrideWinName)
+        winNameList = ["dpARLoadWin", "dpInfoWindow", "dpNewAssetWindow", "dpReplaceDPDataWindow", self.plusInfoWinName, self.colorOverrideWinName]
+        for winName in winNameList:
+            self.utils.closeUI(winName)
 
 
     def clearDPARLoadingWindow(self, *args):
@@ -261,12 +265,12 @@ class Start(object):
         path = os.path.dirname(__file__)
         randImage = random.randint(0,7)
         self.clearDPARLoadingWindow()
-        cmds.window('dpARLoadWin', title='dpAutoRigSystem', iconName='dpAutoRig', widthHeight=(285, 203), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpARLoadWin', title='dpAutoRigSystem', iconName='dpAutoRig', widthHeight=(285, 208), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         cmds.columnLayout('dpARLoadLayout')
         cmds.image('loadingImage', image=(path+"/Icons/dp_loading_0%i.png" %randImage), backgroundColor=(0.8, 0.8, 0.8), parent='dpARLoadLayout')
-        cmds.text('versionText', label=loadingString, parent='dpARLoadLayout')
+        cmds.text('versionText', label=loadingString, height=20, parent='dpARLoadLayout')
         cmds.showWindow('dpARLoadWin')
-        cmds.window('dpARLoadWin', edit=True, widthHeight=(285, 203))
+        cmds.window('dpARLoadWin', edit=True, widthHeight=(285, 208))
     
 
     def dpARDownloadMaster(self, *args):
@@ -468,7 +472,7 @@ class Start(object):
         #colTopRightA - columnLayout:
         self.allUIs["colTopRightA"] = cmds.rowColumnLayout('colTopRightA', numberOfColumns=2, adjustableColumn=1, columnWidth=(120, 50), parent=self.allUIs["riggingTabLayout"])
         self.allUIs["i001_modules"] = cmds.text(self.lang['i001_modules'], font="boldLabelFont", width=150, align='center', parent=self.allUIs["colTopRightA"])
-        self.allUIs["triCollapseITB"] = cmds.iconTextButton("triCollapseITB", image=self.triDownIcon, annotation=self.lang['i348_triangleIconAnn'], command=self.collapseModulesFL, width=17, height=17, style='iconOnly', align='right', parent=self.allUIs["colTopRightA"])
+        self.allUIs["triCollapseGuidesITB"] = cmds.iconTextButton("triCollapseGuidesITB", image=self.triDownIcon, annotation=self.lang['i348_triangleIconAnn'], command=partial(self.collapseAllFL, "triCollapseGuidesITB", 0), width=17, height=17, style='iconOnly', align='right', parent=self.allUIs["colTopRightA"])
         cmds.setParent(self.allUIs["riggingTabLayout"])
         #colMiddleLeftA - scrollLayout - guidesLayout:
         self.allUIs["colMiddleLeftA"] = cmds.scrollLayout("colMiddleLeftA", width=160, parent=self.allUIs["riggingTabLayout"])
@@ -540,7 +544,7 @@ class Start(object):
         self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         # radio buttons:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
-        allJoints  = cmds.radioButton(label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints)
+        cmds.radioButton(label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints) #all joints
         dpARJoints = cmds.radioButton(label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints)
         self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=3, columnWidth=[(1, 45), (2, 45), (3, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
@@ -555,7 +559,7 @@ class Start(object):
         #colSkinRightA - columnLayout:
         self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
-        allGeoms = cmds.radioButton(label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms)
+        cmds.radioButton(label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms) #all geometries
         selGeoms = cmds.radioButton(label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms)
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["displaySkinLogWin"] = cmds.checkBox('displaySkinLogWin', label=self.lang['i286_displaySkinLog'], align='left', value=1, parent=self.allUIs["colSkinRightA"])
@@ -579,7 +583,7 @@ class Start(object):
         self.allUIs['skinCopyRowLayout'] = cmds.rowLayout('skinCopyRowLayout', numberOfColumns=3, columnWidth3=(90, 90, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs["skinCopyFL"])
         self.allUIs["skinSurfAssociationCollection"] = cmds.radioCollection('skinSurfAssociationCollection', parent=self.allUIs["skinCopyRowLayout"])
         closestPoint = cmds.radioButton(label="closestPoint", annotation="closestPoint")
-        uvSpace      = cmds.radioButton(label="uvSpace", annotation="uvSpace")
+        cmds.radioButton(label="uvSpace", annotation="uvSpace") #uvSpace
         self.allUIs["skinCopy2Layout"] = cmds.paneLayout("skinCopy2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCopyRowLayout"])
         self.allUIs["skinCopyOneSourceBT"] = cmds.button("skinCopyOneSourceBT", label=self.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.skin.copySkinFromOneSource, None, True), annotation=self.lang['i288_copySkinDesc'], parent=self.allUIs["skinCopy2Layout"])
         self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.copySkinSameName, None, True), annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
@@ -649,11 +653,11 @@ class Start(object):
         self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.lang['i100_curveShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
         self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
         # here we populate the control module layout with the items from Controllers folder:
-        self.controlModuleList = self.startGuideModules(self.curvesSimpleFolder, "start", "controlModuleLayout")
+        self.startGuideModules(self.curvesSimpleFolder, "start", "controlModuleLayout")
         self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.lang['i118_combinedShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
         self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
         # here we populate the control module layout with the items from Controllers folder:
-        self.combinedControlModuleList = self.startGuideModules(self.curvesCombinedFolder, "start", "combinedControlModuleLayout")
+        self.startGuideModules(self.curvesCombinedFolder, "start", "combinedControlModuleLayout")
         # editSeletedController - frameLayout:
         self.allUIs["editSelectedControllerFL"] = cmds.frameLayout('editSelectedControllerFL', label=self.lang['i011_editSelected']+" "+self.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
         self.allUIs["editSelectedController3Layout"] = cmds.paneLayout("editSelectedController3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
@@ -706,7 +710,7 @@ class Start(object):
         self.allUIs["toolsTabLayout"] = cmds.formLayout('toolsTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
         self.allUIs["toolsMainLayout"] = cmds.scrollLayout("toolsMainLayout", parent=self.allUIs["toolsTabLayout"])
         self.allUIs["toolsLayout"] = cmds.columnLayout("toolsLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["toolsMainLayout"])
-        self.extraModuleList = self.startGuideModules(self.toolsFolder, "start", "toolsLayout")
+        self.startGuideModules(self.toolsFolder, "start", "toolsLayout")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["toolsTabLayout"], edit=True,
                         attachForm=[(self.allUIs["toolsMainLayout"], 'top', 20), (self.allUIs["toolsMainLayout"], 'left', 5), (self.allUIs["toolsMainLayout"], 'right', 5), (self.allUIs["toolsMainLayout"], 'bottom', 5)]
@@ -719,32 +723,32 @@ class Start(object):
         self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
         self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label=self.lang['i208_checkin'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
         # check-in
-        self.validatorCheckInModuleList = self.startGuideModules(self.checkInFolder, "start", "validatorCheckInLayout")
+        self.startGuideModules(self.checkInFolder, "start", "validatorCheckInLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectAllCheckinCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=False, changeCommand=partial(self.changeActiveAllModules, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
-        self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
-        self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckIn2Layout"])
-        self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        self.allUIs["selectedCheckInPL"] = cmds.paneLayout("selectedCheckInPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
+        self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckInPL"])
+        self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckInPL"])
         cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
         # check-out
         self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.lang['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-        self.validatorCheckOutModuleList = self.startGuideModules(self.checkOutFolder, "start", "validatorCheckOutLayout")
+        self.startGuideModules(self.checkOutFolder, "start", "validatorCheckOutLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectAllCheckoutCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
-        self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
-        self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOut2Layout"])
-        self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        self.allUIs["selectedCheckOutPL"] = cmds.paneLayout("selectedCheckOutPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
+        self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOutPL"])
+        self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOutPL"])
         # pipeline check-addons
         if self.pipeliner.pipeData['addOnsPath']:
             if self.getValidatorsAddOns():
                 cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
                 self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.lang['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsPath'])
+                self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsPath'])
                 cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectAllAddonCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
-                self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-                self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
-                self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                self.allUIs["selectedCheckAddOnsPL"] = cmds.paneLayout("selectedCheckAddOnsPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
+                self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOnsPL"])
+                self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOnsPL"])
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
@@ -760,39 +764,54 @@ class Start(object):
         # -- Rebuilder tab
 
         self.allUIs["rebuilderTabLayout"] = cmds.formLayout('rebuilderTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # project pipeline asset
+        self.allUIs["assetMainLayout"] = cmds.columnLayout('assetMainLayout', adjustableColumn=False, parent=self.allUIs["rebuilderTabLayout"])
+        self.allUIs["assetLayout"] = cmds.frameLayout('assetLayout', label=self.lang['i303_asset'], collapsable=True, collapse=False, width=370, parent=self.allUIs["assetMainLayout"])
+        self.allUIs["mayaProjectText"] = cmds.textFieldGrp("mayaProjectText", label="Maya "+self.lang['i301_project']+":", text=self.pipeliner.pipeData['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
+        self.allUIs["pipelineText"] = cmds.textFieldGrp("pipelineText", label="Pipeline:", text=self.pipeliner.pipeData['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
+        self.allUIs["assetText"] = cmds.textFieldGrp("assetText", label=self.lang['i303_asset']+":", text=self.pipeliner.pipeData['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
+        self.allUIs["assetLayout"] = cmds.paneLayout("assetLayout", configuration="vertical3", separatorThickness=7.0, parent=self.allUIs["assetLayout"])
+        # asset buttons
+        self.allUIs['loadAssetBT'] = cmds.button("loadAssetBT", label=self.lang['i187_load'], command=self.pipeliner.loadAsset, parent=self.allUIs["assetLayout"])
+        self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["assetLayout"])
+        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=self.pipeliner.replaceDPData, parent=self.allUIs["assetLayout"])
+        cmds.separator(style='in', height=20, width=370, parent=self.allUIs["assetMainLayout"])
+        # processes
+        self.allUIs["processesLayout"] = cmds.rowColumnLayout('processesLayout', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, "left"), (2, "right")], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, "both", 10), (2, "right", 10)], parent=self.allUIs["rebuilderTabLayout"])
+        cmds.text('processesIOT', label=self.lang['i292_processes'].upper()+" IO", font="boldLabelFont", parent=self.allUIs["processesLayout"])
+        self.allUIs["triCollapseRebuilderITB"] = cmds.iconTextButton("triCollapseRebuilderITB", image=self.triDownIcon, annotation=self.lang['i348_triangleIconAnn'], command=partial(self.collapseAllFL, "triCollapseRebuilderITB", 1), width=17, height=17, style='iconOnly', align='right', parent=self.allUIs["processesLayout"])
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
-        # asset
-        self.allUIs["rebuilderAssetFL"] = cmds.frameLayout('rebuilderAssetFL', label=self.lang['i303_asset'], collapsable=True, collapse=True, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
-        self.allUIs["rebuilderAsset2Layout"] = cmds.paneLayout("rebuilderAsset2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderAssetFL"])
-        self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["rebuilderAsset2Layout"])
-        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=self.pipeliner.replaceDPData, parent=self.allUIs["rebuilderAsset2Layout"])
-        cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
-        self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper()+" IO", collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
-        # processes
-        self.rebuilderModuleList = self.startGuideModules(self.rebuilderFolder, "start", "rebuilderProcessLayout")
-        cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["rebuilderSourceLayout"] = cmds.frameLayout('rebuilderSourceLayout', label=self.lang['i331_source'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(self.sourceFolder, "start", "rebuilderSourceLayout")
-        self.allUIs["rebuilderSetupLayout"] = cmds.frameLayout('rebuilderSetupLayout', label=self.lang['i332_setup'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(self.setupFolder, "start", "rebuilderSetupLayout")
-        self.allUIs["rebuilderDeformingLayout"] = cmds.frameLayout('rebuilderDeformingLayout', label=self.lang['i333_deforming'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(self.deformingFolder, "start", "rebuilderDeformingLayout")
-        self.allUIs["rebuilderCustomLayout"] = cmds.frameLayout('rebuilderCustomLayout', label=self.lang['i334_custom'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
-        self.rebuilderModuleList = self.startGuideModules(self.customFolder, "start", "rebuilderCustomLayout")
-        cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
+        self.startGuideModules(self.rebuilderFolder, "start", "rebuilderLayout")
+        cmds.separator(style='none', parent=self.allUIs["rebuilderLayout"])
+        self.allUIs["rebuilderStartLayout"] = cmds.frameLayout('rebuilderStartLayout', label=self.lang['c110_start'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
+        self.startGuideModules(self.startFolder, "start", "rebuilderStartLayout")
+        self.allUIs["rebuilderSourceLayout"] = cmds.frameLayout('rebuilderSourceLayout', label=self.lang['i331_source'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
+        self.startGuideModules(self.sourceFolder, "start", "rebuilderSourceLayout")
+        self.allUIs["rebuilderSetupLayout"] = cmds.frameLayout('rebuilderSetupLayout', label=self.lang['i332_setup'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
+        self.startGuideModules(self.setupFolder, "start", "rebuilderSetupLayout")
+        self.allUIs["rebuilderDeformingLayout"] = cmds.frameLayout('rebuilderDeformingLayout', label=self.lang['i333_deforming'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
+        self.startGuideModules(self.deformingFolder, "start", "rebuilderDeformingLayout")
+        self.allUIs["rebuilderCustomLayout"] = cmds.frameLayout('rebuilderCustomLayout', label=self.lang['i334_custom'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
+        self.startGuideModules(self.customFolder, "start", "rebuilderCustomLayout")
+        cmds.separator(style='none', parent=self.allUIs["rebuilderLayout"])
+        self.rebuilderFLList = ["rebuilderStartLayout", "rebuilderSourceLayout", "rebuilderSetupLayout", "rebuilderDeformingLayout", "rebuilderCustomLayout"]
+        self.collapseAllFL("triCollapseRebuilderITB", 1) #close all = hack to start opened to get the right width then collapse them
         # rebuilder
-        self.allUIs["footerRebuilder"] = cmds.columnLayout('footerRebuilder', adjustableColumn=True, parent=self.allUIs["rebuilderTabLayout"])
-        cmds.separator(style='in', height=20, parent=self.allUIs["footerRebuilder"])
+        self.allUIs["footerRebuilder"] = cmds.columnLayout('footerRebuilder', adjustableColumn=False, parent=self.allUIs["rebuilderTabLayout"])
+        cmds.separator(style='in', height=20, width=370, parent=self.allUIs["footerRebuilder"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["footerRebuilder"])
         cmds.separator(style='none', height=10, parent=self.allUIs["footerRebuilder"])
-        self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["footerRebuilder"])
-        self.allUIs["splitDataSelectProcessBT"] = cmds.button("splitDataSelectProcessBT", label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
-        self.allUIs["rebuildSelectProcessBT"] = cmds.button("rebuildSelectProcessBT", label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["selectedRebuildersPL"] = cmds.paneLayout("selectedRebuildersPL", configuration="vertical2", separatorThickness=7.0, width=370, parent=self.allUIs["footerRebuilder"])
+        self.allUIs["splitDataSelectProcessBT"] = cmds.button("splitDataSelectProcessBT", label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuildersPL"])
+        self.allUIs["rebuildSelectProcessBT"] = cmds.button("rebuildSelectProcessBT", label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuildersPL"])
         cmds.separator(style='none', height=10, parent=self.allUIs["footerRebuilder"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 80), (self.allUIs["footerRebuilder"], 'left', 5), (self.allUIs["footerRebuilder"], 'right', 5), (self.allUIs["footerRebuilder"], 'bottom', 5)],
+                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 80), 
+                                    (self.allUIs["assetMainLayout"], 'left', 5), (self.allUIs["assetMainLayout"], 'right', 5), (self.allUIs["assetMainLayout"], 'top', 15),
+                                    (self.allUIs["footerRebuilder"], 'left', 5), (self.allUIs["footerRebuilder"], 'right', 5), (self.allUIs["footerRebuilder"], 'bottom', 5)],
+                        attachControl=[(self.allUIs["rebuilderMainLayout"], 'top', 10, self.allUIs["processesLayout"]), (self.allUIs["processesLayout"], 'top', 10, self.allUIs["assetMainLayout"])],
                         attachNone=[(self.allUIs["footerRebuilder"], 'top')]
                         )
         
@@ -1321,6 +1340,9 @@ class Start(object):
             if guideDir == self.rebuilderFolder and not self.loadedRebuilder:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedRebuilder = True
+            if guideDir == self.startFolder and not self.loadedStart:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedStart = True
             if guideDir == self.sourceFolder and not self.loadedSource:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedSource = True
@@ -1379,7 +1401,7 @@ class Start(object):
             self.controlInstanceList.append(ctrlInstance)
         else:
             isRebuilder = False
-            if guideDir == self.rebuilderFolder.replace("/", ".") or guideDir == self.sourceFolder.replace("/", ".") or guideDir == self.setupFolder.replace("/", ".") or guideDir == self.deformingFolder.replace("/", ".") or guideDir == self.customFolder.replace("/", "."):
+            if guideDir == self.rebuilderFolder.replace("/", ".") or guideDir == self.startFolder.replace("/", ".") or guideDir == self.sourceFolder.replace("/", ".") or guideDir == self.setupFolder.replace("/", ".") or guideDir == self.deformingFolder.replace("/", ".") or guideDir == self.customFolder.replace("/", "."):
                 isRebuilder = True
                 moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=self.allUIs[layout])
             else:
@@ -1567,19 +1589,33 @@ class Start(object):
         cmds.text(self.allUIs["footerRiggingText"], edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerRigging'])
     
     
-    def collapseModulesFL(self, *args):
+    def collapseAllFL(self, iconTB="triCollapseGuidesITB", layout=0, *args):
         """ Edit the current module frame layout collapse and icon.
+            Layout number:
+            0 = guide module frame layouts
+            1 = rebuilder processes frame layouts
         """
         collapseValue = True
         imageIcon = self.triRightIcon
-        if self.moduleFLCollapseStatus:
-            collapseValue = False
-            imageIcon = self.triDownIcon
-        if self.moduleInstancesList:
-            for modInst in self.moduleInstancesList:
-                cmds.frameLayout(modInst.moduleFrameLayout, edit=True, collapse=collapseValue)
-        cmds.iconTextButton(self.allUIs['triCollapseITB'], edit=True, image=imageIcon)
-        self.moduleFLCollapseStatus = collapseValue
+        if layout == 0: #guide modules
+            moduleList = self.moduleInstancesList
+            if self.moduleFLCollapseStatus:
+                collapseValue = False
+                imageIcon = self.triDownIcon
+            self.moduleFLCollapseStatus = collapseValue
+        else: #rebuilder processes
+            moduleList = self.rebuilderFLList
+            if self.rebuilderFLCollapseStatus:
+                collapseValue = False
+                imageIcon = self.triDownIcon
+            self.rebuilderFLCollapseStatus = collapseValue
+        if moduleList:
+            for module in moduleList:
+                if layout == 0:
+                    cmds.frameLayout(module.moduleFrameLayout, edit=True, collapse=collapseValue)
+                else:
+                    cmds.frameLayout(self.allUIs[module], edit=True, collapse=collapseValue)
+        cmds.iconTextButton(self.allUIs[iconTB], edit=True, image=imageIcon)
 
 
     def checkImportedGuides(self, askUser=True, *args):
@@ -1657,8 +1693,7 @@ class Start(object):
         """ Return a list of Validator's AddOns to load.
         """
         if os.path.exists(self.pipeliner.pipeData['addOnsPath']):
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
-            return self.validatorAddOnsModuleList
+            return self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
 
 
     def loadPipelineValidatorPresets(self, *args):

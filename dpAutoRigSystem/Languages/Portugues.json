@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-12-27",
+    "_updated"       : "2024-12-29",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -465,7 +465,7 @@
     "i300_sParentingIOAnn"      : "O diretório onde será exportado ou importado os dados de parent.",
     "i301_project"              : "Projeto",
     "i302_sSetupGeometryIOAnn"  : "O diretório onde será exportado ou importado as geometrias usadas no setup.",
-    "i303_asset"                : "Asset",
+    "i303_asset"                : "Ativo",
     "i304_new"                  : "Novo",
     "i305_none"                 : "Nada",
     "i306_run"                  : "Rodar",
@@ -511,6 +511,8 @@
     "i346_loadedSucess"         : "carregado com sucesso, obrigado.",
     "i347_sChannelIOAnn"        : "O diretório onde será exportado ou importado os dados de estados dos atributos de tranform da channelBox.",
     "i348_triangleIconAnn"      : "Colapsar ou expandir todos os frame layouts de módulos.",
+    "i349_alreadyExistsAsset"   : "Já existe um ativo com esse nome na pipeline.\nPor favor, selecione outro nome ou apenas carregue este.",
+    "i350_notFoundPipeInfoFile" : "Não encontrado o arquivo dpPipelineInfo.json para configurar os dados de publicação, desculpe.",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -784,7 +786,7 @@
     "r024_setupGeometryIODesc"  : "Essa ação vai trabalhar as geometrias usadas no setup\nexportando e importando dos grupos como:\nBlendShape_Grp and WIP_Grp.",
     "r025_newSceneIO"           : "Nova cena",
     "r026_newSceneIODesc"       : "Essa ação vai trabalhar com um arquivo de nova cena\nbaseado no contexto do nome do asset\npara começar a reconstrução em uma cena limpa.",
-    "r027_noAssetContext"       : "Parado! Não existe contexto de asset configurado para o recriar, desculpe.",
+    "r027_noAssetContext"       : "Não existe contexto de asset configurado para o recriar, desculpe.",
     "r028_rigItIO"              : "Rig isso",
     "r029_rigItIODesc"          : "Essa ação vai chamar o método principal\npara criar o setup de rig para todas as guias existentes.",
     "r030_blendShapeIO"         : "BlendShape",
@@ -824,6 +826,7 @@
     "r064_channelIO"            : "Canal",
     "r065_channelIODesc"        : "Essa ação vai trabalhar os atributos do transform\npara locked, hidden e não keyable\nimportando e exportando as informações de\ntranslate, rotate, scale and visibility.",
     "r066_shapeToReplace"       : "Esse é um shape para ser substituído?",
+    "r067_currentAssetContext"  : "Contexto de ativo atual:",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

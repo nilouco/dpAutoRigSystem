@@ -5,6 +5,7 @@ import os
 import json
 import time
 import shutil
+import stat
 
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
@@ -35,6 +36,7 @@ class Pipeliner(object):
         """
         self.pipeData = self.getPipelineData()
         self.getPipeFileName()
+        self.refreshProjectUI()
         self.refreshAssetNameUI()
         
 
@@ -300,10 +302,13 @@ class Pipeliner(object):
             self.pipeData['publishPath'] = False
             self.pipeData['addOnsPath'] = False
             self.pipeData['presetsPath'] = False
+            self.pipeData['wipPath'] = False
             # getting pipeline settings
             self.pipeData['path'] = self.getPipelinePath()
         self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
         self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
+        self.pipeData['mayaProject'] = cmds.workspace(query=True, openWorkspace=True)
+        self.pipeData['projectPath'] = self.pipeData['mayaProject']
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
             if self.pipeData['sceneName']:
@@ -311,12 +316,14 @@ class Pipeliner(object):
                 if not self.pipeData['sceneName'] == self.pipeData['f_drive']+"/"+self.pipeData['shortName']:
                     self.getInfoByPath("f_studio", "f_drive", cut=True)
                     self.getInfoByPath("f_project", "f_studio", cut=True)
+                self.pipeData['wipPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']
                 self.pipeData['projectPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                 self.pipeData['path'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipeData['path']):
                     self.pipeData['f_drive'] = ""
                     self.pipeData['f_studio'] = ""
                     self.pipeData['f_project'] = ""
+                    self.pipeData['f_wipPath'] = ""
                     self.pipeData['projectPath'] = ""
                     self.pipeData['path'] = ""
                     loaded = False
@@ -456,7 +463,7 @@ class Pipeliner(object):
             self.pipeData['publishPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+projectFolder+self.pipeData['f_publish']
             return self.pipeData['publishPath']
         else:
-            print("Not found dpPipelineInfo.json file to setup the publishing data, sorry.")
+            print(self.dpUIinst.lang['i350_notFoundPipeInfoFile'])
 
 
     def loadPipeInfo(self, loaded=None, *args):
@@ -551,15 +558,10 @@ class Pipeliner(object):
             if pathDataFromUI.endswith(".json"):
                 self.infoFile = pathDataFromUI[pathDataFromUI.rfind("/")+1:]
         if self.pipeData['path'] and self.infoFile:
-            print("here 0000")
             self.makeDirIfNotExists(self.pipeData['path'])
-            print("here 00001")
             self.setPipelineInfoFile()
-            print("here 00002")
             self.createPipelineInfoSubFolders()
-            print("here 00003")
             self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
-            print("here 00004")
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         self.utils.closeUI('dpPipelinerWindow')
@@ -752,25 +754,21 @@ class Pipeliner(object):
             return False
 
 
-    def refreshAssetNameUI(self, newSceneValue=False, *args):
+    def refreshAssetNameUI(self, *args):
         """ Just read again the pipeline data and set the UI with the assetName.
         """
-        if newSceneValue:
-            cmds.frameLayout(self.dpUIinst.allUIs["rebuilderAssetFL"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - None")
+        if self.checkAssetContext():
+            try:
+                cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.pipeData['assetName'])
+                print(self.dpUIinst.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
+            except:
+                pass
         else:
-            if self.pipeData['assetName']:
-                if self.pipeData['assetName'] == "None":
-                    print(self.dpUIinst.lang['r027_noAssetContext'])
-                else:
-                    try:
-                        cmds.frameLayout(self.dpUIinst.allUIs["rebuilderAssetFL"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
-                    except:
-                        pass
-            else:
-                try:
-                    cmds.frameLayout(self.dpUIinst.allUIs["rebuilderAssetFL"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - None")
-                except:
-                    pass
+            try:
+                cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text="None")
+                print(self.dpUIinst.lang['r027_noAssetContext'])
+            except:
+                pass
 
 
     def checkAssetContext(self, *args):
@@ -783,6 +781,40 @@ class Pipeliner(object):
                     hasAssetContext = True
         return hasAssetContext
     
+
+    def refreshProjectUI(self, *args):
+        """ Just edit the UI with the current pipeline path.
+        """
+        try:
+            cmds.textFieldGrp(self.dpUIinst.allUIs["mayaProjectText"], edit=True, text=self.pipeData['mayaProject'])
+            cmds.textFieldGrp(self.dpUIinst.allUIs["pipelineText"], edit=True, text=self.pipeData['projectPath'])
+        except:
+            pass
+
+
+    def loadAsset(self, *arts):
+        """
+        """
+        print("loading asset here, merci....")
+        if "wipPath" in list(self.pipeData.keys()):
+            if self.pipeData['wipPath']:
+                print("wipFolder =", self.pipeData['wipPath'])
+                assetList = next(os.walk(self.pipeData['wipPath']))[1]
+                print("assetList =", assetList)
+                print("mayaProj =", self.pipeData['mayaProject'])
+            
+            
+            
+            else:
+                print("theres no wipPath 1")
+        else:
+            print("theres no wipPath 2")
+
+
+
+
+
+
 
     def loadProjectPath(self, *args):
         """ Open a file dialog to get the project path and write it in the respective field.
@@ -829,8 +861,8 @@ class Pipeliner(object):
         newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpNewAssetWin)
         cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
         self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text="1", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text="1", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         try:
             self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text=self.pipeData['projectPath'], columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         except:
@@ -856,6 +888,9 @@ class Pipeliner(object):
                 cmds.file(rename=self.newAssetFile)
                 cmds.file(save=True, type="mayaAscii", force=True)
                 self.utils.closeUI("dpNewAssetWindow")
+                self.refreshAssetData()
+            else:
+                cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i349_alreadyExistsAsset'], button="Ok")
         else:
             cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i307_fillFieldCorrectly'], button="Ok")
 
@@ -875,8 +910,8 @@ class Pipeliner(object):
                         self.pathToReplaceFrom = path[:path.rfind(self.dpUIinst.dpData)-1]
                     if not toReplaceList:
                         self.getDPDataExistListToReplace(self.pathToReplaceFrom)
-                        if self.existList:
-                            self.dpDataToReplaceUI(self.existList)
+                        if self.existDataList:
+                            self.dpDataToReplaceUI(self.existDataList)
                     else:
                         self.runReplaceDPData(path, toReplaceList)
         else:
@@ -889,25 +924,40 @@ class Pipeliner(object):
         defaultList = [
             "modelIO",
             "setupGeometryIO",
+            "blendShapeIO",
             "shaderIO",
             "guideIO",
-            "controlShapeIO",
+            "rivetIO",
+            "parentingIO",
             "skinningIO",
-            "parentingIO"
+            "deformationIO",
+            "componentTagIO",
+            "inputOrderIO",
+            "renameIO",
+            "transformationIO",
+            "controlShapeIO",
+            "attributeIO",
+            "constraintIO",
+            "utilityIO",
+            "drivenKeyIO",
+            "offsetMatrixIO",
+            "connectionIO",
+            "calibrationIO",
+            "channelIO"
             ]
-        self.existList = []
+        self.existDataList = []
         for item in defaultList:
             if os.path.exists(path+"/"+self.pipeData["s_"+item]):
-                self.existList.append(item)
+                self.existDataList.append(item)
 
 
-    def dpDataToReplaceUI(self, existList, *args):
+    def dpDataToReplaceUI(self, existDataList, *args):
         """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
         """
         # declaring variables:
         self.replaceDPData_title     = 'dpAutoRig - '+self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData+" - "+self.dpUIinst.lang['i303_asset']
         self.replaceDPData_winWidth  = 220
-        self.replaceDPData_winHeight = 350
+        self.replaceDPData_winHeight = 330+(len(existDataList)*16)
         self.replaceDPData_align     = "left"
         # creating replace dpData Window:
         self.utils.closeUI("dpReplaceDPDataWindow")
@@ -915,21 +965,31 @@ class Pipeliner(object):
         # creating layout:
         replaceDPDataColumnLayout = cmds.columnLayout('replaceDPDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
         cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        cmds.text("rebuilderReplaceDataText", label=self.dpUIinst.lang['i308_toReplaceDPData']+" "+self.pipeData['assetName'], parent=replaceDPDataColumnLayout)
+        cmds.text("rebuilderReplaceDataText", label=self.dpUIinst.lang['i308_toReplaceDPData'], parent=replaceDPDataColumnLayout)
+        cmds.text("rebuilderReplaceDataAssetText", label="\n"+self.pipeData['assetName'], font="boldLabelFont", parent=replaceDPDataColumnLayout)
         cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        for item in existList:
+        for item in existDataList:
             cmds.checkBox(item+"CB", label=item, value=True)
         cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        cmds.button('runReplaceDPDataBT', label=self.dpUIinst.lang['m219_replace'].upper(), align=self.replaceDPData_align, command=self.getDPDataToReplaceByUI, parent=replaceDPDataColumnLayout)
+        cmds.checkBox(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], value=True, changeCommand=self.selectAllDPDataCB, parent=replaceDPDataColumnLayout)
+        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
+        cmds.button('runReplaceDPDataBT', label=self.dpUIinst.lang['m219_replace'].upper()+"\n"+" -> "+self.pipeData['assetName'], align=self.replaceDPData_align, command=self.getDPDataToReplaceByUI, parent=replaceDPDataColumnLayout)
         # call New Asset Window:
         cmds.showWindow(dpReplaceDPDataWindow)
         
+    
+    def selectAllDPDataCB(self, cbValue, *args):
+        """ Set all existing data checkbox values.
+        """
+        for item in self.existDataList:
+            cmds.checkBox(item+"CB", edit=True, value=cbValue)
+
 
     def getDPDataToReplaceByUI(self, *args):
         """ Read the dpReplaceDPDataWindow UI to get the active checkBoxes in order to return it in a list.
         """
         self.dpDataToReplaceList = []
-        for item in self.existList:
+        for item in self.existDataList:
             if cmds.checkBox(item+"CB", query=True, value=True):
                 self.dpDataToReplaceList.append(item)
         if self.dpDataToReplaceList:
