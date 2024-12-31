@@ -512,7 +512,9 @@
     "i347_sChannelIOAnn"        : "The folder to export and import the transform channelBox attribute states data.",
     "i348_triangleIconAnn"      : "Collapse or expand all module frame layouts.",
     "i349_alreadyExistsAsset"   : "Already exists this asset name in the pipeline.\nPlease select another name or just load this one.",
-    "i350_notFoundPipeInfoFile" : "Not found dpPipelineInfo.json file to setup the publishing data, sorry.",
+    "i350_notFoundPipeInfoFile" : "Not found dpPipelineInfo.json file to setup the asset data, sorry.",
+    "i351_notFoundWIPAssets"    : "Not found WIP asset files to load, sorry.",
+    "i352_notFoundWIPPath"      : "Not found WIP asset path to load, sorry.\nPlease set your project pipeline.\nIf you want, you can use the Create - Pipeliner menu.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

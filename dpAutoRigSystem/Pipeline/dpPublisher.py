@@ -30,32 +30,6 @@ class Publisher(object):
         if ext == "mb":
             return "mayaBinary"
         return "mayaAscii"
-    
-
-    def userSaveThisScene(self, *args):
-        """ Open a confirmDialog to user save or save as this file.
-            Return the saved file path or False if canceled.
-        """
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        saveName = self.dpUIinst.lang['i222_save']
-        saveAsName = self.dpUIinst.lang['i223_saveAs']
-        cancelName = self.dpUIinst.lang['i132_cancel']
-        confirmResult = cmds.confirmDialog(title=self.publisherName, message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
-        if confirmResult == cancelName:
-            return False
-        else:
-            if not shortName or confirmResult == saveAsName: #untitled or saveAs
-                newName = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
-                if newName:
-                    ext = self.getFileTypeByExtension(newName[0])
-                    cmds.file(rename=newName[0])
-                    return cmds.file(save=True, type=ext)
-                else:
-                    return False
-            else: #save
-                cmds.file(rename=cmds.file(query=True, sceneName=True))
-                ext = cmds.file(type=True, query=True)[0]
-                return cmds.file(save=True, type=ext)
 
 
     def mainUI(self, *args):
@@ -66,7 +40,7 @@ class Publisher(object):
         self.utils.closeUI('dpPublisherWindow')
         savedScene = self.utils.checkSavedScene()
         if not savedScene:
-            savedScene = self.userSaveThisScene()
+            savedScene = self.dpUIinst.pipeliner.userSaveThisScene(True)
         if savedScene:
             # window
             publisher_winWidth  = 450

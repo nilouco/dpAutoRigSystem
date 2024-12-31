@@ -246,7 +246,7 @@ class Start(object):
         if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
             cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
             #cmds.deleteUI("dpAutoRigSystemWC", control=True)
-        winNameList = ["dpARLoadWin", "dpInfoWindow", "dpNewAssetWindow", "dpReplaceDPDataWindow", self.plusInfoWinName, self.colorOverrideWinName]
+        winNameList = ["dpARLoadWin", "dpInfoWindow", "dpNewAssetWindow", "dpReplaceDPDataWindow", "dpSelectAssetWindow", self.plusInfoWinName, self.colorOverrideWinName]
         for winName in winNameList:
             self.utils.closeUI(winName)
 

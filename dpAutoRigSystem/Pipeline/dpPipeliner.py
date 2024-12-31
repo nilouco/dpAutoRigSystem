@@ -788,42 +788,102 @@ class Pipeliner(object):
     def refreshProjectUI(self, *args):
         """ Just edit the UI with the current pipeline path.
         """
+        # get path to update openFolder button command
+        path = self.pipeData['projectPath']
+        if "wipPath" in self.pipeData.keys():
+            path = self.pipeData['wipPath']
+        if self.pipeData['assetName'] and self.pipeData['assetPath']:
+            path = self.pipeData['assetPath']
         try:
             cmds.textFieldGrp(self.dpUIinst.allUIs["mayaProjectText"], edit=True, text=self.pipeData['mayaProject'])
             cmds.textFieldGrp(self.dpUIinst.allUIs["pipelineText"], edit=True, text=self.pipeData['projectPath'])
-            cmds.button(self.dpUIinst.allUIs['openAssetFolderBT'], edit=True, command=partial(self.dpUIinst.packager.openFolder, self.pipeData['projectPath']))
+            cmds.button(self.dpUIinst.allUIs['openAssetFolderBT'], edit=True, command=partial(self.dpUIinst.packager.openFolder, path))
         except:
             pass
 
 
-    def loadAsset(self, *arts):
+    def getLatestFile(self, path, *args):
+        """ Returns the latest listed file in the given path.
         """
+        latestFileList = next(os.walk(path))[2]
+        if latestFileList:
+            latestFileList.sort()
+            return latestFileList[-1]
+
+
+    def loadAsset(self, path=None, file=None, mode=0, *arts):
+        """ Open the saved Maya file with the user choose by UI or given path and file name arguments.
+            Mode:
+            0 = load: open Maya scene.
+            1 = replaceData: copy dpData from the selected or given asset to this current file.
         """
-        print("loading asset here, merci....")
-        if "wipPath" in list(self.pipeData.keys()):
-            if self.pipeData['wipPath']:
-                print("wipFolder =", self.pipeData['wipPath'])
-                if os.path.exists(self.pipeData['wipPath']):
-                    assetList = next(os.walk(self.pipeData['wipPath']))[1]
-                    if assetList:
-                        print("assetList =", assetList)
-                    else:
-                        print("no asset list here.")
-                    print("mayaProj =", self.pipeData['mayaProject'])
-                else:
-                    print("theres no wipPath, no exists...")
-            
-            
-            
+        if not path:
+            if "wipPath" in list(self.pipeData.keys()):
+                path = self.pipeData['wipPath']
             else:
-                print("theres no wipPath 1")
+                # There's no path to load assets
+                cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i350_notFoundPipeInfoFile'], button="Ok")
+        if path and os.path.exists(path):
+            if not file:
+                assetList = next(os.walk(path))[1]
+                if assetList:
+                    # Load UI to choose one asset to define the file to use
+                    self.selectAssetFromListUI(assetList, path, mode)
+                    return
+                else:
+                    # Inform that it isn't possible to continue without wip assets to load
+                    cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i351_notFoundWIPAssets'], button="Ok")
+            if file:
+                if mode == 0: #load
+                    # Get latest version
+                    assetFolder = path+"/"+file
+                    latestFile = self.getLatestFile(assetFolder)
+                    # Open maya scene
+                    if latestFile:
+                        savedScene = self.utils.checkSavedScene()
+                        if not savedScene:
+                            savedScene = self.userSaveThisScene(False)
+                        if savedScene:
+                            cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
+                elif mode == 1: #replaceData
+                    print("replacing data here")
+                    #TODO open UI to replace dpData from.
+
+        
         else:
-            print("theres no wipPath 2")
+            # There's no wip path to load assets
+            cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i352_notFoundWIPPath'], button="Ok")
 
 
+    def selectAssetFromListUI(self, assetList, path, mode, *args):
+        """ Let user select the asset file we use in the given mode (load or replaceData).
+            Button will call the loadAsset method again passing the choose arguments.
+            Works well for load and replace data.
+        """
+        # declaring variables:
+        selectAsset_title = 'dpAutoRig - '+self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i303_asset']
+        select_winWidth = 240
+        select_winHeight = 285
+        select_align = "center"
+        self.utils.closeUI("dpSelectAssetWindow")
+        dpSelectAssetWin = cmds.window('dpSelectAssetWindow', title=selectAsset_title, iconName='dpInfo', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        # creating layout:
+        selectColumnLayout = cmds.columnLayout('selectColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetWin)
+        cmds.separator(style='none', height=10, parent=selectColumnLayout)
+        cmds.text(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i303_asset']+":", align="left", parent=selectColumnLayout)
+        self.selectAssetTSL = cmds.textScrollList('selectAssetTSL', allowMultiSelection=False, append=assetList, parent=selectColumnLayout)
+        self.runSelectAssetBT = cmds.button('runSelectAssetBT', label=self.dpUIinst.lang['m004_select'], align=select_align, command=partial(self.selectAssetFromUI, path, mode), parent=selectColumnLayout)
+        # call Window:
+        cmds.showWindow(dpSelectAssetWin)
 
 
-
+    def selectAssetFromUI(self, path, mode, *args):
+        """ Transfer path and mode arguments to loadAsset method and also pass the selected item from the text scroll list UI.
+        """
+        selectedAssetItemList = cmds.textScrollList(self.selectAssetTSL, query=True, selectItem=True)
+        if selectedAssetItemList:
+            self.loadAsset(path, selectedAssetItemList[0], mode)
+            self.utils.closeUI("dpSelectAssetWindow")
 
 
     def loadProjectPath(self, *args):
@@ -1034,3 +1094,36 @@ class Pipeliner(object):
                     prefix = sourceItem[:sourceItem.find("_")+1]
                     destItem = destPath+"/"+prefix+self.pipeData['assetName']+self.pipeData['s_model']+"0".zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+"0".zfill(self.pipeData['i_padding'])+ext
                     shutil.copy2(sourcePath+"/"+sourceItem, destItem)
+
+
+    def userSaveThisScene(self, mustSaveIt=True, *args):
+        """ Open a confirmDialog to user save or save as this file.
+            Return the saved file path or False if canceled.
+            If not mustSaveIt, the user can choose continue without saving, them it'll return True.
+        """
+        shortName = cmds.file(query=True, sceneName=True, shortName=True)
+        saveName = self.dpUIinst.lang['i222_save']
+        saveAsName = self.dpUIinst.lang['i223_saveAs']
+        cancelName = self.dpUIinst.lang['i132_cancel']
+        continueName = self.dpUIinst.lang['i174_continue']
+        if mustSaveIt:
+            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+        else:
+            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName, continueName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+        if confirmResult == cancelName:
+            return False
+        if confirmResult == continueName:
+            return True
+        else:
+            if not shortName or confirmResult == saveAsName: #untitled or saveAs
+                newName = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
+                if newName:
+                    ext = self.getFileTypeByExtension(newName[0])
+                    cmds.file(rename=newName[0])
+                    return cmds.file(save=True, type=ext)
+                else:
+                    return False
+            else: #save
+                cmds.file(rename=cmds.file(query=True, sceneName=True))
+                ext = cmds.file(type=True, query=True)[0]
+                return cmds.file(save=True, type=ext)

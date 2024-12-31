@@ -512,7 +512,9 @@
     "i347_sChannelIOAnn"        : "Le dossier ou on va importer et exporter les donnés des states pour les attributes de tranform du channelBox.",
     "i348_triangleIconAnn"      : "Collapser ou expandir tous les frame layouts des módules.",
     "i349_alreadyExistsAsset"   : "Il y en a déjà un actif avec ce nom dans la pipeline.\nChange le nom ou charge celui-la, stp.",
-    "i350_notFoundPipeInfoFile" : "Fichier dpPipelineInfo.json introuvable pour configurer les données de publication, désolé.",
+    "i350_notFoundPipeInfoFile" : "Fichier dpPipelineInfo.json introuvable pour configurer les données de l'actif, désolé.",
+    "i351_notFoundWIPAssets"    : "Fichiers des actives introuvables pour les charger, désolé.",
+    "i352_notFoundWIPPath"      : "Path des actives en constrution n'est pas trouvé, désolé.\nConfigurer la pipeline de ton projet, stp.\nSi tu veux, tu peux utiliser le menu Create - Pipeliner.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
