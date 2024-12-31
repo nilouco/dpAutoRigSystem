@@ -692,6 +692,16 @@ class Pipeliner(object):
         return rigWipVersion
 
 
+    def getModelVersion(self, *args):
+        """ Find the model version by scene name and return it.
+        """
+        modelVersion = 0
+        shortName = cmds.file(query=True, sceneName=True, shortName=True)
+        if self.pipeData['s_model'] in shortName:
+            modelVersion = shortName[shortName.rfind(self.pipeData['s_model'])+len(self.pipeData['s_model']):shortName.rfind(self.pipeData['s_rig'])]
+        return modelVersion
+    
+
     def getAssetName(self, *args):
         """ Compare the sceneName with the father folder name to define if we use the assetName as a default pipeline setup.
             Return True or False and the shortName of the asset if found.
@@ -757,18 +767,64 @@ class Pipeliner(object):
             return False
 
 
+    def saveVersion(self, *args):
+        """ UI to chose save asset version options.
+        """
+        if self.checkAssetContext():
+            # declaring variables:
+            saveVersion_title     = 'dpAutoRig - '+self.dpUIinst.lang['i222_save']+" "+self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m205_version'].lower()
+            saveVersion_winWidth  = 380
+            saveVersion_winHeight = 220
+            saveVersion_align     = "left"
+            # window:
+            self.utils.closeUI("dpSaveVersionWindow")
+            dpSaveVersionWin = cmds.window('dpSaveVersionWindow', title=saveVersion_title, iconName='dpInfo', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+            # creating text layout:
+            saveVersionColumnLayout = cmds.columnLayout('saveVersionColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpSaveVersionWin)
+            cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
+            cmds.textFieldGrp('currentPathTFG', label="Path", text=self.pipeData['wipPath'], columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
+            cmds.textFieldGrp('currentFileNameTFG', label=self.dpUIinst.lang['i276_current'], text=self.getCurrentFileName(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
+            self.saveModelVersionTFG = cmds.textFieldGrp('saveModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text=str(int(self.getModelVersion())), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
+            self.saveRigVersionTFG = cmds.textFieldGrp('saveRigVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text=str(int(self.getRigWIPVersion())+1), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
+            cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
+            cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=saveVersion_align, parent=saveVersionColumnLayout)
+            previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=saveVersionColumnLayout)
+            self.saveVersionPreviewTxt = cmds.text('saveVersionPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
+            cmds.button('runSaveVersionBT', label=self.dpUIinst.lang['i222_save'], align=saveVersion_align, command=self.runSaveVersion, parent=saveVersionColumnLayout)
+            # call save asset version Window:
+            cmds.showWindow(dpSaveVersionWin)
+            self.getSaveVersionPreviewTextByUI()
+        else:
+            cmds.confirmDialog(title=self.dpUIinst.lang['i222_save']+" "+self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m205_version'].lower(), message=self.dpUIinst.lang['r069_noAssetToSaveVersion'], button="Ok")
+
+
+    def runSaveVersion(self, *args):
+        """ Just save a new asset file version.
+        """
+        if self.saveVersionFile:
+            thisType = "mayaAscii"
+            if "extension" in self.pipeData.keys() and self.pipeData['extension'].endswith("mb"):
+                thisType = "mayaBinary"
+            cmds.file(rename=self.saveVersionFile)
+            cmds.file(save=True, type=thisType, force=True)
+            self.utils.closeUI("dpSaveVersionWindow")
+            self.refreshAssetData()
+
+
     def refreshAssetNameUI(self, *args):
         """ Just read again the pipeline data and set the UI with the assetName.
         """
         if self.checkAssetContext():
             try:
+                cmds.frameLayout(self.dpUIinst.allUIs["assetLayout"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
                 cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.pipeData['assetName'])
                 print(self.dpUIinst.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
             except:
                 pass
         else:
             try:
-                cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text="None")
+                cmds.frameLayout(self.dpUIinst.allUIs["assetLayout"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.dpUIinst.lang['i305_none'])
+                cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.dpUIinst.lang['i305_none'])
                 print(self.dpUIinst.lang['r027_noAssetContext'])
             except:
                 pass
@@ -922,23 +978,35 @@ class Pipeliner(object):
         return self.newAssetFile
 
 
+    def getSaveVersionPreviewTextByUI(self, *args):
+        """ Concatenate UI info to compose rig version file name to save.
+        """
+        modelVersionValue = cmds.textFieldGrp(self.saveModelVersionTFG, query=True, text=True)
+        rigVersionValue = cmds.textFieldGrp(self.saveRigVersionTFG, query=True, text=True)
+        previewSaveVersionFileName = self.pipeData['assetName']+self.pipeData['s_model']+modelVersionValue.zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+rigVersionValue.zfill(self.pipeData['i_padding'])+self.pipeData['extension']
+        self.saveVersionFile = self.pipeData['assetPath']+"/"+previewSaveVersionFileName
+        if self.saveVersionFile:
+            cmds.text(self.saveVersionPreviewTxt, edit=True, label=previewSaveVersionFileName)
+        return self.saveVersionPreviewTxt
+        
+
     def createNewAssetUI(self, *args):
         """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.
         """
         # declaring variables:
         self.newAsset_title     = 'dpAutoRig - '+self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset']
-        self.newAsset_winWidth  = 420
-        self.newAsset_winHeight = 250
+        self.newAsset_winWidth  = 380
+        self.newAsset_winHeight = 220
         self.newAsset_align     = "left"
         # creating New Asset Window:
         self.utils.closeUI("dpNewAssetWindow")
         dpNewAssetWin = cmds.window('dpNewAssetWindow', title=self.newAsset_title, iconName='dpInfo', widthHeight=(self.newAsset_winWidth, self.newAsset_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpNewAssetWin)
+        newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpNewAssetWin)
         cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
-        self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, adjustableColumn=2, parent=newAssetColumnLayout)
+        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         try:
             self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text=self.pipeData['projectPath'], columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         except:
@@ -947,7 +1015,6 @@ class Pipeliner(object):
         cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
         previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=newAssetColumnLayout)
         self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-        cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
         cmds.button('runCreateNewAssetBT', label=self.dpUIinst.lang['i158_create'], align=self.newAsset_align, command=self.createNewAsset, parent=newAssetColumnLayout)
         # call New Asset Window:
         cmds.showWindow(dpNewAssetWin)

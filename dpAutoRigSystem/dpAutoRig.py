@@ -246,7 +246,7 @@ class Start(object):
         if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
             cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
             #cmds.deleteUI("dpAutoRigSystemWC", control=True)
-        winNameList = ["dpARLoadWin", "dpInfoWindow", "dpNewAssetWindow", "dpReplaceDPDataWindow", "dpSelectAssetWindow", self.plusInfoWinName, self.colorOverrideWinName]
+        winNameList = ["dpARLoadWin", "dpInfoWindow", "dpNewAssetWindow", "dpReplaceDPDataWindow", "dpSelectAssetWindow", "dpSaveVersionWindow", self.plusInfoWinName, self.colorOverrideWinName]
         for winName in winNameList:
             self.utils.closeUI(winName)
 
@@ -770,12 +770,13 @@ class Start(object):
         self.allUIs["mayaProjectText"] = cmds.textFieldGrp("mayaProjectText", label="Maya "+self.lang['i301_project']+":", text=self.pipeliner.pipeData['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
         self.allUIs["pipelineText"] = cmds.textFieldGrp("pipelineText", label="Pipeline:", text=self.pipeliner.pipeData['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
         self.allUIs["assetText"] = cmds.textFieldGrp("assetText", label=self.lang['i303_asset']+":", text=self.pipeliner.pipeData['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent=self.allUIs["assetLayout"])
-        self.allUIs["assetLayout"] = cmds.paneLayout("assetLayout", configuration="vertical4", separatorThickness=7.0, parent=self.allUIs["assetLayout"])
         # asset buttons
-        self.allUIs['loadAssetBT'] = cmds.button("loadAssetBT", label=self.lang['i187_load'], command=self.pipeliner.loadAsset, parent=self.allUIs["assetLayout"])
-        self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["assetLayout"])
-        self.allUIs['openAssetFolderBT'] = cmds.button("openAssetFolderBT", label=self.lang['c108_open']+" "+self.lang['i298_folder'], command=partial(self.packager.openFolder, self.pipeliner.pipeData['projectPath']), parent=self.allUIs["assetLayout"])
-        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=partial(self.pipeliner.loadAsset, mode=1), parent=self.allUIs["assetLayout"])
+        self.allUIs["assetButtonsLayout"] = cmds.rowColumnLayout("assetButtonsLayout", numberOfColumns=5, columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left"), (5, "left")], columnAttach=[(1, "left", 10), (2, "left", 10), (3, "left", 10), (4, "left", 10), (5, "left", 10)], parent=self.allUIs["assetLayout"])
+        self.allUIs['saveVersionAssetBT'] = cmds.button("saveVersionAssetBT", label=self.lang['i222_save']+" "+self.lang['m205_version'], command=self.pipeliner.saveVersion, parent=self.allUIs["assetButtonsLayout"])
+        self.allUIs['loadAssetBT'] = cmds.button("loadAssetBT", label=self.lang['i187_load'], command=self.pipeliner.loadAsset, parent=self.allUIs["assetButtonsLayout"])
+        self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["assetButtonsLayout"])
+        self.allUIs['openAssetFolderBT'] = cmds.button("openAssetFolderBT", label=self.lang['c108_open']+" "+self.lang['i298_folder'], command=partial(self.packager.openFolder, self.pipeliner.pipeData['projectPath']), parent=self.allUIs["assetButtonsLayout"])
+        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=partial(self.pipeliner.loadAsset, mode=1), parent=self.allUIs["assetButtonsLayout"])
         cmds.separator(style='in', height=20, width=370, parent=self.allUIs["assetMainLayout"])
         # processes
         self.allUIs["processesLayout"] = cmds.rowColumnLayout('processesLayout', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, "left"), (2, "right")], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, "both", 10), (2, "right", 10)], parent=self.allUIs["rebuilderTabLayout"])

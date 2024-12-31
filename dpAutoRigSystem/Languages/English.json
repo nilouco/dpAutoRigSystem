@@ -830,6 +830,7 @@
     "r066_shapeToReplace"       : "Is this a shape to be replaced?",
     "r067_currentAssetContext"  : "Current asset context:",
     "r068_replacedDataSuccess"  : "Replaced dpData with success.",
+    "r069_noAssetToSaveVersion" : "Seems we don't have a valid asset setup yet, sorry.\n\nYou can create a new one or load an existing asset before continue.\nIf you prefer, save you scene in the pipeline before continue, please.",
 
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

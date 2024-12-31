@@ -830,6 +830,7 @@
     "r066_shapeToReplace"       : "Esse é um shape para ser substituído?",
     "r067_currentAssetContext"  : "Contexto de ativo atual:",
     "r068_replacedDataSuccess"  : "Substituído dpData com sucesso.",
+    "r069_noAssetToSaveVersion" : "Parece que não temos uma configuração de ativo valida ainda, desculpe.\n\nVocê pode criar um novo ativo ou carregar um existente antes de continuar.\nSe preferir, salve sua cena na pipeline antes de continuar, por favor.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

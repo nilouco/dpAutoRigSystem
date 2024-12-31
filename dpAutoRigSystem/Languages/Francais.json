@@ -830,6 +830,7 @@
     "r066_shapeToReplace"       : "Est-ce que c'est un shape pour remplacer?",
     "r067_currentAssetContext"  : "Contexte d'actif actuel:",
     "r068_replacedDataSuccess"  : "Remplacé le dpData avec sucèss.",
+    "r069_noAssetToSaveVersion" : "Il semble que nous n'ayons pas encore de configuration d'actif valide, désolé.\n\nVous pouvez en créer un nouveau ou charger un actif existant avant de continuer.\nSi vous préférez, enregistrez votre scène dans le pipeline avant de continuer, s'il vous plaît.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",
