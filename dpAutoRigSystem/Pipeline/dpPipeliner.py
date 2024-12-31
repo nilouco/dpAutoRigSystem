@@ -10,7 +10,7 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.12
+DP_PIPELINER_VERSION = 1.13
 
 
 class Pipeliner(object):
@@ -827,6 +827,8 @@ class Pipeliner(object):
             if not file:
                 assetList = next(os.walk(path))[1]
                 if assetList:
+                    if mode == 1: #replaceData exclude the current asset from given list to chose.
+                        assetList.remove(self.pipeData['assetName'])
                     # Load UI to choose one asset to define the file to use
                     self.selectAssetFromListUI(assetList, path, mode)
                     return
@@ -834,9 +836,9 @@ class Pipeliner(object):
                     # Inform that it isn't possible to continue without wip assets to load
                     cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i351_notFoundWIPAssets'], button="Ok")
             if file:
+                assetFolder = path+"/"+file
                 if mode == 0: #load
                     # Get latest version
-                    assetFolder = path+"/"+file
                     latestFile = self.getLatestFile(assetFolder)
                     # Open maya scene
                     if latestFile:
@@ -846,10 +848,14 @@ class Pipeliner(object):
                         if savedScene:
                             cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
                 elif mode == 1: #replaceData
-                    print("replacing data here")
-                    #TODO open UI to replace dpData from.
-
-        
+                    # Open UI to select each desired module dpData to replace from
+                    self.pathToReplaceFrom = assetFolder
+                    self.getDPDataExistListToReplace(self.pathToReplaceFrom)
+                    if self.existDataList:
+                        self.dpDataToReplaceUI(file)
+                    else:
+                        # There's no data do replace from the selected asset
+                        cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['r007_notExportedData']+": "+file, button="Ok")
         else:
             # There's no wip path to load assets
             cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i352_notFoundWIPPath'], button="Ok")
@@ -965,29 +971,6 @@ class Pipeliner(object):
             cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i307_fillFieldCorrectly'], button="Ok")
 
 
-    def replaceDPData(self, path=None, toReplaceList=None, *args):
-        """ Check given path and to replace list and call the method to replace or the UI to choose what to replace in the dpData folder.
-        """
-        if self.checkAssetContext():
-            if not path:
-                pathList = cmds.fileDialog2(fileMode=3, caption=self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData, okCaption=self.dpUIinst.lang['i196_import'])
-                if pathList:
-                    path = pathList[0]
-            if path:
-                if os.path.exists(path):
-                    self.pathToReplaceFrom = path
-                    if self.dpUIinst.dpData in path:
-                        self.pathToReplaceFrom = path[:path.rfind(self.dpUIinst.dpData)-1]
-                    if not toReplaceList:
-                        self.getDPDataExistListToReplace(self.pathToReplaceFrom)
-                        if self.existDataList:
-                            self.dpDataToReplaceUI(self.existDataList)
-                    else:
-                        self.runReplaceDPData(path, toReplaceList)
-        else:
-            cmds.confirmDialog(title=self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData, message=self.dpUIinst.lang['r027_noAssetContext'], button="Ok")
-
-
     def getDPDataExistListToReplace(self, path, *args):
         """ Check if exists exported module data in the given path.
         """
@@ -1021,41 +1004,42 @@ class Pipeliner(object):
                 self.existDataList.append(item)
 
 
-    def dpDataToReplaceUI(self, existDataList, *args):
+    def dpDataToReplaceUI(self, fromAssetName, *args):
         """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
         """
         # declaring variables:
         self.replaceDPData_title     = 'dpAutoRig - '+self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData+" - "+self.dpUIinst.lang['i303_asset']
         self.replaceDPData_winWidth  = 220
-        self.replaceDPData_winHeight = 330+(len(existDataList)*16)
+        self.replaceDPData_winHeight = 330+(len(self.existDataList)*16)
         self.replaceDPData_align     = "left"
         # creating replace dpData Window:
         self.utils.closeUI("dpReplaceDPDataWindow")
         dpReplaceDPDataWindow = cmds.window('dpReplaceDPDataWindow', title=self.replaceDPData_title, iconName='dpInfo', widthHeight=(self.replaceDPData_winWidth, self.replaceDPData_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
-        replaceDPDataColumnLayout = cmds.columnLayout('replaceDPDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
-        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        cmds.text("rebuilderReplaceDataText", label=self.dpUIinst.lang['i308_toReplaceDPData'], parent=replaceDPDataColumnLayout)
-        cmds.text("rebuilderReplaceDataAssetText", label="\n"+self.pipeData['assetName'], font="boldLabelFont", parent=replaceDPDataColumnLayout)
-        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        for item in existDataList:
+        replaceDataColumnLayout = cmds.columnLayout('replaceDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
+        cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
+        cmds.text("rebuilderReplaceDataText", label=self.dpUIinst.lang['i308_toReplaceDPData'], parent=replaceDataColumnLayout)
+        cmds.text("rebuilderReplaceDataAssetText", label="\n"+self.pipeData['assetName'], font="boldLabelFont", parent=replaceDataColumnLayout)
+        cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
+        for item in self.existDataList:
             cmds.checkBox(item+"CB", label=item, value=True)
-        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        cmds.checkBox(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], value=True, changeCommand=self.selectAllDPDataCB, parent=replaceDPDataColumnLayout)
-        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
-        cmds.button('runReplaceDPDataBT', label=self.dpUIinst.lang['m219_replace'].upper()+"\n"+" -> "+self.pipeData['assetName'], align=self.replaceDPData_align, command=self.getDPDataToReplaceByUI, parent=replaceDPDataColumnLayout)
+        cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
+        if len(self.existDataList) > 1:
+            cmds.checkBox(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], value=True, changeCommand=self.selectAllDataCB, parent=replaceDataColumnLayout)
+            cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
+        cmds.button('runReplaceDataBT', label=self.dpUIinst.lang['m219_replace'].upper()+"\n"+fromAssetName+" -> "+self.pipeData['assetName'], align=self.replaceDPData_align, command=self.replaceDataByUI, parent=replaceDataColumnLayout)
         # call New Asset Window:
         cmds.showWindow(dpReplaceDPDataWindow)
         
     
-    def selectAllDPDataCB(self, cbValue, *args):
+    def selectAllDataCB(self, cbValue, *args):
         """ Set all existing data checkbox values.
         """
         for item in self.existDataList:
             cmds.checkBox(item+"CB", edit=True, value=cbValue)
 
 
-    def getDPDataToReplaceByUI(self, *args):
+    def replaceDataByUI(self, *args):
         """ Read the dpReplaceDPDataWindow UI to get the active checkBoxes in order to return it in a list.
         """
         self.dpDataToReplaceList = []
@@ -1063,11 +1047,11 @@ class Pipeliner(object):
             if cmds.checkBox(item+"CB", query=True, value=True):
                 self.dpDataToReplaceList.append(item)
         if self.dpDataToReplaceList:
-            self.runReplaceDPData()
+            self.runReplaceData()
             self.utils.closeUI("dpReplaceDPDataWindow")
         
 
-    def runReplaceDPData(self, path=None, toReplaceList=None, *args):
+    def runReplaceData(self, path=None, toReplaceList=None, *args):
         """ Replace the dpData subFolder with the given arguments.
         """
         if not path:
@@ -1094,6 +1078,9 @@ class Pipeliner(object):
                     prefix = sourceItem[:sourceItem.find("_")+1]
                     destItem = destPath+"/"+prefix+self.pipeData['assetName']+self.pipeData['s_model']+"0".zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+"0".zfill(self.pipeData['i_padding'])+ext
                     shutil.copy2(sourcePath+"/"+sourceItem, destItem)
+            # Concatenate done message
+            sucessMessageText = self.dpUIinst.lang['r068_replacedDataSuccess']+"\n\n"+self.dpUIinst.lang['i036_from']+": "+path+"\n"+self.dpUIinst.lang['i037_to']+": "+self.pipeData['assetName']+"\n\n"+" \n".join(toReplaceList)
+            cmds.confirmDialog(title="dpAutoRigSystem", message=sucessMessageText, button="Ok")
 
 
     def userSaveThisScene(self, mustSaveIt=True, *args):

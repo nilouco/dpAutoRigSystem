@@ -775,7 +775,7 @@ class Start(object):
         self.allUIs['loadAssetBT'] = cmds.button("loadAssetBT", label=self.lang['i187_load'], command=self.pipeliner.loadAsset, parent=self.allUIs["assetLayout"])
         self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["assetLayout"])
         self.allUIs['openAssetFolderBT'] = cmds.button("openAssetFolderBT", label=self.lang['c108_open']+" "+self.lang['i298_folder'], command=partial(self.packager.openFolder, self.pipeliner.pipeData['projectPath']), parent=self.allUIs["assetLayout"])
-        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=self.pipeliner.replaceDPData, parent=self.allUIs["assetLayout"])
+        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=partial(self.pipeliner.loadAsset, mode=1), parent=self.allUIs["assetLayout"])
         cmds.separator(style='in', height=20, width=370, parent=self.allUIs["assetMainLayout"])
         # processes
         self.allUIs["processesLayout"] = cmds.rowColumnLayout('processesLayout', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, "left"), (2, "right")], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, "both", 10), (2, "right", 10)], parent=self.allUIs["rebuilderTabLayout"])
