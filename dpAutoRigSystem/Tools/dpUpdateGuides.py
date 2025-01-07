@@ -7,7 +7,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DP_UPDATEGUIDES_VERSION = 1.7
+DP_UPDATEGUIDES_VERSION = 1.8
 
 
 class UpdateGuides(object):
@@ -358,7 +358,7 @@ class UpdateGuides(object):
         for guide in self.updateData:
             guideType = self.updateData[guide]['guideModuleName']
             # create the new guide
-            currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules/Standard")
+            currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules.Standard")
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
             currentNewGuide.editGuideModuleName(guideName)
