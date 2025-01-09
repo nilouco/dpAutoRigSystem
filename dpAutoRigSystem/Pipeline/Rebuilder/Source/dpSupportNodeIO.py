@@ -3,26 +3,26 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "SetupGeometryIO"
-TITLE = "r023_setupGeometryIO"
-DESCRIPTION = "r024_setupGeometryIODesc"
-ICON = "/Icons/dp_setupGeometryIO.png"
+CLASS_NAME = "SupportNodeIO"
+TITLE = "r023_supportNodeIO"
+DESCRIPTION = "r024_supportNodeIODesc"
+ICON = "/Icons/dp_supportNodeIO.png"
 
-DP_SETUPGEOMETRYIO_VERSION = 1.1
+DP_SUPPORTNODEIO_VERSION = 1.1
 
 
-class SetupGeometryIO(dpBaseAction.ActionStartClass):
+class SupportNodeIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_SETUPGEOMETRYIO_VERSION
+        self.version = DP_SUPPORTNODEIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_setupGeometryIO"
-        self.startName = "dpSetupGeometry"
+        self.ioDir = "s_supportNodeIO"
+        self.startName = "dpSupportNode"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -47,14 +47,14 @@ class SetupGeometryIO(dpBaseAction.ActionStartClass):
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
-                        meshList = None
+                        itemList = None
                         if objList:
-                            meshList = objList
+                            itemList = objList
                         else:
-                            meshList = self.getGeometryToExportList()
-                        if meshList:
+                            itemList = self.getNodeToExportList()
+                        if itemList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
-                            self.exportAlembicFile(meshList, attr=False)
+                            self.exportAlembicFile(itemList, attr=False, curve=True)
                         else:
                             self.maybeDoneIO("Geometries")
                     else: #import
@@ -76,15 +76,16 @@ class SetupGeometryIO(dpBaseAction.ActionStartClass):
         return self.dataLogDic
 
 
-    def getGeometryToExportList(self, *args):
-        """ Returns a list of the first children node in geometry groups.
+    def getNodeToExportList(self, *args):
+        """ Returns a list of the first children node in base groups.
         """
         geoList = []
-        geoGrpList = ["supportGrp", "blendShapesGrp", "wipGrp"]
+        geoGrpList = ["supportGrp", "blendShapesGrp", "wipGrp", "fxGrp"]
         for geoGrp in geoGrpList:
             grp = self.utils.getNodeByMessage(geoGrp)
             if grp:
-                meshList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-                if meshList:
+                itemList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+                itemList.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
+                if itemList:
                     geoList.extend(n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.utils.getSuffixNumberList(n)[1].endswith("Base"))
         return geoList

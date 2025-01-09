@@ -437,8 +437,9 @@ class ActionStartClass(object):
             self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
 
 
-    def exportAlembicFile(self, meshList, path=None, startName=None, fileName=None, attr=True, *args):
+    def exportAlembicFile(self, itemList, path=None, startName=None, fileName=None, attr=True, curve=False, *args):
         """ Export given mesh list to alembic file.
+            If curve argument is True, it'll also accept export nurbsCurve shapes.
         """
         try:
             if not path:
@@ -447,14 +448,16 @@ class ActionStartClass(object):
                 startName = self.startName
             if not fileName:
                 fileName = self.pipeliner.pipeData['currentFileName']
-            nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
+            nodeStateDic = self.changeNodeState(itemList, state=1) #has no effect
             # export alembic
             self.pipeliner.makeDirIfNotExists(path)
-            ioItems = ' -root '.join(meshList)
+            ioItems = ' -root '.join(itemList)
             attrStr = ""
             if attr:
-                meshList.extend(cmds.listRelatives(meshList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
-                for mesh in meshList:
+                itemList.extend(cmds.listRelatives(itemList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
+                if curve:
+                    itemList.extend(cmds.listRelatives(itemList, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True))
+                for mesh in itemList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     userDefAttrList = cmds.listAttr(mesh, userDefined=True)
                     if userDefAttrList:
@@ -463,10 +466,10 @@ class ActionStartClass(object):
             abcName = path+"/"+startName+"_"+fileName+".abc"
             cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+attrStr+" -file "+abcName)
             if nodeStateDic:
-                self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
+                self.changeNodeState(itemList, findDeformers=False, dic=nodeStateDic) #back deformer as before
             self.wellDoneIO(abcName)
         except Exception as e:
-            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+            self.notWorkedWellIO(', '.join(itemList)+": "+str(e))
 
 
     def importLatestAlembicFile(self, exportedList, *args):

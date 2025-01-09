@@ -1,5 +1,5 @@
 dpModelIO
 dpCheckinIO
-dpSetupGeometryIO
+dpSupportNodeIO
 dpBlendShapeIO
 dpShaderIO
