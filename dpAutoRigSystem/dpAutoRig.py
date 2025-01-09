@@ -2094,10 +2094,17 @@ class Start(object):
         Generic function to create base group
         TODO maybe move it to utils?
     '''
-    def getBaseGrp(self, sAttrName, sGrpName):
+    def getBaseGrp(self, sAttrName, sGrpName, oldList=None):
         if not cmds.objExists(sGrpName):
-            cmds.createNode("transform", name=sGrpName)
-        if not cmds.objExists(self.masterGrp+"."+sAttrName):
+            needCreateIt = True
+            if oldList:
+                if cmds.objExists(oldList[1]):
+                    sAttrName = oldList[0]
+                    sGrpName = oldList[1]
+                    needCreateIt = False
+            if needCreateIt:
+                cmds.createNode("transform", name=sGrpName)
+        if not sAttrName in cmds.listAttr(self.masterGrp):
             cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
         if not cmds.listConnections(self.masterGrp+"."+sAttrName, destination=False, source=True):
             cmds.connectAttr(sGrpName+".message", self.masterGrp+"."+sAttrName, force=True)
@@ -2193,13 +2200,13 @@ class Start(object):
         cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
         # Get or create all the needed group
+        self.supportGrp     = self.getBaseGrp("supportGrp", self.prefix+"Support_Grp", ["modelsGrp", self.prefix+"Model_Grp"]) #just to make compatibility with old rigs
         self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.prefix+"Ctrls_Grp")
         self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.prefix+"Ctrls_Visibility_Grp")
         self.dataGrp        = self.getBaseGrp("dataGrp", self.prefix+"Data_Grp")
         self.renderGrp      = self.getBaseGrp("renderGrp", self.prefix+"Render_Grp")
         self.proxyGrp       = self.getBaseGrp("proxyGrp", self.prefix+"Proxy_Grp")
         self.fxGrp          = self.getBaseGrp("fxGrp", self.prefix+"FX_Grp")
-        self.supportGrp     = self.getBaseGrp("supportGrp", self.prefix+"Support_Grp")
         self.staticGrp      = self.getBaseGrp("staticGrp", self.prefix+"Static_Grp")
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
@@ -2322,10 +2329,15 @@ class Start(object):
         """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
         """
         masterGroupAttrList = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
-        for masterGroupAttr in masterGroupAttrList:
-            if not cmds.objExists(nodeGrp+"."+masterGroupAttr):
-                cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)
-                return False
+        oldAttrList = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
+        for m, masterGroupAttr in enumerate(masterGroupAttrList):
+            if not masterGroupAttr in cmds.listAttr(nodeGrp):
+                if not oldAttrList[m]:
+                    cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)
+                    return False
+                elif not oldAttrList[m] in cmds.listAttr(nodeGrp):
+                    cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)
+                    return False
         return cmds.getAttr(nodeGrp+"."+self.masterAttr)
 
 
