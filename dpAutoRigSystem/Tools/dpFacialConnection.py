@@ -56,12 +56,15 @@ class FacialConnection(object):
         self.eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
         self.eyebrowName2 = tweaksName+"_"+eyebrowName+"_02"
         self.eyebrowName3 = tweaksName+"_"+eyebrowName+"_03"
+        self.eyebrowName4 = tweaksName+"_"+eyebrowName+"_04"
         # squints names:
         self.squintName1 = tweaksName+"_"+squintName+"_01"
         self.squintName2 = tweaksName+"_"+squintName+"_02"
         self.squintName3 = tweaksName+"_"+squintName+"_03"
+        self.squintName4 = tweaksName+"_"+squintName+"_04"
         # cheeks names:
         self.cheekName1 = tweaksName+"_"+cheekName+"_01"
+        self.cheekName2 = tweaksName+"_"+cheekName+"_02"
         # lip names:
         self.upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
         self.upperLipName1 = tweaksName+"_"+upperName+"_"+lipName+"_01"
@@ -71,13 +74,13 @@ class FacialConnection(object):
         self.lowerLipName2 = tweaksName+"_"+lowerName+"_"+lipName+"_02"
         self.lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
         # list:
-        self.tweaksNameList = [self.eyebrowMiddleName, self.eyebrowName1, self.eyebrowName2, self.eyebrowName3, \
-                                self.squintName1, self.squintName2, self.squintName3, \
-                                self.cheekName1, \
+        self.tweaksNameList = [self.eyebrowMiddleName, self.eyebrowName1, self.eyebrowName2, self.eyebrowName3, self.eyebrowName4, \
+                                self.squintName1, self.squintName2, self.squintName3,\
+                                self.cheekName1, self.cheekName2, \
                                 self.upperLipMiddleName, self.upperLipName1, self.upperLipName2, self.lowerLipMiddleName, self.lowerLipName1, self.lowerLipName2, self.lipCornerName]
-        self.tweaksNameStrList = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", \
+        self.tweaksNameStrList = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", "eyebrowName4", \
                                 "squintName1", "squintName2", "squintName3", \
-                                "cheekName1", \
+                                "cheekName1", "cheekName2", \
                                 "upperLipMiddleName", "upperLipName1", "upperLipName2", "lowerLipMiddleName", "lowerLipName1", "lowerLipName2", "lipCornerName"]
     
     
