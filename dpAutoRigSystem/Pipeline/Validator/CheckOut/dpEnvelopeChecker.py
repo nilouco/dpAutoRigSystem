@@ -9,7 +9,7 @@ TITLE = "v094_envelopeChecker"
 DESCRIPTION = "v095_envelopeCheckerDesc"
 ICON = "/Icons/dp_envelopeChecker.png"
 
-DP_ENVELOPECHECKER_VERSION = 1.0
+DP_ENVELOPECHECKER_VERSION = 1.1
 
 
 class EnvelopeChecker(dpBaseAction.ActionStartClass):
@@ -41,7 +41,7 @@ class EnvelopeChecker(dpBaseAction.ActionStartClass):
     def runAction(self, firstMode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If verifyMode parameter is False, it'll run in fix mode.
+            If firstMode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
                 - checkedObjList = node list of checked items
                 - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
@@ -50,7 +50,6 @@ class EnvelopeChecker(dpBaseAction.ActionStartClass):
         """
         # starting
         self.firstMode = firstMode
-        self.verbose = True
         self.cleanUpToStart()
 
         # ---

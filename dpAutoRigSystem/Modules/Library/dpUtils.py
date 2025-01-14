@@ -1098,7 +1098,7 @@ class Utils(object):
             pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
         else:
             return False
-        print("\nLog file", pathFile)
+        print("Log file", pathFile)
         outFile = open(pathFile, "w")
         json.dump(dic, outFile, indent=4)
         outFile.close()

@@ -1764,7 +1764,7 @@ class Start(object):
         else:
             logText += "\n"+self.lang['i207_notMarked']
             heightSize = 2
-        logText = self.pipeliner.getToday(True)+"\n"+logText
+        logText = self.pipeliner.getToday(True)+"\n\n"+logText+"\n"
         if verbose:
             self.logger.infoWin('i019_log', actionType, logText, "left", 250, (150+(heightSize)*13))
             print("\n-------------\n"+self.lang[actionType]+"\n"+logText)

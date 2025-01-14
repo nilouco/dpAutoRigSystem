@@ -47,13 +47,13 @@ class SkinningIO(dpBaseAction.ActionStartClass):
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
                 if self.firstMode: #export
-                    meshList = None
+                    itemList = None
                     if objList:
-                        meshList = objList
+                        itemList = objList
                     else:
-                        meshList = self.dpUIinst.skin.getDeformedModelList(deformerTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
-                    if meshList:
-                        self.exportDicToJsonFile(self.dpUIinst.skin.getSkinWeightData(meshList))
+                        itemList = self.dpUIinst.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                    if itemList:
+                        self.exportDicToJsonFile(self.dpUIinst.skin.getSkinWeightData(itemList))
                     else:
                         self.maybeDoneIO("Render_Grp")
                 else: #import

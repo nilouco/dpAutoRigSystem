@@ -105,14 +105,15 @@ class Weights(object):
         return matrixDic
 
 
-    def getDeformedModelList(self, deformerTypeList=["skinCluster"], ignoreAttr="None", *args):
-        """ Returns a list of deformed mesh transforms.
+    def getDeformedItemList(self, deformerTypeList=["skinCluster"], ignoreAttr="None", *args):
+        """ Returns a list of deformed item transforms of meshes and nurbsCurves.
             Use given lists and attribute to filter the results.
         """
-        deformedModelList, ranList = [], []
-        allMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-        if allMeshList:
-            for item in allMeshList:
+        deformedItemList, ranList = [], []
+        itemList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+        itemList.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve"))
+        if itemList:
+            for item in itemList:
                 transformNode = item[:item[1:].find("|")+1]
                 if not transformNode in ranList:
                     ranList.append(transformNode)
@@ -129,9 +130,9 @@ class Weights(object):
                                 print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
                             for desiredType in deformerTypeList:
                                 if self.checkExistingDeformerNode(childNode, deformerType=desiredType)[0]:
-                                    if not childNode in deformedModelList:
-                                        deformedModelList.append(childNode)
-        return deformedModelList
+                                    if not childNode in deformedItemList:
+                                        deformedItemList.append(childNode)
+        return deformedItemList
 
 
     def checkExistingDeformerNode(self, item, deleteIt=False, deformerType="skinCluster", *args):

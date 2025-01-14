@@ -212,7 +212,7 @@ class ActionStartClass(object):
         everythingOkText = self.dpUIinst.lang['v007_allOk']
         titleText = self.getTitle()
         # header
-        logText = "\n"+nameText+": "+titleText+"\n"
+        logText = nameText+": "+titleText+"\n"
         # mode
         logText += modeText+": "
         actionText = self.secondBTLabel.upper()
@@ -233,6 +233,7 @@ class ActionStartClass(object):
         if self.messageList:
             for msg in self.messageList:
                 logText += "\n"+msg
+        logText += "\n"
         # dataLog
         self.dataLogDic["log"] = self.dpUIinst.lang[self.actionType]
         self.dataLogDic["user"] = getpass.getuser()
@@ -249,8 +250,8 @@ class ActionStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n"+logText)
+            self.dpUIinst.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n\n"+logText, "left", 250, 250)
+            print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n\n"+logText)
             if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])
 

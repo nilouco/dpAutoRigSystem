@@ -49,7 +49,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                     if objList:
                         deformedList = objList
                     else:
-                        deformedList = self.dpUIinst.skin.getDeformedModelList(deformerTypeList=self.dpUIinst.skin.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                        deformedList = self.dpUIinst.skin.getDeformedItemList(deformerTypeList=self.dpUIinst.skin.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if deformedList:
                         self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
                     else:
