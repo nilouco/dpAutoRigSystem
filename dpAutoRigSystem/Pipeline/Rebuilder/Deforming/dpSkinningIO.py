@@ -109,23 +109,23 @@ class SkinningIO(dpBaseAction.ActionStartClass):
         #refNodeList = self.referOldWipFile()
         refNodeList = None
 
-        for mesh in skinWeightDic.keys():
-            if cmds.objExists(mesh):
-                if refNodeList:
+        for item in skinWeightDic.keys():
+            if cmds.objExists(item):
+                if refNodeList: #disable at the momment
                     for refNodeName in refNodeList:
-                        if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
-                            if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
-                                changedShapeMeshList.append(mesh)
+                        if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(item):
+                            if cmds.polyCompare(item, refNodeName, vertices=True) > 0 or cmds.polyCompare(item, refNodeName, edges=True) > 0: #check if shape changes
+                                changedShapeMeshList.append(item)
                                 wellImported = False
-                            elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
-                                changedTopoMeshList.append(mesh)
+                            elif not len(cmds.ls(item+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
+                                changedTopoMeshList.append(item)
                                 wellImported = False
                             else:
-                                toImportList.append(mesh)
+                                toImportList.append(item)
                 else:
-                    toImportList.append(mesh)
+                    toImportList.append(item)
             else:
-                notFoundMeshList.append(mesh)
+                notFoundMeshList.append(item)
         if refNodeList:
             cmds.file(self.refPathName, removeReference=True)
         if toImportList:

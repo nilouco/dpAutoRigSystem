@@ -84,12 +84,12 @@ class Weights(object):
             cmds.setAttr(joint+".liw", 0)
 
 
-    def normalizeMeshWeights(self, mesh, *args):
-        """ Just normalize the skinCluster weigths for the given mesh.
+    def normalizeItemWeights(self, item, *args):
+        """ Just normalize the skinCluster weigths for the given item.
         """
-        for skinClusterNode in self.checkExistingDeformerNode(mesh)[2]:
+        for skinClusterNode in self.checkExistingDeformerNode(item)[2]:
             self.unlockJoints(skinClusterNode)
-            cmds.skinPercent(skinClusterNode, mesh, normalize=True)
+            cmds.skinPercent(skinClusterNode, item, normalize=True)
 
 
     def getConnectedMatrixDic(self, deformerName, *args):
