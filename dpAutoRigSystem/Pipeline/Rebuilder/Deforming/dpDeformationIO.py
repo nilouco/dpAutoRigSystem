@@ -48,15 +48,16 @@ class DeformationIO(dpBaseAction.ActionStartClass):
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
                 if self.firstMode: #export
-                    meshList = None
+                    itemList = None
                     if objList:
-                        meshList = objList
+                        itemList = objList
                     else:
-                        meshList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True)
-                    if meshList:
+                        itemList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True) or []
+                        itemList.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True))
+                    if itemList:
                         # finding deformers
                         hasDef = False
-                        inputDeformerList = cmds.listHistory(meshList, pruneDagObjects=False, interestLevel=True)
+                        inputDeformerList = cmds.listHistory(itemList, pruneDagObjects=False, interestLevel=True)
                         for deformerType in self.defWeights.typeAttrDic.keys():
                             if cmds.ls(inputDeformerList, type=deformerType):
                                 hasDef = True
