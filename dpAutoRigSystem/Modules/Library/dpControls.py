@@ -514,6 +514,7 @@ class ControlClass(object):
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
             if corrective:
                 self.addCorrectiveAttrs(curve)
+                self.startCorrectiveEditMode([curve])
             if not headDef == 0:
                 self.addDefInfluenceAttrs(curve, headDef)
             if guideSource:
@@ -1544,7 +1545,7 @@ class ControlClass(object):
     def jobCorrectiveEditMode(self, ctrlName, *args):
         """ Edit mode to corrective control by scriptJob.
         """
-        if cmds.objExists(ctrlName+".editMode"):
+        if "editMode" in cmds.listAttr(ctrlName):
             editModeValue = cmds.getAttr(ctrlName+".editMode")
             if editModeValue:
                 self.colorShape([ctrlName], 'bonina', rgb=True)
@@ -1556,14 +1557,15 @@ class ControlClass(object):
                 self.setCorrectiveCalibration(ctrlName)
 
 
-    def startCorrectiveEditMode(self, *args):
+    def startCorrectiveEditMode(self, objList=None, *args):
         """ Reload editMode job for existing corrective controllers.
         """
-        transformList = cmds.ls(selection=False, type="transform")
-        if transformList:
-            for transformNode in transformList:
-                if cmds.objExists(transformNode+".editMode"):
-                    self.createCorrectiveMode(transformNode)
+        if not objList:
+            objList = cmds.ls(selection=False, type="transform")
+        if objList:
+            for node in objList:
+                if "editMode" in cmds.listAttr(node):
+                    self.createCorrectiveMode(node)
 
 
     def setCorrectiveCalibration(self, ctrlName, *args):

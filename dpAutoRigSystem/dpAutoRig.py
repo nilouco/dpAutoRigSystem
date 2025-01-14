@@ -192,7 +192,6 @@ class Start(object):
         self.mainUI()
         self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
         self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
-        self.ctrls.startCorrectiveEditMode()
         self.refreshMainUI()
         self.startScriptJobs()
         cmds.select(clear=True)
@@ -237,6 +236,7 @@ class Start(object):
         self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         cmds.scriptJob(event=('workspaceChanged', self.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        self.ctrls.startCorrectiveEditMode()
         self.jobSelectedGuide()
 
 
@@ -3303,8 +3303,8 @@ class Start(object):
         
         # reload the jointSkinList:
         self.populateJoints()
-        
         if not self.rebuilding:
+            self.refreshMainUI()
             # call log window:
             self.logger.logWin()
             # close progress window
