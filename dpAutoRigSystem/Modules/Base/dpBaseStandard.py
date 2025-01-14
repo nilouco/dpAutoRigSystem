@@ -476,7 +476,7 @@ class BaseStandard(object):
                 pass
 
             # unPinGuides before Rig them:
-            self.ctrls.unPinGuide(self.moduleGrp)
+            self.ctrls.unPinGuide([self.moduleGrp])
             
             # RIG:
             self.utils.useDefaultRenderLayer()

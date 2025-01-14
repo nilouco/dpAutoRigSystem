@@ -1085,7 +1085,7 @@ class ControlClass(object):
         """
         if not ctrlName.endswith("_JointEnd"):
             if not ctrlName.endswith("_RadiusCtrl"):
-                if not cmds.objExists(ctrlName+".pinGuide"):
+                if not "pinGuide" in cmds.listAttr(ctrlName):
                     cmds.addAttr(ctrlName, longName="pinGuide", attributeType="bool")
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
@@ -1112,7 +1112,7 @@ class ControlClass(object):
     def jobPinGuide(self, ctrlName, *args):
         """ Pin temporally the guide by scriptJob.
         """
-        if cmds.objExists(ctrlName+".pinGuide"):
+        if "pinGuide" in cmds.listAttr(ctrlName):
             # extracting namespace... need to find an ellegant way using message or stored attribute instead:
             nameSpaceName = None
             cmds.namespace(set=":")
@@ -1156,16 +1156,19 @@ class ControlClass(object):
                 for childNode in childrenList:
                     if cmds.objExists(childNode+".pinGuide"):
                         self.createPinGuide(childNode)
-            if cmds.objExists(guideBase+".pinGuide"):
+            if "pinGuide" in cmds.listAttr(guideBase):
                 self.createPinGuide(guideBase)
 
 
-    def unPinGuide(self, guideBase, *args):
+    def unPinGuide(self, guideList=None, *args):
         """ Remove pinGuide setup.
             We expect to have the scriptJob running here to clean-up the pin setup.
         """
-        if cmds.objExists(guideBase+".pinGuide"):
-            cmds.setAttr(guideBase+".pinGuide", 0)
+        if not guideList:
+            guideList = [guide for guide in cmds.ls(selection=False, type="transform") if "pinGuide" in cmds.listAttr(guide)]
+        if guideList:
+            for guide in guideList:
+                cmds.setAttr(guide+".pinGuide", 0)
 
 
     def storeLockedList(self, ctrlName, *args):
