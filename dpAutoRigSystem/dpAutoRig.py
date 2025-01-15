@@ -968,7 +968,7 @@ class Start(object):
         """
         # Duplicating a module guide
         print(self.lang['i067_duplicating'])
-
+        self.utils.setProgress("dpAutoRigSystem", self.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
         # declaring variables
         nSegmentsAttr = "nJoints"
         customNameAttr = "customName"
@@ -992,7 +992,7 @@ class Start(object):
         thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
         moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
         moduleDir = moduleDir[moduleDir.find(".")+1:]
-
+        self.utils.setProgress(self.lang['i067_duplicating'])
         # initializing a new module instance
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
@@ -1004,39 +1004,41 @@ class Start(object):
         
         # getting a good attribute list
         toSetAttrList = cmds.listAttr(selectedItem)
+        currentAttrList = toSetAttrList.copy()
         guideBaseAttrIdx = toSetAttrList.index(self.guideBaseAttr)
         toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
         toSetAttrList.remove(self.guideBaseAttr)
         toSetAttrList.remove(self.moduleNamespaceAttr)
         toSetAttrList.remove(customNameAttr)
         toSetAttrList.remove(mirrorAxisAttr)
-        
         # check for special attributes
-        if nSegmentsAttr in cmds.listAttr(selectedItem):
+        if nSegmentsAttr in currentAttrList:
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
             if nJointsValue > 0:
                 newGuideInstance.changeJointNumber(nJointsValue)
-        if customNameAttr in cmds.listAttr(selectedItem):
+        self.utils.setProgress(self.lang['i067_duplicating'])
+        if customNameAttr in currentAttrList:
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
             if customNameValue != "" and customNameValue != None:
                 newGuideInstance.editGuideModuleName(customNameValue)
-        if mirrorAxisAttr in cmds.listAttr(selectedItem):
+        self.utils.setProgress(self.lang['i067_duplicating'])
+        if mirrorAxisAttr in currentAttrList:
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
             if mirroirAxisValue != "off":
                 newGuideInstance.changeMirror(mirroirAxisValue)
-        if dispAnnotAttr in cmds.listAttr(selectedItem):
+        if dispAnnotAttr in currentAttrList:
             toSetAttrList.remove(dispAnnotAttr)
             currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
             newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
-        if netAttr in cmds.listAttr(selectedItem):
+        if netAttr in currentAttrList:
             toSetAttrList.remove(netAttr)
         
         # TODO: change to unify style and type attributes        
-        if "type" in cmds.listAttr(selectedItem):
+        if "type" in currentAttrList:
             typeValue = cmds.getAttr(selectedItem+'.type')
             newGuideInstance.changeType(typeValue)
-        if "style" in cmds.listAttr(selectedItem):
+        if "style" in currentAttrList:
             styleValue = cmds.getAttr(selectedItem+'.style')
             newGuideInstance.changeStyle(styleValue)
         
@@ -1074,6 +1076,7 @@ class Start(object):
 
         cmds.delete(selectedItem)
         print(self.lang['r006_wellDone']+" "+newGuideName)
+        self.utils.setProgress(endIt=True)
         return newGuideName
 
         

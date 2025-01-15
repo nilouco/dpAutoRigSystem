@@ -13,6 +13,7 @@ import time
 import getpass
 import datetime
 import stat
+import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
@@ -244,19 +245,19 @@ class Utils(object):
             Return the normalized text.
         """
         normalText = ""
+        enteredText = ''.join(c for c in unicodedata.normalize('NFD', enteredText) if unicodedata.category(c) != 'Mn') #strip accents
         # analisys if it starts with number or has a whitespace or special character:
-        if re.match("[0-9]", enteredText) or re.search("\s", enteredText[:len(enteredText)-1]) or re.search("\W", enteredText):
+        if re.match("[0-9]", enteredText[0]): #starts with number
             return normalText
-        # just add a underscore at the end for one character entered:
-        #elif len(enteredText) == 1 and enteredText != " " and enteredText != "_":
-        #    normalText = enteredText+"_"
-        # edit this to have only a maximum of 'prefixMax' digits:
         else:
-            if len(enteredText) < prefixMax:
-                prefixMax = len(enteredText)
-            for m in range(0, prefixMax):
-                if enteredText[m] != " " and enteredText[m] != "_":
-                    normalText = enteredText[:m+1]
+            #if re.search("\s", enteredText[:len(enteredText)-1]): #has space
+            enteredText = enteredText.replace(" ", "_")
+            while re.search("\W", enteredText): #special character
+                span = re.search("\W", enteredText).span()[0]
+                enteredText = enteredText[:span]+"_"+enteredText[span+1:]
+            if not len(enteredText) < prefixMax:
+                enteredText = enteredText[:prefixMax]
+            normalText = enteredText
         return normalText
 
 

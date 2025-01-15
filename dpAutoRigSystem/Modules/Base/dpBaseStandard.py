@@ -223,18 +223,22 @@ class BaseStandard(object):
                 if suffixNumberList[1]:
                     baseName = suffixNumberList[1]
                 dpAR_nameList = []
-                allTransformList = cmds.ls(selection=False, transforms=True)
-                for transform in allTransformList:
-                    if "dpAR_name" in cmds.listAttr(transform):
-                        currentName = cmds.getAttr(transform+".dpAR_name")
-                        if baseName == self.utils.getSuffixNumberList(currentName)[1]:
-                            dpAR_nameList.append(currentName)
-                    if "customName" in cmds.listAttr(transform):
-                        currentName = cmds.getAttr(transform+".customName")
-                        if currentName:
+                transformList = cmds.ls(selection=False, transforms=True)
+                guideBaseList = [guide for guide in transformList if guide.endswith(self.dpUIinst.guideBaseName)] or []
+                guideBaseList.extend([staticGrp for staticGrp in transformList if "staticHook" in cmds.listAttr(staticGrp)])
+                if guideBaseList:
+                    for transform in guideBaseList:
+                        transformAttrList = cmds.listAttr(transform)
+                        if "dpAR_name" in transformAttrList:
+                            currentName = cmds.getAttr(transform+".dpAR_name")
                             if baseName == self.utils.getSuffixNumberList(currentName)[1]:
-                                if not currentName in dpAR_nameList:
-                                    dpAR_nameList.append(currentName)
+                                dpAR_nameList.append(currentName)
+                        if "customName" in transformAttrList:
+                            currentName = cmds.getAttr(transform+".customName")
+                            if currentName:
+                                if baseName == self.utils.getSuffixNumberList(currentName)[1]:
+                                    if not currentName in dpAR_nameList:
+                                        dpAR_nameList.append(currentName)
                 if dpAR_nameList:
                     if self.customName in dpAR_nameList:
                         for n in range(1, len(dpAR_nameList)+2):
@@ -251,7 +255,7 @@ class BaseStandard(object):
                 cmds.setAttr(self.annotation+".text", self.customName, type='string')
                 # set userGuideName:
                 self.userGuideName = self.customName
-    
+                
 
     def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
         """ Create the correction manager network node and returns it.
