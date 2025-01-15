@@ -525,22 +525,21 @@ class BaseLayout(object):
         if cmds.objExists(self.previewMirrorGrpName):
             cmds.delete(self.previewMirrorGrpName)
         
-        # verify if there is not any guide module in the guideMirrorGrp and then delete it:
-        self.guideMirrorGrp = self.dpUIinst.guideMirrorGrp
-        self.utils.clearNodeGrp(self.guideMirrorGrp, 'guideBaseMirror', unparent=False)
+        # verify if there is not any guide module in the dpUIinst.guideMirrorGrp and then delete it:
+        self.utils.clearNodeGrp(self.dpUIinst.guideMirrorGrp, 'guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
         guideChildrenList = self.utils.getGuideChildrenList(self.moduleGrp)
         
         self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
         if self.mirrorAxis != 'off':
-            if not cmds.objExists(self.guideMirrorGrp):
-                self.guideMirrorGrp = cmds.group(name=self.guideMirrorGrp, empty=True)
-                cmds.addAttr(self.guideMirrorGrp, longName="selectionChanges", defaultValue=0, attributeType="byte")
-                cmds.setAttr(self.guideMirrorGrp+".template", 1)
-                cmds.setAttr(self.guideMirrorGrp+".hiddenInOutliner", 1)
+            if not cmds.objExists(self.dpUIinst.guideMirrorGrp):
+                self.dpUIinst.guideMirrorGrp = cmds.group(name=self.dpUIinst.guideMirrorGrp, empty=True)
+                cmds.addAttr(self.dpUIinst.guideMirrorGrp, longName="selectionChanges", defaultValue=0, attributeType="byte")
+                cmds.setAttr(self.dpUIinst.guideMirrorGrp+".template", 1)
+                cmds.setAttr(self.dpUIinst.guideMirrorGrp+".hiddenInOutliner", 1)
                 for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v']:
-                    cmds.setAttr(self.guideMirrorGrp+"."+attr, lock=True, keyable=False)
+                    cmds.setAttr(self.dpUIinst.guideMirrorGrp+"."+attr, lock=True, keyable=False)
                         
             if not cmds.objExists(self.previewMirrorGrpName):
                 if guideChildrenList:
@@ -635,7 +634,7 @@ class BaseLayout(object):
                 self.previewMirrorGrp = cmds.group(name=self.previewMirrorGrpName, empty=True)
                 cmds.parent( self.previewMirrorGuide, self.previewMirrorGrpName, absolute=True )
                 # parent the previewMirror group to the guideMirror group:
-                cmds.parent(self.previewMirrorGrp, self.guideMirrorGrp, relative=True)
+                cmds.parent(self.previewMirrorGrp, self.dpUIinst.guideMirrorGrp, relative=True)
                 
                 # add attributes to be read as mirror guide when re-creating this module:
                 cmds.addAttr(self.previewMirrorGrp, longName='guideBaseMirror', attributeType='bool')
