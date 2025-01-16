@@ -152,6 +152,7 @@ class Start(object):
         self.loadedCheckIn = False
         self.loadedCheckOut = False
         self.loadedAddOns = False
+        self.loadedFinishing = False
         self.loadedRebuilder = False
         self.loadedStart = False
         self.loadedSource = False
@@ -167,6 +168,7 @@ class Start(object):
         self.checkInInstanceList = []
         self.checkOutInstanceList = []
         self.checkAddOnsInstanceList = []
+        self.checkFinishingInstanceList = []
         self.rebuilderInstanceList = []
         self.degreeOption = 0
         self.userDefAutoCheckUpdate = 1
@@ -749,6 +751,17 @@ class Start(object):
                 self.allUIs["selectedCheckAddOnsPL"] = cmds.paneLayout("selectedCheckAddOnsPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOnsPL"])
                 self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOnsPL"])
+        # pipeline check-finishing
+        if self.pipeliner.pipeData['finishingPath']:
+            if self.getValidatorsAddOns("finishingPath"):
+                cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+                self.allUIs["validatorFinishingLayout"] = cmds.frameLayout('validatorFinishingLayout', label=self.lang['i354_finishing'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+                self.startGuideModules("", "start", "validatorFinishingLayout", path=self.pipeliner.pipeData['finishingPath'])
+                cmds.separator(style="none", parent=self.allUIs["validatorFinishingLayout"])
+                self.allUIs["selectAllFinishingCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i354_finishing'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkFinishingInstanceList), parent=self.allUIs["validatorFinishingLayout"])
+                self.allUIs["selectedCheckFinishingPL"] = cmds.paneLayout("selectedCheckFinishingPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorFinishingLayout"])
+                self.allUIs["verifyAllSelectFinishingBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkFinishingInstanceList, True, True), parent=self.allUIs["selectedCheckFinishingPL"])
+                self.allUIs["fixAllSelectFinishingBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkFinishingInstanceList, False, True), parent=self.allUIs["selectedCheckFinishingPL"])
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
@@ -911,7 +924,7 @@ class Start(object):
     def resetAllButtonColors(self, *args):
         """ Just reset the button colors to default for each validator or rebuilder module.
         """
-        buttonInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList + self.rebuilderInstanceList
+        buttonInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList + self.checkFinishingInstanceList + self.rebuilderInstanceList
         if buttonInstanceList:
             for item in buttonInstanceList:
                 item.resetButtonColors()
@@ -1360,9 +1373,13 @@ class Start(object):
             if guideDir == self.customFolder and not self.loadedCustom:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCustom = True
-            if guideDir == "" and not self.loadedAddOns:
-                print(path+" : "+str(guideModuleList))
-                self.loadedAddOns = True
+            if guideDir == "":
+                if not "Finishing" in layout and not self.loadedAddOns:
+                    print(path+" : "+str(guideModuleList))
+                    self.loadedAddOns = True
+                elif not self.loadedFinishing:
+                    print(path+" : "+str(guideModuleList))
+                    self.loadedFinishing = True
         return guideModuleList
     
     
@@ -1434,7 +1451,10 @@ class Start(object):
                 elif guideDir == self.checkOutFolder.replace("/", "."):
                     self.checkOutInstanceList.append(validatorInstance)
                 else: #addOns
-                    self.checkAddOnsInstanceList.append(validatorInstance)
+                    if "Finishing" in layout: #workaround to define this module as finishing addOn to run after all.
+                        self.checkFinishingInstanceList.append(validatorInstance)
+                    else:
+                        self.checkAddOnsInstanceList.append(validatorInstance)
                     if validatorInstance.customName:
                         cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
                         #validatorInstance.title = validatorInstance.customName
@@ -1694,11 +1714,11 @@ class Start(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-    def getValidatorsAddOns(self, *args):
+    def getValidatorsAddOns(self, path="addOnsPath", *args):
         """ Return a list of Validator's AddOns to load.
         """
-        if os.path.exists(self.pipeliner.pipeData['addOnsPath']):
-            return self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
+        if os.path.exists(self.pipeliner.pipeData[path]):
+            return self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData[path])
 
 
     def loadPipelineValidatorPresets(self, *args):
@@ -1713,7 +1733,7 @@ class Start(object):
     
     def setValidatorPreset(self, *args):
         self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
-        checkInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList
+        checkInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList + self.checkFinishingInstanceList
         if checkInstanceList:
             for presetKey in self.validatorPresetDic[self.validatorPresetName]:
                 for validatorModule in checkInstanceList:

@@ -152,6 +152,7 @@ class Publisher(object):
         toCheckValidatorList = self.dpUIinst.checkAddOnsInstanceList
         toCheckValidatorList.extend(self.dpUIinst.checkInInstanceList)
         toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
+        toCheckValidatorList.extend(self.dpUIinst.checkFinishingInstanceList)
         if toCheckValidatorList:
             validationResultDataList = self.dpUIinst.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue

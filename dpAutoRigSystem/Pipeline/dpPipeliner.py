@@ -149,7 +149,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2025-01-09",
+        "updated" : "2025-01-16",
         
         "f_drive"            : "",
         "f_studio"           : "",
@@ -159,6 +159,7 @@ class Pipeliner(object):
         "f_toClient"         : "Data/ToClient",
         "s_presets"          : "dpPresets",
         "s_addOns"           : "dpAddOns",
+        "s_finishing"        : "dpFinishing",
         "s_hist"             : self.dpUIinst.dpData+"/dpHist",
         "s_modelIO"          : self.dpUIinst.dpData+"/dpModel",
         "s_supportNodeIO"    : self.dpUIinst.dpData+"/dpSupportNode",
@@ -234,6 +235,7 @@ class Pipeliner(object):
         "f_toClient"         : "i233_fToClientAnn",
         "s_presets"          : "i234_sPresetsAnn",
         "s_addOns"           : "i235_sAddOnsAnn",
+        "s_finishing"        : "i353_sFinishingAnn",
         "s_hist"             : "i236_sHistAnn",
         "s_modelIO"          : "i293_sModelIOAnn",
         "s_supportNodeIO"    : "i302_sSetupGeometryIOAnn",
@@ -301,6 +303,7 @@ class Pipeliner(object):
             self.pipeData = self.pipeInfo
             self.pipeData['publishPath'] = False
             self.pipeData['addOnsPath'] = False
+            self.pipeData['finishingPath'] = False
             self.pipeData['presetsPath'] = False
             # getting pipeline settings
             self.pipeData['path'] = self.getPipelinePath()
@@ -338,6 +341,7 @@ class Pipeliner(object):
             if self.pipeInfo:
                 # mounting structured pipeline data
                 self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
+                self.pipeData['finishingPath'] = self.pipeData['path']+"/"+self.pipeData['s_finishing']
                 self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
             else:
                 self.pipeInfo = self.declareDefaultPipelineInfo()
@@ -543,9 +547,10 @@ class Pipeliner(object):
 
 
     def createPipelineInfoSubFolders(self, *args):
-        """ Create pipeline info addOnsPath and presetsPath sub folders if they don't exists.
+        """ Create pipeline info addOnsPath, finishingPath and presetsPath sub folders if they don't exists.
         """
         self.makeDirIfNotExists(self.pipeData['addOnsPath'])
+        self.makeDirIfNotExists(self.pipeData['finishingPath'])
         self.makeDirIfNotExists(self.pipeData['presetsPath'])
 
 

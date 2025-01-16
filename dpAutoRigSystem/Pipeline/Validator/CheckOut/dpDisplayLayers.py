@@ -8,7 +8,7 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-DP_DISPLAYLAYERS_VERSION = 1.4
+DP_DISPLAYLAYERS_VERSION = 1.5
 
 
 class DisplayLayers(dpBaseAction.ActionStartClass):
@@ -59,13 +59,13 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
                     self.extraLayerToDelete.append(layer)
             if not self.extraLayerToDelete:
                 if cmds.objExists(self.geoLayerName) and cmds.objExists(self.ctrlLayerName):
-                    layersConfigurationCheckList = [True, False, 2, True, True, 0]
+                    layersConfigurationCheckList = [True, True, 2, True, True, 0]
                     geoLyrVisibility = cmds.getAttr(self.geoLayerName+".visibility") #True
-                    geoLyrHideOnPlayback = cmds.getAttr(self.geoLayerName+".hideOnPlayback") #False
-                    geolLyrDisplayType = cmds.getAttr(self.geoLayerName+".displayType") #2
+                    geoLyrHideOnPlayback = cmds.getAttr(self.geoLayerName+".hideOnPlayback") #True
+                    geolLyrDisplayType = cmds.getAttr(self.geoLayerName+".displayType") #2 = ref
                     ctrlLyrVisibility = cmds.getAttr(self.ctrlLayerName+".visibility") #True
                     ctrlLyrHideOnPlayback = cmds.getAttr(self.ctrlLayerName+".hideOnPlayback") #True
-                    ctrlLyrDisplayType = cmds.getAttr(self.ctrlLayerName+".displayType") #0
+                    ctrlLyrDisplayType = cmds.getAttr(self.ctrlLayerName+".displayType") #0 = none
                     layersConfiguration = [geoLyrVisibility, geoLyrHideOnPlayback, geolLyrDisplayType, ctrlLyrVisibility, ctrlLyrHideOnPlayback, ctrlLyrDisplayType]
                     # Check layers configuration
                     if layersConfiguration == layersConfigurationCheckList:
@@ -136,14 +136,10 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
                 newLayer = cmds.rename(newLayer, layerName)
                 if geoType:
                     cmds.setAttr(newLayer+".displayType", 2)
-                else: #ctrl
-                    cmds.setAttr(newLayer+".hideOnPlayback", 1)
                 cmds.select(clear=True)
             else:
                 if geoType:
                     cmds.setAttr(layerName+".displayType", 2)
-                else: #ctrl
-                    cmds.setAttr(layerName+".hideOnPlayback", 1)
                 cmds.select(clear=True)
 
 
