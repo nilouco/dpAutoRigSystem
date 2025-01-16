@@ -247,6 +247,7 @@ class Zipper(object):
         cmds.addAttr(self.zipperCtrl, longName=initialDistanceAttr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipperCtrl, longName=distanceAttr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipperCtrl, longName=rigScaleAttr, attributeType='float', defaultValue=1)
+        self.ctrls.setStringAttrFromList(self.zipperCtrl, [autoCalibrateMinAttr, autoCalibrateMaxAttr])
         
         ctrlGrp = cmds.group(self.zipperCtrl, name=self.zipperName+"_Control_Grp")
         self.toIDList.append(ctrlGrp)
