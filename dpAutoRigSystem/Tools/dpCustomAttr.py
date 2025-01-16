@@ -214,7 +214,7 @@ class CustomAttr(object):
             cmds.separator(style='none', height=5, parent=addAttrLayout)
         cmds.separator(style='in', height=10, parent=addAttrLayout)
         cmds.text("customAddTxt", label=self.dpUIinst.lang['m212_customAttr']+":", align="left", height=30, parent=addAttrLayout)
-        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustomAttrTFG", label="", text="", buttonLabel=self.dpUIinst.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom", False), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
+        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustomAttrTFG", label="", text="", buttonLabel=self.dpUIinst.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom"), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
         cmds.showWindow(self.addWindowName)
 
 
@@ -260,7 +260,6 @@ class CustomAttr(object):
                                         attr = attr[:point]+attr[point].capitalize()+attr[point+1:]
                                 else:
                                     attr = None
-                                cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
                     elif attrIndex == 0: #dpID
                         #if not cmds.objExists(item+"."+ATTR_DPID):
                         #if not ATTR_DPID in (cmds.listAttr(item, userDefined=True) or []):
@@ -276,6 +275,8 @@ class CustomAttr(object):
                         if not cmds.attributeQuery(attr, node=item, exists=True):
                             cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
                             cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
+            if self.ui:
+                cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
 
 
     def removeAttrUI(self, *args):
