@@ -937,6 +937,8 @@
     "v092_unlockAttributes"       : "Unlock attributs",
     "v093_unlockAttributesDesc"   : "Ce validateur vérifiera et va faire l'unlock des attributs.",
     "v094_envelopeChecker"        : "Vérificateur d'enveloppe",
-    "v095_envelopeCheckerDesc"    : "Ce validateur vérifie les attributs d'enveloppe inférieurs à un."
+    "v095_envelopeCheckerDesc"    : "Ce validateur vérifie les attributs d'enveloppe inférieurs à un.",
+    "v096_cleanup"                : "Cleanup",
+    "v097_cleanupDesc"            : "Ce validateur vérifie les attributs de dpDeleteIt et éfface leur nodes."
 
 }

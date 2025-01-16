@@ -3,23 +3,24 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "ExitEditMode"
-TITLE = "v034_exitEditMode"
-DESCRIPTION = "v035_exitEditModeDesc"
-ICON = "/Icons/dp_exitEditMode.png"
+CLASS_NAME = "Cleanup"
+TITLE = "v096_cleanup"
+DESCRIPTION = "v097_cleanupDesc"
+ICON = "/Icons/dp_cleanup.png"
 
-DP_EXITEDITMODE_VERSION = 1.3
+DP_CLEANUP_VERSION = 1.0
 
 
-class ExitEditMode(dpBaseAction.ActionStartClass):
+class Cleanup(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_EXITEDITMODE_VERSION
+        self.version = DP_CLEANUP_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        self.cleanupAttr = "dpDeleteIt"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -41,34 +42,29 @@ class ExitEditMode(dpBaseAction.ActionStartClass):
         if objList:
             toCheckList = objList
         else:
-            toCheckList = self.dpUIinst.ctrls.getControlList()
+            toCheckList = cmds.ls() #all
         if toCheckList:
             self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             for item in toCheckList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                # conditional to check here
-                if "editMode" in cmds.listAttr(item):
-                    if cmds.getAttr(item+".editMode") == 1:
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                # delete the corrective script job
-                                self.dpUIinst.ctrls.deleteOldJobs(item)
-                                # remove color override
-                                shapeList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
-                                if shapeList:
-                                    for shapeNode in shapeList:
-                                        cmds.setAttr(shapeNode+".overrideRGBColors", 0)
-                                # set edit mode off
-                                cmds.setAttr(item+".editMode", 0)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                            except:
+                if cmds.objExists(item):
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    # conditional to check here
+                    if self.cleanupAttr in cmds.listAttr(item):
+                        if cmds.getAttr(item+"."+self.cleanupAttr) == 1:
+                            self.checkedObjList.append(item)
+                            self.foundIssueList.append(True)
+                            if self.firstMode:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                            else: #fix
+                                try:
+                                    # delete the node
+                                    cmds.lockNode(item, lock=False)
+                                    cmds.delete(item)
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
         else:
             self.notFoundNodes()
         # --- validator code --- end
