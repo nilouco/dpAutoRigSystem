@@ -11,7 +11,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.4
+DP_PROXYCREATOR_VERSION = 1.5
 
 
 class ProxyCreator(dpBaseAction.ActionStartClass):
@@ -52,7 +52,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
                 if cmds.objExists("Proxy_Grp"):
                     proxyGrp = "Proxy_Grp"
         if proxyGrp:
-            if not cmds.objExists(proxyGrp+"."+PROXIED):
+            if not PROXIED in cmds.listAttr(proxyGrp):
                 meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
                 if not meshList:
                     renderGrp = self.utils.getNodeByMessage("renderGrp")
@@ -69,8 +69,8 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
                             meshTransform = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
                             if meshTransform:
                                 if not meshTransform[0] in toProxyList:
-                                    if not cmds.objExists(meshTransform[0]+"."+NO_PROXY):
-                                        if not cmds.objExists(meshTransform[0]+"."+PROXIED):
+                                    if not NO_PROXY in cmds.listAttr(meshTransform):
+                                        if not PROXIED in cmds.listAttr(meshTransform):
                                             toProxyList.append(meshTransform[0])
                     if toProxyList:
                         self.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
@@ -189,9 +189,9 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
 
 
     def proxyIntegration(self, grp, *args):
-        """ Add attributes, connect to deformer envelopes if possible to disable them and 
+        """ Add attributes, connect to deformer nodeState if possible to disable them in order to get performance.
         """
-        if not cmds.objExists(grp+"."+PROXIED):
+        if not PROXIED in cmds.listAttr(grp):
             cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
         optionCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optionCtrl:
@@ -208,7 +208,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
             if deformerList:
                 for deformNode in deformerList:
                     try:
-                        cmds.connectAttr(optionCtrl+".proxyRevOutput", deformNode+".envelope") #don't force it please
+                        cmds.connectAttr(optionCtrl+".proxy", deformNode+".nodeState") #don't force it please
                     except:
                         pass #maybe it already has a connection from another node
             # hide controllers and meshes
@@ -225,7 +225,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
         """
         if attr or suffixName:
             if attr:
-                if cmds.objExists(ctrl+"."+attr):
+                if attr in cmds.listAttr(ctrl):
                     connectList = cmds.listConnections(ctrl+"."+attr, source=False, destination=True, plugs=True) #list before connect on it
                     visMD = cmds.createNode("multiplyDivide", name="Proxy_"+(attr[0].upper()+attr[1:])+"_Vis_MD")
                     cmds.connectAttr(ctrl+".proxyRevOutput", visMD+".input1X", force=True)
