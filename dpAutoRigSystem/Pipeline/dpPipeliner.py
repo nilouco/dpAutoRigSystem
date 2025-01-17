@@ -326,7 +326,6 @@ class Pipeliner(object):
                     self.pipeData['f_drive'] = ""
                     self.pipeData['f_studio'] = ""
                     self.pipeData['f_project'] = ""
-                    self.pipeData['f_wipPath'] = ""
                     self.pipeData['projectPath'] = ""
                     self.pipeData['path'] = ""
                     self.pipeData['wipPath'] = self.pipeData['mayaProject']+"/"+self.pipeData['f_wip']
