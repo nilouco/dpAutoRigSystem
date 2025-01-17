@@ -356,6 +356,9 @@ class Start(object):
         """
         cmds.optionVar(stringValue=('dpAutoRigLastDegreeOption', degreeOption))
         self.degreeOption = int(degreeOption[0])
+        for modInst in self.moduleInstancesList:
+            if "degree" in cmds.listAttr(modInst.moduleGrp):
+                cmds.setAttr(modInst.moduleGrp+".degree", self.degreeOption)
     
     
     def mainUI(self):
@@ -514,8 +517,8 @@ class Start(object):
         self.degreeOptionMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
         # verify if there is an optionVar of last choosen by user in Maya system:
         lastDegreeOption = self.checkLastOptionVar("dpAutoRigLastDegreeOption", "0 - Preset", self.degreeOptionMenuItemList)
-        for degreeOption in self.degreeOptionMenuItemList:
-            cmds.menuItem(label=degreeOption, parent=self.degreeOptionMenu)
+        for degOpt in self.degreeOptionMenuItemList:
+            cmds.menuItem(label=degOpt, parent=self.degreeOptionMenu)
         cmds.optionMenu(self.degreeOptionMenu, edit=True, value=lastDegreeOption)
         cmds.text(self.lang['i128_optionDegree'], parent=self.allUIs["degreeLayout"])
         self.degreeOption = int(lastDegreeOption[0])

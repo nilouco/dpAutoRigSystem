@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-01-16",
+    "_updated"       : "2025-01-17",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -229,7 +229,7 @@
     "i062_notFound"             : "Not found",
     "i063_skinAddBtn"           : "Add",
     "i064_skinRemBtn"           : "Remove",
-    "i065_colorizeCtrl"         : "Colorize controls",
+    "i065_colorizeCtrl"         : "Colorize controllers",
     "i066_addAttr"              : "Add supplementary attributes",
     "i067_duplicating"          : "Duplicating a module guide.",
     "i068_CtrlD"                : "Ctrl + D",
