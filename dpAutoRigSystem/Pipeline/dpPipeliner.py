@@ -686,21 +686,23 @@ class Pipeliner(object):
             return max(numberList)+1
     
 
-    def getRigWIPVersion(self, *args):
+    def getRigWIPVersion(self, shortName=None, *args):
         """ Find the rig version by scene name and return it.
         """
         rigWipVersion = 0
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
+        if not shortName:
+            shortName = cmds.file(query=True, sceneName=True, shortName=True)
         if self.pipeData['s_rig'] in shortName:
             rigWipVersion = shortName[shortName.rfind(self.pipeData['s_rig'])+len(self.pipeData['s_rig']):shortName.rfind(".")]
         return rigWipVersion
 
 
-    def getModelVersion(self, *args):
+    def getModelVersion(self, shortName=None, *args):
         """ Find the model version by scene name and return it.
         """
         modelVersion = 0
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
+        if not shortName:
+            shortName = cmds.file(query=True, sceneName=True, shortName=True)
         if self.pipeData['s_model'] in shortName:
             modelVersion = shortName[shortName.rfind(self.pipeData['s_model'])+len(self.pipeData['s_model']):shortName.rfind(self.pipeData['s_rig'])]
         return modelVersion
@@ -889,6 +891,7 @@ class Pipeliner(object):
                 if assetList:
                     if mode == 1: #replaceData exclude the current asset from given list to chose.
                         assetList.remove(self.pipeData['assetName'])
+                    assetList.sort()
                     # Load UI to choose one asset to define the file to use
                     self.selectAssetFromListUI(assetList, path, mode)
                     return
@@ -993,6 +996,19 @@ class Pipeliner(object):
             cmds.text(self.saveVersionPreviewTxt, edit=True, label=previewSaveVersionFileName)
         return self.saveVersionPreviewTxt
         
+
+    def getNextFileVersionName(self, existingFile=True, *args):
+        """ Concatenate asset info to compose rig version file name to save.
+        """
+        if existingFile and "wipPath" in list(self.pipeData.keys()):
+            path = self.pipeData['wipPath']+"/"+self.pipeData['assetName']
+            modelVersionValue = str(int(self.getModelVersion(self.getLatestFile(path))))
+            rigVersionValue = str(int(self.getRigWIPVersion(self.getLatestFile(path)))+1)
+        else:
+            modelVersionValue = str(int(self.getModelVersion()))
+            rigVersionValue = str(int(self.getRigWIPVersion())+1)
+        return self.pipeData['assetPath']+"/"+self.pipeData['assetName']+self.pipeData['s_model']+modelVersionValue.zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+rigVersionValue.zfill(self.pipeData['i_padding'])+self.pipeData['extension']
+    
 
     def createNewAssetUI(self, *args):
         """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.

@@ -168,7 +168,8 @@ class ActionStartClass(object):
         buttonLabel = self.getLatestExportedData()
         buttonCommand = self.dpUIinst.packager.openFolder
         buttonArgument = self.ioPath
-        cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument]))
+        if cmds.iconTextButton(self.infoITB, query=True, exists=True):
+            cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument]))
 
 
     def getLatestExportedData(self, *args):
@@ -510,7 +511,7 @@ class ActionStartClass(object):
     def updateDeleteDataButton(self, *args):
         """ Check if there's some exported data for this module and update the delete data button as enable or disable.
         """
-        if self.ioDir:
+        if self.ioDir and cmds.iconTextButton(self.deleteDataITB, query=True, exists=True):
             if self.getExportedList(askHasData=True):
                 cmds.iconTextButton(self.deleteDataITB, edit=True, enable=True)
             else:

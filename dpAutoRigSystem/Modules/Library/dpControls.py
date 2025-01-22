@@ -1025,7 +1025,7 @@ class ControlClass(object):
                                 tempList.append(fatherNode)
                 if tempList:
                     bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
-                    bbList[1] *= 0.5 #less importance to height
+                    bbList[1] *= 0.75 #less importance to height
                     bbAverage = self.dpUIinst.utils.averageValue(bbList)
                     resultValue = magicNumber*bbAverage*origRadius
                     if resultValue:

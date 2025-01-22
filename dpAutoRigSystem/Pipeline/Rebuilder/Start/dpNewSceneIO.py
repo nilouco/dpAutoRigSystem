@@ -49,7 +49,7 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
             else: #import
                 self.dpUIinst.rebuilding = True
                 try:
-                    # start a new asset context clean scene
+                    # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
                     self.wellDoneIO(self.pipeliner.pipeData["assetName"])
                 except Exception as e:
