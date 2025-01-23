@@ -235,9 +235,9 @@ class Start(object):
         #cmds.scriptJob(event=('SceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
         #cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
-        cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
-        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
         cmds.scriptJob(event=('workspaceChanged', self.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         self.ctrls.startCorrectiveEditMode()
         self.jobSelectedGuide()
 
@@ -847,7 +847,7 @@ class Start(object):
         cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
     
     
-    def refreshMainUI(self, savedScene=False, *args):
+    def refreshMainUI(self, savedScene=False, resetButtons=True, *args):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
@@ -860,7 +860,8 @@ class Start(object):
         self.populateJoints()
         self.populateGeoms()
         if not self.rebuilding:
-            self.resetAllButtonColors()
+            if resetButtons:
+                self.resetAllButtonColors()
             self.pipeliner.refreshAssetData()
             for rebuildInstance in self.rebuilderInstanceList:
                 rebuildInstance.updateActionButtons(color=False)
