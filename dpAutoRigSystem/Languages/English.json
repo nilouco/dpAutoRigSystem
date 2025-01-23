@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-01-17",
+    "_updated"       : "2025-01-23",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -940,5 +940,6 @@
     "v094_envelopeChecker"        : "Envelope checker",
     "v095_envelopeCheckerDesc"    : "This validator check for envelope attributes lower than one.",
     "v096_cleanup"                : "Cleanup",
-    "v097_cleanupDesc"            : "This validator check for dpDeleteIt attributes and delete their nodes."
+    "v097_cleanupDesc"            : "This validator check for dpDeleteIt attributes and delete their nodes.",
+    "v098_askUserChooseFile"      : "Now we have two rigging files:\n\n1 - WIP = work in progress\n2 - Published = validated\n\nWhich file do you want to open?"
 }

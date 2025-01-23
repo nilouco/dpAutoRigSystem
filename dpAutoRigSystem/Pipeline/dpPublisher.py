@@ -327,6 +327,7 @@ class Publisher(object):
                     self.successPublishedWindow(publishFileName)
                 self.utils.setProgress(endIt=True)
                 self.utils.closeUI('dpPublisherWindow')
+                self.askUserChooseFile(publishFileName)
 
             else:
                 mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')
@@ -348,6 +349,18 @@ class Publisher(object):
         if raison:
             self.dpUIinst.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
             mel.eval('warning \"'+raison+'\";')
+
+
+    def askUserChooseFile(self, publishFileName, *args):
+        """ Ask user witch file want to open:
+            1 - WIP file
+            2 - Published file
+        """
+        optWip = "1 - "+self.pipeliner.pipeData['shortName']
+        optPub = "2 - "+publishFileName
+        result = cmds.confirmDialog(title=self.publisherName, message=self.dpUIinst.lang['v098_askUserChooseFile'], button=[optWip, optPub], defaultButton=optPub, cancelButton=optPub, dismissString=optPub)
+        if result == optWip:
+            cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
 
 
     def successPublishedWindow(self, publishedFile, *args):
