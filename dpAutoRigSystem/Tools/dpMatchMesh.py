@@ -1,15 +1,15 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from maya import OpenMaya as om
+from maya import OpenMaya
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "MatchMesh"
 TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
 
-DP_MATCHMESH_VERSION = 2.0
+DP_MATCHMESH_VERSION = 3.0
 
 
 class MatchMesh(object):
@@ -24,9 +24,6 @@ class MatchMesh(object):
     def dpMatchMesh(self, *args):
         """ Get selection and transfere vertices information.
         """
-        # declaring variables
-        fromTransformDic, toTransformDic = {}, {}
-        
         # get a list of selected items
         selList = cmds.ls(selection=True)
         
@@ -34,27 +31,9 @@ class MatchMesh(object):
             cmds.warning(self.dpUIinst.lang['i040_notMatchSel'])
         else:
             # declaring current variables
-            fromFather = None
-            fromTransform = selList[0]
-            toTransform = selList[1]
             fromMesh = selList[0]
             toMesh = selList[1]
             gotMeshes = True
-            
-            # getting transforms
-            if cmds.objectType(selList[0]) != "transform":
-                parentList = cmds.listRelatives(selList[0], allParents=True, type="transform")
-                if parentList:
-                    fromTransform = parentList[0]
-            if cmds.objectType(selList[1]) != "transform":
-                parentList = cmds.listRelatives(selList[1], allParents=True, type="transform")
-                if parentList:
-                    toTransform = parentList
-            
-            # getting fromTransform father
-            fromFatherList = cmds.listRelatives(fromTransform, allParents=True, type="transform")
-            if fromFatherList:
-                fromFather = fromFatherList[0]
             
             # getting meshes
             if cmds.objectType(selList[0]) != "mesh":
@@ -71,49 +50,29 @@ class MatchMesh(object):
                     gotMeshes = False
             
             if gotMeshes:
-                # storing transformation data
-                for attr in self.dpUIinst.transformAttrList[:-1]:
-                    fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
-                    toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
-                
                 # get list of mesh vertices proccess
                 # selecting meshes
                 cmds.select([fromMesh, toMesh])
-                meshList = om.MSelectionList()
-                om.MGlobal.getActiveSelectionList(meshList)
+                meshList = OpenMaya.MSelectionList()
+                OpenMaya.MGlobal.getActiveSelectionList(meshList)
                 
                 # declaring from and to objects, dagPaths and vertice lists
-                fromObject = om.MObject()
-                fromDagPath = om.MDagPath()
-                toObject = om.MObject()
-                toDagPath = om.MDagPath()
-                fromVerticeList = om.MPointArray()
-                toVerticeList = om.MPointArray()
+                fromObject = OpenMaya.MObject()
+                fromDagPath = OpenMaya.MDagPath()
+                toObject = OpenMaya.MObject()
+                toDagPath = OpenMaya.MDagPath()
+                fromVerticeList = OpenMaya.MPointArray()
+                toVerticeList = OpenMaya.MPointArray()
                 
                 # getting dagPaths
                 meshList.getDagPath(0, fromDagPath, fromObject)
                 meshList.getDagPath(1, toDagPath, toObject)
                 # getting open maya API mesh
-                fromMeshFn = om.MFnMesh(fromDagPath)
-                toMeshFn = om.MFnMesh(toDagPath)
+                fromMeshFn = OpenMaya.MFnMesh(fromDagPath)
+                toMeshFn = OpenMaya.MFnMesh(toDagPath)
                 
                 # verify the same number of vertices
                 if fromMeshFn.numVertices() == toMeshFn.numVertices():
-                    # put fromTransform in the same location then toTransform
-                    if fromFather != None:
-                        cmds.parent(fromTransform, world=True)
-                    for attr in self.dpUIinst.transformAttrList[:-1]:
-                        cmds.setAttr(fromTransform+"."+attr, lock=False)
-                        cmds.setAttr(toTransform+"."+attr, lock=False)
-                        if not "s" in attr:
-                            cmds.setAttr(fromTransform+"."+attr, 0)
-                            cmds.setAttr(toTransform+"."+attr, 0)
-                        else:
-                            cmds.setAttr(fromTransform+"."+attr, 1)
-                            cmds.setAttr(toTransform+"."+attr, 1)
-                    tempToDeleteA = cmds.parentConstraint(fromTransform, toTransform, maintainOffset=False)
-                    tempToDeleteB = cmds.scaleConstraint(fromTransform, toTransform, maintainOffset=False)
-                    cmds.delete(tempToDeleteA, tempToDeleteB)
                     
                     # getting vertices as points
                     fromMeshFn.getPoints(fromVerticeList)
@@ -135,14 +94,7 @@ class MatchMesh(object):
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
                     
                     self.utils.setProgress(endIt=True)
-                    
-                    if fromFather != None:
-                        cmds.parent(fromTransform, fromFather)
-                    # restore transformation data
-                    for attr in self.dpUIinst.transformAttrList[:-1]:
-                        cmds.setAttr(fromTransform+"."+attr, fromTransformDic[attr])
-                        cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
-                    
+
                     if not cancelled:
                         cmds.select(selList)
                         self.dpUIinst.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
