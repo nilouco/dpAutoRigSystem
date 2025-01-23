@@ -34,10 +34,11 @@ class Pipeliner(object):
     def refreshAssetData(self, *args):
         """ Load the asset data from saved file in the pipeline.
         """
-        self.pipeData = self.getPipelineData()
-        self.getPipeFileName()
-        self.refreshProjectUI()
-        self.refreshAssetNameUI()
+        if not self.dpUIinst.rebuilding:
+            self.pipeData = self.getPipelineData()
+            self.getPipeFileName()
+            self.refreshProjectUI()
+            self.refreshAssetNameUI()
         
 
     def getToday(self, fullTime=False, *args):
@@ -814,6 +815,7 @@ class Pipeliner(object):
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=thisType, force=True)
             self.utils.closeUI("dpSaveVersionWindow")
+            self.dpUIinst.rebuilding = False
             self.refreshAssetData()
 
 
@@ -909,6 +911,7 @@ class Pipeliner(object):
                         if not savedScene:
                             savedScene = self.userSaveThisScene(False)
                         if savedScene:
+                            self.dpUIinst.rebuilding = False
                             cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
                 elif mode == 1: #replaceData
                     # Open UI to select each desired module dpData to replace from
@@ -1051,6 +1054,7 @@ class Pipeliner(object):
                 cmds.file(rename=self.newAssetFile)
                 cmds.file(save=True, type="mayaAscii", force=True)
                 self.utils.closeUI("dpNewAssetWindow")
+                self.dpUIinst.rebuilding = False
                 self.refreshAssetData()
             else:
                 cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i349_alreadyExistsAsset'], button="Ok")
