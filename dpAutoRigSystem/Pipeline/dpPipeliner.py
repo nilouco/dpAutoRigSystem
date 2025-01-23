@@ -239,7 +239,7 @@ class Pipeliner(object):
         "s_finishing"        : "i353_sFinishingAnn",
         "s_hist"             : "i236_sHistAnn",
         "s_modelIO"          : "i293_sModelIOAnn",
-        "s_supportNodeIO"    : "i302_sSetupGeometryIOAnn",
+        "s_supportNodeIO"    : "i302_sSupportNodeIOAnn",
         "s_blendShapeIO"     : "i309_sBlendShapeIOAnn",
         "s_shaderIO"         : "i294_sShaderIOAnn",
         "s_guideIO"          : "i295_sGuideIOAnn",
@@ -1067,7 +1067,7 @@ class Pipeliner(object):
         """
         defaultList = [
             "modelIO",
-            "setupGeometryIO",
+            "supportNodeIO",
             "blendShapeIO",
             "shaderIO",
             "guideIO",

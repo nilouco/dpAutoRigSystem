@@ -464,7 +464,7 @@
     "i299_notUniqueName"        : "Não tem único nome para esse node",
     "i300_sParentingIOAnn"      : "O diretório onde será exportado ou importado os dados de parent.",
     "i301_project"              : "Projeto",
-    "i302_sSetupGeometryIOAnn"  : "O diretório onde será exportado ou importado as geometrias usadas no setup.",
+    "i302_sSupportNodeIOAnn"    : "O diretório onde será exportado ou importado as geometrias usadas no setup.",
     "i303_asset"                : "Ativo",
     "i304_new"                  : "Novo",
     "i305_none"                 : "Nada",
