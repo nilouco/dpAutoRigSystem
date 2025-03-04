@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.1
+DP_UTILS_VERSION = 3.2
 
 
 class Utils(object):
@@ -1471,3 +1471,22 @@ class Utils(object):
                 # use a brute force to delete without permission:
                 os.chmod(filePath, stat.S_IWUSR)
                 os.remove(filePath)
+
+
+    def cleanupDeletedGuides(self, *args):
+        """ Check for broken guides by deleted base using keyboard.
+            Remove unused guide namespaces.
+            Return True if found a namespace without moduleGrp guide base or False if it's okay.
+        """
+        cleanned = False
+        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
+        if namespaceList:
+            for n in namespaceList:
+                if "__dpAR" in n:
+                    if not cmds.objExists(n+":Guide_Base"):
+                        if cmds.objExists(n+":Guide_Base_WorldSize_Ref"):
+                            cmds.delete(n+":Guide_Base_WorldSize_Ref")
+                        cmds.namespace(moveNamespace=(n, ':'), force=True)
+                        cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
+                        cleanned = True
+        return cleanned

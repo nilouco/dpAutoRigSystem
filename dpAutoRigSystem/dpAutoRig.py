@@ -1481,13 +1481,16 @@ class Start(object):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
+        # run sanitize method to clean-up deleted guides by user keyboard
+        if self.utils.cleanupDeletedGuides():
+            self.refreshMainUI()
         # creating unique namespace:
         cmds.namespace(setNamespace=":")
         # generate the current moduleName added the next new number suffix:
         if number:
-            userSpecName = self.baseName + str(number)
+            userSpecName = self.baseName+str(number)
         else:
-            userSpecName = self.baseName + self.utils.findLastNumber()
+            userSpecName = self.baseName+self.utils.findLastNumber()
         # especific import command for guides storing theses guides modules in a variable:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
@@ -1583,6 +1586,9 @@ class Start(object):
                     curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.guideBaseName
                     if cmds.objExists(curGuideName):
                         self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
+                    else:
+                        cmds.namespace(moveNamespace=(n, ':'), force=True)
+                        cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
 
         self.clearGuideLayout()
         # if exists any guide module in the scene, recreate its instance as objectClass:

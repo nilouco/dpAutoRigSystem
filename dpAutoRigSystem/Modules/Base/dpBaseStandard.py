@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.4
+DP_BASESTANDARD_VERSION = 2.5
 
 
 class BaseStandard(object):
@@ -29,7 +29,7 @@ class BaseStandard(object):
         # defining guideNamespace:
         cmds.namespace(setNamespace=":")
         self.namespaceExists = cmds.namespace(exists=self.guideNamespace)
-        self.guideName = self.guideNamespace + ":Guide"
+        self.guideName = self.guideNamespace+":Guide"
         self.moduleGrp = self.guideName+"_Base"
         self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
         self.annotation = self.moduleGrp+"_Ant"
@@ -42,7 +42,7 @@ class BaseStandard(object):
         self.utils = dpUIinst.utils
         # calling dpControls:
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.moduleGrp)
-        # starting correctionManater:
+        # starting correctionManager:
         self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
         # starting module:
         if not self.namespaceExists:
@@ -722,15 +722,13 @@ class BaseStandard(object):
     def createWorldSize(self, *args):
         """ Create a null transform and use it as worldSize reference setup to scale the moduleGrp by offsetTransformMatrix.
         """
-        cmds.namespace(set=self.guideNamespace, force=True)
-        wsRef = cmds.createNode("transform", name="Guide_Base_WorldSize_Ref")
-        cmds.namespace(set=":")
+        self.wsRef = cmds.createNode("transform", name=self.guideNamespace+":Guide_Base_WorldSize_Ref")
         for attr in ["X", "Y", "Z"]:
-            cmds.connectAttr(self.moduleGrp+".worldSize", wsRef+".scale"+attr)
-        cmds.connectAttr(wsRef+".worldMatrix[0]", self.moduleGrp+".offsetParentMatrix", force=True)
-        cmds.setAttr(wsRef+".visibility", False)
-        cmds.setAttr(wsRef+".template", 1)
-        cmds.parent(wsRef, self.dpUIinst.tempGrp)
+            cmds.connectAttr(self.moduleGrp+".worldSize", self.wsRef+".scale"+attr)
+        cmds.connectAttr(self.wsRef+".worldMatrix[0]", self.moduleGrp+".offsetParentMatrix", force=True)
+        cmds.setAttr(self.wsRef+".visibility", False)
+        cmds.setAttr(self.wsRef+".template", 1)
+        cmds.parent(self.wsRef, self.dpUIinst.tempGrp)
 
 
     # Getters:
