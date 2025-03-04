@@ -106,44 +106,6 @@ class Publisher(object):
         if self.pipeliner.pipeData['s_rig'] in shortName:
             rigWipVersion = shortName[shortName.rfind(self.pipeliner.pipeData['s_rig'])+len(self.pipeliner.pipeData['s_rig']):shortName.rfind(".")]
         return rigWipVersion
-
-
-    def getPipeFileName(self, filePath, *args):
-        """ Return the generated file name based on the pipeline publish folder.
-            It checks the asset name and define the file version to save the published file.
-        """
-        self.assetNameList = []
-        if os.path.exists(filePath):
-            self.pipeliner.pipeData['assetNameFolderIssue'] = False
-            assetName = self.checkPipelineAssetNameFolder()
-            customAssetName = self.pipeliner.getCustomAssetNameInfo(assetName)
-            if not assetName:
-                assetName = self.shortAssetName
-                customAssetName = self.shortAssetName
-                self.pipeliner.pipeData['assetNameFolderIssue'] = True
-            publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
-            fileNameList = next(os.walk(filePath))[2]
-            if fileNameList:
-                for fileName in fileNameList:
-                    if customAssetName+self.pipeliner.pipeData['s_middle'] in fileName:
-                        if not fileName in self.assetNameList:
-                            self.assetNameList.append(fileName)
-                if self.assetNameList:
-                    publishVersion = self.defineFileVersion(self.assetNameList)
-            if self.pipeliner.pipeData['b_capitalize']:
-                assetName = assetName.capitalize()
-            elif self.pipeliner.pipeData['b_lower']:
-                assetName = assetName.lower()
-            elif self.pipeliner.pipeData['b_upper']:
-                assetName = assetName.upper()
-            self.pipeliner.pipeData['assetName'] = assetName
-            self.pipeliner.pipeData['customAssetName'] = customAssetName
-            self.pipeliner.pipeData['rigVersion'] = self.getRigWIPVersion()
-            self.pipeliner.pipeData['publishVersion'] = publishVersion
-            fileName = self.pipeliner.pipeData['s_prefix']+customAssetName+self.pipeliner.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
-            return fileName
-        else:
-            return False
     
 
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):

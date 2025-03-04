@@ -745,17 +745,18 @@ class Pipeliner(object):
         self.assetNameList = []
         if not filePath:
             filePath = self.getCurrentPath()
-        if os.path.exists(filePath):
-            self.pipeData['assetNameFolderIssue'], assetName = self.getAssetName()
+        self.pipeData['assetNameFolderIssue'], assetName = self.getAssetName()
+        if assetName:
             publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
-            fileNameList = next(os.walk(filePath))[2]
-            if fileNameList:
-                for fileName in fileNameList:
-                    if assetName+self.pipeData['s_middle'] in fileName:
-                        if not fileName in self.assetNameList:
-                            self.assetNameList.append(fileName)
-                if self.assetNameList:
-                    publishVersion = self.defineFileVersion(self.assetNameList)
+            if os.path.exists(filePath):
+                fileNameList = next(os.walk(filePath))[2]
+                if fileNameList:
+                    for fileName in fileNameList:
+                        if assetName+self.pipeData['s_middle'] in fileName:
+                            if not fileName in self.assetNameList:
+                                self.assetNameList.append(fileName)
+                    if self.assetNameList:
+                        publishVersion = self.defineFileVersion(self.assetNameList)
             if self.pipeData['b_capitalize']:
                 assetName = assetName.capitalize()
             elif self.pipeData['b_lower']:
