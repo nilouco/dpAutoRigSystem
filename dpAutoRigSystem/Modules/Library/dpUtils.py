@@ -1276,7 +1276,7 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, verbose=True, title="Rigging", *args):
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, filterLattice=True, verbose=True, title="Rigging", *args):
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
         cameraList = ["|persp", "|top", "|side", "|front"]
@@ -1309,7 +1309,7 @@ class Utils(object):
                     toRemoveList.append(item)
             if filterLinearDeform:
                 for defName in ["deformBend", "deformTwist", "deformSquash", "deformFlare", "deformSine", "deformWave"]:
-                    if cmds.listRelatives(item, children=True, type=defName):
+                    if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
                         toRemoveList.append(item)
             if filterEffector:
                 if cmds.listRelatives(item, children=True, type="ikEffector") or itemType == "ikEffector":
@@ -1320,10 +1320,12 @@ class Utils(object):
             if filterBaseName:
                 if self.getSuffixNumberList(item)[1].endswith("Base"):
                     toRemoveList.append(item)
+            if filterLattice:
+                for defName in ["lattice", "baseLattice"]:
+                    if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
+                        toRemoveList.append(item)
         if toRemoveList:
-            toRemoveList = list(set(toRemoveList))
-            for toRemoveNode in toRemoveList:
-                itemList.remove(toRemoveNode)
+            itemList = list(set(itemList) - set(toRemoveList))
         return itemList
 
 

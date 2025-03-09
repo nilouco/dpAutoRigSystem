@@ -403,7 +403,7 @@ class ActionStartClass(object):
         if toCheckList:
             self.utils.setProgress(self.dpUIinst.lang[self.title], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
             self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            filteredList = self.utils.filterTransformList(toCheckList, filterConstraint=False, filterFollicle=False, filterJoint=False, filterLocator=False, filterHandle=False, filterLinearDeform=False, filterEffector=False, title=self.dpUIinst.lang[self.title]+" "+self.dpUIinst.lang['i329_broken'])
+            filteredList = self.utils.filterTransformList(toCheckList, verbose=self.verbose, title=self.dpUIinst.lang[self.title]+" "+self.dpUIinst.lang['i329_broken'])
             if filteredList:
                 for item in filteredList:
                     shortName = item[item.rfind("|")+1:]

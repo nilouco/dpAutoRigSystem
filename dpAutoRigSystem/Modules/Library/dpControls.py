@@ -309,7 +309,7 @@ class ControlClass(object):
 
 
     def renameShape(self, transformList, *args):
-        """Find shapes, rename them to Shapes and return the results.
+        """Find shapes, rename them to #Shapes and return the results.
         """
         resultList = []
         for transform in transformList:
@@ -613,7 +613,7 @@ class ControlClass(object):
                     # restore the shape world position
                     for i in curveCVList:
                         cmds.xform(shape+'.cp['+str(i)+']', a=True, worldSpace=True, t=vtxWorldPosition[i])
-                    cmds.rename(shape, optCtrlTxt+"Shape"+str(s))
+                    cmds.rename(shape, optCtrlTxt+str(s)+"Shape")
             cmds.delete(cvText)
             cmds.parent(optCtrlTxt, curve)
             cmds.setAttr(optCtrlTxt+".template", 1)

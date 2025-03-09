@@ -165,6 +165,7 @@ class Weights(object):
                     defDic["nonLinear"] = None
                     defDic["relatedNode"] = None
                     defDic["relatedData"] = None
+                    defDic["divisions"] = None
                     if attr:
                         connectedNodeList = None
                         connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
@@ -176,6 +177,7 @@ class Weights(object):
                                 defDic["nonLinear"] = defType.replace("deform", "").lower()
                         if defType == "ffd": #lattice
                             defDic["relatedData"] = self.getLatticeInfo(connectedNodeList[0], deformerNode)
+                            defDic["divisions"] = cmds.lattice(deformerNode, query=True, divisions=True)
                         elif defType == "wire":
                             defDic["relatedData"] = self.getCurveInfo(connectedNodeList[0])
                         if connectedNodeList:
