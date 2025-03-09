@@ -8,7 +8,7 @@ TITLE = "r008_shaderIO"
 DESCRIPTION = "r009_shaderIODesc"
 ICON = "/Icons/dp_shaderIO.png"
 
-DP_SHADERIO_VERSION = 1.0
+DP_SHADERIO_VERSION = 1.1
 
 
 class ShaderIO(dpBaseAction.ActionStartClass):
@@ -61,7 +61,7 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                     if objList:
                         shaderList = objList
                     else:
-                        shaderList = self.getShaderToExportList()
+                        shaderList = self.getUsedMaterialList()
                     if shaderList:
                         self.exportDicToJsonFile(self.getShaderDataDic(shaderList))
                     else:
@@ -136,25 +136,6 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                         shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
             cmds.select(clear=True)
         return shaderDic
-    
-
-    def getShaderToExportList(self, *args):
-        """ Returns a list of shaders to export as json dictionary.
-        """
-        materialList = ["anisotropic", "blinn", "hairTubeShader", "lambert", "phong", "phongE", "aiStandardSurface", "standardSurface"]
-        ignoreMaterialList = ["lambert1"]
-        shaderList = []
-        for material in materialList:
-            matList = cmds.ls(selection=False, type=material)
-            if matList:
-                shaderList.extend(matList)
-        if shaderList:
-            shaderList = list(set(shaderList))
-            shaderList.sort()
-            for ignoreMaterial in ignoreMaterialList:
-                if ignoreMaterial in shaderList:
-                    shaderList.remove(ignoreMaterial)
-        return shaderList
 
 
     def importShader(self, shaderDic, *args):

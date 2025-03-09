@@ -9,7 +9,7 @@ TITLE = "v084_unusedNodeCleaner"
 DESCRIPTION = "v085_unusedNodeCleanerDesc"
 ICON = "/Icons/dp_unusedNodeCleaner.png"
 
-DP_UNUSEDNODECLEANER_VERSION = 1.1
+DP_UNUSEDNODECLEANER_VERSION = 1.2
 
 
 class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
@@ -78,18 +78,3 @@ class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         return self.dataLogDic
-
-
-    def getUsedMaterialList(self, *args):
-        """ List all materials used by geometry in the scene.
-            https://discourse.techart.online/t/list-all-materials-used-in-scene/10185
-        """
-        usedMaterialList = []
-        shadingEngineList = cmds.ls(type='shadingEngine')
-        for shadEng in shadingEngineList:
-            # if an shadingEngine has 'sets' members, it is used in the scene
-            if cmds.sets(shadEng, query=True):
-                matList = cmds.listConnections('{}.surfaceShader'.format(shadEng))
-                if matList:
-                    usedMaterialList.extend(matList)
-        return list(set(usedMaterialList))

@@ -536,3 +536,20 @@ class ActionStartClass(object):
                 self.notWorkedWellIO(self.ioPath)
             self.reportLog()
             self.firstBTLabel = oldFirstBTLabel
+
+
+    def getUsedMaterialList(self, *args):
+        """ List all materials used by geometry in the scene.
+            https://discourse.techart.online/t/list-all-materials-used-in-scene/10185
+        """
+        usedMaterialList = []
+        shadingEngineList = cmds.ls(type='shadingEngine')
+        for shadEng in shadingEngineList:
+            # if an shadingEngine has 'sets' members, it is used in the scene
+            if cmds.sets(shadEng, query=True):
+                matList = cmds.listConnections('{}.surfaceShader'.format(shadEng))
+                if matList:
+                    usedMaterialList.extend(matList)
+        usedMaterialList = list(set(usedMaterialList))
+        usedMaterialList.sort()
+        return usedMaterialList
