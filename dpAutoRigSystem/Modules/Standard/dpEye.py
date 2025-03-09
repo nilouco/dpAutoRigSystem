@@ -15,7 +15,7 @@ PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
 
-DP_EYE_VERSION = 2.2
+DP_EYE_VERSION = 2.3
 
 
 class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -447,7 +447,8 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.utils.originedFrom(objName=ctrl, attrString=cvLoc)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
-        ctrlZero = self.utils.zeroOut([ctrl])
+        ctrlZero = self.utils.zeroOut([ctrl], offset=True)
+        cmds.setAttr(cmds.listRelatives(ctrlZero, children=True, type="transform")[0]+".dpNotTransformIO", 0)
         cmds.delete(cmds.parentConstraint(cvLoc, ctrlZero[0], maintainOffset=False))
         cmds.parent(ctrlZero[0], self.baseEyeCtrl)
         # fixing flip mirror:
