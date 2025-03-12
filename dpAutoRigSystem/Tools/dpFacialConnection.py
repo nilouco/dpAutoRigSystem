@@ -15,7 +15,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.0
+DP_FACIALCONNECTION_VERSION = 1.1
 
 
 class FacialConnection(object):
@@ -141,7 +141,7 @@ class FacialConnection(object):
                         fromMesh = fromMeshList[n]
                         break
         if fromMesh:
-            geoList = []
+            geoList, resultList = [], []
             prefix = baseName
             if self.ui:
                 btContinue = self.dpUIinst.lang['i174_continue']
@@ -164,6 +164,9 @@ class FacialConnection(object):
             for t, tgt in enumerate(self.targetList):
                 dup = cmds.duplicate(fromMesh)[0]
                 geo = cmds.rename(dup, prefix+tgt+suffix)
+                resultList.append(geo)
+                cmds.select(geo)
+                cmds.hyperShade(geo, assign="initialShadingGroup")
                 if t == 0:
                     cmds.setAttr(geo+".visibility", 0)
                     geoList.append(geo)
@@ -176,10 +179,12 @@ class FacialConnection(object):
             geoGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
             cmds.parent(geoList, geoGrp)
             cmds.parent(facialGrp, geoGrp)
-            cmds.hyperShade(assign="initialShadingGroup")
             self.dpUIinst.customAttr.addAttr(0, [geoGrp], descendents=True) #dpID
+            if self.ui and resultList:
+                self.dpUIinst.logger.infoWin('m085_facialConnection', 'm237_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.dpUIinst.lang["i042_notSelection"]+"\";")
+        self.utils.closeUI('dpFacialConnectionWindow')
 
 
     def dpGetFacialCtrlDic(self, ctrlList, *args):
@@ -199,6 +204,7 @@ class FacialConnection(object):
         """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
         """
         bsDic = {}
+        resultList = []
         # get facialList attr from found dpAR controls
         facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
         # get target list from existing blendShape nodes
@@ -226,12 +232,16 @@ class FacialConnection(object):
                             if connectIt:
                                 cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
                                 print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
+                                resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
+        if self.ui and resultList:
+            self.dpUIinst.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
+        self.utils.closeUI('dpFacialConnectionWindow')
 
 
     def dpConnectToJoints(self, ctrlList=None, *args):
         """ Connect the facial controllers attributes to the stored facial tweakers data.
         """
-        self.toIDList = []
+        self.toIDList, resultList = [], []
         # redefining Tweaks variables to get the tweaks name list
         self.dpInitTweaksVariables()
         # get joint target list
@@ -286,7 +296,11 @@ class FacialConnection(object):
                                                             self.dpCreateRemapNode(facialCtrl, facialAttr, jntTarget, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
                                                             self.RmVNumber = self.RmVNumber+1
                                                         print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
+                                                        resultList.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
                     self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+                    if self.ui and resultList:
+                        self.dpUIinst.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
+        self.utils.closeUI('dpFacialConnectionWindow')
 
     
     def dpGetJointNodeList(self, itemList, *args):

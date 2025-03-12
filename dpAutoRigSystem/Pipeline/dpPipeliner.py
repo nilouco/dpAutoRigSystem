@@ -752,7 +752,7 @@ class Pipeliner(object):
                 fileNameList = next(os.walk(filePath))[2]
                 if fileNameList:
                     for fileName in fileNameList:
-                        if assetName+self.pipeData['s_middle'] in fileName:
+                        if assetName+self.pipeData['s_middle'] in fileName or assetName.lower()+self.pipeData['s_middle'] in fileName or assetName.upper()+self.pipeData['s_middle'] in fileName:
                             if not fileName in self.assetNameList:
                                 self.assetNameList.append(fileName)
                     if self.assetNameList:

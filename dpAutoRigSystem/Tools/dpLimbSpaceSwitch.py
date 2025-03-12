@@ -91,7 +91,7 @@ class LimbSpaceSwitch(object):
                 
                 if cmds.objExists(ikCtrl):
                     if cmds.objExists(ikCtrl+"."+self.followAttr):
-                        return
+                        pass
                     else:
                         if x == 0: #arm
                             followValue = 4 #chestB
