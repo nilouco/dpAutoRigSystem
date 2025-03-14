@@ -167,6 +167,9 @@ class FacialConnection(object):
                 resultList.append(geo)
                 cmds.select(geo)
                 cmds.hyperShade(geo, assign="initialShadingGroup")
+                connectedPlug = cmds.listConnections(geo+".drawOverride", destination=False, source=True, plugs=True)
+                if connectedPlug:
+                    cmds.disconnectAttr(connectedPlug[0], geo+".drawOverride")
                 if t == 0:
                     cmds.setAttr(geo+".visibility", 0)
                     geoList.append(geo)

@@ -914,6 +914,7 @@ class Pipeliner(object):
                         if savedScene:
                             self.dpUIinst.rebuilding = False
                             cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
+                            cmds.workspace(directory=assetFolder)
                 elif mode == 1: #replaceData
                     # Open UI to select each desired module dpData to replace from
                     self.pathToReplaceFrom = assetFolder
@@ -1051,8 +1052,10 @@ class Pipeliner(object):
         if assetFile:
             self.newAssetFile = assetFile
         if self.newAssetFile:
-            if self.makeDirIfNotExists(self.newAssetFile[:self.newAssetFile.rfind("/")]):
+            folder = self.newAssetFile[:self.newAssetFile.rfind("/")]
+            if self.makeDirIfNotExists(folder):
                 cmds.file(rename=self.newAssetFile)
+                cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
                 self.utils.closeUI("dpNewAssetWindow")
                 self.dpUIinst.rebuilding = False

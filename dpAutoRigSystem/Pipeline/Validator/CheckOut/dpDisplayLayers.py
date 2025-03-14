@@ -59,12 +59,12 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
                     self.extraLayerToDelete.append(layer)
             if not self.extraLayerToDelete:
                 if cmds.objExists(self.geoLayerName) and cmds.objExists(self.ctrlLayerName):
-                    layersConfigurationCheckList = [True, True, 2, True, True, 0]
+                    layersConfigurationCheckList = [True, False, 2, True, False, 0]
                     geoLyrVisibility = cmds.getAttr(self.geoLayerName+".visibility") #True
-                    geoLyrHideOnPlayback = cmds.getAttr(self.geoLayerName+".hideOnPlayback") #True
+                    geoLyrHideOnPlayback = cmds.getAttr(self.geoLayerName+".hideOnPlayback") #False
                     geolLyrDisplayType = cmds.getAttr(self.geoLayerName+".displayType") #2 = ref
                     ctrlLyrVisibility = cmds.getAttr(self.ctrlLayerName+".visibility") #True
-                    ctrlLyrHideOnPlayback = cmds.getAttr(self.ctrlLayerName+".hideOnPlayback") #True
+                    ctrlLyrHideOnPlayback = cmds.getAttr(self.ctrlLayerName+".hideOnPlayback") #False
                     ctrlLyrDisplayType = cmds.getAttr(self.ctrlLayerName+".displayType") #0 = none
                     layersConfiguration = [geoLyrVisibility, geoLyrHideOnPlayback, geolLyrDisplayType, ctrlLyrVisibility, ctrlLyrHideOnPlayback, ctrlLyrDisplayType]
                     # Check layers configuration

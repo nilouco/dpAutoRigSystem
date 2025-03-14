@@ -169,7 +169,7 @@ class Packager(object):
         dpImagerWindow = cmds.window('dpImagerWindow', width=720, height=720, menuBarVisible=False, titleBar=True, visible=True)
         cmds.paneLayout(parent=dpImagerWindow)
         dpImagerPanel = cmds.modelPanel(menuBarVisible=False, label='dpImagerPanel')
-        cmds.modelEditor(dpImagerPanel, edit=True, displayAppearance='smoothShaded')
+        cmds.modelEditor(dpImagerPanel, edit=True, displayAppearance='smoothShaded', allObjects=True)
         barLayout = cmds.modelPanel(dpImagerPanel, query=True, barLayout=True)
         cmds.frameLayout(barLayout, edit=True, collapse=True)
         cmds.showWindow(dpImagerWindow)
