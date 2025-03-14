@@ -32,7 +32,7 @@ class Renamer():
         # call main function
         if self.ui:
             self.renamerUI()
-            cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+            cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
     
     
     def closeRenamerUI(self, *args):

@@ -42,7 +42,7 @@ class IkFkSnapClass(object):
         self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
         self.storeIkFkSnapData()
         if dpDev:
-            cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=True, compressUndo=True)
+            cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
         else:
             self.generateScriptNode()
     
@@ -316,7 +316,7 @@ class IkFkSnap(object):
     def __init__(self, ikFkSnapNet, *args):
         self.ikFkSnapNet = ikFkSnapNet
         self.reloadNetData()
-        cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=True, compressUndo=True)
+        cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
 
     def reloadNetData(self):
         self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]

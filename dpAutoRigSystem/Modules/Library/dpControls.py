@@ -1091,7 +1091,7 @@ class ControlClass(object):
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                     cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
                 self.deleteOldJobs(ctrlName)
-                cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
+                cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=False, compressUndo=True)
                 self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
 
 
@@ -1540,7 +1540,7 @@ class ControlClass(object):
         """ Create a scriptJob to read this attribute change.
         """
         self.deleteOldJobs(ctrlName)
-        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=True, compressUndo=True)
+        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=False, compressUndo=True)
         if cmds.getAttr(ctrlName+".editMode"):
             self.colorShape([ctrlName], 'bonina', rgb=True)
 
