@@ -45,14 +45,15 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         if self.pipeliner.checkAssetContext():
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
-                ctrlList = None
+                itemList = None
                 if objList:
-                    ctrlList = objList
+                    itemList = objList
                 else:
-                    ctrlList = self.dpUIinst.ctrls.getControlList()
-                if ctrlList:
+                    itemList = self.dpUIinst.ctrls.getControlList()
+                    itemList.extend(self.getModelToExportList())
+                if itemList:
                     if self.firstMode: #export
-                        self.exportDicToJsonFile(self.getAttributeDataDic(ctrlList))
+                        self.exportDicToJsonFile(self.getAttributeDataDic(itemList))
                     else: #import
                         attrDic = self.importLatestJsonFile(self.getExportedList())
                         if attrDic:
@@ -76,38 +77,47 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         return self.dataLogDic
 
 
-    def getAttributeDataDic(self, ctrlList, *args):
+    def getAttributeDataDic(self, objList, *args):
         """ Processes the given controller list to collect and mount the attributes data.
+            Also works with meshes.
             Returns the dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
-        for ctrl in ctrlList:
+        itemList = objList.copy()
+        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        for node in objList:
+            meshList = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
+            if meshList:
+                itemList.extend([m for m in meshList if not cmds.getAttr(m+".intermediateObject")])
+                itemList.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type="transform") if cmds.listRelatives(t, children=True, type="mesh")])
+        itemList = list(set(itemList))
+        itemList.sort()
+        for item in itemList:
             self.utils.setProgress(self.dpUIinst.lang[self.title])
-            attrList = cmds.listAttr(ctrl, userDefined=True)
+            attrList = cmds.listAttr(item, userDefined=True)
             if attrList:
-                dic[ctrl] = {"attributes" : {},
+                dic[item] = {"attributes" : {},
                                 "order" : attrList}
                 for attr in attrList:
-                    if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
-                        attrType = cmds.getAttr(ctrl+"."+attr, type=True)
-                        dic[ctrl]["attributes"][attr] = {
+                    if not cmds.getAttr(item+"."+attr, type=True) == "message":
+                        attrType = cmds.getAttr(item+"."+attr, type=True)
+                        dic[item]["attributes"][attr] = {
                                             "type" : attrType,
-                                            "value" : cmds.getAttr(ctrl+"."+attr),
-                                            "locked" : cmds.getAttr(ctrl+"."+attr, lock=True),
-                                            "keyable" : cmds.getAttr(ctrl+"."+attr, keyable=True),
-                                            "channelBox" : cmds.getAttr(ctrl+"."+attr, channelBox=True)
+                                            "value" : cmds.getAttr(item+"."+attr),
+                                            "locked" : cmds.getAttr(item+"."+attr, lock=True),
+                                            "keyable" : cmds.getAttr(item+"."+attr, keyable=True),
+                                            "channelBox" : cmds.getAttr(item+"."+attr, channelBox=True)
                                             }
                         if attrType in self.defaultValueTypeList:
                             if attrType == "enum":
-                                dic[ctrl]["attributes"][attr]["enumName"] = cmds.attributeQuery(attr, node=ctrl, listEnum=True)[0]
-                            dic[ctrl]["attributes"][attr]["default"] = cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True)
-                            dic[ctrl]["attributes"][attr]["maxExists"] = cmds.attributeQuery(attr, node=ctrl, maxExists=True) or False
-                            if dic[ctrl]["attributes"][attr]["maxExists"]:
-                                dic[ctrl]["attributes"][attr]["maximum"] = cmds.attributeQuery(attr, node=ctrl, maximum=True)[0]
-                            dic[ctrl]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=ctrl, minExists=True) or False
-                            if dic[ctrl]["attributes"][attr]["minExists"]:
-                                dic[ctrl]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)[0]
+                                dic[item]["attributes"][attr]["enumName"] = cmds.attributeQuery(attr, node=item, listEnum=True)[0]
+                            dic[item]["attributes"][attr]["default"] = cmds.addAttr(item+"."+attr, query=True, defaultValue=True)
+                            dic[item]["attributes"][attr]["maxExists"] = cmds.attributeQuery(attr, node=item, maxExists=True) or False
+                            if dic[item]["attributes"][attr]["maxExists"]:
+                                dic[item]["attributes"][attr]["maximum"] = cmds.attributeQuery(attr, node=item, maximum=True)[0]
+                            dic[item]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=item, minExists=True) or False
+                            if dic[item]["attributes"][attr]["minExists"]:
+                                dic[item]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=item, minimum=True)[0]
         return dic
 
 

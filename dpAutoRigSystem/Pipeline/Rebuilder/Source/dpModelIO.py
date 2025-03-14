@@ -74,38 +74,3 @@ class ModelIO(dpBaseAction.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
-
-
-    def getModelToExportList(self, *args):
-        """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
-        """
-        meshList, tempList = [], []
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
-        if renderGrp:
-            meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-            if meshList:
-                return cmds.listRelatives(renderGrp, children=True, type="transform")
-        if not meshList:
-            unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-            if unparentedMeshList:
-                for item in unparentedMeshList:
-                    if not cmds.objExists(item+".masterGrp"):
-                        fatherNode = item[:item[1:].find("|")+1]
-                        if fatherNode:
-                            if not cmds.objExists(fatherNode+".masterGrp"):
-                                if not fatherNode in tempList:
-                                    tempList.append(fatherNode)
-        if tempList:
-            for node in tempList:
-                isCleaned = True
-                if not cmds.objExists(node+".guideBase") and not cmds.objExists(node+".dpGuide"):
-                    childrenList = cmds.listRelatives(node, children=True, allDescendents=True)
-                    if childrenList:
-                        for child in childrenList:
-                            if cmds.objExists(child+".guideBase") or cmds.objExists(child+".dpGuide"):
-                                isCleaned = False
-                else:
-                    isCleaned = False
-                if isCleaned:
-                    meshList.append(node)
-        return meshList
