@@ -1765,6 +1765,11 @@ class Start(object):
             firstMode = True for verify/export
                       = False for fix/import
         """
+        if firstMode and actionType == "r000_rebuilder": #splitData
+            if self.utils.getDuplicatedNames():
+                confirm = cmds.confirmDialog(title=self.lang['v024_duplicatedName'], icon="question", message=self.lang['i355_uniqueNameDependence'], button=[self.lang['i071_yes'], self.lang['i072_no']], defaultButton=self.lang['i072_no'], cancelButton=self.lang['i072_no'], dismissString=self.lang['i072_no'])
+                if confirm == self.lang['i072_no']:
+                    return
         self.resetAllButtonColors()
         actionResultData = {}
         logText = ""

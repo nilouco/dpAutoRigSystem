@@ -1492,3 +1492,10 @@ class Utils(object):
                         cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
                         cleanned = True
         return cleanned
+
+
+    def getDuplicatedNames(self, *args):
+        """ Returns a list of duplicated names.
+            Returns False if there are only unique names.
+        """
+        return [n for n in cmds.ls(selection=False, shortNames=True) if "|" in n] or False
