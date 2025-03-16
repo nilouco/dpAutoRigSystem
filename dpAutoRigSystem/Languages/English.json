@@ -518,6 +518,7 @@
     "i353_sFinishingAnn"        : "Where in the pipeline we can find the stored validators to finishing.\nThe path should be the same as the PipelineInfo.json file.",
     "i354_finishing"            : "finishing",
     "i355_uniqueNameDependence" : "It seems we have some nodes with duplicated names in the scene.\nSome modules depend on unique names and may fail.\n\nDo you want to continue anyway?",
+    "i356_sVisibilityIOAnn"     : "The folder to export and import visibility data.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -835,6 +836,8 @@
     "r067_currentAssetContext"  : "Current asset context:",
     "r068_replacedDataSuccess"  : "Replaced dpData with success.",
     "r069_noAssetToSaveVersion" : "Seems we don't have a valid asset setup yet, sorry.\n\nYou can create a new one or load an existing asset before continue.\nIf you prefer, save you scene in the pipeline before continue, please.",
+    "r070_visibilityIO"         : "Visibility",
+    "r071_visibilityIODesc"     : "This action will work with the visibility attribute\nexporting and importing its info.",
 
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

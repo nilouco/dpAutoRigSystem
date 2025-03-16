@@ -518,6 +518,7 @@
     "i353_sFinishingAnn"        : "Où dans le pipeline pouvons-nous trouver les finaux des validateurs stokés.\nLe chemin doit être le même que le fichier PipelineInfo.json.",
     "i354_finishing"            : "finalisation",
     "i355_uniqueNameDependence" : "Il semble que nous ayons des nodes avec des noms dupliqués dans la scène.\nCertains modules dépendent de noms uniques et peuvent échouer.\n\nVoulez-vous continuer quand même?",
+    "i356_sVisibilityIOAnn"     : "Le dossier ou on va importer et exporter les donnés de visibilité.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -835,6 +836,8 @@
     "r067_currentAssetContext"  : "Contexte d'actif actuel:",
     "r068_replacedDataSuccess"  : "Remplacé le dpData avec sucèss.",
     "r069_noAssetToSaveVersion" : "Il semble que nous n'ayons pas encore de configuration d'actif valide, désolé.\n\nVous pouvez en créer un nouveau ou charger un actif existant avant de continuer.\nSi vous préférez, enregistrez votre scène dans le pipeline avant de continuer, s'il vous plaît.",
+    "r070_visibilityIO"         : "Visibilité",
+    "r071_visibilityIODesc"     : "Cette action va travailler l'attribut de visibilité\nen l'exportant et en l'important.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

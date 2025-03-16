@@ -10,7 +10,7 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.13
+DP_PIPELINER_VERSION = 1.14
 
 
 class Pipeliner(object):
@@ -183,6 +183,7 @@ class Pipeliner(object):
         "s_offsetMatrixIO"   : self.dpUIinst.dpData+"/dpOffsetMatrix",
         "s_connectionIO"     : self.dpUIinst.dpData+"/dpConnection",
         "s_calibrationIO"    : self.dpUIinst.dpData+"/dpCalibration",
+        "s_visibilityIO"     : self.dpUIinst.dpData+"/dpVisibility",
         "s_channelIO"        : self.dpUIinst.dpData+"/dpChannel",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
@@ -258,7 +259,8 @@ class Pipeliner(object):
         "s_drivenKeyIO"      : "i330_sDrivenKeyIOAnn",
         "s_offsetMatrixIO"   : "i345_sOffsetMatrixIOAnn",
         "s_connectionIO"     : "i327_sConnectionIOAnn",
-        "s_calibrationIO"    : "i324_sCalibrationIOAnn",
+        "s_calibrationIO"    : "i356_sVisibilityIOAnn",
+        "s_visibilityIO"     : "i324_sVisibilityIOAnn",
         "s_channelIO"        : "i347_sChannelIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",

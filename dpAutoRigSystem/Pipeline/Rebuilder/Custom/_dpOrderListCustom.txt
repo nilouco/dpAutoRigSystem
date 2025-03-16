@@ -8,4 +8,5 @@ dpDrivenKeyIO
 dpOffsetMatrixIO
 dpConnectionIO
 dpCalibrationIO
+dpVisibilityIO
 dpChannelIO

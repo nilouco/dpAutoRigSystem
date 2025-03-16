@@ -3,26 +3,27 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "ChannelIO"
-TITLE = "r064_channelIO"
-DESCRIPTION = "r065_channelIODesc"
-ICON = "/Icons/dp_channelIO.png"
+CLASS_NAME = "VisibilityIO"
+TITLE = "r070_visibilityIO"
+DESCRIPTION = "r071_visibilityIODesc"
+ICON = "/Icons/dp_visibilityIO.png"
 
-DP_CHANNELIO_VERSION = 1.0
+DP_VISIBILITYIO_VERSION = 1.0
 
 
-class ChannelIO(dpBaseAction.ActionStartClass):
+class VisibilityIO(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_CHANNELIO_VERSION
+        self.version = DP_VISIBILITYIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_channelIO"
-        self.startName = "dpChannel"
+        self.ioDir = "s_visibilityIO"
+        self.startName = "dpVisibility"
+        self.ignoreList = ["defaultLayer"]
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -48,14 +49,14 @@ class ChannelIO(dpBaseAction.ActionStartClass):
                 if objList:
                     itemList = objList
                 else:
-                    itemList = cmds.ls(selection=False, type="transform")
+                    itemList = cmds.ls(selection=False)#, type="transform")
                 if itemList:
                     if self.firstMode: #export
-                        self.exportDicToJsonFile(self.getChannelDataDic(itemList))
+                        self.exportDicToJsonFile(self.getVisibilityDataDic(itemList))
                     else: #import
-                        attrDic = self.importLatestJsonFile(self.getExportedList())
-                        if attrDic:
-                            self.importChannelData(attrDic)
+                        visDic = self.importLatestJsonFile(self.getExportedList())
+                        if visDic:
+                            self.importVisibilityData(visDic)
                         else:
                             self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
@@ -75,8 +76,8 @@ class ChannelIO(dpBaseAction.ActionStartClass):
         return self.dataLogDic
 
 
-    def getChannelDataDic(self, itemList, *args):
-        """ Processes the given item list to collect and mount the tranform attributes data.
+    def getVisibilityDataDic(self, itemList, *args):
+        """ Processes the given item list to check the visibility value if it doesn't have input connection.
             Returns the dictionary to export.
         """
         dic = {}
@@ -84,40 +85,33 @@ class ChannelIO(dpBaseAction.ActionStartClass):
         for item in itemList:
             self.utils.setProgress(self.dpUIinst.lang[self.title])
             if cmds.objExists(item):
-                dic[item] = {}
-                for attr in self.dpUIinst.transformAttrList:
-                    dic[item][attr] = {
-                                        "locked" : cmds.getAttr(item+"."+attr, lock=True),
-                                        "keyable" : cmds.getAttr(item+"."+attr, keyable=True),
-                                        "channelBox" : cmds.getAttr(item+"."+attr, channelBox=True)
-                                        }
+                if "visibility" in cmds.listAttr(item):
+                    if not cmds.listConnections(item+".visibility", source=True, destination=False):
+                        dic[item] = cmds.getAttr(item+".visibility")
         return dic
 
 
-    def importChannelData(self, attrDic, *args):
-        """ Import tranform attributes states from exported dictionary.
-            Just set them as locked, hidden, non keyable or not.
+    def importVisibilityData(self, visDic, *args):
+        """ Import visibility attribute values from exported dictionary.
         """
-        self.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
+        self.utils.setProgress(max=len(visDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
-        for item in attrDic.keys():
+        for item in visDic.keys():
             notFoundNodesList = []
             self.utils.setProgress(self.dpUIinst.lang[self.title])
-            # check attributes
+            # check attribute
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
-                for attr in self.dpUIinst.transformAttrList:
-                    try:
-                        cmds.setAttr(item+"."+attr, keyable=attrDic[item][attr]['keyable'])
-                        if not attrDic[item][attr]['keyable']:
-                            cmds.setAttr(item+"."+attr, channelBox=attrDic[item][attr]['channelBox'])
-                        cmds.setAttr(item+"."+attr, lock=attrDic[item][attr]['locked'])
-                        if not item in wellImportedList:
-                            wellImportedList.append(item)
-                    except Exception as e:
-                        self.notWorkedWellIO(item+" - "+str(e))
+                if not cmds.getAttr(item+".visibility", lock=True):
+                    if not item in self.ignoreList:
+                        try:
+                            cmds.setAttr(item+".visibility", visDic[item])
+                            if not item in wellImportedList:
+                                wellImportedList.append(item)
+                        except Exception as e:
+                            self.notWorkedWellIO(item+" - "+str(e))
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
