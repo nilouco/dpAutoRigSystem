@@ -408,48 +408,60 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ New functions when the button reOrient is pressed. For Arm, the extrem will point to the corner. For legs, the extrem will point to the ground.
         """
         # re-declaring guides names:
-        self.cvExtremLoc = self.guideName+"_Extrem"
-        self.cvCornerLoc = self.guideName+"_Corner"
         self.mainAic = self.guideName+"_Main_Zero_0_Grp_AiC"
         
-        # reOrient guides first
-        self.reOrientGuide()
-        
-        # re-orient extremLoc to align with cornerLoc. 
-        if self.getLimbType()==self.armName:
-            toUnparentList = []
-            extremChildrenList = cmds.listRelatives(self.cvExtremLoc, children=True, type="transform")
-            if extremChildrenList:
-                extremChildrenGrpTemp = cmds.group(empty=True, name="extremChildren_Temp_Grp", parent=self.moduleGrp)
-                for extremChildren in extremChildrenList:
-                    if cmds.objExists(extremChildren+".pinGuide"):
-                        toUnparentList.append(extremChildren)
-                        cmds.parent(extremChildren, extremChildrenGrpTemp)
-                tempUpVectorWrist = cmds.group(empty=True, name="tempUpVectorWrist_Null")
-                cmds.parent(tempUpVectorWrist, self.moduleGrp)
-                cmds.matchTransform(tempUpVectorWrist, self.cvExtremLoc)
-                cmds.setAttr(tempUpVectorWrist+".translateX", 2)
-                tempToDelWristAim = cmds.aimConstraint(self.cvCornerLoc, self.cvExtremLoc, aimVector=(0.0, 0.0, -1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempUpVectorWrist, name=self.cvExtremLoc+"_Tmp_AiC")
-                cmds.delete(tempToDelWristAim, tempUpVectorWrist)
-            if toUnparentList:
-                cmds.parent(toUnparentList, self.cvExtremLoc)
-            cmds.delete(extremChildrenGrpTemp)
+        # re-orient extremLoc to align with cornerLoc if the clavicle and wrist aren't pinned.
+        if not cmds.getAttr(self.cvExtremLoc+".pinGuide") and not cmds.getAttr(self.cvBeforeLoc+".pinGuide"):
+            # reOrient guides first
+            self.reOrientGuide()
+            # do guide alignment
+            if self.getLimbType()==self.armName:
+                extremChildrenGrpTemp = False
+                toUnparentList = []
+                pinGuideStateDic = {}
+                cmds.setAttr(self.cvExtremLoc+".pinGuide", 0)
+                extremChildrenList = cmds.listRelatives(self.cvExtremLoc, children=True, type="transform")
+                if extremChildrenList:
+                    hasSubGuideBase = False
+                    for extremChildren in extremChildrenList:
+                        if "pinGuide" in cmds.listAttr(extremChildren):
+                            hasSubGuideBase = True
+                    if hasSubGuideBase:
+                        extremChildrenGrpTemp = cmds.group(empty=True, name="extremChildren_Temp_Grp", parent=self.moduleGrp)
+                        for extremChildren in extremChildrenList:
+                            if "pinGuide" in cmds.listAttr(extremChildren):
+                                toUnparentList.append(extremChildren)
+                                pinGuideStateDic[extremChildren] = cmds.getAttr(extremChildren+".pinGuide")
+                                cmds.setAttr(extremChildren+".pinGuide", 0)
+                                cmds.parent(extremChildren, extremChildrenGrpTemp)
+                    tempUpVectorWrist = cmds.group(empty=True, name="tempUpVectorWrist_Null")
+                    cmds.parent(tempUpVectorWrist, self.moduleGrp)
+                    cmds.matchTransform(tempUpVectorWrist, self.cvExtremLoc)
+                    cmds.setAttr(tempUpVectorWrist+".translateX", 2)
+                    tempToDelWristAim = cmds.aimConstraint(self.cvCornerLoc, self.cvExtremLoc, aimVector=(0.0, 0.0, -1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempUpVectorWrist, name=self.cvExtremLoc+"_Tmp_AiC")
+                    cmds.delete(tempToDelWristAim, tempUpVectorWrist)
+                if toUnparentList:
+                    cmds.parent(toUnparentList, self.cvExtremLoc)
+                for node in pinGuideStateDic.keys():
+                    cmds.setAttr(node+".pinGuide", pinGuideStateDic[node])
+                if extremChildrenGrpTemp:
+                    cmds.delete(extremChildrenGrpTemp)
 
-            # adjust offset depends on corner position
-            cmds.setAttr(self.cvMainLoc+".rotateX", 0)
-            self.setAimConstraintOffset(self.mainAic)
-                
-        # setup to reorient the ankle guide to point to the ground when rotate mainGuide
-        if self.getLimbType()==self.legName:
-            ankleToAimNull = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
-            cmds.matchTransform(ankleToAimNull, self.cvExtremLoc, position=True)
-            cmds.setAttr(ankleToAimNull+".translateY", -10)
-            tempToDelAnkleAim = cmds.aimConstraint(ankleToAimNull, self.cvExtremLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), name=self.cvExtremLoc+"_Tmp_AiC")
-            cmds.delete(tempToDelAnkleAim, ankleToAimNull)
+                # adjust offset depends on corner position
+                cmds.setAttr(self.cvMainLoc+".rotateX", 0)
+                self.setAimConstraintOffset(self.mainAic)
+                    
+            # setup to reorient the ankle guide to point to the ground when rotate mainGuide
+            if self.getLimbType()==self.legName:
+                ankleToAimNull = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
+                cmds.matchTransform(ankleToAimNull, self.cvExtremLoc, position=True)
+                cmds.setAttr(ankleToAimNull+".translateY", -10)
+                tempToDelAnkleAim = cmds.aimConstraint(ankleToAimNull, self.cvExtremLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), name=self.cvExtremLoc+"_Tmp_AiC")
+                cmds.delete(tempToDelAnkleAim, ankleToAimNull)
 
-            # leg offset adjust
-            cmds.setAttr(self.cvMainLoc+".rotateY", 0)
-            self.setAimConstraintOffset(self.mainAic)
+                # leg offset adjust
+                cmds.setAttr(self.cvMainLoc+".rotateY", 0)
+                self.setAimConstraintOffset(self.mainAic)
         cmds.select(self.moduleGrp)
 
 
