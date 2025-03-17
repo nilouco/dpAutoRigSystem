@@ -57,7 +57,7 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                         if objList:
                             bsList = objList
                         else:
-                            bsList = cmds.ls(selection=False, type="blendShape")
+                            bsList = [n for n in cmds.ls(selection=False, type="blendShape") if cmds.blendShape(n, query=True, geometry=True)]
                         if bsList:
                             bsDic = self.getBSDataDic(bsList)
                             for bsNode in bsList:

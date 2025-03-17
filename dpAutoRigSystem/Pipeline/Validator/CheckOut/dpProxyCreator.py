@@ -204,7 +204,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
             deformerList = self.skinClusterList
             defList = ["blendShape", "wrap", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             for deform in defList:
-                deformerList.extend(cmds.ls(type=deform))
+                deformerList.extend(cmds.ls(type=deform) or [])
             if deformerList:
                 for deformNode in deformerList:
                     try:

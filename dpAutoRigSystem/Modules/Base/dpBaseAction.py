@@ -456,9 +456,9 @@ class ActionStartClass(object):
             ioItems = ' -root '.join(itemList)
             attrStr = ""
             if attr:
-                itemList.extend(cmds.listRelatives(itemList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
+                itemList.extend(cmds.listRelatives(itemList, type="mesh", children=True, allDescendents=True, noIntermediate=True) or [])
                 if curve:
-                    itemList.extend(cmds.listRelatives(itemList, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True))
+                    itemList.extend(cmds.listRelatives(itemList, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
                 for mesh in itemList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     userDefAttrList = cmds.listAttr(mesh, userDefined=True)

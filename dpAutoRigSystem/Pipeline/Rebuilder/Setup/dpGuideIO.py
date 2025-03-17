@@ -55,7 +55,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         netList = objList
                     else:
                         netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
-                        netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet"))
+                        netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
                     if netList:
                         self.dpUIinst.ctrls.unPinGuide()
                         self.exportDicToJsonFile(self.getGuideDataDic(netList))

@@ -184,7 +184,6 @@ class Publisher(object):
                     validatorsResult = self.runCheckedValidators(False, True, publishLog) #fix mode
                 if validatorsResult:
                     self.abortPublishing(validatorsResult)
-
                 else:
                     self.utils.setProgress(self.dpUIinst.lang['i336_storingData']+"...", addNumber=False)
                     
@@ -230,6 +229,7 @@ class Publisher(object):
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
                             self.abortPublishing(self.dpUIinst.lang['v022_noFilePath'])
+                            return
                     
                     # mount folders
                     if self.pipeliner.pipeData['b_deliver']:
@@ -287,9 +287,9 @@ class Publisher(object):
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
-                self.utils.setProgress(endIt=True)
-                self.utils.closeUI('dpPublisherWindow')
-                self.askUserChooseFile(publishFileName)
+                    self.utils.setProgress(endIt=True)
+                    self.utils.closeUI('dpPublisherWindow')
+                    self.askUserChooseFile(publishFileName)
 
             else:
                 mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')
@@ -304,9 +304,10 @@ class Publisher(object):
             End progressWindow.
             Warning the raison of the error.
         """
+        self.utils.setProgress(endIt=True)
+        self.utils.closeUI('dpPublisherWindow')
         # reopen current file
         cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
-        self.utils.setProgress(endIt=True)
         # report the error in a log window
         if raison:
             self.dpUIinst.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)

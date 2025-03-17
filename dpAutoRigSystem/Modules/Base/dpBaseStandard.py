@@ -225,7 +225,7 @@ class BaseStandard(object):
                 dpAR_nameList = []
                 transformList = cmds.ls(selection=False, transforms=True)
                 guideBaseList = [guide for guide in transformList if guide.endswith(self.dpUIinst.guideBaseName)] or []
-                guideBaseList.extend([staticGrp for staticGrp in transformList if "staticHook" in cmds.listAttr(staticGrp)])
+                guideBaseList.extend([staticGrp for staticGrp in transformList if "staticHook" in cmds.listAttr(staticGrp)] or [])
                 if guideBaseList:
                     for transform in guideBaseList:
                         transformAttrList = cmds.listAttr(transform)

@@ -87,5 +87,5 @@ class SupportNodeIO(dpBaseAction.ActionStartClass):
                 itemList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
                 itemList.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
                 if itemList:
-                    geoList.extend(n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.utils.getSuffixNumberList(n)[1].endswith("Base"))
+                    geoList.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.utils.getSuffixNumberList(n)[1].endswith("Base")] or [])
         return geoList

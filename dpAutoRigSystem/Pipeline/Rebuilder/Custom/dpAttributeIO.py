@@ -88,8 +88,8 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         for node in objList:
             meshList = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
             if meshList:
-                itemList.extend([m for m in meshList if not cmds.getAttr(m+".intermediateObject")])
-                itemList.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type="transform") if cmds.listRelatives(t, children=True, type="mesh")])
+                itemList.extend([m for m in meshList if not cmds.getAttr(m+".intermediateObject")] or [])
+                itemList.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type="transform") or [] if cmds.listRelatives(t, children=True, type="mesh")] or [])
         itemList = list(set(itemList))
         itemList.sort()
         for item in itemList:

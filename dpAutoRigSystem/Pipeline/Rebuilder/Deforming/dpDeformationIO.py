@@ -10,7 +10,7 @@ TITLE = "r033_deformationIO"
 DESCRIPTION = "r034_deformationIODesc"
 ICON = "/Icons/dp_deformationIO.png"
 
-DP_DEFORMATIONIO_VERSION = 1.1
+DP_DEFORMATIONIO_VERSION = 1.2
 
 
 class DeformationIO(dpBaseAction.ActionStartClass):
@@ -53,7 +53,7 @@ class DeformationIO(dpBaseAction.ActionStartClass):
                         itemList = objList
                     else:
                         itemList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True) or []
-                        itemList.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True))
+                        itemList.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True) or [])
                     if itemList:
                         # finding deformers
                         hasDef = False
@@ -161,11 +161,35 @@ class DeformationIO(dpBaseAction.ActionStartClass):
                 cmds.rename(sculptList[2], deformerDic[deformerNode]["relatedData"]["originLocator"])
             elif deformerDic[deformerNode]["type"] == "wrap":
                 if cmds.objExists(deformerDic[deformerNode]["relatedNode"]):
+                    wrapBaseShape = False
+                    if "inflType" in cmds.listAttr(deformerDic[deformerNode]["relatedNode"]):
+                        pluggedList = cmds.listConnections(deformerDic[deformerNode]["relatedNode"]+".inflType", destination=True, source=False)
+                        if pluggedList:
+                            for plugged in pluggedList:
+                                if cmds.objectType(plugged) == "wrap":
+                                    wrapBaseShapeList = cmds.listConnections(plugged+".basePoints[0]", destination=False, source=True)
+                                    if wrapBaseShapeList:
+                                        wrapBaseShape = wrapBaseShapeList[0]
+                                        break
                     cmds.select(self.existShapeList, deformerDic[deformerNode]["relatedNode"])
                     mel.eval("CreateWrap;")
                     hist = cmds.listHistory(self.existShapeList)
                     wrapList = cmds.ls(hist, type="wrap")[0]
                     newDefNode = cmds.rename(wrapList, deformerDic[deformerNode]["name"])
+                    newWrapBaseNode = cmds.listConnections(newDefNode+".basePoints[0]", destination=False, source=True)[0]
+                    if wrapBaseShape:
+                        cmds.connectAttr(wrapBaseShape+".worldMesh[0]", newDefNode+".basePoints[0]", force=True)
+                        cmds.delete(newWrapBaseNode)
+                    supportGrp = self.utils.getNodeByMessage("supportGrp")
+                    if supportGrp:
+                        parentNodeList = []
+                        if wrapBaseShape:
+                            parentNodeList = cmds.listRelatives(wrapBaseShape, parent=True)
+                        else:
+                            parentNodeList = cmds.listRelatives(newWrapBaseNode, parent=True)
+                        if parentNodeList:
+                            if not parentNodeList[0] == supportGrp:
+                                cmds.parent(newWrapBaseNode, supportGrp)
             elif deformerDic[deformerNode]["type"] == "shrinkWrap":
                 newDefNode = cmds.deformer(self.existShapeList, type=deformerDic[deformerNode]["type"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0] #shrinkWrap
                 for cAttr in ["continuity", "smoothUVs", "keepBorder", "boundaryRule", "keepHardEdge", "propagateEdgeHardness", "keepMapBorders"]:

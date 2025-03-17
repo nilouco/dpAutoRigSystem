@@ -271,7 +271,7 @@ class Skinning(dpWeights.Weights):
         """
         skinWeightsList = []
         componentList = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
-        componentList.extend(cmds.ls(item+".cv[*]", flatten=True)) #nurbsCurve
+        componentList.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
         for component in range(0, len(componentList)):
             skinWeightsList.append(self.getDeformerWeights(skinClusterNode, component, infList))
         return skinWeightsList
@@ -282,7 +282,7 @@ class Skinning(dpWeights.Weights):
         """
         skinDataDic = {}
         componentList = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
-        componentList.extend(cmds.ls(item+".cv[*]", flatten=True)) #nurbsCurve
+        componentList.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
         for component in range(0, len(componentList)):
             value = cmds.getAttr(skinClusterNode+"."+attrName+"["+str(component)+"]")
             if not value == 0:
@@ -339,7 +339,7 @@ class Skinning(dpWeights.Weights):
         # get indices
         matrixDic = self.getConnectedMatrixDic(skinClusterName)
         componentList = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
-        componentList.extend(cmds.ls(item+".cv[*]", flatten=True)) #nurbsCurve
+        componentList.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
         for c in range(0, len(componentList)):
             for jntName in skinWeightDic[item][skinClusterName]['skinJointsWeights'][c].keys():
                 # set weights

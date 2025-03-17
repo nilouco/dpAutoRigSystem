@@ -1093,6 +1093,7 @@ class Pipeliner(object):
             "offsetMatrixIO",
             "connectionIO",
             "calibrationIO",
+            "visibilityIO",
             "channelIO"
             ]
         self.existDataList = []

@@ -110,8 +110,8 @@ class Weights(object):
             Use given lists and attribute to filter the results.
         """
         deformedItemList, ranList = [], []
-        itemList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-        itemList.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve"))
+        itemList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh") or []
+        itemList.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve") or [])
         if itemList:
             for item in itemList:
                 transformNode = item[:item[1:].find("|")+1]
