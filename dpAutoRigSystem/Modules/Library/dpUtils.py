@@ -548,10 +548,7 @@ class Utils(object):
                                     cmds.parent(child, fatherList[0])
                                 else:
                                     cmds.parent(child, world=True)
-                else:
-                    cmds.delete(nodeGrpName)
-            else:
-                cmds.delete(nodeGrpName)
+            cmds.delete(nodeGrpName)
 
 
     def getGuideChildrenList(self, nodeName):
