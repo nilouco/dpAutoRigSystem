@@ -38,34 +38,37 @@ class UnlockInitialShadingGroup(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
-        else:
-            toCheckList = ["initialShadingGroup"]
-        if toCheckList:
-            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            for item in toCheckList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(item):
-                    if item == "initialShadingGroup":
-                        # conditional to check here
-                        if cmds.lockNode(item, query=True, lockUnpublished=True):
-                            if cmds.getAttr(item+".nodeState", lock=True):
-                                self.checkedObjList.append(item)
-                                self.foundIssueList.append(True)
-                                if self.firstMode:
-                                    self.resultOkList.append(False)
-                                else: #fix
-                                    try:
-                                        cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                        cmds.setAttr(item+".nodeState", lock=False)
-                                        self.resultOkList.append(True)
-                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                                    except:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = ["initialShadingGroup"]
+            if toCheckList:
+                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                for item in toCheckList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if cmds.objExists(item):
+                        if item == "initialShadingGroup":
+                            # conditional to check here
+                            if cmds.lockNode(item, query=True, lockUnpublished=True):
+                                if cmds.getAttr(item+".nodeState", lock=True):
+                                    self.checkedObjList.append(item)
+                                    self.foundIssueList.append(True)
+                                    if self.firstMode:
                                         self.resultOkList.append(False)
-                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                    else: #fix
+                                        try:
+                                            cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                            cmds.setAttr(item+".nodeState", lock=False)
+                                            self.resultOkList.append(True)
+                                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                        except:
+                                            self.resultOkList.append(False)
+                                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

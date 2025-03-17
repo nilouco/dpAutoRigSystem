@@ -42,30 +42,33 @@ class OffsetMatrixIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                nodeList = None
-                if objList:
-                    nodeList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    nodeList = None
+                    if objList:
+                        nodeList = objList
+                    else:
+                        nodeList = cmds.ls(selection=False, type="transform")
+                    if nodeList:
+                        if self.firstMode: #export
+                            toExportDataDic = self.getOffsetMatrixDataDic(nodeList)
+                            self.exportDicToJsonFile(toExportDataDic)
+                        else: #import
+                            toImportDic = self.importLatestJsonFile(self.getExportedList())
+                            if toImportDic:
+                                self.importOffsetMatrixData(toImportDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else:
-                    nodeList = cmds.ls(selection=False, type="transform")
-                if nodeList:
-                    if self.firstMode: #export
-                        toExportDataDic = self.getOffsetMatrixDataDic(nodeList)
-                        self.exportDicToJsonFile(toExportDataDic)
-                    else: #import
-                        toImportDic = self.importLatestJsonFile(self.getExportedList())
-                        if toImportDic:
-                            self.importOffsetMatrixData(toImportDic)
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

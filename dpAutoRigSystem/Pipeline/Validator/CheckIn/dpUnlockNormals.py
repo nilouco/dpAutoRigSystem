@@ -38,33 +38,36 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            allMeshList = objList
-        else:
-            allMeshList = cmds.ls(selection=False, type='mesh')
-        if allMeshList:
-            self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
-            for mesh in allMeshList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(mesh):
-                    lockedList = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
-                    # check if there's any locked normal
-                    if True in lockedList:
-                        self.checkedObjList.append(mesh)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
-                            except:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                allMeshList = objList
+            else:
+                allMeshList = cmds.ls(selection=False, type='mesh')
+            if allMeshList:
+                self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
+                for mesh in allMeshList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if cmds.objExists(mesh):
+                        lockedList = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
+                        # check if there's any locked normal
+                        if True in lockedList:
+                            self.checkedObjList.append(mesh)
+                            self.foundIssueList.append(True)
+                            if self.firstMode:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
-    
+                            else: #fix
+                                try:
+                                    cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True)
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+        
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -38,32 +38,35 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        hiddenList = [self.dpUIinst.tempGrp, self.dpUIinst.guideMirrorGrp]
-        if not objList:
-            objList = cmds.ls(selection=False, type="transform")
-        if objList:
-            self.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
-            for item in hiddenList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if item in objList:
-                    self.checkedObjList.append(item)
-                    if cmds.objExists(item):
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:    
-                                cmds.delete(item)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                            except:
+        if not cmds.file(query=True, reference=True):
+            hiddenList = [self.dpUIinst.tempGrp, self.dpUIinst.guideMirrorGrp]
+            if not objList:
+                objList = cmds.ls(selection=False, type="transform")
+            if objList:
+                self.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
+                for item in hiddenList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if item in objList:
+                        self.checkedObjList.append(item)
+                        if cmds.objExists(item):
+                            self.foundIssueList.append(True)
+                            if self.firstMode:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                    else:
-                        self.foundIssueList.append(False)
-                        self.resultOkList.append(True)
+                            else: #fix
+                                try:    
+                                    cmds.delete(item)
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        else:
+                            self.foundIssueList.append(False)
+                            self.resultOkList.append(True)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

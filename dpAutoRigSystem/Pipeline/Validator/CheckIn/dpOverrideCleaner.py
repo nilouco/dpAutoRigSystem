@@ -38,36 +38,39 @@ class OverrideCleaner(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        nodeList = cmds.ls(selection=False)
-        if objList:
-            nodeList = objList
-        if nodeList:
-            overridedList = []
-            self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
-            for item in nodeList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(item+".overrideEnabled"):
-                    if cmds.getAttr(item+".overrideEnabled") == 1:
-                        overridedList.append(item)
-            # conditional to check here
-            if overridedList:
-                for item in overridedList:
-                    self.checkedObjList.append(item)
-                    self.foundIssueList.append(True)
-                    if self.firstMode:
-                        self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            cmds.lockNode(item, lock=False, lockUnpublished=False)
-                            cmds.setAttr(item+".overrideEnabled", lock=False)
-                            cmds.setAttr(item+".overrideEnabled", 0)
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                        except:
+        if not cmds.file(query=True, reference=True):
+            nodeList = cmds.ls(selection=False)
+            if objList:
+                nodeList = objList
+            if nodeList:
+                overridedList = []
+                self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
+                for item in nodeList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if cmds.objExists(item+".overrideEnabled"):
+                        if cmds.getAttr(item+".overrideEnabled") == 1:
+                            overridedList.append(item)
+                # conditional to check here
+                if overridedList:
+                    for item in overridedList:
+                        self.checkedObjList.append(item)
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        else: #fix
+                            try:
+                                cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                cmds.setAttr(item+".overrideEnabled", lock=False)
+                                cmds.setAttr(item+".overrideEnabled", 0)
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

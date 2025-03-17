@@ -41,44 +41,47 @@ class ShaderIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                self.customAttrList = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
-                                       "longitudinalWidthR", "longitudinalShiftR", "intensityR", "longitudinalWidthTT", "intensityTT", "longitudinalShiftTT", "azimuthalWidthTT",
-                                        "longitudinalWidthTT", "angle", "spreadX", "spreadY", "fresnelRefractiveIndex", "specularShift", "scatter", "scatterPower", 
-                                        "tubeDirection", "highlightSize", "roughness", "refractions", "refractiveIndex", "refractionLimit", "reflectionLimit", "reflectivity",
-                                        "specularRollOff", "eccentricity", "diffuse", "cosinePower", "base", "diffuseRoughness", "metalness", "specular", "specularRoughness",
-                                        "specularIOR", "specularAnisotropy", "specularRotation", "transmission", "transmissionDepth", "transmissionScatterAnisotropy", 
-                                        "transmissionDispersion", "transmissionExtraRoughness", "subsurface", "subsurfaceScale", "subsurfaceAnisotropy", "coat", "coatRoughness", 
-                                        "coatIOR", "coatAnisotropy", "coatRotation", "coatAffectColor", "coatAffectRoughness", "sheen", "sheenRoughness", "emission", "thinFilmThickness",
-                                        "thinFilmIOR", "thinWalled"]
-                self.vectorColorList = ["outColor", "outTransparency", "outGlowColor", "outMatteOpacity", "colorTT", "colorTRT", "tipColorD", "rootColorD", "whiteness", "reflectedColor",
-                                        "specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "subsurfaceRadius", "coatColor", "sheenColor", "emissionColor",
-                                        "ambientColor", "incandescence", ]
-                if self.firstMode: #export
-                    shaderList = None
-                    if objList:
-                        shaderList = objList
-                    else:
-                        shaderList = self.getUsedMaterialList()
-                    if shaderList:
-                        self.exportDicToJsonFile(self.getShaderDataDic(shaderList))
-                    else:
-                        self.maybeDoneIO("Shading")
-                else: #import
-                    shaderDic = self.importLatestJsonFile(self.getExportedList())
-                    if shaderDic:
-                        try:
-                            self.importShader(shaderDic)
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    self.customAttrList = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
+                                        "longitudinalWidthR", "longitudinalShiftR", "intensityR", "longitudinalWidthTT", "intensityTT", "longitudinalShiftTT", "azimuthalWidthTT",
+                                            "longitudinalWidthTT", "angle", "spreadX", "spreadY", "fresnelRefractiveIndex", "specularShift", "scatter", "scatterPower", 
+                                            "tubeDirection", "highlightSize", "roughness", "refractions", "refractiveIndex", "refractionLimit", "reflectionLimit", "reflectivity",
+                                            "specularRollOff", "eccentricity", "diffuse", "cosinePower", "base", "diffuseRoughness", "metalness", "specular", "specularRoughness",
+                                            "specularIOR", "specularAnisotropy", "specularRotation", "transmission", "transmissionDepth", "transmissionScatterAnisotropy", 
+                                            "transmissionDispersion", "transmissionExtraRoughness", "subsurface", "subsurfaceScale", "subsurfaceAnisotropy", "coat", "coatRoughness", 
+                                            "coatIOR", "coatAnisotropy", "coatRotation", "coatAffectColor", "coatAffectRoughness", "sheen", "sheenRoughness", "emission", "thinFilmThickness",
+                                            "thinFilmIOR", "thinWalled"]
+                    self.vectorColorList = ["outColor", "outTransparency", "outGlowColor", "outMatteOpacity", "colorTT", "colorTRT", "tipColorD", "rootColorD", "whiteness", "reflectedColor",
+                                            "specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "subsurfaceRadius", "coatColor", "sheenColor", "emissionColor",
+                                            "ambientColor", "incandescence", ]
+                    if self.firstMode: #export
+                        shaderList = None
+                        if objList:
+                            shaderList = objList
+                        else:
+                            shaderList = self.getUsedMaterialList()
+                        if shaderList:
+                            self.exportDicToJsonFile(self.getShaderDataDic(shaderList))
+                        else:
+                            self.maybeDoneIO("Shading")
+                    else: #import
+                        shaderDic = self.importLatestJsonFile(self.getExportedList())
+                        if shaderDic:
+                            try:
+                                self.importShader(shaderDic)
+                            except Exception as e:
+                                self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

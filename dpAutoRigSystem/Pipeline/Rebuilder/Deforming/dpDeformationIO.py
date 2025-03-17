@@ -44,40 +44,43 @@ class DeformationIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    itemList = None
-                    if objList:
-                        itemList = objList
-                    else:
-                        itemList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True) or []
-                        itemList.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True) or [])
-                    if itemList:
-                        # finding deformers
-                        hasDef = False
-                        inputDeformerList = cmds.listHistory(itemList, pruneDagObjects=False, interestLevel=True)
-                        for deformerType in self.defWeights.typeAttrDic.keys():
-                            if cmds.ls(inputDeformerList, type=deformerType):
-                                hasDef = True
-                                break
-                        if hasDef:
-                            self.exportDicToJsonFile(self.getDeformerDataDic(inputDeformerList))
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    if self.firstMode: #export
+                        itemList = None
+                        if objList:
+                            itemList = objList
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" deformers")
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
-                else: #import
-                    deformerDic = self.importLatestJsonFile(self.getExportedList())
-                    if deformerDic:
-                        self.importDeformationData(deformerDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            itemList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True) or []
+                            itemList.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True) or [])
+                        if itemList:
+                            # finding deformers
+                            hasDef = False
+                            inputDeformerList = cmds.listHistory(itemList, pruneDagObjects=False, interestLevel=True)
+                            for deformerType in self.defWeights.typeAttrDic.keys():
+                                if cmds.ls(inputDeformerList, type=deformerType):
+                                    hasDef = True
+                                    break
+                            if hasDef:
+                                self.exportDicToJsonFile(self.getDeformerDataDic(inputDeformerList))
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" deformers")
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
+                    else: #import
+                        deformerDic = self.importLatestJsonFile(self.getExportedList())
+                        if deformerDic:
+                            self.importDeformationData(deformerDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

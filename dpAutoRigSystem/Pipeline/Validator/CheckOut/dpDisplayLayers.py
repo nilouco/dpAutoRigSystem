@@ -38,62 +38,65 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            ctrlsGeometryList = objList
-        else:
-            # List all controls
-            ctrlsGeometryList = None
-            self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
-            if self.allCtrlsList:
-                allGeoList = self.getGeometryTranform()
-                ctrlsGeometryList = self.allCtrlsList
-                if allGeoList:
-                    ctrlsGeometryList = self.allCtrlsList + allGeoList
-        if ctrlsGeometryList:
-            self.geoLayerName = "Geo_Lyr"
-            self.ctrlLayerName = "Ctrl_Lyr"
-            allLayersList = cmds.ls(type="displayLayer")
-            self.extraLayerToDelete = []
-            for layer in allLayersList:
-                if layer != self.geoLayerName and layer != self.ctrlLayerName and layer != "defaultLayer":
-                    self.extraLayerToDelete.append(layer)
-            if not self.extraLayerToDelete:
-                if cmds.objExists(self.geoLayerName) and cmds.objExists(self.ctrlLayerName):
-                    layersConfigurationCheckList = [True, False, 2, True, False, 0]
-                    geoLyrVisibility = cmds.getAttr(self.geoLayerName+".visibility") #True
-                    geoLyrHideOnPlayback = cmds.getAttr(self.geoLayerName+".hideOnPlayback") #False
-                    geolLyrDisplayType = cmds.getAttr(self.geoLayerName+".displayType") #2 = ref
-                    ctrlLyrVisibility = cmds.getAttr(self.ctrlLayerName+".visibility") #True
-                    ctrlLyrHideOnPlayback = cmds.getAttr(self.ctrlLayerName+".hideOnPlayback") #False
-                    ctrlLyrDisplayType = cmds.getAttr(self.ctrlLayerName+".displayType") #0 = none
-                    layersConfiguration = [geoLyrVisibility, geoLyrHideOnPlayback, geolLyrDisplayType, ctrlLyrVisibility, ctrlLyrHideOnPlayback, ctrlLyrDisplayType]
-                    # Check layers configuration
-                    if layersConfiguration == layersConfigurationCheckList:
-                        itemsInGeoLayerList = cmds.editDisplayLayerMembers(self.geoLayerName, fullNames=True, query=True)
-                        itemsInCtrlLayerList = cmds.editDisplayLayerMembers(self.ctrlLayerName, query=True)
-                        # Check layers members
-                        if itemsInGeoLayerList and itemsInCtrlLayerList:
-                            missingGeoList = list(set(allGeoList) - set(itemsInGeoLayerList))
-                            remainingGeoList = list(set(itemsInGeoLayerList) - set(allGeoList))
-                            missingCtrlList = list(set(self.allCtrlsList) - set(itemsInCtrlLayerList))
-                            remainingCtrlList = list(set(itemsInCtrlLayerList) - set(self.allCtrlsList))
-                            toFixList = missingGeoList + remainingGeoList + missingCtrlList + remainingCtrlList
-                            if toFixList:
-                                self.verifyFixMode(toFixList)
-                        else:
-                            # Empty layer
-                            self.verifyFixMode([self.dpUIinst.lang['v056_emptyLayers']])
-                    else:
-                        # Layer configuration
-                        self.verifyFixMode([self.dpUIinst.lang['v057_layerConfiguration']])
-                else:
-                    # No display layer
-                    self.verifyFixMode([self.dpUIinst.lang['v054_displayLayers']])
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                ctrlsGeometryList = objList
             else:
-                # Extra Lyr to delete
-                self.verifyFixMode(self.extraLayerToDelete)
+                # List all controls
+                ctrlsGeometryList = None
+                self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
+                if self.allCtrlsList:
+                    allGeoList = self.getGeometryTranform()
+                    ctrlsGeometryList = self.allCtrlsList
+                    if allGeoList:
+                        ctrlsGeometryList = self.allCtrlsList + allGeoList
+            if ctrlsGeometryList:
+                self.geoLayerName = "Geo_Lyr"
+                self.ctrlLayerName = "Ctrl_Lyr"
+                allLayersList = cmds.ls(type="displayLayer")
+                self.extraLayerToDelete = []
+                for layer in allLayersList:
+                    if layer != self.geoLayerName and layer != self.ctrlLayerName and layer != "defaultLayer":
+                        self.extraLayerToDelete.append(layer)
+                if not self.extraLayerToDelete:
+                    if cmds.objExists(self.geoLayerName) and cmds.objExists(self.ctrlLayerName):
+                        layersConfigurationCheckList = [True, False, 2, True, False, 0]
+                        geoLyrVisibility = cmds.getAttr(self.geoLayerName+".visibility") #True
+                        geoLyrHideOnPlayback = cmds.getAttr(self.geoLayerName+".hideOnPlayback") #False
+                        geolLyrDisplayType = cmds.getAttr(self.geoLayerName+".displayType") #2 = ref
+                        ctrlLyrVisibility = cmds.getAttr(self.ctrlLayerName+".visibility") #True
+                        ctrlLyrHideOnPlayback = cmds.getAttr(self.ctrlLayerName+".hideOnPlayback") #False
+                        ctrlLyrDisplayType = cmds.getAttr(self.ctrlLayerName+".displayType") #0 = none
+                        layersConfiguration = [geoLyrVisibility, geoLyrHideOnPlayback, geolLyrDisplayType, ctrlLyrVisibility, ctrlLyrHideOnPlayback, ctrlLyrDisplayType]
+                        # Check layers configuration
+                        if layersConfiguration == layersConfigurationCheckList:
+                            itemsInGeoLayerList = cmds.editDisplayLayerMembers(self.geoLayerName, fullNames=True, query=True)
+                            itemsInCtrlLayerList = cmds.editDisplayLayerMembers(self.ctrlLayerName, query=True)
+                            # Check layers members
+                            if itemsInGeoLayerList and itemsInCtrlLayerList:
+                                missingGeoList = list(set(allGeoList) - set(itemsInGeoLayerList))
+                                remainingGeoList = list(set(itemsInGeoLayerList) - set(allGeoList))
+                                missingCtrlList = list(set(self.allCtrlsList) - set(itemsInCtrlLayerList))
+                                remainingCtrlList = list(set(itemsInCtrlLayerList) - set(self.allCtrlsList))
+                                toFixList = missingGeoList + remainingGeoList + missingCtrlList + remainingCtrlList
+                                if toFixList:
+                                    self.verifyFixMode(toFixList)
+                            else:
+                                # Empty layer
+                                self.verifyFixMode([self.dpUIinst.lang['v056_emptyLayers']])
+                        else:
+                            # Layer configuration
+                            self.verifyFixMode([self.dpUIinst.lang['v057_layerConfiguration']])
+                    else:
+                        # No display layer
+                        self.verifyFixMode([self.dpUIinst.lang['v054_displayLayers']])
+                else:
+                    # Extra Lyr to delete
+                    self.verifyFixMode(self.extraLayerToDelete)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

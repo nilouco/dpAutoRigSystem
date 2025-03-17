@@ -195,69 +195,69 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
+        if not cmds.file(query=True, reference=True):
+            self.currentFileName = cmds.file(query=True, sceneName=True, shortName=True)[:-3]
+            rootNode = None
 
-        self.currentFileName = cmds.file(query=True, sceneName=True, shortName=True)[:-3]
-        rootNode = None
-
-        self.dpTeamFile = self.checkIfdpTeam()
-        if self.dpTeamFile:
-            self.currentFileName = self.currentFileName.replace("_v", "_h")
-        
-        globalCtrl = self.utils.getNodeByMessage("globalCtrl")
-        # Verify if another Ctrl was sent via code to check hierarchy from.
-        if objList and cmds.objExists(objList[0]) and self.checkNurbs(objList[0]):
-            rootNode = objList[0]
-        elif cmds.objExists(globalCtrl) and self.checkNurbs(globalCtrl):
-            rootNode = globalCtrl
-        else:
-            self.checkedObjList.append(str(rootNode))
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.lang['v062_globalMissing'])
-            self.updateActionButtons()
-            self.reportLog()
-            self.utils.setProgress(endIt=True)
-            return self.dataLogDic
-
-        currentFileHierarchyDic = self.raiseHierarchy(rootNode)
-        lastHierarchyFilePath = self.lookForLastHierarchy()
-        isHierarchySame = True
-
-        if lastHierarchyFilePath:
-            lastHierarchyDic = self.retrieveDicFromFile(lastHierarchyFilePath)
-            isHierarchySame = self.compareHierarchy(lastHierarchyDic, currentFileHierarchyDic)
-            self.checkedObjList.append(lastHierarchyFilePath)
-        else:
-            self.checkedObjList.append("Controls Hierarchy")
-            self.messageList.append(self.dpUIinst.lang['v063_firstHierarchy'])
-
-        if self.firstMode:
-            if isHierarchySame:
+            self.dpTeamFile = self.checkIfdpTeam()
+            if self.dpTeamFile:
+                self.currentFileName = self.currentFileName.replace("_v", "_h")
+            
+            globalCtrl = self.utils.getNodeByMessage("globalCtrl")
+            # Verify if another Ctrl was sent via code to check hierarchy from.
+            if objList and cmds.objExists(objList[0]) and self.checkNurbs(objList[0]):
+                rootNode = objList[0]
+            elif cmds.objExists(globalCtrl) and self.checkNurbs(globalCtrl):
+                rootNode = globalCtrl
+            else:
+                self.checkedObjList.append(str(rootNode))
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
-            else:
-                self.foundIssueList.append(True)
-                self.resultOkList.append(False)
-        else:
-            if cmds.file(query=True, sceneName=True) != "":
-                if lastHierarchyFilePath == None:
-                    self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
-                elif not isHierarchySame:
-                    self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
-            else:
-                self.checkedObjList.append("Scene")
-                self.foundIssueList.append(True)
-                self.resultOkList.append(False)
-                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+" "+self.dpUIinst.lang['v064_hierarchy'])
-                self.messageList.append(self.dpUIinst.lang['i201_saveScene'])
+                self.messageList.append(self.dpUIinst.lang['v062_globalMissing'])
                 self.updateActionButtons()
                 self.reportLog()
                 self.utils.setProgress(endIt=True)
                 return self.dataLogDic
-            
 
+            currentFileHierarchyDic = self.raiseHierarchy(rootNode)
+            lastHierarchyFilePath = self.lookForLastHierarchy()
+            isHierarchySame = True
+
+            if lastHierarchyFilePath:
+                lastHierarchyDic = self.retrieveDicFromFile(lastHierarchyFilePath)
+                isHierarchySame = self.compareHierarchy(lastHierarchyDic, currentFileHierarchyDic)
+                self.checkedObjList.append(lastHierarchyFilePath)
+            else:
+                self.checkedObjList.append("Controls Hierarchy")
+                self.messageList.append(self.dpUIinst.lang['v063_firstHierarchy'])
+
+            if self.firstMode:
+                if isHierarchySame:
+                    self.foundIssueList.append(False)
+                    self.resultOkList.append(True)
+                else:
+                    self.foundIssueList.append(True)
+                    self.resultOkList.append(False)
+            else:
+                if cmds.file(query=True, sceneName=True) != "":
+                    if lastHierarchyFilePath == None:
+                        self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
+                    elif not isHierarchySame:
+                        self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
+                    self.foundIssueList.append(False)
+                    self.resultOkList.append(True)
+                else:
+                    self.checkedObjList.append("Scene")
+                    self.foundIssueList.append(True)
+                    self.resultOkList.append(False)
+                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+" "+self.dpUIinst.lang['v064_hierarchy'])
+                    self.messageList.append(self.dpUIinst.lang['i201_saveScene'])
+                    self.updateActionButtons()
+                    self.reportLog()
+                    self.utils.setProgress(endIt=True)
+                    return self.dataLogDic
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

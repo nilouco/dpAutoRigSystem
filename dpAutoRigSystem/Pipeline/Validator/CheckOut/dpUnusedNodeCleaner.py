@@ -39,37 +39,40 @@ class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
-        else:
-            toCheckList = cmds.ls(selection=False, materials=True)
-        if toCheckList:
-            if len(toCheckList) > 3: #discarding default materials
-                # getting data to analyse
-                defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1']
-                allMatList = list(set(toCheckList) - set(defaultMatList))
-                usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
-                # conditional to check here
-                if not len(allMatList) == len(usedMatList):
-                    self.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
-                    self.checkedObjList.append(str(", ".join(issueMatList)))
-                    self.foundIssueList.append(True)
-                    if self.firstMode:
-                        self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            fixResult = mel.eval("MLdeleteUnused;")
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+str(fixResult)+" nodes = "+str(len(issueMatList))+" materials")
-                        except:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = cmds.ls(selection=False, materials=True)
+            if toCheckList:
+                if len(toCheckList) > 3: #discarding default materials
+                    # getting data to analyse
+                    defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1']
+                    allMatList = list(set(toCheckList) - set(defaultMatList))
+                    usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
+                    # conditional to check here
+                    if not len(allMatList) == len(usedMatList):
+                        self.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
+                        self.checkedObjList.append(str(", ".join(issueMatList)))
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": materials")
+                        else: #fix
+                            try:
+                                fixResult = mel.eval("MLdeleteUnused;")
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+str(fixResult)+" nodes = "+str(len(issueMatList))+" materials")
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": materials")
+                else:
+                    self.notFoundNodes()
             else:
                 self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

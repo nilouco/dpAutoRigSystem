@@ -41,29 +41,32 @@ class TransformationIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    transformList = None
-                    if objList:
-                        transformList = objList
-                    else:
-                        transformList = cmds.ls(selection=False, long=True, type="transform")
-                    if transformList:
-                        self.exportDicToJsonFile(self.getTransformDataDic(transformList))
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
-                else: #import
-                    transformDic = self.importLatestJsonFile(self.getExportedList())
-                    if transformDic:
-                        self.importTransformation(transformDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    if self.firstMode: #export
+                        transformList = None
+                        if objList:
+                            transformList = objList
+                        else:
+                            transformList = cmds.ls(selection=False, long=True, type="transform")
+                        if transformList:
+                            self.exportDicToJsonFile(self.getTransformDataDic(transformList))
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                    else: #import
+                        transformDic = self.importLatestJsonFile(self.getExportedList())
+                        if transformDic:
+                            self.importTransformation(transformDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

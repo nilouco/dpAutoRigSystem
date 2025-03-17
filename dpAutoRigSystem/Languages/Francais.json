@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-03-15",
+    "_updated"       : "2025-03-17",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -838,6 +838,7 @@
     "r069_noAssetToSaveVersion" : "Il semble que nous n'ayons pas encore de configuration d'actif valide, désolé.\n\nVous pouvez en créer un nouveau ou charger un actif existant avant de continuer.\nSi vous préférez, enregistrez votre scène dans le pipeline avant de continuer, s'il vous plaît.",
     "r070_visibilityIO"         : "Visibilité",
     "r071_visibilityIODesc"     : "Cette action va travailler l'attribut de visibilité\nen l'exportant et en l'important.",
+    "r072_noReferenceAllowed"   : "Ce n'est pas possible continuer le processus parqu'il y a des références dans la scene, désolé.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

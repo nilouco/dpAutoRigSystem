@@ -38,39 +38,42 @@ class WIPCleaner(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        wipGrp = None
-        if objList:
-            wipGrp = objList
-        else:
-            wipGrp = self.utils.getNodeByMessage("wipGrp")
-            if not wipGrp:
-                if cmds.objExists("WIP_Grp"):
-                    wipGrp = "WIP_Grp"
-        if wipGrp:
-            self.utils.setProgress(max=len(wipGrp), addOne=False, addNumber=False)
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
-            self.checkedObjList.append(wipGrp)
-            wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
-            if wipChildrenList:
-                self.foundIssueList.append(True)
-                if self.firstMode:
-                    self.resultOkList.append(False)
-                else: #fix    
-                    try:
-                        cmds.delete(wipChildrenList)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+wipGrp)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+wipGrp)
+        if not cmds.file(query=True, reference=True):
+            wipGrp = None
+            if objList:
+                wipGrp = objList
             else:
+                wipGrp = self.utils.getNodeByMessage("wipGrp")
+                if not wipGrp:
+                    if cmds.objExists("WIP_Grp"):
+                        wipGrp = "WIP_Grp"
+            if wipGrp:
+                self.utils.setProgress(max=len(wipGrp), addOne=False, addNumber=False)
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.checkedObjList.append(wipGrp)
+                wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
+                if wipChildrenList:
+                    self.foundIssueList.append(True)
+                    if self.firstMode:
+                        self.resultOkList.append(False)
+                    else: #fix    
+                        try:
+                            cmds.delete(wipChildrenList)
+                            self.resultOkList.append(True)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+wipGrp)
+                        except:
+                            self.resultOkList.append(False)
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+wipGrp)
+                else:
+                    self.foundIssueList.append(False)
+                    self.resultOkList.append(True)
+            else:
+                self.checkedObjList.append("")
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
+                self.messageList.append(self.dpUIinst.lang['v011_notWIP'])
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.lang['v011_notWIP'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

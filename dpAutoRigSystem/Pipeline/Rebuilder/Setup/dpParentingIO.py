@@ -41,38 +41,41 @@ class ParentingIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    transformList = None
-                    if objList:
-                        transformList = objList
-                    else:
-                        transformList = cmds.ls(selection=False, long=True, type="transform")
-                    if transformList:
-                        self.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
-                        # define data to export
-                        parentDic = self.getParentingDataDic(transformList)
-                        parentDic.update(self.getBrokenIDDataDic())
-                        self.exportDicToJsonFile(parentDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
-                else: #import
-                    parentDic = self.importLatestJsonFile(self.getExportedList())
-                    if parentDic:
-                        try:
-                            if self.importBrokenIDData(parentDic):
-                                self.importParentingData(parentDic) #double run to first put broken nodes in place
-                            self.importParentingData(parentDic)
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    if self.firstMode: #export
+                        transformList = None
+                        if objList:
+                            transformList = objList
+                        else:
+                            transformList = cmds.ls(selection=False, long=True, type="transform")
+                        if transformList:
+                            self.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
+                            # define data to export
+                            parentDic = self.getParentingDataDic(transformList)
+                            parentDic.update(self.getBrokenIDDataDic())
+                            self.exportDicToJsonFile(parentDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                    else: #import
+                        parentDic = self.importLatestJsonFile(self.getExportedList())
+                        if parentDic:
+                            try:
+                                if self.importBrokenIDData(parentDic):
+                                    self.importParentingData(parentDic) #double run to first put broken nodes in place
+                                self.importParentingData(parentDic)
+                            except Exception as e:
+                                self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

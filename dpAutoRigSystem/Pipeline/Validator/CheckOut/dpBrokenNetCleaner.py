@@ -38,29 +38,32 @@ class BrokenNetCleaner(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = cmds.ls(selection=False, type='network')
+            if toCheckList:
+                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                for item in toCheckList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    # conditional to check here
+                    if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"): #correctionManater
+                        if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
+                            self.cleanUpNetwork(item)
+                    elif cmds.objExists(item+".worldRef"): #ikFkSnap
+                        if not cmds.listConnections(item+".worldRef", source=True, destination=False):
+                            self.cleanUpNetwork(item)
+                    elif cmds.objExists(item+".follicle"): #rivet
+                        if not cmds.listConnections(item+".follicle", source=True, destination=False):
+                            self.cleanUpNetwork(item)
+                    elif cmds.objExists(item+".linkedNode"): #guide
+                        if not cmds.listConnections(item+".linkedNode", source=True, destination=False):
+                            self.cleanUpNetwork(item)
+            else:
+                self.notFoundNodes()
         else:
-            toCheckList = cmds.ls(selection=False, type='network')
-        if toCheckList:
-            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            for item in toCheckList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                # conditional to check here
-                if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"): #correctionManater
-                    if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
-                        self.cleanUpNetwork(item)
-                elif cmds.objExists(item+".worldRef"): #ikFkSnap
-                    if not cmds.listConnections(item+".worldRef", source=True, destination=False):
-                        self.cleanUpNetwork(item)
-                elif cmds.objExists(item+".follicle"): #rivet
-                    if not cmds.listConnections(item+".follicle", source=True, destination=False):
-                        self.cleanUpNetwork(item)
-                elif cmds.objExists(item+".linkedNode"): #guide
-                    if not cmds.listConnections(item+".linkedNode", source=True, destination=False):
-                        self.cleanUpNetwork(item)
-        else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

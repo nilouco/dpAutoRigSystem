@@ -38,58 +38,61 @@ class KeyframeCleaner(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = cmds.ls(selection=False)
+            if toCheckList:
+                # get animation node list
+                animCurveList = cmds.ls(type="animCurve")
+                if animCurveList:
+                    animatedList = []
+                    for animCrv in animCurveList:
+                        connectionList = cmds.ls(cmds.listConnections(animCrv), type=["transform", "blendShape", "nonLinear"])
+                        if connectionList and not connectionList[0] in animatedList:
+                            animatedList.append(connectionList[0])
+                    if animatedList:
+                        self.utils.setProgress(max=len(animatedList), addOne=False, addNumber=False)
+                        for item in animatedList:
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            if item in toCheckList:
+                                if cmds.objExists(item):
+                                    crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
+                                    if crvList:
+                                        foundKey = False
+                                        for crv in crvList:
+                                            # conditional to check here
+                                            if len(cmds.listConnections(crv, source=True)) >= 2:
+                                                pass #drivenKey
+                                            else: #normal key
+                                                foundKey = True
+                                                break
+                                        if foundKey:
+                                            self.checkedObjList.append(item)
+                                            self.foundIssueList.append(True)
+                                            if self.firstMode:
+                                                self.resultOkList.append(False)
+                                            else: #fix
+                                                reported = False
+                                                for crv in crvList:
+                                                    if len(cmds.listConnections(crv, source=True)) < 2:
+                                                        try:
+                                                            # delete animation curve (keyframe)
+                                                            cmds.delete(crv)
+                                                            if not reported:
+                                                                self.resultOkList.append(True)
+                                                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                                                reported = True
+                                                        except:
+                                                            if not reported:
+                                                                self.resultOkList.append(False)
+                                                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                                                reported = True
+            else:
+                self.notFoundNodes()
         else:
-            toCheckList = cmds.ls(selection=False)
-        if toCheckList:
-            # get animation node list
-            animCurveList = cmds.ls(type="animCurve")
-            if animCurveList:
-                animatedList = []
-                for animCrv in animCurveList:
-                    connectionList = cmds.ls(cmds.listConnections(animCrv), type=["transform", "blendShape", "nonLinear"])
-                    if connectionList and not connectionList[0] in animatedList:
-                        animatedList.append(connectionList[0])
-                if animatedList:
-                    self.utils.setProgress(max=len(animatedList), addOne=False, addNumber=False)
-                    for item in animatedList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
-                        if item in toCheckList:
-                            if cmds.objExists(item):
-                                crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
-                                if crvList:
-                                    foundKey = False
-                                    for crv in crvList:
-                                        # conditional to check here
-                                        if len(cmds.listConnections(crv, source=True)) >= 2:
-                                            pass #drivenKey
-                                        else: #normal key
-                                            foundKey = True
-                                            break
-                                    if foundKey:
-                                        self.checkedObjList.append(item)
-                                        self.foundIssueList.append(True)
-                                        if self.firstMode:
-                                            self.resultOkList.append(False)
-                                        else: #fix
-                                            reported = False
-                                            for crv in crvList:
-                                                if len(cmds.listConnections(crv, source=True)) < 2:
-                                                    try:
-                                                        # delete animation curve (keyframe)
-                                                        cmds.delete(crv)
-                                                        if not reported:
-                                                            self.resultOkList.append(True)
-                                                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                                                            reported = True
-                                                    except:
-                                                        if not reported:
-                                                            self.resultOkList.append(False)
-                                                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                                                            reported = True
-        else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -42,63 +42,66 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        self.skinClusterList = []
-        proxyGrp = None
-        if objList:
-            proxyGrp = objList[0]
-        else:
-            proxyGrp = self.utils.getNodeByMessage("proxyGrp")
-            if not proxyGrp:
-                if cmds.objExists("Proxy_Grp"):
-                    proxyGrp = "Proxy_Grp"
-        if proxyGrp:
-            if not PROXIED in cmds.listAttr(proxyGrp):
-                meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
-                if not meshList:
-                    renderGrp = self.utils.getNodeByMessage("renderGrp")
-                    if not renderGrp:
-                        if cmds.objExists("Render_Grp"):
-                            renderGrp = "Render_Grp"
-                    if renderGrp:
-                        meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, fullPath=True, type="mesh")
-                if meshList:
-                    # find meshes to generate proxy
-                    toProxyList = []
-                    for mesh in meshList:
-                        if len(cmds.ls(mesh)) == 1:
-                            meshTransform = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
-                            if meshTransform:
-                                if not meshTransform[0] in toProxyList:
-                                    if not NO_PROXY in cmds.listAttr(meshTransform):
-                                        if not PROXIED in cmds.listAttr(meshTransform):
-                                            toProxyList.append(meshTransform[0])
-                    if toProxyList:
-                        self.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
-                        self.checkedObjList.append(proxyGrp)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                for sourceTransform in toProxyList:
-                                    sourceShortName = self.utils.getShortName(sourceTransform)
-                                    self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+sourceShortName)
-                                    self.createProxy(sourceTransform, sourceShortName, proxyGrp)
-                                self.proxyIntegration(proxyGrp)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+proxyGrp)
-                            except:
+        if not cmds.file(query=True, reference=True):
+            self.skinClusterList = []
+            proxyGrp = None
+            if objList:
+                proxyGrp = objList[0]
+            else:
+                proxyGrp = self.utils.getNodeByMessage("proxyGrp")
+                if not proxyGrp:
+                    if cmds.objExists("Proxy_Grp"):
+                        proxyGrp = "Proxy_Grp"
+            if proxyGrp:
+                if not PROXIED in cmds.listAttr(proxyGrp):
+                    meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
+                    if not meshList:
+                        renderGrp = self.utils.getNodeByMessage("renderGrp")
+                        if not renderGrp:
+                            if cmds.objExists("Render_Grp"):
+                                renderGrp = "Render_Grp"
+                        if renderGrp:
+                            meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, fullPath=True, type="mesh")
+                    if meshList:
+                        # find meshes to generate proxy
+                        toProxyList = []
+                        for mesh in meshList:
+                            if len(cmds.ls(mesh)) == 1:
+                                meshTransform = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
+                                if meshTransform:
+                                    if not meshTransform[0] in toProxyList:
+                                        if not NO_PROXY in cmds.listAttr(meshTransform):
+                                            if not PROXIED in cmds.listAttr(meshTransform):
+                                                toProxyList.append(meshTransform[0])
+                        if toProxyList:
+                            self.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
+                            self.checkedObjList.append(proxyGrp)
+                            self.foundIssueList.append(True)
+                            if self.firstMode:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
+                            else: #fix
+                                try:
+                                    for sourceTransform in toProxyList:
+                                        sourceShortName = self.utils.getShortName(sourceTransform)
+                                        self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+sourceShortName)
+                                        self.createProxy(sourceTransform, sourceShortName, proxyGrp)
+                                    self.proxyIntegration(proxyGrp)
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+proxyGrp)
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
+                        else:
+                            self.foundIssueList.append(False)
+                            self.resultOkList.append(True)
                     else:
-                        self.foundIssueList.append(False)
-                        self.resultOkList.append(True)
+                        self.notFoundNodes(proxyGrp)
                 else:
                     self.notFoundNodes(proxyGrp)
             else:
                 self.notFoundNodes(proxyGrp)
         else:
-            self.notFoundNodes(proxyGrp)
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
         

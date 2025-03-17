@@ -39,41 +39,44 @@ class VaccineCleaner(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
-        else:
-            toCheckList = cmds.ls(selection=False, type='script')
-        if toCheckList:
-            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            for item in toCheckList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                # conditional to check here
-                scriptdata = cmds.scriptNode(item, beforeScript=True, query=True)
-                #if "fuck_All_U" in scriptdata:
-                if "_gene" in scriptdata:
-                    self.checkedObjList.append(item)
-                    self.foundIssueList.append(True)
-                    if self.firstMode:
-                        self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            cmds.delete(item)
-                            path = cmds.internalVar(userAppDir=True)+"/scripts/"
-                            vaccineList = ["vaccine.py", "vaccine.pyc"]
-                            for vaccine in vaccineList:
-                                if os.path.exists(path+vaccine):
-                                    os.remove(path+vaccine)
-                            if os.path.exists(path+"userSetup.py"):
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
-                            else:
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                            cmds.select(clear=True)
-                            self.resultOkList.append(True)
-                        except:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = cmds.ls(selection=False, type='script')
+            if toCheckList:
+                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                for item in toCheckList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    # conditional to check here
+                    scriptdata = cmds.scriptNode(item, beforeScript=True, query=True)
+                    #if "fuck_All_U" in scriptdata:
+                    if "_gene" in scriptdata:
+                        self.checkedObjList.append(item)
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        else: #fix
+                            try:
+                                cmds.delete(item)
+                                path = cmds.internalVar(userAppDir=True)+"/scripts/"
+                                vaccineList = ["vaccine.py", "vaccine.pyc"]
+                                for vaccine in vaccineList:
+                                    if os.path.exists(path+vaccine):
+                                        os.remove(path+vaccine)
+                                if os.path.exists(path+"userSetup.py"):
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
+                                else:
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                cmds.select(clear=True)
+                                self.resultOkList.append(True)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -42,30 +42,33 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                itemList = None
-                if objList:
-                    itemList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    itemList = None
+                    if objList:
+                        itemList = objList
+                    else:
+                        itemList = self.dpUIinst.ctrls.getControlList()
+                        itemList.extend(self.getModelToExportList())
+                    if itemList:
+                        if self.firstMode: #export
+                            self.exportDicToJsonFile(self.getAttributeDataDic(itemList))
+                        else: #import
+                            attrDic = self.importLatestJsonFile(self.getExportedList())
+                            if attrDic:
+                                self.importAttributeData(attrDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    itemList = self.dpUIinst.ctrls.getControlList()
-                    itemList.extend(self.getModelToExportList())
-                if itemList:
-                    if self.firstMode: #export
-                        self.exportDicToJsonFile(self.getAttributeDataDic(itemList))
-                    else: #import
-                        attrDic = self.importLatestJsonFile(self.getExportedList())
-                        if attrDic:
-                            self.importAttributeData(attrDic)
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.maybeDoneIO("Ctrls_Grp")
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

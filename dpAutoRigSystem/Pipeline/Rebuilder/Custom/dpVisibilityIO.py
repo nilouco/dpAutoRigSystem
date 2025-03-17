@@ -42,29 +42,32 @@ class VisibilityIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                itemList = None
-                if objList:
-                    itemList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    itemList = None
+                    if objList:
+                        itemList = objList
+                    else:
+                        itemList = cmds.ls(selection=False)#, type="transform")
+                    if itemList:
+                        if self.firstMode: #export
+                            self.exportDicToJsonFile(self.getVisibilityDataDic(itemList))
+                        else: #import
+                            visDic = self.importLatestJsonFile(self.getExportedList())
+                            if visDic:
+                                self.importVisibilityData(visDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    itemList = cmds.ls(selection=False)#, type="transform")
-                if itemList:
-                    if self.firstMode: #export
-                        self.exportDicToJsonFile(self.getVisibilityDataDic(itemList))
-                    else: #import
-                        visDic = self.importLatestJsonFile(self.getExportedList())
-                        if visDic:
-                            self.importVisibilityData(visDic)
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.maybeDoneIO("Ctrls_Grp")
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

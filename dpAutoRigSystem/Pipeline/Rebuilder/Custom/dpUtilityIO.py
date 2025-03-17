@@ -41,29 +41,32 @@ class UtilityIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                utilityList = None
-                if objList:
-                    utilityList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    utilityList = None
+                    if objList:
+                        utilityList = objList
+                    else:
+                        utilityList = cmds.ls(selection=False, type=self.utils.utilityTypeList)
+                    if self.firstMode: #export
+                        if utilityList:
+                            self.exportDicToJsonFile(self.getUtilityDataDic(utilityList))
+                        else:
+                            self.maybeDoneIO("Utility nodes.")
+                    else: #import
+                        utilityDic = self.importLatestJsonFile(self.getExportedList())
+                        if utilityDic:
+                            self.importUtilityData(utilityDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
-                    utilityList = cmds.ls(selection=False, type=self.utils.utilityTypeList)
-                if self.firstMode: #export
-                    if utilityList:
-                        self.exportDicToJsonFile(self.getUtilityDataDic(utilityList))
-                    else:
-                        self.maybeDoneIO("Utility nodes.")
-                else: #import
-                    utilityDic = self.importLatestJsonFile(self.getExportedList())
-                    if utilityDic:
-                        self.importUtilityData(utilityDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

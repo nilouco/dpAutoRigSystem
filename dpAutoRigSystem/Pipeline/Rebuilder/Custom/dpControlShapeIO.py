@@ -1,4 +1,5 @@
 # importing libraries:
+from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
@@ -40,42 +41,45 @@ class ControlShapeIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                ctrlList = None
-                if objList:
-                    ctrlList = objList
-                else:
-                    ctrlList = self.dpUIinst.ctrls.getControlList()
-                if ctrlList:
-                    self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
-                    if self.firstMode: #export
-                        try:
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".ma"
-                            self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
-                            self.wellDoneIO(ctrlFileName)
-                        except Exception as e:
-                            self.notWorkedWellIO(', '.join(ctrlList)+": "+str(e))
-                    else: #import
-                        exportedList = self.getExportedList()
-                        if exportedList:
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    ctrlList = None
+                    if objList:
+                        ctrlList = objList
+                    else:
+                        ctrlList = self.dpUIinst.ctrls.getControlList()
+                    if ctrlList:
+                        self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+                        if self.firstMode: #export
                             try:
-                                exportedList.sort()
-                                ctrlsToImport = self.ioPath+"/"+exportedList[-1]
-                                self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport, ui=False, verbose=True)
-                                self.wellDoneIO(exportedList[-1])
+                                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                                ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".ma"
+                                self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
+                                self.wellDoneIO(ctrlFileName)
                             except Exception as e:
-                                self.notWorkedWellIO(exportedList[-1]+": "+str(e))
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.notWorkedWellIO(', '.join(ctrlList)+": "+str(e))
+                        else: #import
+                            exportedList = self.getExportedList()
+                            if exportedList:
+                                try:
+                                    exportedList.sort()
+                                    ctrlsToImport = self.ioPath+"/"+exportedList[-1]
+                                    self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport, ui=False, verbose=True)
+                                    self.wellDoneIO(exportedList[-1])
+                                except Exception as e:
+                                    self.notWorkedWellIO(exportedList[-1]+": "+str(e))
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    self.maybeDoneIO("Ctrls_Grp")
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

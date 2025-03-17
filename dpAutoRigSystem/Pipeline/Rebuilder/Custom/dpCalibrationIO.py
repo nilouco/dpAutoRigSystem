@@ -41,29 +41,32 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                ctrlList = None
-                if objList:
-                    ctrlList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    ctrlList = None
+                    if objList:
+                        ctrlList = objList
+                    else:
+                        ctrlList = self.dpUIinst.ctrls.getControlList()
+                    if ctrlList:
+                        if self.firstMode: #export
+                            self.exportDicToJsonFile(self.getCalibrationDataDic(ctrlList))
+                        else: #import
+                            calibrationDic = self.importLatestJsonFile(self.getExportedList())
+                            if calibrationDic:
+                                self.importCalibrationData(calibrationDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    ctrlList = self.dpUIinst.ctrls.getControlList()
-                if ctrlList:
-                    if self.firstMode: #export
-                        self.exportDicToJsonFile(self.getCalibrationDataDic(ctrlList))
-                    else: #import
-                        calibrationDic = self.importLatestJsonFile(self.getExportedList())
-                        if calibrationDic:
-                            self.importCalibrationData(calibrationDic)
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.maybeDoneIO("Ctrls_Grp")
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

@@ -54,33 +54,35 @@ class EnvelopeChecker(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        if objList:
-            allNodesList = objList
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                allNodesList = objList
+            else:
+                allNodesList = cmds.ls()
+            allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
+            allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
+            self.checkedObjList.extend(allValidEnvelopeNodes)
+            if self.checkedObjList:
+                self.utils.setProgress(max=len(self.checkedObjList), addOne=False, addNumber=False)
+
+                for node in self.checkedObjList:
+                    self.foundIssueList.append(self.verifyEnvelope(node))
+
+                if not self.firstMode:
+                    for idx, issue in enumerate(self.checkedObjList):
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        if issue:
+                            try:
+                                cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
+                                self.foundIssueList[idx] = False
+                            except Exception as e:
+                                mel.eval('print \"dpAR: '+e+'\\n\";')
+            else:
+                self.foundIssueList.append(False)
+
+            self.resultOkList.append(not True in self.foundIssueList)
         else:
-            allNodesList = cmds.ls()
-        allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
-        allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
-        self.checkedObjList.extend(allValidEnvelopeNodes)
-        if self.checkedObjList:
-            self.utils.setProgress(max=len(self.checkedObjList), addOne=False, addNumber=False)
-
-            for node in self.checkedObjList:
-                self.foundIssueList.append(self.verifyEnvelope(node))
-
-            if not self.firstMode:
-                for idx, issue in enumerate(self.checkedObjList):
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    if issue:
-                        try:
-                            cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
-                            self.foundIssueList[idx] = False
-                        except Exception as e:
-                            mel.eval('print \"dpAR: '+e+'\\n\";')
-        else:
-            self.foundIssueList.append(False)
-
-        self.resultOkList.append(not True in self.foundIssueList)
-
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

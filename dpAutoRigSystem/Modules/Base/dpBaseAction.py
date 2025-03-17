@@ -272,7 +272,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(True)
         self.resultOkList.append(False)
-        self.messageList.append(self.dpUIinst.lang['r005_notWorkedWell']+": "+item)
+        self.messageList.append(self.dpUIinst.lang['r005_notWorkedWell'])
 
 
     def wellDoneIO(self, item="", text="r006_wellDone", *args):
@@ -291,7 +291,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
-        self.messageList.append(self.dpUIinst.lang['r063_maybeDoneIO']+": "+item)
+        self.messageList.append(self.dpUIinst.lang['r063_maybeDoneIO'])
 
 
     def getIOPath(self, ioDir, *args):

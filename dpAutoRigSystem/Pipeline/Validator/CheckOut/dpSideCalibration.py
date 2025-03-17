@@ -38,64 +38,67 @@ class SideCalibration(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
-        else:
-            toCheckList = self.dpUIinst.ctrls.getControlList()
-        if toCheckList:
-            pairDic = {}
-            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            for item in toCheckList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                # conditional to check here
-                if cmds.objExists(item+".calibrationList"):
-                    if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
-                        foundOtherSide = False
-                        for node in toCheckList:
-                            if node[2:] == item[2:]: #other side found
-                                pairDic[item] = node
-                                foundOtherSide = True
-                                break
-                        if foundOtherSide:
-                            calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(item)
-                            if calibrationList:
-                                notMirrorAttrList = self.dpUIinst.ctrls.getListFromStringAttr(item, "notMirrorList")
-                                if notMirrorAttrList:
-                                    calibrationList = list(set(calibrationList) - set(notMirrorAttrList))
-                                for attr in calibrationList:
-                                    if cmds.objExists(item+"."+attr) and cmds.objExists(pairDic[item]+"."+attr):
-                                        # current values
-                                        itemCurrentValue = float(format(cmds.getAttr(item+"."+attr),".3f"))
-                                        pairCurrentValue = float(format(cmds.getAttr(pairDic[item]+"."+attr),".3f"))
-                                        if not itemCurrentValue == pairCurrentValue:
-                                            # found issue here
-                                            self.checkedObjList.append(item+"."+attr)
-                                            self.foundIssueList.append(True)
-                                            if self.firstMode:
-                                                self.resultOkList.append(False)
-                                            else: #fix
-                                                try:
-                                                    # default values (supposed to be the same for the two sides)
-                                                    itemDefaultValue = float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f"))
-                                                    if pairCurrentValue == itemDefaultValue:
-                                                        # pair current value is equal to its default value, so we set the pair value as item current value
-                                                        cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
-                                                    else:
-                                                        # check for left, top or front side to use it as priority node:
-                                                        if item[0] == self.dpUIinst.lang['p002_left'] or item[0] == self.dpUIinst.lang['p004_top'] or item[0] == self.dpUIinst.lang['p006_front']:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = self.dpUIinst.ctrls.getControlList()
+            if toCheckList:
+                pairDic = {}
+                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                for item in toCheckList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    # conditional to check here
+                    if cmds.objExists(item+".calibrationList"):
+                        if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
+                            foundOtherSide = False
+                            for node in toCheckList:
+                                if node[2:] == item[2:]: #other side found
+                                    pairDic[item] = node
+                                    foundOtherSide = True
+                                    break
+                            if foundOtherSide:
+                                calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(item)
+                                if calibrationList:
+                                    notMirrorAttrList = self.dpUIinst.ctrls.getListFromStringAttr(item, "notMirrorList")
+                                    if notMirrorAttrList:
+                                        calibrationList = list(set(calibrationList) - set(notMirrorAttrList))
+                                    for attr in calibrationList:
+                                        if cmds.objExists(item+"."+attr) and cmds.objExists(pairDic[item]+"."+attr):
+                                            # current values
+                                            itemCurrentValue = float(format(cmds.getAttr(item+"."+attr),".3f"))
+                                            pairCurrentValue = float(format(cmds.getAttr(pairDic[item]+"."+attr),".3f"))
+                                            if not itemCurrentValue == pairCurrentValue:
+                                                # found issue here
+                                                self.checkedObjList.append(item+"."+attr)
+                                                self.foundIssueList.append(True)
+                                                if self.firstMode:
+                                                    self.resultOkList.append(False)
+                                                else: #fix
+                                                    try:
+                                                        # default values (supposed to be the same for the two sides)
+                                                        itemDefaultValue = float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f"))
+                                                        if pairCurrentValue == itemDefaultValue:
+                                                            # pair current value is equal to its default value, so we set the pair value as item current value
                                                             cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                         else:
-                                                            cmds.setAttr(item+"."+attr, pairCurrentValue)
-                                                    self.resultOkList.append(True)
-                                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
-                                                except:
-                                                    self.resultOkList.append(False)
-                                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
-                                    else:
-                                        self.resultOkList.append(True)
-                                        self.messageList.append(item+"."+attr+" "+self.dpUIinst.lang['i061_notExists'])
+                                                            # check for left, top or front side to use it as priority node:
+                                                            if item[0] == self.dpUIinst.lang['p002_left'] or item[0] == self.dpUIinst.lang['p004_top'] or item[0] == self.dpUIinst.lang['p006_front']:
+                                                                cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
+                                                            else:
+                                                                cmds.setAttr(item+"."+attr, pairCurrentValue)
+                                                        self.resultOkList.append(True)
+                                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
+                                                    except:
+                                                        self.resultOkList.append(False)
+                                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
+                                        else:
+                                            self.resultOkList.append(True)
+                                            self.messageList.append(item+"."+attr+" "+self.dpUIinst.lang['i061_notExists'])
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

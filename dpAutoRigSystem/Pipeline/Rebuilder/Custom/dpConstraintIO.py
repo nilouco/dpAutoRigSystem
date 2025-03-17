@@ -42,29 +42,32 @@ class ConstraintIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                constraintList = None
-                if objList:
-                    constraintList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    constraintList = None
+                    if objList:
+                        constraintList = objList
+                    else:
+                        constraintList = cmds.ls(selection=False, type=self.constraintTypeList)
+                    if self.firstMode: #export
+                        if constraintList:
+                            self.exportDicToJsonFile(self.getConstraintDataDic(constraintList))
+                        else:
+                            self.maybeDoneIO("Constraints")
+                    else: #import
+                        constDic = self.importLatestJsonFile(self.getExportedList())
+                        if constDic:
+                            self.importConstraintData(constDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
-                    constraintList = cmds.ls(selection=False, type=self.constraintTypeList)
-                if self.firstMode: #export
-                    if constraintList:
-                        self.exportDicToJsonFile(self.getConstraintDataDic(constraintList))
-                    else:
-                        self.maybeDoneIO("Constraints")
-                else: #import
-                    constDic = self.importLatestJsonFile(self.getExportedList())
-                    if constDic:
-                        self.importConstraintData(constDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

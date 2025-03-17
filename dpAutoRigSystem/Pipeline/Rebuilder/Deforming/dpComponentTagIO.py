@@ -43,43 +43,46 @@ class ComponentTagIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                nodeList = None
-                if objList:
-                    nodeList = objList
-                else:
-                    nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
-                if self.firstMode: #export
-                    if nodeList:
-                        # finding tags
-                        hasTag = False
-                        for node in nodeList:
-                            if cmds.geometryAttrInfo(node+"."+cmds.deformableShape(node, localShapeOutAttr=True)[0], componentTagHistory=True):
-                                hasTag = True
-                                break
-                        if hasTag:
-                            # Declaring the data dictionary to export it
-                            self.tagDataDic = { "tagged"     : self.defWeights.getComponentTagInfo(nodeList),
-                                                "influencer" : self.defWeights.getComponentTagInfluencer(),
-                                                "falloff"    : self.defWeights.getComponentTagFalloff()
-                                            }
-                            self.exportDicToJsonFile(self.tagDataDic)
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    nodeList = None
+                    if objList:
+                        nodeList = objList
+                    else:
+                        nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
+                    if self.firstMode: #export
+                        if nodeList:
+                            # finding tags
+                            hasTag = False
+                            for node in nodeList:
+                                if cmds.geometryAttrInfo(node+"."+cmds.deformableShape(node, localShapeOutAttr=True)[0], componentTagHistory=True):
+                                    hasTag = True
+                                    break
+                            if hasTag:
+                                # Declaring the data dictionary to export it
+                                self.tagDataDic = { "tagged"     : self.defWeights.getComponentTagInfo(nodeList),
+                                                    "influencer" : self.defWeights.getComponentTagInfluencer(),
+                                                    "falloff"    : self.defWeights.getComponentTagFalloff()
+                                                }
+                                self.exportDicToJsonFile(self.tagDataDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" componentTag")
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" componentTag")
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh, lattice")
-                else: #import
-                    tagDataDic = self.importLatestJsonFile(self.getExportedList())
-                    if tagDataDic:
-                        self.importTag(tagDataDic, nodeList)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh, lattice")
+                    else: #import
+                        tagDataDic = self.importLatestJsonFile(self.getExportedList())
+                        if tagDataDic:
+                            self.importTag(tagDataDic, nodeList)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

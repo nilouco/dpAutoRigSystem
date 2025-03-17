@@ -46,51 +46,54 @@ class GuideIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    netList = None
-                    if objList:
-                        netList = objList
-                    else:
-                        netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
-                        netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
-                    if netList:
-                        self.dpUIinst.ctrls.unPinGuide()
-                        self.exportDicToJsonFile(self.getGuideDataDic(netList))
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
-                        cmds.select(clear=True)
-                else: #import
-                    # apply viewport xray
-                    modelPanelList = cmds.getPanel(type="modelPanel")
-                    for mp in modelPanelList:
-                        cmds.modelEditor(mp, edit=True, xray=True)
-                    guideDic = self.importLatestJsonFile(self.getExportedList())
-                    if guideDic:
-                        wellImported = False
-                        try:
-                            wellImported = self.importGuide(guideDic)
-                            self.setupGuideBaseParenting(guideDic)
-                        except Exception as e:
-                            if not wellImported: #guide initialization issue
-                                self.notWorkedWellIO(self.dpUIinst.lang['m195_couldNotBeSet']+": "+str(e))
-                            else: #parenting issue
-                                self.notWorkedWellIO(self.dpUIinst.lang['m197_notPossibleParent']+": "+str(e))
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    if self.firstMode: #export
+                        netList = None
+                        if objList:
+                            netList = objList
+                        else:
+                            netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
+                            netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
+                        if netList:
+                            self.dpUIinst.ctrls.unPinGuide()
+                            self.exportDicToJsonFile(self.getGuideDataDic(netList))
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                            cmds.select(clear=True)
+                    else: #import
+                        # apply viewport xray
+                        modelPanelList = cmds.getPanel(type="modelPanel")
+                        for mp in modelPanelList:
+                            cmds.modelEditor(mp, edit=True, xray=True)
+                        guideDic = self.importLatestJsonFile(self.getExportedList())
+                        if guideDic:
                             wellImported = False
-                        if wellImported:
-                            self.wellDoneIO(self.latestDataFile)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                    cmds.select(clear=True)
-                    # remove viewport xray
-                    for mp in modelPanelList:
-                        cmds.modelEditor(mp, edit=True, xray=False)
+                            try:
+                                wellImported = self.importGuide(guideDic)
+                                self.setupGuideBaseParenting(guideDic)
+                            except Exception as e:
+                                if not wellImported: #guide initialization issue
+                                    self.notWorkedWellIO(self.dpUIinst.lang['m195_couldNotBeSet']+": "+str(e))
+                                else: #parenting issue
+                                    self.notWorkedWellIO(self.dpUIinst.lang['m197_notPossibleParent']+": "+str(e))
+                                wellImported = False
+                            if wellImported:
+                                self.wellDoneIO(self.latestDataFile)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                        cmds.select(clear=True)
+                        # remove viewport xray
+                        for mp in modelPanelList:
+                            cmds.modelEditor(mp, edit=True, xray=False)
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

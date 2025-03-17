@@ -45,40 +45,43 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            # load alembic plugin
-            if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
-                self.ioPath = self.getIOPath(self.ioDir)
-                self.targetPath = self.ioPath+"/"+self.targetName
-                self.originalPath = self.ioPath+"/"+self.originalName
-                if self.ioPath:
-                    if self.firstMode: #export
-                        bsList = None
-                        if objList:
-                            bsList = objList
-                        else:
-                            bsList = [n for n in cmds.ls(selection=False, type="blendShape") if cmds.blendShape(n, query=True, geometry=True)]
-                        if bsList:
-                            bsDic = self.getBSDataDic(bsList)
-                            for bsNode in bsList:
-                                self.exportTargetFile(bsNode)
-                                transformList = [cmds.listRelatives(geoShape, parent=True, type="transform")[0] for geoShape in bsDic[bsNode]["geometry"]]
-                                self.exportAlembicFile(transformList, self.originalPath, self.originalName, bsNode, False)
-                            self.exportDicToJsonFile(bsDic)
-                        else:
-                            self.maybeDoneIO("BlendShapes_Grp")
-                    else: #import
-                        bsDic = self.importLatestJsonFile(self.getExportedList())
-                        if bsDic:
-                            self.importBlendShapes(bsDic)
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                # load alembic plugin
+                if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
+                    self.ioPath = self.getIOPath(self.ioDir)
+                    self.targetPath = self.ioPath+"/"+self.targetName
+                    self.originalPath = self.ioPath+"/"+self.originalName
+                    if self.ioPath:
+                        if self.firstMode: #export
+                            bsList = None
+                            if objList:
+                                bsList = objList
+                            else:
+                                bsList = [n for n in cmds.ls(selection=False, type="blendShape") if cmds.blendShape(n, query=True, geometry=True)]
+                            if bsList:
+                                bsDic = self.getBSDataDic(bsList)
+                                for bsNode in bsList:
+                                    self.exportTargetFile(bsNode)
+                                    transformList = [cmds.listRelatives(geoShape, parent=True, type="transform")[0] for geoShape in bsDic[bsNode]["geometry"]]
+                                    self.exportAlembicFile(transformList, self.originalPath, self.originalName, bsNode, False)
+                                self.exportDicToJsonFile(bsDic)
+                            else:
+                                self.maybeDoneIO("BlendShapes_Grp")
+                        else: #import
+                            bsDic = self.importLatestJsonFile(self.getExportedList())
+                            if bsDic:
+                                self.importBlendShapes(bsDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

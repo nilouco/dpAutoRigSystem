@@ -44,31 +44,34 @@ class RivetIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    netList = None
-                    if objList:
-                        netList = objList
-                    else:
-                        netList = self.utils.getNetworkNodeByAttr("dpRivetNet")
-                    if netList:
-                        self.exportDicToJsonFile(self.getRivetDataDic(netList))
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    if self.firstMode: #export
+                        netList = None
+                        if objList:
+                            netList = objList
+                        else:
+                            netList = self.utils.getNetworkNodeByAttr("dpRivetNet")
+                        if netList:
+                            self.exportDicToJsonFile(self.getRivetDataDic(netList))
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                            cmds.select(clear=True)
+                    else: #import
+                        rivetDic = self.importLatestJsonFile(self.getExportedList())
+                        if rivetDic:
+                            self.importRivet(rivetDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
                         cmds.select(clear=True)
-                else: #import
-                    rivetDic = self.importLatestJsonFile(self.getExportedList())
-                    if rivetDic:
-                        self.importRivet(rivetDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                    cmds.select(clear=True)
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

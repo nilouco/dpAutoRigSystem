@@ -41,31 +41,34 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                ctrlList = None
-                if objList:
-                    ctrlList = objList
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    ctrlList = None
+                    if objList:
+                        ctrlList = objList
+                    else:
+                        ctrlList = self.dpUIinst.ctrls.getControlList()
+                    if ctrlList:
+                        if self.firstMode: #export
+                            toExportDataDic = self.getConnectionDataDic(ctrlList)
+                            toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.utils.utilityTypeList))) #utilityNodes without dpID
+                            self.exportDicToJsonFile(toExportDataDic)
+                        else: #import
+                            connectDic = self.importLatestJsonFile(self.getExportedList())
+                            if connectDic:
+                                self.importConnectionData(connectDic)
+                            else:
+                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                    else:
+                        self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    ctrlList = self.dpUIinst.ctrls.getControlList()
-                if ctrlList:
-                    if self.firstMode: #export
-                        toExportDataDic = self.getConnectionDataDic(ctrlList)
-                        toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.utils.utilityTypeList))) #utilityNodes without dpID
-                        self.exportDicToJsonFile(toExportDataDic)
-                    else: #import
-                        connectDic = self.importLatestJsonFile(self.getExportedList())
-                        if connectDic:
-                            self.importConnectionData(connectDic)
-                        else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.maybeDoneIO("Ctrls_Grp")
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

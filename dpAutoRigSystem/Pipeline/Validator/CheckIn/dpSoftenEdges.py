@@ -38,41 +38,44 @@ class SoftenEdges(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            allMeshList = objList
-        else:
-            allMeshList = cmds.ls(selection=False, type="mesh")
-        if allMeshList:
-            self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
-            for mesh in allMeshList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(mesh):
-                    cmds.select(mesh)
-                    # set selection only non-smoothed edges
-                    cmds.polySelectConstraint(type=0x8000, mode=3, smoothness=1)
-                    hardenEdges = cmds.ls(selection=True)
-                    cmds.polySelectConstraint(mode=0)
-                    if hardenEdges:
-                        # converts the selected edges to faces
-                        toFace = cmds.polyListComponentConversion(hardenEdges, toFace=True, internal=True)
-                        # check if there's any non-smoothed edges
-                        if toFace:
-                            self.checkedObjList.append(mesh)
-                            self.foundIssueList.append(True)
-                            if self.firstMode:
-                                self.resultOkList.append(False)
-                            else: #fix
-                                try:
-                                    cmds.polySoftEdge(mesh, angle=180, constructionHistory=False)
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
-                                except:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                allMeshList = objList
+            else:
+                allMeshList = cmds.ls(selection=False, type="mesh")
+            if allMeshList:
+                self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
+                for mesh in allMeshList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if cmds.objExists(mesh):
+                        cmds.select(mesh)
+                        # set selection only non-smoothed edges
+                        cmds.polySelectConstraint(type=0x8000, mode=3, smoothness=1)
+                        hardenEdges = cmds.ls(selection=True)
+                        cmds.polySelectConstraint(mode=0)
+                        if hardenEdges:
+                            # converts the selected edges to faces
+                            toFace = cmds.polyListComponentConversion(hardenEdges, toFace=True, internal=True)
+                            # check if there's any non-smoothed edges
+                            if toFace:
+                                self.checkedObjList.append(mesh)
+                                self.foundIssueList.append(True)
+                                if self.firstMode:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
-                    cmds.select(clear=True)
-    
+                                else: #fix
+                                    try:
+                                        cmds.polySoftEdge(mesh, angle=180, constructionHistory=False)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+                        cmds.select(clear=True)
+        
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

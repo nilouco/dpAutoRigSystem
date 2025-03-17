@@ -39,34 +39,37 @@ class Cleanup(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
-        else:
-            toCheckList = cmds.ls() #all
-        if toCheckList:
-            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            for item in toCheckList:
-                if cmds.objExists(item):
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    # conditional to check here
-                    if self.cleanupAttr in cmds.listAttr(item):
-                        if cmds.getAttr(item+"."+self.cleanupAttr) == 1:
-                            self.checkedObjList.append(item)
-                            self.foundIssueList.append(True)
-                            if self.firstMode:
-                                self.resultOkList.append(False)
-                            else: #fix
-                                try:
-                                    # delete the node
-                                    cmds.lockNode(item, lock=False)
-                                    cmds.delete(item)
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                                except:
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = cmds.ls() #all
+            if toCheckList:
+                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                for item in toCheckList:
+                    if cmds.objExists(item):
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        # conditional to check here
+                        if self.cleanupAttr in cmds.listAttr(item):
+                            if cmds.getAttr(item+"."+self.cleanupAttr) == 1:
+                                self.checkedObjList.append(item)
+                                self.foundIssueList.append(True)
+                                if self.firstMode:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                else: #fix
+                                    try:
+                                        # delete the node
+                                        cmds.lockNode(item, lock=False)
+                                        cmds.delete(item)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

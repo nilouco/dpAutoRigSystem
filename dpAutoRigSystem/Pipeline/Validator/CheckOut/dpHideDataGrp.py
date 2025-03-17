@@ -38,36 +38,39 @@ class HideDataGrp(dpBaseAction.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        dataGrp = None
-        if objList:
-            dataGrp = objList[0]
-        else:
-            dataGrp = self.utils.getNodeByMessage("dataGrp")
-            if not dataGrp:
-                if cmds.objExists("Data_Grp"):
-                    dataGrp = "Data_Grp"
-        if dataGrp:
-            self.utils.setProgress(max=1)
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
-            self.checkedObjList.append(dataGrp)
-            visibilityStatus = cmds.getAttr(dataGrp+".visibility")
-            if visibilityStatus:
-                self.foundIssueList.append(True)
-                if self.firstMode:
-                    self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        cmds.setAttr(dataGrp+".visibility", 0)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+dataGrp)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+dataGrp)
+        if not cmds.file(query=True, reference=True):
+            dataGrp = None
+            if objList:
+                dataGrp = objList[0]
             else:
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
+                dataGrp = self.utils.getNodeByMessage("dataGrp")
+                if not dataGrp:
+                    if cmds.objExists("Data_Grp"):
+                        dataGrp = "Data_Grp"
+            if dataGrp:
+                self.utils.setProgress(max=1)
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.checkedObjList.append(dataGrp)
+                visibilityStatus = cmds.getAttr(dataGrp+".visibility")
+                if visibilityStatus:
+                    self.foundIssueList.append(True)
+                    if self.firstMode:
+                        self.resultOkList.append(False)
+                    else: #fix
+                        try:
+                            cmds.setAttr(dataGrp+".visibility", 0)
+                            self.resultOkList.append(True)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+dataGrp)
+                        except:
+                            self.resultOkList.append(False)
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+dataGrp)
+                else:
+                    self.foundIssueList.append(False)
+                    self.resultOkList.append(True)
+            else:
+                self.notFoundNodes()
         else:
-            self.notFoundNodes()
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

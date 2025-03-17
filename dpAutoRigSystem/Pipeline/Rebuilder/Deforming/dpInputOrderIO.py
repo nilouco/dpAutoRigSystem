@@ -41,29 +41,32 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    deformedList = None
-                    if objList:
-                        deformedList = objList
-                    else:
-                        deformedList = self.dpUIinst.skin.getDeformedItemList(deformerTypeList=self.dpUIinst.skin.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
-                    if deformedList:
-                        self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
-                else: #import
-                    orderDic = self.importLatestJsonFile(self.getExportedList())
-                    if orderDic:
-                        self.importInputOrder(orderDic)
-                    else:
-                        self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+        if not cmds.file(query=True, reference=True):
+            if self.pipeliner.checkAssetContext():
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    if self.firstMode: #export
+                        deformedList = None
+                        if objList:
+                            deformedList = objList
+                        else:
+                            deformedList = self.dpUIinst.skin.getDeformedItemList(deformerTypeList=self.dpUIinst.skin.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                        if deformedList:
+                            self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
+                    else: #import
+                        orderDic = self.importLatestJsonFile(self.getExportedList())
+                        if orderDic:
+                            self.importInputOrder(orderDic)
+                        else:
+                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
