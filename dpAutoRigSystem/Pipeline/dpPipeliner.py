@@ -259,8 +259,8 @@ class Pipeliner(object):
         "s_drivenKeyIO"      : "i330_sDrivenKeyIOAnn",
         "s_offsetMatrixIO"   : "i345_sOffsetMatrixIOAnn",
         "s_connectionIO"     : "i327_sConnectionIOAnn",
-        "s_calibrationIO"    : "i356_sVisibilityIOAnn",
-        "s_visibilityIO"     : "i324_sVisibilityIOAnn",
+        "s_calibrationIO"    : "i324_sCalibrationIOAnn",
+        "s_visibilityIO"     : "i356_sVisibilityIOAnn",
         "s_channelIO"        : "i347_sChannelIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
@@ -342,6 +342,7 @@ class Pipeliner(object):
             self.pipeInfo = self.getPipelineInfo()
             if self.pipeInfo:
                 # mounting structured pipeline data
+                self.pipeData['publishPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_publish']
                 self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
                 self.pipeData['finishingPath'] = self.pipeData['path']+"/"+self.pipeData['s_finishing']
                 self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']

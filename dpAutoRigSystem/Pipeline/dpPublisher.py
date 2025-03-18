@@ -41,6 +41,7 @@ class Publisher(object):
         savedScene = self.utils.checkSavedScene()
         if not savedScene:
             savedScene = self.dpUIinst.pipeliner.userSaveThisScene(True)
+            return
         if savedScene:
             # window
             publisher_winWidth  = 450
