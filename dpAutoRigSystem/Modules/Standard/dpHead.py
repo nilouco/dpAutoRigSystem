@@ -11,7 +11,7 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
-DP_HEAD_VERSION = 3.0
+DP_HEAD_VERSION = 3.1
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -491,7 +491,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.addFlip = self.getModuleAttr("flip")
             self.addCorrective = self.getModuleAttr("corrective")
             # declare lists to store names and attributes:
-            self.worldRefList, self.upperCtrlList, self.upperJawCtrlList = [], [], []
+            self.worldRefList, self.upperCtrlList, self.upperJawCtrlList, self.facialCtrlGrpList = [], [], [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # run for all sides
             for s, side in enumerate(self.sideList):
@@ -1076,6 +1076,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ctrls.addDefInfluenceAttrs(fCtrl, 2)
             # ctrl zeroOut grp and color:
             fCtrlGrp = self.utils.zeroOut([fCtrl])[0]
+            cmds.addAttr(fCtrlGrp, longName="facialReceiver", attributeType="bool", defaultValue=1)
+            self.facialCtrlGrpList.append(fCtrlGrp)
             self.ctrls.colorShape([fCtrl], color)
             # lock or limit XYZ axis:
             self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
@@ -1244,6 +1246,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                                 "lCtrls"               : self.aLCtrls,
                                                 "rCtrls"               : self.aRCtrls,
                                                 "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
-                                                "upperJawCtrlList"     : self.upperJawCtrlList
+                                                "upperJawCtrlList"     : self.upperJawCtrlList,
+                                                "facialCtrlGrpList"    : self.facialCtrlGrpList
                                               }
                                     }

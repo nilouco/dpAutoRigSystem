@@ -2955,10 +2955,11 @@ class Start(object):
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
                         
-                        # integrate the head orient from the masterCtrl:
+                        # integrate the head orient from the masterCtrl and facial controllers to optionCtrl:
                         if moduleType == self.headName:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                            self.facialCtrlGrpList       = self.integratedTaskDic[moduleDic]['facialCtrlGrpList']
                             # working with item guide mirror:
                             self.itemMirrorNameList = [""]
                             # get itemGuideName:
@@ -2973,7 +2974,13 @@ class Start(object):
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
-                        
+                            if self.facialCtrlGrpList:
+                                if not cmds.objExists(self.optionCtrl+"."+self.lang['c059_facial'].lower()):
+                                    cmds.addAttr(self.optionCtrl, longName=self.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                    cmds.setAttr(self.optionCtrl+"."+self.lang['c059_facial'].lower(), channelBox=True)
+                                for facialCtrlGrp in self.facialCtrlGrpList:
+                                    cmds.connectAttr(self.optionCtrl+"."+self.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
+                            
                         # integrate the Eye with the Head setup:
                         if moduleType == self.eyeName:
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
@@ -3249,6 +3256,7 @@ class Start(object):
                 leftAttr = self.lang['p002_left'].lower()
                 rightAttr = self.lang['p003_right'].lower()
                 tweaksAttr = self.lang['m081_tweaks'].lower()
+                facialAttr = self.lang['c059_facial'].lower()
                 
                 if not cmds.objExists(self.optionCtrl+"."+generalAttr):
                     cmds.addAttr(self.optionCtrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
@@ -3321,7 +3329,7 @@ class Start(object):
                 'dpAR_000Fk', 'dpAR_000Dyn', 'dpAR_001Fk', 'dpAR_001Dyn', 'dpAR_002Fk', 'dpAR_002Dyn', 
                 'dpAR_000Fk1', 'dpAR_000Dyn1', leftAttr+'dpAR_000Fk', leftAttr+'dpAR_000Fk1', rightAttr+'dpAR_000Fk', rightAttr+'dpAR_000Fk1', leftAttr+'dpAR_000Dyn', leftAttr+'dpAR_000Dyn1', rightAttr+'dpAR_000Dyn', rightAttr+'dpAR_000Dyn1',
                 'dpAR_001Fk1', 'dpAR_001Dyn1', leftAttr+'dpAR_001Fk', leftAttr+'dpAR_001Fk1', rightAttr+'dpAR_001Fk', rightAttr+'dpAR_001Fk1', leftAttr+'dpAR_001Dyn', leftAttr+'dpAR_001Dyn1', rightAttr+'dpAR_001Dyn', rightAttr+'dpAR_001Dyn1',
-                'display', 'mesh', 'proxy', 'controllers', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
+                'display', 'mesh', 'proxy', 'controllers', 'bends', 'extraBends', facialAttr, tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
