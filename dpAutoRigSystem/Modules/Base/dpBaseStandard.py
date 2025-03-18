@@ -102,7 +102,7 @@ class BaseStandard(object):
         baseFloatAttrList = ['shapeSize', 'worldSize']
         for baseFloatAttr in baseFloatAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseFloatAttr, attributeType='float', defaultValue=1)
-        cmds.setAttr(self.moduleGrp+".worldSize", keyable=True)
+            cmds.setAttr(self.moduleGrp+"."+baseFloatAttr, keyable=True)
 
         baseIntegerAttrList = ['degree']
         for baseIntAttr in baseIntegerAttrList:
