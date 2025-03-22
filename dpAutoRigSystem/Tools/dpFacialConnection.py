@@ -184,7 +184,7 @@ class FacialConnection(object):
             cmds.parent(facialGrp, geoGrp)
             self.dpUIinst.customAttr.addAttr(0, [geoGrp], descendents=True) #dpID
             if self.ui and resultList:
-                self.dpUIinst.logger.infoWin('m085_facialConnection', 'm237_createdTgt', '\n'.join(resultList), 'center', 200, 350)
+                self.dpUIinst.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.dpUIinst.lang["i042_notSelection"]+"\";")
         self.utils.closeUI('dpFacialConnectionWindow')

@@ -106,7 +106,7 @@ class Rivet(object):
         deformerLayout = cmds.columnLayout('deformerLayout', columnOffset=("left", 20), parent=faceToRivetLayout)
         self.deformerCollection = cmds.radioCollection('deformerCollection', parent=deformerLayout)
         self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
-        self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
+        self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m172_wrapDeformer"], annotation=self.wrapDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
         cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
         if not self.mayaVersionRequired:
             cmds.radioCollection(self.deformerCollection, edit=True, select=self.wrapDeformerRB)
@@ -171,7 +171,7 @@ class Rivet(object):
             if netNode:
                 self.removeRivetFromNetNode(netNode)
             else:
-                mel.eval('print \"dpAR: '+self.dpUIinst.lang['m234_unableRemRivet']+itemList[i]+'\\n\";')
+                mel.eval('print \"dpAR: '+self.dpUIinst.lang['m204_unableRemRivet']+itemList[i]+'\\n\";')
         self.refreshRivetList()
         cmds.select(clear=True)
     
@@ -196,7 +196,7 @@ class Rivet(object):
             self.checkRivetGrp()
             self.utils.setProgress(endIt=True)
         else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m235_noItemSelect']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m169_noItemSelect']+'\\n\";')
         cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
 
     
@@ -254,7 +254,7 @@ class Rivet(object):
                     else:
                         cmds.delete(attachedGeometry)
         cmds.delete(rivetNetNode)
-        mel.eval('print \"dpAR: '+self.dpUIinst.lang['m236_removedRivet']+" "+rivetControl+'\\n\";')
+        mel.eval('print \"dpAR: '+self.dpUIinst.lang['m144_removedRivet']+" "+rivetControl+'\\n\";')
     
 
     def itemsWithRivetList(self):

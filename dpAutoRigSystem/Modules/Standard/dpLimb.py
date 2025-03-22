@@ -409,6 +409,11 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """
         # re-declaring guides names:
         self.mainAic = self.guideName+"_Main_Zero_0_Grp_AiC"
+        self.cvBeforeLoc = self.guideName+"_Before"
+        self.cvMainLoc = self.guideName+"_Main"
+        self.cvCornerLoc = self.guideName+"_Corner"
+        self.cvExtremLoc = self.guideName+"_Extrem"
+        self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
         
         # re-orient extremLoc to align with cornerLoc if the clavicle and wrist aren't pinned.
         if not cmds.getAttr(self.cvExtremLoc+".pinGuide") and not cmds.getAttr(self.cvBeforeLoc+".pinGuide"):

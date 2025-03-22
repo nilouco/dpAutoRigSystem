@@ -290,7 +290,8 @@ class Publisher(object):
                     self.successPublishedWindow(publishFileName)
                     self.utils.setProgress(endIt=True)
                     self.utils.closeUI('dpPublisherWindow')
-                    self.askUserChooseFile(publishFileName)
+                    if fromUI:
+                        self.askUserChooseFile(publishFileName)
 
             else:
                 mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')

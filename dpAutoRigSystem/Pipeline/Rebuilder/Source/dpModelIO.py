@@ -63,7 +63,7 @@ class ModelIO(dpBaseAction.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
+                    self.notWorkedWellIO(self.dpUIinst.lang['e018_notLoadedPlugin']+"AbcExport")
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         else:

@@ -21,6 +21,8 @@
 DPAR_VERSION_2025 = "5.00.00"
 DPAR_UPDATELOG = "N790 - Rebuilder."
 
+# to make old dpAR version compatible to receive this update message - it can be deleted in the future 
+DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must to download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the text file named _shelfButton.txt!\nThanks."
 
 # Import libraries
 import os
@@ -131,7 +133,7 @@ class Start(object):
         self.moduleNamespaceAttr = "moduleNamespace"
         self.moduleInstanceInfoAttr = "moduleInstanceInfo"
         self.dpARWebSiteURL = "https://nilouco.blogspot.com"
-        self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
+        self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/790-rebuilder/dpAutoRigSystem/dpAutoRig.py"
         self.gitHubURL = "https://github.com/nilouco/dpAutoRigSystem"
         self.masterURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
         self.whatsChangedURL = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
@@ -1868,7 +1870,7 @@ class Start(object):
             whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.whatsChangedURL), parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.gitHubURL), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.masterURL, "zip"), parent=updateLayout)
-            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.masterURL, self.update_remoteVersion), parent=updateLayout)
+#            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.masterURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
         cmds.separator(height=30)
         self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.lang['i092_autoCheckUpdate'], align="left", value=self.userDefAutoCheckUpdate, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
