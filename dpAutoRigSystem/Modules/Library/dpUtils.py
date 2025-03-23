@@ -770,9 +770,9 @@ class Utils(object):
             remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
             # find the line with the version and compare them:
             for line in remoteContents:
-                if "DPAR_VERSION_2025 = " in line:
+                if "DPAR_VERSION_5 = " in line:
                     gotRemoteFile = True
-                    remoteVersion = line[21:-2] #these magic numbers filter only the version XX.YY.ZZ
+                    remoteVersion = line[18:-2] #these magic numbers filter only the version XX.YY.ZZ
                     if remoteVersion == self.dpUIinst.dpARVersion:
                         # 0 - the current version is up to date
                         return [0, None, None]
