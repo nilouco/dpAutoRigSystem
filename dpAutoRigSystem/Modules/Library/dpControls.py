@@ -596,7 +596,7 @@ class ControlClass(object):
         # create Option_Ctrl Text:
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="OPTION", constructionHistory=False)[0]
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="OPTIONS", constructionHistory=False)[0]
             for attr in ["X", "Y", "Z"]:
                 cmds.setAttr(cvText+".scale"+attr, 0.3*r)
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
@@ -617,7 +617,7 @@ class ControlClass(object):
             cmds.delete(cvText)
             cmds.parent(optCtrlTxt, curve)
             cmds.setAttr(optCtrlTxt+".template", 1)
-            cmds.setAttr(optCtrlTxt+".tx", -0.55*r)
+            cmds.setAttr(optCtrlTxt+".tx", -0.61*r)
             cmds.setAttr(optCtrlTxt+".ty", 1.1*r)
             self.dpUIinst.customAttr.addAttr(0, [optCtrlTxt]) #dpID
         except:
