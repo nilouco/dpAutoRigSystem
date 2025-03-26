@@ -245,19 +245,12 @@ class JointDisplay(object):
     def keepSelectedObj(self, *args):
         """Mantain ative selected joints"""
 
-        # selectedUIJoints = self.selectionUiList
-        # selectedUIBoard = self.selectedBoard
-        # allboards = self.allBoardList
         selectedItems = self.selectionUiList
         print(f'keepSelectedObj Called________!!!!!!!')
-        # for board in self.allBoardList:
 
-            # selList = cmds.textScrollList(self.boneFieldcolumn, query=True, selectItem=True)
-            # self.moveToLeft()
-            # cmds.textScrollList(self.jointFieldcolumn, edit=True, selectItem=selList)
-        print(f'DESTINATION BOARD >>>>>> {self.destinationBoard}')
+        print(f'DESTINATION BOARD >>>>>> {self.allBoardList[self.destinationBoard]}')
         if selectedItems:
-            cmds.textScrollList(self.destinationBoard, edit=True, selectItem=selectedItems)
+            cmds.textScrollList(self.allBoardList[self.destinationBoard], edit=True, selectItem=selectedItems)
 
  
 
@@ -292,27 +285,10 @@ class JointDisplay(object):
 
 
 
-    # def mainfilter():
-    #     Filter list to populate the 
-        
-    #     #TODO
-    #     # create a filter to populate list that will be searched 
 
-    
-    # def refreshLists(self,*args, **kwargs):
-    #     
+# TODO
+# - create a filter: To populate list that will be searched
+# - mantain the selected joints in the list, after the board changed
+# - Do the function Dropbox button to do the action
+# - 
 
-    #     self.getAllJointList()
-    #     self.populateLabelList()
-
-        
-        #TODO
-        # read all joints
-        # populate fields
-
-    # def activeSelectionBoard():
-    #     Find the active selection and indicate the board
-    #     
-
-
-#Study 
