@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.26"
-DPAR_UPDATELOG = "N862 - IkFkSnap state issue.\nN853 - UpdateGuides issue about new reverse foot pivot."
+DPAR_VERSION_PY3 = "4.04.27"
+DPAR_UPDATELOG = "N878 - Latest version 4.\n\nATTENTION !!!\n\nThere's a new dpAutoRigSystem released version 5.\nBut it isn't compatible with this current version 4, sorry.\nYou must download it and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 
 
 
@@ -1724,7 +1724,8 @@ class DP_AutoRig_UI(object):
             updateDesc = cmds.text("\n"+self.lang[self.update_text], align="center", parent=updateLayout)
             cmds.text("\n"+DPAR_VERSION_PY3+self.lang['i090_currentVersion'], align="left", parent=updateLayout)
         if self.update_remoteVersion:
-            cmds.text(self.update_remoteVersion+self.lang['i091_onlineVersion'], align="left", parent=updateLayout)
+            remoteVersion = self.update_remoteVersion.replace("\\n", "\n")
+            cmds.text(remoteVersion+self.lang['i091_onlineVersion'], align="left", parent=updateLayout)
             cmds.separator(height=30)
             if self.update_remoteLog:
                 remoteLog = self.update_remoteLog.replace("\\n", "\n")
@@ -1734,7 +1735,7 @@ class DP_AutoRig_UI(object):
             whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(dpUtils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(dpUtils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
-            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
+#            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
         cmds.separator(height=30)
         self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.lang['i092_autoCheckUpdate'], align="left", value=self.userDefAutoCheckUpdate, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
