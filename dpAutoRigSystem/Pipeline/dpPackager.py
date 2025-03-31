@@ -19,10 +19,15 @@ CAM_ROTY = 30
 CAM_ROTZ = 0
 CTRL_LAYER = "Ctrl_Lyr"
 
-DP_PACKAGER_VERSION = 1.8
+DP_PACKAGER_VERSION = 1.9
 
 
 class Packager(object):
+
+    def __init__(self, dpUIinst) -> None:
+        self.utils = dpUtils.Utils(dpUIinst)
+        self.callback = None
+    
     
     def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
         """ Create a zipped file with given filePath and fileName replacing the extention (.ma or .mb) to .zip
@@ -52,7 +57,7 @@ class Packager(object):
         cmds.viewFit(allObjects=True)
         posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
         if not focusIt:
-            focusIt = dpUtils.getNodeByMessage("renderGrp")
+            focusIt = self.utils.getNodeByMessage("renderGrp")
         if focusIt:
             # frame render group
             cmds.select(focusIt)
@@ -160,11 +165,11 @@ class Packager(object):
             b += 1
             
         # create a new persp viewport window to get the image from it
-        dpUtils.closeUI("dpImagerWindow")
+        self.utils.closeUI("dpImagerWindow")
         dpImagerWindow = cmds.window('dpImagerWindow', width=720, height=720, menuBarVisible=False, titleBar=True, visible=True)
         cmds.paneLayout(parent=dpImagerWindow)
         dpImagerPanel = cmds.modelPanel(menuBarVisible=False, label='dpImagerPanel')
-        cmds.modelEditor(dpImagerPanel, edit=True, displayAppearance='smoothShaded')
+        cmds.modelEditor(dpImagerPanel, edit=True, displayAppearance='smoothShaded', allObjects=True)
         barLayout = cmds.modelPanel(dpImagerPanel, query=True, barLayout=True)
         cmds.frameLayout(barLayout, edit=True, collapse=True)
         cmds.showWindow(dpImagerWindow)
@@ -187,7 +192,7 @@ class Packager(object):
         cmds.playblast(frame=currentFrame, viewer=False, format="image", compression="jpg", showOrnaments=True, completeFilename=exportPath, widthHeight=[width, height], percent=100, forceOverwrite=False, quality=100, editorPanelName=dpImagerPanel)
         # clean up the UI
         cmds.deleteUI(dpImagerPanel, panel=True)
-        dpUtils.closeUI("dpImagerWindow")
+        self.utils.closeUI("dpImagerWindow")
         # back scene preferences to stored status
         cmds.camera(cam, edit=True, aspectRatio=1.5)
         cmds.grid(toggle=currentGrid)
@@ -288,12 +293,13 @@ class Packager(object):
         if not callbackPath in sys.path:
            sys.path.append(callbackPath)
         try:
-            #import dpPublishCallback
-            dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
-            reload(dpCallback)
-            callback = dpCallback.Callback()
-            result = callback.main(data)
-            return result
+            if not self.callback:
+                #import dpPublishCallback
+                dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
+                #if self.dpUIinst.dev:
+                reload(dpCallback)
+                self.callback = dpCallback.Callback()
+            return self.callback.main(data)
         except:
             pass
 

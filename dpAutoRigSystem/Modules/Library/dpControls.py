@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from . import dpUtils
-from ...Validator.CheckOut import dpResetPose
+from ...Pipeline.Validator.CheckOut import dpResetPose
 from functools import partial
 import os
 import getpass
@@ -13,52 +12,132 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-dic_colors = {
-    "yellow": 17,
-    "red": 13,
-    "blue": 6,
-    "cyan": 18,
-    "green": 7,
-    "darkRed": 4,
-    "darkBlue": 15,
-    "white": 16,
-    "black": 1,
-    "gray": 3,
-    "bonina": [0.38, 0, 0.15],
-    "none": 0,
-}
-
-DP_CONTROLS_VERSION = 2.5
+DP_CONTROLS_VERSION = 2.8
 
 
 class ControlClass(object):
-
-    def __init__(self, dpUIinst, moduleGrp=None, *args):
+    def __init__(self, dpUIinst, moduleGrp=None, *args, **kwargs):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
         self.dpUIinst = dpUIinst
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
+        self.utils = dpUIinst.utils
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
+        self.shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
         self.doingName = self.dpUIinst.lang['m094_doing']
+        self.declareColors()
+
+
+    def getDPARTempGrp(self, tempGrp=None, *args):
+        """ Create the dpAR temp group if it doesn't exists.
+        """
+        if not tempGrp:
+            tempGrp = self.dpUIinst.tempGrp
+        if not cmds.objExists(tempGrp):
+            cmds.group(name=tempGrp, empty=True)
+            cmds.setAttr(tempGrp+".visibility", 0)
+            cmds.setAttr(tempGrp+".template", 1)
+            cmds.setAttr(tempGrp+".hiddenInOutliner", 1)
+            self.setLockHide([tempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+        return tempGrp
+
+
+    def declareColors(self, *args):
+        """ Just declare color lists and dictionary to use as override color data.
+        self.colorList = [  [0.627, 0.627, 0.627],
+                            [0, 0, 0],
+                            [0.247, 0.247, 0.247],
+                            [0.498, 0.498, 0.498],
+                            [0.608, 0, 0.157],
+                            [0, 0.016, 0.373],
+                            [0, 0, 1],
+                            [0, 0.275, 0.094],
+                            [0.145, 0, 0.263],
+                            [0.780, 0, 0.78],
+                            [0.537, 0.278, 0.2],
+                            [0.243, 0.133, 0.122],
+                            [0.600, 0.145, 0],
+                            [1, 0, 0],
+                            [0, 1, 0],
+                            [0, 0.255, 0.6],
+                            [1, 1, 1],
+                            [1, 1, 0],
+                            [0.388, 0.863, 1],
+                            [0.263, 1, 0.635],
+                            [1, 0.686, 0.686],
+                            [0.890, 0.675, 0.475],
+                            [1, 1, 0.384],
+                            [0, 0.6, 0.325],
+                            [0.627, 0.412, 0.188],
+                            [0.620, 0.627, 0.188],
+                            [0.408, 0.627, 0.188],
+                            [0.188, 0.627, 0.365],
+                            [0.188, 0.627, 0.627],
+                            [0.188, 0.404, 0.627],
+                            [0.435, 0.188, 0.627],
+                            [0.627, 0.188, 0.412] ]
+        """
+        self.colorList = self.getColorList()
+        self.dic_colors = {
+                            "none": 0,
+                            "yellow": 17,
+                            "red": 13,
+                            "blue": 6,
+                            "cyan": 18,
+                            "green": 7,
+                            "darkRed": 4,
+                            "darkBlue": 15,
+                            "white": 16,
+                            "black": 1,
+                            "gray": 3,
+                            "bonina": [0.38, 0, 0.15]
+                        }
+    
+
+    def getColorList(self, *args):
+        """ Return a list of Maya's colors.
+        """
+        #Manually add the "none" color
+        colorList = [[0.627, 0.627, 0.627]]
+        #WARNING --> color index in maya start to 1
+        colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
+        return colorList
+
+
+    def getGuideListByAttr(self, item, attr="guideColorIndex", *args):
+        """ Return the guide children list if it is a guide node.
+        """
+        guideList = []
+        if attr in cmds.listAttr(item):
+            guideList.append(item)
+            if "__" in item and ":" in item and item.endswith("Guide_Base"):
+                spaceName = item.split(":")[0]
+                childrenList = cmds.listRelatives(item, children=True, allDescendents=True, noIntermediate=True, type=self.shapeTypeList)
+                if childrenList:
+                    for child in childrenList:
+                        if child.startswith(spaceName):
+                            guideList.append(child)
+        return guideList
 
 
     # CONTROLS functions:
-    def colorShape(self, objList, color, rgb=False, outliner=False, *args):
+    def colorShape(self, objList, color, rgb=False, outliner=False, instance=None, *args):
         """ Create a color override for all shapes from the objList.
         """
+        # define colorIndex value
         iColorIdx = color
         if rgb:
-            if color in list(dic_colors):
-                color = dic_colors[color]
-        elif color in list(dic_colors):
-            iColorIdx = dic_colors[color]
-
+            if color in list(self.dic_colors):
+                color = self.dic_colors[color]
+        elif color in list(self.dic_colors):
+            iColorIdx = self.dic_colors[color]
+        if not objList:
+            objList = cmds.ls(selection=True)
         # find shapes and apply the color override:
-        shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         if objList:
             for objName in objList:
                 if outliner:
@@ -66,18 +145,32 @@ class ControlClass(object):
                 else:
                     objType = cmds.objectType(objName)
                     # verify if the object is the shape type:
-                    if objType in shapeTypeList:
-                        self.setColorOverride(objName, color, iColorIdx, rgb)
+                    if objType in self.shapeTypeList:
+                        self.setColorOverride(objName, color, iColorIdx, rgb, instance=instance)
                     # verify if the object is a transform type:
                     elif objType == "transform":
-                        # find all shapes children of the transform object:
-                        shapeList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
-                        if shapeList:
-                            for shape in shapeList:
-                                self.setColorOverride(shape, color, iColorIdx, rgb)
+                        # try get guide shape list
+                        itemList = self.getGuideListByAttr(objName)
+                        if itemList:
+                            if rgb:
+                                cmds.setAttr(objName+".guideColorIndex", -1)
+                                cmds.setAttr(objName+".guideColorR", color[0])
+                                cmds.setAttr(objName+".guideColorG", color[1])
+                                cmds.setAttr(objName+".guideColorB", color[2])
+                            else:
+                                cmds.setAttr(objName+".guideColorIndex", iColorIdx)
+                                cmds.setAttr(objName+".guideColorR", self.colorList[iColorIdx][0])
+                                cmds.setAttr(objName+".guideColorG", self.colorList[iColorIdx][1])
+                                cmds.setAttr(objName+".guideColorB", self.colorList[iColorIdx][2])
+                        else:
+                            # find all shapes children of the transform object:
+                            itemList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
+                        if itemList:
+                            for shape in itemList:
+                                self.setColorOverride(shape, color, iColorIdx, rgb, instance=instance)
 
 
-    def setColorOverride(self, item, color, iColorIdx, rgb, outliner=False, *args):
+    def setColorOverride(self, item, color, iColorIdx, rgb, outliner=False, instance=None, *args):
         """ Set the color for the given node and color data.
         """
         if outliner:
@@ -96,9 +189,17 @@ class ControlClass(object):
                 cmds.setAttr(item+".overrideColorR", color[0])
                 cmds.setAttr(item+".overrideColorG", color[1])
                 cmds.setAttr(item+".overrideColorB", color[2])
+                if instance:
+                    cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
+                    if not instance.moduleGrp in cmds.ls(selection=True):
+                        cmds.button(instance.selectButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
+                if instance:
+                    cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
+                    if not instance.moduleGrp in cmds.ls(selection=True):
+                        cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
 
 
     def removeColor(self, itemList, *args):
@@ -108,13 +209,107 @@ class ControlClass(object):
             itemList = cmds.ls(selection=True)
         if itemList:
             for item in itemList:
-                cmds.setAttr(item+".overrideEnabled", 0)
-                cmds.setAttr(item+".overrideRGBColors", 0)
-                cmds.setAttr(item+".useOutlinerColor", 0)
+                guideList = self.getGuideListByAttr(item)
+                if guideList:
+                    for guide in guideList:
+                        if not guide in itemList:
+                            itemList.append(guide)
+            for item in itemList:
+                isGuide = False
+                if "Guide" in item:
+                    self.colorShape([item], "blue")
+                    isGuide = True
+                if "Guide_Base" in item:
+                    self.colorShape([item], "yellow")
+                    isGuide = True
+                if "Guide_Base_RadiusCtrl" in item:
+                    self.colorShape([item], "cyan")
+                    isGuide = True
+                if not isGuide or not cmds.objectType(item) in self.shapeTypeList:
+                    cmds.setAttr(item+".overrideEnabled", 0)
+                    cmds.setAttr(item+".overrideRGBColors", 0)
+                    cmds.setAttr(item+".useOutlinerColor", 0)
+                if "guideColorIndex" in cmds.listAttr(item):
+                    cmds.setAttr(item+".guideColorIndex", 0)
+                    cmds.setAttr(item+".guideColorR", self.colorList[0][0])
+                    cmds.setAttr(item+".guideColorG", self.colorList[0][1])
+                    cmds.setAttr(item+".guideColorB", self.colorList[0][2])
+
+
+    def getCurrentRGBColor(self, item, outliner=False, *args):
+        """ Return the current guide RGB color or outliner override color.
+        """
+        if outliner:
+            return [cmds.getAttr(item+".outlinerColor.outlinerColor"+attr) for attr in ['R', 'G', 'B']]
+        else:
+            return [cmds.getAttr(item+".overrideColor"+attr) for attr in ['R', 'G', 'B']]
+        
+
+    def getGuideRGBColorList(self, instance, *args):
+        """ Return the guide RGB color list.
+        """
+        currentRGBList = []
+        for attr in ['R', 'G', 'B']:
+            currentRGBList.append(cmds.getAttr(instance.moduleGrp+".guideColor"+attr))
+        return currentRGBList
+
+
+    def setColorRGBByUI(self, itemList=None, slider=None, instance=None, *args, **kwargs):
+        """ Read from UI the rgb color to set override of given list or selected nodes.
+        """
+        if not itemList:
+            itemList = cmds.ls(selection=True)
+        if itemList:
+            if slider:
+                self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), rgb=True, instance=instance)
+
+
+    def setColorOutlinerByUI(self, itemList=None, slider=None, *args):
+        """ Read from UI the rgb color to set override of given list or selected nodes.
+        """
+        if not itemList:
+            itemList = cmds.ls(selection=True)
+        if itemList:
+            if slider:
+                self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
+
+
+    def colorizeUI(self, instance=None, *args, **kwargs):
+        """ Show a little window to choose the color of the button and the override the guide.
+            From the old dpColorOverride extra tool. Thanks!
+        """
+        currentRBGColor = self.getCurrentRGBColor(self.moduleGrp)
+        currentRBGOutlinerColor = self.getCurrentRGBColor(self.moduleGrp, True)
+        self.dpUIinst.utils.closeUI(self.dpUIinst.colorOverrideWinName)
+        # creating colorOverride Window:
+        colorOverride_winWidth  = 170
+        colorOverride_winHeight = 115
+        dpColorOverrideWin = cmds.window(self.dpUIinst.colorOverrideWinName, title=self.dpUIinst.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        # creating layout:
+        colorTabLayout = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=dpColorOverrideWin)
+        # Index layout:
+        colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20), parent=colorTabLayout)
+        # creating buttons
+        for colorIndex, colorValues in enumerate(self.colorList):
+            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [self.moduleGrp], colorIndex, instance=instance), parent=colorIndexLayout)
+        # RGB layout:
+        colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
+        cmds.separator(height=10, style='none', parent=colorRGBLayout)
+        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [self.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
+        cmds.button("removeOverrideColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
+        # Outliner layout:
+        colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
+        cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
+        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [self.moduleGrp], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
+        cmds.button("removeOutlinerColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
+        # renaming tabLayouts:
+        cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))
+        # call colorIndex Window:
+        cmds.showWindow(dpColorOverrideWin)
 
 
     def renameShape(self, transformList, *args):
-        """Find shapes, rename them to Shapes and return the results.
+        """Find shapes, rename them to #Shapes and return the results.
         """
         resultList = []
         for transform in transformList:
@@ -141,8 +336,8 @@ class ControlClass(object):
                     cmds.connectAttr(fromObj+"."+attr, toObj+"."+attr, force=f)
                 except:
                     print("Error: Cannot connect", toObj, ".", attr, "directely.")
-        
-        
+
+
     def setLockHide(self, objList, attrList, l=True, k=False, cb=False, *args):
         """Set lock or hide to attributes for object in lists.
         """
@@ -154,10 +349,10 @@ class ControlClass(object):
                         cmds.setAttr(obj+"."+attr, lock=l, keyable=k, channelBox=cb)
                     except:
                         print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
-                        
-                        
+
+
     def setNonKeyable(self, objList, attrList, *args):
-        """Set nonKeyable to attributes for objects in lists.
+        """Set as nonKeyable to attributes for the given object list.
         """
         if objList and attrList:
             for obj in objList:
@@ -175,13 +370,12 @@ class ControlClass(object):
         """
         # declare a list of attributes for render:
         renderAttrList = ["castsShadows", "receiveShadows", "motionBlur", "primaryVisibility", "smoothShading", "visibleInReflections", "visibleInRefractions", "doubleSided", "miTransparencyCast", "miTransparencyReceive", "miReflectionReceive", "miRefractionReceive", "miFinalGatherCast", "miFinalGatherReceive"]
-        shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         # find all children shapes:
         if objList:
             for obj in objList:
                 objType = cmds.objectType(obj)
                 # verify if the object is the shape type:
-                if objType in shapeTypeList:
+                if objType in self.shapeTypeList:
                     # set attributes as not renderable:
                     for attr in renderAttrList:
                         try:
@@ -203,14 +397,14 @@ class ControlClass(object):
                                     #print("Error: Cannot set not renderable ", attr, "as zero for", shape)
                                     pass
 
-    
+
     def createSimpleRibbon(self, name='ribbon', totalJoints=6, jointLabelNumber=0, jointLabelName="SimpleRibbon", *args):
         """ Creates a Ribbon system.
             Receives the total number of joints to create.
             Returns the ribbon nurbs plane, the joints groups and joints created.
         """
         # create a ribbonNurbsPlane:
-        ribbonNurbsPlane = cmds.nurbsPlane(name=name+"RibbonNurbsPlane", constructionHistory=False, object=True, polygon=0, axis=(0, 1, 0), width=1, lengthRatio=8, patchesV=totalJoints)[0]
+        ribbonNurbsPlane = cmds.nurbsPlane(name=name+"Ribbon_NP", constructionHistory=False, object=True, polygon=0, axis=(0, 1, 0), width=1, lengthRatio=8, patchesV=totalJoints)[0]
         # get the ribbonNurbsPlane shape:
         ribbonNurbsPlaneShape = cmds.listRelatives(ribbonNurbsPlane, shapes=True, children=True)[0]
         # make this ribbonNurbsPlane as template, invisible and not renderable:
@@ -218,27 +412,28 @@ class ControlClass(object):
         cmds.setAttr(ribbonNurbsPlane+".visibility", 0)
         self.setNotRenderable([ribbonNurbsPlaneShape])
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        cmds.addAttr(ribbonNurbsPlane, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+        self.utils.addCustomAttr([ribbonNurbsPlane], self.dpUIinst.skin.ignoreSkinningAttr)
         # create groups to be used as a root of the ribbon system:
         ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_Rbn_RibbonJoint_Grp")
         # create joints:
         jointList, jointGrpList = [], []
         for j in range(totalJoints+1):
             # create pointOnSurfaceInfo:
-            infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+"_POSI"+str(j+1))
+            infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+str(j+1)+"_POSI")
+            self.dpUIinst.customAttr.addAttr(0, [infoNode]) #dpID
             # setting parameters worldSpace, U and V:
-            cmds.connectAttr(ribbonNurbsPlaneShape + ".worldSpace[0]", infoNode + ".inputSurface")
-            cmds.setAttr(infoNode + ".parameterV", ((1/float(totalJoints))*j) )
-            cmds.setAttr(infoNode + ".parameterU", 0.5)
+            cmds.connectAttr(ribbonNurbsPlaneShape+".worldSpace[0]", infoNode+".inputSurface")
+            cmds.setAttr(infoNode+".parameterV", ((1/float(totalJoints))*j) )
+            cmds.setAttr(infoNode+".parameterU", 0.5)
             # create and parent groups to calculate:
             posGrp = cmds.group(n=name+"Pos"+str(j+1)+"_Grp", empty=True)
             upGrp  = cmds.group(n=name+"Up"+str(j+1)+"_Grp", empty=True)
             aimGrp = cmds.group(n=name+"Aim"+str(j+1)+"_Grp", empty=True)
             cmds.parent(upGrp, aimGrp, posGrp, relative=True)
             # connect groups translations:
-            cmds.connectAttr(infoNode + ".position", posGrp + ".translate", force=True)
-            cmds.connectAttr(infoNode + ".tangentU", upGrp + ".translate", force=True)
-            cmds.connectAttr(infoNode + ".tangentV", aimGrp + ".translate", force=True)
+            cmds.connectAttr(infoNode+".position", posGrp+".translate", force=True)
+            cmds.connectAttr(infoNode+".tangentU", upGrp+".translate", force=True)
+            cmds.connectAttr(infoNode+".tangentV", aimGrp+".translate", force=True)
             # create joint:
             cmds.select(clear=True)
             joint = cmds.joint(name=name+"_%02d_Jnt"%(j+1))
@@ -253,10 +448,12 @@ class ControlClass(object):
             # parent this ribbonPos to the ribbonGrp:
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
-            dpUtils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
+            self.utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
+            self.utils.addCustomAttr([posGrp, upGrp, aimGrp, jointGrp], self.utils.ignoreTransformIOAttr)
+        self.utils.addCustomAttr([ribbonGrp, ribbonNurbsPlane], self.utils.ignoreTransformIOAttr)
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
-    
-    
+
+
     def getControlNodeById(self, ctrlType, *args):
         """ Find and return node list with ctrlType in its attribute.
         """
@@ -267,16 +464,16 @@ class ControlClass(object):
                 if cmds.getAttr(item+".controlID") == ctrlType:
                     ctrlList.append(item)
         return ctrlList
-    
-    
+
+
     def getControlModuleById(self, ctrlType, *args):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
         ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['type']
         return ctrlModule
-        
-        
+
+
     def getControlDegreeById(self, ctrlType, *args):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
@@ -295,7 +492,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -317,10 +514,14 @@ class ControlClass(object):
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
             if corrective:
                 self.addCorrectiveAttrs(curve)
+                self.startCorrectiveEditMode([curve])
             if not headDef == 0:
                 self.addDefInfluenceAttrs(curve, headDef)
+            if guideSource:
+                cmds.addAttr(curve, longName="guideSource", dataType="string")
+                cmds.setAttr(curve+".guideSource", guideSource, type="string")
             return curve
-        
+
 
     def addDefInfluenceAttrs(self, curve, defInfluenceType):
         """ Add specific attribute to be deformed by FFD
@@ -335,13 +536,13 @@ class ControlClass(object):
                 cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
 
 
-    def cvLocator(self, ctrlName, r=1, d=1, guide=False, *args):
+    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", *args):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
-        curveInstance = self.getControlInstance("Locator")
-        curve = curveInstance.cvMain(False, "Locator", ctrlName, r, d, '+Y', (0, 0, 0), 1, guide)
+        curveInstance = self.getControlInstance(cvType)
+        curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
-            self.addGuideAttrs(curve)
+            self.addGuideAttrs(curve, color)
         return curve
 
 
@@ -380,13 +581,13 @@ class ControlClass(object):
             self.addGuideAttrs(locCtrl)
         cmds.select(clear=True)
         return locCtrl
-    
-    
+
+
     def cvCharacter(self, ctrlType, ctrlName, r=1, d=1, dir="+Y", rot=(0, 0, 0), *args):
         """ Create and return a curve to be used as a control.
         """
         # get radius by checking linear unit
-        r = self.dpCheckLinearUnit(r)
+        #r = self.dpCheckLinearUnit(r)
         curve = self.cvControl(ctrlType, ctrlName, r, d, dir, rot)
         # edit a minime curve:
         cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True, minValue=0.001)
@@ -395,7 +596,9 @@ class ControlClass(object):
         # create Option_Ctrl Text:
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="Option Ctrl", constructionHistory=False)[0]
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="OPTIONS", constructionHistory=False)[0]
+            for attr in ["X", "Y", "Z"]:
+                cmds.setAttr(cvText+".scale"+attr, 0.3*r)
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
             if txtShapeList:
                 for s, shape in enumerate(txtShapeList):
@@ -410,12 +613,13 @@ class ControlClass(object):
                     # restore the shape world position
                     for i in curveCVList:
                         cmds.xform(shape+'.cp['+str(i)+']', a=True, worldSpace=True, t=vtxWorldPosition[i])
-                    cmds.rename(shape, optCtrlTxt+"Shape"+str(s))
+                    cmds.rename(shape, optCtrlTxt+str(s)+"Shape")
             cmds.delete(cvText)
             cmds.parent(optCtrlTxt, curve)
             cmds.setAttr(optCtrlTxt+".template", 1)
-            cmds.setAttr(optCtrlTxt+".tx", -0.72*r)
+            cmds.setAttr(optCtrlTxt+".tx", -0.61*r)
             cmds.setAttr(optCtrlTxt+".ty", 1.1*r)
+            self.dpUIinst.customAttr.addAttr(0, [optCtrlTxt]) #dpID
         except:
             # it will pass if we don't able to find the font to create the text
             pass
@@ -435,14 +639,14 @@ class ControlClass(object):
                     if histType == historyName:
                         foundHistoryList.append(hist)
             return foundHistoryList
-    
-    
+
+
     def cvBaseGuide(self, ctrlName, r=1, *args):
         """Create a control to be used as a Base Guide control.
             Returns the main control (circle) and the radius control in a list.
         """
         # get radius by checking linear unit
-        r = self.dpCheckLinearUnit(r)
+        #r = self.dpCheckLinearUnit(r)
         # create a simple circle curve:
         circle = cmds.circle(n=ctrlName, ch=True, o=True, nr=(0, 0, 1), d=3, s=8, radius=r)[0]
         radiusCtrl = cmds.circle(n=ctrlName+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
@@ -474,8 +678,8 @@ class ControlClass(object):
         # pinGuide:
         self.createPinGuide(circle)
         return [circle, radiusCtrl]
-    
-    
+
+
     def setAndFreeze(nodeName="", tx=None, ty=None, tz=None, rx=None, ry=None, rz=None, sx=None, sy=None, sz=None, freeze=True):
         """This function set attribute values and do a freezeTransfomation.
         """
@@ -504,8 +708,8 @@ class ControlClass(object):
                     cmds.makeIdentity(nodeName, apply=freeze, translate=freezeT, rotate=freezeR, scale=freezeS)
                 except:
                     pass
-    
-    
+
+
     def copyAttr(self, sourceItem=False, attrList=False, verbose=False, *args):
         """ Get and store in a dictionary the attributes from sourceItem.
             Returns the dictionary with attribute values.
@@ -535,8 +739,8 @@ class ControlClass(object):
                 if verbose:
                     print(self.dpUIinst.lang["i125_copiedAttr"])
         return self.attrValueDic
-    
-    
+
+
     def pasteAttr(self, destinationList=False, verbose=False, *args):
         """ Get to destination list and set the dictionary values on them.
         """
@@ -558,8 +762,8 @@ class ControlClass(object):
                                 print(self.dpUIinst.lang["e016_notPastedAttr"], attr)
             if verbose:
                 print(self.dpUIinst.lang["i126_pastedAttr"])
-    
-    
+
+
     def copyAndPasteAttr(self, verbose=False, *args):
         """ Call copy and past functions.
         """
@@ -572,16 +776,16 @@ class ControlClass(object):
                 destinationList = currentSelectedList[1:]
                 # calling function to paste attributes to destinationList:
                 self.pasteAttr(destinationList, verbose)
-    
-    
+
+
     def transferAttr(self, sourceItem, destinationList, attrList, *args):
         """ Transfer attributes from sourceItem to destinationList.
         """
         if sourceItem and destinationList and attrList:
             self.copyAttr(sourceItem, attrList)
             self.pasteAttr(destinationList)
-    
-    
+
+
     def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, force=False, *args):
         """ Transfer control shape from sourceItem to destination list
         """
@@ -601,6 +805,7 @@ class ControlClass(object):
                         sourceVis = None
                         defList = False
                         dupSourceItem = cmds.duplicate(sourceItem)[0]
+                        self.utils.deleteOrigShape(dupSourceItem)
                         if keepColor:
                             self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
@@ -627,31 +832,31 @@ class ControlClass(object):
                             self.destChildrenGrp = cmds.group(destChildrenList, name="dpTemp_DestChildren_Grp")
                             cmds.parent(self.destChildrenGrp, world=True)
                         if defList:
-                            dpUtils.reapplyDeformers(dupSourceItem, defList)
+                            self.utils.reapplyDeformers(dupSourceItem, defList)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
                             if needKeepVis:
                                 cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
                             if not force:
                                 cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
-                            else:
+                            elif cmds.objExists(dupSourceShape):
                                 # make sure we use the current shape of a froze transform, usefull to mirror control shapes
                                 forcedShape = cmds.parent(dupSourceShape, destTransform, absolute=True, shape=True)[0]
-                                forcedTransform = cmds.listRelatives(forcedShape, parent=True, type="transform")
+                                forcedTransform = cmds.listRelatives(forcedShape, parent=True, type="transform", fullPath=True)
+                                histList = cmds.listHistory(forcedShape)
+                                # workaround to avoid undesirable warning about tweak nodes
+                                cmds.delete(forcedShape, constructionHistory=True)
+                                for x in histList:
+                                    if "tweak" in x:
+                                        if cmds.objExists(x):
+                                            cmds.delete(x)
                                 cmds.makeIdentity(forcedTransform, apply=True, translate=True, rotate=True, scale=True)
                                 cmds.parent(forcedShape, destTransform, relative=True, shape=True)
                                 cmds.delete(forcedTransform)
-                                if defList:
-                                    if cmds.objExists(forcedShape):
-                                        histList = cmds.listHistory(forcedShape)
-                                        if histList:
-                                            for defNode in histList:
-                                                if cmds.objExists(defNode):
-                                                    if cmds.objectType(defNode) == "transformGeometry":
-                                                        cmds.delete(forcedShape, constructionHistory=True)
-                                                        dpUtils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
-                                                        break
-                        cmds.delete(dupSourceItem)
+                                if defList and histList:
+                                    self.utils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
+                        if cmds.objExists(dupSourceItem):
+                            cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
                         # restore children transforms to correct parent hierarchy:
                         if destChildrenList:
@@ -661,8 +866,9 @@ class ControlClass(object):
                         # update cvControls attributes:
                         self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
-    
-    
+                    self.dpUIinst.customAttr.addAttr(0, destinationList, shapes=True) #dpID
+
+
     def setSourceColorOverride(self, sourceItem, destinationList, *args):
         """ Check if there's a colorOverride for destination shapes
             and try to set it to source shapes.
@@ -682,8 +888,8 @@ class ControlClass(object):
                             colorList.append(cmds.getAttr(childShape+".overrideColor"))
                             self.colorShape([sourceItem], colorList[0])
                         break
-                        
-    
+
+
     def resetCurve(self, changeDegree=False, transformList=False, *args):
         """ Read the current curve degree of selected curve controls and change it to another one.
             1 to 3
@@ -713,10 +919,10 @@ class ControlClass(object):
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
                     self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
             cmds.select(transformList)
-    
+
 
     def confirmAskUser(self, titleText, messageText, *args):
-        """
+        """ Just a confirmDialog that return user choise as True or False.
         """
         # ask user to continue
         resultQuestion = cmds.confirmDialog(
@@ -729,7 +935,8 @@ class ControlClass(object):
         if resultQuestion == self.dpUIinst.lang['i071_yes']:
             return True
         return False
-    
+
+
     def dpCreateControlsPreset(self, *args):
         """ Creates a json file as a Control Preset and returns it.
         """
@@ -779,15 +986,16 @@ class ControlClass(object):
                             resultString += ',"'+pID+'":{"type":"'+self.dpUIinst.ctrlPreset[pID]["type"]+'","degree":'+str(self.dpUIinst.ctrlPreset[pID]["degree"])+'}'
                     resultString += "}"
         return resultString
-    
-    
-    def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):
+
+
+    def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", boundingBox=True, *args):
         """ Verify if the Maya linear unit is in Centimeter.
             Return the radius to the new unit size.
 
             WIP!
             Changing to shapeSize cluster setup
         """
+        magicNumber = 0.085
         newRadius = origRadius
     #    newRadius = 1
     #    linearUnit = cmds.currentUnit(query=True, linear=True, fullName=True)
@@ -804,9 +1012,28 @@ class ControlClass(object):
     #        newRadius = origRadius*0.032808
     #    elif linearUnit == "yard":
     #        newRadius = origRadius*0.010936
+        # adapt radius to geometry meshes size
+        if boundingBox:
+            meshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            if meshList:
+                tempList = []
+                for item in meshList:
+                    if not "_DeformerCube_Geo" in item:
+                        fatherNode = item[:item[1:].find("|")+1]
+                        if fatherNode:
+                            if not fatherNode in tempList:
+                                tempList.append(fatherNode)
+                if tempList:
+                    bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
+                    bbList[1] *= 0.75 #less importance to height
+                    bbAverage = self.dpUIinst.utils.averageValue(bbList)
+                    resultValue = magicNumber*bbAverage*origRadius
+                    if resultValue:
+                        return resultValue
+                    return origRadius
         return newRadius
-    
-    
+        
+
     #@dpUtils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
@@ -826,8 +1053,8 @@ class ControlClass(object):
             print("There are not children shape to create shapeSize setup of:", transformNode)
         if clusterHandle:
             self.connectShapeSize(clusterHandle)
-    
-    
+
+
     def connectShapeSize(self, clusterHandle, *args):
         """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
         """
@@ -835,50 +1062,44 @@ class ControlClass(object):
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
         # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
-        self.dpARTempGrp = 'dpAR_Temp_Grp'
-        if not cmds.objExists(self.dpARTempGrp):
-            cmds.group(name=self.dpARTempGrp, empty=True)
-            cmds.setAttr(self.dpARTempGrp+".visibility", 0)
-            cmds.setAttr(self.dpARTempGrp+".template", 1)
-            cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
-            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
-        cmds.parent(clusterHandle, self.dpARTempGrp)
-    
-    
-    def addGuideAttrs(self, ctrlName, *args):
+        cmds.parent(clusterHandle, self.dpUIinst.tempGrp)
+
+
+    def addGuideAttrs(self, ctrlName, color="blue", *args):
         """ Add and set attributes to this control curve be used as a guide.
         """
         # create an attribute to be used as guide by module:
         cmds.addAttr(ctrlName, longName="nJoint", attributeType='long')
         cmds.setAttr(ctrlName+".nJoint", 1)
         # colorize curveShapes:
-        self.colorShape([ctrlName], 'blue')
+        self.colorShape([ctrlName], color)
         # shapeSize setup:
         self.shapeSizeSetup(ctrlName)
         # pinGuide:
         self.createPinGuide(ctrlName)
-    
-    
+
+
     def createPinGuide(self, ctrlName, *args):
         """ Add pinGuide attribute if it doesn't exist yet.
             Create a scriptJob to read this attribute change.
         """
         if not ctrlName.endswith("_JointEnd"):
             if not ctrlName.endswith("_RadiusCtrl"):
-                if not cmds.objExists(ctrlName+".pinGuide"):
+                if not "pinGuide" in cmds.listAttr(ctrlName):
                     cmds.addAttr(ctrlName, longName="pinGuide", attributeType="bool")
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                     cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
-                cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
+                self.deleteOldJobs(ctrlName)
+                cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=False, compressUndo=True)
                 self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
-    
-    
+
+
     def setPinnedGuideColor(self, ctrlName, status, color="red", *args):
         """ Set the color override for pinned guide shapes.
         """
         cmds.setAttr(ctrlName+".overrideEnabled", status)
-        cmds.setAttr(ctrlName+".overrideColor", dic_colors[color])
+        cmds.setAttr(ctrlName+".overrideColor", self.dic_colors[color])
         shapeList = cmds.listRelatives(ctrlName, children=True, fullPath=False, shapes=True)
         if shapeList:
             for shapeNode in shapeList:
@@ -886,13 +1107,12 @@ class ControlClass(object):
                     cmds.setAttr(shapeNode+".overrideEnabled", 0)
                 else:
                     cmds.setAttr(shapeNode+".overrideEnabled", 1)
-    
-    
+
+
     def jobPinGuide(self, ctrlName, *args):
         """ Pin temporally the guide by scriptJob.
         """
-        transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
-        if cmds.objExists(ctrlName+".pinGuide"):
+        if "pinGuide" in cmds.listAttr(ctrlName):
             # extracting namespace... need to find an ellegant way using message or stored attribute instead:
             nameSpaceName = None
             cmds.namespace(set=":")
@@ -910,23 +1130,23 @@ class ControlClass(object):
                         self.storeLockedList(ctrlName)
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
-                        for attr in transformAttrList:
+                        for attr in self.dpUIinst.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=False)
                         pc = cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)[0]
                         cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
-                        for attr in transformAttrList:
+                        for attr in self.dpUIinst.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=True)
             else:
                 pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
                 if pcNodeList:
                     cmds.delete(pcNodeList[0])
-                    for attr in transformAttrList:
+                    for attr in self.dpUIinst.transformAttrList:
                         cmds.setAttr(ctrlName+"."+attr, lock=False)
                     self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)
             cmds.namespace(set=":")
-    
-    
+
+
     def startPinGuide(self, guideBase, *args):
         """ Reload pinGuide job for already created guide.
         """
@@ -936,16 +1156,19 @@ class ControlClass(object):
                 for childNode in childrenList:
                     if cmds.objExists(childNode+".pinGuide"):
                         self.createPinGuide(childNode)
-            if cmds.objExists(guideBase+".pinGuide"):
+            if "pinGuide" in cmds.listAttr(guideBase):
                 self.createPinGuide(guideBase)
-    
-    
-    def unPinGuide(self, guideBase, *args):
+
+
+    def unPinGuide(self, guideList=None, *args):
         """ Remove pinGuide setup.
             We expect to have the scriptJob running here to clean-up the pin setup.
         """
-        if cmds.objExists(guideBase+".pinGuide"):
-            cmds.setAttr(guideBase+".pinGuide", 0)
+        if not guideList:
+            guideList = [guide for guide in cmds.ls(selection=False, type="transform") if "pinGuide" in cmds.listAttr(guide)]
+        if guideList:
+            for guide in guideList:
+                cmds.setAttr(guide+".pinGuide", 0)
 
 
     def storeLockedList(self, ctrlName, *args):
@@ -982,18 +1205,16 @@ class ControlClass(object):
         importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.lang['i196_import']+" "+self.dpUIinst.lang['i193_calibration'])
         if not importCalibrationPath:
             return
-        progressAmount = 0
-        cmds.progressWindow(title=importCalibrationNamespace, progress=progressAmount, status='0% - '+self.dpUIinst.lang['i214_refFile'], isInterruptable=False)
+        self.utils.setProgress(self.dpUIinst.lang['i214_refFile'], importCalibrationNamespace, addOne=False)
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
         refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
-            maxProcess = len(refNodeList)
             for item in refNodeList:
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(repr(progressAmount)+' - '+self.dpUIinst.lang['i215_setAttr']))
+                self.utils.setProgress(max=len(refNodeList), addOne=False, addNumber=False)
+                self.utils.setProgress(self.dpUIinst.lang['i215_setAttr'], addOne=True)
                 if cmds.objExists(item+".calibrationList"):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
@@ -1003,9 +1224,9 @@ class ControlClass(object):
                     self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
         # remove referenced file:
         cmds.file(importCalibrationPath, removeReference=True)
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
         print("dpImportCalibrationPath: "+importCalibrationPath)
-        
+
 
     def mirrorCalibration(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
         """ Mirror calibration by naming using prefixes to find nodes.
@@ -1029,10 +1250,13 @@ class ControlClass(object):
                             for node in allNodeList:
                                 self.mirrorCalibration(node, fromPrefix, toPrefix)
             else:
-                attrList = self.getCalibrationAttr(nodeName)
+                attrList = self.getListFromStringAttr(nodeName)
                 if attrList:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
+                        notMirrorAttrList = self.getListFromStringAttr(nodeName, "notMirrorList")
+                        if notMirrorAttrList:
+                            attrList = list(set(attrList) - set(notMirrorAttrList))
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
             print(self.dpUIinst.lang['i198_mirrorPrefix'])
@@ -1050,7 +1274,7 @@ class ControlClass(object):
                     destinationList = currentSelectionList[1:]
         if sourceItem:
             if not attrList:
-                attrList = self.getCalibrationAttr(sourceItem)
+                attrList = self.getListFromStringAttr(sourceItem)
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
@@ -1059,25 +1283,27 @@ class ControlClass(object):
             print(self.dpUIinst.lang['i042_notSelection'])
 
 
-    def setCalibrationAttr(self, nodeName, attrList, *args):
-        """ Set the calibration attribute that contains a list of attributes to be used in the transfer calibration.
-            Add calibrationList attribute if it doesn't exists.
+    def setStringAttrFromList(self, nodeName, attrList, attrName="calibrationList", *args):
+        """ Set the given attribute that contains a list of the given list.
+            Add a string attribute if it doesn't exists.
+            Useful for calibrationList attribute.
         """
         if cmds.objExists(nodeName):
             if attrList:
                 calibrationAttr = ';'.join(attrList)
-                if not cmds.objExists(nodeName+".calibrationList"):
-                    cmds.addAttr(nodeName, longName="calibrationList", dataType="string")
-                cmds.setAttr(nodeName+".calibrationList", calibrationAttr, type="string")
+                if not cmds.objExists(nodeName+"."+attrName):
+                    cmds.addAttr(nodeName, longName=attrName, dataType="string")
+                cmds.setAttr(nodeName+"."+attrName, calibrationAttr, type="string")
 
 
-    def getCalibrationAttr(self, nodeName, *args):
-        """ Return the calibrationList attribute if it exists in the given nodeName.
+    def getListFromStringAttr(self, nodeName, attrName="calibrationList", *args):
+        """ Return the list from a string if it exists in the given nodeName.
+            Useful to ready calibrationList attributes by default.
         """
-        if cmds.objExists(nodeName+".calibrationList"):
-            return list(cmds.getAttr(nodeName+".calibrationList").split(";"))
+        if cmds.objExists(nodeName+"."+attrName):
+            return list(cmds.getAttr(nodeName+"."+attrName).split(";"))
 
-    
+
     def getControlList(self, *args):
         """ List all dpControl transforms that has active .dpControl attribute.
             Returns a list of them.
@@ -1091,38 +1317,37 @@ class ControlClass(object):
         return nodeList
 
 
-    def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, *args):
+    def exportShape(self, nodeList=None, path=None, IO=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, verbose=False, dir="dpControlShape", *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
-            If publish is True, it will use the current location and create the dpShapeIO directory by default.
+            If IO is True, it will use the current location and create the dpControlShapeIO directory inside dpData folder by default.
             If keepSnapshot is True, it will parent a backup dpSnapshotGrp group to Wip_Grp and hide it.
             If overrideExisting is True, it will delete the old node before create the new snapshot.
         """
         currentPath = cmds.file(query=True, sceneName=True)
         if not currentPath:
-            print(self.dpUIinst.lang['i201_saveScene'])
-            return
-        
+            if path and "dpData" in path:
+                currentPath = path.split("dpData")[0]
+            else:
+                print(self.dpUIinst.lang['i201_saveScene'])
+                return
         if not nodeList:
             nodeList = self.getControlList()
         if nodeList:
             if not path:
-                if publish:
-                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
+                if IO:
+                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
                     if not os.path.exists(dpFolder):
                         os.makedirs(dpFolder)
-                    path = dpFolder+"/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
+                    path = dpFolder+"/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
                 else:
                     pathList = cmds.fileDialog2(fileMode=0, caption="Export Shapes")
                     if pathList:
                         path = pathList[0] 
             if path:
                 if ui:
-                    # Starting progress window
-                    progressAmount = 0
-                    cmds.progressWindow(title=self.dpUIinst.lang['i164_export'], progress=progressAmount, status=self.doingName+': 0%', isInterruptable=False)
-                    maxProcess = len(nodeList)
+                    self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i164_export'], len(nodeList), addOne=False, addNumber=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1130,10 +1355,8 @@ class ControlClass(object):
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
                 for item in nodeList:
-                    if ui:
-                        # Update progress window
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.doingName+': ' + repr(progressAmount) + ' Shape'))
+                    if ui or verbose:
+                        self.utils.setProgress(self.doingName+': Shape')
                     snapshotName = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
@@ -1156,11 +1379,12 @@ class ControlClass(object):
                     cmds.file(exportSelected=True, type='mayaAscii', prompt=False, force=True)
                     cmds.file(rename=currentPath)
                     # DEV helper keepSnapshot
-                    if not cmds.objExists("WIP_Grp"): #TODO need to be refactory to get this node by masterGrp attribute
+                    wipGrp = self.utils.getNodeByMessage("wipGrp")
+                    if not cmds.objExists(wipGrp):
                         keepSnapshot = False
                     if keepSnapshot:
                         try:
-                            cmds.parent(dpSnapshotGrp, "WIP_Grp")
+                            cmds.parent(dpSnapshotGrp, wipGrp)
                             cmds.setAttr(dpSnapshotGrp+".visibility", 0)
                             if cmds.objExists("Backup_"+dpSnapshotGrp):
                                 cmds.delete("Backup_"+dpSnapshotGrp)
@@ -1175,26 +1399,29 @@ class ControlClass(object):
             print(self.dpUIinst.lang['i202_noControls'])
         if ui:
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
 
 
-    def importShape(self, nodeList=None, path=None, recharge=False, ui=True, *args):
+    def importShape(self, nodeList=None, path=None, IO=False, ui=True, verbose=False, dir="dpControlShape", *args):
         """ Import control shapes from an external loaded Maya file.
             If not get an user defined parameter for a node list, it will import all shapes.
-            If the recharge parameter is True, it will use the default path as current location inside dpShapeIO directory.
+            If the IO parameter is True, it will use the default path as current location inside dpControlShapeIO directory.
         """
         importShapeNamespace = "dpImportShape"
         if not nodeList:
             nodeList = self.getControlList()
         if nodeList:
-            if recharge:
+            if IO:
                 currentPath = cmds.file(query=True, sceneName=True)
                 if not currentPath:
-                    print(self.dpUIinst.lang['i201_saveScene'])
-                    return
-                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
-                dpShapeFile = "/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
-                path = dpFolder+dpShapeFile
+                    if path and "dpData" in path:
+                        currentPath = path.split("dpData")[0]
+                    else:
+                        print(self.dpUIinst.lang['i201_saveScene'])
+                        return
+                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
+                dpControlShapeFile = "/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
+                path = dpFolder+dpControlShapeFile
                 if not os.path.exists(path):
                     print (self.dpUIinst.lang['i202_noControls'])
                     return
@@ -1212,15 +1439,10 @@ class ControlClass(object):
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
                         if ui:
-                            # Starting progress window
-                            progressAmount = 0
-                            cmds.progressWindow(title=self.dpUIinst.lang['i196_import'], progress=progressAmount, status=self.doingName+': 0%', isInterruptable=False)
-                            maxProcess = len(refNodeList)
+                            self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i196_import'], len(refNodeList), addOne=False, addNumber=False)
                         for sourceRefNode in refNodeList:
-                            if ui:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.doingName+': ' + repr(progressAmount) + ' Shape'))
+                            if ui or verbose:
+                                self.utils.setProgress(self.doingName+': Shape')
                             if cmds.objectType(sourceRefNode) == "transform":
                                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destinationNode):
@@ -1232,7 +1454,7 @@ class ControlClass(object):
             print(self.dpUIinst.lang['i202_noControls'])
         if ui:
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
 
 
     def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
@@ -1240,12 +1462,13 @@ class ControlClass(object):
             Connect setup nodes and add calibration attributes to it.
             Returns the corrective controller and its highest zero out group.
         """
+        toIDList = []
         calibrateAttrList = ["T", "R", "S"]
         calibrateAxisList = ["X", "Y", "Z"]
         toCalibrationList = []
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
-        jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
-        jcrGrp1 = dpUtils.zeroOut([jcrGrp0])[0]
+        jcrGrp0 = self.utils.zeroOut([jcrCtrl])[0]
+        jcrGrp1 = self.utils.zeroOut([jcrGrp0])[0]
         cmds.delete(cmds.parentConstraint(jcrName, jcrGrp1, maintainOffset=False))
         cmds.parentConstraint(cmds.listRelatives(jcrName, parent=True)[0], jcrGrp1, maintainOffset=True, name=jcrGrp1+"_PaC")
         cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
@@ -1258,6 +1481,7 @@ class ControlClass(object):
             for axis in calibrateAxisList:
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
                 intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
+                toIDList.extend([remapV, intensityMD])
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
                 cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
                 cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
@@ -1266,6 +1490,7 @@ class ControlClass(object):
                 # add calibrate attributes:
                 if attr == "S":
                     scaleClp = cmds.createNode("clamp", name=jcrName.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
+                    toIDList.append(scaleClp)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
                     cmds.setAttr(remapV+".outputMin", 1)
                     cmds.setAttr(scaleClp+".minR", 1)
@@ -1275,6 +1500,7 @@ class ControlClass(object):
                 else:
                     invertMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_MD"))
                     invertCnd = cmds.createNode("condition", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_Cnd"))
+                    toIDList.extend([invertMD, invertCnd])
                     cmds.setAttr(invertCnd+".secondTerm", 1)
                     cmds.setAttr(invertCnd+".colorIfTrueR", -1)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
@@ -1285,10 +1511,11 @@ class ControlClass(object):
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
-        self.setCalibrationAttr(jcrCtrl, toCalibrationList)
+        self.dpUIinst.customAttr.addAttr(0, toIDList) #dpID
+        self.setStringAttrFromList(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
-    
-    
+
+
     def addCorrectiveAttrs(self, ctrlName, *args):
         """ Add and set attributes to this control curve be used as a corrective controller.
         """
@@ -1298,7 +1525,7 @@ class ControlClass(object):
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
 
 
-    def deleteOldCorrectiveJobs(self, ctrlName, *args):
+    def deleteOldJobs(self, ctrlName, *args):
         """ Try to find an existing script job already running for this corrective controller and kill it.
         """
         jobList = cmds.scriptJob(listJobs=True)
@@ -1307,21 +1534,21 @@ class ControlClass(object):
                 if ctrlName in job:
                     jobNumber = int(job[:job.find(":")])
                     cmds.scriptJob(kill=jobNumber, force=True)
-                    
+
 
     def createCorrectiveMode(self, ctrlName, *args):
         """ Create a scriptJob to read this attribute change.
         """
-        self.deleteOldCorrectiveJobs(ctrlName)
-        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=True, compressUndo=True)
+        self.deleteOldJobs(ctrlName)
+        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=False, compressUndo=True)
         if cmds.getAttr(ctrlName+".editMode"):
             self.colorShape([ctrlName], 'bonina', rgb=True)
-    
-    
+
+
     def jobCorrectiveEditMode(self, ctrlName, *args):
         """ Edit mode to corrective control by scriptJob.
         """
-        if cmds.objExists(ctrlName+".editMode"):
+        if "editMode" in cmds.listAttr(ctrlName):
             editModeValue = cmds.getAttr(ctrlName+".editMode")
             if editModeValue:
                 self.colorShape([ctrlName], 'bonina', rgb=True)
@@ -1331,18 +1558,19 @@ class ControlClass(object):
                     for shapeNode in shapeList:
                         cmds.setAttr(shapeNode+".overrideRGBColors", 0)
                 self.setCorrectiveCalibration(ctrlName)
-    
-    
-    def startCorrectiveEditMode(self, *args):
+
+
+    def startCorrectiveEditMode(self, objList=None, *args):
         """ Reload editMode job for existing corrective controllers.
         """
-        transformList = cmds.ls(selection=False, type="transform")
-        if transformList:
-            for transformNode in transformList:
-                if cmds.objExists(transformNode+".editMode"):
-                    self.createCorrectiveMode(transformNode)
-    
-    
+        if not objList:
+            objList = cmds.ls(selection=False, type="transform")
+        if objList:
+            for node in objList:
+                if "editMode" in cmds.listAttr(node):
+                    self.createCorrectiveMode(node)
+
+
     def setCorrectiveCalibration(self, ctrlName, *args):
         """ Remove corrective controller editMode setup.
             Calculate the results of transformations to set the calibration attributes.
@@ -1406,23 +1634,20 @@ class ControlClass(object):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
-                            # Starting progress window
-                            maxProcess = len(allNodeList)
-                            progressAmount = 0
-                            cmds.progressWindow(title=self.dpUIinst.lang['m010_mirror'], maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['m067_shape'], isInterruptable=False)
+                            self.utils.setProgress(self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['m010_mirror'], len(allNodeList), addOne=False, addNumber=False)
                             for node in allNodeList:
-                                progressAmount += 1
                                 if node in allControlList:
-                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['m067_shape']+" "+node, isInterruptable=False)                                   
+                                    self.utils.setProgress(self.dpUIinst.lang['m067_shape']+": "+node)
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
-                        cmds.progressWindow(endProgress=True)
+                        self.utils.setProgress(endIt=True)
             else:
                 if cmds.objExists(nodeName+"."+DPCONTROL) and cmds.getAttr(nodeName+"."+DPCONTROL) == 1:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
                         # do mirror algorithm
                         duplicatedSource = cmds.duplicate(nodeName, name=nodeName+"_Duplicated_TEMP")[0]
+                        self.utils.deleteOrigShape(duplicatedSource)
                         duplicatedGrp = cmds.group(duplicatedSource, name=duplicatedSource+"_Grp")
                         mirrorShapeGrp = cmds.group(empty=True, name=duplicatedSource+"_MirrorShape_Grp")
                         cmds.parent(duplicatedGrp, mirrorShapeGrp)
@@ -1448,28 +1673,28 @@ class ControlClass(object):
             nodeToRunList = self.getControlList()
         if nodeToRunList:
             if resetMode:
-                self.resetPose.runValidator(False, nodeToRunList)
+                self.resetPose.runAction(False, nodeToRunList)
+                self.utils.setProgress(endIt=True)
             else: #set default values
                 for item in nodeToRunList:
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
                     if attrList:
-                        print("attrList =", attrList)
                         for attr in attrList:
                             # hack to avoid Maya limitation to edit boolean attributes
                             if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
                                 cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
-    
+
 
     def getSelectedControls(self, *args):
         """ Return the intersection of all dpControls in the scene and the selected items.
         """
         return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))
-    
+
 
     def defaultValueEditor(self, *args):
         """ Create an UI to edit the attributes default values.
         """
-        dpUtils.closeUI(self.defaultValueWindowName)
+        self.utils.closeUI(self.defaultValueWindowName)
         # window
         defaultValueOption_winWidth  = 430
         defaultValueOption_winHeight = 300
@@ -1493,7 +1718,7 @@ class ControlClass(object):
         self.populateSelectedControls()
         # call window
         cmds.showWindow(self.defaultValueWindowName)
-        
+
 
     def populateSelectedControls(self, *args):
         """ Refresh the default value editor UI to fill it with the selected dpAR controllers.

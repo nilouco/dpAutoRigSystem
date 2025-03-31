@@ -12,7 +12,6 @@
 # importing libraries:
 from maya import cmds
 from maya.api import OpenMaya
-from ...Extras import dpCustomAttr
 import math
 
 DP_IKFKSNAP_VERSION = 2.3
@@ -22,6 +21,7 @@ DP_IKFKSNAP_VERSION = 2.3
 class IkFkSnapClass(object):
     def __init__(self, dpUIinst, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, *args):
         # defining variables:
+        self.dpUIinst = dpUIinst
         self.netName = netName
         self.worldRef = worldRef
         self.ikFkBlendAttr = cmds.getAttr(self.worldRef+".ikFkBlendAttrName")
@@ -38,12 +38,11 @@ class IkFkSnapClass(object):
         # store data
         self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
         self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
-        self.customAttr = dpCustomAttr.CustomAttr(dpUIinst, ui=False, verbose=False)
-        self.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
+        self.dpUIinst.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
         self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
         self.storeIkFkSnapData()
         if dpDev:
-            cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=True, compressUndo=True)
+            cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
         else:
             self.generateScriptNode()
     
@@ -317,7 +316,7 @@ class IkFkSnap(object):
     def __init__(self, ikFkSnapNet, *args):
         self.ikFkSnapNet = ikFkSnapNet
         self.reloadNetData()
-        cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=True, compressUndo=True)
+        cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
 
     def reloadNetData(self):
         self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
@@ -516,6 +515,7 @@ for net in cmds.ls(type="network"):
                 IkFkSnap(net)
 '''
         sn = cmds.scriptNode(name=self.netName+'_IkFkSnap_SN', sourceType='python', scriptType=2, beforeScript=ikFkSnapCode)
+        self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
         cmds.addAttr(self.ikFkSnapNet, longName="ikFkSnapScriptNode", attributeType="message")
         cmds.addAttr(sn, longName="ikFkSnapNet", attributeType="message")
         cmds.connectAttr(sn+".message", self.ikFkSnapNet+".ikFkSnapScriptNode", force=True)

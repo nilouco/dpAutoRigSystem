@@ -1,9 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpUtils
-from . import dpPipeliner
-from . import dpPackager
 from functools import partial
 import os
 
@@ -21,8 +18,9 @@ class Publisher(object):
         self.publisherName = self.dpUIinst.lang['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
-        self.pipeliner = dpPipeliner.Pipeliner()
-        self.packager = dpPackager.Packager()
+        self.utils = dpUIinst.utils
+        self.pipeliner = dpUIinst.pipeliner
+        self.packager = dpUIinst.packager
 
 
     def getFileTypeByExtension(self, fileName, *args):
@@ -32,43 +30,18 @@ class Publisher(object):
         if ext == "mb":
             return "mayaBinary"
         return "mayaAscii"
-    
-
-    def userSaveThisScene(self, *args):
-        """ Open a confirmDialog to user save or save as this file.
-            Return the saved file path or False if canceled.
-        """
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        saveName = self.dpUIinst.lang['i222_save']
-        saveAsName = self.dpUIinst.lang['i223_saveAs']
-        cancelName = self.dpUIinst.lang['i132_cancel']
-        confirmResult = cmds.confirmDialog(title=self.publisherName, message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
-        if confirmResult == cancelName:
-            return False
-        else:
-            if not shortName or confirmResult == saveAsName: #untitled or saveAs
-                newName = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
-                if newName:
-                    ext = self.getFileTypeByExtension(newName[0])
-                    cmds.file(rename=newName[0])
-                    return cmds.file(save=True, type=ext)
-                else:
-                    return False
-            else: #save
-                cmds.file(rename=cmds.file(query=True, sceneName=True))
-                ext = cmds.file(type=True, query=True)[0]
-                return cmds.file(save=True, type=ext)
 
 
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
         self.ui = True
-        dpUtils.closeUI('dpSuccessPublishedWindow')
-        dpUtils.closeUI('dpPublisherWindow')
-        savedScene = dpUtils.checkSavedScene()
+        self.utils.closeUI('dpSuccessPublishedWindow')
+        self.utils.closeUI('dpPublisherWindow')
+        savedScene = self.utils.checkSavedScene()
         if not savedScene:
-            savedScene = self.userSaveThisScene()
+            savedScene = self.dpUIinst.pipeliner.userSaveThisScene(True)
+            return
         if savedScene:
             # window
             publisher_winWidth  = 450
@@ -92,7 +65,7 @@ class Publisher(object):
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
             self.pipeliner.mainUI(self.dpUIinst)
-            dpUtils.closeUI('dpPipelinerWindow')
+            self.utils.closeUI('dpPipelinerWindow')
             self.setPublishFilePath()
 
 
@@ -100,35 +73,6 @@ class Publisher(object):
         """ Set the current publish path as the entered text in the textField.
         """
         self.pipeliner.pipeData['publishPath'] = cmds.textFieldButtonGrp(self.filePathFBG, query=True, text=True)
-
-
-    def checkPipelineAssetNameFolder(self, *args):
-        """ Compare the sceneName with the father folder name to define if we use the assetName as a default pipeline setup.
-            Return the shortName of the asset if found.
-            Otherwise return False
-        """
-        self.currentAssetName = cmds.file(query=True, sceneName=True)
-        self.shortAssetName = cmds.file(query=True, sceneName=True, shortName=True)
-        if "_" in self.shortAssetName:
-            self.shortAssetName = self.shortAssetName[:self.shortAssetName.find("_")]
-        for ext in [".ma", ".mb"]:
-            if self.shortAssetName.endswith(ext):
-                self.shortAssetName = self.shortAssetName[:-3]
-        folderAssetName = self.currentAssetName[:self.currentAssetName.rfind("/")]
-        folderAssetName = folderAssetName[folderAssetName.rfind("/")+1:]
-        if folderAssetName == self.shortAssetName:
-            return self.shortAssetName
-        return False
-
-
-    def defineFileVersion(self, assetNameList, *args):
-        """ Return the max number plus one of a versioned files list.
-        """
-        if assetNameList:
-            numberList = []
-            for item in assetNameList:
-                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['s_middle'])[1]))
-            return max(numberList)+1
 
 
     def setPublishFilePath(self, filePath=None, *args):
@@ -140,7 +84,7 @@ class Publisher(object):
         if filePath:
             try:
                 cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(filePath))
-                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.getPipeFileName(filePath)))
+                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.pipeliner.getPipeFileName(filePath)))
                 self.pipeliner.pipeData['publishPath'] = filePath
             except:
                 pass
@@ -163,54 +107,17 @@ class Publisher(object):
         if self.pipeliner.pipeData['s_rig'] in shortName:
             rigWipVersion = shortName[shortName.rfind(self.pipeliner.pipeData['s_rig'])+len(self.pipeliner.pipeData['s_rig']):shortName.rfind(".")]
         return rigWipVersion
-
-
-    def getPipeFileName(self, filePath, *args):
-        """ Return the generated file name based on the pipeline publish folder.
-            It checks the asset name and define the file version to save the published file.
-        """
-        self.assetNameList = []
-        if os.path.exists(filePath):
-            self.pipeliner.pipeData['assetNameFolderIssue'] = False
-            assetName = self.checkPipelineAssetNameFolder()
-            customAssetName = self.pipeliner.getCustomAssetNameInfo(assetName)
-            if not assetName:
-                assetName = self.shortAssetName
-                customAssetName = self.shortAssetName
-                self.pipeliner.pipeData['assetNameFolderIssue'] = True
-            publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
-            fileNameList = next(os.walk(filePath))[2]
-            if fileNameList:
-                for fileName in fileNameList:
-                    if customAssetName+self.pipeliner.pipeData['s_middle'] in fileName:
-                        if not fileName in self.assetNameList:
-                            self.assetNameList.append(fileName)
-                if self.assetNameList:
-                    publishVersion = self.defineFileVersion(self.assetNameList)
-            if self.pipeliner.pipeData['b_capitalize']:
-                assetName = assetName.capitalize()
-            elif self.pipeliner.pipeData['b_lower']:
-                assetName = assetName.lower()
-            elif self.pipeliner.pipeData['b_upper']:
-                assetName = assetName.upper()
-            self.pipeliner.pipeData['assetName'] = assetName
-            self.pipeliner.pipeData['customAssetName'] = customAssetName
-            self.pipeliner.pipeData['rigVersion'] = self.getRigWIPVersion()
-            self.pipeliner.pipeData['publishVersion'] = publishVersion
-            fileName = self.pipeliner.pipeData['s_prefix']+customAssetName+self.pipeliner.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
-            return fileName
-        else:
-            return False
     
 
-    def runCheckedValidators(self, verifyMode=True, stopIfFoundBlock=True, publishLog=None, *args):
+    def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = self.dpUIinst.checkInInstanceList
+        toCheckValidatorList = self.dpUIinst.checkAddOnsInstanceList
+        toCheckValidatorList.extend(self.dpUIinst.checkInInstanceList)
         toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
-        toCheckValidatorList.extend(self.dpUIinst.checkAddOnsInstanceList)
+        toCheckValidatorList.extend(self.dpUIinst.checkFinishingInstanceList)
         if toCheckValidatorList:
-            validationResultDataList = self.dpUIinst.runSelectedValidators(toCheckValidatorList, verifyMode, True, stopIfFoundBlock, publishLog)
+            validationResultDataList = self.dpUIinst.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
                 stoppedMessage = self.dpUIinst.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
                 return stoppedMessage
@@ -223,10 +130,10 @@ class Publisher(object):
         validatorsResult = self.runCheckedValidators() #verify mode
         if validatorsResult:
             mel.eval('warning \"'+validatorsResult+'\";')
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
         else:
             validatorsResult = self.dpUIinst.lang['v007_allOk']
-        self.dpUIinst.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
+        self.dpUIinst.logger.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
 
 
     def runPublishing(self, fromUI, verifyValidator=True, comments=False, *args):
@@ -246,12 +153,10 @@ class Publisher(object):
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            maxProcess = 4
-            progressAmount = 0
-            cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Starting...', isInterruptable=False)
+            self.utils.setProgress(self.dpUIinst.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
 
             # check if there'a a file name to publish this scene
-            publishFileName = self.getPipeFileName(self.pipeliner.pipeData['publishPath'])
+            publishFileName = self.pipeliner.getPipeFileName(self.pipeliner.pipeData['publishPath'])
             if fromUI:
                 publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
             if publishFileName:
@@ -280,10 +185,8 @@ class Publisher(object):
                     validatorsResult = self.runCheckedValidators(False, True, publishLog) #fix mode
                 if validatorsResult:
                     self.abortPublishing(validatorsResult)
-
                 else:
-                    progressAmount += 1
-                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
+                    self.utils.setProgress(self.dpUIinst.lang['i336_storingData']+"...", addNumber=False)
                     
                     self.pipeliner.pipeData.update(publishLog)
 
@@ -294,6 +197,10 @@ class Publisher(object):
                         if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
                         cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        # asset name
+                        if not cmds.objExists(self.dpUIinst.masterGrp+".assetName"):
+                            cmds.addAttr(self.dpUIinst.masterGrp, longName="assetName", dataType="string")
+                        cmds.setAttr(self.dpUIinst.masterGrp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
                         # comments
                         if not cmds.objExists(self.dpUIinst.masterGrp+".comment"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="comment", dataType="string")
@@ -314,8 +221,7 @@ class Publisher(object):
                     else:
                         builtVersion = self.dpUIinst.dpARVersion
 
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['i227_getImage'], isInterruptable=False)
+                    self.utils.setProgress(self.dpUIinst.lang['i227_getImage']+"...", addNumber=False)
 
                     # publishing file
                     # create folders to publish file if needed
@@ -324,6 +230,7 @@ class Publisher(object):
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
                             self.abortPublishing(self.dpUIinst.lang['v022_noFilePath'])
+                            return
                     
                     # mount folders
                     if self.pipeliner.pipeData['b_deliver']:
@@ -332,9 +239,10 @@ class Publisher(object):
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
                                 self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.getToday())
-                    cmds.progressWindow(endProgress=True)
-                    progressAmount += 1
-                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['i225_savingFile'], isInterruptable=False)
+                                self.utils.setProgress(endIt=True)
+                                self.utils.setProgress(self.dpUIinst.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
+                    else:
+                        self.utils.setProgress(self.dpUIinst.lang['i225_savingFile']+"...", addNumber=False)
                     
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
@@ -342,26 +250,29 @@ class Publisher(object):
 
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['i226_exportFiles'], isInterruptable=False)
-
                         if self.pipeliner.pipeData['toClientPath']:
                             # toClient
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Zipping", addNumber=False)
                             zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.getToday())
                             # dropbox
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Clouding", addNumber=False)
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
                             # open folder
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Folder openning", addNumber=False)
                             self.packager.openFolder(self.pipeliner.pipeData['toClientPath'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpHist", addNumber=False)
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
                         # organize old published files
-                        if self.assetNameList:
-                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        if self.pipeliner.assetNameList:
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpOld", addNumber=False)
+                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpLog", addNumber=False)
                             messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
@@ -369,6 +280,7 @@ class Publisher(object):
 
                     # publishing callback
                     if self.pipeliner.pipeData['s_callback']:
+                        self.utils.setProgress("Callback...", addNumber=False)
                         if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
                             callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'], self.pipeliner.pipeData)
                             if callbackResult:
@@ -376,7 +288,10 @@ class Publisher(object):
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
-                dpUtils.closeUI('dpPublisherWindow')
+                    self.utils.setProgress(endIt=True)
+                    self.utils.closeUI('dpPublisherWindow')
+                    if fromUI:
+                        self.askUserChooseFile(publishFileName)
 
             else:
                 mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')
@@ -391,20 +306,33 @@ class Publisher(object):
             End progressWindow.
             Warning the raison of the error.
         """
+        self.utils.setProgress(endIt=True)
+        self.utils.closeUI('dpPublisherWindow')
         # reopen current file
         cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
-        cmds.progressWindow(endProgress=True)
         # report the error in a log window
         if raison:
-            self.dpUIinst.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
+            self.dpUIinst.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
             mel.eval('warning \"'+raison+'\";')
+
+
+    def askUserChooseFile(self, publishFileName, *args):
+        """ Ask user witch file want to open:
+            1 - WIP file
+            2 - Published file
+        """
+        optWip = "1 - "+self.pipeliner.pipeData['shortName']
+        optPub = "2 - "+publishFileName
+        result = cmds.confirmDialog(title=self.publisherName, message=self.dpUIinst.lang['v098_askUserChooseFile'], button=[optWip, optPub], defaultButton=optPub, cancelButton=optPub, dismissString=optPub)
+        if result == optWip:
+            cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
 
 
     def successPublishedWindow(self, publishedFile, *args):
         """ If everything works well we can call a success publishing window here.
         """
-        dpUtils.closeUI('dpSuccessPublishedWindow')
-        cmds.progressWindow(endProgress=True)
+        self.utils.closeUI('dpSuccessPublishedWindow')
+        self.utils.setProgress(endIt=True)
         # window
         winWidth  = 250
         winHeight = 130
