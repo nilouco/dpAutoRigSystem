@@ -121,6 +121,13 @@ class Pipeliner(object):
                 if self.pipeData[dependent]:
                     try:
                         name = name[name.rfind(self.pipeData[dependent]+"/")+len(self.pipeData[dependent])+1:]
+                        if self.pipeData["f_wip"]:
+                            if self.pipeData["f_wip"] in name:
+                                name = name.split(self.pipeData["f_wip"])[0]
+                                if name.endswith("/"):
+                                    name = name[:-1]
+                                if "/" in name:
+                                    name = name[:name.rfind("/")]
                     except:
                         self.pipeData[field] = ""
                         self.pipeData[dependent] = ""
