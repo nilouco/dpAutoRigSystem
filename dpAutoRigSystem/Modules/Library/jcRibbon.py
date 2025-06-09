@@ -678,7 +678,7 @@ class RibbonClass(object):
                 for addDir in additionalDirList:
                     for addAxis in additionalAxisList:
                         cmds.select(jnt)
-                        jad = cmds.joint(name=jnt.replace("_Jnt", "_"+str(d).zfill(2)+"_Jad"))
+                        jad = cmds.joint(name=jnt.replace("_Jnt", "_"+str(d).zfill(2)+"_Jad"), scaleCompensate=False)
                         # joint position:
                         if s == 1: #right
                             if axis == (0, 0, -1): #arm
