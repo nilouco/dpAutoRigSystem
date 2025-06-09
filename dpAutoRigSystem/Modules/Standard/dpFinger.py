@@ -350,6 +350,11 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 jointIkList = cmds.listRelatives(dupIk, children=True, allDescendents=True, fullPath=True)
                 for jointNode in jointIkList:
                     if "_Jnt" in jointNode[jointNode.rfind("|"):]:
+                        # set joint preferred angle
+                        currentRY = cmds.getAttr(jointNode+".rotateY")
+                        cmds.setAttr(jointNode+".rotateY", -90)
+                        cmds.joint(jointNode, edit=True, setPreferredAngles=True)
+                        cmds.setAttr(jointNode+".rotateY", currentRY)
                         cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_Jnt", "_Ik_Jxt"))
                     elif "_JEnd" in jointNode[jointNode.rfind("|"):]:
                         cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_JEnd", "_Ik_JEnd"))
