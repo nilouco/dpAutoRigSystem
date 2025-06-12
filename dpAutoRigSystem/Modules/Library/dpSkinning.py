@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from . import dpWeights
 
-DP_SKINNING_VERSION = 1.5
+DP_SKINNING_VERSION = 1.6
 
 
 class Skinning(dpWeights.Weights):
@@ -40,6 +40,15 @@ class Skinning(dpWeights.Weights):
                     except:
                         pass
         return True
+    
+
+    def setSkinRelativeMode(self, scNode, scMode=1, *args):
+        """ Configure the skinCluster relative mode.
+            Default is 1 = local to avoid only 1 joint deformation issue.
+        """
+        if cmds.about(version=True) >= "2023":
+            if "relativeSpaceMode" in cmds.listAttr(scNode):
+                cmds.setAttr(scNode+".relativeSpaceMode", scMode)
     
 
     def skinFromUI(self, mode=None, *args):
@@ -98,6 +107,7 @@ class Skinning(dpWeights.Weights):
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         newSkinClusterNode = cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)[0]
                         cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
+                        self.setSkinRelativeMode(newSkinClusterNode)
                 print(self.dpUIinst.lang['i077_skinned']+', '.join(geomSkinList))
                 if logWin:
                     if notSkinnedList:
@@ -164,6 +174,7 @@ class Skinning(dpWeights.Weights):
                 elif cmds.about(version=True) >= "2024": #accepting multiple skinClusters
                     newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, multi=True, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
                 cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
+                self.setSkinRelativeMode(newSkinClusterNode)
                 # copy skin weights from source to destination
                 if byUVs:
                     sourceUVMap = cmds.polyUVSet(sourceItem, query=True, allUVSets=True)[0]
@@ -261,9 +272,10 @@ class Skinning(dpWeights.Weights):
                         cmds.delete(scNode)
         if needToCreateSkinCluster:
             if cmds.about(version=True) >= "2024": #accepting multiple skinClusters
-                cmds.skinCluster(incomingJointList, item, multi=True, name=skinClusterName, toSelectedBones=True, skinMethod=skinWeightDic[item][skinClusterName]['skinMethodToUse'], obeyMaxInfluences=skinWeightDic[item][skinClusterName]['skinMaintainMaxInf'], maximumInfluences=skinWeightDic[item][skinClusterName]['skinMaxInf'])[0]
+                scNode = cmds.skinCluster(incomingJointList, item, multi=True, name=skinClusterName, toSelectedBones=True, skinMethod=skinWeightDic[item][skinClusterName]['skinMethodToUse'], obeyMaxInfluences=skinWeightDic[item][skinClusterName]['skinMaintainMaxInf'], maximumInfluences=skinWeightDic[item][skinClusterName]['skinMaxInf'])[0]
             else:
-                cmds.skinCluster(incomingJointList, item, name=skinClusterName, toSelectedBones=True, skinMethod=skinWeightDic[item][skinClusterName]['skinMethodToUse'], obeyMaxInfluences=skinWeightDic[item][skinClusterName]['skinMaintainMaxInf'], maximumInfluences=skinWeightDic[item][skinClusterName]['skinMaxInf'])[0]
+                scNode = cmds.skinCluster(incomingJointList, item, name=skinClusterName, toSelectedBones=True, skinMethod=skinWeightDic[item][skinClusterName]['skinMethodToUse'], obeyMaxInfluences=skinWeightDic[item][skinClusterName]['skinMaintainMaxInf'], maximumInfluences=skinWeightDic[item][skinClusterName]['skinMaxInf'])[0]
+            self.setSkinRelativeMode(scNode)
 
 
     def getSkinWeights(self, item, skinClusterNode, infList=False, *args):
