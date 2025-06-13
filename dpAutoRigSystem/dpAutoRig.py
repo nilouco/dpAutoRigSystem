@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.05"
-DPAR_UPDATELOG = "N898 - SkinCluster local relative space mode."
+DPAR_VERSION_5 = "5.00.06"
+DPAR_UPDATELOG = "N895 - Don't checkin if there's All_Grp or guides."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2125,7 +2125,7 @@ class Start(object):
             # validate master (All_Grp) node
             # If it doesn't work, the user need to clean the current scene to avoid duplicated names, for the moment.
             for nodeGrp in masterGrpList:
-                if self.validateMasterGrp(nodeGrp):
+                if self.utils.validateMasterGrp(nodeGrp):
                     self.masterGrp = nodeGrp
                     return False
         return True
@@ -2364,22 +2364,6 @@ class Start(object):
             if pacList:
                 for pac in pacList:
                     cmds.connectAttr(self.ctrlsVisGrp+"."+attr, pac, force=True)
-
-
-    def validateMasterGrp(self, nodeGrp, *args):
-        """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
-        """
-        masterGroupAttrList = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
-        oldAttrList = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
-        for m, masterGroupAttr in enumerate(masterGroupAttrList):
-            if not masterGroupAttr in cmds.listAttr(nodeGrp):
-                if not oldAttrList[m]:
-                    cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)
-                    return False
-                elif not oldAttrList[m] in cmds.listAttr(nodeGrp):
-                    cmds.setAttr(nodeGrp+"."+self.masterAttr, 0)
-                    return False
-        return cmds.getAttr(nodeGrp+"."+self.masterAttr)
 
 
     def reorderAttributes(self, objList, attrList, verbose=True, *args):

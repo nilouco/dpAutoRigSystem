@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.2
+DP_UTILS_VERSION = 3.3
 
 
 class Utils(object):
@@ -232,9 +232,9 @@ class Utils(object):
                 if cmds.getAttr(transform+"."+typeName) == className:
                     numberList.append(className)
             # try check if there is a masterGrp and get its counter:
-            if cmds.objExists(transform+".masterGrp") and cmds.getAttr(transform+".masterGrp") == 1:
+            if cmds.objExists(transform+"."+self.dpUIinst.masterAttr) and cmds.getAttr(transform+"."+self.dpUIinst.masterAttr) == 1:
                 guideTypeCount = cmds.getAttr(transform+'.dp'+className+'Count')
-        if(guideTypeCount > len(numberList)):
+        if guideTypeCount > len(numberList):
             return guideTypeCount
         else:
             return len(numberList)
@@ -919,6 +919,35 @@ class Utils(object):
                 return jointList
 
 
+    def getAllGrp(self, masterAttr=None, *args):
+        """ Return the All_Grp if it exists in the scene.
+        """
+        if not masterAttr:
+            masterAttr = self.dpUIinst.masterAttr
+        allTransformList = cmds.ls(selection=False, type="transform")
+        if allTransformList:
+            for transform in allTransformList:
+                if cmds.objExists(transform+"."+masterAttr):
+                    if cmds.getAttr(transform+"."+masterAttr) == 1:
+                        return transform #All_Grp found
+
+
+    def validateMasterGrp(self, nodeGrp, *args):
+        """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
+        """
+        masterGroupAttrList = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
+        oldAttrList = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
+        for m, masterGroupAttr in enumerate(masterGroupAttrList):
+            if not masterGroupAttr in cmds.listAttr(nodeGrp):
+                if not oldAttrList[m]:
+                    cmds.setAttr(nodeGrp+"."+self.dpUIinst.masterAttr, 0)
+                    return False
+                elif not oldAttrList[m] in cmds.listAttr(nodeGrp):
+                    cmds.setAttr(nodeGrp+"."+self.dpUIinst.masterAttr, 0)
+                    return False
+        return cmds.getAttr(nodeGrp+"."+self.dpUIinst.masterAttr)
+    
+
     def getNodeByMessage(self, attrName, node=None, *args):
         """ Get connected node in the given attribute searching as message.
             If there isn't a given node, try to use All_Grp.
@@ -926,14 +955,7 @@ class Utils(object):
         """
         result = False
         if not node:
-            # try to find All_Grp
-            allTransformList = cmds.ls(selection=False, type="transform")
-            if allTransformList:
-                for transform in allTransformList:
-                    if cmds.objExists(transform+".masterGrp"):
-                        if cmds.getAttr(transform+".masterGrp") == 1:
-                            node = transform #All_Grp found
-                            break
+            node = self.getAllGrp()
         if node:
             if cmds.objExists(node+"."+attrName):
                 foundNodeList = cmds.listConnections(node+"."+attrName, source=True, destination=False)
