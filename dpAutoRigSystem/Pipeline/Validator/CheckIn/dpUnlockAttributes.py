@@ -8,7 +8,7 @@ TITLE = 'v092_unlockAttributes'
 DESCRIPTION = 'v093_unlockAttributesDesc'
 ICON = '/Icons/dp_unlockAttributes.png'
 
-DP_UNLOCKATTRIBUTES_VERSION = 1.1
+DP_UNLOCKATTRIBUTES_VERSION = 1.2
 
 
 class UnlockAttributes(dpBaseAction.ActionStartClass):
@@ -38,39 +38,45 @@ class UnlockAttributes(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        if not cmds.file(query=True, reference=True):
-            nodeList = cmds.ls(selection=False)
-            if objList:
-                nodeList = objList
-            if nodeList:
-                lockedAttrDic = {}
-                self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
-                for item in nodeList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    lockedAttrList = cmds.listAttr(item, locked=True)
-                    if lockedAttrList:
-                        lockedAttrDic[item] = lockedAttrList
-                # conditional to check here
-                if lockedAttrDic:
-                    for item in lockedAttrDic.keys():
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                for attr in lockedAttrDic[item]:
-                                    cmds.setAttr(item+"."+attr, lock=False)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(lockedAttrDic[item]))
-                            except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" = "+attr)
+        if not self.utils.getAllGrp():
+            if not self.utils.getNetworkNodeByAttr("dpGuideNet"):
+                if not cmds.file(query=True, reference=True):
+                    nodeList = cmds.ls(selection=False)
+                    if objList:
+                        nodeList = objList
+                    if nodeList:
+                        lockedAttrDic = {}
+                        self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
+                        for item in nodeList:
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            lockedAttrList = cmds.listAttr(item, locked=True)
+                            if lockedAttrList:
+                                lockedAttrDic[item] = lockedAttrList
+                        # conditional to check here
+                        if lockedAttrDic:
+                            for item in lockedAttrDic.keys():
+                                self.checkedObjList.append(item)
+                                self.foundIssueList.append(True)
+                                if self.firstMode:
+                                    self.resultOkList.append(False)
+                                else: #fix
+                                    try:
+                                        cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                        for attr in lockedAttrDic[item]:
+                                            cmds.setAttr(item+"."+attr, lock=False)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(lockedAttrDic[item]))
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" = "+attr)
+                    else:
+                        self.notFoundNodes()
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
             else:
-                self.notFoundNodes()
+                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-04-30",
+    "_updated"       : "2025-06-13",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -941,6 +941,8 @@
     "v095_envelopeCheckerDesc"    : "Ce validateur vérifie les attributs d'enveloppe inférieurs à un.",
     "v096_cleanup"                : "Cleanup",
     "v097_cleanupDesc"            : "Ce validateur vérifie les attributs de dpDeleteIt et éfface leur nodes.",
-    "v098_askUserChooseFile"      : "On a deux fichiers de rigging maintenant:\n\n1 - WIP = travail en cours\n2 - Publié = validé\n\nLequel fichier vouz vouler ouvrir?"
+    "v098_askUserChooseFile"      : "On a deux fichiers de rigging maintenant:\n\n1 - WIP = travail en cours\n2 - Publié = validé\n\nLequel fichier vouz vouler ouvrir?",
+    "v099_cantExistsAllGrp"       : "On ne peut pas valider des fichiers avec All_Grp créé, désolé.",
+    "v100_cantExistsGuides"       : "On ne peux pas valider des fichiers qui contien des guides, désolé."
 
 }

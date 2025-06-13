@@ -8,7 +8,7 @@ TITLE = 'v090_overrideCleaner'
 DESCRIPTION = 'v091_overrideCleanerDesc'
 ICON = '/Icons/dp_overrideCleaner.png'
 
-DP_OVERRIDECLEANER_VERSION = 1.2
+DP_OVERRIDECLEANER_VERSION = 1.3
 
 
 class OverrideCleaner(dpBaseAction.ActionStartClass):
@@ -38,39 +38,45 @@ class OverrideCleaner(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        if not cmds.file(query=True, reference=True):
-            nodeList = cmds.ls(selection=False)
-            if objList:
-                nodeList = objList
-            if nodeList:
-                overridedList = []
-                self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
-                for item in nodeList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    if cmds.objExists(item+".overrideEnabled"):
-                        if cmds.getAttr(item+".overrideEnabled") == 1:
-                            overridedList.append(item)
-                # conditional to check here
-                if overridedList:
-                    for item in overridedList:
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                cmds.setAttr(item+".overrideEnabled", lock=False)
-                                cmds.setAttr(item+".overrideEnabled", 0)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                            except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+        if not self.utils.getAllGrp():
+            if not self.utils.getNetworkNodeByAttr("dpGuideNet"):
+                if not cmds.file(query=True, reference=True):
+                    nodeList = cmds.ls(selection=False)
+                    if objList:
+                        nodeList = objList
+                    if nodeList:
+                        overridedList = []
+                        self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
+                        for item in nodeList:
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            if cmds.objExists(item+".overrideEnabled"):
+                                if cmds.getAttr(item+".overrideEnabled") == 1:
+                                    overridedList.append(item)
+                        # conditional to check here
+                        if overridedList:
+                            for item in overridedList:
+                                self.checkedObjList.append(item)
+                                self.foundIssueList.append(True)
+                                if self.firstMode:
+                                    self.resultOkList.append(False)
+                                else: #fix
+                                    try:
+                                        cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                        cmds.setAttr(item+".overrideEnabled", lock=False)
+                                        cmds.setAttr(item+".overrideEnabled", 0)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                    else:
+                        self.notFoundNodes()
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
             else:
-                self.notFoundNodes()
+                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 
