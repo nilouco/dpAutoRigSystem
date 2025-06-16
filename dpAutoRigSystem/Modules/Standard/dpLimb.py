@@ -16,7 +16,7 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
-DP_LIMB_VERSION = 3.4
+DP_LIMB_VERSION = 3.5
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -1276,7 +1276,27 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.addAttr(self.ikCornerCtrl, longName="pin", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 poleVectorPinPC = cmds.parentConstraint(self.masterCtrlRef, self.ikCornerCtrlZero, maintainOffset=True, name=self.ikCornerCtrlZero+"_PaC")[0]
                 cmds.connectAttr(self.ikCornerCtrl+'.pin', poleVectorPinPC+"."+self.masterCtrlRef+"W0", force=True)
-                
+
+                # poleVector rest calibration setup:
+                cornerInvertMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+cornerName+"_Invert_MD")
+                self.toIDList.append(cornerInvertMD)
+                if s == 0:
+                    restList = []
+                for r, restAxis in enumerate(['X', 'Y', 'Z']):
+                    cmds.addAttr(self.ikCornerCtrl, longName=self.dpUIinst.lang['c053_invert']+restAxis, attributeType="bool", defaultValue=s)
+                for r, restAxis in enumerate(['X', 'Y', 'Z']):
+                    cornerInvertCnd = cmds.createNode('condition', name=side+self.userGuideName+"_"+cornerName+"_Invert"+restAxis+"_Cnd")
+                    self.toIDList.append(cornerInvertCnd)
+                    cmds.setAttr(cornerInvertCnd+".colorIfTrueR", 1)
+                    cmds.setAttr(cornerInvertCnd+".colorIfFalseR", -1)
+                    if s == 0:
+                        restList.append(cmds.getAttr(poleVectorPinPC+".restTranslate"+restAxis))
+                    cmds.addAttr(self.ikCornerCtrl, longName="calibrateRestT"+restAxis, attributeType='float', defaultValue=restList[r], keyable=False)
+                    cmds.connectAttr(cornerInvertMD+".output"+restAxis, poleVectorPinPC+".restTranslate"+restAxis, force=True)
+                    cmds.connectAttr(self.ikCornerCtrl+"."+self.dpUIinst.lang['c053_invert']+restAxis, cornerInvertCnd+".firstTerm", force=True)
+                    cmds.connectAttr(cornerInvertCnd+".outColorR", cornerInvertMD+".input2"+restAxis, force=True)
+                    cmds.connectAttr(self.ikCornerCtrl+".calibrateRestT"+restAxis, cornerInvertMD+".input1"+restAxis, force=True)
+                    
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', minValue=0, max=1, defaultValue=1, keyable=True)
@@ -2010,11 +2030,17 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     ]
                 fkExtremCalibrationList = [self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize()]
                 fkBeforeCalibrationList = [self.dpUIinst.lang['c032_follow']]
+                cornerCalibrationList = ["calibrateRestTX", "calibrateRestTY", "calibrateRestTZ"]
+                cornerNotMirrorList = [self.dpUIinst.lang['c053_invert']+"X",
+                                        self.dpUIinst.lang['c053_invert']+"Y",
+                                        self.dpUIinst.lang['c053_invert']+"Z"]
                 if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     self.ctrls.setStringAttrFromList(self.quadExtraCtrl, ['autoOrient'])
                 self.ctrls.setStringAttrFromList(self.ikExtremCtrl, ikExtremCalibrationList)
                 self.ctrls.setStringAttrFromList(self.fkCtrlList[-1], fkExtremCalibrationList)
                 self.ctrls.setStringAttrFromList(self.fkCtrlList[0], fkBeforeCalibrationList)
+                self.ctrls.setStringAttrFromList(self.ikCornerCtrl, cornerCalibrationList)
+                self.ctrls.setStringAttrFromList(self.ikCornerCtrl, cornerNotMirrorList, "notMirrorList") #useful to export calibrationIO and not mirror them
 
                 # integrating dics:
                 self.extremJntList.append(self.skinJointList[-2])
