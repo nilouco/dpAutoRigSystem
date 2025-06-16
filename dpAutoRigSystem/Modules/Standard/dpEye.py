@@ -15,7 +15,7 @@ PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
 
-DP_EYE_VERSION = 2.3
+DP_EYE_VERSION = 2.4
 
 
 class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -524,7 +524,9 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(cmds.orientConstraint(self.cvEndJointZero, self.fkEyeCtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.baseEyeCtrl, maintainOffset=False))
                 # zeroOut controls:
-                eyeZeroList = self.utils.zeroOut([self.baseEyeCtrl, self.fkEyeCtrl])
+                eyeZeroList = self.utils.zeroOut([self.baseEyeCtrl])
+                eyeZeroList.append(self.utils.zeroOut([self.fkEyeCtrl], offset=True))
+                eyeZeroOffsetGrp = cmds.listRelatives(eyeZeroList[1], children=True)[0]
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
@@ -532,7 +534,12 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.setAttr(eyeZeroList[0]+".scaleY", -1)
                         cmds.setAttr(eyeZeroList[0]+".scaleZ", -1)                        
                 cmds.parent(eyeZeroList[1], self.baseEyeCtrl)
-                
+                # calibrate offset rotate:
+                for offsetAxis in ['X', 'Y', 'Z']:
+                    cmds.addAttr(self.fkEyeCtrl, longName="calibrateR"+offsetAxis, attributeType='float', defaultValue=0, keyable=False)
+                    cmds.connectAttr(self.fkEyeCtrl+".calibrateR"+offsetAxis, eyeZeroOffsetGrp+".rotate"+offsetAxis, force=True)
+                fkCtrlCalibrationList = ["calibrateRX", "calibrateRY", "calibrateRZ"]
+                self.ctrls.setStringAttrFromList(self.fkEyeCtrl, fkCtrlCalibrationList)
                 # hide visibility attribute:
                 cmds.setAttr(self.fkEyeCtrl+'.visibility', keyable=False)
                 self.ctrls.setLockHide([self.fkEyeCtrl], ['tx', 'ty', 'tz'])
