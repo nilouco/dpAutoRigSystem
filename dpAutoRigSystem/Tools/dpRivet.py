@@ -29,12 +29,11 @@ TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
 ICON = "/Icons/dp_rivet.png"
 
-MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.6
+DP_RIVET_VERSION = 2.7
 
 
 class Rivet(object):
@@ -559,21 +558,8 @@ class Rivet(object):
         self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
 
         # integrate to dpAutoRigSystem:
-        self.masterGrp = None
-        self.masterCtrl = None
-        self.scalableGrp = None
-        allList = cmds.ls(selection=False, type="transform")
-        if allList:
-            for node in allList:
-                if cmds.objExists(node+"."+MASTER_GRP) and cmds.getAttr(node+"."+MASTER_GRP) == 1:
-                    self.masterGrp = node
-        if self.masterGrp:
-            masterCtrlList = cmds.listConnections(self.masterGrp+".masterCtrl")
-            scalableGrpList = cmds.listConnections(self.masterGrp+".scalableGrp")
-            if masterCtrlList:
-                self.masterCtrl = masterCtrlList[0]
-            if scalableGrpList:
-                self.scalableGrp = scalableGrpList[0]
+        self.masterCtrl = self.utils.getNodeByMessage("masterCtrl")
+        self.scalableGrp = self.utils.getNodeByMessage("scalableGrp")
         
         # create Rivet_Grp in order to organize hierarchy:
         createdRivetGrp = False

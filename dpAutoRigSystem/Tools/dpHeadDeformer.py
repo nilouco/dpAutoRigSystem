@@ -10,7 +10,7 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.0
+DP_HEADDEFORMER_VERSION = 4.1
 
 
 class HeadDeformer(object):
@@ -364,7 +364,7 @@ class HeadDeformer(object):
             
             # try to integrate to Scalable_Grp
             for item in cmds.ls(selection=False, type="transform"):
-                if cmds.objExists(item+".masterGrp") and cmds.getAttr(item+".masterGrp") == 1:
+                if cmds.objExists(item+"."+self.dpUIinst.masterAttr) and cmds.getAttr(item+"."+self.dpUIinst.masterAttr) == 1:
                     scalableGrp = cmds.listConnections(item+".scalableGrp")[0]
                     cmds.parent(dataGrp, scalableGrp)
                     break
