@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_BASELAYOUT_VERSION = 2.5
+DP_BASELAYOUT_VERSION = 2.6
 
 
 class BaseLayout(object):
@@ -604,6 +604,7 @@ class BaseLayout(object):
                 self.previewMirrorGuide = cmds.rename(duplicated, self.moduleGrp.replace(":", "_")+'_Mirror')
                 cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
                 cmds.delete(cmds.listRelatives(self.previewMirrorGuide, shapes=True, type="nurbsCurve"))
+                self.utils.unlockAttr([self.previewMirrorGuide])
                 
                 # clean up old module attributes in order to avoid numbering issue:
                 if cmds.objExists(self.previewMirrorGuide+".customName"):
