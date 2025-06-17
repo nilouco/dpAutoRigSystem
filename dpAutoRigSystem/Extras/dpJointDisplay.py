@@ -193,8 +193,8 @@ class JointDisplay(object):
     def moveToRight(self,*args):
         """ """
         # Get active selection of button list
-        print(f'Move to Right Pressed')
-        selectedJoints = self.activeSelection(self.selectedBoard)
+        print(f'Move to Right called')
+        selectedJoints = self.selectionUiList
         print(f'Move to Right Selected Board ---------{self.selectedBoard}')
         if selectedJoints:
             for jnt in selectedJoints:
@@ -215,9 +215,9 @@ class JointDisplay(object):
     def moveToLeft(self, *args, **kwargs):
         """ """
         # Get active selection of button list
-        print(f'Move to Right Pressed')
-        selectedJoints = self.activeSelection(self.selectedBoard)
-        print(selectedJoints)
+        print(f'Move to Left called')
+        selectedJoints = self.selectionUiList
+        print(f'Move to Left Selected Board ---------{self.selectedBoard}')
 
         if selectedJoints:
             for jnt in selectedJoints:
@@ -225,9 +225,11 @@ class JointDisplay(object):
                 if currentDrawStyle > 0 < 3 :
                     print(f'DrawStyle atual {currentDrawStyle}')
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle - 1)
+                    self.destinationBoard = self.searchBoardIndex() - 1
                 else: 
                     currentDrawStyle = 3
-                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)          
+                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
+                    self.destinationBoard = 0          
             self.refreshLists(self)
             self.keepSelectedObj(self)  
 
@@ -251,6 +253,7 @@ class JointDisplay(object):
         print(f'DESTINATION BOARD >>>>>> {self.allBoardList[self.destinationBoard]}')
         if selectedItems:
             cmds.textScrollList(self.allBoardList[self.destinationBoard], edit=True, selectItem=selectedItems)
+            print(f'Selected Items {selectedItems}')
 
  
 
@@ -290,5 +293,4 @@ class JointDisplay(object):
 # - create a filter: To populate list that will be searched
 # - mantain the selected joints in the list, after the board changed
 # - Do the function Dropbox button to do the action
-# - 
-
+# - 2025-06-17 - Stopped trying to fix the keeping select function and buttons
