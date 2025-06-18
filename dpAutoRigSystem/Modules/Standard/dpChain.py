@@ -10,7 +10,7 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
-DP_CHAIN_VERSION = 2.4
+DP_CHAIN_VERSION = 2.5
 
 
 class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -464,6 +464,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.xform(self.ikClusterList[-1], worldSpace=True, rotatePivot=endIkJointPos)
                 # ik cluster group:
                 self.ikClusterGrp = cmds.group(self.ikClusterList, name=side+self.userGuideName+"_Ik_Cluster_Grp")
+                for axis in ['X', 'Y', 'Z']:
+                    cmds.connectAttr(self.dpUIinst.optionCtrl+".rigScaleOutput", self.ikClusterGrp+".scale"+axis)
 
                 # ik controls:
                 self.ikCtrlList, self.ikCtrlZeroList = [], []
@@ -611,6 +613,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.worldRef+".scaleX", stretchBC+".color2.color2R", force=True)
                 # output stretch values to joint scale:
                 for j in range(0, len(self.ikJointList)-2):
+                    cmds.connectAttr(stretchBC+".output.outputR", self.ikJointList[j]+".scaleX", force=True)
+                    cmds.connectAttr(stretchBC+".output.outputR", self.ikJointList[j]+".scaleY", force=True)
                     cmds.connectAttr(stretchBC+".output.outputR", self.ikJointList[j]+".scaleZ", force=True)
                     cmds.connectAttr(stretchBC+".output.outputR", self.skinJointList[j]+".scaleZ", force=True)
 
