@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from . import dpWeights
 
-DP_SKINNING_VERSION = 1.6
+DP_SKINNING_VERSION = 1.7
 
 
 class Skinning(dpWeights.Weights):
@@ -175,6 +175,14 @@ class Skinning(dpWeights.Weights):
                     newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, multi=True, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
                 cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
                 self.setSkinRelativeMode(newSkinClusterNode)
+                if not skinMethodToUse == 0:
+                    if cmds.getAttr(sourceDef+".dqsSupportNonRigid"):
+                        cmds.setAttr(newSkinClusterNode+".dqsSupportNonRigid", 1)
+                        plug = cmds.listConnections(sourceDef+".dqsScaleX", destination=False, source=True, plugs=True)
+                        if plug:
+                            cmds.connectAttr(plug[0], newSkinClusterNode+".dqsScaleX", force=True)
+                            cmds.connectAttr(plug[0], newSkinClusterNode+".dqsScaleY", force=True)
+                            cmds.connectAttr(plug[0], newSkinClusterNode+".dqsScaleZ", force=True)
                 # copy skin weights from source to destination
                 if byUVs:
                     sourceUVMap = cmds.polyUVSet(sourceItem, query=True, allUVSets=True)[0]
