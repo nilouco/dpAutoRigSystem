@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-13",
+    "_updated"       : "2025-06-18",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -507,7 +507,7 @@
     "i343_tools"                : "Ferramentas",
     "i344_deleted"              : "Apagado",
     "i345_sOffsetMatrixIOAnn"   : "O diretório onde será exportado ou importado os dados de conexões de parent offset matrix.",
-    "i346_loadedSucess"         : "carregado com sucesso, obrigado.",
+    "i346_loadedSuccess"         : "carregado com sucesso, obrigado.",
     "i347_sChannelIOAnn"        : "O diretório onde será exportado ou importado os dados de estados dos atributos de tranform da channelBox.",
     "i348_triangleIconAnn"      : "Colapsar ou expandir todos os frame layouts de módulos.",
     "i349_alreadyExistsAsset"   : "Já existe um ativo com esse nome na pipeline.\nPor favor, selecione outro nome ou apenas carregue este.",
@@ -519,6 +519,7 @@
     "i355_uniqueNameDependence" : "Parece existirem nodes com nomes duplicados na cena.\nAlguns módulos dependem de nomes únicos e podem falhar.\n\nVocê quer continuar de qualquer forma?",
     "i356_sVisibilityIOAnn"     : "O diretório onde será exportado ou importado os dados de visibilidade.",
     "i357_putInfoFilePathHere"  : "Coloque o path do diretório do arquivo de info da pipeline aqui",
+    "i358_batch"                : "Lote",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

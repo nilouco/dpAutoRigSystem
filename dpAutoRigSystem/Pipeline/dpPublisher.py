@@ -4,7 +4,7 @@ from maya import mel
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.9
+DP_PUBLISHER_VERSION = 1.11
 
 
 class Publisher(object):
@@ -45,7 +45,7 @@ class Publisher(object):
         if savedScene:
             # window
             publisher_winWidth  = 450
-            publisher_winHeight = 200
+            publisher_winHeight = 160
             cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(DP_PUBLISHER_VERSION), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             cmds.showWindow('dpPublisherWindow')
             # create UI layout and elements:
@@ -57,10 +57,11 @@ class Publisher(object):
             self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.dpUIinst.lang['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
             self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.dpUIinst.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             # buttons
-            publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical3', paneSize=[(1, 20, 20), (2, 20, 20), (3, 50, 20)], parent=publisherLayout)
+            publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
-            cmds.button('diagnoseBT', label=self.dpUIinst.lang['i224_diagnose'], command=partial(self.runDiagnosing), height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
+            cmds.button('diagnoseBT', label=self.dpUIinst.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
             cmds.button('publishBT', label=self.dpUIinst.lang['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('publishBatchBT', label=self.dpUIinst.lang['i358_batch'], command=partial(self.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
@@ -149,7 +150,7 @@ class Publisher(object):
             - backup old published file version in the dpOld folder
             - packaging the delivered files as toClient zipFile, toCloud dropbox, toHist folders
             - generate the image preview
-            If it fails, it'll reopen the current file without save any change.
+            If it fails, it'll reopen the current file without save any change and returns False.
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
@@ -185,6 +186,7 @@ class Publisher(object):
                     validatorsResult = self.runCheckedValidators(False, True, publishLog) #fix mode
                 if validatorsResult:
                     self.abortPublishing(validatorsResult)
+                    return False
                 else:
                     self.utils.setProgress(self.dpUIinst.lang['i336_storingData']+"...", addNumber=False)
                     
@@ -230,7 +232,7 @@ class Publisher(object):
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
                             self.abortPublishing(self.dpUIinst.lang['v022_noFilePath'])
-                            return
+                            return False
                     
                     # mount folders
                     if self.pipeliner.pipeData['b_deliver']:
@@ -328,7 +330,7 @@ class Publisher(object):
             cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
 
 
-    def successPublishedWindow(self, publishedFile, *args):
+    def successPublishedWindow(self, publishedFile, error=False, *args):
         """ If everything works well we can call a success publishing window here.
         """
         self.utils.closeUI('dpSuccessPublishedWindow')
@@ -344,5 +346,46 @@ class Publisher(object):
         cmds.text(label=self.dpUIinst.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
         cmds.separator(style="none", height=20, parent=succesLayout)
         cmds.text(label=publishedFile, parent=succesLayout)
-        cmds.separator(style="none", height=20, parent=succesLayout)
-        cmds.text(label=self.dpUIinst.lang['i018_thanks'], parent=succesLayout)
+        if error:
+            cmds.separator(style="in", height=20, parent=succesLayout)
+            cmds.text(label=self.dpUIinst.lang['i141_error']+":", font='boldLabelFont', parent=succesLayout)
+            cmds.separator(style="none", height=20, parent=succesLayout)
+            cmds.text(label=error, parent=succesLayout)
+            cmds.separator(style="none", height=20, parent=succesLayout)
+            cmds.text(label=self.dpUIinst.lang['i074_attention'], parent=succesLayout)
+        else:
+            cmds.separator(style="none", height=20, parent=succesLayout)
+            cmds.text(label=self.dpUIinst.lang['i018_thanks'], parent=succesLayout)
+
+
+    def loadPublishingBatch(self, path, assetList=None, comments=None, *args):
+        """ Load assets to batch publish them.
+        """
+        if path:
+            publishedList, errorList = [], []
+            if not comments:
+                comments = cmds.textFieldGrp(self.pipeliner.commentBatchTFG, query=True, text=True)
+                if not comments:
+                    comments = self.dpUIinst.lang['m046_publisher']+" v"+str(DP_PUBLISHER_VERSION)
+            if not comments.endswith(self.dpUIinst.lang['i358_batch']):
+                comments = self.dpUIinst.lang['i358_batch']+" - "+comments
+            if not assetList:
+                assetList = [a[a.rfind("|")+1:-2] for a in self.pipeliner.selectedBatchList if cmds.checkBox(a, query=True, value=True)]
+            if assetList:
+                print(self.dpUIinst.lang['i335_starting']+" "+self.dpUIinst.lang['i358_batch']+" "+self.dpUIinst.lang['m046_publisher']+"...")
+                print(self.dpUIinst.lang['i219_comments']+":", comments)
+                print(self.dpUIinst.lang['i303_asset']+"s:", assetList)
+                for asset in assetList:
+                    self.pipeliner.loadAsset(path, asset)
+                    publishResult = self.runPublishing(fromUI=False, comments=comments)
+                    if publishResult == False:
+                        errorList.append(asset)
+                    else:
+                        publishedList.append(self.pipeliner.pipeData['publishFileName'])
+                if errorList:
+                    self.successPublishedWindow("\n".join(publishedList), error="\n".join(errorList))
+                else:
+                    cmds.file(newFile=True, force=True)
+                    self.successPublishedWindow("\n".join(publishedList))
+            #close UI
+            self.utils.closeUI("dpSelectAssetCBWindow")
