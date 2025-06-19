@@ -223,7 +223,7 @@ class Pipeliner(object):
         "b_i_wip"            : True,
         "b_i_publish"        : True,
         "b_i_date"           : True,
-        "b_i_degrade"        : True        
+        "b_i_degrade"        : True
         }
         return defaultPipeInfo
 

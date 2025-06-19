@@ -330,7 +330,7 @@ class Publisher(object):
             cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
 
 
-    def successPublishedWindow(self, publishedFile, error=False, *args):
+    def successPublishedWindow(self, publishedFile, errorList=False, *args):
         """ If everything works well we can call a success publishing window here.
         """
         self.utils.closeUI('dpSuccessPublishedWindow')
@@ -342,17 +342,21 @@ class Publisher(object):
         cmds.showWindow('dpSuccessPublishedWindow')
         # create UI layout and elements:
         succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
-        cmds.separator(style="none", height=20, parent=succesLayout)
-        cmds.text(label=self.dpUIinst.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
-        cmds.separator(style="none", height=20, parent=succesLayout)
-        cmds.text(label=publishedFile, parent=succesLayout)
-        if error:
+        if publishedFile:
+            cmds.separator(style="none", height=20, parent=succesLayout)
+            cmds.text(label=self.dpUIinst.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
+            cmds.separator(style="none", height=20, parent=succesLayout)
+            cmds.text(label=publishedFile, parent=succesLayout)
+        if errorList:
             cmds.separator(style="in", height=20, parent=succesLayout)
             cmds.text(label=self.dpUIinst.lang['i141_error']+":", font='boldLabelFont', parent=succesLayout)
-            cmds.separator(style="none", height=20, parent=succesLayout)
-            cmds.text(label=error, parent=succesLayout)
-            cmds.separator(style="none", height=20, parent=succesLayout)
             cmds.text(label=self.dpUIinst.lang['i074_attention'], parent=succesLayout)
+            cmds.separator(style="none", height=20, parent=succesLayout)
+            for errorFile in errorList:
+
+                cmds.button(label=errorFile, command=partial(self.pipeliner.loadAsset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
+#                cmds.text(label=error, parent=succesLayout)
+            cmds.separator(style="none", height=20, parent=succesLayout)
         else:
             cmds.separator(style="none", height=20, parent=succesLayout)
             cmds.text(label=self.dpUIinst.lang['i018_thanks'], parent=succesLayout)
@@ -383,7 +387,7 @@ class Publisher(object):
                     else:
                         publishedList.append(self.pipeliner.pipeData['publishFileName'])
                 if errorList:
-                    self.successPublishedWindow("\n".join(publishedList), error="\n".join(errorList))
+                    self.successPublishedWindow("\n".join(publishedList), errorList)
                 else:
                     cmds.file(newFile=True, force=True)
                     self.successPublishedWindow("\n".join(publishedList))
