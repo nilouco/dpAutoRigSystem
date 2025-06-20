@@ -353,9 +353,7 @@ class Publisher(object):
             cmds.text(label=self.dpUIinst.lang['i074_attention'], parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
             for errorFile in errorList:
-
                 cmds.button(label=errorFile, command=partial(self.pipeliner.loadAsset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
-#                cmds.text(label=error, parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
         else:
             cmds.separator(style="none", height=20, parent=succesLayout)
@@ -391,5 +389,4 @@ class Publisher(object):
                 else:
                     cmds.file(newFile=True, force=True)
                     self.successPublishedWindow("\n".join(publishedList))
-            #close UI
             self.utils.closeUI("dpSelectAssetCBWindow")
