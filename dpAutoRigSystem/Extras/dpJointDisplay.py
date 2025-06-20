@@ -88,18 +88,18 @@ class JointDisplay(object):
     
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout, adjustableColumn=True)
         
         # defining move buttons
         cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft, parent=buttonLayout)
         cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
-        changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
-        cmds.menuItem( label='Bone', parent=changeAllMenu)
-        cmds.menuItem( label='Multi-Child as box', parent=changeAllMenu )
-        cmds.menuItem( label='None', parent=changeAllMenu )
-        cmds.menuItem( label='Joint', parent=changeAllMenu )
+        self.changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay']+' :', width = 200, parent=buttonLayout, changeCommand= self.changeAllButton)
+        cmds.menuItem( label='Bone', parent=self.changeAllMenu)
+        cmds.menuItem( label='Multi-Child as box', parent=self.changeAllMenu )
+        cmds.menuItem( label='None', parent=self.changeAllMenu )
+        cmds.menuItem( label='Joint', parent=self.changeAllMenu )
         
-        cmds.button("cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command='Cancel', parent=buttonLayout)
+        cmds.button("cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpCloseJointDisplayUI, parent=buttonLayout)
         cmds.separator(style='none', height=10, parent=buttonLayout)
 
         # call dpJointDisplayUI Window:
@@ -232,6 +232,29 @@ class JointDisplay(object):
                     self.destinationBoard = 0          
             self.refreshLists(self)
             self.keepSelectedObj(self)  
+
+    def changeAllButton(self, *args):
+        selectedLabel = cmds.optionMenu(self.changeAllMenu, query=True, value=True)
+        print(f'BUTON PRESSED {selectedLabel}')
+        labelDict = {'Bone':0, 'Multi-Child as box':1, 'None':2, 'Joint':3}
+
+        self.selectedBoard = selectedLabel
+        destinationBoardIndex = 0
+        for label in labelDict.keys:
+            if selectedLabel == label:
+                # destinationBoardIndex = labelDict[label]
+                print(f'{label}')
+
+
+        if self.getAllJointList:
+            for jnt in self.getAllJointList:
+                cmds.setAttr(jnt +'.drawStyle', destinationBoardIndex)
+
+
+                
+
+
+        
 
 
     def searchBoardIndex(self, *args):
