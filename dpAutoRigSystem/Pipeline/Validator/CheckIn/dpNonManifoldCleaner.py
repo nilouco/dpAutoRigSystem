@@ -1,24 +1,25 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "GeometryHistory"
-TITLE = "v071_geometryHistory"
-DESCRIPTION = "v072_geometryHistoryDesc"
-ICON = "/Icons/dp_geometryHistory.png"
+CLASS_NAME = "NonManifoldCleaner"
+TITLE = "v101_nonManifoldCleaner"
+DESCRIPTION = "v102_nonManifoldCleanerDesc"
+ICON = "/Icons/dp_nonManifoldCleaner.png"
 
-DP_GEOMETRYHISTORY_VERSION = 1.5
+DP_NONMANIFOLDCLEANER_VERSION = 1.0
 
 
-class GeometryHistory(dpBaseAction.ActionStartClass):
+class NonManifoldCleaner(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_GEOMETRYHISTORY_VERSION
+        self.version = DP_NONMANIFOLDCLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -41,26 +42,10 @@ class GeometryHistory(dpBaseAction.ActionStartClass):
         if not self.utils.getAllGrp():
             if not self.utils.getNetworkNodeByAttr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
-                    ignoreTypeList = ["tweak", "file", "place2dTexture"]
                     if objList:
                         geoToCleanList = objList
                     else:
-                        geoList = []
-                        transformList = self.getMeshTransformList()
-                        if transformList:
-                            for transform in transformList:
-                                # Filter which geometry has deformer history and groupLevels to pass through sets and shader
-                                historyList = cmds.listHistory(transform, pruneDagObjects=True, groupLevels=True)
-                                if historyList:
-                                    for history in historyList:
-                                        # Pass through tweak and initialShading nodes
-                                        if not cmds.nodeType(history) in ignoreTypeList: 
-                                            if history != "initialShadingGroup":
-                                                geoList.append(transform)
-                        # Merge duplicated names
-                        geoToCleanFullPathList = list(set(geoList))
-                        # Get shortName to better reading in display log
-                        geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
+                        geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.getMeshTransformList()))), long=False)
                     if geoToCleanList:
                         self.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
                         for geo in geoToCleanList:
@@ -72,10 +57,13 @@ class GeometryHistory(dpBaseAction.ActionStartClass):
                                     self.resultOkList.append(False)
                                 else: #fix
                                     try:
-                                        # Delete history
-                                        cmds.delete(geo, constructionHistory=True)
+                                        cmds.select(geo)
+                                        # Cleanup non manifolds
+                                        mel.eval('polyCleanupArgList 4 { "0","1","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
                                         self.resultOkList.append(True)
                                         self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+geo)
+                                        mel.eval('changeSelectMode -object;')
+                                        cmds.select(clear=True)
                                     except:
                                         self.resultOkList.append(False)
                                         self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+geo)
@@ -95,3 +83,14 @@ class GeometryHistory(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         return self.dataLogDic
+
+
+    def checkNonManifold(self, itemList, *args):
+        """ Verify if there are non manifold meshes and return them if exists.
+        """
+        nonManifoldList = []
+        if itemList:
+            for item in itemList:
+                if cmds.polyInfo(item, nonManifoldEdges=True, nonManifoldUVEdges=True, nonManifoldUVs=True, nonManifoldVertices=True):
+                    nonManifoldList.append(item)
+        return nonManifoldList
