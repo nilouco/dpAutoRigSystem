@@ -39,36 +39,42 @@ class NonManifoldCleaner(dpBaseAction.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        if not cmds.file(query=True, reference=True):
-            if objList:
-                geoToCleanList = objList
+        if not self.utils.getAllGrp():
+            if not self.utils.getNetworkNodeByAttr("dpGuideNet"):
+                if not cmds.file(query=True, reference=True):
+                    if objList:
+                        geoToCleanList = objList
+                    else:
+                        geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.getMeshTransformList()))), long=False)
+                    if geoToCleanList:
+                        self.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
+                        for geo in geoToCleanList:
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            if cmds.objExists(geo):
+                                self.checkedObjList.append(geo)
+                                self.foundIssueList.append(True)
+                                if self.firstMode:
+                                    self.resultOkList.append(False)
+                                else: #fix
+                                    try:
+                                        cmds.select(geo)
+                                        # Cleanup non manifolds
+                                        mel.eval('polyCleanupArgList 4 { "0","1","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+geo)
+                                        mel.eval('changeSelectMode -object;')
+                                        cmds.select(clear=True)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+geo)
+                    else:
+                        self.notFoundNodes()
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
             else:
-                geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.getMeshTransformList()))), long=False)
-            if geoToCleanList:
-                self.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
-                for geo in geoToCleanList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    if cmds.objExists(geo):
-                        self.checkedObjList.append(geo)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.select(geo)
-                                # Cleanup non manifolds
-                                mel.eval('polyCleanupArgList 4 { "0","1","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+geo)
-                                mel.eval('changeSelectMode -object;')
-                                cmds.select(clear=True)
-                            except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+geo)
-            else:
-                self.notFoundNodes()
+                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 
