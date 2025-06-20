@@ -1,5 +1,6 @@
 dpKeyframeCleaner
 dpNgSkinToolsCleaner
+dpPruneSkinWeights
 dpBrokenNetCleaner
 dpColorSetCleaner
 dpHideDataGrp
