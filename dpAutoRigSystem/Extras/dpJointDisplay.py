@@ -72,10 +72,10 @@ class JointDisplay(object):
         columnLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout, adjustableColumn=True)
 
         # creating titles
-        boneTitle = cmds.text('boneTitle', label='Bone',parent=columnLayout)
-        multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=columnLayout)
-        noneTitle = cmds.text('noneTitle', label='None',parent=columnLayout)
-        jointTitle = cmds.text('jointTitle',label='Joint',parent=columnLayout)
+        cmds.text('boneTitle', label='Bone',parent=columnLayout)
+        cmds.text('multiChildTitle',label='Multi-Child as box',parent=columnLayout)
+        cmds.text('noneTitle', label='None',parent=columnLayout)
+        cmds.text('jointTitle',label='Joint',parent=columnLayout)
         
 
         # bone display panels
@@ -194,10 +194,10 @@ class JointDisplay(object):
         """ """
         # Get active selection of button list
         print(f'Move to Right called')
-        selectedJoints = self.selectionUiList
+        self.selectionUiList
         print(f'Move to Right Selected Board ---------{self.selectedBoard}')
-        if selectedJoints:
-            for jnt in selectedJoints:
+        if self.selectionUiList:
+            for jnt in self.selectionUiList:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
                 if currentDrawStyle < 3:
                     print(f'DrawStyle atual {currentDrawStyle}')
@@ -216,11 +216,11 @@ class JointDisplay(object):
         """ """
         # Get active selection of button list
         print(f'Move to Left called')
-        selectedJoints = self.selectionUiList
+        self.selectionUiList
         print(f'Move to Left Selected Board ---------{self.selectedBoard}')
 
-        if selectedJoints:
-            for jnt in selectedJoints:
+        if self.selectionUiList:
+            for jnt in self.selectionUiList:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
                 if currentDrawStyle > 0 < 3 :
                     print(f'DrawStyle atual {currentDrawStyle}')
@@ -236,26 +236,26 @@ class JointDisplay(object):
     def changeAllButton(self, *args):
         selectedLabel = cmds.optionMenu(self.changeAllMenu, query=True, value=True)
         print(f'BUTON PRESSED {selectedLabel}')
-        labelDict = {'Bone':0, 'Multi-Child as box':1, 'None':2, 'Joint':3}
-
-        self.selectedBoard = selectedLabel
-        destinationBoardIndex = 0
-        for label in labelDict.keys:
-            if selectedLabel == label:
-                # destinationBoardIndex = labelDict[label]
-                print(f'{label}')
-
-
-        if self.getAllJointList:
-            for jnt in self.getAllJointList:
-                cmds.setAttr(jnt +'.drawStyle', destinationBoardIndex)
+        if selectedLabel == 'Bone':
+            self.setAllDrawstyle(0)
+        elif selectedLabel == 'Multi-Child as box':
+            self.setAllDrawstyle(1)
+        elif selectedLabel == 'None':
+            self.setAllDrawstyle(2)
+        elif selectedLabel == 'Joint':
+            self.setAllDrawstyle(3)
 
 
+    def setAllDrawstyle(self, drawStyleIndex, *args):
+        self.allJointsList
+        if self.allJointsList:
+            for jnt in self.allJointsList:
+                cmds.setAttr(f"{jnt}.drawStyle", drawStyleIndex)
+                self.selectionUiList.append(jnt)
+        self.destinationBoard = drawStyleIndex
+        self.refreshLists()
+        #self.keepSelectedObj()
                 
-
-
-        
-
 
     def searchBoardIndex(self, *args):
         index = 0
@@ -272,8 +272,7 @@ class JointDisplay(object):
 
         selectedItems = self.selectionUiList
         print(f'keepSelectedObj Called________!!!!!!!')
-
-        print(f'DESTINATION BOARD >>>>>> {self.allBoardList[self.destinationBoard]}')
+        #print(f'DESTINATION BOARD >>>>>> {self.allBoardList[self.destinationBoard]}')
         if selectedItems:
             cmds.textScrollList(self.allBoardList[self.destinationBoard], edit=True, selectItem=selectedItems)
             print(f'Selected Items {selectedItems}')
@@ -314,6 +313,4 @@ class JointDisplay(object):
 
 # TODO
 # - create a filter: To populate list that will be searched
-# - mantain the selected joints in the list, after the board changed
-# - Do the function Dropbox button to do the action
-# - 2025-06-17 - Stopped trying to fix the keeping select function and buttons
+# - make the heitght of the window responsive.
