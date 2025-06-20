@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.11"
-DPAR_UPDATELOG = "N896 - Fix Chain scale."
+DPAR_VERSION_5 = "5.00.12"
+DPAR_UPDATELOG = "N877 - Publish batch."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -199,7 +199,7 @@ class Start(object):
         self.startScriptJobs()
         cmds.select(clear=True)
         self.utils.closeUI("dpARLoadWin")
-        print("dpAutoRigSystem "+self.lang['i346_loadedSucess']+"\n----------")
+        print("dpAutoRigSystem "+self.lang['i346_loadedSuccess']+"\n----------")
 
 
     def ui(self, *args):

@@ -10,7 +10,7 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.15
+DP_PIPELINER_VERSION = 1.16
 
 
 class Pipeliner(object):
@@ -121,13 +121,20 @@ class Pipeliner(object):
                 if self.pipeData[dependent]:
                     try:
                         name = name[name.rfind(self.pipeData[dependent]+"/")+len(self.pipeData[dependent])+1:]
+                        toEndIt = False
                         if self.pipeData["f_wip"]:
                             if self.pipeData["f_wip"] in name:
                                 name = name.split(self.pipeData["f_wip"])[0]
-                                if name.endswith("/"):
-                                    name = name[:-1]
-                                if "/" in name:
-                                    name = name[:name.rfind("/")]
+                                toEndIt = True
+                        if self.pipeData["f_publish"]:
+                            if self.pipeData["f_publish"] in name:
+                                name = name.split(self.pipeData["f_publish"])[0]
+                                toEndIt = True
+                        if toEndIt:
+                            if name.endswith("/"):
+                                name = name[:-1]
+                            if "/" in name:
+                                name = name[:name.rfind("/")]
                     except:
                         self.pipeData[field] = ""
                         self.pipeData[dependent] = ""
@@ -223,7 +230,7 @@ class Pipeliner(object):
         "b_i_wip"            : True,
         "b_i_publish"        : True,
         "b_i_date"           : True,
-        "b_i_degrade"        : True        
+        "b_i_degrade"        : True
         }
         return defaultPipeInfo
 
@@ -798,7 +805,7 @@ class Pipeliner(object):
 
     def getPipeFileName(self, filePath=None, *args):
         """ Return the generated file name based on the pipeline publish folder.
-            It's check the asset name and define the file version to save the published file.
+            It checks the asset name and define the file version to save the published file.
         """
         self.pipeData['assetName'] = None
         self.assetNameList = []
@@ -940,6 +947,7 @@ class Pipeliner(object):
             Mode:
             0 = load: open Maya scene.
             1 = replaceData: copy dpData from the selected or given asset to this current file.
+            2 = checkBoxes UI to select assets.
         """
         if not path:
             if "wipPath" in list(self.pipeData.keys()):
@@ -951,9 +959,12 @@ class Pipeliner(object):
             if not file:
                 assetList = next(os.walk(path))[1]
                 if assetList:
-                    if mode == 1: #replaceData exclude the current asset from given list to chose.
-                        assetList.remove(self.pipeData['assetName'])
                     assetList.sort()
+                    if mode == 2:
+                        self.selectAssetCheckBoxUI(assetList, path, mode)
+                        return
+                    elif mode == 1: #replaceData exclude the current asset from given list to chose.
+                        assetList.remove(self.pipeData['assetName'])
                     # Load UI to choose one asset to define the file to use
                     self.selectAssetFromListUI(assetList, path, mode)
                     return
@@ -974,6 +985,8 @@ class Pipeliner(object):
                             self.dpUIinst.rebuilding = False
                             cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
                             cmds.workspace(directory=assetFolder)
+                            self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
+                            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
                 elif mode == 1: #replaceData
                     # Open UI to select each desired module dpData to replace from
                     self.pathToReplaceFrom = assetFolder
@@ -1017,6 +1030,37 @@ class Pipeliner(object):
         if selectedAssetItemList:
             self.loadAsset(path, selectedAssetItemList[0], mode)
             self.utils.closeUI("dpSelectAssetWindow")
+
+
+    def selectAssetCheckBoxUI(self, assetList, path, mode, *args):
+        """ Let user select the assets to publish in batch.
+        """
+        # declaring variables:
+        selectAssetCB_title = 'dpAutoRig - '+self.dpUIinst.lang['m046_publisher']+" "+self.dpUIinst.lang['i358_batch']
+        selectCB_winWidth = 240
+        selectCB_winHeight = 285
+        selectCB_align = "center"
+        self.utils.closeUI("dpSelectAssetCBWindow")
+        dpSelectAssetCBWin = cmds.window('dpSelectAssetCBWindow', title=selectAssetCB_title, iconName='dpInfo', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating layout:
+        selectBatchLayout = cmds.columnLayout('selectBatchLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetCBWin)
+        cmds.separator(style='none', height=10, parent=selectBatchLayout)
+        cmds.text(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i303_asset']+"s:", align="left", parent=selectBatchLayout)
+        if len(assetList) > 1:
+            cmds.checkBox(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], value=False, changeCommand=self.selectAllAssetCB, parent=selectBatchLayout)
+        cmds.separator(style='in', height=10, parent=selectBatchLayout)
+        selectCBAssetSL = cmds.scrollLayout('selectCBAssetSL', parent=selectBatchLayout)
+        selectCBColumnLayout = cmds.columnLayout('selectCBColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=selectCBAssetSL)
+        # assets checkboxes
+        self.selectedBatchList = []
+        for asset in assetList:
+            self.selectedBatchList.append(cmds.checkBox(asset+"CB", label=asset, parent=selectCBColumnLayout))
+        cmds.separator(style='in', height=10, parent=selectBatchLayout)
+        self.commentBatchTFG = cmds.textFieldGrp('commentBatchTFG', label=self.dpUIinst.lang['i219_comments'], text='', adjustableColumn=2, editable=True, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth=[(1, 55), (2, 50)], parent=selectBatchLayout)
+        self.runSelectCBAssetBT = cmds.button('runSelectCBAssetBT', label=self.dpUIinst.lang['i216_publish'], align=selectCB_align, command=partial(self.dpUIinst.publisher.loadPublishingBatch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=selectBatchLayout)
+        cmds.separator(style='none', height=5, parent=selectBatchLayout)
+        # call Window:
+        cmds.showWindow(dpSelectAssetCBWin)
 
 
     def loadProjectPath(self, *args):
@@ -1192,6 +1236,13 @@ class Pipeliner(object):
         """
         for item in self.existDataList:
             cmds.checkBox(item+"CB", edit=True, value=cbValue)
+
+
+    def selectAllAssetCB(self, cbValue, *args):
+        """ Set all existing asset checkbox values.
+        """
+        for item in self.selectedBatchList:
+            cmds.checkBox(item, edit=True, value=cbValue)
 
 
     def replaceDataByUI(self, *args):
