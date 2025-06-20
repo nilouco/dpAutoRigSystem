@@ -8,7 +8,7 @@ TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 ICON = "/Icons/dp_geometryHistory.png"
 
-DP_GEOMETRYHISTORY_VERSION = 1.4
+DP_GEOMETRYHISTORY_VERSION = 1.5
 
 
 class GeometryHistory(dpBaseAction.ActionStartClass):
@@ -45,21 +45,18 @@ class GeometryHistory(dpBaseAction.ActionStartClass):
                     if objList:
                         geoToCleanList = objList
                     else:
-                        shapeList = cmds.ls(selection=False, type='mesh')
                         geoList = []
-                        if shapeList:
-                            # Get only transform nodes
-                            transformList = list(set(cmds.listRelatives(shapeList, type="transform", parent=True, fullPath=True)))
-                            if transformList:
-                                for transform in transformList:
-                                    # Filter which geometry has deformer history and groupLevels to pass through sets and shader
-                                    historyList = cmds.listHistory(transform, pruneDagObjects=True, groupLevels=True)
-                                    if historyList:
-                                        for history in historyList:
-                                            # Pass through tweak and initialShading nodes
-                                            if not cmds.nodeType(history) in ignoreTypeList: 
-                                                if history != "initialShadingGroup":
-                                                    geoList.append(transform)
+                        transformList = self.getMeshTransformList()
+                        if transformList:
+                            for transform in transformList:
+                                # Filter which geometry has deformer history and groupLevels to pass through sets and shader
+                                historyList = cmds.listHistory(transform, pruneDagObjects=True, groupLevels=True)
+                                if historyList:
+                                    for history in historyList:
+                                        # Pass through tweak and initialShading nodes
+                                        if not cmds.nodeType(history) in ignoreTypeList: 
+                                            if history != "initialShadingGroup":
+                                                geoList.append(transform)
                         # Merge duplicated names
                         geoToCleanFullPathList = list(set(geoList))
                         # Get shortName to better reading in display log

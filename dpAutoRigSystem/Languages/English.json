@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-18",
+    "_updated"       : "2025-06-20",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -936,7 +936,7 @@
     "v088_softenEdges"            : "Soften Edges",
     "v089_softenEdgesDesc"        : "This validator will verify soften edges in the geometries.",
     "v090_overrideCleaner"        : "Override cleaner",
-    "v091_overrideCleanerDesc"    : "This validator will verify if there nodes with overrides\nand remove them.",
+    "v091_overrideCleanerDesc"    : "This validator will verify if there are nodes with overrides\nand remove them.",
     "v092_unlockAttributes"       : "Unlock attributes",
     "v093_unlockAttributesDesc"   : "This validator will verify and unlock attributes.",
     "v094_envelopeChecker"        : "Envelope checker",
@@ -945,5 +945,7 @@
     "v097_cleanupDesc"            : "This validator check for dpDeleteIt attributes and delete their nodes.",
     "v098_askUserChooseFile"      : "Now we have two rigging files:\n\n1 - WIP = work in progress\n2 - Published = validated\n\nWhich file do you want to open?",
     "v099_cantExistsAllGrp"       : "We can't validate scenes with built All_Grp, sorry.",
-    "v100_cantExistsGuides"       : "We can't validate scenes with guides, sorry."
+    "v100_cantExistsGuides"       : "We can't validate scenes with guides, sorry.",
+    "v101_nonManifoldCleaner"     : "NonManifold cleaner",
+    "v102_nonManifoldCleanerDesc" : "This validator will verify if there are polygons\nwith non-manifold issues and remove them."
 }
