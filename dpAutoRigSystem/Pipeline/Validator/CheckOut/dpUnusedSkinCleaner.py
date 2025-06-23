@@ -8,7 +8,7 @@ TITLE = "v082_unusedSkinCleaner"
 DESCRIPTION = "v083_unusedSkinCleanerDesc"
 ICON = "/Icons/dp_unusedSkinCleaner.png"
 
-DP_UNUSEDSKINCLEANER_VERSION = 1.2
+DP_UNUSEDSKINCLEANER_VERSION = 1.3
 
 
 class UnusedSkinCleaner(dpBaseAction.ActionStartClass):
@@ -47,25 +47,42 @@ class UnusedSkinCleaner(dpBaseAction.ActionStartClass):
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    # conditional to check here
-                    influenceList = cmds.skinCluster(item, query=True, influence=True)
-                    weightedInfluenceList = cmds.skinCluster(item, query=True, weightedInfluence=True)
-                    if not len(influenceList) == len(weightedInfluenceList):
+                    # conditional 1 to check here if there's an influenced node, otherwise delete the unused skinCluster
+                    meshList = cmds.skinCluster(item, query=True, geometry=True)
+                    if meshList:
+                        # conditional 2 to check here if there's weighted vertices by influencer
+                        influenceList = cmds.skinCluster(item, query=True, influence=True)
+                        weightedInfluenceList = cmds.skinCluster(item, query=True, weightedInfluence=True)
+                        if not len(influenceList) == len(weightedInfluenceList):
+                            self.checkedObjList.append(item)
+                            self.foundIssueList.append(True)
+                            if self.firstMode:
+                                self.resultOkList.append(False)
+                            else: #fix
+                                try:
+                                    toRemoveJointList = []
+                                    for jointNode in influenceList:
+                                        if not jointNode in weightedInfluenceList:
+                                            if not jointNode in toRemoveJointList:
+                                                toRemoveJointList.append(jointNode)
+                                    if toRemoveJointList:
+                                        cmds.skinCluster(item, edit=True, removeInfluence=toRemoveJointList, toSelectedBones=True)
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(len(toRemoveJointList))+" joints")
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                    else:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                toRemoveJointList = []
-                                for jointNode in influenceList:
-                                    if not jointNode in weightedInfluenceList:
-                                        if not jointNode in toRemoveJointList:
-                                            toRemoveJointList.append(jointNode)
-                                if toRemoveJointList:
-                                    cmds.skinCluster(item, edit=True, removeInfluence=toRemoveJointList, toSelectedBones=True)
+                                cmds.lockNode(item, lock=False)
+                                cmds.delete(item)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(len(toRemoveJointList))+" joints")
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = deleted")
                             except:
                                 self.resultOkList.append(False)
                                 self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)

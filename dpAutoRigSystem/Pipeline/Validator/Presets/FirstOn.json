@@ -33,6 +33,7 @@
     "NgSkinToolsCleaner"        : false,
     "OutlinerCleaner"           : false,
     "ProxyCreator"              : false,
+    "PruneSkinWeights"          : false,
     "ResetPose"                 : false,
     "SideCalibration"           : false,
     "TargetCleaner"             : false,

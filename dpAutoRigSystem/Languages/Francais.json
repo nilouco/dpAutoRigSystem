@@ -946,6 +946,8 @@
     "v099_cantExistsAllGrp"       : "On ne peut pas valider des fichiers avec All_Grp créé, désolé.",
     "v100_cantExistsGuides"       : "On ne peux pas valider des fichiers qui contien des guides, désolé.",
     "v101_nonManifoldCleaner"     : "NonManifold nettoyer",
-    "v102_nonManifoldCleanerDesc" : "Ce validateur vérifiera s'il y a des non-manifold erreurs\ndans les polygons pour les corriger."
+    "v102_nonManifoldCleanerDesc" : "Ce validateur vérifiera s'il y a des non-manifold erreurs\ndans les polygons pour les corriger.",
+    "v103_pruneSkinWeights"       : "Tailler skin weights",
+    "v104_pruneSkinWeightsDesc"   : "Ce validateur vérifiera s'il y a des petits skin weights\npour les tailler."
 
 }

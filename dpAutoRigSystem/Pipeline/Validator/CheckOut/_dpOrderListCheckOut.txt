@@ -8,6 +8,7 @@ dpSideCalibration
 dpTargetCleaner
 dpUnknownNodesCleaner
 dpUnusedNodeCleaner
+dpPruneSkinWeights
 dpUnusedSkinCleaner
 dpEnvelopeChecker
 dpWIPCleaner

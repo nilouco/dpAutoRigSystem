@@ -946,6 +946,8 @@
     "v099_cantExistsAllGrp"       : "Não podemos validar cenas com All_Grp construído, desculpe.",
     "v100_cantExistsGuides"       : "Não podemos validar cenas com guias, desculpe.",
     "v101_nonManifoldCleaner"     : "NonManifold limpador",
-    "v102_nonManifoldCleanerDesc" : "Esse validador vai verificar se existem polígonos\ncom erros de non-manifold e corrigi-los."
+    "v102_nonManifoldCleanerDesc" : "Esse validador vai verificar se existem polígonos\ncom erros de non-manifold e corrigi-los.",
+    "v103_pruneSkinWeights"       : "Podar skin weights",
+    "v104_pruneSkinWeightsDesc"   : "Esse validador vai verificar se existem pequenos pesos de skin\npara apara-los."
     
 }

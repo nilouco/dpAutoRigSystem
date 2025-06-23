@@ -947,5 +947,7 @@
     "v099_cantExistsAllGrp"       : "We can't validate scenes with built All_Grp, sorry.",
     "v100_cantExistsGuides"       : "We can't validate scenes with guides, sorry.",
     "v101_nonManifoldCleaner"     : "NonManifold cleaner",
-    "v102_nonManifoldCleanerDesc" : "This validator will verify if there are polygons\nwith non-manifold issues and remove them."
+    "v102_nonManifoldCleanerDesc" : "This validator will verify if there are polygons\nwith non-manifold issues and remove them.",
+    "v103_pruneSkinWeights"       : "Prune skin weights",
+    "v104_pruneSkinWeightsDesc"   : "This validator will verify if there are\nsmall skinning weights to prune."
 }
