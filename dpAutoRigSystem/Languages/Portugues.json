@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-20",
+    "_updated"       : "2025-06-23",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -948,6 +948,8 @@
     "v101_nonManifoldCleaner"     : "NonManifold limpador",
     "v102_nonManifoldCleanerDesc" : "Esse validador vai verificar se existem polígonos\ncom erros de non-manifold e corrigi-los.",
     "v103_pruneSkinWeights"       : "Podar skin weights",
-    "v104_pruneSkinWeightsDesc"   : "Esse validador vai verificar se existem pequenos pesos de skin\npara apara-los."
+    "v104_pruneSkinWeightsDesc"   : "Esse validador vai verificar se existem pequenos pesos de skin\npara apara-los.",
+    "v105_cycleChecker"           : "Verificador de ciclos",
+    "v106_cycleCheckerDesc"       : "Esse validador vai verificar se existem erros de ciclo no arquivo\nIrá apenas vefiricar e nos informar sobre isso\nporque esse tema é muito complexo para ser corrigido\nautomaticamente no momento, desculpe."
     
 }

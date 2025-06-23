@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-20",
+    "_updated"    : "2025-06-23",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
@@ -19,6 +19,7 @@
     "UnlockNormals"             : true,
     "VaccineCleaner"            : true,
 
+    "CycleChecker"              : true,
     "BrokenNetCleaner"          : true,
     "Cleanup"                   : true,
     "ColorSetCleaner"           : true,

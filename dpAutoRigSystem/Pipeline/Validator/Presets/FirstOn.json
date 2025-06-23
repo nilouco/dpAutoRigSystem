@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-20",
+    "_updated"    : "2025-06-23",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
@@ -19,6 +19,7 @@
     "UnlockNormals"             : false,
     "VaccineCleaner"            : false,
 
+    "CycleChecker"              : false,
     "BrokenNetCleaner"          : false,
     "Cleanup"                   : false,
     "ColorSetCleaner"           : false,
