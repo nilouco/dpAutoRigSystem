@@ -47,7 +47,8 @@ class CycleChecker(dpBaseAction.ActionStartClass):
                 self.checkedObjList.append(objList)
             else:
                 cycles = cmds.cycleCheck(all=False, list=True)
-                self.checkedObjList.append("\n".join(cycles))
+                if cycles:
+                    self.checkedObjList.append("\n".join(cycles))
             if cycles:
                 self.foundIssueList.append(True)
                 if self.firstMode:
