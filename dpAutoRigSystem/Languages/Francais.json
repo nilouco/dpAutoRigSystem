@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-06-20",
+    "_updated"       : "2025-06-23",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -948,6 +948,8 @@
     "v101_nonManifoldCleaner"     : "NonManifold nettoyer",
     "v102_nonManifoldCleanerDesc" : "Ce validateur vérifiera s'il y a des non-manifold erreurs\ndans les polygons pour les corriger.",
     "v103_pruneSkinWeights"       : "Tailler skin weights",
-    "v104_pruneSkinWeightsDesc"   : "Ce validateur vérifiera s'il y a des petits skin weights\npour les tailler."
+    "v104_pruneSkinWeightsDesc"   : "Ce validateur vérifiera s'il y a des petits skin weights\npour les tailler.",
+    "v105_cycleChecker"           : "Vérificateur de cycle",
+    "v106_cycleCheckerDesc"       : "Ce validateur vérifiera s'il y a des erreurs de cycle dans la scene.\nIl va just nous informer par rapport ça.\nparce que c'est trop dificille de corriger ça automaticament\na ce moment, désolé."
 
 }
