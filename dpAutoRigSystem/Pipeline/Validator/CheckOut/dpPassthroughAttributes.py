@@ -3,22 +3,22 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "ColorSetCleaner"
-TITLE = "v030_colorSetCleaner"
-DESCRIPTION = "v031_colorSetCleanerDesc"
-ICON = "/Icons/dp_colorSetCleaner.png"
+CLASS_NAME = "PassthroughAttributes"
+TITLE = "v107_passthroughAttributes"
+DESCRIPTION = "v108_passthroughAttributesDesc"
+ICON = "/Icons/dp_passthroughAttributes.png"
 
-DP_COLORSETCLEANER_VERSION = 1.4
+DP_PASSTHROUGHATTRIBUTES_VERSION = 1.0
 
 
-class ColorSetCleaner(dpBaseAction.ActionStartClass):
+class PassthroughAttributes(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_COLORSETCLEANER_VERSION
+        self.version = DP_PASSTHROUGHATTRIBUTES_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -42,22 +42,20 @@ class ColorSetCleaner(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = cmds.ls(selection=False, type='createColorSet')
+                toCheckList = cmds.ls(selection=False) #all
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     # conditional to check here
-                    if cmds.objectType(item) == "createColorSet":
+                    if True: # TODO validate task here
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                if cmds.objExists(item):
-                                    cmds.delete(item)
-                                cmds.select(clear=True)
+                                # TODO fix task here
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
