@@ -143,7 +143,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             upVectorObject = self.utils.createLocatorInItemPosition(self.radiusGuide)  # using locator to avoid cycle error
             jointLocList = []
             for child in childrenList:
-                # Check if the child is a joint locator
+                # Check if the child is a joint locator, with nJoint attribute
                 if cmds.attributeQuery("nJoint", node=child, exists=True):
                     jointLocList.append(child)
             return jointLocList, upVectorObject
@@ -153,6 +153,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Aim the target towards the aimed object using the upObject(RadiusCtrl) for orientation.
         """ 
         # If it's JointEnd, unlock translateX and translateY attributes to allow unparenting to world with no translation issues.
+        # The JointEnd will be unlocked after pressing the reOrient button only.
         if target == self.cvEndJoint:
             cmds.setAttr(target + ".translateX", lock=False, keyable=True)
             cmds.setAttr(target + ".translateY", lock=False, keyable=True)
@@ -174,7 +175,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # Check if the backGuide is not the guideBase
                 if not backGuide == guideBase:
                     self.aimFunction(jointLoc, backGuide, upVectorObject)
-                # If the backGuide is the guideBase, aim the jointLoc to the guideBase
+                # If the backGuide is the guideBase, aim the jointLoc1 to the guideBase
                 if backGuide == guideBase:
                     nJoint2 = cmds.listRelatives(jointLoc, children=True, type="transform")[0]
                     posTempLoc = self.utils.createLocatorInItemPosition(nJoint2)
@@ -200,14 +201,17 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.guideBase = self.moduleGrp
         self.radiusGuide = self.guideName + "_Base_RadiusCtrl"
         self.cvEndJoint = self.guideName + "_JointEnd"
-
+        # Check if the guideBase exists:
         if cmds.attributeQuery("guideBase", node=self.guideBase, exists=True):
+            # Get the jointLocList and upVectorObject:
             self.jointLocList, self.upVectorObject = self.getJointLocList(self.guideBase)
+            # Reorient the FK line:
             self.reOrientFkLine(self.jointLocList, self.upVectorObject, self.guideBase, self.cvEndJoint)
 
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
+        # Create the reOrien button in the flip layout:
         self.reOrientBT = cmds.button(label=self.dpUIinst.lang["m022_reOrient"],annotation=self.dpUIinst.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent=self.flipLayout)
 
 
