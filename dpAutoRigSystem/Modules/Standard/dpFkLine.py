@@ -175,7 +175,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # Check if the backGuide is not the guideBase
                 if not backGuide == guideBase:
                     self.aimFunction(jointLoc, backGuide, upVectorObject)
-                # If the backGuide is the guideBase, aim the jointLoc1 to the guideBase
+                # If the backGuide is the guideBase, align the jointLoc1 to the guideBase
                 if backGuide == guideBase:
                     nJoint2 = cmds.listRelatives(jointLoc, children=True, type="transform")[0]
                     posTempLoc = self.utils.createLocatorInItemPosition(nJoint2)
@@ -212,7 +212,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
         # Create the reOrien button in the flip layout:
-        self.reOrientBT = cmds.button(label=self.dpUIinst.lang["m022_reOrient"],annotation=self.dpUIinst.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent=self.flipLayout)
+        self.reOrientBT = cmds.button(label=self.dpUIinst.lang["m022_reOrient"], annotation=self.dpUIinst.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent=self.flipLayout)
 
 
     def rigModule(self, *args):
