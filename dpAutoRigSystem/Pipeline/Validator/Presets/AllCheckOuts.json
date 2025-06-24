@@ -33,6 +33,7 @@
     "KeyframeCleaner"           : true,
     "NgSkinToolsCleaner"        : true,
     "OutlinerCleaner"           : true,
+    "PassthroughAttributes"     : true,
     "ProxyCreator"              : true,
     "PruneSkinWeights"          : true,
     "ResetPose"                 : true,

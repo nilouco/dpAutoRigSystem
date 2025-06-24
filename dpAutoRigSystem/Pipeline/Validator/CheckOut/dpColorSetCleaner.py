@@ -8,7 +8,7 @@ TITLE = "v030_colorSetCleaner"
 DESCRIPTION = "v031_colorSetCleanerDesc"
 ICON = "/Icons/dp_colorSetCleaner.png"
 
-DP_COLORSETCLEANER_VERSION = 1.3
+DP_COLORSETCLEANER_VERSION = 1.4
 
 
 class ColorSetCleaner(dpBaseAction.ActionStartClass):
@@ -48,20 +48,21 @@ class ColorSetCleaner(dpBaseAction.ActionStartClass):
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     # conditional to check here
-                    self.checkedObjList.append(item)
-                    self.foundIssueList.append(True)
-                    if self.firstMode:
-                        self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            if cmds.objExists(item):
-                                cmds.delete(item)
-                            cmds.select(clear=True)
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                        except:
+                    if cmds.objectType(item) == "createColorSet":
+                        self.checkedObjList.append(item)
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        else: #fix
+                            try:
+                                if cmds.objExists(item):
+                                    cmds.delete(item)
+                                cmds.select(clear=True)
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:

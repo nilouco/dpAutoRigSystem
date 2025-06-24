@@ -19,5 +19,6 @@ dpControllerTag
 dpControlsHierarchy
 dpDisplayLayers
 dpResetPose
+dpPassthroughAttributes
 dpProxyCreator
 dpCleanup
