@@ -1518,3 +1518,13 @@ class Utils(object):
             Returns False if there are only unique names.
         """
         return [n for n in cmds.ls(selection=False, shortNames=True) if "|" in n] or False
+
+
+    def createLocatorInItemPosition(self, item, *args):
+        """Create a locator in the input item position
+        Return the created locator name.
+        """
+        if item:
+            posTemp = cmds.spaceLocator(name=item + "_LocTemp")[0]
+            cmds.matchTransform(posTemp, item, position=True, rotation=True)
+            return posTemp
