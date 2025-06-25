@@ -178,13 +178,11 @@ class JointDisplay(object):
         """ Button to move the selected joints to the right board
         """
         # Get active selection of button list
-        self.selectionUiList
         if self.selectionUiList:
             for jnt in self.selectionUiList:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
                 if currentDrawStyle < 3:
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
-                    print (f' Returned Seach BOARD {self.searchBoardIndex()}')
                     self.destinationBoard = self.searchBoardIndex() + 1
                 else: 
                     currentDrawStyle = 0
@@ -198,8 +196,6 @@ class JointDisplay(object):
         """ Button to move the selected joints to the left board 
         """
         # Get active selection of button list
-        self.selectionUiList
-
         if self.selectionUiList:
             for jnt in self.selectionUiList:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
