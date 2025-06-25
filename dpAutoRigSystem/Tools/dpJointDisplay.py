@@ -159,11 +159,10 @@ class JointDisplay(object):
         # Get active selection of button list
         if self.selectionUiList:
             currentDrawStyle = cmds.getAttr(self.selectionUiList[0]+'.drawStyle')
-            print("currentDrawStyle =", currentDrawStyle)
             if currentDrawStyle < 3:
                 for jnt in self.selectionUiList:
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
-                self.destinationBoardIndex += 1
+                self.destinationBoardIndex = currentDrawStyle + 1
             else:
                 currentDrawStyle = 0
                 for jnt in self.selectionUiList: 
@@ -179,11 +178,10 @@ class JointDisplay(object):
         # Get active selection of button list
         if self.selectionUiList:
             currentDrawStyle = cmds.getAttr(self.selectionUiList[0]+'.drawStyle')
-            print("currentDrawStyle =", currentDrawStyle)
             if currentDrawStyle > 0 < 3:
                 for jnt in self.selectionUiList:
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle - 1)
-                self.destinationBoardIndex -= 1
+                self.destinationBoardIndex = currentDrawStyle - 1
             else: 
                 currentDrawStyle = 3
                 for jnt in self.selectionUiList:
@@ -222,11 +220,8 @@ class JointDisplay(object):
     def keepSelectedObj(self, *args):
         """ Mantain ative selected joints.
         """
-        print("self.selectionUiList = selectedItems =", self.selectionUiList)
         selectedItems = self.selectionUiList
         if selectedItems:
-            print("self.destinationBoardIndex = ", self.destinationBoardIndex)
-            print("self.allBoardList[self.destinationBoardIndex] = ", self.allBoardList[self.destinationBoardIndex])
             cmds.textScrollList(self.allBoardList[self.destinationBoardIndex], edit=True, selectItem=selectedItems)
 
  
@@ -244,9 +239,3 @@ class JointDisplay(object):
         self.selectedBoard = boardIndex
         self.deselectOtherBoards(boardIndex)
         self.selectionUiList = cmds.textScrollList(self.allBoardList[boardIndex], query=True, selectItem=True)
-
-
-#TODO
-# - Fix the height of the textScrollList
-# - Fix the responsivity of the lower buttons
-# - Fix the buttons Move Left and Right to do nothing when there is no selection
