@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-23",
+    "_updated"       : "2025-06-24",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -953,6 +953,8 @@
     "v105_cycleChecker"              : "Cycle checker",
     "v106_cycleCheckerDesc"          : "This validator will verify if there are\ncycle errors in the scene.\nIt'll only verify and let us know about it\nbecause this theme is very complex to fix automatically\nat the moment, sorry.",
     "v107_passthroughAttributes"     : "Passthrough attributes",
-    "v108_passthroughAttributesDesc" : "This validator will verify if there are\nattributes with no necessary inbetween connections.\nIf so, it'll change (a -> b -> c) to (a -> c)."
+    "v108_passthroughAttributesDesc" : "This validator will verify if there are\nattributes with no necessary inbetween connections.\nIf so, it'll change (a -> b -> c) to (a -> c).",
+    "v111_jointEndCleaner"           : "Joint End cleaner",
+    "v112_jointEndCleanerDesc"       : "This validator will verify if there are\nunnecessary joints at the end of the chains.\nIf so, it'll delete them because they aren't useful to animation."
     
 }

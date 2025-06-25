@@ -785,7 +785,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # creating joint chains:
                 self.chainDic = {}
                 self.jSufixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt', '_IkNotStretch_Jxt', '_IkAC_Jxt']
-                self.jEndSufixList = ['_JEnd', '_Ik_JEnd', '_Fk_JEnd', '_IkNotStretch_JEnd', '_IkAC_JEnd']
+                self.jEndSufixList = ['_'+self.dpUIinst.jointEndAttr, '_Ik_'+self.dpUIinst.jointEndAttr, '_Fk_'+self.dpUIinst.jointEndAttr, '_IkNotStretch_'+self.dpUIinst.jointEndAttr, '_IkAC_'+self.dpUIinst.jointEndAttr]
                 for t, sufix in enumerate(self.jSufixList):
                     self.wipList = []
                     cmds.select(clear=True)
@@ -793,6 +793,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         newJoint = cmds.joint(name=side+self.userGuideName+"_"+jName+sufix)
                         self.wipList.append(newJoint)
                     jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSufixList[t])
+                    self.utils.addJointEndAttr([jEndJnt])
                     self.wipList.append(jEndJnt)
                     self.chainDic[sufix] = self.wipList
                 # getting jointLists:
@@ -1811,7 +1812,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.skinJointList[-2] = extremNewName
                     cmds.select(clear=True)
                     cmds.joint(name=extremOldName)
-                    orientJEnd = cmds.joint(name=extremOldName.replace("Jnt", "Orient_JEnd"))
+                    orientJEnd = cmds.joint(name=extremOldName.replace("Jnt", "Orient_"+self.dpUIinst.jointEndAttr))
+                    self.utils.addJointEndAttr([orientJEnd])
                     cmds.parentConstraint(self.extremOrientCtrl, extremOldName, maintainOffset=False, name=extremOldName+"_PaC")
                     cmds.delete(cmds.parentConstraint(self.skinJointList[-1], orientJEnd, maintainOffset=False))
                     cmds.addAttr(extremOldName, longName='dpAR_joint', attributeType='float', keyable=False)

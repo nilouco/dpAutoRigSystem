@@ -9,7 +9,7 @@ TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 ICON = "/Icons/dp_nose.png"
 
-DP_NOSE_VERSION = 2.2
+DP_NOSE_VERSION = 2.3
 
 
 class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -435,7 +435,8 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # create end joint:
                 cmds.select(self.tipJnt)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                self.utils.addJointEndAttr([self.endJoint])
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
 
                 # optimize control CV shapes:

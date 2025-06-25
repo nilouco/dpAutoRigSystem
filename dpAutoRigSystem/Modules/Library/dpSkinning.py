@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from . import dpWeights
 
-DP_SKINNING_VERSION = 1.7
+DP_SKINNING_VERSION = 1.8
 
 
 class Skinning(dpWeights.Weights):
@@ -429,3 +429,15 @@ class Skinning(dpWeights.Weights):
                     else:
                         self.importSkinWeightsFromFile([item], path[0], self.ioStartName+"_"+self.getIOFileName(item)+".json")
         self.utils.setProgress(endIt=True)
+
+    
+    def getSkinnedJointList(self, skinClusterList=None, *args):
+        """ Returns a list of influence of the given skinCluster list or all.
+        """
+        skinnedList = []
+        if not skinClusterList:
+            skinClusterList = cmds.ls(selection=False, type="skinCluster")
+        if skinClusterList:
+            for item in skinClusterList:
+                skinnedList.extend(cmds.skinCluster(item, query=True, influence=True))
+        return skinnedList
