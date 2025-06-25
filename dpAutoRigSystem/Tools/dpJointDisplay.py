@@ -27,7 +27,6 @@ class JointDisplay(object):
         self.selectedBoard = []
         self.allBoardList = ['boneFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn', 'jointFieldcolumn']
         self.destinationBoard = ''
-        
         # call main function
         if self.ui:
             self.dpJointDisplayUI(self)
@@ -35,58 +34,56 @@ class JointDisplay(object):
             cmds.scriptJob(event=('SelectionChanged', self.refreshLists), parent='dpJointDisplayWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
 
 
-    def dpCloseJointDisplayUI(self, *args):
-        if cmds.window('dpJointDisplayWindow', query=True, exists=True):
-            cmds.deleteUI('dpJointDisplayWindow', window=True)
-
-
     def dpJointDisplayUI(self, *args):
         """ Create a window in order to load the joints in the scene.
         """
         # call close UI function
-        self.dpCloseJointDisplayUI(self)
+        self.dpUIinst.utils.closeUI('dpJointDisplayWindow')
         # starting UI
-        jointDisplay_winWidth  = 500
-        jointDisplay_winHeight = 175
+        jointDisplay_winWidth  = 660
+        jointDisplay_winHeight = 410
         dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.dpUIinst.lang["m233_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating Main layout:
         jointDisplayMainLayout = cmds.columnLayout('jointDisplayMainLayout', columnOffset=('both', 5), adjustableColumn=True)
         
         # filter
+        cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=jointDisplayMainLayout)
         self.jointFilter = cmds.textFieldGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", textChangedCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
-
-        # creating column Layout
-        columnLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout, adjustableColumn=4)
-
-        # creating titles
-        cmds.text('boneTitle', label='Bone',parent=columnLayout)
-        cmds.text('multiChildTitle',label='Multi-Child as box',parent=columnLayout)
-        cmds.text('noneTitle', label='None',parent=columnLayout)
-        cmds.text('jointTitle',label='Joint',parent=columnLayout)
+        cmds.separator(style='none', height=5, parent=filterLayout)
 
         # bone display panels
-        self.boneFieldcolumn = cmds.textScrollList(self.allBoardList[0], enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True, height=300)
-        self.multiChildFieldcolumn = cmds.textScrollList(self.allBoardList[1], enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True, height=300)
-        self.noneFieldcolumn = cmds.textScrollList(self.allBoardList[2],enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True, height=300)
-        self.jointFieldcolumn = cmds.textScrollList(self.allBoardList[3],enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True, height=300)
+        scrollLayout = cmds.paneLayout("scrollLayout", configuration="vertical4", separatorThickness=5.0, width=400, parent=jointDisplayMainLayout)
+        boneColumnLayout = cmds.columnLayout('boneColumnLayout', columnOffset=('both', 1), adjustableColumn=True, parent=scrollLayout)
+        multiColumnLayout = cmds.columnLayout('multiColumnLayout', columnOffset=('both', 1), adjustableColumn=True, parent=scrollLayout)
+        noneColumnLayout = cmds.columnLayout('noneColumnLayout', columnOffset=('both', 1), adjustableColumn=True, parent=scrollLayout)
+        jointColumnLayout = cmds.columnLayout('jointColumnLayout', columnOffset=('both', 1), adjustableColumn=True, parent=scrollLayout)
+        cmds.text('boneTitleTXT', label='Bone', font="boldLabelFont", parent=boneColumnLayout)
+        cmds.text('multiChildTitleTXT', label='Multi-Child as box', font="boldLabelFont", parent=multiColumnLayout)
+        cmds.text('noneTitleTXT', label='None', font="boldLabelFont", parent=noneColumnLayout)
+        cmds.text('jointTitleTXT', label='Joint', font="boldLabelFont", parent=jointColumnLayout)
+        cmds.separator(style='none', height=5, parent=boneColumnLayout)
+        cmds.separator(style='none', height=5, parent=multiColumnLayout)
+        cmds.separator(style='none', height=5, parent=noneColumnLayout)
+        cmds.separator(style='none', height=5, parent=jointColumnLayout)
+        self.boneFieldcolumn = cmds.textScrollList(self.allBoardList[0], enable=True, parent=boneColumnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True, height=300)
+        self.multiChildFieldcolumn = cmds.textScrollList(self.allBoardList[1], enable=True, parent=multiColumnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True, height=300)
+        self.noneFieldcolumn = cmds.textScrollList(self.allBoardList[2],enable=True, parent=noneColumnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True, height=300)
+        self.jointFieldcolumn = cmds.textScrollList(self.allBoardList[3],enable=True, parent=jointColumnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True, height=300)
     
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout, adjustableColumn=True)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True, numberOfColumns=3, columnWidth=[(1, 160), (2, 100), (3, 160)], columnOffset=[(1, "both", 5), (2, "both", 80), (3, "both", 5)], adjustableColumn=2, parent=jointDisplayMainLayout)
         
         # defining move buttons
-        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft, parent=buttonLayout)
-        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
+        cmds.button("moveRightBT", label=self.dpUIinst.lang['c034_move']+' >>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
         self.chabgeAllToMenu = cmds.optionMenu('chabgeAllTo',label=self.dpUIinst.lang['i359_changeTo']+' :', width = 200, parent=buttonLayout, changeCommand= self.chabgeAllToButton)
         cmds.menuItem( label='Bone', parent=self.chabgeAllToMenu)
         cmds.menuItem( label='Multi-Child as box', parent=self.chabgeAllToMenu )
         cmds.menuItem( label='None', parent=self.chabgeAllToMenu )
         cmds.menuItem( label='Joint', parent=self.chabgeAllToMenu )
-        
-        cmds.button("cancel", label=self.dpUIinst.lang['c109_close'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpCloseJointDisplayUI, parent=buttonLayout)
-        cmds.separator(style='none', height=10, parent=buttonLayout)
+        cmds.button("moveLeftBT", label='<< '+self.dpUIinst.lang['c034_move'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft, parent=buttonLayout)
 
         # call dpJointDisplayUI Window:
         cmds.showWindow(dpJointDisplayWin)
