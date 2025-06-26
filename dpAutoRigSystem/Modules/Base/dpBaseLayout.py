@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_BASELAYOUT_VERSION = 2.6
+DP_BASELAYOUT_VERSION = 2.7
 
 
 class BaseLayout(object):
@@ -100,6 +100,7 @@ class BaseLayout(object):
                 self.deformerExists = cmds.objExists(self.moduleGrp+".deformer")
                 self.facialExists = cmds.objExists(self.moduleGrp+".facial")
                 self.deformedByExists = cmds.objExists(self.moduleGrp+".deformedBy")
+                self.jawExists = cmds.objExists(self.moduleGrp+".jaw")
                 
                 # UI
                 # edit label of frame layout:
@@ -214,18 +215,13 @@ class BaseLayout(object):
                     
                 # create eyelid layout:
                 if self.eyelidExists:
-                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="selectedModuleColumn" )
+                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="selectedModuleColumn")
                     cmds.text(" ", parent=self.eyelidLayout)
-                    eyelidValue = cmds.getAttr(self.moduleGrp+".eyelid")
-                    self.eyelidCB = cmds.checkBox(label=self.dpUIinst.lang['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.eyelidLayout)
-                    lidPivotValue = cmds.getAttr(self.moduleGrp+".lidPivot")
-                    self.lidPivotCB = cmds.checkBox(label=self.dpUIinst.lang['i283_pivot'], value=lidPivotValue, changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
-                    specValue = cmds.getAttr(self.moduleGrp+".specular")
-                    self.specCB = cmds.checkBox(label=self.dpUIinst.lang['i184_specular'], value=specValue, changeCommand=self.changeSpecular, parent=self.eyelidLayout)
-                    irisValue = cmds.getAttr(self.moduleGrp+".iris")
-                    self.irisCB = cmds.checkBox(label=self.dpUIinst.lang['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.eyelidLayout)
-                    pupilValue = cmds.getAttr(self.moduleGrp+".pupil")
-                    self.pupilCB = cmds.checkBox(label=self.dpUIinst.lang['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.eyelidLayout)
+                    self.eyelidCB = cmds.checkBox(label=self.dpUIinst.lang['i079_eyelid'], value=cmds.getAttr(self.moduleGrp+".eyelid"), changeCommand=self.changeEyelid, parent=self.eyelidLayout)
+                    self.lidPivotCB = cmds.checkBox(label=self.dpUIinst.lang['i283_pivot'], value=cmds.getAttr(self.moduleGrp+".lidPivot"), changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
+                    self.specCB = cmds.checkBox(label=self.dpUIinst.lang['i184_specular'], value=cmds.getAttr(self.moduleGrp+".specular"), changeCommand=self.changeSpecular, parent=self.eyelidLayout)
+                    self.irisCB = cmds.checkBox(label=self.dpUIinst.lang['i080_iris'], value=cmds.getAttr(self.moduleGrp+".iris"), changeCommand=self.changeIris, parent=self.eyelidLayout)
+                    self.pupilCB = cmds.checkBox(label=self.dpUIinst.lang['i081_pupil'], value=cmds.getAttr(self.moduleGrp+".pupil"), changeCommand=self.changePupil, parent=self.eyelidLayout)
                 
                 # create geometry layout:
                 if self.geoExists:
@@ -264,6 +260,15 @@ class BaseLayout(object):
                     currentFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
                     if currentFatherB:
                         cmds.textField(self.fatherBTF, edit=True, text=currentFatherB, parent=self.fatherBColumn)
+                
+                # head items layout
+                if self.jawExists:
+                    self.headItemsLayout = cmds.rowLayout('headItemsLayout', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent="selectedModuleColumn")
+                    cmds.text(" ", parent=self.headItemsLayout)
+                    self.jawCB = cmds.checkBox(label=self.dpUIinst.lang['c025_jaw'], value=cmds.getAttr(self.moduleGrp+".jaw"), changeCommand=self.changeJaw, parent=self.headItemsLayout)
+                    self.chinCB = cmds.checkBox(label=self.dpUIinst.lang['c026_chin'], value=cmds.getAttr(self.moduleGrp+".chin"), changeCommand=self.changeChin, parent=self.headItemsLayout)
+                    self.lipsCB = cmds.checkBox(label=self.dpUIinst.lang['c062_lips'], value=cmds.getAttr(self.moduleGrp+".lips"), changeCommand=self.changeLips, parent=self.headItemsLayout)
+                    self.upperHeadCB = cmds.checkBox(label=self.dpUIinst.lang['c044_upper']+" "+self.dpUIinst.lang['c024_head'], value=cmds.getAttr(self.moduleGrp+".upperHead"), changeCommand=self.changeUpperHead, parent=self.headItemsLayout)
                 
                 # create degree layout:
                 if self.degreeExists:
@@ -369,6 +374,7 @@ class BaseLayout(object):
                     cmds.radioCollection(self.facialTypeRC, edit=True, select=bs)
                     if userType:
                         cmds.radioCollection(self.facialTypeRC, edit=True, select=jnt)
+                    
                     
                 if self.deformedByExists:
                     self.deformedByLayout = cmds.rowLayout('deformedByLayout', numberOfColumns=3, columnWidth3=(100, 170, 30), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )

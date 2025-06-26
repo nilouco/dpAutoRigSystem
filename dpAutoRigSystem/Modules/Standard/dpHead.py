@@ -11,7 +11,12 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
-DP_HEAD_VERSION = 3.1
+JAW = "jaw"
+CHIN = "chin"
+LIPS = "lips"
+UPPERHEAD = "upperHead"
+
+DP_HEAD_VERSION = 3.2
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -48,10 +53,13 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.addAttr(self.moduleGrp, longName="deformer", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="facial", attributeType='bool')
         for attr in self.facialAttrList:
-            cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool')
-            cmds.setAttr(self.moduleGrp+"."+attr, 1)
+            cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool', defaultValue=1)
         cmds.addAttr(self.moduleGrp, longName="connectUserType", attributeType='long', defaultValue=0) #bs
-
+        cmds.addAttr(self.moduleGrp, longName=JAW, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.moduleGrp, longName=CHIN, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.moduleGrp, longName=LIPS, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.moduleGrp, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
+        
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
         self.cvHeadLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Head", r=0.4, d=1, guide=True)
@@ -317,6 +325,30 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.moduleGrp+"."+attr, cbValue)
         cmds.setAttr(self.facialLocDic[attr]+".visibility", cbValue)
 
+
+    def changeJaw(self, value, *args):
+        """
+        """
+        print("wip jaw")
+
+
+    def changeChin(self, value, *args):
+        """
+        """
+        print("wip chin")
+        
+
+    def changeLips(self, value, *args):
+        """
+        """
+        print("wip lips")
+        
+
+    def changeUpperHead(self, value, *args):
+        """
+        """
+        print("wip upperHead")
+        
 
     def setupJawMove(self, attrCtrl, openCloseID, positiveRotation=True, axis="Y", intAttrID="c049_intensity", invertRot=False, createOutput=False, fixValue=0.01, *args):
         """ Create the setup for move jaw group when jaw control rotates for open or close adjustements.
