@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-23",
+    "_updated"    : "2025-06-25",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
@@ -19,12 +19,13 @@
     "UnlockNormals"             : true,
     "VaccineCleaner"            : true,
 
-    "CycleChecker"              : true,
+    "BindPoseCleaner"           : true,
     "BrokenNetCleaner"          : true,
     "Cleanup"                   : true,
     "ColorSetCleaner"           : true,
     "ControllerTag"             : true,
     "ControlsHierarchy"         : true,
+    "CycleChecker"              : true,
     "DisplayLayers"             : true,
     "ExitEditMode"              : true,
     "EnvelopeChecker"           : true,

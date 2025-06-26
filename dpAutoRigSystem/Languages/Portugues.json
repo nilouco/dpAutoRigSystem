@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-23",
+    "_updated"       : "2025-06-25",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -952,6 +952,8 @@
     "v105_cycleChecker"              : "Verificador de ciclos",
     "v106_cycleCheckerDesc"          : "Esse validador vai verificar se existem erros de ciclo no arquivo\nIrá apenas vefiricar e nos informar sobre isso\nporque esse tema é muito complexo para ser corrigido\nautomaticamente no momento, desculpe.",
     "v107_passthroughAttributes"     : "Atributos de passagem",
-    "v108_passthroughAttributesDesc" : "Esse validador vai verificar se existem atributos\ndesnecessários entre as conexões.\nSe sim, mudará (a -> b -> c) para (a -> c)."
+    "v108_passthroughAttributesDesc" : "Esse validador vai verificar se existem atributos\ndesnecessários entre as conexões.\nSe sim, mudará (a -> b -> c) para (a -> c).",
+    "v113_bindPoseCleaner"           : "BindPose limpador",
+    "v114_bindPoseCleanerDesc"       : "Esse validador vai verificar se existem nodes de bindPose\nna cena. Se sim, ele vai deleta-los e criar\napenas um node para todos os joints skinados."
     
 }

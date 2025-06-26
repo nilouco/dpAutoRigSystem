@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2025-06-23",
+    "_updated"    : "2025-06-25",
 
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,
@@ -19,12 +19,13 @@
     "UnlockNormals"             : false,
     "VaccineCleaner"            : false,
 
-    "CycleChecker"              : true,
+    "BindPoseCleaner"           : true,
     "BrokenNetCleaner"          : true,
     "Cleanup"                   : true,
     "ColorSetCleaner"           : true,
     "ControllerTag"             : true,
     "ControlsHierarchy"         : true,
+    "CycleChecker"              : true,
     "DisplayLayers"             : true,
     "ExitEditMode"              : true,
     "EnvelopeChecker"           : true,
