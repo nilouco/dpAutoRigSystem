@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-23",
+    "_updated"    : "2025-06-26",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
@@ -36,6 +36,7 @@
     "ProxyCreator"              : true,
     "PruneSkinWeights"          : true,
     "ResetPose"                 : true,
+    "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
     "UnknownNodesCleaner"       : true,

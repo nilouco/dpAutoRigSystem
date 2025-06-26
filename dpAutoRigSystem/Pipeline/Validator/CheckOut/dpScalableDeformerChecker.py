@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
@@ -36,6 +35,7 @@ class ScalableDeformerChecker(dpBaseAction.ActionStartClass):
         # starting
         self.firstMode = firstMode
         self.cleanUpToStart()
+        self.rigScaleOutputAttr = "rigScaleOutput"
         
         # ---
         # --- validator code --- beginning
@@ -45,47 +45,51 @@ class ScalableDeformerChecker(dpBaseAction.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type=['skinCluster', 'deltaMush'])
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                rigScaleOutput = ['Option_Ctrl.rigScaleOutput']          
-                itemAttrToFixList = []
-                for node in toCheckList:
-                    nodeType = cmds.objectType(node)
-                    # check skinCluster nodes and connections
-                    if nodeType == "skinCluster":
-                        skinMethod = cmds.getAttr(node + ".skinningMethod")
-                        if skinMethod != 0: # If it's not "Classic Linear"
-                            if cmds.getAttr(node + ".dqsSupportNonRigid") == False:
-                                itemAttrToFixList.append(node+".dqsSupportNonRigid")
-                            for attrDqs in ["dqsScaleX", "dqsScaleY", "dqsScaleZ"]:
-                                scConnection = cmds.listConnections(node+"."+attrDqs, source=True, destination=True, plugs=True)
-                                if scConnection != rigScaleOutput:
-                                    itemAttrToFixList.append(node+"."+attrDqs)
-                    # check deltaMush nodes and connections
-                    elif nodeType == "deltaMush":
-                        for attr in ["scaleX", "scaleY", "scaleZ"]:
-                            dmConection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
-                            if dmConection != rigScaleOutput:
-                                itemAttrToFixList.append(node+"."+attr)
-                if itemAttrToFixList:
-                    for itemAttr in itemAttrToFixList:
-                        self.checkedObjList.append(itemAttr)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                if itemAttr.endswith("dqsSupportNonRigid"):
-                                    # check non-rigid support attribute
-                                    cmds.setAttr(itemAttr, True)
-                                else:
-                                    # connect the rigScaleOutput to the deformer scale attributes
-                                    cmds.connectAttr(rigScaleOutput[0], itemAttr, force=True)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+itemAttr)
-                            except:
+                optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+                if optionCtrl:
+                    self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                    rigScaleOutput = [optionCtrl+"."+self.rigScaleOutputAttr]
+                    itemAttrToFixList = []
+                    for node in toCheckList:
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        nodeType = cmds.objectType(node)
+                        # check skinCluster nodes and connections
+                        if nodeType == "skinCluster":
+                            if cmds.getAttr(node+".skinningMethod") != 0: # If it's not "Classic Linear"
+                                if cmds.getAttr(node+".dqsSupportNonRigid") == False:
+                                    itemAttrToFixList.append(node+".dqsSupportNonRigid")
+                                for attrDqs in ["dqsScaleX", "dqsScaleY", "dqsScaleZ"]:
+                                    scConnection = cmds.listConnections(node+"."+attrDqs, source=True, destination=True, plugs=True)
+                                    if scConnection != rigScaleOutput:
+                                        itemAttrToFixList.append(node+"."+attrDqs)
+                        # check deltaMush nodes and connections
+                        elif nodeType == "deltaMush":
+                            for attr in ["scaleX", "scaleY", "scaleZ"]:
+                                dmConnection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
+                                if dmConnection != rigScaleOutput:
+                                    itemAttrToFixList.append(node+"."+attr)
+                    if itemAttrToFixList:
+                        for itemAttr in itemAttrToFixList:
+                            self.checkedObjList.append(itemAttr)
+                            self.foundIssueList.append(True)
+                            if self.firstMode:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+itemAttr)
-                            cmds.select(clear=True)
+                            else: #fix
+                                try:
+                                    if itemAttr.endswith("dqsSupportNonRigid"):
+                                        # check non-rigid support attribute
+                                        cmds.setAttr(itemAttr, True)
+                                    else:
+                                        # connect the rigScaleOutput to the deformer scale attributes
+                                        cmds.connectAttr(rigScaleOutput[0], itemAttr, force=True)
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+itemAttr)
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+itemAttr)
+                                cmds.select(clear=True)
+                else:
+                    self.notFoundNodes("Option_Ctrl")
             else:
                 self.notFoundNodes()
         else:
