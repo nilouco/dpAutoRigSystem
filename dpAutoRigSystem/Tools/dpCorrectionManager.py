@@ -14,7 +14,7 @@ ICON = "/Icons/dp_correctionManager.png"
 ANGLE = "Angle"
 DISTANCE = "Distance"
 
-DP_CORRECTIONMANAGER_VERSION = 2.9
+DP_CORRECTIONMANAGER_VERSION = 2.11
 
 
 class CorrectionManager(object):
@@ -358,6 +358,7 @@ class CorrectionManager(object):
                 cmds.connectAttr(rivetNode+".message", self.net+"."+toAttach+"_Rivet", force=True)
             else:
                 cmds.parentConstraint(toAttach, grp, maintainOffset=False, name=grp+"_PaC")
+                cmds.scaleConstraint(toAttach, grp, maintainOffset=True, name=grp+"_ScC")
             cmds.parent(grp, self.utils.getNodeByMessage("correctionDataGrp", self.net))
             return loc
         else:
