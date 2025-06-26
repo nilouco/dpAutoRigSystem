@@ -953,7 +953,7 @@
     "v106_cycleCheckerDesc"             : "Ce validateur vérifiera s'il y a des erreurs de cycle dans la scene.\nIl va just nous informer par rapport ça.\nparce que c'est trop dificille de corriger ça automaticament\na ce moment, désolé.",
 
 
-    "v109_scalableDeformerChecker"      : "Déformateurs évolutifs",
+    "v109_scalableDeformerChecker"      : "Vérificateur déformateurs évolutifs",
     "v110_scalableDeformerCheckerDesc"  : "Ce validateur vérifie s'il existe des déformateurs avec des \nconnexions évolutives dans la scène. \nIl vérifie et corrige les connexions évolutives \naux déformateurs : skinCluster et deltaMush."
     
 }

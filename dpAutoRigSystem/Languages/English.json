@@ -954,7 +954,7 @@
     "v106_cycleCheckerDesc"             : "This validator will verify if there are\ncycle errors in the scene.\nIt'll only verify and let us know about it\nbecause this theme is very complex to fix automatically\nat the moment, sorry.",
 
 
-    "v109_scalableDeformerChecker"      : "Scalable Deformers",
+    "v109_scalableDeformerChecker"      : "Scalable deformer checker",
     "v110_scalableDeformerCheckerDesc"  : "This validator will verify if there are\ndeformers with scalable connections in the scene.\nIt'll check and fix the scalable connections\nto deformers: skinCluster and deltaMush."
     
 }

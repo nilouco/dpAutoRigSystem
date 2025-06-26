@@ -75,8 +75,10 @@ class ScalableDeformerChecker(dpBaseAction.ActionStartClass):
                         else: #fix
                             try:
                                 if itemAttr.endswith("dqsSupportNonRigid"):
+                                    # check non-rigid support attribute
                                     cmds.setAttr(itemAttr, True)
                                 else:
+                                    # connect the rigScaleOutput to the deformer scale attributes
                                     cmds.connectAttr(rigScaleOutput[0], itemAttr, force=True)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+itemAttr)

@@ -953,7 +953,7 @@
     "v106_cycleCheckerDesc"             : "Esse validador vai verificar se existem erros de ciclo no arquivo\nIrá apenas vefiricar e nos informar sobre isso\nporque esse tema é muito complexo para ser corrigido\nautomaticamente no momento, desculpe.",
 
 
-    "v109_scalableDeformerChecker"      : "Deformadores Escaláveis",
+    "v109_scalableDeformerChecker"      : "Verificador de deformadores escaláveis",
     "v110_scalableDeformerCheckerDesc"  : "Este validador verificará se há\ndeformadores com conexões escaláveis na cena.\nEle verificará e corrigirá as conexões escaláveis\nnos deformadores: skinCluster e deltaMush."
     
 }
