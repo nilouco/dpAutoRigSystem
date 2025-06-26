@@ -12,6 +12,7 @@ dpUnusedNodeCleaner
 dpPruneSkinWeights
 dpUnusedSkinCleaner
 dpEnvelopeChecker
+dpScalableDeformerChecker
 dpWIPCleaner
 dpExitEditMode
 dpHideCorrectives
