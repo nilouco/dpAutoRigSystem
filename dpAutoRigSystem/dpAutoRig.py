@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.21"
+DPAR_VERSION_5 = "5.00.18"
 DPAR_UPDATELOG = "N903 - Scalable deformer checker new checkout validator module."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 

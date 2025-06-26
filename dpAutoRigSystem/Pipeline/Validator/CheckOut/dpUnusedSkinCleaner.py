@@ -42,7 +42,7 @@ class UnusedSkinCleaner(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = cmds.ls(selection=False, type=["skinCluster", "deltaMush"])
+                toCheckList = cmds.ls(selection=False, type="skinCluster")
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
