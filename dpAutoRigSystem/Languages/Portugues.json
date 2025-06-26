@@ -951,6 +951,8 @@
     "v104_pruneSkinWeightsDesc"        : "Esse validador vai verificar se existem pequenos pesos de skin\npara apara-los.",
     "v105_cycleChecker"                : "Verificador de ciclos",
     "v106_cycleCheckerDesc"            : "Esse validador vai verificar se existem erros de ciclo no arquivo\nIrá apenas vefiricar e nos informar sobre isso\nporque esse tema é muito complexo para ser corrigido\nautomaticamente no momento, desculpe.",
+    "v107_passthroughAttributes"       : "Atributos de passagem",
+    "v108_passthroughAttributesDesc"   : "Esse validador vai verificar se existem atributos\ndesnecessários entre as conexões.\nSe sim, mudará (a -> b -> c) para (a -> c).",
     "v109_scalableDeformerChecker"     : "Deformadores escaláveis",
     "v110_scalableDeformerCheckerDesc" : "Este validador verificará se há\ndeformadores com conexões escaláveis na cena.\nEle verificará e corrigirá as conexões escaláveis\nnos deformadores: skinCluster e deltaMush."
     
