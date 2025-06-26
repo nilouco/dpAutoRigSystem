@@ -266,8 +266,8 @@ class BaseLayout(object):
                     self.headItemsLayout = cmds.rowLayout('headItemsLayout', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent="selectedModuleColumn")
                     cmds.text(" ", parent=self.headItemsLayout)
                     self.jawCB = cmds.checkBox(label=self.dpUIinst.lang['c025_jaw'], value=cmds.getAttr(self.moduleGrp+".jaw"), changeCommand=self.changeJaw, parent=self.headItemsLayout)
-                    self.chinCB = cmds.checkBox(label=self.dpUIinst.lang['c026_chin'], value=cmds.getAttr(self.moduleGrp+".chin"), changeCommand=self.changeChin, parent=self.headItemsLayout)
-                    self.lipsCB = cmds.checkBox(label=self.dpUIinst.lang['c062_lips'], value=cmds.getAttr(self.moduleGrp+".lips"), changeCommand=self.changeLips, parent=self.headItemsLayout)
+                    self.chinCB = cmds.checkBox(label=self.dpUIinst.lang['c026_chin'], value=cmds.getAttr(self.moduleGrp+".chin"), changeCommand=self.changeChin, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
+                    self.lipsCB = cmds.checkBox(label=self.dpUIinst.lang['c062_lips'], value=cmds.getAttr(self.moduleGrp+".lips"), changeCommand=self.changeLips, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
                     self.upperHeadCB = cmds.checkBox(label=self.dpUIinst.lang['c044_upper']+" "+self.dpUIinst.lang['c024_head'], value=cmds.getAttr(self.moduleGrp+".upperHead"), changeCommand=self.changeUpperHead, parent=self.headItemsLayout)
                 
                 # create degree layout:
@@ -335,13 +335,13 @@ class BaseLayout(object):
 
                 if self.deformerExists:
                     self.deformerLayout = cmds.rowLayout('deformerLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.dpUIinst.lang['c097_deformer'].capitalize(), parent=self.deformerLayout)
+                    self.deformerTxt = cmds.text(self.dpUIinst.lang['c097_deformer'].capitalize(), parent=self.deformerLayout)
                     self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.moduleGrp+".deformer"), changeCommand=self.changeDeformer, parent=self.deformerLayout)
                 
                 # create head facial controllers layout:
                 if self.facialExists:
                     self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), parent=self.facialLayout)
+                    self.facialTxt = cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), parent=self.facialLayout)
                     facialValue = cmds.getAttr(self.moduleGrp+".facial")
                     self.facialCB = cmds.checkBox('facialCB', label="", value=facialValue, changeCommand=self.changeFacial, parent=self.facialLayout)
                     collapsed = False

@@ -85,18 +85,18 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # create jointGuides:
         self.jGuideNeck0 = cmds.joint(name=self.guideName+"_JGuideNeck0", radius=0.001)
         self.jGuideHead = cmds.joint(name=self.guideName+"_JGuideHead", radius=0.001)
-        self.jGuideUpperJaw = cmds.joint(name=self.guideName+"_jGuideUpperJaw", radius=0.001)
-        self.jGuideUpperLip = cmds.joint(name=self.guideName+"_jGuideUpperLip", radius=0.001)
+        self.jGuideUpperJaw = cmds.joint(name=self.guideName+"_JGuideUpperJaw", radius=0.001)
+        self.jGuideUpperLip = cmds.joint(name=self.guideName+"_JGuideUpperLip", radius=0.001)
         cmds.select(self.jGuideUpperJaw)
-        self.jGuideUpperHead = cmds.joint(name=self.guideName+"_jGuideUpperHead", radius=0.001)
+        self.jGuideUpperHead = cmds.joint(name=self.guideName+"_JGuideUpperHead", radius=0.001)
         cmds.select(self.jGuideHead)
         self.jGuideJaw  = cmds.joint(name=self.guideName+"_JGuideJaw", radius=0.001)
         self.jGuideChin = cmds.joint(name=self.guideName+"_JGuideChin", radius=0.001)
         self.jGuideChew = cmds.joint(name=self.guideName+"_JGuideChew", radius=0.001)
         cmds.select(self.jGuideChin)
-        self.jGuideLowerLip = cmds.joint(name=self.guideName+"_jGuideLowerLip", radius=0.001)
+        self.jGuideLowerLip = cmds.joint(name=self.guideName+"_JGuideLowerLip", radius=0.001)
         cmds.select(self.jGuideJaw)
-        self.jGuideLLip = cmds.joint(name=self.guideName+"_jGuideLLip", radius=0.001)
+        self.jGuideLLip = cmds.joint(name=self.guideName+"_JGuideLLip", radius=0.001)
         # set jointGuides as templates:
         jGuideList = [self.jGuideNeck0, self.jGuideHead, self.jGuideUpperJaw, self.jGuideUpperHead, self.jGuideJaw, self.jGuideChin, self.jGuideChew, self.jGuideUpperLip, self.jGuideLowerLip]
         for jGuide in jGuideList:
@@ -326,28 +326,61 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.facialLocDic[attr]+".visibility", cbValue)
 
 
-    def changeJaw(self, value, *args):
+    def setChangeFacial(self, value, *args):
+        """ Set display of facial controllers.
         """
-        """
-        print("wip jaw")
+        cmds.checkBox(self.facialCB, edit=True, enable=value)
+        cmds.text(self.facialTxt, edit=True, enable=value)
+        if not value:
+            self.changeFacial(value)
+            cmds.checkBox(self.facialCB, edit=True, value=False)
 
+
+    def changeJaw(self, value, *args):
+        """ Change creation for Jaw.
+            Affects: Chin, Chew, UpperLip, LowerLip, LipsSide, UpperJaw, LowerJaw.
+        """
+        cmds.setAttr(self.cvJawLoc+".visibility", value)
+        cmds.setAttr(self.jGuideHead+".visibility", value)
+        self.changeLips(value)
+        self.changeChin(value)
+        cmds.checkBox(self.lipsCB, edit=True, value=value, enable=value)
+        cmds.checkBox(self.chinCB, edit=True, value=value, enable=value)
+        cmds.setAttr(self.moduleGrp+"."+JAW, value)
+        self.setChangeFacial(value)
+        
 
     def changeChin(self, value, *args):
+        """ Change creation for Chin.
+            Affects: Chew, LoweLip.
         """
-        """
-        print("wip chin")
+        cmds.setAttr(self.cvChinLoc+".visibility", value)
+        cmds.setAttr(self.moduleGrp+"."+CHIN, value)
+        self.setChangeFacial(value)
         
 
     def changeLips(self, value, *args):
+        """ Change creation for Lips.
+            Affects: UpperLip, LowerLip, LipsSide
         """
-        """
-        print("wip lips")
+        cmds.setAttr(self.cvLCornerLipLoc+".visibility", value)
+        cmds.setAttr(self.cvRCornerLipLoc+".visibility", value)
+        cmds.setAttr(self.cvUpperLipLoc+".visibility", value)
+        cmds.setAttr(self.cvLowerLipLoc+".visibility", value)
+        cmds.setAttr(self.jGuideJaw+".visibility", value)
+        cmds.setAttr(self.jGuideUpperJaw+".visibility", value)
+        cmds.setAttr(self.moduleGrp+"."+LIPS, value)
+        self.setChangeFacial(value)
         
 
     def changeUpperHead(self, value, *args):
+        """ Change creation for UpperHead.
         """
-        """
-        print("wip upperHead")
+        cmds.setAttr(self.cvUpperJawLoc+".visibility", value)
+        cmds.setAttr(self.jGuideUpperJaw+".visibility", value)
+        cmds.checkBox(self.deformerCB, edit=True, enable=value)
+        cmds.text(self.deformerTxt, edit=True, enable=value)
+        self.setChangeFacial(value)
         
 
     def setupJawMove(self, attrCtrl, openCloseID, positiveRotation=True, axis="Y", intAttrID="c049_intensity", invertRot=False, createOutput=False, fixValue=0.01, *args):
@@ -512,6 +545,9 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.cvDeformerCenterLoc = side+middle+guide+"_DeformerCenter"
         self.cvDeformerRadiusLoc = side+middle+guide+"_DeformerRadius"
         self.deformerCube = side+middle+guide+"_DeformerCube_Geo"
+        self.jGuideJaw = side+middle+guide+"_JGuideJaw"
+        self.jGuideHead = side+middle+guide+"_JGuideHead"
+        self.jGuideUpperJaw = side+middle+guide+"_JGuideUpperJaw"
         
 
     def rigModule(self, *args):
