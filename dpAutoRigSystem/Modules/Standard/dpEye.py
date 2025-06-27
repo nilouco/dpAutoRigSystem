@@ -15,7 +15,7 @@ PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
 
-DP_EYE_VERSION = 2.4
+DP_EYE_VERSION = 2.5
 
 
 class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -433,7 +433,8 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # joint position:
         cmds.delete(cmds.parentConstraint(cvLoc, mainJnt, maintainOffset=False))
         # create end joint:
-        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang[codeName]+"_JEnd", scaleCompensate=False, radius=0.5)
+        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang[codeName]+"_"+self.dpUIinst.jointEndAttr, scaleCompensate=False, radius=0.5)
+        self.utils.addJointEndAttr([endJoint])
         cmds.delete(cmds.parentConstraint(mainJnt, endJoint, maintainOffset=False))
         cmds.setAttr(endJoint+".translateZ", self.ctrlRadius)
         # creating control:
@@ -545,7 +546,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ctrls.setLockHide([self.fkEyeCtrl], ['tx', 'ty', 'tz'])
                 # create end joint:
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 cmds.parent(self.endJoint, self.jnt, absolute=True)
                 # create parent and scale constraint from ctrl to jxt:
@@ -589,7 +590,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # jointScale position:
                 cmds.delete(cmds.parentConstraint(self.guide, self.eyeScaleJnt, maintainOffset=False))
                 # create endScale joint:
-                self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_JEnd", radius=0.5)
+                self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_"+self.dpUIinst.jointEndAttr, radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.eyeScaleJnt, self.endScaleJoint, maintainOffset=False))
                 cmds.setAttr(self.endScaleJoint+".translateZ", self.ctrlRadius)
                 if s == 1:
@@ -600,6 +601,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.scaleConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=True, name=self.eyeScaleJnt+"_ScC")
                 self.eyeScaleGrp = cmds.group(self.eyeScaleJnt, name=self.eyeScaleJnt+"_Grp")
                 self.eyeScaleGrpList.append(self.eyeScaleGrp)
+                self.utils.addJointEndAttr([self.endJoint, self.endScaleJoint])
                 
                 # create specular setup:
                 if self.getModuleAttr(SPEC):
@@ -615,7 +617,8 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.eyeSpecScaleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"Specular_2")
                     cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", self.ctrlRadius)
                     # create endSpecular joint:
-                    self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_JEnd", radius=0.5)
+                    self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                    self.utils.addJointEndAttr([self.endSpecJoint])
                     cmds.setAttr(self.endSpecJoint+".translateZ", 0.2*self.ctrlRadius)
                     cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)
                     # specular control:
@@ -656,6 +659,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 translationList.append(k+w)
                             cmds.xform(self.eyeSpecScaleZeroGrp, translation=translationList, worldSpace=True)
                             cmds.xform(self.eyeSpecScaleZeroGrp, rotation=lEyeSpecScaleZeroGrpData["rotation"], worldSpace=True)
+                    
 
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):

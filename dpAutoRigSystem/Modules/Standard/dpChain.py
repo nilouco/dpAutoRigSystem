@@ -193,8 +193,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         renamedList = []
         for item in reversed(jntList):
             if cmds.objectType(item) == "joint":
-                if "_JEnd" in item:
-                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_JEnd", toName+"_JEnd"))
+                if self.dpUIinst.jointEndAttr in cmds.listAttr(item):
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_"+self.dpUIinst.jointEndAttr, toName+"_"+self.dpUIinst.jointEndAttr))
                     renamedList.append(newName)
                     continue
                 elif "_Jax" in item:
@@ -232,7 +232,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dynJntList = self.clearRenameJointChain(dynJntList, "_Fk", "_Dyn")
         dynJntList.insert(0, firstDynJnt)
         self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
-        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_JEnd")
+        self.utils.addJointEndAttr([self.skinJointList[-1]])
+        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_"+self.dpUIinst.jointEndAttr)
         self.utils.removeUserDefinedAttr(self.skinJointList[:-1])
         newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
         cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
@@ -322,7 +323,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # creating joint chains:
                 self.chainDic = {}
                 self.jSuffixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt']
-                self.jEndSuffixList = ['_JEnd', '_Ik_JEnd', '_Fk_JEnd']
+                self.jEndSuffixList = ['_'+self.dpUIinst.jointEndAttr, '_Ik_'+self.dpUIinst.jointEndAttr, '_Fk_'+self.dpUIinst.jointEndAttr]
                 for t, suffix in enumerate(self.jSuffixList):
                     self.wipList = []
                     cmds.select(clear=True)
@@ -330,6 +331,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         newJoint = cmds.joint(name=side+self.userGuideName+"_%02d"%n+suffix)
                         self.wipList.append(newJoint)
                     jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSuffixList[t], radius=0.5)
+                    self.utils.addJointEndAttr([jEndJnt])
                     self.wipList.append(jEndJnt)
                     self.chainDic[suffix] = self.wipList
                 # getting jointLists:

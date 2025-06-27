@@ -16,7 +16,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_RIBBONCLASS_VERSION = 2.6
+DP_RIBBONCLASS_VERSION = 2.7
 
 
 class RibbonClass(object):
@@ -441,8 +441,8 @@ class RibbonClass(object):
         drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bottom_Jxt')
         drv_Jnt[1] = cmds.rename(drv_Jnt[1], name+'_Drv_Mid_Jxt')
         drv_Jnt[2] = cmds.rename(drv_Jnt[2], name+'_Drv_Top_Jxt')
-        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_JEnd')
-        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_JEnd')
+        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_'+self.dpUIinst.jointEndAttr)
+        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_'+self.dpUIinst.jointEndAttr)
         
         #place joints correctly accordaly with the user options choose
         if (horizontal and axis==(1, 0, 0)) or (horizontal and axis==(0, 0, 1)):
@@ -466,7 +466,8 @@ class RibbonClass(object):
         aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Rot_Jxt')[0])
         cmds.setAttr(aux_Jnt[0]+'.jointOrient', 0, 0, 0)
         cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 5)
-        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_JEnd')[0])
+        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_'+self.dpUIinst.jointEndAttr)[0])
+        self.utils.addJointEndAttr([drv_Jnt[3], drv_Jnt[4], aux_Jnt[-1]])
         
         cmds.parent(aux_Jnt[1], mid_Loc[3])
         cmds.setAttr(aux_Jnt[1]+'.translate', 0, 0, 0)

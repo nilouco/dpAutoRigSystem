@@ -11,7 +11,7 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
-DP_HEAD_VERSION = 3.1
+DP_HEAD_VERSION = 3.2
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -505,11 +505,11 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     headJntName = side+self.userGuideName+"_02_"+self.dpUIinst.lang['c024_head']+"_Jnt"
                 upperJawJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c025_jaw']+"_Jnt"
                 upperHeadJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head']+"_Jnt"
-                upperEndJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head']+"_JEnd"
+                upperEndJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head']+"_"+self.dpUIinst.jointEndAttr
                 jawJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c025_jaw']+"_Jnt"
                 chinJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c026_chin']+"_Jnt"
                 chewJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c048_chew']+"_Jnt"
-                endJntName = side+self.userGuideName+"_JEnd"
+                endJntName = side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr
                 lCornerLipJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['p002_left']+"_"+self.dpUIinst.lang['c043_corner']+self.dpUIinst.lang['c039_lip']+"_Jnt"
                 rCornerLipJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['p003_right']+"_"+self.dpUIinst.lang['c043_corner']+self.dpUIinst.lang['c039_lip']+"_Jnt"
                 upperLipJntName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip']+"_Jnt"
@@ -555,6 +555,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.chinJnt = cmds.joint(name=chinJntName, scaleCompensate=False)
                 self.chewJnt = cmds.joint(name=chewJntName, scaleCompensate=False)
                 self.endJnt  = cmds.joint(name=endJntName, scaleCompensate=False, radius=0.5)
+                self.utils.addJointEndAttr([upperEndJntName, endJntName])
                 cmds.select(self.headJnt)
                 self.lCornerLipJnt = cmds.joint(name=lCornerLipJntName, scaleCompensate=False)
                 cmds.select(self.headJnt)

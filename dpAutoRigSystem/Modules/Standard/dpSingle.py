@@ -9,7 +9,7 @@ TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
 
-DP_SINGLE_VERSION = 2.3
+DP_SINGLE_VERSION = 2.4
 
 
 class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -224,7 +224,8 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 # create end joint:
                 cmds.select(self.jnt)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                self.utils.addJointEndAttr([self.endJoint])
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
