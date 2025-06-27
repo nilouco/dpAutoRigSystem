@@ -6,7 +6,7 @@ from ....Modules.Base import dpBaseAction
 CLASS_NAME = "HideAllJoints"
 TITLE = "v115_hideAllJoints"
 DESCRIPTION = "v116_hideAllJointsDesc"
-ICON = "/Icons/dp_HideAllJoint.png"
+ICON = "/Icons/dp_hideAllJoints.png"
 
 DP_HIDEALLJOINTS_VERSION = 1.0
 
