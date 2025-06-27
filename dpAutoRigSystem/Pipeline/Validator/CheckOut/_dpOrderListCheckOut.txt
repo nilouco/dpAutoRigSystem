@@ -12,6 +12,7 @@ dpUnusedNodeCleaner
 dpPruneSkinWeights
 dpUnusedSkinCleaner
 dpEnvelopeChecker
+dpScalableDeformerChecker
 dpWIPCleaner
 dpExitEditMode
 dpHideCorrectives
@@ -19,6 +20,8 @@ dpControllerTag
 dpControlsHierarchy
 dpDisplayLayers
 dpResetPose
+dpJointEndCleaner
+dpBindPoseCleaner
 dpPassthroughAttributes
 dpProxyCreator
 dpCleanup

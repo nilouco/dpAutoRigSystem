@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.22"
+DPAR_VERSION_5 = "5.00.21"
 DPAR_UPDATELOG = "N892 - Scalable corrective issue fix."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
@@ -144,6 +144,7 @@ class Start(object):
         self.dpData = "dpData"
         self.dpLog = "dpLog"
         self.dpID = "dpID"
+        self.jointEndAttr = "JEnd"
         self.transformAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
         self.loadedPath = False
         self.loadedStandard = False

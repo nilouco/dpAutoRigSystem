@@ -9,7 +9,7 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
-DP_SPINE_VERSION = 2.4
+DP_SPINE_VERSION = 2.5
 
 
 class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
