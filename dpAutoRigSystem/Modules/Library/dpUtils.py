@@ -1526,3 +1526,21 @@ class Utils(object):
         if itemList:
             for item in itemList:
                 cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)
+        
+
+    def createLocatorInItemPosition(self, item, *args):
+        """Create a locator in the input item position
+            Return the created locator name.
+        """
+        if item:
+            posTemp = cmds.spaceLocator(name=item+"_LocTemp")[0]
+            cmds.matchTransform(posTemp, item, position=True, rotation=True)
+            return posTemp
+
+
+    def parentChildrenGuideTo(self, node, dest, *args):
+        """ Parent all node children guides to the given destination.
+        """
+        childrenGuideList = self.getGuideChildrenList(node)
+        if childrenGuideList:
+            cmds.parent(childrenGuideList, dest)

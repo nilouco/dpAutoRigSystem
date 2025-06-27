@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.21"
-DPAR_UPDATELOG = "N892 - Scalable corrective issue fix."
+DPAR_VERSION_5 = "5.00.22"
+DPAR_UPDATELOG = "N794 - Head items to create or not."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2958,17 +2958,21 @@ class Start(object):
                                 worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
                                 self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
                                 if bColorize:
-                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
-                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
-                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
-                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
+                                    if self.integratedTaskDic[moduleDic]['ctrlList']:
+                                        self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
+                                    if self.integratedTaskDic[moduleDic]['InnerCtrls']:
+                                        self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
+                                    if self.integratedTaskDic[moduleDic]['lCtrls']:
+                                        self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
+                                    if self.integratedTaskDic[moduleDic]['rCtrls']:
+                                        self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                             if self.facialCtrlGrpList:
                                 if not cmds.objExists(self.optionCtrl+"."+self.lang['c059_facial'].lower()):
                                     cmds.addAttr(self.optionCtrl, longName=self.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
                                     cmds.setAttr(self.optionCtrl+"."+self.lang['c059_facial'].lower(), channelBox=True)
                                 for facialCtrlGrp in self.facialCtrlGrpList:
                                     cmds.connectAttr(self.optionCtrl+"."+self.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
-                            
+                        
                         # integrate the Eye with the Head setup:
                         if moduleType == self.eyeName:
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
@@ -3176,15 +3180,16 @@ class Start(object):
                                 fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                 upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
                                 upperJawCtrl = self.integratedTaskDic[fatherGuide]['upperJawCtrlList'][0]
-                                ctrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][0]
-                                mainCtrl = self.integratedTaskDic[moduleDic]['mainCtrlList'][0]
-                                cmds.addAttr(mainCtrl, longName="spaceSwitch", attributeType="enum", en="Upper Jaw:Upper Head", keyable=True)
-                                revNode = cmds.createNode("reverse", name="Nose_SpaceSwitch_Rev")
-                                pac = cmds.parentConstraint(upperJawCtrl, upperCtrl, ctrlGrp, maintainOffset=True, name=ctrlGrp+"_PaC")[0]
-                                cmds.connectAttr(mainCtrl+".spaceSwitch", pac+"."+upperCtrl+"W1", force=True)
-                                cmds.connectAttr(mainCtrl+".spaceSwitch", revNode+".inputX", force=True)
-                                cmds.connectAttr(revNode+".outputX", pac+"."+upperJawCtrl+"W0", force=True)
-                                self.toIDList.extend([pac, revNode])
+                                if not upperJawCtrl == upperCtrl:
+                                    ctrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][0]
+                                    mainCtrl = self.integratedTaskDic[moduleDic]['mainCtrlList'][0]
+                                    cmds.addAttr(mainCtrl, longName="spaceSwitch", attributeType="enum", en="Upper Jaw:Upper Head", keyable=True)
+                                    revNode = cmds.createNode("reverse", name="Nose_SpaceSwitch_Rev")
+                                    pac = cmds.parentConstraint(upperJawCtrl, upperCtrl, ctrlGrp, maintainOffset=True, name=ctrlGrp+"_PaC")[0]
+                                    cmds.connectAttr(mainCtrl+".spaceSwitch", pac+"."+upperCtrl+"W1", force=True)
+                                    cmds.connectAttr(mainCtrl+".spaceSwitch", revNode+".inputX", force=True)
+                                    cmds.connectAttr(revNode+".outputX", pac+"."+upperJawCtrl+"W0", force=True)
+                                    self.toIDList.extend([pac, revNode])
                         
                         # worldRef of chain controlled by optionCtrl:
                         if moduleType == self.chainName:
