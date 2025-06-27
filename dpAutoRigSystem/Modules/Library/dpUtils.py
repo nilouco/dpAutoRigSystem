@@ -1528,3 +1528,11 @@ class Utils(object):
             posTemp = cmds.spaceLocator(name=item + "_LocTemp")[0]
             cmds.matchTransform(posTemp, item, position=True, rotation=True)
             return posTemp
+
+
+    def parentChildrenGuideTo(self, node, dest, *args):
+        """ Parent all node children guides to the given destination.
+        """
+        childrenGuideList = self.getGuideChildrenList(node)
+        if childrenGuideList:
+            cmds.parent(childrenGuideList, dest)
