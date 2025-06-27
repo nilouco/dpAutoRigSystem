@@ -520,6 +520,7 @@
     "i356_sVisibilityIOAnn"     : "Le dossier ou on va importer et exporter les donnés de visibilité.",
     "i357_putInfoFilePathHere"  : "Met le path du dossier de l'info de pipeline ici",
     "i358_batch"                : "Lot",
+    "i359_changeTo"             : "Changer pour",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -753,6 +754,8 @@
     "m230_proxyCreator"          : "Proxy createur",
     "m231_proxyCreatorDesc"      : "Ce module va creer a mesh proxy pour le rig courant.",
     "m232_morphDeformer"         : "Déformateur Morph",
+    "m233_jointDisplay"          : "Joint d'affichage",
+    "m234_jointDisplayDesc"      : "Modifier l'affichage des articulations dans la fenêtre",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
