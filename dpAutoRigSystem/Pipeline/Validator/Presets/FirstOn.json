@@ -30,6 +30,7 @@
     "EnvelopeChecker"           : false,
     "HideCorrectives"           : false,
     "HideDataGrp"               : false,
+    "dpJointEndCleaner"         : false,
     "KeyframeCleaner"           : false,
     "NgSkinToolsCleaner"        : false,
     "OutlinerCleaner"           : false,

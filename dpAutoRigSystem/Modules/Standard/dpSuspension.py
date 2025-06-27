@@ -9,7 +9,7 @@ TITLE = "m153_suspension"
 DESCRIPTION = "m154_suspensionDesc"
 ICON = "/Icons/dp_suspension.png"
 
-DP_SUSPENSION_VERSION = 2.1
+DP_SUSPENSION_VERSION = 2.2
 
 
 class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -99,7 +99,8 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.userGuideName+"_"+letter+"_1_Jnt", scaleCompensate=False)
-                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_JEnd", scaleCompensate=False, radius=0.5)
+                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.dpUIinst.jointEndAttr, scaleCompensate=False, radius=0.5)
+                    self.utils.addJointEndAttr([endJoint])
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:

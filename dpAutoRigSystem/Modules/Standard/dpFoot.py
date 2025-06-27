@@ -9,7 +9,7 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
-DP_FOOT_VERSION = 2.4
+DP_FOOT_VERSION = 2.5
 
 
 class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -167,15 +167,16 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.footJnt = cmds.joint(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_Jnt")
                 self.utils.setJointLabel(self.footJnt, s+self.jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
                 self.middleFootJxt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jxt")
-                self.endJnt = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
+                self.endJnt = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
                 cmds.select(clear=True)
                 self.middleFootJnt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jnt")
                 self.utils.setJointLabel(self.middleFootJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
-                self.endBJnt = cmds.joint(name=side+self.userGuideName+"B_JEnd", radius=0.5)
+                self.endBJnt = cmds.joint(name=side+self.userGuideName+"B_"+self.dpUIinst.jointEndAttr, radius=0.5)
                 cmds.parent(self.middleFootJnt, self.middleFootJxt)
                 cmds.addAttr(self.footJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.addAttr(self.middleFootJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(clear=True)
+                self.utils.addJointEndAttr([self.endJnt, self.endBJnt])
                 
                 #Deactivate the segment scale compensate on the bone to prevent scaling problem
                 #It will prevent a double scale problem that will come from the upper parent in the rig

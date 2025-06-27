@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.3
+DP_UTILS_VERSION = 3.4
 
 
 class Utils(object):
@@ -1520,11 +1520,9 @@ class Utils(object):
         return [n for n in cmds.ls(selection=False, shortNames=True) if "|" in n] or False
 
 
-    def createLocatorInItemPosition(self, item, *args):
-        """Create a locator in the input item position
-        Return the created locator name.
+    def addJointEndAttr(self, itemList, *args):
+        """ Create a jointEnd boolean attribute to the given list.
         """
-        if item:
-            posTemp = cmds.spaceLocator(name=item + "_LocTemp")[0]
-            cmds.matchTransform(posTemp, item, position=True, rotation=True)
-            return posTemp
+        if itemList:
+            for item in itemList:
+                cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)

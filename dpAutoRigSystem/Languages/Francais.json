@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-06-26",
+    "_updated"       : "2025-06-27",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -954,6 +954,8 @@
     "v107_passthroughAttributes"       : "Attributs de transfert",
     "v108_passthroughAttributesDesc"   : "Ce validateur vérifiera s'il existe des attributs\nsans connexions intermédiaires nécessaires.\nSi oui, il changera (a -> b -> c) pour (a -> c).",
     "v109_scalableDeformerChecker"     : "Scale de deformeurs",
-    "v110_scalableDeformerCheckerDesc" : "Ce validateur vérifie s'il existe des déformateurs avec des\nconnexions de scale dans la scène.\nIl vérifie et corrige les connexions de scale\naux déformateurs: skinCluster et deltaMush."
+    "v110_scalableDeformerCheckerDesc" : "Ce validateur vérifie s'il existe des déformateurs avec des\nconnexions de scale dans la scène.\nIl vérifie et corrige les connexions de scale\naux déformateurs: skinCluster et deltaMush.",
+    "v111_jointEndCleaner"             : "Joint End nerroyer",
+    "v112_jointEndCleanerDesc"         : "Ce validateur vérifiera s'il existe des joints non utilisés\nà la fin de la chain. Si oui, il va les effacer\nparce qu'ils ne sont pas utiles dans l'animation."
 
 }
