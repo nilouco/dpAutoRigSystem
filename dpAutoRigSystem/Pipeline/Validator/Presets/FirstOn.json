@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-24",
+    "_updated"    : "2025-06-26",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
@@ -38,6 +38,7 @@
     "ProxyCreator"              : false,
     "PruneSkinWeights"          : false,
     "ResetPose"                 : false,
+    "ScalableDeformerChecker"   : false,
     "SideCalibration"           : false,
     "TargetCleaner"             : false,
     "UnknownNodesCleaner"       : false,
