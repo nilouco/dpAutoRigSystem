@@ -6,7 +6,7 @@ from ....Modules.Base import dpBaseAction
 CLASS_NAME = "HideAllJoints"
 TITLE = "v109_hideAllJoints"
 DESCRIPTION = "v110_hideAllJointsDesc"
-ICON = "/Icons/dp_passthroughAttributes.png"
+ICON = "/Icons/dpHideAllJoint.png"
 
 DP_HIDEALLJOINTS_VERSION = 1.0
 
@@ -47,18 +47,14 @@ class HideAllJoints(dpBaseAction.ActionStartClass):
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    # conditional to check here
-                    if not item +'.drawStyle' == 0: # TODO validate task here
+                    if not cmds.getAttr(item +'.drawStyle') == 2:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                # TODO fix task here
-                                print(f'joint = {item}')
-                                cmds.setAttr(item +'.drawStyle', 0)
-                                print(f'{item} drawStyle set to 0')
+                                cmds.setAttr(item +'.drawStyle', 2)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
