@@ -19,6 +19,7 @@ dpControllerTag
 dpControlsHierarchy
 dpDisplayLayers
 dpResetPose
+dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
 dpCleanup
