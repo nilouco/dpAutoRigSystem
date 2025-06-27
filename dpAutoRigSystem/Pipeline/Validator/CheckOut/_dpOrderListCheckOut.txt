@@ -21,6 +21,7 @@ dpControlsHierarchy
 dpDisplayLayers
 dpResetPose
 dpJointEndCleaner
+dpBindPoseCleaner
 dpPassthroughAttributes
 dpProxyCreator
 dpCleanup

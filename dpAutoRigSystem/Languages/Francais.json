@@ -956,6 +956,8 @@
     "v109_scalableDeformerChecker"     : "Scale de deformeurs",
     "v110_scalableDeformerCheckerDesc" : "Ce validateur vérifie s'il existe des déformateurs avec des\nconnexions de scale dans la scène.\nIl vérifie et corrige les connexions de scale\naux déformateurs: skinCluster et deltaMush.",
     "v111_jointEndCleaner"             : "Joint End nerroyer",
-    "v112_jointEndCleanerDesc"         : "Ce validateur vérifiera s'il existe des joints non utilisés\nà la fin de la chain. Si oui, il va les effacer\nparce qu'ils ne sont pas utiles dans l'animation."
+    "v112_jointEndCleanerDesc"         : "Ce validateur vérifiera s'il existe des joints non utilisés\nà la fin de la chain. Si oui, il va les effacer\nparce qu'ils ne sont pas utiles dans l'animation.",
+    "v113_bindPoseCleaner"             : "BindPose nettoyeur",
+    "v114_bindPoseCleanerDesc"         : "Ce validateur vérifiera s'il existe des\nbindPose nodes dans la scène.\nSi oui, il va les effacer et créer\njuste un node pour tous les joints skinnés dans la scène."
 
 }
