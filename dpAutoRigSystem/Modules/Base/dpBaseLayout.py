@@ -342,7 +342,7 @@ class BaseLayout(object):
                 # create head facial controllers layout:
                 if self.facialExists:
                     facialEnableValue = True
-                    if not cmds.getAttr(self.moduleGrp+".jaw") or not cmds.getAttr(self.moduleGrp+".chin") or not cmds.getAttr(self.moduleGrp+".lips"):
+                    if not cmds.getAttr(self.moduleGrp+".jaw") or not cmds.getAttr(self.moduleGrp+".chin") or not cmds.getAttr(self.moduleGrp+".lips") or not cmds.getAttr(self.moduleGrp+".upperHead"):
                         facialEnableValue=False
                     self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
                     self.facialTxt = cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), enable=facialEnableValue, parent=self.facialLayout)
