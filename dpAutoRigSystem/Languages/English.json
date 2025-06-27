@@ -959,6 +959,8 @@
     "v111_jointEndCleaner"             : "Joint End cleaner",
     "v112_jointEndCleanerDesc"         : "This validator will verify if there are\nunnecessary joints at the end of the chains.\nIf so, it'll delete them because they aren't useful to animation.",
     "v113_bindPoseCleaner"             : "BindPose cleaner",
-    "v114_bindPoseCleanerDesc"         : "This validator will verify if there are\nbindPose nodes in the scene.\nIf so, it'll delete them and create just\na new one node for all skinned joints."
+    "v114_bindPoseCleanerDesc"         : "This validator will verify if there are\nbindPose nodes in the scene.\nIf so, it'll delete them and create just\na new one node for all skinned joints.",
+    "v115_hideAllJoints"               : "Hide all joints",
+    "v116_hideAllJointsDesc"           : "This validator will hide joints in the scene."
 
 }
