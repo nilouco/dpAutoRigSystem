@@ -953,7 +953,7 @@
     "v106_cycleCheckerDesc"          : "Ce validateur vérifiera s'il y a des erreurs de cycle dans la scene.\nIl va just nous informer par rapport ça.\nparce que c'est trop dificille de corriger ça automaticament\na ce moment, désolé.",
     "v107_passthroughAttributes"     : "Attributs de transfert",
     "v108_passthroughAttributesDesc" : "Ce validateur vérifiera s'il existe des attributs\nsans connexions intermédiaires nécessaires.\nSi oui, il changera (a -> b -> c) pour (a -> c).",
-    "v109_hideAllJoints"             : "Cacher toutes les joints",
-    "v110_hideAllJointsDesc"         : "Ce validateur masquera les articulations de la scène."
+    "v115_hideAllJoints"             : "Cacher toutes les joints",
+    "v116_hideAllJointsDesc"         : "Ce validateur masquera les articulations de la scène."
 
 }

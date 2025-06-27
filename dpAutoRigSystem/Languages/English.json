@@ -954,8 +954,8 @@
     "v106_cycleCheckerDesc"          : "This validator will verify if there are\ncycle errors in the scene.\nIt'll only verify and let us know about it\nbecause this theme is very complex to fix automatically\nat the moment, sorry.",
     "v107_passthroughAttributes"     : "Passthrough attributes",
     "v108_passthroughAttributesDesc" : "This validator will verify if there are\nattributes with no necessary inbetween connections.\nIf so, it'll change (a -> b -> c) to (a -> c).",
-    "v109_hideAllJoints"             : "Hide all joints",
-    "v110_hideAllJointsDesc"         : "This validator will hide joints in the scene."
+    "v115_hideAllJoints"             : "Hide all joints",
+    "v116_hideAllJointsDesc"         : "This validator will hide joints in the scene."
 
     
 }
