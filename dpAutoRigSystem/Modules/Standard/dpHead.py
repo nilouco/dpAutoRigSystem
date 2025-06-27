@@ -393,7 +393,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.setChangeFacial(value)
         if not value:
             self.changeDeformer(value)
-            cmds.checkBox(self.deformerCB, edit=True, value=value)
+            cmds.checkBox(self.deformerCB, edit=True, value=False)
         self.utils.parentChildrenGuideTo(self.cvUpperJawLoc, self.cvHeadLoc)
         self.utils.parentChildrenGuideTo(self.cvUpperHeadLoc, self.cvHeadLoc)
         cmds.select(self.moduleGrp)

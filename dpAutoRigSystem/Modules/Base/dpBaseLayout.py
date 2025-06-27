@@ -334,16 +334,20 @@ class BaseLayout(object):
                                 cmds.setAttr(self.moduleGrp+".mainControls", 0)
 
                 if self.deformerExists:
+                    deformerEnableValue = cmds.getAttr(self.moduleGrp+".upperHead")
                     self.deformerLayout = cmds.rowLayout('deformerLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    self.deformerTxt = cmds.text(self.dpUIinst.lang['c097_deformer'].capitalize(), parent=self.deformerLayout)
-                    self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.moduleGrp+".deformer"), changeCommand=self.changeDeformer, parent=self.deformerLayout)
+                    self.deformerTxt = cmds.text(self.dpUIinst.lang['c097_deformer'].capitalize(), enable=deformerEnableValue, parent=self.deformerLayout)
+                    self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.moduleGrp+".deformer"), changeCommand=self.changeDeformer, enable=deformerEnableValue, parent=self.deformerLayout)
                 
                 # create head facial controllers layout:
                 if self.facialExists:
+                    facialEnableValue = True
+                    if not cmds.getAttr(self.moduleGrp+".jaw") or not cmds.getAttr(self.moduleGrp+".chin") or not cmds.getAttr(self.moduleGrp+".lips"):
+                        facialEnableValue=False
                     self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    self.facialTxt = cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), parent=self.facialLayout)
+                    self.facialTxt = cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), enable=facialEnableValue, parent=self.facialLayout)
                     facialValue = cmds.getAttr(self.moduleGrp+".facial")
-                    self.facialCB = cmds.checkBox('facialCB', label="", value=facialValue, changeCommand=self.changeFacial, parent=self.facialLayout)
+                    self.facialCB = cmds.checkBox('facialCB', label="", value=facialValue, changeCommand=self.changeFacial, enable=facialEnableValue, parent=self.facialLayout)
                     collapsed = False
                     if not facialValue:
                         collapsed = True
