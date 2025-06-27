@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.18"
+DPAR_VERSION_5 = "5.00.23"
 DPAR_UPDATELOG = "N088 - New Joint Display tool."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 

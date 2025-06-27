@@ -46,12 +46,14 @@ class JointDisplay(object):
 
         # creating Main layout:
         jointDisplayMainLayout = cmds.columnLayout('jointDisplayMainLayout', columnOffset=('both', 5), adjustableColumn=True)
-        
-        # filter
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
-        filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=jointDisplayMainLayout)
-        self.jointFilter = cmds.textFieldGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", textChangedCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
-        cmds.separator(style='none', height=5, parent=filterLayout)
+        #headerLayout = cmds.paneLayout("headerLayout", configuration="vertical2", separatorThickness=5.0, width=400, parent=jointDisplayMainLayout)
+        headerLayout = cmds.rowColumnLayout("headerLayout", adjustableColumn=1, numberOfColumns=2, columnWidth=[(1, 140), (2, 320)], columnAlign=[(1, 'left'), (2, 'right')], columnAttach=[(1, 'left', 10), (2, 'right', 10)], parent=jointDisplayMainLayout)
+
+        # filter
+        self.jointFilter = cmds.textFieldGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", textChangedCommand=self.refreshLists, adjustableColumn=2, parent=headerLayout)
+        self.radiusFSG = cmds.floatSliderGrp("radiusFSG", label=self.dpUIinst.lang['c067_radius'].capitalize(), field=True, minValue=0, value=1, sliderStep=0.1, changeCommand=self.changeRadius, adjustableColumn=3, parent=headerLayout)
+        cmds.separator(style='none', height=5, parent=jointDisplayMainLayout)
 
         # bone display panels
         scrollLayout = cmds.paneLayout("scrollLayout", configuration="vertical4", separatorThickness=5.0, width=400, parent=jointDisplayMainLayout)
@@ -239,3 +241,12 @@ class JointDisplay(object):
         self.selectedBoard = boardIndex
         self.deselectOtherBoards(boardIndex)
         self.selectionUiList = cmds.textScrollList(self.allBoardList[boardIndex], query=True, selectItem=True)
+
+
+    def changeRadius(self, value, *args):
+        """ Set the selected joints radius as given value.
+        """
+        self.refreshLists()
+        if self.selectionUiList:
+            for jnt in self.selectionUiList:
+                cmds.setAttr(jnt+".radius", value)
