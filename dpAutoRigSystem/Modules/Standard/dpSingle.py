@@ -167,7 +167,15 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
                     for attr in self.dpUIinst.transformAttrList[:-1]:
-                        cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr)
+                        cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr, force=True)
+                    # fix mirror issue: Maya 2026 release bug
+                    if s == 1:
+                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                            invMD = cmds.createNode("multiplyDivide", name=jxtName.replace("_Jxt", "_Inv_MD"))
+                            for sAxis in ["X", "Y", "Z"]:
+                                cmds.setAttr(invMD+".input2"+sAxis, -1)
+                                cmds.connectAttr(self.singleCtrl+'.translate'+sAxis, invMD+'.input1'+sAxis, force=True)
+                                cmds.connectAttr(invMD+'.output'+sAxis, self.jnt+'.translate'+sAxis, force=True)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.lang['c046_holder']+"_Grp")
@@ -211,12 +219,6 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.setAttr(sdkLocGrp+".rotateZ", 0)
                         # rename indirectSkinning joint from Jnt to Jis:
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
-                    # fix mirror issue:
-                    if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
-                            cmds.setAttr(jxt+".scaleX", -1)
-                            cmds.setAttr(jxt+".scaleY", -1)
-                            cmds.setAttr(jxt+".scaleZ", -1)
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
                     cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
