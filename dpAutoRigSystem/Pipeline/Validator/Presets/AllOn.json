@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-26",
+    "_updated"    : "2025-06-30",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
@@ -11,6 +11,7 @@
     "InvertedNormals"           : true,
     "NamespaceCleaner"          : true,
     "NonManifoldCleaner"        : true,
+    "NonQuadFace"               : true,
     "OverrideCleaner"           : true,
     "ShowBPCleaner"             : true,
     "SoftenEdges"               : true,

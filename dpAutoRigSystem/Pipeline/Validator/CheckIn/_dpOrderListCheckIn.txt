@@ -5,6 +5,7 @@ dpUnlockInitialShadingGroup
 dpShowBPCleaner
 dpDuplicatedName
 dpNonManifoldCleaner
+dpNonQuadFace
 dpUnlockNormals
 dpInvertedNormals
 dpFreezeTransform
