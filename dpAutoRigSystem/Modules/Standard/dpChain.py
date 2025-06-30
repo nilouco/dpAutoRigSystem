@@ -466,8 +466,9 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.xform(self.ikClusterList[-1], worldSpace=True, rotatePivot=endIkJointPos)
                 # ik cluster group:
                 self.ikClusterGrp = cmds.group(self.ikClusterList, name=side+self.userGuideName+"_Ik_Cluster_Grp")
-                for axis in ['X', 'Y', 'Z']:
-                    cmds.connectAttr(self.dpUIinst.optionCtrl+".rigScaleOutput", self.ikClusterGrp+".scale"+axis)
+                if self.dpUIinst.optionCtrl:
+                    for axis in ['X', 'Y', 'Z']:
+                        cmds.connectAttr(self.dpUIinst.optionCtrl+".rigScaleOutput", self.ikClusterGrp+".scale"+axis)
 
                 # ik controls:
                 self.ikCtrlList, self.ikCtrlZeroList = [], []
