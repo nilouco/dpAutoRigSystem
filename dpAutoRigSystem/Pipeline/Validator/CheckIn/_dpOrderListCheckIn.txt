@@ -7,5 +7,6 @@ dpDuplicatedName
 dpNonManifoldCleaner
 dpUnlockNormals
 dpInvertedNormals
+dpColorPerVertexCleaner
 dpFreezeTransform
 dpGeometryHistory
