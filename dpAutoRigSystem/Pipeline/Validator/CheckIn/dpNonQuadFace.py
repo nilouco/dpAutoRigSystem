@@ -93,6 +93,7 @@ class NonQuadFace(dpBaseAction.ActionStartClass):
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
                     self.messageList.append("Tris:    "+str(trisList)+"\nPolys: "+str(polyList))
+                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelFaces']+"\nmaya.cmds.select("+str(nonQuadFaceList)+")\n---")
                     cmds.select(nonQuadFaceList)
             else:
                 self.notFoundNodes()
