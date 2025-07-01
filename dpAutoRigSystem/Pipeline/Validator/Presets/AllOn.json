@@ -4,6 +4,7 @@
     "_date"       : "2022-09-12",
     "_updated"    : "2025-06-30",
 
+    "ColorPerVertexCleaner"     : true,
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
     "GeometryHistory"           : true,

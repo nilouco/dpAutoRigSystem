@@ -965,6 +965,8 @@
     "v114_bindPoseCleanerDesc"         : "This validator will verify if there are\nbindPose nodes in the scene.\nIf so, it'll delete them and create just\na new one node for all skinned joints.",
     "v115_hideAllJoints"               : "Hide all joints",
     "v116_hideAllJointsDesc"           : "This validator will hide joints in the scene.",
+    "v117_colorPerVertexCleaner"       : "Color per vertex cleaner",
+    "v118_colorPerVertexCleanerDesc"   : "This validator will remove polyColorPerVertex nodes in the scene.",
     "v119_nonQuadFace"                 : "Non quad face",
     "v120_nonQuadFaceDesc"             : "This validator will find non quad polygon faces.\nIt won't possible to fix automatically, sorry.",
     "v121_sharePythonSelFaces"         : "Please share with modelers this Python command to select the faces:"

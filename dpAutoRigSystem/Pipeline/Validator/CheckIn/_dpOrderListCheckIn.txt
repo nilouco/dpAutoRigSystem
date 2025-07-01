@@ -8,5 +8,6 @@ dpNonManifoldCleaner
 dpNonQuadFace
 dpUnlockNormals
 dpInvertedNormals
+dpColorPerVertexCleaner
 dpFreezeTransform
 dpGeometryHistory
