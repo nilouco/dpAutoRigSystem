@@ -2,8 +2,9 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2025-06-26",
+    "_updated"    : "2025-06-30",
 
+    "ColorPerVertexCleaner"     : false,
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,
     "GeometryHistory"           : false,
