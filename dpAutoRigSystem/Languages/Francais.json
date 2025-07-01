@@ -965,6 +965,9 @@
     "v115_hideAllJoints"               : "Cacher toutes les joints",
     "v116_hideAllJointsDesc"           : "Ce validateur masquera les articulations de la scène.",
     "v117_colorPerVertexCleaner"       : "Color per vertex nettoyeur",
-    "v118_colorPerVertexCleanerDesc"   : "Ce validateur effacera les nodes de polyColorPerVertex de la scene."
+    "v118_colorPerVertexCleanerDesc"   : "Ce validateur effacera les nodes de polyColorPerVertex de la scene.",
+    "v119_nonQuadFace"                 : "Non quad face",
+    "v120_nonQuadFaceDesc"             : "Ce validateur trouverá des faces non quad.\nIl ne sera pas possible de les corriger automaticament, désolé.",
+    "v121_sharePythonSelFaces"         : "Partager avec les modeleurs ce command en Python pour selectionner les faces, s'il tu plâit."
 
 }

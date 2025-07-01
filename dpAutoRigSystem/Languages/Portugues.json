@@ -965,6 +965,9 @@
     "v115_hideAllJoints"               : "Ocultar todos joints",
     "v116_hideAllJointsDesc"           : "Esse validador ocultará todos os joints na cena.",
     "v117_colorPerVertexCleaner"       : "Color per vertex limpador",
-    "v118_colorPerVertexCleanerDesc"   : "Esse validador removerá nodes de polyColorPerVertex da cena."
+    "v118_colorPerVertexCleanerDesc"   : "Esse validador removerá nodes de polyColorPerVertex da cena.",
+    "v119_nonQuadFace"                 : "Non quad face",
+    "v120_nonQuadFaceDesc"             : "Esse validador encontrará faces de polígonos não quadradas.\nNão será possível corrigir automaticamente, desculpe.",
+    "v121_sharePythonSelFaces"         : "Compartilhe com os modeladores esse comando em Python para selecionar as faces, por favor:"
 
 }

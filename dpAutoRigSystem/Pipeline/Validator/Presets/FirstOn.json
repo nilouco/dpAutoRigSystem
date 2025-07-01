@@ -12,6 +12,7 @@
     "InvertedNormals"           : false,
     "NamespaceCleaner"          : false,
     "NonManifoldCleaner"        : false,
+    "NonQuadFace"               : false,
     "OverrideCleaner"           : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,
