@@ -5,7 +5,7 @@
     "_updated"    : "2025-06-02",
 
     "ColorPerVertexCleaner"     : true,
-    "BorderOrHole"              : false,
+    "BorderGap"                 : false,
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,
     "GeometryHistory"           : false,

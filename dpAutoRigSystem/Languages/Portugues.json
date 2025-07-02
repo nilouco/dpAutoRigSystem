@@ -969,7 +969,7 @@
     "v119_nonQuadFace"                 : "Non quad face",
     "v120_nonQuadFaceDesc"             : "Esse validador encontrará faces de polígonos não quadradas.\nNão será possível corrigir automaticamente, desculpe.",
     "v121_sharePythonSelect"           : "Compartilhe com os modeladores esse comando em Python para selecionar a identificação, por favor:",
-    "v122_borderOrHole"                : "Borda ou Buraco",
-    "v123_borderOrHoleDesc"            : "Esse validador encontrará bordas ou buracos nas meshes.\nNão será possível corrigir automaticamente, desculpe.\nMas você pode tentar usar o comando do Maya de fill hole."
+    "v122_borderGap"                   : "Borda em espaço",
+    "v123_borderGapDesc"               : "Esse validador encontrará bordas ou buracos nas meshes.\nNão será possível corrigir automaticamente, desculpe.\nMas você pode tentar usar o comando do Maya de fill hole."
 
 }

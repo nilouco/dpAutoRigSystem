@@ -4,22 +4,22 @@ from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "BorderOrHole"
-TITLE = "v122_borderOrHole"
-DESCRIPTION = "v123_borderOrHoleDesc"
-ICON = "/Icons/dp_borderOrHole.png"
+CLASS_NAME = "BorderGap"
+TITLE = "v122_borderGap"
+DESCRIPTION = "v123_borderGapDesc"
+ICON = "/Icons/dp_borderGap.png"
 
-DP_BORDERORHOLE_VERSION = 1.0
+DP_BORDERGAP_VERSION = 1.0
 
 
-class BorderOrHole(dpBaseAction.ActionStartClass):
+class BorderGap(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_BORDERORHOLE_VERSION
+        self.version = DP_BORDERGAP_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -47,7 +47,7 @@ class BorderOrHole(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
-                holeList, holeObjList = [], []
+                gapList, gapObjList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
@@ -69,17 +69,17 @@ class BorderOrHole(dpBaseAction.ActionStartClass):
                                     indexConFaces = OpenMaya.MIntArray()
                                     iterPolys.getConnectedFaces(indexConFaces)
                                     if len(indexConFaces) == 1:
-                                        if not objectName in holeObjList:
-                                            holeObjList.append(objectName)
-                                        holeList.append(objectName+'.e['+str(iterPolys.index())+']')
+                                        if not objectName in gapObjList:
+                                            gapObjList.append(objectName)
+                                        gapList.append(objectName+'.e['+str(iterPolys.index())+']')
                                     # Move to next polygon in the mesh list
                                     iterPolys.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if holeObjList:
-                    holeObjList.sort()
-                    for item in holeObjList:
+                if gapObjList:
+                    gapObjList.sort()
+                    for item in gapObjList:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
@@ -87,9 +87,9 @@ class BorderOrHole(dpBaseAction.ActionStartClass):
                         else: #fix
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                    self.messageList.append(self.dpUIinst.lang['v122_borderOrHole']+": "+str(holeList))
-                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(holeList)+")\n---")
-                    cmds.select(holeList)
+                    self.messageList.append(self.dpUIinst.lang['v122_borderGap']+": "+str(gapList))
+                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(gapList)+")\n---")
+                    cmds.select(gapList)
             else:
                 self.notFoundNodes()
         else:

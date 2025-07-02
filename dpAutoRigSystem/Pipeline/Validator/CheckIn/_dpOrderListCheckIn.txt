@@ -6,7 +6,7 @@ dpShowBPCleaner
 dpDuplicatedName
 dpNonManifoldCleaner
 dpNonQuadFace
-dpBorderOrHole
+dpBorderGap
 dpUnlockNormals
 dpInvertedNormals
 dpColorPerVertexCleaner
