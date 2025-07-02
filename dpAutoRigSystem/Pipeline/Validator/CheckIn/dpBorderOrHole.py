@@ -4,22 +4,22 @@ from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "NonQuadFace"
-TITLE = "v119_nonQuadFace"
-DESCRIPTION = "v120_nonQuadFaceDesc"
-ICON = "/Icons/dp_nonQuadFace.png"
+CLASS_NAME = "BorderOrHole"
+TITLE = "v122_borderOrHole"
+DESCRIPTION = "v123_borderOrHoleDesc"
+ICON = "/Icons/dp_borderOrHole.png"
 
-DP_NONQUADFACE_VERSION = 1.0
+DP_BORDERORHOLE_VERSION = 1.0
 
 
-class NonQuadFace(dpBaseAction.ActionStartClass):
+class BorderOrHole(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_NONQUADFACE_VERSION
+        self.version = DP_BORDERORHOLE_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -47,7 +47,7 @@ class NonQuadFace(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
-                polyObjList, trisObjList, trisList, polyList = [], [], [], []
+                holeList, holeObjList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
@@ -62,29 +62,24 @@ class NonQuadFace(dpBaseAction.ActionStartClass):
                         for obj in toCheckList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                iterPolys = OpenMaya.MItMeshPolygon(shapeNode)
+                                iterPolys = OpenMaya.MItMeshEdge(shapeNode)
                                 # Iterate through polys on current mesh
                                 while not iterPolys.isDone():
-                                    nVertex = iterPolys.polygonVertexCount()
-                                    if nVertex > 4:
-                                        if not objectName in polyObjList:
-                                            polyObjList.append(objectName)
-                                        polyList.append(objectName+'.f['+str(iterPolys.index())+']')
-                                    elif nVertex == 3:
-                                        if not objectName in trisObjList:
-                                            trisObjList.append(objectName)
-                                        trisList.append(objectName+'.f['+str(iterPolys.index())+']')
+                                    # Get current polygons connected faces
+                                    indexConFaces = OpenMaya.MIntArray()
+                                    iterPolys.getConnectedFaces(indexConFaces)
+                                    if len(indexConFaces) == 1:
+                                        if not objectName in holeObjList:
+                                            holeObjList.append(objectName)
+                                        holeList.append(objectName+'.e['+str(iterPolys.index())+']')
                                     # Move to next polygon in the mesh list
                                     iterPolys.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if polyObjList or trisObjList:
-                    nonQuadObjList = list(set(polyObjList+trisObjList))
-                    nonQuadFaceList = list(set(polyList+trisList))
-                    nonQuadObjList.sort()
-                    nonQuadFaceList.sort()
-                    for item in nonQuadObjList:
+                if holeObjList:
+                    holeObjList.sort()
+                    for item in holeObjList:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
@@ -92,9 +87,9 @@ class NonQuadFace(dpBaseAction.ActionStartClass):
                         else: #fix
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                    self.messageList.append("Tris:    "+str(trisList)+"\nPolys: "+str(polyList))
-                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(nonQuadFaceList)+")\n---")
-                    cmds.select(nonQuadFaceList)
+                    self.messageList.append(self.dpUIinst.lang['v122_borderOrHole']+": "+str(holeList))
+                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(holeList)+")\n---")
+                    cmds.select(holeList)
             else:
                 self.notFoundNodes()
         else:
