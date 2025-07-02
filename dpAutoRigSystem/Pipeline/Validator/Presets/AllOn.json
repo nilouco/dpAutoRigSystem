@@ -2,9 +2,10 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-30",
+    "_updated"    : "2025-07-02",
 
     "ColorPerVertexCleaner"     : true,
+    "BorderGap"                 : true,
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
     "GeometryHistory"           : true,
