@@ -18,6 +18,7 @@
     "OverrideCleaner"           : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,
+    "TFaceCleaner"              : false,
     "UnlockAttributes"          : false,
     "UnlockInitialShadingGroup" : false,
     "UnlockNormals"             : false,

@@ -972,6 +972,8 @@
     "v122_borderGap"                   : "Borda em espaço",
     "v123_borderGapDesc"               : "Esse validador encontrará bordas ou buracos nas meshes.\nNão será possível corrigir automaticamente, desculpe.\nMas você pode tentar usar o comando do Maya de fill hole.",
     "v124_laminaFaceCleaner"           : "Lamina face limpador",
-    "v125_laminaFaceCleanerDesc"       : "Esse validador vai verificar se existem lamina faces nas meshes.\nIrá limpa-las pelo cleanup."
+    "v125_laminaFaceCleanerDesc"       : "Esse validador vai verificar se existem lamina faces nas meshes.\nIrá limpa-las pelo cleanup.",
+    "v128_tFaceCleaner"                : "T face limpador",
+    "v129_tFaceCleanerDesc"            : "Esse validador verificará se existem faces T nas meshes.\nIsso quer dizer se existe uma edge conectada a 3 ou mais faces.\nEle vai corrigir isso."
 
 }
