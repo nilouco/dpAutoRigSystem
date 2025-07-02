@@ -971,6 +971,8 @@
     "v120_nonQuadFaceDesc"             : "This validator will find non quad polygon faces.\nIt won't be possible to fix it automatically, sorry.",
     "v121_sharePythonSelect"           : "Please share with modelers this Python command to select the identified:",
     "v122_borderGap"                   : "Border gap",
-    "v123_borderGapDesc"               : "This validator will find borders or holes in the mesh.\nIt won't be possible to if it automatically, sorry.\nBut you can try to use the fill hole Maya command to try fix it."
+    "v123_borderGapDesc"               : "This validator will find borders or holes in the mesh.\nIt won't be possible to if it automatically, sorry.\nBut you can try to use the fill hole Maya command to try fix it.",
+    "v124_laminaFaceCleaner"           : "Lamina face cleaner",
+    "v125_laminaFaceCleanerDesc"       : "This validator will verify if there are some lamina faces in the meshes.\nIt'll cleanup them."
 
 }
