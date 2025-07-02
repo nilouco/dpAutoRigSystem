@@ -6,9 +6,9 @@ import random
 
 # global variables to this module:
 CLASS_NAME = "BrokenRivet"
-TITLE = "Broken Rivet"
-DESCRIPTION = "Verify if there is follicles at origin, meaning that they are not attached properly, try to fix them."
-ICON = "/Icons/dp_passthroughAttributes.png"
+TITLE = "v096_cleanup"
+DESCRIPTION = "v097_cleanupDesc"
+ICON = "/Icons/dp_brokenRivet.png"
 
 DP_BROKEN_RIVET = 1.0
 
@@ -22,6 +22,8 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_BROKEN_RIVET
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
+
 
     def list_follicles_at_origin(self):
         follicles_at_origin = []
@@ -42,6 +44,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         
         return follicles_at_origin
 
+
     def disablePac(self, folTr, netNode):
         try:
             parentConstraint = cmds.listConnections(f"{netNode}.pacNode", destination=False)[0]
@@ -51,6 +54,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
                 cmds.setAttr(f"{parentConstraint}.{pacAttr}", 0)
         except Exception as e:
             print(e)
+
 
     def removeRivetFromNetNode(self, folTr, rivetNetNode):
             """ Remove the rivet from its network node.
@@ -89,17 +93,20 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
 
             cmds.delete(rivetNetNode)
 
+
     def get_rivet_net_from_fol_transform(self, folTr):
         folTrOutputList = cmds.listConnections(f"{folTr}.message", source=False, destination=True)
         for connection in folTrOutputList:
             if "_Net" in connection:
                 return connection
 
+
     def remove_rivet_from_follicle_transform_list(self, follicle_transform_list):
         for folTr in follicle_transform_list:
             rivetNetNode = self.get_rivet_net_from_fol_transform(folTr)
             self.disablePac(folTr, rivetNetNode)
             self.removeRivetFromNetNode(folTr, rivetNetNode)
+
 
     def get_connections_from_follicle(self, follicles_origin_list):
         controllers_list = []
@@ -113,6 +120,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             if face_to_rivet_geo:
                 attach_geo_list.append(face_to_rivet_geo)
         return controllers_list, attach_geo_list
+
 
     def get_closest_vertex(self, point, vtx_list):
         """
@@ -203,6 +211,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
 
         return [total[0] / norm, total[1] / norm, total[2] / norm]
 
+
     def get_direction_vector(self, model, vtx_index):
         cmds.select(clear=True)
         cmds.select(f"{model}.vtx[{vtx_index}]")
@@ -263,6 +272,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             else:
                 print("Error: offset changed closest vertex")
 
+
     def randomizeNewPivot(self, rivet_controllers_list, attach_to_geo_list):
         cmds.progressWindow(title="Processing", progress=0, status=rivet_controllers_list[0], isInterruptable=True)
         for idx, control in enumerate(rivet_controllers_list):
@@ -270,12 +280,12 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             self.randomize_translation(control, attach_to_geo_list[idx])
         cmds.progressWindow(endProgress=True)
 
+
     def recreateRivetWithNewPivot(self, rivet_controllers_list, attach_geo_list):
-        rivetInstance = dpRivet.Rivet(self, self.dpUIinst, ui=False)
         for idx, controller in enumerate(rivet_controllers_list):
             uvSet = cmds.polyUVSet(attach_geo_list[idx], query=True, allUVSets=True)[0]
-            rivetInstance.dpCreateRivet(attach_geo_list[idx], uvSet, [controller], True, False, True, True, True, False, False)
-            print()
+            self.dpRivet.dpCreateRivet(attach_geo_list[idx], uvSet, [controller], True, False, True, True, True, False, False)
+
 
     def runAction(self, firstMode=True, objList=None, *args):
         """ Main method to process this validator instructions.
@@ -300,22 +310,24 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
                 toCheckList = cmds.ls(type='follicle')
             if toCheckList:
                 follicles_origin_list = self.list_follicles_at_origin()
+                rivet_controllers_list, attach_geo_list = self.get_connections_from_follicle(follicles_origin_list)
                 if self.firstMode:
-                    self.checkedObjList.copy(follicles_origin_list)
+                    self.checkedObjList = rivet_controllers_list.copy()
                     self.foundIssueList = [True] * len(self.checkedObjList)
                 else: #fix
-                    rivet_controllers_list, attach_geo_list = self.get_connections_from_follicle(follicles_origin_list)
                     self.remove_rivet_from_follicle_transform_list(follicles_origin_list)
                     self.randomizeNewPivot(rivet_controllers_list, attach_geo_list)
                     self.recreateRivetWithNewPivot(rivet_controllers_list, attach_geo_list)
                     follicles_origin_list = self.list_follicles_at_origin()
-                    print("Remaing broken rivets: ", follicles_origin_list)
                     if len(follicles_origin_list) == 0:
                         self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+follicles_origin_list)
+                        for fixed in rivet_controllers_list:
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+fixed)
                     else:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+follicles_origin_list)
+                        rivet_controllers_list = self.get_connections_from_follicle(follicles_origin_list)
+                        for nonFixed in rivet_controllers_list:
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+nonFixed)
                 # self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # for follicle in toCheckList:
                 #     self.utils.setProgress(self.dpUIinst.lang[self.title])
