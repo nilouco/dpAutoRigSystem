@@ -6,8 +6,8 @@ import random
 
 # global variables to this module:
 CLASS_NAME = "BrokenRivet"
-TITLE = "v096_cleanup"
-DESCRIPTION = "v097_cleanupDesc"
+TITLE = "v126_brokenRivet"
+DESCRIPTION = "v127_brokenRivetDesc"
 ICON = "/Icons/dp_brokenRivet.png"
 
 DP_BROKEN_RIVET = 1.0
@@ -25,7 +25,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
 
 
-    def list_follicles_at_origin(self):
+    def listFolliclesAtOrigin(self):
         follicles_at_origin = []
         
         follicle_shapes = cmds.ls(type='follicle')
@@ -94,25 +94,25 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             cmds.delete(rivetNetNode)
 
 
-    def get_rivet_net_from_fol_transform(self, folTr):
+    def getRivetNetFromFolTransform(self, folTr):
         folTrOutputList = cmds.listConnections(f"{folTr}.message", source=False, destination=True)
         for connection in folTrOutputList:
             if "_Net" in connection:
                 return connection
 
 
-    def remove_rivet_from_follicle_transform_list(self, follicle_transform_list):
+    def removeRivetFromFollicleTransformList(self, follicle_transform_list):
         for folTr in follicle_transform_list:
-            rivetNetNode = self.get_rivet_net_from_fol_transform(folTr)
+            rivetNetNode = self.getRivetNetFromFolTransform(folTr)
             self.disablePac(folTr, rivetNetNode)
             self.removeRivetFromNetNode(folTr, rivetNetNode)
 
 
-    def get_connections_from_follicle(self, follicles_origin_list):
+    def getConnectionsFromFollicle(self, follicles_origin_list):
         controllers_list = []
         attach_geo_list = []
         for folTr in follicles_origin_list:
-            rivetNetNode = self.get_rivet_net_from_fol_transform(folTr)
+            rivetNetNode = self.getRivetNetFromFolTransform(folTr)
             rivet_controller = cmds.listConnections(f"{rivetNetNode}.itemNode", source=True, destination=False)[0]
             face_to_rivet_geo = cmds.listConnections(f"{rivetNetNode}.geoToAttach", source=True, destination=False)[0]
             if rivet_controller:
@@ -122,7 +122,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         return controllers_list, attach_geo_list
 
 
-    def get_closest_vertex(self, point, vtx_list):
+    def getClosestVertex(self, point, vtx_list):
         """
         Finds the closest vertex to a given point in Maya using cmds.
         :param point: A tuple (x, y, z) representing the target point.
@@ -145,7 +145,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         return closest_vertex
 
 
-    def get_connected_edges(self, mesh_name, vertex_index):
+    def getConnectedEdges(self, mesh_name, vertex_index):
         """
         Returns all edge indexes connected to a given vertex.
         :param mesh_name: Name of the mesh object.
@@ -164,7 +164,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         return edge_indexes
 
 
-    def get_edge_length(self, mesh_name, edge_index):
+    def getEdgeLength(self, mesh_name, edge_index):
         """
         Returns the length of an edge given its index.
         :param mesh_name: Name of the mesh object.
@@ -189,7 +189,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         return length
 
 
-    def normalize_vector_sum(self, vectors):
+    def normalizeVectorSum(self, vectors):
         """
         Sums a list of vectors and returns the normalized result.
         
@@ -212,7 +212,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         return [total[0] / norm, total[1] / norm, total[2] / norm]
 
 
-    def get_direction_vector(self, model, vtx_index):
+    def getDirectionVector(self, model, vtx_index):
         cmds.select(clear=True)
         cmds.select(f"{model}.vtx[{vtx_index}]")
         cmds.GrowPolygonSelectionRegion()
@@ -223,12 +223,12 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             if ".vtx[" in vertex:  # Ensure it's a vertex selection
                 vtx_vector = cmds.pointPosition(vertex)
                 vertex_vectors.append(vtx_vector)
-        normalized_vectors = self.normalize_vector_sum(vertex_vectors)
+        normalized_vectors = self.normalizeVectorSum(vertex_vectors)
 
         return normalized_vectors
 
 
-    def randomize_translation(self, tweakCtrl, model):
+    def randomizeTranslation(self, tweakCtrl, model):
         """
         Randomizes the translation of an tweakCtrl in Maya while ensuring the offset is insignificant compared to its scale.
         """
@@ -237,16 +237,16 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             # Get current translation
             translation = cmds.xform(tweakCtrl, query=True, translation=True, worldSpace=True)
             vertex_set = cmds.ls(f"{model}.vtx[*]", flatten=True)
-            closestVertexIndex = self.get_closest_vertex(translation, vertex_set)
-            closestEdgeIndexList = self.get_connected_edges(model, closestVertexIndex)
+            closestVertexIndex = self.getClosestVertex(translation, vertex_set)
+            closestEdgeIndexList = self.getConnectedEdges(model, closestVertexIndex)
 
             closestEdgeAvgLen = 0.0
             for edgeIndex in closestEdgeIndexList:
-                closestEdgeAvgLen += self.get_edge_length(model, edgeIndex)
+                closestEdgeAvgLen += self.getEdgeLength(model, edgeIndex)
             closestEdgeAvgLen = closestEdgeAvgLen/len(closestEdgeIndexList)
             
             # Unitary direction vector to use as offset direction.
-            u_vector =  self.get_direction_vector(model, closestVertexIndex)
+            u_vector =  self.getDirectionVector(model, closestVertexIndex)
             
             # Calculate a small offset based on scale.
             max_offset = closestEdgeAvgLen * 0.1
@@ -266,7 +266,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             vertex_set = cmds.ls(selection=True, flatten=True)
             cmds.select(clear=True)
 
-            translatedClosestVertexIndex = self.get_closest_vertex(new_translation, vertex_set)
+            translatedClosestVertexIndex = self.getClosestVertex(new_translation, vertex_set)
             if closestVertexIndex == translatedClosestVertexIndex:
                 cmds.xform(tweakCtrl, piv=new_translation, ws=True)
             else:
@@ -277,14 +277,33 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         cmds.progressWindow(title="Processing", progress=0, status=rivet_controllers_list[0], isInterruptable=True)
         for idx, control in enumerate(rivet_controllers_list):
             cmds.progressWindow(edit=True, progress=int((idx+1)/len(rivet_controllers_list) * 100), status=control)
-            self.randomize_translation(control, attach_to_geo_list[idx])
+            self.randomizeTranslation(control, attach_to_geo_list[idx])
         cmds.progressWindow(endProgress=True)
+
+
+    def getRivetOptionsList(self, follicles_origin_list):
+        rivetControllerOptionsDic = {}
+        for follicle in follicles_origin_list:
+            rivetNet = self.getRivetNetFromFolTransform(follicle)
+            rivet_controller = cmds.listConnections(f"{rivetNet}.itemNode", source=True, destination=False)[0]
+            pacNode = cmds.listConnections(f"{rivetNet}.pacNode", source=True, destination=False)[0]
+            transformAttached = cmds.listConnections(f"{rivetNet}.rivet", source=True, destination=False)[0]
+            has_inv_translate = True if cmds.listConnections(f"{rivetNet}.invTGrp", source=True, destination=False) else False
+            has_inv_rotate = True if cmds.listConnections(f"{rivetNet}.invRGrp", source=True, destination=False) else False
+            addInvert = has_inv_translate or has_inv_rotate
+            connections = cmds.listConnections(pacNode, source=True, destination=True, plugs=True) or []
+            found_attrs = [conn.split('.')[-1] for conn in connections]
+            translate_connected = all(attr in found_attrs for attr in ['translateX', 'translateY', 'translateZ'])
+            rotate_connected = all(attr in found_attrs for attr in ['rotateX', 'rotateY', 'rotateZ'])
+            has_parent_group = transformAttached.endswith("_Grp")
+            rivetControllerOptionsDic[rivet_controller] = [translate_connected, rotate_connected, has_parent_group, addInvert, has_inv_translate, has_inv_rotate, False]
+        return rivetControllerOptionsDic
 
 
     def recreateRivetWithNewPivot(self, rivet_controllers_list, attach_geo_list):
         for idx, controller in enumerate(rivet_controllers_list):
             uvSet = cmds.polyUVSet(attach_geo_list[idx], query=True, allUVSets=True)[0]
-            self.dpRivet.dpCreateRivet(attach_geo_list[idx], uvSet, [controller], True, False, True, True, True, False, False)
+            self.dpRivet.dpCreateRivet(attach_geo_list[idx], uvSet, [controller], *self.rivetOptionsDic[controller])
 
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -309,44 +328,26 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             else:
                 toCheckList = cmds.ls(type='follicle')
             if toCheckList:
-                follicles_origin_list = self.list_follicles_at_origin()
-                rivet_controllers_list, attach_geo_list = self.get_connections_from_follicle(follicles_origin_list)
+                follicles_origin_list = self.listFolliclesAtOrigin()
+                rivet_controllers_list, attach_geo_list = self.getConnectionsFromFollicle(follicles_origin_list)
                 if self.firstMode:
                     self.checkedObjList = rivet_controllers_list.copy()
                     self.foundIssueList = [True] * len(self.checkedObjList)
                 else: #fix
-                    self.remove_rivet_from_follicle_transform_list(follicles_origin_list)
+                    self.rivetOptionsDic = self.getRivetOptionsList(follicles_origin_list)
+                    self.removeRivetFromFollicleTransformList(follicles_origin_list)
                     self.randomizeNewPivot(rivet_controllers_list, attach_geo_list)
                     self.recreateRivetWithNewPivot(rivet_controllers_list, attach_geo_list)
-                    follicles_origin_list = self.list_follicles_at_origin()
+                    follicles_origin_list = self.listFolliclesAtOrigin()
                     if len(follicles_origin_list) == 0:
                         self.resultOkList.append(True)
                         for fixed in rivet_controllers_list:
                             self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+fixed)
                     else:
                         self.resultOkList.append(False)
-                        rivet_controllers_list = self.get_connections_from_follicle(follicles_origin_list)
+                        rivet_controllers_list, attach_geo_list = self.getConnectionsFromFollicle(follicles_origin_list)
                         for nonFixed in rivet_controllers_list:
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+nonFixed)
-                # self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                # for follicle in toCheckList:
-                #     self.utils.setProgress(self.dpUIinst.lang[self.title])
-                #     if self.isFollicleAtOrigin(follicle):
-                #         self.checkedObjList.append(follicle)
-                #         self.foundIssueList.append(True)
-                #         if self.firstMode:
-                #             self.resultOkList.append(False)
-                #         else: #fix
-                #             try:
-                #                 parentList = cmds.listRelatives(follicle, parent=True)
-                #                 follicleTransform = parentList[0]
-                #                 if not follicleTransform:
-                #                     raise ValueError("Follicle has no transform.")
-                #                 self.resultOkList.append(True)
-                #                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+follicle)
-                #             except:
-                #                 self.resultOkList.append(False)
-                #                 self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+follicle)
             else:
                 self.notFoundNodes()
         else:

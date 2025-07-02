@@ -958,6 +958,8 @@
     "v111_jointEndCleaner"             : "Joint End limpador",
     "v112_jointEndCleanerDesc"         : "Essa validador vai verificar se existem joints\ndesnecessários no final da cadeia.\nSe sim, vai deleta-los pois não são úteis para a animação.",
     "v113_bindPoseCleaner"             : "BindPose limpador",
-    "v114_bindPoseCleanerDesc"         : "Esse validador vai verificar se existem nodes de bindPose\nna cena. Se sim, ele vai deleta-los e criar\napenas um node para todos os joints skinados."
+    "v114_bindPoseCleanerDesc"         : "Esse validador vai verificar se existem nodes de bindPose\nna cena. Se sim, ele vai deleta-los e criar\napenas um node para todos os joints skinados.",
+    "v126_brokenRivet"                 : "BrokenRivets",
+    "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja, aqueles que não estão corretamente fixados, tenta consertá-los."
 
 }
