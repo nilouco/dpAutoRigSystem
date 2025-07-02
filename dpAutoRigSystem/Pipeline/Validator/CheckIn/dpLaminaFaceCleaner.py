@@ -52,7 +52,6 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
-                        nextGeom = False
                         # get mesh data
                         shapeNode    = iter.thisNode()
                         fnShapeNode  = OpenMaya.MFnDagNode(shapeNode)
@@ -68,7 +67,7 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                                 faceIter   = OpenMaya.MItMeshPolygon(shapeNode)
                                 conFacesIt = OpenMaya.MItMeshPolygon(shapeNode)
                                 # run in faces listing edges
-                                while not faceIter.isDone() and not nextGeom:
+                                while not faceIter.isDone():
                                     # list vertices from this face
                                     edgesIntArray = OpenMaya.MIntArray()
                                     faceIter.getEdges(edgesIntArray)
@@ -88,8 +87,7 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                                             # found laminaFaces
                                             if not objectName in laminedFaceList:
                                                 laminedFaceList.append(objectName)
-                                            laminaList.append(objectName+'.e['+str(edgesIntArray.index())+']')
-                                            nextGeom = True
+                                            laminaList.append(objectName+'.f['+str(faceIter.index())+']')
                                     faceIter.next()
                         # Move to the next selected node in the list
                         iter.next()
