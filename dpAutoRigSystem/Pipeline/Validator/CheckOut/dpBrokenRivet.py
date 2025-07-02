@@ -330,10 +330,9 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             if toCheckList:
                 follicles_origin_list = self.listFolliclesAtOrigin()
                 rivet_controllers_list, attach_geo_list = self.getConnectionsFromFollicle(follicles_origin_list)
-                if self.firstMode:
-                    self.checkedObjList = rivet_controllers_list.copy()
-                    self.foundIssueList = [True] * len(self.checkedObjList)
-                else: #fix
+                self.checkedObjList = rivet_controllers_list.copy()
+                self.foundIssueList = [True] * len(self.checkedObjList)
+                if not self.firstMode:
                     self.rivetOptionsDic = self.getRivetOptionsList(follicles_origin_list)
                     self.removeRivetFromFollicleTransformList(follicles_origin_list)
                     self.randomizeNewPivot(rivet_controllers_list, attach_geo_list)
