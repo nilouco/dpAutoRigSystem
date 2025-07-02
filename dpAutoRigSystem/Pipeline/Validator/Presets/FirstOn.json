@@ -4,7 +4,7 @@
     "_date"       : "2022-09-12",
     "_updated"    : "2025-06-02",
 
-    "BorderOrHole"              : true,
+    "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : false,
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,

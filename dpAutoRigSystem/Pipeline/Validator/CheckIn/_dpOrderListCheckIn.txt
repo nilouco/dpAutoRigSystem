@@ -7,7 +7,7 @@ dpDuplicatedName
 dpLaminaFaceCleaner
 dpNonManifoldCleaner
 dpNonQuadFace
-dpBorderOrHole
+dpBorderGap
 dpUnlockNormals
 dpInvertedNormals
 dpColorPerVertexCleaner

@@ -969,8 +969,8 @@
     "v119_nonQuadFace"                 : "Non quad face",
     "v120_nonQuadFaceDesc"             : "Ce validateur trouverá des faces non quad.\nIl ne sera pas possible de les corriger automaticament, désolé.",
     "v121_sharePythonSelect"           : "Partager avec les modeleurs ce command en Python pour selectionner l'identifié, s'il tu plâit:",
-    "v122_borderOrHole"                : "Bordure ou Trou",
-    "v123_borderOrHoleDesc"            : "Ce validateur trouverá des bordures ou des trous dans les meshes.\nIl ne sera pas possible de les corriger automaticament, désolé.\nMais tu peux essayer d'utiliser le Maya command de fill hole.",
+    "v122_borderGap"                   : "Bordure en espace",
+    "v123_borderGapDesc"               : "Ce validateur trouverá des bordures ou des trous dans les meshes.\nIl ne sera pas possible de les corriger automaticament, désolé.\nMais tu peux essayer d'utiliser le Maya command de fill hole.",
     "v124_laminaFaceCleaner"           : "Lamina face nettoyeur",
     "v125_laminaFaceCleanerDesc"       : "Ce validateur va véfirier s'il y des lamina faces dans les meshes.\nIl va les corriger par le cleanup."
 
