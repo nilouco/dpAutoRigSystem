@@ -46,6 +46,7 @@
     "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
+    "TweakNodeCleaner"          : true,   
     "UnknownNodesCleaner"       : true,
     "UnusedNodeCleaner"         : true,
     "UnusedSkinCleaner"         : true,

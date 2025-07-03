@@ -25,4 +25,5 @@ dpBindPoseCleaner
 dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
+dpTweakNodeCleaner
 dpCleanup

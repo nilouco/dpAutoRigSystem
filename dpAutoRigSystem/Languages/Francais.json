@@ -972,6 +972,8 @@
     "v122_borderGap"                   : "Bordure en espace",
     "v123_borderGapDesc"               : "Ce validateur trouverá des bordures ou des trous dans les meshes.\nIl ne sera pas possible de les corriger automaticament, désolé.\nMais tu peux essayer d'utiliser le Maya command de fill hole.",
     "v124_laminaFaceCleaner"           : "Lamina face nettoyeur",
-    "v125_laminaFaceCleanerDesc"       : "Ce validateur va véfirier s'il y des lamina faces dans les meshes.\nIl va les corriger par le cleanup."
+    "v125_laminaFaceCleanerDesc"       : "Ce validateur va véfirier s'il y des lamina faces dans les meshes.\nIl va les corriger par le cleanup.",
+    "v130_tweakNodeCleaner"            : "Tweak node nettoyeur",
+    "v131_tweaksNodeCleanerDesc"       : "Ce validateur va véfirier s'il y des tweaks nodes dans les meshes.\nIl va les corriger par le cleanup."
 
 }
