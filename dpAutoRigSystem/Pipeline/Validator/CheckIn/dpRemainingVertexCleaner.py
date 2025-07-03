@@ -1,26 +1,25 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
 from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "LaminaFaceCleaner"
-TITLE = "v124_laminaFaceCleaner"
-DESCRIPTION = "v125_laminaFaceCleanerDesc"
-ICON = "/Icons/dp_laminaFaceCleaner.png"
+CLASS_NAME = "RemainingVertexCleaner"
+TITLE = "v134_remainingVertexCleaner"
+DESCRIPTION = "v135_remainingVertexCleanerDesc"
+ICON = "/Icons/dp_remainingVertexCleaner.png"
 
-DP_LAMINAFACECLEANER_VERSION = 1.1
+DP_REMAININGVERTEXCLEANER_VERSION = 1.0
 
 
-class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
+class RemainingVertexCleaner(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_LAMINAFACECLEANER_VERSION
+        self.version = DP_REMAININGVERTEXCLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -48,7 +47,7 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
-                laminedFaceList, laminaList = [], []
+                borderEdgeIdxList, remainingVertexList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
@@ -63,57 +62,54 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                         for obj in toCheckList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                # get faces
-                                faceIter   = OpenMaya.MItMeshPolygon(shapeNode)
-                                conFacesIt = OpenMaya.MItMeshPolygon(shapeNode)
-                                # run in faces listing edges
-                                while not faceIter.isDone():
-                                    # list vertices from this face
-                                    edgesIntArray = OpenMaya.MIntArray()
-                                    faceIter.getEdges(edgesIntArray)
-                                    # get connected faces of this face
-                                    conFacesIntArray = OpenMaya.MIntArray()
-                                    faceIter.getConnectedFaces(conFacesIntArray)
-                                    # run in adjacent faces to list them vertices
-                                    for f in conFacesIntArray:
-                                        # say this is the face index to use for next iterations
-                                        lastIndexPtr = OpenMaya.MScriptUtil().asIntPtr()
-                                        conFacesIt.setIndex(f, lastIndexPtr)
-                                        # get edges from this adjacent face
-                                        conEdgesIntArray = OpenMaya.MIntArray()
-                                        conFacesIt.getEdges(conEdgesIntArray)
-                                        # compare edges to verify if the list are the same
-                                        if sorted(edgesIntArray) == sorted(conEdgesIntArray):
-                                            # found laminaFaces
-                                            if not objectName in laminedFaceList:
-                                                laminedFaceList.append(objectName)
-                                            laminaList.append(objectName+'.f['+str(faceIter.index())+']')
-                                    faceIter.next()
+                                vertexIter = OpenMaya.MItMeshVertex(shapeNode)
+                                iterEdges  = OpenMaya.MItMeshEdge(shapeNode)
+                                # Iterate through edges on current mesh
+                                while not iterEdges.isDone():
+                                    # Get current polygons connected faces
+                                    indexConFaces = OpenMaya.MIntArray()
+                                    iterEdges.getConnectedFaces(indexConFaces)
+                                    if len(indexConFaces) == 1:
+                                        # got a border edge
+                                        borderEdgeIdxList.append(iterEdges.index())
+                                    # Move to next edge in the mesh list
+                                    iterEdges.next()
+                                # Iterate through vertices on current mesh
+                                while not vertexIter.isDone():
+                                    # Get current vertex connected edges
+                                    indexConEdges = OpenMaya.MIntArray()
+                                    vertexIter.getConnectedEdges(indexConEdges)
+                                    if len(indexConEdges) < 3:
+                                        if borderEdgeIdxList:
+                                            if not set(indexConEdges).intersection(borderEdgeIdxList):
+                                                remainingVertexList.append(objectName+'.vtx['+str(vertexIter.index())+']')
+                                        else:
+                                            remainingVertexList.append(objectName+'.vtx['+str(vertexIter.index())+']')
+                                    # Move to next vertex in the mesh list
+                                    vertexIter.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if laminedFaceList:
-                    laminedFaceList.sort()
-                    laminaList.sort()
-                    for item in laminedFaceList:
+                if remainingVertexList:
+                    #remainingVertexList.sort()
+                    for item in remainingVertexList:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                cmds.select(item)
-                                mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"-1\",\"1\" };')
-                                cmds.select(clear=True)
+                                cmds.delete(remainingVertexList)
+                                
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaList))
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaList))
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
                     if self.firstMode:
-                        self.messageList.append("Lamina faces: "+str(laminaList))
-                        self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaList)+")\n---")
-                        cmds.select(laminaList)
+                        self.messageList.append("Remaining vertex: "+str(remainingVertexList))
+                        self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(remainingVertexList)+")\n---")
+                        cmds.select(remainingVertexList)
             else:
                 self.notFoundNodes()
         else:

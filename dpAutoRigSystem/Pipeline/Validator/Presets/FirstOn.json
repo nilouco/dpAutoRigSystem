@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-02",
+    "_updated"    : "2025-06-03",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : false,
@@ -16,6 +16,7 @@
     "NonManifoldCleaner"        : false,
     "NonQuadFace"               : false,
     "OverrideCleaner"           : false,
+    "RemainingVertexCleaner"    : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,
     "UnlockAttributes"          : false,
