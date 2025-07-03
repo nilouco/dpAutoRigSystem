@@ -80,7 +80,6 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             except Exception as e:
                 print(e)
                 cmds.delete(folTr)
-            print(f"{folTr} removed.")
 
             connectionList = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
             if len(connectionList) > 1:
@@ -274,11 +273,8 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
 
 
     def randomizeNewPivot(self, rivet_controllers_list, attach_to_geo_list):
-        cmds.progressWindow(title="Processing", progress=0, status=rivet_controllers_list[0], isInterruptable=True)
         for idx, control in enumerate(rivet_controllers_list):
-            cmds.progressWindow(edit=True, progress=int((idx+1)/len(rivet_controllers_list) * 100), status=control)
             self.randomizeTranslation(control, attach_to_geo_list[idx])
-        cmds.progressWindow(endProgress=True)
 
 
     def getRivetOptionsList(self, follicles_origin_list):
@@ -288,8 +284,8 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             rivet_controller = cmds.listConnections(f"{rivetNet}.itemNode", source=True, destination=False)[0]
             pacNode = cmds.listConnections(f"{rivetNet}.pacNode", source=True, destination=False)[0]
             transformAttached = cmds.listConnections(f"{rivetNet}.rivet", source=True, destination=False)[0]
-            has_inv_translate = True if cmds.listConnections(f"{rivetNet}.invTGrp", source=True, destination=False) else False
-            has_inv_rotate = True if cmds.listConnections(f"{rivetNet}.invRGrp", source=True, destination=False) else False
+            has_inv_translate = cmds.listConnections(f"{rivetNet}.invTGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True)))
+            has_inv_rotate = cmds.listConnections(f"{rivetNet}.invRGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True)))
             addInvert = has_inv_translate or has_inv_rotate
             connections = cmds.listConnections(pacNode, source=True, destination=True, plugs=True) or []
             found_attrs = [conn.split('.')[-1] for conn in connections]
