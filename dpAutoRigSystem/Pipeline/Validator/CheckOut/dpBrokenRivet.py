@@ -10,7 +10,7 @@ TITLE = "v126_brokenRivet"
 DESCRIPTION = "v127_brokenRivetDesc"
 ICON = "/Icons/dp_brokenRivet.png"
 
-DP_BROKEN_RIVET = 1.0
+DP_BROKENRIVET_VERSION = 1.0
 
 
 class BrokenRivet(dpBaseAction.ActionStartClass):
@@ -20,7 +20,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_BROKEN_RIVET
+        self.version = DP_BROKENRIVET_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
 
@@ -57,40 +57,40 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
 
 
     def removeRivetFromNetNode(self, folTr, rivetNetNode):
-            """ Remove the rivet from its network node.
-            """
-            rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
-            if rivetTransform:
-                rivetTransform = rivetTransform[0]
-            rivetControl = cmds.listConnections(f"{rivetNetNode}.itemNode", destination=False)[0]
-            try:
-                originalParent = cmds.listRelatives(rivetTransform, parent=True)
-                currentParent = cmds.listRelatives(rivetControl, parent=True)
-                if originalParent == None:
-                    if currentParent != originalParent:
-                        cmds.parent(rivetControl, world=True)
-                else:
-                    originalParent = originalParent[0]
-                    if not originalParent in currentParent:
-                        cmds.parent(rivetControl, originalParent)
-                if rivetControl != rivetTransform:
-                    cmds.delete([rivetTransform, folTr])
-                else:
-                    cmds.delete(folTr)
-            except Exception as e:
-                print(e)
-                cmds.delete(folTr)
-
-            connectionList = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
-            if len(connectionList) > 1:
-                for connection in connectionList:
-                    if "rivetNet" in connection:
-                        cmds.deleteAttr(connection)
-                        break
+        """ Remove the rivet from its network node.
+        """
+        rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
+        if rivetTransform:
+            rivetTransform = rivetTransform[0]
+        rivetControl = cmds.listConnections(f"{rivetNetNode}.itemNode", destination=False)[0]
+        try:
+            originalParent = cmds.listRelatives(rivetTransform, parent=True)
+            currentParent = cmds.listRelatives(rivetControl, parent=True)
+            if originalParent == None:
+                if currentParent != originalParent:
+                    cmds.parent(rivetControl, world=True)
             else:
-                cmds.deleteAttr(connectionList[0])
+                originalParent = originalParent[0]
+                if not originalParent in currentParent:
+                    cmds.parent(rivetControl, originalParent)
+            if rivetControl != rivetTransform:
+                cmds.delete([rivetTransform, folTr])
+            else:
+                cmds.delete(folTr)
+        except Exception as e:
+            print(e)
+            cmds.delete(folTr)
 
-            cmds.delete(rivetNetNode)
+        connectionList = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
+        if len(connectionList) > 1:
+            for connection in connectionList:
+                if "rivetNet" in connection:
+                    cmds.deleteAttr(connection)
+                    break
+        else:
+            cmds.deleteAttr(connectionList[0])
+
+        cmds.delete(rivetNetNode)
 
 
     def getRivetNetFromFolTransform(self, folTr):
@@ -100,25 +100,25 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
                 return connection
 
 
-    def removeRivetFromFollicleTransformList(self, follicle_transform_list):
-        for folTr in follicle_transform_list:
+    def removeRivetFromFollicleTransformList(self, follicleTransformList):
+        for folTr in follicleTransformList:
             rivetNetNode = self.getRivetNetFromFolTransform(folTr)
             self.disablePac(folTr, rivetNetNode)
             self.removeRivetFromNetNode(folTr, rivetNetNode)
 
 
-    def getConnectionsFromFollicle(self, follicles_origin_list):
+    def getConnectionsFromFollicle(self, folliclesOriginList):
         controllers_list = []
-        attach_geo_list = []
-        for folTr in follicles_origin_list:
+        attachGeoList = []
+        for folTr in folliclesOriginList:
             rivetNetNode = self.getRivetNetFromFolTransform(folTr)
             rivet_controller = cmds.listConnections(f"{rivetNetNode}.itemNode", source=True, destination=False)[0]
             face_to_rivet_geo = cmds.listConnections(f"{rivetNetNode}.geoToAttach", source=True, destination=False)[0]
             if rivet_controller:
                 controllers_list.append(rivet_controller)
             if face_to_rivet_geo:
-                attach_geo_list.append(face_to_rivet_geo)
-        return controllers_list, attach_geo_list
+                attachGeoList.append(face_to_rivet_geo)
+        return controllers_list, attachGeoList
 
 
     def getClosestVertex(self, point, vtx_list):
@@ -272,14 +272,14 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
                 print("Error: offset changed closest vertex")
 
 
-    def randomizeNewPivot(self, rivet_controllers_list, attach_to_geo_list):
-        for idx, control in enumerate(rivet_controllers_list):
+    def randomizeNewPivot(self, rivetControllersList, attach_to_geo_list):
+        for idx, control in enumerate(rivetControllersList):
             self.randomizeTranslation(control, attach_to_geo_list[idx])
 
 
-    def getRivetOptionsList(self, follicles_origin_list):
+    def getRivetOptionsList(self, folliclesOriginList):
         rivetControllerOptionsDic = {}
-        for follicle in follicles_origin_list:
+        for follicle in folliclesOriginList:
             rivetNet = self.getRivetNetFromFolTransform(follicle)
             rivet_controller = cmds.listConnections(f"{rivetNet}.itemNode", source=True, destination=False)[0]
             pacNode = cmds.listConnections(f"{rivetNet}.pacNode", source=True, destination=False)[0]
@@ -296,10 +296,10 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         return rivetControllerOptionsDic
 
 
-    def recreateRivetWithNewPivot(self, rivet_controllers_list, attach_geo_list):
-        for idx, controller in enumerate(rivet_controllers_list):
-            uvSet = cmds.polyUVSet(attach_geo_list[idx], query=True, allUVSets=True)[0]
-            self.dpRivet.dpCreateRivet(attach_geo_list[idx], uvSet, [controller], *self.rivetOptionsDic[controller])
+    def recreateRivetWithNewPivot(self, rivetControllersList, attachGeoList):
+        for idx, controller in enumerate(rivetControllersList):
+            uvSet = cmds.polyUVSet(attachGeoList[idx], query=True, allUVSets=True)[0]
+            self.dpRivet.dpCreateRivet(attachGeoList[idx], uvSet, [controller], *self.rivetOptionsDic[controller])
 
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -320,28 +320,28 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                toCheckList = cmds.ls(objList, type="follicle")
             else:
                 toCheckList = cmds.ls(type='follicle')
             if toCheckList:
-                follicles_origin_list = self.listFolliclesAtOrigin()
-                rivet_controllers_list, attach_geo_list = self.getConnectionsFromFollicle(follicles_origin_list)
-                self.checkedObjList = rivet_controllers_list.copy()
+                folliclesOriginList = self.listFolliclesAtOrigin()
+                rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
+                self.checkedObjList = rivetControllersList.copy()
                 self.foundIssueList = [True] * len(self.checkedObjList)
                 if not self.firstMode:
-                    self.rivetOptionsDic = self.getRivetOptionsList(follicles_origin_list)
-                    self.removeRivetFromFollicleTransformList(follicles_origin_list)
-                    self.randomizeNewPivot(rivet_controllers_list, attach_geo_list)
-                    self.recreateRivetWithNewPivot(rivet_controllers_list, attach_geo_list)
-                    follicles_origin_list = self.listFolliclesAtOrigin()
-                    if len(follicles_origin_list) == 0:
+                    self.rivetOptionsDic = self.getRivetOptionsList(folliclesOriginList)
+                    self.removeRivetFromFollicleTransformList(folliclesOriginList)
+                    self.randomizeNewPivot(rivetControllersList, attachGeoList)
+                    self.recreateRivetWithNewPivot(rivetControllersList, attachGeoList)
+                    folliclesOriginList = self.listFolliclesAtOrigin()
+                    if len(folliclesOriginList) == 0:
                         self.resultOkList.append(True)
-                        for fixed in rivet_controllers_list:
+                        for fixed in rivetControllersList:
                             self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+fixed)
                     else:
                         self.resultOkList.append(False)
-                        rivet_controllers_list, attach_geo_list = self.getConnectionsFromFollicle(follicles_origin_list)
-                        for nonFixed in rivet_controllers_list:
+                        rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
+                        for nonFixed in rivetControllersList:
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+nonFixed)
             else:
                 self.notFoundNodes()
