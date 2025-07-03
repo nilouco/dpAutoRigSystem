@@ -3,6 +3,7 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 from ....Tools import dpRivet
 import random
+import maya.api.OpenMaya as om
 
 # global variables to this module:
 CLASS_NAME = "BrokenRivet"
@@ -123,25 +124,42 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
 
     def getClosestVertex(self, point, vtx_list):
         """
-        Finds the closest vertex to a given point in Maya using cmds.
+        Finds the closest vertex to a given point from a list of vertex component strings.
+        
         :param point: A tuple (x, y, z) representing the target point.
-        :return: Index of the closest vertex.
+        :param vtx_list: List of strings like "mesh.vtx[0]"
+        :return: Index of the closest vertex in the list.
         """
-        closest_vertex = None
+        if not vtx_list:
+            raise ValueError("Vertex list is empty.")
+
+        # Extract mesh name from the first element
+        mesh_name = vtx_list[0].split(".")[0]
+
+        # Get MDagPath from mesh name
+        selection_list = om.MSelectionList()
+        selection_list.add(mesh_name)
+        dag_path = selection_list.getDagPath(0)
+
+        fn_mesh = om.MFnMesh(dag_path)
+        target_point = om.MPoint(point)
+
+        # Extract indices from vertex strings
+        vertex_indices = [int(v.split("[")[1].strip("]")) for v in vtx_list]
+
+        # Find closest vertex
+        closest_vertex_index = -1
         min_distance = float("inf")
 
-        for vertex in vtx_list:
-            vtx_index = int(vertex.split("[")[1].strip("]"))  # Extract index
-            vtx_pos = cmds.xform(vertex, query=True, translation=True, worldSpace=True)
-
-            # Compute Euclidean distance
-            distance = (sum((point[i] - vtx_pos[i]) ** 2 for i in range(3))) ** 0.5
+        for i in vertex_indices:
+            vtx_pos = fn_mesh.getPoint(i, om.MSpace.kWorld)
+            distance = (vtx_pos - target_point).length()
 
             if distance < min_distance:
                 min_distance = distance
-                closest_vertex = vtx_index
+                closest_vertex_index = i
 
-        return closest_vertex
+        return closest_vertex_index
 
 
     def getConnectedEdges(self, mesh_name, vertex_index):
@@ -165,50 +183,48 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
 
     def getEdgeLength(self, mesh_name, edge_index):
         """
-        Returns the length of an edge given its index.
+        Returns the length of an edge given its index using OpenMaya.
+        
         :param mesh_name: Name of the mesh object.
         :param edge_index: Index of the edge.
         :return: Length of the edge.
         """
-        edge = f"{mesh_name}.e[{edge_index}]"  # Format edge identifier
-        verts = cmds.polyInfo(edge, edgeToVertex=True)
+        # Get DAG path of the mesh
+        selection_list = om.MSelectionList()
+        selection_list.add(mesh_name)
+        dag_path = selection_list.getDagPath(0)
 
-        if not verts:
-            return None
+        fn_mesh = om.MFnMesh(dag_path)
 
-        verts = [int(v) for v in verts[0].split()[2:]]  # Extract vertex indices
+        # Get the two vertex indices that form the edge
+        edge_vertices = fn_mesh.getEdgeVertices(edge_index)
 
-        # Get vertex positions
-        vtx1_pos = cmds.xform(f"{mesh_name}.vtx[{verts[0]}]", query=True, translation=True, worldSpace=True)
-        vtx2_pos = cmds.xform(f"{mesh_name}.vtx[{verts[1]}]", query=True, translation=True, worldSpace=True)
+        # Get vertex positions in world space
+        pt1 = fn_mesh.getPoint(edge_vertices[0], om.MSpace.kWorld)
+        pt2 = fn_mesh.getPoint(edge_vertices[1], om.MSpace.kWorld)
 
-        # Compute Euclidean distance (edge length)
-        length = (sum((vtx1_pos[i] - vtx2_pos[i]) ** 2 for i in range(3))) ** 0.5
-
-        return length
+        # Compute Euclidean distance
+        return (pt2 - pt1).length()
 
 
     def normalizeVectorSum(self, vectors):
         """
-        Sums a list of vectors and returns the normalized result.
+        Sums a list of vectors and returns the normalized result using OpenMaya.
         
         :param vectors: List of tuples or lists representing vectors (x, y, z).
-        :return: Normalized list [x, y, z].
+        :return: Normalized MVector.
         """
         if not vectors:
             raise ValueError("Vector list is empty")
 
-        total = [0.0, 0.0, 0.0]
+        total = om.MVector(0.0, 0.0, 0.0)
         for vec in vectors:
-            total[0] += vec[0]
-            total[1] += vec[1]
-            total[2] += vec[2]
+            total += om.MVector(vec)
 
-        norm = (total[0]**2 + total[1]**2 + total[2]**2) ** 0.5
-        if norm == 0:
+        if total.length() == 0.0:
             raise ValueError("Sum of vectors is zero, cannot normalize")
 
-        return [total[0] / norm, total[1] / norm, total[2] / norm]
+        return total.normal()
 
 
     def getDirectionVector(self, model, vtx_index):
