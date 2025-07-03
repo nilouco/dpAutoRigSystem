@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-07-02",
+    "_updated"    : "2025-07-03",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : true,
@@ -15,6 +15,7 @@
     "NamespaceCleaner"          : true,
     "NonManifoldCleaner"        : true,
     "NonQuadFace"               : true,
+    "OneVertex"                 : true,
     "OverrideCleaner"           : true,
     "ShowBPCleaner"             : true,
     "SoftenEdges"               : true,
