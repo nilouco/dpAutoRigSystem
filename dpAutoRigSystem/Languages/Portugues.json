@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-27",
+    "_updated"       : "2025-07-03",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -959,7 +959,7 @@
     "v112_jointEndCleanerDesc"         : "Essa validador vai verificar se existem joints\ndesnecessários no final da cadeia.\nSe sim, vai deleta-los pois não são úteis para a animação.",
     "v113_bindPoseCleaner"             : "BindPose limpador",
     "v114_bindPoseCleanerDesc"         : "Esse validador vai verificar se existem nodes de bindPose\nna cena. Se sim, ele vai deleta-los e criar\napenas um node para todos os joints skinados.",
-    "v126_brokenRivet"                 : "BrokenRivets",
-    "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja, aqueles que não estão corretamente fixados, tenta consertá-los."
+    "v126_brokenRivet"                 : "Broken Rivets",
+    "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja,\naqueles que não estão corretamente fixados,\ne tenta corrigi-los."
 
 }

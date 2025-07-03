@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-06-26",
+    "_updated"    : "2025-07-03",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : true,
@@ -21,6 +21,7 @@
 
     "BindPoseCleaner"           : true,
     "BrokenNetCleaner"          : true,
+    "BrokenRivet"               : true,
     "Cleanup"                   : true,
     "ColorSetCleaner"           : true,
     "ControllerTag"             : true,

@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-06-27",
+    "_updated"       : "2025-07-03",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -960,7 +960,7 @@
     "v112_jointEndCleanerDesc"         : "This validator will verify if there are\nunnecessary joints at the end of the chains.\nIf so, it'll delete them because they aren't useful to animation.",
     "v113_bindPoseCleaner"             : "BindPose cleaner",
     "v114_bindPoseCleanerDesc"         : "This validator will verify if there are\nbindPose nodes in the scene.\nIf so, it'll delete them and create just\na new one node for all skinned joints.",
-    "v126_brokenRivet"                 : "BrokenRivets",
-    "v127_brokenRivetDesc"             : "Lists the follicles in the world origin, meaning those that are not correctly fixed, tries to fix them."
+    "v126_brokenRivet"                 : "Broken Rivets",
+    "v127_brokenRivetDesc"             : "Lists the follicles in the world origin,\nmeaning those that are not correctly fixed,\ntries to fix them."
 
 }
