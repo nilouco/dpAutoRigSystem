@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.32"
+DPAR_VERSION_5 = "5.00.33"
 DPAR_UPDATELOG = "N911 - Detect broken rivets and try to fix them."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 

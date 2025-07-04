@@ -1,4 +1,5 @@
 dpCycleChecker
+dpBrokenRivet
 dpKeyframeCleaner
 dpNgSkinToolsCleaner
 dpBrokenNetCleaner
@@ -12,7 +13,6 @@ dpUnusedNodeCleaner
 dpPruneSkinWeights
 dpUnusedSkinCleaner
 dpEnvelopeChecker
-dpBrokenRivet
 dpScalableDeformerChecker
 dpWIPCleaner
 dpExitEditMode
