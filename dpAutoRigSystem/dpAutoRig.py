@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.32"
+DPAR_VERSION_5 = "5.00.34"
 DPAR_UPDATELOG = "N570 - T face cleaner checkin validator."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 

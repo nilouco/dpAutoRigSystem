@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-07-02",
+    "_updated"       : "2025-07-04",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -162,6 +162,7 @@
     "e019_notFoundAllGrp"          : "Não encontrado o All_Grp para selecionar os controles, desculpe.",
     "e020_notFoundHeadCtrl"        : "Head Deformer criado, mas não encontrado o Head_Ctrl para parentear, desculpe.",
     "e021_cantLoadSoftIk"          : "Não foi possível carregar a extensão dpSoftIk para criar o softIk no módulo Limb, desculpe.",
+    "e022_offsetClosetVertex"      : "O offset mudou o vertex mais próximo.",
     
     "i000_guides"               : "Criar GUIAS",
     "i001_modules"              : "Editar MODULOS",
@@ -973,7 +974,11 @@
     "v123_borderGapDesc"               : "Esse validador encontrará bordas ou buracos nas meshes.\nNão será possível corrigir automaticamente, desculpe.\nMas você pode tentar usar o comando do Maya de fill hole.",
     "v124_laminaFaceCleaner"           : "Lamina face limpador",
     "v125_laminaFaceCleanerDesc"       : "Esse validador vai verificar se existem lamina faces nas meshes.\nIrá limpa-las pelo cleanup.",
+    "v126_brokenRivet"                 : "Broken Rivets",
+    "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja,\naqueles que não estão corretamente fixados,\ne tenta corrigi-los.",
     "v128_tFaceCleaner"                : "T face limpador",
-    "v129_tFaceCleanerDesc"            : "Esse validador verificará se existem faces T nas meshes.\nIsso quer dizer se existe uma edge conectada a 3 ou mais faces.\nEle vai corrigir isso."
+    "v129_tFaceCleanerDesc"            : "Esse validador verificará se existem faces T nas meshes.\nIsso quer dizer se existe uma edge conectada a 3 ou mais faces.\nEle vai corrigir isso.",
+    "v130_tweakNodeCleaner"            : "Tweak node limpador",
+    "v131_tweakNodeCleanerDesc"        : "Esse validador vai verificar se existem tweak nodes na cena.\nIrá deleta-los."
 
 }
