@@ -1,4 +1,5 @@
 dpCycleChecker
+dpBrokenRivet
 dpKeyframeCleaner
 dpNgSkinToolsCleaner
 dpBrokenNetCleaner
@@ -22,6 +23,7 @@ dpDisplayLayers
 dpResetPose
 dpJointEndCleaner
 dpBindPoseCleaner
+dpTweakNodeCleaner
 dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
