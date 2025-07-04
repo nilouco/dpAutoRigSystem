@@ -979,6 +979,8 @@
     "v128_tFaceCleaner"                : "T face limpador",
     "v129_tFaceCleanerDesc"            : "Esse validador verificará se existem faces T nas meshes.\nIsso quer dizer se existe uma edge conectada a 3 ou mais faces.\nEle vai corrigir isso.",
     "v130_tweakNodeCleaner"            : "Tweak node limpador",
-    "v131_tweakNodeCleanerDesc"        : "Esse validador vai verificar se existem tweak nodes na cena.\nIrá deleta-los."
+    "v131_tweakNodeCleanerDesc"        : "Esse validador vai verificar se existem tweak nodes na cena.\nIrá deleta-los.",
+    "v132_oneVertex"                   : "Um vertex",
+    "v133_oneVertexDesc"               : "Esse validator vai verificar se existem vertices non manifold nas meshes.\nIsso quer dizer se tem vertex único unindo 2 shapes."
 
 }

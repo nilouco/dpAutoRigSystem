@@ -980,6 +980,8 @@
     "v128_tFaceCleaner"                : "T face cleaner",
     "v129_tFaceCleanerDesc"            : "This validator will verify if there are T faces in the meshes.\nThat means if there's one edge connected to 3 or plus faces.\nIt'll fix it.",
     "v130_tweakNodeCleaner"            : "Tweak node cleaner",
-    "v131_tweakNodeCleanerDesc"        : "This validator will verify if there are some tweak nodes in the scene.\nIt'll cleanup them."
+    "v131_tweakNodeCleanerDesc"        : "This validator will verify if there are some tweak nodes in the scene.\nIt'll cleanup them.",
+    "v132_oneVertex"                   : "One vertex",
+    "v133_oneVertexDesc"               : "This validator will verify if there are some non manifold vertex in the meshes.\nThat means a vertex in the union of 2 shapes."
 
 }

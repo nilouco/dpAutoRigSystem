@@ -15,6 +15,7 @@
     "NamespaceCleaner"          : true,
     "NonManifoldCleaner"        : true,
     "NonQuadFace"               : true,
+    "OneVertex"                 : true,
     "OverrideCleaner"           : true,
     "ShowBPCleaner"             : true,
     "SoftenEdges"               : true,
