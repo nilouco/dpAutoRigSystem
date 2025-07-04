@@ -91,7 +91,7 @@ class RemainingVertexCleaner(dpBaseAction.ActionStartClass):
                         iter.next()
                 # conditional to check here
                 if remainingVertexList:
-                    #remainingVertexList.sort()
+                    remainingVertexList.reverse()
                     for item in remainingVertexList:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
@@ -99,8 +99,7 @@ class RemainingVertexCleaner(dpBaseAction.ActionStartClass):
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                cmds.delete(remainingVertexList)
-                                
+                                cmds.delete(item)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
