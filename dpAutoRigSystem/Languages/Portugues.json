@@ -976,6 +976,8 @@
     "v125_laminaFaceCleanerDesc"       : "Esse validador vai verificar se existem lamina faces nas meshes.\nIrá limpa-las pelo cleanup.",
     "v126_brokenRivet"                 : "Broken Rivets",
     "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja,\naqueles que não estão corretamente fixados,\ne tenta corrigi-los.",
+    "v128_tFaceCleaner"                : "T face limpador",
+    "v129_tFaceCleanerDesc"            : "Esse validador verificará se existem faces T nas meshes.\nIsso quer dizer se existe uma edge conectada a 3 ou mais faces.\nEle vai corrigir isso.",
     "v130_tweakNodeCleaner"            : "Tweak node limpador",
     "v131_tweakNodeCleanerDesc"        : "Esse validador vai verificar se existem tweak nodes na cena.\nIrá deleta-los."
 

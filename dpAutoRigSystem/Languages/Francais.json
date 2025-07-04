@@ -973,9 +973,12 @@
     "v122_borderGap"                   : "Bordure en espace",
     "v123_borderGapDesc"               : "Ce validateur trouverá des bordures ou des trous dans les meshes.\nIl ne sera pas possible de les corriger automaticament, désolé.\nMais tu peux essayer d'utiliser le Maya command de fill hole.",
     "v124_laminaFaceCleaner"           : "Lamina face nettoyeur",
+    "v125_laminaFaceCleanerDesc"       : "Ce validateur va vérifier s'il y des lamina faces dans les meshes.\nIl va les corriger par le cleanup.",
     "v125_laminaFaceCleanerDesc"       : "Ce validateur va véfirier s'il y des lamina faces dans les meshes.\nIl va les corriger par le cleanup.",
     "v126_brokenRivet"                 : "Broken Rivets",
     "v127_brokenRivetDesc"             : "Cherche pour follicules qui sont à l'origine,\nc'est-à-dire ceux qui ne sont pas correctement fixés,\net essaye de les réparer.",
+    "v128_tFaceCleaner"                : "T face nettoyeur",
+    "v129_tFaceCleanerDesc"            : "Ce validateur va vérifier s'il y a des faces en T dans les meshes.\nÇa vaut dire s'il existe une edge connectée a 3 ou plus faces.\nIl va corriger ça.",
     "v130_tweakNodeCleaner"            : "Tweak node nettoyeur",
     "v131_tweakNodeCleanerDesc"        : "Ce validateur va véfirier s'il y des tweaks nodes dans la scene.\nIl va les effacer."
 
