@@ -300,8 +300,8 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             rivet_controller = cmds.listConnections(f"{rivetNet}.itemNode", source=True, destination=False)[0]
             pacNode = cmds.listConnections(f"{rivetNet}.pacNode", source=True, destination=False)[0]
             transformAttached = cmds.listConnections(f"{rivetNet}.rivet", source=True, destination=False)[0]
-            has_inv_translate = cmds.listConnections(f"{rivetNet}.invTGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True)))
-            has_inv_rotate = cmds.listConnections(f"{rivetNet}.invRGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True)))
+            has_inv_translate = cmds.listConnections(f"{rivetNet}.invTGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True) or [None]))
+            has_inv_rotate = cmds.listConnections(f"{rivetNet}.invRGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True) or [None]))
             addInvert = has_inv_translate or has_inv_rotate
             connections = cmds.listConnections(pacNode, source=True, destination=True, plugs=True) or []
             found_attrs = [conn.split('.')[-1] for conn in connections]
@@ -316,6 +316,14 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         for idx, controller in enumerate(rivetControllersList):
             uvSet = cmds.polyUVSet(attachGeoList[idx], query=True, allUVSets=True)[0]
             self.dpRivet.dpCreateRivet(attachGeoList[idx], uvSet, [controller], *self.rivetOptionsDic[controller])
+            connectedJointList = cmds.listConnections(controller, source=False, type="joint")
+            if connectedJointList:
+                suffix = connectedJointList[0][connectedJointList[0].rfind('_'):]
+                if suffix != "_Jis":
+                    pacConnectedAttr = cmds.listConnections(f"{controller}.rotatePivot", source=False, plugs=True, type="parentConstraint")[0]
+                    if pacConnectedAttr:
+                        # If it is not an indirect skinning joint, disregard the new pivot adjusted in the parent constraint.
+                        cmds.disconnectAttr(f"{controller}.rotatePivot", pacConnectedAttr)
 
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -345,11 +353,15 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
                 self.checkedObjList = rivetControllersList.copy()
                 self.foundIssueList = [True] * len(self.checkedObjList)
                 if not self.firstMode:
-                    self.rivetOptionsDic = self.getRivetOptionsList(folliclesOriginList)
-                    self.removeRivetFromFollicleTransformList(folliclesOriginList)
-                    self.randomizeNewPivot(rivetControllersList, attachGeoList)
-                    self.recreateRivetWithNewPivot(rivetControllersList, attachGeoList)
-                    folliclesOriginList = self.listFolliclesAtOrigin()
+                    maxTries = 5
+                    while len(folliclesOriginList) != 0 and maxTries != 0:
+                        maxTries -= 1
+                        self.rivetOptionsDic = self.getRivetOptionsList(folliclesOriginList)
+                        self.removeRivetFromFollicleTransformList(folliclesOriginList)
+                        self.randomizeNewPivot(rivetControllersList, attachGeoList)
+                        self.recreateRivetWithNewPivot(rivetControllersList, attachGeoList)
+                        folliclesOriginList = self.listFolliclesAtOrigin()
+                        rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
                     if len(folliclesOriginList) == 0:
                         self.resultOkList.append(True)
                         for fixed in rivetControllersList:
