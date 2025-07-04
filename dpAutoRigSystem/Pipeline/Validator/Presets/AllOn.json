@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-07-02",
+    "_updated"    : "2025-07-04",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : true,
@@ -46,6 +46,7 @@
     "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
+    "TweakNodeCleaner"          : true,
     "UnknownNodesCleaner"       : true,
     "UnusedNodeCleaner"         : true,
     "UnusedSkinCleaner"         : true,
