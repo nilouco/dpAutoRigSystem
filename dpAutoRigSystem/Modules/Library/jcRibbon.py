@@ -16,7 +16,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_RIBBONCLASS_VERSION = 2.7
+DP_RIBBONCLASS_VERSION = 2.8
 
 
 class RibbonClass(object):
@@ -466,8 +466,8 @@ class RibbonClass(object):
         aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Rot_Jxt')[0])
         cmds.setAttr(aux_Jnt[0]+'.jointOrient', 0, 0, 0)
         cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 5)
-        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_'+self.dpUIinst.jointEndAttr)[0])
-        self.utils.addJointEndAttr([drv_Jnt[3], drv_Jnt[4], aux_Jnt[-1]])
+        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Rot_Extra_Jxt')[0])
+        self.utils.addJointEndAttr([drv_Jnt[3], drv_Jnt[4]])
         
         cmds.parent(aux_Jnt[1], mid_Loc[3])
         cmds.setAttr(aux_Jnt[1]+'.translate', 0, 0, 0)

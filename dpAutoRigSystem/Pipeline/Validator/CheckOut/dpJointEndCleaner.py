@@ -8,7 +8,7 @@ TITLE = "v111_jointEndCleaner"
 DESCRIPTION = "v112_jointEndCleanerDesc"
 ICON = "/Icons/dp_jointEndCleaner.png"
 
-DP_JOINTENDCLEANER_VERSION = 1.0
+DP_JOINTENDCLEANER_VERSION = 1.1
 
 
 class JointEndCleaner(dpBaseAction.ActionStartClass):
@@ -51,6 +51,7 @@ class JointEndCleaner(dpBaseAction.ActionStartClass):
                 if jEndList:
                     # check connection with skinCluster to avoid delete it and crash the setup
                     jEndList = list(set(jEndList)-set(self.dpUIinst.skin.getSkinnedJointList())) #remove duplicated and skinned joints
+                    jEndList = [j for j in jEndList if not cmds.listRelatives(j, children=True)] #remove if there are children
                     if jEndList:
                         jEndList.sort()
                         for item in jEndList:

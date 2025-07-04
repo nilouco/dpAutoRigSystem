@@ -23,6 +23,8 @@ dpDisplayLayers
 dpResetPose
 dpJointEndCleaner
 dpBindPoseCleaner
+dpTweakNodeCleaner
+dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
 dpCleanup

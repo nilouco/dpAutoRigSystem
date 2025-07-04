@@ -521,6 +521,7 @@
     "i356_sVisibilityIOAnn"     : "The folder to export and import visibility data.",
     "i357_putInfoFilePathHere"  : "Put the path of your pipeline folder info here",
     "i358_batch"                : "Batch",
+    "i359_changeTo"             : "Change to",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -754,6 +755,8 @@
     "m230_proxyCreator"          : "Proxy creator",
     "m231_proxyCreatorDesc"      : "This module will generate a proxy mesh for the current rig.",
     "m232_morphDeformer"         : "Morph Deformer",
+    "m233_jointDisplay"          : "Joint Display",
+    "m234_jointDisplayDesc"      : "Change the joint display in the viewport",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -961,7 +964,20 @@
     "v112_jointEndCleanerDesc"         : "This validator will verify if there are\nunnecessary joints at the end of the chains.\nIf so, it'll delete them because they aren't useful to animation.",
     "v113_bindPoseCleaner"             : "BindPose cleaner",
     "v114_bindPoseCleanerDesc"         : "This validator will verify if there are\nbindPose nodes in the scene.\nIf so, it'll delete them and create just\na new one node for all skinned joints.",
+    "v115_hideAllJoints"               : "Hide all joints",
+    "v116_hideAllJointsDesc"           : "This validator will hide joints in the scene.",
+    "v117_colorPerVertexCleaner"       : "Color per vertex cleaner",
+    "v118_colorPerVertexCleanerDesc"   : "This validator will remove polyColorPerVertex nodes in the scene.",
+    "v119_nonQuadFace"                 : "Non quad face",
+    "v120_nonQuadFaceDesc"             : "This validator will find non quad polygon faces.\nIt won't be possible to fix it automatically, sorry.",
+    "v121_sharePythonSelect"           : "Please share with modelers this Python command to select the identified:",
+    "v122_borderGap"                   : "Border gap",
+    "v123_borderGapDesc"               : "This validator will find borders or holes in the mesh.\nIt won't be possible to if it automatically, sorry.\nBut you can try to use the fill hole Maya command to try fix it.",
+    "v124_laminaFaceCleaner"           : "Lamina face cleaner",
+    "v125_laminaFaceCleanerDesc"       : "This validator will verify if there are some lamina faces in the meshes.\nIt'll cleanup them.",
     "v126_brokenRivet"                 : "Broken Rivets",
-    "v127_brokenRivetDesc"             : "Lists the follicles in the world origin,\nmeaning those that are not correctly fixed,\ntries to fix them."
+    "v127_brokenRivetDesc"             : "Lists the follicles in the world origin,\nmeaning those that are not correctly fixed,\ntries to fix them.",
+    "v130_tweakNodeCleaner"            : "Tweak node cleaner",
+    "v131_tweakNodeCleanerDesc"        : "This validator will verify if there are some tweak nodes in the scene.\nIt'll cleanup them."
 
 }

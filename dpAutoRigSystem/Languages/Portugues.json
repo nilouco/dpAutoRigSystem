@@ -521,6 +521,7 @@
     "i356_sVisibilityIOAnn"     : "O diretório onde será exportado ou importado os dados de visibilidade.",
     "i357_putInfoFilePathHere"  : "Coloque o path do diretório do arquivo de info da pipeline aqui",
     "i358_batch"                : "Lote",
+    "i359_changeTo"             : "Mudar para",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -754,6 +755,8 @@
     "m230_proxyCreator"          : "Proxy creador",
     "m231_proxyCreatorDesc"      : "Esse modulo vai criar uma mesh proxy para o rig atual.",
     "m232_morphDeformer"         : "Deformador Morph",
+    "m233_jointDisplay"          : "Visualização de Joint",
+    "m234_jointDisplayDesc"      : "Muda o formato de visualização dos joints",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -960,7 +963,20 @@
     "v112_jointEndCleanerDesc"         : "Essa validador vai verificar se existem joints\ndesnecessários no final da cadeia.\nSe sim, vai deleta-los pois não são úteis para a animação.",
     "v113_bindPoseCleaner"             : "BindPose limpador",
     "v114_bindPoseCleanerDesc"         : "Esse validador vai verificar se existem nodes de bindPose\nna cena. Se sim, ele vai deleta-los e criar\napenas um node para todos os joints skinados.",
+    "v115_hideAllJoints"               : "Ocultar todos joints",
+    "v116_hideAllJointsDesc"           : "Esse validador ocultará todos os joints na cena.",
+    "v117_colorPerVertexCleaner"       : "Color per vertex limpador",
+    "v118_colorPerVertexCleanerDesc"   : "Esse validador removerá nodes de polyColorPerVertex da cena.",
+    "v119_nonQuadFace"                 : "Non quad face",
+    "v120_nonQuadFaceDesc"             : "Esse validador encontrará faces de polígonos não quadradas.\nNão será possível corrigir automaticamente, desculpe.",
+    "v121_sharePythonSelect"           : "Compartilhe com os modeladores esse comando em Python para selecionar a identificação, por favor:",
+    "v122_borderGap"                   : "Borda em espaço",
+    "v123_borderGapDesc"               : "Esse validador encontrará bordas ou buracos nas meshes.\nNão será possível corrigir automaticamente, desculpe.\nMas você pode tentar usar o comando do Maya de fill hole.",
+    "v124_laminaFaceCleaner"           : "Lamina face limpador",
+    "v125_laminaFaceCleanerDesc"       : "Esse validador vai verificar se existem lamina faces nas meshes.\nIrá limpa-las pelo cleanup.",
     "v126_brokenRivet"                 : "Broken Rivets",
-    "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja,\naqueles que não estão corretamente fixados,\ne tenta corrigi-los."
+    "v127_brokenRivetDesc"             : "Lista os folículos que estão na origem, ou seja,\naqueles que não estão corretamente fixados,\ne tenta corrigi-los.",
+    "v130_tweakNodeCleaner"            : "Tweak node limpador",
+    "v131_tweakNodeCleanerDesc"        : "Esse validador vai verificar se existem tweak nodes na cena.\nIrá deleta-los."
 
 }
