@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2025-07-03",
+    "_updated"    : "2025-07-04",
 
     "BorderGap"                 : false,
     "ColorPerVertexCleaner"     : false,
@@ -19,6 +19,7 @@
     "OverrideCleaner"           : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,
+    "TFaceCleaner"              : false,
     "UnlockAttributes"          : false,
     "UnlockInitialShadingGroup" : false,
     "UnlockNormals"             : false,
@@ -26,6 +27,7 @@
 
     "BindPoseCleaner"           : true,
     "BrokenNetCleaner"          : true,
+    "BrokenRivet"               : true,
     "Cleanup"                   : true,
     "ColorSetCleaner"           : true,
     "ControllerTag"             : true,
@@ -47,6 +49,7 @@
     "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
+    "TweakNodeCleaner"          : true,   
     "UnknownNodesCleaner"       : true,
     "UnusedNodeCleaner"         : true,
     "UnusedSkinCleaner"         : true,

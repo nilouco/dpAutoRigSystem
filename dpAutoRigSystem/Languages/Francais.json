@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-07-03",
+    "_updated"       : "2025-07-04",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -162,6 +162,7 @@
     "e019_notFoundAllGrp"          : "Pas trouvé le groupe All_Grp pour selectionner les controleurs, désolé.",
     "e020_notFoundHeadCtrl"        : "Head Deformer a été créé, mais on n'a pas trouvé le Head_Ctrl pour parenter, désole.",
     "e021_cantLoadSoftIk"          : "Ce n'est pas possible charger l'extention dpSoftIk pour creer le setup de softIk dans le Limb module, désolé.",
+    "e022_offsetClosetVertex"      : "L'offset a changé le vertex plus proche.",
 
     "i000_guides"               : "Créer des GUIDES",
     "i001_modules"              : "Modifier des MODULES",
@@ -973,6 +974,12 @@
     "v123_borderGapDesc"               : "Ce validateur trouverá des bordures ou des trous dans les meshes.\nIl ne sera pas possible de les corriger automaticament, désolé.\nMais tu peux essayer d'utiliser le Maya command de fill hole.",
     "v124_laminaFaceCleaner"           : "Lamina face nettoyeur",
     "v125_laminaFaceCleanerDesc"       : "Ce validateur va véfirier s'il y a des lamina faces dans les meshes.\nIl va les corriger par le cleanup.",
+    "v126_brokenRivet"                 : "Broken Rivets",
+    "v127_brokenRivetDesc"             : "Cherche pour follicules qui sont à l'origine,\nc'est-à-dire ceux qui ne sont pas correctement fixés,\net essaye de les réparer.",
+    "v128_tFaceCleaner"                : "T face nettoyeur",
+    "v129_tFaceCleanerDesc"            : "Ce validateur va vérifier s'il y a des faces en T dans les meshes.\nÇa vaut dire s'il existe une edge connectée a 3 ou plus faces.\nIl va corriger ça.",
+    "v130_tweakNodeCleaner"            : "Tweak node nettoyeur",
+    "v131_tweakNodeCleanerDesc"        : "Ce validateur va véfirier s'il y des tweaks nodes dans la scene.\nIl va les effacer.",
     "v132_oneVertex"                   : "Un vertex",
     "v133_oneVertexDesc"               : "Ce validateur va vérifier s'il y a des non manifold vertices dans les meshes.\nÇa vaut dire s'ils sont uniques dans la connection des 2 shapes."
 

@@ -5,22 +5,22 @@ from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "LaminaFaceCleaner"
-TITLE = "v124_laminaFaceCleaner"
-DESCRIPTION = "v125_laminaFaceCleanerDesc"
-ICON = "/Icons/dp_laminaFaceCleaner.png"
+CLASS_NAME = "TFaceCleaner"
+TITLE = "v128_tFaceCleaner"
+DESCRIPTION = "v129_tFaceCleanerDesc"
+ICON = "/Icons/dp_tFaceCleaner.png"
 
-DP_LAMINAFACECLEANER_VERSION = 1.1
+DP_TFACECLEANER_VERSION = 1.0
 
 
-class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
+class TFaceCleaner(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_LAMINAFACECLEANER_VERSION
+        self.version = DP_TFACECLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -48,7 +48,7 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
-                laminaObjList, laminaFaceList = [], []
+                tFaceList = []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
@@ -63,55 +63,41 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                         for obj in toCheckList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                # get faces
-                                faceIter   = OpenMaya.MItMeshPolygon(shapeNode)
-                                conFacesIt = OpenMaya.MItMeshPolygon(shapeNode)
-                                # run in faces listing edges
-                                while not faceIter.isDone():
-                                    # list vertices from this face
-                                    edgesIntArray = OpenMaya.MIntArray()
-                                    faceIter.getEdges(edgesIntArray)
-                                    # get connected faces of this face
-                                    conFacesIntArray = OpenMaya.MIntArray()
-                                    faceIter.getConnectedFaces(conFacesIntArray)
-                                    # run in adjacent faces to list them vertices
-                                    for f in conFacesIntArray:
-                                        # say this is the face index to use for next iterations
-                                        lastIndexPtr = OpenMaya.MScriptUtil().asIntPtr()
-                                        conFacesIt.setIndex(f, lastIndexPtr)
-                                        # get edges from this adjacent face
-                                        conEdgesIntArray = OpenMaya.MIntArray()
-                                        conFacesIt.getEdges(conEdgesIntArray)
-                                        # compare edges to verify if the list are the same
-                                        if sorted(edgesIntArray) == sorted(conEdgesIntArray):
-                                            # found laminaFaces
-                                            if not objectName in laminaObjList:
-                                                laminaObjList.append(objectName)
-                                            laminaFaceList.append(objectName+'.f['+str(faceIter.index())+']')
-                                    faceIter.next()
+                                # get edges
+                                edgeIter = OpenMaya.MItMeshEdge(shapeNode)
+                                # run in faces listing faces
+                                while not edgeIter.isDone():
+                                    # list faces from this edge
+                                    faceIntArray = OpenMaya.MIntArray()
+                                    edgeIter.getConnectedFaces(faceIntArray)
+                                    # verify the lenght of the connectedFaces
+                                    if len(faceIntArray) > 2:
+                                        # found tFace
+                                        tFaceList.append(objectName+".e["+str(edgeIter.index())+"]")
+                                    edgeIter.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if laminaObjList:
-                    laminaObjList.sort()
-                    laminaFaceList.sort()
-                    for item in laminaObjList:
+                if tFaceList:
+                    tFaceList.sort()
+                    for item in tFaceList:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
-                            self.messageList.append("Lamina faces: "+str(laminaFaceList))
-                            cmds.select(laminaFaceList)
                         else: #fix
                             try:
                                 cmds.select(item)
-                                mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"-1\",\"1\" };')
+                                # Cleanup T Faces
+                                mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"2\",\"0\" };')
                                 cmds.select(clear=True)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                    if self.firstMode:
+                        cmds.select(tFaceList)
             else:
                 self.notFoundNodes()
         else:

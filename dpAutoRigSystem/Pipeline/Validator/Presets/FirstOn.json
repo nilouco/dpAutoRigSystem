@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-07-03",
+    "_updated"    : "2025-07-04",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : false,
@@ -19,6 +19,7 @@
     "OverrideCleaner"           : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,
+    "TFaceCleaner"              : false,
     "UnlockAttributes"          : false,
     "UnlockInitialShadingGroup" : false,
     "UnlockNormals"             : false,
@@ -26,6 +27,7 @@
 
     "BindPoseCleaner"           : false,
     "BrokenNetCleaner"          : false,
+    "BrokenRivet"               : false,
     "Cleanup"                   : false,
     "ColorSetCleaner"           : false,
     "ControllerTag"             : false,
@@ -47,6 +49,7 @@
     "ScalableDeformerChecker"   : false,
     "SideCalibration"           : false,
     "TargetCleaner"             : false,
+    "TweakNodeCleaner"          : false,
     "UnknownNodesCleaner"       : false,
     "UnusedNodeCleaner"         : false,
     "UnusedSkinCleaner"         : false,
