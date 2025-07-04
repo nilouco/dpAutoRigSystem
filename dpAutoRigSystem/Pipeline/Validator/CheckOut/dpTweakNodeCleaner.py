@@ -5,7 +5,7 @@ from ....Modules.Base import dpBaseAction
 # global variables to this module:
 CLASS_NAME = "TweakNodeCleaner"
 TITLE = "v130_tweakNodeCleaner"
-DESCRIPTION = "v131_tweaksNodeCleanerDesc"
+DESCRIPTION = "v131_tweakNodeCleanerDesc"
 ICON = "/Icons/dp_tweakNodeCleaner.png"
 
 DP_TWEAKNODECLEANER_VERSION = 1.0
@@ -63,7 +63,6 @@ class TweakNodeCleaner(dpBaseAction.ActionStartClass):
                         except:
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                    
             else:
                 self.notFoundNodes()
         else:
