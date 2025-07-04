@@ -982,6 +982,8 @@
     "v130_tweakNodeCleaner"            : "Tweak node cleaner",
     "v131_tweakNodeCleanerDesc"        : "This validator will verify if there are some tweak nodes in the scene.\nIt'll cleanup them.",
     "v132_oneVertex"                   : "One vertex",
-    "v133_oneVertexDesc"               : "This validator will verify if there are some non manifold vertex in the meshes.\nThat means a vertex in the union of 2 shapes."
+    "v133_oneVertexDesc"               : "This validator will verify if there are some non manifold vertex in the meshes.\nThat means a vertex in the union of 2 shapes.",
+    "v134_remainingVertexCleaner"      : "Remaining vertex cleaner",
+    "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges."
 
 }

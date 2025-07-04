@@ -111,7 +111,11 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaFaceList))
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaList))
+                    if self.firstMode:
+                        self.messageList.append("Lamina faces: "+str(laminaList))
+                        self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaList)+")\n---")
+                        cmds.select(laminaList)
             else:
                 self.notFoundNodes()
         else:

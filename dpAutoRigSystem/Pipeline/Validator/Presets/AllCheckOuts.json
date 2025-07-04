@@ -17,6 +17,7 @@
     "NonQuadFace"               : false,
     "OneVertex"                 : false,
     "OverrideCleaner"           : false,
+    "RemainingVertexCleaner"    : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,
     "TFaceCleaner"              : false,

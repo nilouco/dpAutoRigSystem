@@ -10,6 +10,7 @@ dpLaminaFaceCleaner
 dpNonManifoldCleaner
 dpNonQuadFace
 dpBorderGap
+dpRemainingVertexCleaner
 dpUnlockNormals
 dpInvertedNormals
 dpColorPerVertexCleaner
