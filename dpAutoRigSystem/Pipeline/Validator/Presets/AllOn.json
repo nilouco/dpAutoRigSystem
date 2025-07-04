@@ -25,6 +25,7 @@
 
     "BindPoseCleaner"           : true,
     "BrokenNetCleaner"          : true,
+    "BrokenRivet"               : true,
     "Cleanup"                   : true,
     "ColorSetCleaner"           : true,
     "ControllerTag"             : true,

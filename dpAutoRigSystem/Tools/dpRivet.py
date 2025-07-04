@@ -33,7 +33,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.7
+DP_RIVET_VERSION = 2.8
 
 
 class Rivet(object):
@@ -793,12 +793,12 @@ class Rivet(object):
             
             # check invert group (back) in order to avoid double transformations:
             if addInvert:
-                for rivet in self.rivetList:
+                for rivet, netNode in zip(self.rivetList, self.netList):
                     invTGrp, invRGrp = self.dpInvertAttrTranformation(rivet, invT, invR)
                     if invTGrp:
-                        cmds.connectAttr(invTGrp+".message", self.net+".invTGrp", force=True)
+                        cmds.connectAttr(invTGrp+".message", netNode+".invTGrp", force=True)
                     if invRGrp:
-                        cmds.connectAttr(invRGrp+".message", self.net+".invRGrp", force=True)
+                        cmds.connectAttr(invRGrp+".message", netNode+".invRGrp", force=True)
             # clean-up temporary nodes:
             cmds.delete(dupGeo, self.cpNode, self.tempNode)
         else:

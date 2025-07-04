@@ -162,6 +162,7 @@
     "e019_notFoundAllGrp"          : "Not found All_Grp to select controls, sorry.",
     "e020_notFoundHeadCtrl"        : "Head Deformer created, but not found Head_Ctrl to parenting, sorry.",
     "e021_cantLoadSoftIk"          : "Can't load dpSoftIk extension in order to create the softIk setup in Limb module, sorry.",
+    "e022_offsetClosetVertex"      : "Offset changed closest vertex.",
 
     "i000_guides"               : "Create GUIDES",
     "i001_modules"              : "Edit MODULES",
@@ -974,6 +975,8 @@
     "v123_borderGapDesc"               : "This validator will find borders or holes in the mesh.\nIt won't be possible to if it automatically, sorry.\nBut you can try to use the fill hole Maya command to try fix it.",
     "v124_laminaFaceCleaner"           : "Lamina face cleaner",
     "v125_laminaFaceCleanerDesc"       : "This validator will verify if there are some lamina faces in the meshes.\nIt'll cleanup them.",
+    "v126_brokenRivet"                 : "Broken Rivets",
+    "v127_brokenRivetDesc"             : "Lists the follicles in the world origin,\nmeaning those that are not correctly fixed,\ntries to fix them.",
     "v130_tweakNodeCleaner"            : "Tweak node cleaner",
     "v131_tweakNodeCleanerDesc"        : "This validator will verify if there are some tweak nodes in the scene.\nIt'll cleanup them."
 
