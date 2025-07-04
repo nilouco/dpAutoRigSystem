@@ -1,9 +1,10 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
+from maya.api import OpenMaya
 from ....Modules.Base import dpBaseAction
 from ....Tools import dpRivet
 import random
-import maya.api.OpenMaya as om
 
 # global variables to this module:
 CLASS_NAME = "BrokenRivet"
@@ -137,12 +138,12 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         mesh_name = vtx_list[0].split(".")[0]
 
         # Get MDagPath from mesh name
-        selection_list = om.MSelectionList()
+        selection_list = OpenMaya.MSelectionList()
         selection_list.add(mesh_name)
         dag_path = selection_list.getDagPath(0)
 
-        fn_mesh = om.MFnMesh(dag_path)
-        target_point = om.MPoint(point)
+        fn_mesh = OpenMaya.MFnMesh(dag_path)
+        target_point = OpenMaya.MPoint(point)
 
         # Extract indices from vertex strings
         vertex_indices = [int(v.split("[")[1].strip("]")) for v in vtx_list]
@@ -152,7 +153,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         min_distance = float("inf")
 
         for i in vertex_indices:
-            vtx_pos = fn_mesh.getPoint(i, om.MSpace.kWorld)
+            vtx_pos = fn_mesh.getPoint(i, OpenMaya.MSpace.kWorld)
             distance = (vtx_pos - target_point).length()
 
             if distance < min_distance:
@@ -190,18 +191,18 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         :return: Length of the edge.
         """
         # Get DAG path of the mesh
-        selection_list = om.MSelectionList()
+        selection_list = OpenMaya.MSelectionList()
         selection_list.add(mesh_name)
         dag_path = selection_list.getDagPath(0)
 
-        fn_mesh = om.MFnMesh(dag_path)
+        fn_mesh = OpenMaya.MFnMesh(dag_path)
 
         # Get the two vertex indices that form the edge
         edge_vertices = fn_mesh.getEdgeVertices(edge_index)
 
         # Get vertex positions in world space
-        pt1 = fn_mesh.getPoint(edge_vertices[0], om.MSpace.kWorld)
-        pt2 = fn_mesh.getPoint(edge_vertices[1], om.MSpace.kWorld)
+        pt1 = fn_mesh.getPoint(edge_vertices[0], OpenMaya.MSpace.kWorld)
+        pt2 = fn_mesh.getPoint(edge_vertices[1], OpenMaya.MSpace.kWorld)
 
         # Compute Euclidean distance
         return (pt2 - pt1).length()
@@ -217,9 +218,9 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         if not vectors:
             raise ValueError("Vector list is empty")
 
-        total = om.MVector(0.0, 0.0, 0.0)
+        total = OpenMaya.MVector(0.0, 0.0, 0.0)
         for vec in vectors:
-            total += om.MVector(vec)
+            total += OpenMaya.MVector(vec)
 
         if total.length() == 0.0:
             raise ValueError("Sum of vectors is zero, cannot normalize")
@@ -285,7 +286,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             if closestVertexIndex == translatedClosestVertexIndex:
                 cmds.xform(tweakCtrl, piv=new_translation, ws=True)
             else:
-                print("Error: offset changed closest vertex")
+                mel.eval('warning \"'+self.dpUIinst.lang['e022_offsetClosetVertex']+'\";')
 
 
     def randomizeNewPivot(self, rivetControllersList, attach_to_geo_list):
