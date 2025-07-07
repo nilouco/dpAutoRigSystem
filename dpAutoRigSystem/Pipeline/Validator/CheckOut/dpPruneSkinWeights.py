@@ -9,7 +9,7 @@ TITLE = "v103_pruneSkinWeights"
 DESCRIPTION = "v104_pruneSkinWeightsDesc"
 ICON = "/Icons/dp_pruneSkinWeights.png"
 
-DP_PRUNESKINWEIGHTS_VERSION = 1.0
+DP_PRUNESKINWEIGHTS_VERSION = 1.1
 
 
 class PruneSkinWeights(dpBaseAction.ActionStartClass):
@@ -36,7 +36,7 @@ class PruneSkinWeights(dpBaseAction.ActionStartClass):
         # starting
         self.firstMode = firstMode
         self.cleanUpToStart()
-        self.pruneMinValue = 0.01
+        self.pruneMinValue = 0.0005
         
         # ---
         # --- validator code --- beginning
