@@ -16,7 +16,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.2
+DP_HEAD_VERSION = 3.3
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -497,11 +497,11 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             if not outputAttrName in cmds.listAttr(self.jawCtrl):
                 cmds.addAttr(self.jawCtrl, longName=calibOutputAttrName, attributeType='float', defaultValue=1)
                 cmds.addAttr(self.jawCtrl, longName=outputAttrName, attributeType='float', defaultValue=1)
-            jawOutputRmV = cmds.createNode('remapValue', name=jawOutputRmVName)
-            self.toIDList.append(jawOutputRmV)
-            cmds.connectAttr(self.jawCtrl+".rotateX", jawOutputRmV+".inputValue", force=True)
-            cmds.connectAttr(self.jawCtrl+"."+calibOutputAttrName, jawOutputRmV+".inputMax", force=True)
-            cmds.connectAttr(jawOutputRmV+".outValue", self.jawCtrl+"."+outputAttrName, force=True)
+            jawOutputSR = cmds.createNode('setRange', name=jawOutputRmVName)
+            self.toIDList.append(jawOutputSR)
+            cmds.connectAttr(self.jawCtrl+".rotateX", jawOutputSR+".valueX", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+calibOutputAttrName, jawOutputSR+".oldMaxX", force=True)
+            cmds.connectAttr(jawOutputSR+".outValueX", self.jawCtrl+"."+outputAttrName, force=True)
             cmds.setAttr(self.jawCtrl+"."+outputAttrName, lock=True)
 
     

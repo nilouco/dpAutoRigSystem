@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 2.8
+DP_CONTROLS_VERSION = 2.9
 
 
 class ControlClass(object):
@@ -1479,20 +1479,20 @@ class ControlClass(object):
         cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
         for attr in calibrateAttrList:
             for axis in calibrateAxisList:
-                remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
+                rangeNode = cmds.createNode("setRange", name=jcrName.replace("_Jcr", "_"+attr+axis+"_SR"))
                 intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
-                toIDList.extend([remapV, intensityMD])
-                cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
-                cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
-                cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
+                toIDList.extend([rangeNode, intensityMD])
+                cmds.connectAttr(correctiveNet+".outputStart", rangeNode+".oldMinX", force=True)
+                cmds.connectAttr(correctiveNet+".outputEnd", rangeNode+".oldMaxX", force=True)
+                cmds.connectAttr(correctiveNet+".outputValue", rangeNode+".valueX", force=True)
                 cmds.connectAttr(jcrCtrl+".intensity", intensityMD+".input1X", force=True)
-                cmds.connectAttr(remapV+".outValue", intensityMD+".input2X", force=True)
+                cmds.connectAttr(rangeNode+".outValueX", intensityMD+".input2X", force=True)
                 # add calibrate attributes:
                 if attr == "S":
                     scaleClp = cmds.createNode("clamp", name=jcrName.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
                     toIDList.append(scaleClp)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
-                    cmds.setAttr(remapV+".outputMin", 1)
+                    cmds.setAttr(rangeNode+".minX", 1)
                     cmds.setAttr(scaleClp+".minR", 1)
                     cmds.setAttr(scaleClp+".maxR", 1000)
                     cmds.connectAttr(intensityMD+".outputX", scaleClp+".inputR", force=True)
@@ -1509,7 +1509,7 @@ class ControlClass(object):
                     cmds.connectAttr(invertCnd+".outColorR", invertMD+".input2X", force=True)
                     cmds.connectAttr(jcrCtrl+".invert"+attr+axis, invertCnd+".firstTerm", force=True)
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
-                cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
+                cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, rangeNode+".maxX", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
         self.dpUIinst.customAttr.addAttr(0, toIDList) #dpID
         self.setStringAttrFromList(jcrCtrl, toCalibrationList)

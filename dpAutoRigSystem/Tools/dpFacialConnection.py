@@ -15,7 +15,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.1
+DP_FACIALCONNECTION_VERSION = 1.2
 
 
 class FacialConnection(object):
@@ -342,8 +342,8 @@ class FacialConnection(object):
         """ Creates the nodes to remap values and connect it to final output (jntTarget) item.
         """
         fromNodeName = self.utils.extractSuffix(fromNode)
-        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
-        self.toIDList.append(remap)
+        rangeNode = cmds.createNode("setRange", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SR")
+        self.toIDList.append(rangeNode)
         outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
         if not cmds.objExists(fromNode+"."+outMaxAttr):
             cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
@@ -354,19 +354,19 @@ class FacialConnection(object):
             self.toIDList.append(md)
             cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
             cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
-            cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
+            cmds.connectAttr(md+".outputX", rangeNode+".maxX", force=True)
         else:
-            cmds.connectAttr(fromNode+"."+outMaxAttr, remap+".outputMax", force=True)
-        cmds.setAttr(remap+".inputMin", iMin)
-        cmds.setAttr(remap+".inputMax", iMax)
-        cmds.setAttr(remap+".outputMin", oMin)
-        cmds.connectAttr(fromNode+"."+fromAttr, remap+".inputValue", force=True)
+            cmds.connectAttr(fromNode+"."+outMaxAttr, rangeNode+".maxX", force=True)
+        cmds.setAttr(rangeNode+".oldMinX", iMin)
+        cmds.setAttr(rangeNode+".oldMaxX", iMax)
+        cmds.setAttr(rangeNode+".minX", oMin)
+        cmds.connectAttr(fromNode+"."+fromAttr, rangeNode+".valueX", force=True)
         # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
         connectedList = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=False)
         if connectedList:
             if cmds.objectType(connectedList[0]) == "plusMinusAverage":
                 inputList = cmds.listConnections(connectedList[0]+".input1D", destination=False, source=True, plugs=False)
-                cmds.connectAttr(remap+".outValue", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
+                cmds.connectAttr(rangeNode+".outValueX", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
             else:
                 if cmds.objectType(connectedList[0]) == "unitConversion":
                     connectedAttr = cmds.listConnections(connectedList[0]+".input", destination=False, source=True, plugs=True)[0]
@@ -375,9 +375,9 @@ class FacialConnection(object):
                 pma = cmds.createNode("plusMinusAverage", name=jntTarget+"_"+toAttr.upper()+"_PMA")
                 self.toIDList.append(pma)
                 cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
-                cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
+                cmds.connectAttr(rangeNode+".outValueX", pma+".input1D[1]", force=True)
                 cmds.connectAttr(pma+".output1D", jntTarget+"."+toAttr, force=True)
                 if cmds.objectType(connectedList[0]) == "unitConversion":
                     cmds.delete(connectedList[0])
         else:
-            cmds.connectAttr(remap+".outValue", jntTarget+"."+toAttr, force=True)
+            cmds.connectAttr(rangeNode+".outValueX", jntTarget+"."+toAttr, force=True)

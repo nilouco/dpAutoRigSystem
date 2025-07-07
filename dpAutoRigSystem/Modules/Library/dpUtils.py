@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.4
+DP_UTILS_VERSION = 3.5
 
 
 class Utils(object):
@@ -42,7 +42,7 @@ class Utils(object):
                             'defaultColorMgtGlobals', 'hardwareRenderGlobals', 'characterPartition', 'defaultHardwareRenderGlobals', 'ikSystem', 'hyperGraphInfo', 'hyperGraphLayout', 'globalCacheControl', 
                             'strokeGlobals', 'dynController1', 'lightLinker1', 'persp', 'perspShape', 'top', 'topShape', 'front', 'frontShape', 'side', 'sideShape', 'shapeEditorManager', 'poseInterpolatorManager', 
                             'layerManager', 'defaultLayer', 'renderLayerManager', 'defaultRenderLayer', 'ikSCsolver', 'ikRPsolver', 'ikSplineSolver', 'hikSolver', 'MayaNodeEditorSavedTabsInfo']
-        self.utilityTypeList = ["blendColors", "blendWeighted", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse"]
+        self.utilityTypeList = ["blendColors", "blendWeighted", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse", "setRange"]
         self.typeAttrDic = {
                             "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
                             "blendWeighted"    : ["current"],
@@ -63,7 +63,8 @@ class Utils(object):
                             "multiplyDivide"   : ["outputX", "outputY", "outputZ"],
                             "plusMinusAverage" : ["output1D", "output2Dx", "output2Dy", "output3Dx", "output3Dy", "output3Dz"],
                             "remapValue"       : ["outColorR", "outColorG", "outColorB", "outValue"],
-                            "reverse"          : ["outputX", "outputY", "outputZ"]
+                            "reverse"          : ["outputX", "outputY", "outputZ"],
+                            "setRange"         : ["outValueX", "outValueY", "outValueZ"]
                         }
         self.typeMultiAttrDic = {
                             "blendWeighted"    : {"input"   : [],
@@ -77,6 +78,12 @@ class Utils(object):
                                                     },
                             "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
                                                   "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
+                                                    },
+                            "setRange"         : {"value"  : ["valueX", "valueY", "valueZ"],
+                                                  "oldMin" : ["oldMinX", "oldMinY", "oldMinZ"],
+                                                  "oldMax" : ["oldMaxX", "oldMaxY", "oldMaxZ"],
+                                                  "min"    : ["minX", "minY", "minZ"],
+                                                  "max"    : ["maxX", "maxY", "maxZ"]
                                                     }
                         }
         self.typeOutMultiAttrDic = {"chooser" : {"output" : []}}
