@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.4
+DP_UTILS_VERSION = 3.5
 
 
 class Utils(object):
@@ -1544,3 +1544,18 @@ class Utils(object):
         childrenGuideList = self.getGuideChildrenList(node)
         if childrenGuideList:
             cmds.parent(childrenGuideList, dest)
+
+
+    def removeFromSets(self, item, *args):
+        """ Remove the given node from existing sets.
+        """
+        if cmds.objExists(item):
+            setList = cmds.listSets(object=item, extendToShape=True)
+            renderSetList = cmds.listSets(object=item, extendToShape=True, type=1) #rendering sets
+            setList = list(set(setList)-set(renderSetList))
+            if setList:
+                for setNode in setList:
+                    cmds.sets(item, remove=setNode)
+                    cmds.sets(item+".vtx[*]", remove=setNode)
+                    cmds.sets(item+".f[*]", remove=setNode)
+                    cmds.sets(item+".e[*]", remove=setNode)
