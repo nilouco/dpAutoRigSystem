@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-07-04",
+    "_updated"       : "2025-07-07",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -984,6 +984,8 @@
     "v132_oneVertex"                   : "One vertex",
     "v133_oneVertexDesc"               : "This validator will verify if there are some non manifold vertex in the meshes.\nThat means a vertex in the union of 2 shapes.",
     "v134_remainingVertexCleaner"      : "Remaining vertex cleaner",
-    "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges."
-
+    "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges.",
+    "v136_parentedGeometry"            : "Parented Geometry",
+    "v137_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy."
+  
 }

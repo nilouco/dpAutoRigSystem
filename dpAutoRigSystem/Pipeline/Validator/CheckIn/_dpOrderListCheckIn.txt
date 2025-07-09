@@ -14,5 +14,6 @@ dpRemainingVertexCleaner
 dpUnlockNormals
 dpInvertedNormals
 dpColorPerVertexCleaner
+dpParentedGeometry
 dpFreezeTransform
 dpGeometryHistory
