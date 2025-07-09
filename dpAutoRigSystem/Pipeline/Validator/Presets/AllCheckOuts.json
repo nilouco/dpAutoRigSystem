@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2025-07-04",
+    "_updated"    : "2025-07-09",
 
     "BorderGap"                 : false,
     "ColorPerVertexCleaner"     : false,
@@ -46,6 +46,7 @@
     "PassthroughAttributes"     : true,
     "ProxyCreator"              : true,
     "PruneSkinWeights"          : true,
+    "RangeOptimizer"            : true,
     "ResetPose"                 : true,
     "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,

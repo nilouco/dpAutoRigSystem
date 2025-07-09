@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-07-04",
+    "_updated"       : "2025-07-09",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -163,6 +163,7 @@
     "e020_notFoundHeadCtrl"        : "Head Deformer criado, mas não encontrado o Head_Ctrl para parentear, desculpe.",
     "e021_cantLoadSoftIk"          : "Não foi possível carregar a extensão dpSoftIk para criar o softIk no módulo Limb, desculpe.",
     "e022_offsetClosetVertex"      : "O offset mudou o vertex mais próximo.",
+    "e023_unableTransferPlug"      : "Não é possível transferir mais de uma conexão.",
     
     "i000_guides"               : "Criar GUIAS",
     "i001_modules"              : "Editar MODULOS",
@@ -983,6 +984,8 @@
     "v132_oneVertex"                   : "Um vertex",
     "v133_oneVertexDesc"               : "Esse validator vai verificar se existem vertices non manifold nas meshes.\nIsso quer dizer se tem vertex único unindo 2 shapes.",
     "v134_remainingVertexCleaner"      : "Vertex restante limpador",
-    "v135_remainingVertexCleanerDesc"  : "Esse validador verificará se existem vertices restantes na mesh.\nIsso significa que tem um vertex conectado a somente 2 edges que não são bordas."
+    "v135_remainingVertexCleanerDesc"  : "Esse validador verificará se existem vertices restantes na mesh.\nIsso significa que tem um vertex conectado a somente 2 edges que não são bordas.",
+    "v136_rangeOptimizer"              : "Optimizador de alcance",
+    "v137_rangeOptimizerDesc"          : "Esse validador irá verificar se existem nodes de remapValue\nque possam ser convertidos em nodes de setRange\nsem perder funcionalidade.\nIsso optimizará o calculo e tornará o rig mais rápido."
 
 }

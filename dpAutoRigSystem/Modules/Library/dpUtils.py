@@ -42,7 +42,7 @@ class Utils(object):
                             'defaultColorMgtGlobals', 'hardwareRenderGlobals', 'characterPartition', 'defaultHardwareRenderGlobals', 'ikSystem', 'hyperGraphInfo', 'hyperGraphLayout', 'globalCacheControl', 
                             'strokeGlobals', 'dynController1', 'lightLinker1', 'persp', 'perspShape', 'top', 'topShape', 'front', 'frontShape', 'side', 'sideShape', 'shapeEditorManager', 'poseInterpolatorManager', 
                             'layerManager', 'defaultLayer', 'renderLayerManager', 'defaultRenderLayer', 'ikSCsolver', 'ikRPsolver', 'ikSplineSolver', 'hikSolver', 'MayaNodeEditorSavedTabsInfo']
-        self.utilityTypeList = ["blendColors", "blendWeighted", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse", "setRange"]
+        self.utilityTypeList = ["blendColors", "blendWeighted", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse"]
         self.typeAttrDic = {
                             "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
                             "blendWeighted"    : ["current"],
@@ -63,8 +63,7 @@ class Utils(object):
                             "multiplyDivide"   : ["outputX", "outputY", "outputZ"],
                             "plusMinusAverage" : ["output1D", "output2Dx", "output2Dy", "output3Dx", "output3Dy", "output3Dz"],
                             "remapValue"       : ["outColorR", "outColorG", "outColorB", "outValue"],
-                            "reverse"          : ["outputX", "outputY", "outputZ"],
-                            "setRange"         : ["outValueX", "outValueY", "outValueZ"]
+                            "reverse"          : ["outputX", "outputY", "outputZ"]
                         }
         self.typeMultiAttrDic = {
                             "blendWeighted"    : {"input"   : [],
@@ -78,12 +77,6 @@ class Utils(object):
                                                     },
                             "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
                                                   "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
-                                                    },
-                            "setRange"         : {"value"  : ["valueX", "valueY", "valueZ"],
-                                                  "oldMin" : ["oldMinX", "oldMinY", "oldMinZ"],
-                                                  "oldMax" : ["oldMaxX", "oldMaxY", "oldMaxZ"],
-                                                  "min"    : ["minX", "minY", "minZ"],
-                                                  "max"    : ["maxX", "maxY", "maxZ"]
                                                     }
                         }
         self.typeOutMultiAttrDic = {"chooser" : {"output" : []}}
@@ -1551,3 +1544,18 @@ class Utils(object):
         childrenGuideList = self.getGuideChildrenList(node)
         if childrenGuideList:
             cmds.parent(childrenGuideList, dest)
+
+
+    def removeFromSets(self, item, *args):
+        """ Remove the given node from existing sets.
+        """
+        if cmds.objExists(item):
+            setList = cmds.listSets(object=item, extendToShape=True)
+            renderSetList = cmds.listSets(object=item, extendToShape=True, type=1) #rendering sets
+            setList = list(set(setList)-set(renderSetList))
+            if setList:
+                for setNode in setList:
+                    cmds.sets(item, remove=setNode)
+                    cmds.sets(item+".vtx[*]", remove=setNode)
+                    cmds.sets(item+".f[*]", remove=setNode)
+                    cmds.sets(item+".e[*]", remove=setNode)

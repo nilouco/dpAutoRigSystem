@@ -28,7 +28,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_SOFTIK_VERSION = 2.2
+DP_SOFTIK_VERSION = 2.1
 
 
 class SoftIkClass(object):
@@ -52,7 +52,7 @@ class SoftIkClass(object):
         
         # set up node network for softIk:
         self.calibrateMD = cmds.createNode("multiplyDivide", name=userName+"_SoftCalibrate_MD")
-        softSR = cmds.createNode("setRange", name=userName+"_SoftDistance_SR")
+        softRmV = cmds.createNode("remapValue", name=userName+"_SoftDistance_RmV")
         daMD = cmds.createNode("plusMinusAverage", name=userName+"_DA_PMA")
         xMinusDaPMA = cmds.createNode("plusMinusAverage", name=userName+"_X_Minus_DA_PMA")
         negateXMinusMD = cmds.createNode("multiplyDivide", name=userName+"_Negate_X_Minus_MD")
@@ -66,11 +66,11 @@ class SoftIkClass(object):
         lengthStartMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Start_MD")
         lenghtOutputMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Output_MD")
         softIkRigScaleMD = cmds.createNode("multiplyDivide", name=userName+"_SoftIk_RigScale_MD")
-        self.toIDList.extend([self.calibrateMD, softSR, daMD, xMinusDaPMA, negateXMinusMD, divByDSoftMD, powEMD, oneMinusPowEPMD, timesDSoftMD, plusDAPMA, daCnd, distDiffPMA, lengthStartMD, lenghtOutputMD, softIkRigScaleMD])
+        self.toIDList.extend([self.calibrateMD, softRmV, daMD, xMinusDaPMA, negateXMinusMD, divByDSoftMD, powEMD, oneMinusPowEPMD, timesDSoftMD, plusDAPMA, daCnd, distDiffPMA, lengthStartMD, lenghtOutputMD, softIkRigScaleMD])
         
         # set default values and operations:
         cmds.setAttr(powEMD+".input1X", 2.718281828)
-        cmds.setAttr(softSR+".minX", 0.001)
+        cmds.setAttr(softRmV+".outputMin", 0.001)
         cmds.setAttr(negateXMinusMD+".input2X", -1)
         cmds.setAttr(oneMinusPowEPMD+".input1D[0]", 1)
         cmds.setAttr(daMD+".operation", 2) #divide
@@ -86,9 +86,9 @@ class SoftIkClass(object):
 
         # make connections:
         cmds.connectAttr(ctrlName+".softIk_"+self.dpUIinst.lang['c111_calibrate'], self.calibrateMD+".input1X", force=True)
-        cmds.connectAttr(self.calibrateMD+".outputX", softSR+".maxX", force=True)
-        cmds.connectAttr(ctrlName+".softIk", softSR+".valueX", force=True)
-        cmds.connectAttr(softSR+".outValueX", ctrlName+".softDistance", force=True)
+        cmds.connectAttr(self.calibrateMD+".outputX", softRmV+".outputMax", force=True)
+        cmds.connectAttr(ctrlName+".softIk", softRmV+".inputValue", force=True)
+        cmds.connectAttr(softRmV+".outValue", ctrlName+".softDistance", force=True)
         cmds.connectAttr(ctrlName+".startChainLength", lengthStartMD+".input1X", force=True)
         cmds.connectAttr(lengthStartMD+".outputX", daMD+".input1D[0]", force=True)
         cmds.connectAttr(ctrlName+"."+self.dpUIinst.lang["c113_length"], lengthStartMD+".input2X", force=True)
