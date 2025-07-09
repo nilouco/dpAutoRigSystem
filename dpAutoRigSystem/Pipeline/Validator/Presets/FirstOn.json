@@ -46,7 +46,7 @@
     "PassthroughAttributes"     : false,
     "ProxyCreator"              : false,
     "PruneSkinWeights"          : false,
-    "RangeOptimizer"            : false,
+    "RemapValueToSetRange"      : false,
     "ResetPose"                 : false,
     "ScalableDeformerChecker"   : false,
     "SideCalibration"           : false,

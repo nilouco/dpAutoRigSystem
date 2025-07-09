@@ -986,7 +986,7 @@
     "v133_oneVertexDesc"               : "This validator will verify if there are some non manifold vertex in the meshes.\nThat means a vertex in the union of 2 shapes.",
     "v134_remainingVertexCleaner"      : "Remaining vertex cleaner",
     "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges.",
-    "v136_rangeOptimizer"              : "Range optimizer",
-    "v137_rangeOptimizerDesc"          : "This validator will verify if there are remapValue nodes\nthat could be converted to setRange nodes\nwithout losing any behavior.\nIt'll optimize the calculation and get a faster rig."
+    "v136_remapValueToSetRange"        : "RemapValue to SetRange",
+    "v137_remapValueToSetRangeDesc"    : "This validator will verify if there are remapValue nodes\nthat could be converted to setRange nodes\nwithout losing any behavior.\nIt'll optimize the calculation and get a faster rig."
 
 }

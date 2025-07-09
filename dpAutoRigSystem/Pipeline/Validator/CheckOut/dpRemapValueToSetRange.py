@@ -3,22 +3,22 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "RangeOptimizer"
-TITLE = "v136_rangeOptimizer"
-DESCRIPTION = "v137_rangeOptimizerDesc"
-ICON = "/Icons/dp_rangeOptimizer.png"
+CLASS_NAME = "RemapValueToSetRange"
+TITLE = "v136_remapValueToSetRange"
+DESCRIPTION = "v137_remapValueToSetRangeDesc"
+ICON = "/Icons/dp_remapValueToSetRange.png"
 
-DP_RANGEOPTIMIZER_VERSION = 1.0
+DP_REMAPVALUETOSETRANGE_VERSION = 1.0
 
 
-class RangeOptimizer(dpBaseAction.ActionStartClass):
+class RemapValueToSetRange(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_RANGEOPTIMIZER_VERSION
+        self.version = DP_REMAPVALUETOSETRANGE_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 

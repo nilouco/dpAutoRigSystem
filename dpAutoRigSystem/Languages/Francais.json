@@ -985,7 +985,7 @@
     "v133_oneVertexDesc"               : "Ce validateur va vérifier s'il y a des non manifold vertices dans les meshes.\nÇa vaut dire s'ils sont uniques dans la connection des 2 shapes.",
     "v134_remainingVertexCleaner"      : "Vertex restant nettoyeur",
     "v135_remainingVertexCleanerDesc"  : "Ce validateur va véfirier s'il y des vertices restants dans la mesh.\nÇa vaut dire s'il a de vertex connecté à juste 2 edges que ne sont pas des bordures.",
-    "v136_rangeOptimizer"              : "Optimiseur de portée",
-    "v137_rangeOptimizerDesc"          : "Ce validateur vérifiera si des nodes de remapValue que pourraient être\nconvertis en nodes de setRange sans perte de comportement.\nIl optimisera le calcul et va faire le rig plus vite."
+    "v136_remapValueToSetRange"        : "RemapValue pour SetRange",
+    "v137_remapValueToSetRangeDesc"    : "Ce validateur vérifiera si des nodes de remapValue que pourraient être\nconvertis en nodes de setRange sans perte de comportement.\nIl optimisera le calcul et va faire le rig plus vite."
 
 }

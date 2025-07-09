@@ -24,7 +24,7 @@ dpResetPose
 dpJointEndCleaner
 dpBindPoseCleaner
 dpTweakNodeCleaner
-dpRangeOptimizer
+dpRemapValueToSetRange
 dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
