@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-07-04",
+    "_updated"    : "2025-07-09",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : true,
@@ -46,6 +46,7 @@
     "PassthroughAttributes"     : true,
     "ProxyCreator"              : true,
     "PruneSkinWeights"          : true,
+    "RemapValueToSetRange"      : true,
     "ResetPose"                 : true,
     "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,
