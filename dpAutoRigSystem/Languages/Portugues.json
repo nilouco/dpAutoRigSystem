@@ -983,6 +983,8 @@
     "v132_oneVertex"                   : "Um vertex",
     "v133_oneVertexDesc"               : "Esse validator vai verificar se existem vertices non manifold nas meshes.\nIsso quer dizer se tem vertex único unindo 2 shapes.",
     "v134_remainingVertexCleaner"      : "Vertex restante limpador",
-    "v135_remainingVertexCleanerDesc"  : "Esse validador verificará se existem vertices restantes na mesh.\nIsso significa que tem um vertex conectado a somente 2 edges que não são bordas."
+    "v135_remainingVertexCleanerDesc"  : "Esse validador verificará se existem vertices restantes na mesh.\nIsso significa que tem um vertex conectado a somente 2 edges que não são bordas.",
+    "v138_removeEmptyTransform"        : "Remover transform vazios",
+    "v139_removeEmptyTransformDesc"    : "This validator will verify if have any transform without son or connection and delete them."
 
 }
