@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.39"
+DPAR_VERSION_5 = "5.00.40"
 DPAR_UPDATELOG = "N914 - Parented geometry checkin validator."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 

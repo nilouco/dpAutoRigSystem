@@ -4,6 +4,7 @@ dpNamespaceCleaner
 dpUnlockInitialShadingGroup
 dpShowBPCleaner
 dpDuplicatedName
+dpParentedGeometry
 dpOneVertex
 dpTFaceCleaner
 dpLaminaFaceCleaner
@@ -11,9 +12,11 @@ dpNonManifoldCleaner
 dpNonQuadFace
 dpBorderGap
 dpRemainingVertexCleaner
+dpColorPerVertexCleaner
 dpUnlockNormals
 dpInvertedNormals
-dpColorPerVertexCleaner
-dpParentedGeometry
+dpSoftenEdges
+dpOverrideCleaner
+dpUnlockAttributes
 dpFreezeTransform
 dpGeometryHistory

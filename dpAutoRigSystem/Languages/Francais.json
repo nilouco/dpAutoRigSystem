@@ -984,7 +984,7 @@
     "v133_oneVertexDesc"               : "Ce validateur va vérifier s'il y a des non manifold vertices dans les meshes.\nÇa vaut dire s'ils sont uniques dans la connection des 2 shapes.",
     "v134_remainingVertexCleaner"      : "Vertex restant nettoyeur",
     "v135_remainingVertexCleanerDesc"  : "Ce validateur va véfirier s'il y des vertices restants dans la mesh.\nÇa vaut dire s'il a de vertex connecté à juste 2 edges que ne sont pas des bordures.",
-    "v136_parentedGeometry"            : "Géométrie parentée",
-    "v137_parentedGeometryDesc"        : "Ce validateur vérifie la présence de géométries parentées dans la hiérarchie."
+    "v140_parentedGeometry"            : "Géométrie parentée",
+    "v141_parentedGeometryDesc"        : "Ce validateur vérifie la présence de géométries parentées dans la hiérarchie."
 
 }

@@ -985,7 +985,7 @@
     "v133_oneVertexDesc"               : "This validator will verify if there are some non manifold vertex in the meshes.\nThat means a vertex in the union of 2 shapes.",
     "v134_remainingVertexCleaner"      : "Remaining vertex cleaner",
     "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges.",
-    "v136_parentedGeometry"            : "Parented Geometry",
-    "v137_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy."
+    "v140_parentedGeometry"            : "Parented geometry",
+    "v141_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy."
   
 }

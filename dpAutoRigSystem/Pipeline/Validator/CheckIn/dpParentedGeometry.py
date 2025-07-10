@@ -4,8 +4,8 @@ from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
 CLASS_NAME = "ParentedGeometry"
-TITLE = "v136_parentedGeometry"
-DESCRIPTION = "v137_parentedGeometryDesc"
+TITLE = "v140_parentedGeometry"
+DESCRIPTION = "v141_parentedGeometryDesc"
 ICON = "/Icons/dp_parentedGeometry.png"
 
 DP_PARENTEDGEOMETRY_VERSION = 1.0
@@ -43,7 +43,8 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                 toCheckList = cmds.ls(objList, type="mesh")
             else:
                 toCheckList = cmds.ls(selection=False, type="mesh") #all meshes in the scene
-                meshParentList = []
+            meshParentList = []
+            if toCheckList:
                 # get the parent(transform) of each shape in the scene           
                 for mesh in toCheckList:
                     parents = cmds.listRelatives(mesh, parent=True, fullPath=True)
