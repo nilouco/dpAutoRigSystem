@@ -11,7 +11,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.5
+DP_PROXYCREATOR_VERSION = 1.6
 
 
 class ProxyCreator(dpBaseAction.ActionStartClass):
@@ -163,6 +163,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
                         self.repeatedNameList.append(shortName)
                         self.utils.removeUserDefinedAttr(dup)
                         self.utils.deleteOrigShape(dup)
+                        self.utils.removeFromSets(dup)
                         if nodeFaceList:
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
                             cmds.delete(faceDupList)
