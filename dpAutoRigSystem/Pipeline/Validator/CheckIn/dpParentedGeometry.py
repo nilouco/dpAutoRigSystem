@@ -52,37 +52,47 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                 # remove duplicates
                 meshParentList = list(set(meshParentList))
             if meshParentList:
-                self.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
+                # avoid reporting the same item multiple times
+                reportedChildren = set()
                 for mesh in meshParentList:
                     # check if exists to avoid missing nodes
                     if not cmds.objExists(mesh):
                         continue
                     allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
-                    # get all Descendents and check if it's different than its parent
+                    # get all descendents and check if it's different than its parent
                     childrenList = [d for d in allDescendents if cmds.objExists(d) and d != mesh]
                     if childrenList:
+                        self.utils.setProgress(max=len(childrenList), addOne=False, addNumber=False)
                         for item in childrenList:
                             # check if the item isn't a constraint node
                             if not cmds.objectType(item).endswith("Constraint"):
-                                self.utils.setProgress(self.dpUIinst.lang[self.title])
                                 item = item.split("|")[-1] # get only the last part of the path
-                                self.checkedObjList.append(item)
-                                self.foundIssueList.append(True)
+                                # check to avoid multiple report
+                                if item not in reportedChildren:
+                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                                    reportedChildren.add(item)
+                                    self.checkedObjList.append(item)
+                                    self.foundIssueList.append(True)
                                 if self.firstMode:
                                     self.resultOkList.append(False)
                                 else: #fix
                                     try:
-                                        # try to parent the item to the mesh grandparentparent
                                         grandParent = cmds.listRelatives(mesh, parent=True, fullPath=True)
                                         if grandParent and cmds.objExists(grandParent[0]):
+                                            # try to parent the item to the mesh grandparent
                                             cmds.parent(item, grandParent[0])
-                                        else: # if no parent, just unparent it to world
+                                        else: 
+                                            # if no parent, just unparent it to world
                                             cmds.parent(item, world=True)
-                                        self.resultOkList.append(True)
-                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                        # check to avoid reporting fix the same item multiple times
+                                        if item not in reportedChildren:
+                                            self.resultOkList.append(True)
+                                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                                     except:
                                         self.resultOkList.append(False)
                                         self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                if reportedChildren:
+                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(reportedChildren)+")\n---")
             else:
                 self.notFoundNodes()
         else:
