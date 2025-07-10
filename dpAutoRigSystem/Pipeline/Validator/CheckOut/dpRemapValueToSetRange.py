@@ -63,9 +63,13 @@ class RemapValueToSetRange(dpBaseAction.ActionStartClass):
                     remappedGradient = True
                     for index in indexList:
                         valuePosition, valueFloat, valueInterp = cmds.getAttr(f"{item}.value[{index}]")[0]
-                        if valuePosition != valueFloat:
+                        if valuePosition != valueFloat: #there's curve
                             break
                         if valueInterp != 1.0: #linear
+                            break
+                        if cmds.getAttr(item+".inputMin") > cmds.getAttr(item+".inputMax"): #setRange isn't able to work well with it as a remapValue
+                            break
+                        if cmds.getAttr(item+".outputMin") > cmds.getAttr(item+".outputMax"):
                             break
                     else:
                         remappedGradient = False
