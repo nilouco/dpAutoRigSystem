@@ -13,7 +13,7 @@ WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.65, 0.65)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
-DP_ACTIONSTARTCLASS_VERSION = 2.6
+DP_ACTIONSTARTCLASS_VERSION = 2.7
 
 
 class ActionStartClass(object):
@@ -598,3 +598,9 @@ class ActionStartClass(object):
         if shapeList:
             # Get only transform nodes
             return list(set(cmds.listRelatives(shapeList, type="transform", parent=True, fullPath=True)))
+
+
+    def reorderList(self, itemList, *args):
+        """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
+        """
+        return sorted(itemList, key = lambda x: x.count("|"), reverse=True)

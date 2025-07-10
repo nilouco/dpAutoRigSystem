@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.4
+DP_UTILS_VERSION = 3.5
 
 
 class Utils(object):
@@ -1295,56 +1295,57 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, filterLattice=True, verbose=True, title="Rigging", *args):
+    def filterTransformList(self, itemList=None, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, filterLattice=True, verbose=True, title="Rigging", *args):
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
-        cameraList = ["|persp", "|top", "|side", "|front"]
-        constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "poleVectorConstraint"]
-        toRemoveList = []
-        for item in itemList:
-            if verbose:
-                self.setProgress(title)
-            itemType = cmds.objectType(item)
-            if filterCamera:
-                for cameraName in cameraList:
-                    if item.endswith(cameraName):
+        if itemList:
+            cameraList = ["|persp", "|top", "|side", "|front"]
+            constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "poleVectorConstraint"]
+            toRemoveList = []
+            for item in itemList:
+                if verbose:
+                    self.setProgress(title)
+                itemType = cmds.objectType(item)
+                if filterCamera:
+                    for cameraName in cameraList:
+                        if item.endswith(cameraName):
+                            toRemoveList.append(item)
+                if filterConstraint:
+                    if itemType in constraintList:
                         toRemoveList.append(item)
-            if filterConstraint:
-                if itemType in constraintList:
-                    toRemoveList.append(item)
-            if filterFollicle:
-                if cmds.listRelatives(item, children=True, type="follicle"):
-                    toRemoveList.append(item)
-            if filterJoint:
-                if cmds.listRelatives(item, children=True, type="joint") or itemType == "joint":
-                    toRemoveList.append(item)
-            if filterLocator:
-                if cmds.listRelatives(item, children=True, type="locator"):
-                    toRemoveList.append(item)
-            if filterHandle:
-                if cmds.listRelatives(item, children=True, type="ikHandle") or itemType == "ikHandle":
-                    toRemoveList.append(item)
-                if cmds.listRelatives(item, children=True, type="clusterHandle") or itemType == "clusterHandle":
-                    toRemoveList.append(item)
-            if filterLinearDeform:
-                for defName in ["deformBend", "deformTwist", "deformSquash", "deformFlare", "deformSine", "deformWave"]:
-                    if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
+                if filterFollicle:
+                    if cmds.listRelatives(item, children=True, type="follicle"):
                         toRemoveList.append(item)
-            if filterEffector:
-                if cmds.listRelatives(item, children=True, type="ikEffector") or itemType == "ikEffector":
-                    toRemoveList.append(item)
-            if filterBaseNode:
-                if item in self.baseNodeList:
-                    toRemoveList.append(item)
-            if filterBaseName:
-                if self.getSuffixNumberList(item)[1].endswith("Base"):
-                    toRemoveList.append(item)
-            if filterLattice:
-                for defName in ["lattice", "baseLattice"]:
-                    if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
+                if filterJoint:
+                    if cmds.listRelatives(item, children=True, type="joint") or itemType == "joint":
                         toRemoveList.append(item)
-        if toRemoveList:
-            itemList = list(set(itemList) - set(toRemoveList))
+                if filterLocator:
+                    if cmds.listRelatives(item, children=True, type="locator"):
+                        toRemoveList.append(item)
+                if filterHandle:
+                    if cmds.listRelatives(item, children=True, type="ikHandle") or itemType == "ikHandle":
+                        toRemoveList.append(item)
+                    if cmds.listRelatives(item, children=True, type="clusterHandle") or itemType == "clusterHandle":
+                        toRemoveList.append(item)
+                if filterLinearDeform:
+                    for defName in ["deformBend", "deformTwist", "deformSquash", "deformFlare", "deformSine", "deformWave"]:
+                        if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
+                            toRemoveList.append(item)
+                if filterEffector:
+                    if cmds.listRelatives(item, children=True, type="ikEffector") or itemType == "ikEffector":
+                        toRemoveList.append(item)
+                if filterBaseNode:
+                    if item in self.baseNodeList:
+                        toRemoveList.append(item)
+                if filterBaseName:
+                    if self.getSuffixNumberList(item)[1].endswith("Base"):
+                        toRemoveList.append(item)
+                if filterLattice:
+                    for defName in ["lattice", "baseLattice"]:
+                        if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
+                            toRemoveList.append(item)
+            if toRemoveList:
+                itemList = list(set(itemList) - set(toRemoveList))
         return itemList
 
 

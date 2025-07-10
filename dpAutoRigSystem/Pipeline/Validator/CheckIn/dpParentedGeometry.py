@@ -43,57 +43,44 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                 toCheckList = cmds.ls(objList, type="mesh")
             else:
                 toCheckList = cmds.ls(selection=False, type="mesh") #all meshes in the scene
-            meshParentList = []
             if toCheckList:
-                # get the parent(transform) of each shape in the scene           
-                for mesh in toCheckList:
-                    parents = cmds.listRelatives(mesh, parent=True, fullPath=True)
-                    if parents:
-                        meshParentList.append(parents[0])
-                # remove duplicates
-                meshParentList = list(set(meshParentList))
-            if meshParentList:
-                # avoid reporting the same item multiple times
-                reportedChildren = set()
-                for mesh in meshParentList:
-                    # check if exists to avoid missing nodes
-                    if not cmds.objExists(mesh):
-                        continue
-                    allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
-                    # get all descendents and check if it's different than its parent
-                    childrenList = [d for d in allDescendents if cmds.objExists(d) and d != mesh]
-                    if childrenList:
-                        self.utils.setProgress(max=len(childrenList), addOne=False, addNumber=False)
-                        for item in childrenList:
-                            # check if the item isn't a constraint node
-                            if not cmds.objectType(item).endswith("Constraint"):
-                                item = item.split("|")[-1] # get only the last part of the path
-                                # check to avoid multiple report
-                                if item not in reportedChildren:
-                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                                    reportedChildren.add(item)
-                                    self.checkedObjList.append(item)
-                                    self.foundIssueList.append(True)
-                                if self.firstMode:
-                                    self.resultOkList.append(False)
-                                else: #fix
-                                    try:
-                                        grandParent = cmds.listRelatives(mesh, parent=True, fullPath=True)
-                                        if grandParent and cmds.objExists(grandParent[0]):
-                                            # try to parent the item to the mesh grandparent
-                                            cmds.parent(item, grandParent[0])
-                                        else: 
-                                            # if no parent, just unparent it to world
-                                            cmds.parent(item, world=True)
-                                        # check to avoid reporting fix the same item multiple times
-                                        if item not in reportedChildren:
+                meshParentList = self.getMeshTransformList(toCheckList)
+                if meshParentList:
+                    meshParentList = self.reorderList(meshParentList)
+                    self.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
+                    # avoid reporting the same item multiple times
+                    reportedChildren = set()
+                    for mesh in meshParentList:
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        # check if exists to avoid missing nodes
+                        if cmds.objExists(mesh):
+                            allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
+                            # get all descendents and check if it's different than its parent
+                            childrenList = self.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
+                            if childrenList:
+                                for item in childrenList:
+                                    shortName = item.split("|")[-1] # get only the last part of the path
+                                    # check to avoid multiple report
+                                    if not shortName in reportedChildren:
+                                        reportedChildren.add(shortName)
+                                        self.checkedObjList.append(shortName)
+                                        self.foundIssueList.append(True)
+                                    if self.firstMode:
+                                        self.resultOkList.append(False)
+                                    else: #fix
+                                        try:
+                                            grandParent = cmds.listRelatives(mesh, parent=True, fullPath=True)
+                                            if grandParent and cmds.objExists(grandParent[0]):
+                                                # try to parent the item to the mesh grandparent
+                                                cmds.parent(item, grandParent[0])
+                                            else: 
+                                                # if no parent, just unparent it to world
+                                                cmds.parent(item, world=True)
                                             self.resultOkList.append(True)
                                             self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                                    except:
-                                        self.resultOkList.append(False)
-                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                if reportedChildren:
-                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(reportedChildren)+")\n---")
+                                        except:
+                                            self.resultOkList.append(False)
+                                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
