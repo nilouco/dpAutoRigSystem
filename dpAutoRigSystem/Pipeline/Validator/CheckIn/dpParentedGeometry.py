@@ -49,7 +49,6 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                     meshParentList = self.reorderList(meshParentList)
                     self.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
                     # avoid reporting the same item multiple times
-                    reportedChildren = set()
                     for mesh in meshParentList:
                         self.utils.setProgress(self.dpUIinst.lang[self.title])
                         # check if exists to avoid missing nodes
@@ -59,11 +58,8 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                             childrenList = self.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
                             if childrenList:
                                 for item in childrenList:
-                                    shortName = item.split("|")[-1] # get only the last part of the path
-                                    # check to avoid multiple report
-                                    if not shortName in reportedChildren:
-                                        reportedChildren.add(shortName)
-                                        self.checkedObjList.append(shortName)
+                                    if not item.split("|")[-1] in self.checkedObjList:
+                                        self.checkedObjList.append(item.split("|")[-1]) # get only the last part of the path
                                         self.foundIssueList.append(True)
                                     if self.firstMode:
                                         self.resultOkList.append(False)
