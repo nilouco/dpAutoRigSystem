@@ -46,17 +46,17 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 emptyTransformList = self.filterEmptyTransformList(toCheckList)
-                for item in emptyTransformList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    # conditional to check here
-                    if True: # TODO validate task here
+                 # conditional to check here
+                if emptyTransformList:
+                    for item in emptyTransformList:
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
                         self.checkedObjList.append(self.utils.getShortName(item))
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                # TODO fix task here
+                                cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
@@ -80,14 +80,12 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
-        
         filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
         filteredList = self.reorderList(filteredList) #self.reorderList(filteredList)
         emptyTransforms = []
         for transform in filteredList:
-            if transform.count("|") == 1:
-                if not cmds.listRelatives(transform, children=True, fullPath=True)and not cmds.listConnections(transform):
-                    emptyTransforms.append(transform)
+            if not cmds.listRelatives(transform, children=True, fullPath=True) and not cmds.listConnections(transform):
+                emptyTransforms.append(transform)
         return emptyTransforms
 
 
