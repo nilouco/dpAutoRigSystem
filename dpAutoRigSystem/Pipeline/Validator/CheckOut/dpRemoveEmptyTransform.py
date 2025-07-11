@@ -92,4 +92,4 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
     def reorderList(self, itemList, *args):
         """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
         """
-        return sorted(itemList, key = lambda x: x.count("|"), reverse=False)
+        return sorted(itemList, key = lambda x: x.count("|"), reverse=True)
