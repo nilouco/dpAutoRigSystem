@@ -386,7 +386,7 @@ class Utils(object):
         """
         if objName != "":
             if cmds.objExists(objName):
-                if not cmds.objExists(objName+"."+hookType):
+                if not hookType in cmds.listAttr(objName):
                     cmds.addAttr(objName, longName=hookType, attributeType='bool')
                     cmds.setAttr(objName+"."+hookType, 1)
                 if addNotTransformIO:

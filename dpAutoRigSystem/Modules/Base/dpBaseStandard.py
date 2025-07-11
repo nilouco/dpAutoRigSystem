@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.5
+DP_BASESTANDARD_VERSION = 2.6
 
 
 class BaseStandard(object):
@@ -253,6 +253,7 @@ class BaseStandard(object):
                     pass
                 cmds.setAttr(self.moduleGrp+".customName", self.customName, type='string')
                 cmds.setAttr(self.annotation+".text", self.customName, type='string')
+                cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
                 # set userGuideName:
                 self.userGuideName = self.customName
                 
@@ -525,6 +526,8 @@ class BaseStandard(object):
         """ Generate the hook setup to find lists of controllers, scalable and static groups.
             Add message attributes to map hooked groups for the rigged module.
         """
+        print("self.userGuideName =", self.userGuideName)
+        print("side =", side)
         # create a masterModuleGrp to be checked if this rig exists:
         self.toCtrlHookGrp     = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
         self.toScalableHookGrp = cmds.group(scalableList, name=side+self.userGuideName+"_Scalable_Grp")
@@ -536,20 +539,26 @@ class BaseStandard(object):
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
         self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
         self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-        cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-        cmds.setAttr(self.toStaticHookGrp+".dpAR_type", self.guideModuleName, type="string")
+#        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
+#        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
+#        cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
+#        cmds.setAttr(self.toStaticHookGrp+".dpAR_type", self.guideModuleName, type="string")
+        cmds.lockNode(self.guideNet, lock=False)
         # add module type counter value
-        cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-        cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', self.dpAR_count)
+        print("self.guideNet =", self.guideNet)
+        if not 'dpAR_count' in cmds.listAttr(self.guideNet):
+            cmds.addAttr(self.guideNet, longName='dpAR_count', attributeType='long', keyable=False)
+            cmds.setAttr(self.guideNet+'.dpAR_count', self.dpAR_count)
         # message attributes
-        cmds.addAttr(self.toStaticHookGrp, longName="controlHookGrp", attributeType="message")
-        cmds.addAttr(self.toStaticHookGrp, longName="scalableHookGrp", attributeType="message")
-        cmds.connectAttr(self.toCtrlHookGrp+".message", self.toStaticHookGrp+".controlHookGrp", force=True)
-        cmds.connectAttr(self.toScalableHookGrp+".message", self.toStaticHookGrp+".scalableHookGrp", force=True)
+        cmds.addAttr(self.guideNet, longName=side+"ControlHookGrp", attributeType="message")
+        cmds.addAttr(self.guideNet, longName=side+"StaticHookGrp", attributeType="message")
+        cmds.addAttr(self.guideNet, longName=side+"ScalableHookGrp", attributeType="message")
+        cmds.connectAttr(self.toCtrlHookGrp+".message", self.guideNet+"."+side+"ControlHookGrp", force=True)
+        cmds.connectAttr(self.toScalableHookGrp+".message", self.guideNet+"."+side+"ScalableHookGrp", force=True)
+        cmds.connectAttr(self.toStaticHookGrp+".message", self.guideNet+"."+side+"StaticHookGrp", force=True)
         cmds.setAttr(self.toScalableHookGrp+".visibility", self.getJointsVisibility())
         cmds.setAttr(self.toStaticHookGrp+".visibility", self.getJointsVisibility())
+        cmds.lockNode(self.guideNet, lock=True)
 
     
     def integratingInfo(self, *args):
@@ -571,11 +580,13 @@ class BaseStandard(object):
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
         cmds.addAttr(self.guideNet, longName="moduleType", dataType="string")
+        cmds.addAttr(self.guideNet, longName="guideName", dataType="string")
         cmds.addAttr(self.guideNet, longName="guideNumber", dataType="string")
         cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
         cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
         cmds.addAttr(self.guideNet, longName="linkedNode", attributeType="message")
         cmds.setAttr(self.guideNet+".moduleType", self.guideModuleName, type="string")
+        cmds.setAttr(self.guideNet+".guideName", self.userGuideName, type="string")
         cmds.setAttr(self.guideNet+".guideNumber", guideNumber, type="string")
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
         cmds.lockNode(self.guideNet, lock=False)

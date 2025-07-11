@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.40"
+DPAR_VERSION_5 = "5.00.42"
 DPAR_UPDATELOG = "N489 - Count all modules and avoid unused locators."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
@@ -3223,13 +3223,13 @@ class Start(object):
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0
-                    newTranformList = cmds.ls(selection=False, type="transform")
-                    for transf in newTranformList:
-                        if cmds.objExists(transf+'.dpAR_type'):
-                            dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
-                            if ( dpARType == guideType ):
+                    guideNetList = cmds.ls(selection=False, type="network")
+                    for net in guideNetList:
+                        if cmds.objExists(net+'.moduleType'):
+                            dpARType = 'dp'+(cmds.getAttr(net+'.moduleType'))
+                            if dpARType == guideType:
                                 typeCounter = typeCounter + 1
-                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
+                    if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             #Actualise all controls (All_Grp.controlList) for this rig:
