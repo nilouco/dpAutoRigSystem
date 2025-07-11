@@ -163,6 +163,7 @@
     "e020_notFoundHeadCtrl"        : "Head Deformer criado, mas não encontrado o Head_Ctrl para parentear, desculpe.",
     "e021_cantLoadSoftIk"          : "Não foi possível carregar a extensão dpSoftIk para criar o softIk no módulo Limb, desculpe.",
     "e022_offsetClosetVertex"      : "O offset mudou o vertex mais próximo.",
+    "e023_unableTransferPlug"      : "Não é possível transferir mais de uma conexão.",
     
     "i000_guides"               : "Criar GUIAS",
     "i001_modules"              : "Editar MODULOS",
@@ -984,6 +985,8 @@
     "v133_oneVertexDesc"               : "Esse validator vai verificar se existem vertices non manifold nas meshes.\nIsso quer dizer se tem vertex único unindo 2 shapes.",
     "v134_remainingVertexCleaner"      : "Vertex restante limpador",
     "v135_remainingVertexCleanerDesc"  : "Esse validador verificará se existem vertices restantes na mesh.\nIsso significa que tem um vertex conectado a somente 2 edges que não são bordas.",
+    "v136_remapValueToSetRange"        : "RemapValue para SetRange",
+    "v137_remapValueToSetRangeDesc"    : "Esse validador irá verificar se existem nodes de remapValue\nque possam ser convertidos em nodes de setRange\nsem perder funcionalidade.\nIsso optimizará o calculo e tornará o rig mais rápido.",
     "v140_parentedGeometry"            : "Geometria parenteada",
     "v141_parentedGeometryDesc"        : "Este validador verificará se há alguma geometria parenteada na hierarquia de outras geometrias."
 

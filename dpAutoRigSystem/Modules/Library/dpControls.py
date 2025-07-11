@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 2.8
+DP_CONTROLS_VERSION = 2.9
 
 
 class ControlClass(object):
@@ -867,6 +867,27 @@ class ControlClass(object):
                         self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
                     self.dpUIinst.customAttr.addAttr(0, destinationList, shapes=True) #dpID
+
+
+    def transferPlug(self, fromPlug, toPlug, value=True, connections=True, *args):
+        """ Set and transfer attributes connections.
+        """
+        if value:
+            cmds.setAttr(toPlug, cmds.getAttr(fromPlug))
+        if connections:
+            inputList = cmds.listConnections(fromPlug, source=True, destination=False, plugs=True)
+            if inputList:
+                if len(inputList) > 1:
+                    raise RuntimeError(self.dpUIinst.lang['e023_unableTransferPlug'])
+                cmds.connectAttr(inputList[0], toPlug, force=True)
+            destinationList = cmds.listConnections(fromPlug, source=False, destination=True, plugs=True) or []
+            for dest in destinationList:
+                locked = cmds.getAttr(dest, lock=True)
+                if locked:
+                    cmds.setAttr(dest, lock=False)
+                cmds.connectAttr(toPlug, dest, force=True)
+                if locked:
+                    cmds.setAttr(dest, lock=True)
 
 
     def setSourceColorOverride(self, sourceItem, destinationList, *args):
