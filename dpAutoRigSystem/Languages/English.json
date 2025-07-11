@@ -987,6 +987,8 @@
     "v134_remainingVertexCleaner"      : "Remaining vertex cleaner",
     "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges.",
     "v136_remapValueToSetRange"        : "RemapValue to SetRange",
-    "v137_remapValueToSetRangeDesc"    : "This validator will verify if there are remapValue nodes\nthat could be converted to setRange nodes\nwithout losing any behavior.\nIt'll optimize the calculation and get a faster rig."
-
+    "v137_remapValueToSetRangeDesc"    : "This validator will verify if there are remapValue nodes\nthat could be converted to setRange nodes\nwithout losing any behavior.\nIt'll optimize the calculation and get a faster rig.",
+    "v140_parentedGeometry"            : "Parented geometry",
+    "v141_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy."
+  
 }

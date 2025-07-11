@@ -17,6 +17,7 @@
     "NonQuadFace"               : false,
     "OneVertex"                 : false,
     "OverrideCleaner"           : false,
+    "ParentedGeometry"          : false,
     "RemainingVertexCleaner"    : false,
     "ShowBPCleaner"             : false,
     "SoftenEdges"               : false,

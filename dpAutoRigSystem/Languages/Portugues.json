@@ -986,6 +986,8 @@
     "v134_remainingVertexCleaner"      : "Vertex restante limpador",
     "v135_remainingVertexCleanerDesc"  : "Esse validador verificará se existem vertices restantes na mesh.\nIsso significa que tem um vertex conectado a somente 2 edges que não são bordas.",
     "v136_remapValueToSetRange"        : "RemapValue para SetRange",
-    "v137_remapValueToSetRangeDesc"    : "Esse validador irá verificar se existem nodes de remapValue\nque possam ser convertidos em nodes de setRange\nsem perder funcionalidade.\nIsso optimizará o calculo e tornará o rig mais rápido."
+    "v137_remapValueToSetRangeDesc"    : "Esse validador irá verificar se existem nodes de remapValue\nque possam ser convertidos em nodes de setRange\nsem perder funcionalidade.\nIsso optimizará o calculo e tornará o rig mais rápido.",
+    "v140_parentedGeometry"            : "Geometria parenteada",
+    "v141_parentedGeometryDesc"        : "Este validador verificará se há alguma geometria parenteada na hierarquia de outras geometrias."
 
 }
