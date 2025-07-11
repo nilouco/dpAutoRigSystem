@@ -46,12 +46,11 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 emptyTransformList = self.filterEmptyTransformList(toCheckList)
-                print("Empty transforms found: ", emptyTransformList)
                 for item in emptyTransformList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     # conditional to check here
                     if True: # TODO validate task here
-                        self.checkedObjList.append(item)
+                        self.checkedObjList.append(self.utils.getShortName(item))
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
@@ -83,25 +82,14 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
         """
         
         filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
-        filteredList = self.reorderList(filteredList)
-
-        print("Filtered transform list: ", filteredList)
-
+        filteredList = self.reorderList(filteredList) #self.reorderList(filteredList)
         emptyTransforms = []
         for transform in filteredList:
-
-            if transform.count("|") < 2:
-                print("Transform >>> :" , transform)
-                emptyTransforms.append(transform)
-
-            # if transform.count("|") < 2:
-            #     emptyTransforms.append(transform[transform.rfind("|"):])
-            #     print("Empty transform found: ", transform)
-                # if not cmds.listRelatives(transform, children=True, fullPath=True)and not cmds.listConnections(transform):
-                #     emptyTransforms.append(transform)
-            # if not cmds.listConnections(transform): 
-            #     emptyTransforms.append(transform)
+            if transform.count("|") == 1:
+                if not cmds.listRelatives(transform, children=True, fullPath=True)and not cmds.listConnections(transform):
+                    emptyTransforms.append(transform)
         return emptyTransforms
+
 
     def reorderList(self, itemList, *args):
         """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
