@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-07-09",
+    "_updated"    : "2025-07-11",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : false,
@@ -48,6 +48,7 @@
     "ProxyCreator"              : false,
     "PruneSkinWeights"          : false,
     "RemapValueToSetRange"      : false,
+    "RemoveEmptyTransform"      : false,
     "ResetPose"                 : false,
     "ScalableDeformerChecker"   : false,
     "SideCalibration"           : false,

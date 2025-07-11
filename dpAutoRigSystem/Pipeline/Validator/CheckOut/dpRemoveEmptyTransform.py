@@ -46,11 +46,12 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 emptyTransformList = self.filterEmptyTransformList(toCheckList)
-                 # conditional to check here
+                emptyTransformList.extend(self.filterEmptyTransformList(self.getIgnoreConnected(), True))
+                # conditional to check here
                 if emptyTransformList:
                     for item in emptyTransformList:
                         self.utils.setProgress(self.dpUIinst.lang[self.title])
-                        self.checkedObjList.append(self.utils.getShortName(item))
+                        self.checkedObjList.append(self.utils.getShortName(item, False))
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.resultOkList.append(False)
@@ -76,20 +77,39 @@ class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
         self.endProgress()
         return self.dataLogDic
     
-    def filterEmptyTransformList(self, transformList=None, *args):
+    
+    def filterEmptyTransformList(self, transformList=None, connected=False, *args):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
         filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
-        filteredList = self.reorderList(filteredList) #self.reorderList(filteredList)
+        filteredList = self.reorderList(filteredList)
         emptyTransforms = []
         for transform in filteredList:
-            if not cmds.listRelatives(transform, children=True, fullPath=True) and not cmds.listConnections(transform):
-                emptyTransforms.append(transform)
+            if connected:
+                hasConnection = False
+            else:
+                hasConnection = cmds.listConnections(transform)
+                if hasConnection:
+                    nodeGraphList = cmds.listConnections(transform, type="nodeGraphEditorInfo") or []
+                    hasConnection = set(hasConnection)-set(nodeGraphList)
+            if not hasConnection:
+                childrenList = cmds.listRelatives(transform, children=True, fullPath=True)
+                if not childrenList:
+                    emptyTransforms.append(transform)
+                elif len(list(set(childrenList).intersection(emptyTransforms))) == len(childrenList):
+                    emptyTransforms.append(transform)
         return emptyTransforms
+    
 
-
-    def reorderList(self, itemList, *args):
-        """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
+    def getIgnoreConnected(self, *args):
+        """ Ignore dpAr default nodes
         """
-        return sorted(itemList, key = lambda x: x.count("|"), reverse=True)
+        ignoredList = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
+        nodeList = []
+        for item in ignoredList:
+            gotNode = self.utils.getNodeByMessage(item)
+            if gotNode:
+                nodeList.append(gotNode)
+        return nodeList
+    
