@@ -1466,7 +1466,7 @@ class Utils(object):
         return self.progress
 
 
-    def getShortName(self, name, *args):
+    def getShortName(self, name, vBar=True, *args):
         """ Returns the short name of the given node.
             Example:
             |All_Grp|Render_Grp|Body_Mesh -> BodyMesh
@@ -1477,8 +1477,11 @@ class Utils(object):
             shortName = name
             if "|" in name:
                 if name.count("|") > 1:
-                    shortName = name[name.rfind("|"):]
-                else:
+                    if vBar:
+                        shortName = name[name.rfind("|"):]
+                    else:
+                        shortName = name[name.rfind("|")+1:]
+                elif not vBar:   
                     shortName = name[1:]
         return shortName
 

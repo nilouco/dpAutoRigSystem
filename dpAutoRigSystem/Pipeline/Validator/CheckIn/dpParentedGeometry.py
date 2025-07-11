@@ -58,8 +58,8 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                             childrenList = self.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
                             if childrenList:
                                 for item in childrenList:
-                                    if not item.split("|")[-1] in self.checkedObjList:
-                                        self.checkedObjList.append(item.split("|")[-1]) # get only the last part of the path
+                                    if not self.utils.getShortName(item, False) in self.checkedObjList:
+                                        self.checkedObjList.append(self.utils.getShortName(item, False)) # get only the last part of the path
                                         self.foundIssueList.append(True)
                                     if self.firstMode:
                                         self.resultOkList.append(False)
@@ -68,7 +68,8 @@ class ParentedGeometry(dpBaseAction.ActionStartClass):
                                             grandParent = cmds.listRelatives(mesh, parent=True, fullPath=True)
                                             if grandParent and cmds.objExists(grandParent[0]):
                                                 # try to parent the item to the mesh grandparent
-                                                cmds.parent(item, grandParent[0])
+                                                if cmds.objExists(item):
+                                                    cmds.parent(item, grandParent[0])
                                             else: 
                                                 # if no parent, just unparent it to world
                                                 cmds.parent(item, world=True)
