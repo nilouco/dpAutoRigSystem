@@ -531,12 +531,7 @@ class BaseStandard(object):
         self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
         if staticList:
             cmds.parent(staticList, self.toStaticHookGrp)
-        # create a locator in order to avoid delete static group
-        loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
-        self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp, loc]) #dpID
-        cmds.setAttr(loc+".visibility", 0)
-        cmds.parent(loc, self.toStaticHookGrp, absolute=True)
-        self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
         # add hook attributes to be read when rigging integrated modules:
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
         self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
