@@ -8,7 +8,7 @@ TITLE = "r019_parentingIO"
 DESCRIPTION = "r020_parentingIODesc"
 ICON = "/Icons/dp_parentingIO.png"
 
-DP_PARENTINGIO_VERSION = 1.0
+DP_PARENTINGIO_VERSION = 1.1
 
 
 class ParentingIO(dpBaseAction.ActionStartClass):
@@ -85,12 +85,6 @@ class ParentingIO(dpBaseAction.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
-
-
-    def reorderList(self, itemList, *args):
-        """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
-        """
-        return sorted(itemList, key = lambda x: x.count("|"), reverse=True)
 
 
     def getParentingDataDic(self, transformList=None, *args):

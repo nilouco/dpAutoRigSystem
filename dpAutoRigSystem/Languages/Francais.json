@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-07-04",
+    "_updated"       : "2025-07-09",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -163,6 +163,7 @@
     "e020_notFoundHeadCtrl"        : "Head Deformer a été créé, mais on n'a pas trouvé le Head_Ctrl pour parenter, désole.",
     "e021_cantLoadSoftIk"          : "Ce n'est pas possible charger l'extention dpSoftIk pour creer le setup de softIk dans le Limb module, désolé.",
     "e022_offsetClosetVertex"      : "L'offset a changé le vertex plus proche.",
+    "e023_unableTransferPlug"      : "Ce n'est pas possible de transférer plus d'une connexion.",
 
     "i000_guides"               : "Créer des GUIDES",
     "i001_modules"              : "Modifier des MODULES",
@@ -984,7 +985,11 @@
     "v133_oneVertexDesc"               : "Ce validateur va vérifier s'il y a des non manifold vertices dans les meshes.\nÇa vaut dire s'ils sont uniques dans la connection des 2 shapes.",
     "v134_remainingVertexCleaner"      : "Vertex restant nettoyeur",
     "v135_remainingVertexCleanerDesc"  : "Ce validateur va véfirier s'il y des vertices restants dans la mesh.\nÇa vaut dire s'il a de vertex connecté à juste 2 edges que ne sont pas des bordures.",
+    "v136_remapValueToSetRange"        : "RemapValue pour SetRange",
+    "v137_remapValueToSetRangeDesc"    : "Ce validateur vérifiera si des nodes de remapValue que pourraient être\nconvertis en nodes de setRange sans perte de comportement.\nIl optimisera le calcul et va faire le rig plus vite.",
     "v138_removeEmptyTransform"        : "Supprimer les transformations vides",
-    "v139_removeEmptyTransformDesc"    : "Ce validateur vérifiera s'il y a des transformations sans fils ou connexion et les supprimera."
+    "v139_removeEmptyTransformDesc"    : "Ce validateur vérifiera s'il y a des transformations sans fils ou connexion et les supprimera.",
+    "v140_parentedGeometry"            : "Géométrie parentée",
+    "v141_parentedGeometryDesc"        : "Ce validateur vérifie la présence de géométries parentées dans la hiérarchie."
 
 }

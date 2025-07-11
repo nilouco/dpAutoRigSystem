@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.39"
+DPAR_VERSION_5 = "5.00.41"
 DPAR_UPDATELOG = "N597 - Remove empty transform checkout."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
