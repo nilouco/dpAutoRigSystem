@@ -2557,12 +2557,11 @@ class Start(object):
                             self.itemGuideName = sideName + self.prefix + self.itemGuideInstance
                         
                         # get hook groups info:
-                        self.itemRiggedGrp = self.itemGuideName+"_Static_Grp"
-                        self.staticHookGrp = self.itemRiggedGrp
-                        self.ctrlHookGrp = cmds.listConnections(self.itemRiggedGrp+".controlHookGrp", destination=False, source=True)[0]
-                        self.scalableHookGrp = cmds.listConnections(self.itemRiggedGrp+".scalableHookGrp", destination=False, source=True)[0]
+                        self.staticHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"StaticHookGrp", destination=False, source=True)[0]
+                        self.ctrlHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ControlHookGrp", destination=False, source=True)[0]
+                        self.scalableHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ScalableHookGrp", destination=False, source=True)[0]
                         self.rootHookGrp = ""
-                        riggedChildList = cmds.listRelatives(self.itemRiggedGrp, children=True, type='transform')
+                        riggedChildList = cmds.listRelatives(self.staticHookGrp, children=True, type='transform')
                         if riggedChildList:
                             for child in riggedChildList:
                                 if cmds.objExists(child+".ctrlHook") and cmds.getAttr(child+".ctrlHook") == 1:
