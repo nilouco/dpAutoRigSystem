@@ -2558,25 +2558,12 @@ class Start(object):
                         
                         # get hook groups info:
                         self.staticHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"StaticHookGrp", destination=False, source=True)[0]
-                        self.ctrlHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ControlHookGrp", destination=False, source=True)[0]
                         self.scalableHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ScalableHookGrp", destination=False, source=True)[0]
-                        self.rootHookGrp = ""
-                        riggedChildList = cmds.listRelatives(self.staticHookGrp, children=True, type='transform')
-                        if riggedChildList:
-                            for child in riggedChildList:
-                                if cmds.objExists(child+".ctrlHook") and cmds.getAttr(child+".ctrlHook") == 1:
-                                    self.ctrlHookGrp = child
-                                elif cmds.objExists(child+".scalableHook") and cmds.getAttr(child+".scalableHook") == 1:
-                                    self.scalableHookGrp = child
-                                elif cmds.objExists(child+".staticHook") and cmds.getAttr(child+".staticHook") == 1:
-                                    self.staticHookGrp = child
-                                elif cmds.objExists(child+".rootHook") and cmds.getAttr(child+".rootHook") == 1:
-                                    self.rootHookGrp = child
+                        self.ctrlHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ControlHookGrp", destination=False, source=True)[0]
                         
                         # get guideModule hierarchy data:
                         self.fatherGuide = self.hookDic[guideModule.moduleGrp]['fatherGuide']
                         self.parentNode  = self.hookDic[guideModule.moduleGrp]['parentNode']
-                        
                         # get father info:
                         if self.fatherGuide:
                             self.fatherModule              = self.hookDic[guideModule.moduleGrp]['fatherModule']
@@ -2586,21 +2573,16 @@ class Start(object):
                             self.fatherCustomName          = self.hookDic[guideModule.moduleGrp]['fatherCustomName']
                             self.fatherMirrorAxis          = self.hookDic[guideModule.moduleGrp]['fatherMirrorAxis']
                             self.fatherGuideMirrorNameList = self.hookDic[guideModule.moduleGrp]['fatherMirrorName']
-                            
                             # working with father mirror:
                             self.fatherMirrorNameList = [""]
-                            
                             # get fatherName:
                             if self.fatherMirrorAxis != "off":
                                 self.fatherMirrorNameList = self.fatherGuideMirrorNameList
-                            
                             for f, sideFatherName in enumerate(self.fatherMirrorNameList):
-                                
                                 if self.fatherCustomName:
                                     self.fatherName = sideFatherName + self.prefix + self.fatherCustomName
                                 else:
                                     self.fatherName = sideFatherName + self.prefix + self.fatherInstance
-                                
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
                                 if self.fatherRiggedParentNode:
@@ -2609,42 +2591,29 @@ class Start(object):
                                             # parent them to the correct side of the father's mirror:
                                             if self.ctrlHookGrp:
                                                 cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                                # make ctrlHookGrp inactive:
-                                                cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-
                                     else:
                                         # parent them to the unique father:
                                         if self.ctrlHookGrp:
                                             cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                            # make ctrlHookGrp inactive:
-                                            cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-                        
                         elif self.parentNode:
                             # parent module control to just a node in the scene:
                             cmds.parent(self.ctrlHookGrp, self.parentNode)
-                            # make ctrlHookGrp inactive:
-                            cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
                         else:
                             # parent module control to default masterGrp:
                             cmds.parent(self.ctrlHookGrp, self.ctrlsVisGrp)
-                            # make ctrlHookGrp inactive:
-                            cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-                        
-                        if self.rootHookGrp:
-                            # parent module rootHook to rootCtrl:
-                            cmds.parent(self.rootHookGrp, self.ctrlsVisGrp)
-                            # make rootHookGrp inactive:
-                            cmds.setAttr(self.rootHookGrp+".rootHook", 0)
-                        
                         # put static and scalable groups in dataGrp:
-                        if self.staticHookGrp:
-                            cmds.parent(self.staticHookGrp, self.staticGrp)
-                            # make staticHookGrp inative:
-                            cmds.setAttr(self.staticHookGrp+".staticHook", 0)
-                        if self.scalableHookGrp:
-                            cmds.parent(self.scalableHookGrp, self.scalableGrp)
-                            # make scalableHookGrp inative:
-                            cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
+                        cmds.parent(self.staticHookGrp, self.staticGrp)
+                        cmds.parent(self.scalableHookGrp, self.scalableGrp)
+                        # finish hookGrps:
+                        cmds.setAttr(self.staticHookGrp+".staticHook", 0)
+                        cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
+                        cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
+                        cmds.lockNode(guideModule.guideNet, lock=False)
+                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"StaticHookGrp")
+                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"ScalableHookGrp")
+                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"ControlHookGrp")
+                        cmds.lockNode(guideModule.guideNet, lock=True)
+
                 
                 # prepare to show a dialog box if find a bug:
                 self.detectedBug = False
