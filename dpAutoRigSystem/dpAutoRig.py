@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.42"
+DPAR_VERSION_5 = "5.01.00"
 DPAR_UPDATELOG = "N489 - Count all modules and avoid unused locators."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 

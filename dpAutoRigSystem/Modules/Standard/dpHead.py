@@ -16,7 +16,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.2
+DP_HEAD_VERSION = 3.3
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -671,6 +671,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     toFlipList.extend([self.jawCtrl])
                     self.ctrls.setLockHide([self.jawCtrl], ['v'], l=False)
                     if hasChin:
+                        cmds.select(self.jawJnt)
                         self.chinJnt = cmds.joint(name=chinJntName, scaleCompensate=False)
                         self.chewJnt = cmds.joint(name=chewJntName, scaleCompensate=False)
                         self.endJnt  = cmds.joint(name=endJntName, scaleCompensate=False, radius=0.5)
