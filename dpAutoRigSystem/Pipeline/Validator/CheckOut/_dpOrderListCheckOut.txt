@@ -28,4 +28,5 @@ dpRemapValueToSetRange
 dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
+dpRemoveEmptyTransform
 dpCleanup
