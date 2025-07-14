@@ -3,22 +3,22 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "RemoveEmptyTransform"
-TITLE = "v138_removeEmptyTransform"
-DESCRIPTION = "v139_removeEmptyTransformDesc"
-ICON = "/Icons/dp_removeEmptyTransform.png"
+CLASS_NAME = "EmptyTransformCleaner"
+TITLE = "v138_emptyTransformCleaner"
+DESCRIPTION = "v139_emptyTransformCleanerDesc"
+ICON = "/Icons/dp_emptyTransformCleaner.png"
 
-DP_REMOVEEMPTYTRANSFORM_VERSION = 1.0
+DP_EMPTYTRANSFORMCLEANER_VERSION = 1.0
 
 
-class RemoveEmptyTransform(dpBaseAction.ActionStartClass):
+class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_REMOVEEMPTYTRANSFORM_VERSION
+        self.version = DP_EMPTYTRANSFORMCLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
