@@ -526,8 +526,6 @@ class BaseStandard(object):
         """ Generate the hook setup to find lists of controllers, scalable and static groups.
             Add message attributes to map hooked groups for the rigged module.
         """
-        print("self.userGuideName =", self.userGuideName)
-        print("side =", side)
         # create a masterModuleGrp to be checked if this rig exists:
         self.toCtrlHookGrp     = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
         self.toScalableHookGrp = cmds.group(scalableList, name=side+self.userGuideName+"_Scalable_Grp")
@@ -539,13 +537,8 @@ class BaseStandard(object):
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
         self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
         self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-#        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-#        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-#        cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-#        cmds.setAttr(self.toStaticHookGrp+".dpAR_type", self.guideModuleName, type="string")
         cmds.lockNode(self.guideNet, lock=False)
         # add module type counter value
-        print("self.guideNet =", self.guideNet)
         if not 'dpAR_count' in cmds.listAttr(self.guideNet):
             cmds.addAttr(self.guideNet, longName='dpAR_count', attributeType='long', keyable=False)
             cmds.setAttr(self.guideNet+'.dpAR_count', self.dpAR_count)
