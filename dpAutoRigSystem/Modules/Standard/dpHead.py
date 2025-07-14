@@ -1180,7 +1180,13 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 # head deformer
                 if cmds.getAttr(self.moduleGrp+".deformer") and hasUpperHead:
-                    headDefCtrlList = [self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl]
+                    headDefCtrlList = [self.upperJawCtrl, self.upperHeadCtrl]
+                    if hasJaw:
+                        headDefCtrlList.append(self.jawCtrl)
+                        if hasChin:
+                            headDefCtrlList.extend([self.chinCtrl, self.chewCtrl])
+                        if hasLips:
+                            headDefCtrlList.extend([self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl])
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
                     hdNet = self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet)
