@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.5
+DP_BASESTANDARD_VERSION = 2.6
 
 
 class BaseStandard(object):
@@ -253,6 +253,7 @@ class BaseStandard(object):
                     pass
                 cmds.setAttr(self.moduleGrp+".customName", self.customName, type='string')
                 cmds.setAttr(self.annotation+".text", self.customName, type='string')
+                cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
                 # set userGuideName:
                 self.userGuideName = self.customName
                 
@@ -531,30 +532,26 @@ class BaseStandard(object):
         self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
         if staticList:
             cmds.parent(staticList, self.toStaticHookGrp)
-        # create a locator in order to avoid delete static group
-        loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
-        self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp, loc]) #dpID
-        cmds.setAttr(loc+".visibility", 0)
-        cmds.parent(loc, self.toStaticHookGrp, absolute=True)
-        self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
         # add hook attributes to be read when rigging integrated modules:
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
         self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
         self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-        cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-        cmds.setAttr(self.toStaticHookGrp+".dpAR_type", self.guideModuleName, type="string")
+        cmds.lockNode(self.guideNet, lock=False)
         # add module type counter value
-        cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-        cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', self.dpAR_count)
+        if not 'dpAR_count' in cmds.listAttr(self.guideNet):
+            cmds.addAttr(self.guideNet, longName='dpAR_count', attributeType='long', keyable=False)
+            cmds.setAttr(self.guideNet+'.dpAR_count', self.dpAR_count)
         # message attributes
-        cmds.addAttr(self.toStaticHookGrp, longName="controlHookGrp", attributeType="message")
-        cmds.addAttr(self.toStaticHookGrp, longName="scalableHookGrp", attributeType="message")
-        cmds.connectAttr(self.toCtrlHookGrp+".message", self.toStaticHookGrp+".controlHookGrp", force=True)
-        cmds.connectAttr(self.toScalableHookGrp+".message", self.toStaticHookGrp+".scalableHookGrp", force=True)
+        cmds.addAttr(self.guideNet, longName=side+"ControlHookGrp", attributeType="message")
+        cmds.addAttr(self.guideNet, longName=side+"StaticHookGrp", attributeType="message")
+        cmds.addAttr(self.guideNet, longName=side+"ScalableHookGrp", attributeType="message")
+        cmds.connectAttr(self.toCtrlHookGrp+".message", self.guideNet+"."+side+"ControlHookGrp", force=True)
+        cmds.connectAttr(self.toScalableHookGrp+".message", self.guideNet+"."+side+"ScalableHookGrp", force=True)
+        cmds.connectAttr(self.toStaticHookGrp+".message", self.guideNet+"."+side+"StaticHookGrp", force=True)
         cmds.setAttr(self.toScalableHookGrp+".visibility", self.getJointsVisibility())
         cmds.setAttr(self.toStaticHookGrp+".visibility", self.getJointsVisibility())
+        cmds.lockNode(self.guideNet, lock=True)
 
     
     def integratingInfo(self, *args):
@@ -576,16 +573,21 @@ class BaseStandard(object):
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
         cmds.addAttr(self.guideNet, longName="moduleType", dataType="string")
+        cmds.addAttr(self.guideNet, longName="guideName", dataType="string")
         cmds.addAttr(self.guideNet, longName="guideNumber", dataType="string")
         cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
         cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
         cmds.addAttr(self.guideNet, longName="linkedNode", attributeType="message")
         cmds.setAttr(self.guideNet+".moduleType", self.guideModuleName, type="string")
+        cmds.setAttr(self.guideNet+".guideName", self.userGuideName, type="string")
         cmds.setAttr(self.guideNet+".guideNumber", guideNumber, type="string")
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
-        cmds.connectAttr(self.moduleGrp+".message", self.guideNet+".linkedNode", force=True)
+        if self.dpUIinst.optionCtrl:
+            cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
+        else:
+            cmds.connectAttr(self.moduleGrp+".message", self.guideNet+".linkedNode", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
 
     
@@ -701,9 +703,10 @@ class BaseStandard(object):
                     self.serialized = True
         else: #update linked node to avoid cleanup this network if it's broken
             cmds.lockNode(self.guideNet, lock=False)
-            cmds.connectAttr(self.toStaticHookGrp+".message", self.guideNet+".linkedNode", force=True)
-            cmds.addAttr(self.toStaticHookGrp, longName="net", attributeType="message")
-            cmds.connectAttr(self.guideNet+".message", self.toStaticHookGrp+".net", force=True)
+            if self.dpUIinst.optionCtrl:
+                cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
+            else:
+                cmds.connectAttr(self.toStaticHookGrp+".message", self.guideNet+".linkedNode", force=True)
             cmds.lockNode(self.guideNet, lock=True)
     
 

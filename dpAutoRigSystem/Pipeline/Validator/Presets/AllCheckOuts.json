@@ -48,7 +48,7 @@
     "ProxyCreator"              : true,
     "PruneSkinWeights"          : true,
     "RemapValueToSetRange"      : true,
-    "RemoveEmptyTransform"      : true,
+    "EmptyTransformCleaner"     : true,
     "ResetPose"                 : true,
     "ScalableDeformerChecker"   : true,
     "SideCalibration"           : true,

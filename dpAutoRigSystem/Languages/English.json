@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-07-09",
+    "_updated"       : "2025-07-14",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -988,8 +988,8 @@
     "v135_remainingVertexCleanerDesc"  : "This validator will verify if there are some remaining vertex in the meshes.\nIt means have one vertex connected to only 2 non border edges.",
     "v136_remapValueToSetRange"        : "RemapValue to SetRange",
     "v137_remapValueToSetRangeDesc"    : "This validator will verify if there are remapValue nodes\nthat could be converted to setRange nodes\nwithout losing any behavior.\nIt'll optimize the calculation and get a faster rig.",   
-    "v138_removeEmptyTransform"        : "Remove empty transform",
-    "v139_removeEmptyTransformDesc"    : "This validator will verify if have any transform without son or connection and delete them.",
+    "v138_emptyTransformCleaner"       : "Empty transform cleaner",
+    "v139_emptyTransformCleanerDesc"   : "This validator will verify if have any transform without son or connection and delete them.",
     "v140_parentedGeometry"            : "Parented geometry",
     "v141_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy."
   

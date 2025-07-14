@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.5
+DP_UTILS_VERSION = 3.6
 
 
 class Utils(object):
@@ -386,7 +386,7 @@ class Utils(object):
         """
         if objName != "":
             if cmds.objExists(objName):
-                if not cmds.objExists(objName+"."+hookType):
+                if not hookType in cmds.listAttr(objName):
                     cmds.addAttr(objName, longName=hookType, attributeType='bool')
                     cmds.setAttr(objName+"."+hookType, 1)
                 if addNotTransformIO:

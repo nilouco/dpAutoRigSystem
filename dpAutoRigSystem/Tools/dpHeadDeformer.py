@@ -10,7 +10,7 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.1
+DP_HEADDEFORMER_VERSION = 4.2
 
 
 class HeadDeformer(object):
@@ -308,12 +308,15 @@ class HeadDeformer(object):
             ctrlIDNotIncludeList = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if headSubCtrl:
                 headSubCtrlChildrenList = cmds.listRelatives(headSubCtrl, allDescendents=True)
-                childrenControlsList.append(headSubCtrlChildrenList)
+                if headSubCtrlChildrenList:
+                    for child in headSubCtrlChildrenList:
+                        childrenControlsList.append(child)
             if jawCtrl:
-                jawCtrlChildrenList = cmds.listRelatives(jawCtrl, allDescendents=True)                    
-                childrenControlsList.append(jawCtrlChildrenList)
+                jawCtrlChildrenList = cmds.listRelatives(jawCtrl, allDescendents=True)
+                if jawCtrlChildrenList:
+                    for child in jawCtrlChildrenList:
+                        childrenControlsList.append(child)
             if childrenControlsList:
-                childrenControlsList = childrenControlsList[0]+childrenControlsList[1]
                 for item in childrenControlsList:
                     if cmds.objExists(item+".controlID"):
                         if not cmds.objExists(item+"."+DPHEADDEFINFLUENCE):

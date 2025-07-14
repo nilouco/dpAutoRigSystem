@@ -7,7 +7,7 @@ TITLE = "m209_pinSide"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_pinSide.png"
 
-DP_PINSIDE_VERSION = 1.2
+DP_PINSIDE_VERSION = 1.3
 
 
 class PinSide(dpBaseCurve.BaseCurve):

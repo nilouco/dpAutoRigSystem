@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.41"
-DPAR_UPDATELOG = "N597 - Remove empty transform checkout."
+DPAR_VERSION_5 = "5.01.00"
+DPAR_UPDATELOG = "N489 - Count all modules and avoid unused locators."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2557,27 +2557,13 @@ class Start(object):
                             self.itemGuideName = sideName + self.prefix + self.itemGuideInstance
                         
                         # get hook groups info:
-                        self.itemRiggedGrp = self.itemGuideName+"_Static_Grp"
-                        self.staticHookGrp = self.itemRiggedGrp
-                        self.ctrlHookGrp = cmds.listConnections(self.itemRiggedGrp+".controlHookGrp", destination=False, source=True)[0]
-                        self.scalableHookGrp = cmds.listConnections(self.itemRiggedGrp+".scalableHookGrp", destination=False, source=True)[0]
-                        self.rootHookGrp = ""
-                        riggedChildList = cmds.listRelatives(self.itemRiggedGrp, children=True, type='transform')
-                        if riggedChildList:
-                            for child in riggedChildList:
-                                if cmds.objExists(child+".ctrlHook") and cmds.getAttr(child+".ctrlHook") == 1:
-                                    self.ctrlHookGrp = child
-                                elif cmds.objExists(child+".scalableHook") and cmds.getAttr(child+".scalableHook") == 1:
-                                    self.scalableHookGrp = child
-                                elif cmds.objExists(child+".staticHook") and cmds.getAttr(child+".staticHook") == 1:
-                                    self.staticHookGrp = child
-                                elif cmds.objExists(child+".rootHook") and cmds.getAttr(child+".rootHook") == 1:
-                                    self.rootHookGrp = child
+                        self.staticHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"StaticHookGrp", destination=False, source=True)[0]
+                        self.scalableHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ScalableHookGrp", destination=False, source=True)[0]
+                        self.ctrlHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ControlHookGrp", destination=False, source=True)[0]
                         
                         # get guideModule hierarchy data:
                         self.fatherGuide = self.hookDic[guideModule.moduleGrp]['fatherGuide']
                         self.parentNode  = self.hookDic[guideModule.moduleGrp]['parentNode']
-                        
                         # get father info:
                         if self.fatherGuide:
                             self.fatherModule              = self.hookDic[guideModule.moduleGrp]['fatherModule']
@@ -2587,21 +2573,16 @@ class Start(object):
                             self.fatherCustomName          = self.hookDic[guideModule.moduleGrp]['fatherCustomName']
                             self.fatherMirrorAxis          = self.hookDic[guideModule.moduleGrp]['fatherMirrorAxis']
                             self.fatherGuideMirrorNameList = self.hookDic[guideModule.moduleGrp]['fatherMirrorName']
-                            
                             # working with father mirror:
                             self.fatherMirrorNameList = [""]
-                            
                             # get fatherName:
                             if self.fatherMirrorAxis != "off":
                                 self.fatherMirrorNameList = self.fatherGuideMirrorNameList
-                            
                             for f, sideFatherName in enumerate(self.fatherMirrorNameList):
-                                
                                 if self.fatherCustomName:
                                     self.fatherName = sideFatherName + self.prefix + self.fatherCustomName
                                 else:
                                     self.fatherName = sideFatherName + self.prefix + self.fatherInstance
-                                
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
                                 if self.fatherRiggedParentNode:
@@ -2610,42 +2591,29 @@ class Start(object):
                                             # parent them to the correct side of the father's mirror:
                                             if self.ctrlHookGrp:
                                                 cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                                # make ctrlHookGrp inactive:
-                                                cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-
                                     else:
                                         # parent them to the unique father:
                                         if self.ctrlHookGrp:
                                             cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                            # make ctrlHookGrp inactive:
-                                            cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-                        
                         elif self.parentNode:
                             # parent module control to just a node in the scene:
                             cmds.parent(self.ctrlHookGrp, self.parentNode)
-                            # make ctrlHookGrp inactive:
-                            cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
                         else:
                             # parent module control to default masterGrp:
                             cmds.parent(self.ctrlHookGrp, self.ctrlsVisGrp)
-                            # make ctrlHookGrp inactive:
-                            cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-                        
-                        if self.rootHookGrp:
-                            # parent module rootHook to rootCtrl:
-                            cmds.parent(self.rootHookGrp, self.ctrlsVisGrp)
-                            # make rootHookGrp inactive:
-                            cmds.setAttr(self.rootHookGrp+".rootHook", 0)
-                        
                         # put static and scalable groups in dataGrp:
-                        if self.staticHookGrp:
-                            cmds.parent(self.staticHookGrp, self.staticGrp)
-                            # make staticHookGrp inative:
-                            cmds.setAttr(self.staticHookGrp+".staticHook", 0)
-                        if self.scalableHookGrp:
-                            cmds.parent(self.scalableHookGrp, self.scalableGrp)
-                            # make scalableHookGrp inative:
-                            cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
+                        cmds.parent(self.staticHookGrp, self.staticGrp)
+                        cmds.parent(self.scalableHookGrp, self.scalableGrp)
+                        # finish hookGrps:
+                        cmds.setAttr(self.staticHookGrp+".staticHook", 0)
+                        cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
+                        cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
+                        cmds.lockNode(guideModule.guideNet, lock=False)
+                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"StaticHookGrp")
+                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"ScalableHookGrp")
+                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"ControlHookGrp")
+                        cmds.lockNode(guideModule.guideNet, lock=True)
+
                 
                 # prepare to show a dialog box if find a bug:
                 self.detectedBug = False
@@ -3223,13 +3191,13 @@ class Start(object):
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0
-                    newTranformList = cmds.ls(selection=False, type="transform")
-                    for transf in newTranformList:
-                        if cmds.objExists(transf+'.dpAR_type'):
-                            dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
-                            if ( dpARType == guideType ):
+                    guideNetList = cmds.ls(selection=False, type="network")
+                    for net in guideNetList:
+                        if cmds.objExists(net+'.moduleType'):
+                            dpARType = 'dp'+(cmds.getAttr(net+'.moduleType'))
+                            if dpARType == guideType:
                                 typeCounter = typeCounter + 1
-                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
+                    if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             #Actualise all controls (All_Grp.controlList) for this rig:
