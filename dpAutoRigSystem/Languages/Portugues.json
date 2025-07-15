@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-07-14",
+    "_updated"       : "2025-07-15",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -509,7 +509,7 @@
     "i343_tools"                : "Ferramentas",
     "i344_deleted"              : "Apagado",
     "i345_sOffsetMatrixIOAnn"   : "O diretório onde será exportado ou importado os dados de conexões de parent offset matrix.",
-    "i346_loadedSuccess"         : "carregado com sucesso, obrigado.",
+    "i346_loadedSuccess"        : "carregado com sucesso, obrigado.",
     "i347_sChannelIOAnn"        : "O diretório onde será exportado ou importado os dados de estados dos atributos de tranform da channelBox.",
     "i348_triangleIconAnn"      : "Colapsar ou expandir todos os frame layouts de módulos.",
     "i349_alreadyExistsAsset"   : "Já existe um ativo com esse nome na pipeline.\nPor favor, selecione outro nome ou apenas carregue este.",
@@ -758,6 +758,10 @@
     "m232_morphDeformer"         : "Deformador Morph",
     "m233_jointDisplay"          : "Visualização de Joint",
     "m234_jointDisplayDesc"      : "Muda o formato de visualização dos joints",
+    "m235_selectedStaticAttr"    : "O atributo selecionado é estático e não pode ser movido, desculpe.",
+    "m236_canReorderUserDefAttr" : "Podemos apenas reordenar atributos que foram adicionados pelo usuário.",
+    "m237_selectChannelBoxAttr"  : "Selecione um ou mais atributos na Channel Box, por favor.",
+    "m238_selectTransform"       : "Selecione um ou mais nodes de transform para reordernar atributos, por favor.",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
