@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-07-09",
+    "_updated"       : "2025-07-15",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -509,7 +509,7 @@
     "i343_tools"                : "Outils",
     "i344_deleted"              : "Effacé",
     "i345_sOffsetMatrixIOAnn"   : "Le dossier ou on va importer et exporter les donnés des connexions des parent offset matrix.",
-    "i346_loadedSuccess"         : "chargé avec succès, merci.",
+    "i346_loadedSuccess"        : "chargé avec succès, merci.",
     "i347_sChannelIOAnn"        : "Le dossier ou on va importer et exporter les donnés des states pour les attributes de tranform du channelBox.",
     "i348_triangleIconAnn"      : "Collapser ou expandir tous les frame layouts des módules.",
     "i349_alreadyExistsAsset"   : "Il y en a déjà un actif avec ce nom dans la pipeline.\nChange le nom ou charge celui-la, stp.",
@@ -758,6 +758,10 @@
     "m232_morphDeformer"         : "Déformateur Morph",
     "m233_jointDisplay"          : "Joint d'affichage",
     "m234_jointDisplayDesc"      : "Modifier l'affichage des articulations dans la fenêtre",
+    "m235_selectedStaticAttr"    : "L'attribut selecioné est statique et ne peut pas être changé, désolé.",
+    "m236_canReorderUserDefAttr" : "On ne peut réorganiser que les attributs ajoutés par l'utilisateur.",
+    "m237_selectChannelBoxAttr"  : "Veuillez sélectionner un ou plusieurs attributs dans la Channel Box, s'il vous plaît.",
+    "m238_selectTransform"       : "Sélectionnez un ou plusieurs nodes de transform pour réorganiser les attributs, s'il vous plaît.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -987,8 +991,8 @@
     "v135_remainingVertexCleanerDesc"  : "Ce validateur va véfirier s'il y des vertices restants dans la mesh.\nÇa vaut dire s'il a de vertex connecté à juste 2 edges que ne sont pas des bordures.",
     "v136_remapValueToSetRange"        : "RemapValue pour SetRange",
     "v137_remapValueToSetRangeDesc"    : "Ce validateur vérifiera si des nodes de remapValue que pourraient être\nconvertis en nodes de setRange sans perte de comportement.\nIl optimisera le calcul et va faire le rig plus vite.",
-    "v138_removeEmptyTransform"        : "Supprimer les transformations vides",
-    "v139_removeEmptyTransformDesc"    : "Ce validateur vérifiera s'il y a des transformations sans fils ou connexion et les supprimera.",
+    "v138_emptyTransformCleaner"       : "Supprimer les transformations vides",
+    "v139_emptyTransformCleanerDesc"   : "Ce validateur vérifiera s'il y a des transformations sans fils ou connexion et les supprimera.",
     "v140_parentedGeometry"            : "Géométrie parentée",
     "v141_parentedGeometryDesc"        : "Ce validateur vérifie la présence de géométries parentées dans la hiérarchie."
 
