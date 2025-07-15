@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from functools import partial
 import os
 import json
 
@@ -15,7 +16,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.1
+DP_FACIALCONNECTION_VERSION = 1.2
 
 
 class FacialConnection(object):
@@ -33,11 +34,15 @@ class FacialConnection(object):
                             "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
                             "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"
                             ]
+        self.combinationTargetList = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
+        self.mouthTgts = ["MouthSmile", "MouthSad", "MouthWide", "MouthNarrow"]
+        self.browTgts = ["BrowUp", "BrowDown", "BrowSad", "BrowFrown"]
+        self.combinationPossibleList = [('Smile', 'Wide'), ('Smile', 'Narrow'), ('Sad', 'Wide'), ('Sad', 'Narrow'), ('Up', 'Sad'), ('Up', 'Frown'), ('Down', 'Sad'), ('Down', 'Frown')]
         # call main function:
         if self.ui:
             self.dpFacialConnectionUI(self)
     
-    
+
     def dpInitTweaksVariables(self, *args):
         # part names:
         mainName = self.dpUIinst.lang['c058_main']
@@ -115,12 +120,14 @@ class FacialConnection(object):
         # creating targetMirrorUI Window:
         self.utils.closeUI('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 220
-        facialCtrl_winHeight = 160
+        facialCtrl_winHeight = 200
         dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.dpUIinst.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
         cmds.separator(height=5, style="in", horizontal=True, parent=facialCtrlLayout)
         cmds.button(label=self.dpUIinst.lang["m140_createTargets"], annotation=self.dpUIinst.lang['m141_createTargetsDesc'], width=220, command=self.dpCreateTargets, align="center", parent=facialCtrlLayout)
+        #cmds.button(label="Create Combination Targets", annotation=self.dpUIinst.lang['m141_createTargetsDesc'], width=220, command=partial(self.dpCreateTargets, tgtList=self.combinationTargetList, defaultTargets=False), align="center", parent=facialCtrlLayout)
+        self.combinationTgtCB = cmds.checkBox(label="Add combination targets", annotation=self.dpUIinst.lang['m141_createTargetsDesc'], value=0, parent=facialCtrlLayout)
         cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
         cmds.text(label=self.dpUIinst.lang['m142_connectFacialAttr'], parent=facialCtrlLayout)
         cmds.button(label=self.dpUIinst.lang['m170_blendShapes']+" - "+self.dpUIinst.lang['i185_animation'], annotation="Create selected facial controls.", width=220, command=self.dpConnectToBlendShape, parent=facialCtrlLayout)
@@ -128,8 +135,8 @@ class FacialConnection(object):
         # call facialControlUI Window:
         cmds.showWindow(dpFacialControlWin)
     
-
-    def dpCreateTargets(self, fromMesh=None, baseName="Head", *args):
+ 
+    def dpCreateTargets(self, fromMesh=None, baseName="Head", combinationTargets=False, *args):
         """ Creates the default blendShape targets used in the system by default.
         """
         if not fromMesh:
@@ -159,17 +166,13 @@ class FacialConnection(object):
                 prefix = prefix+"_"
             prefix = prefix.capitalize()
             suffix = "_Tgt"
-            facialGrp = cmds.group(empty=True, name=prefix+"Facial_Tgt_Grp")
             # create target meshes
-            for t, tgt in enumerate(self.targetList):
-                dup = cmds.duplicate(fromMesh)[0]
-                geo = cmds.rename(dup, prefix+tgt+suffix)
-                resultList.append(geo)
-                cmds.select(geo)
-                cmds.hyperShade(geo, assign="initialShadingGroup")
-                connectedPlug = cmds.listConnections(geo+".drawOverride", destination=False, source=True, plugs=True)
-                if connectedPlug:
-                    cmds.disconnectAttr(connectedPlug[0], geo+".drawOverride")
+            tgtList = self.targetList
+            if cmds.checkBox(self.combinationTgtCB, query=True, value=True):
+                tgtList = self.targetList+self.combinationTargetList
+            facialGrp = cmds.group(empty=True, name=prefix+"Facial_Tgt_Grp")
+            for t, tgt in enumerate(tgtList):
+                geo = self.dpDuplicateRenameAndInitShaderTgt(fromMesh, prefix, tgt, suffix)
                 if t == 0:
                     cmds.setAttr(geo+".visibility", 0)
                     geoList.append(geo)
@@ -182,12 +185,25 @@ class FacialConnection(object):
             geoGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
             cmds.parent(geoList, geoGrp)
             cmds.parent(facialGrp, geoGrp)
-            self.dpUIinst.customAttr.addAttr(0, [geoGrp], descendents=True) #dpID
+            self.dpUIinst.customAttr.addAttr(0, [geo], descendents=True) #dpID
             if self.ui and resultList:
                 self.dpUIinst.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.dpUIinst.lang["i042_notSelection"]+"\";")
         self.utils.closeUI('dpFacialConnectionWindow')
+    
+
+    def dpDuplicateRenameAndInitShaderTgt(self, fromMesh, prefix, tgt, suffix, *args):
+        """ Duplicate the given mesh and rename it to the target name.
+        """
+        dup = cmds.duplicate(fromMesh)[0]
+        geo = cmds.rename(dup, prefix+tgt+suffix)
+        cmds.select(geo)
+        cmds.hyperShade(geo, assign="initialShadingGroup")
+        connectedPlug = cmds.listConnections(geo+".drawOverride", destination=False, source=True, plugs=True)
+        if connectedPlug:
+            cmds.disconnectAttr(connectedPlug[0], geo+".drawOverride")
+        return geo
 
 
     def dpGetFacialCtrlDic(self, ctrlList, *args):
@@ -202,44 +218,74 @@ class FacialConnection(object):
                     resultDic[ctrl] = self.ctrls.getListFromStringAttr(ctrl, "facialList")
         return resultDic
     
+    def dpGetBsNodeDic(self, bsList):
+        bsDic = {}
+        if bsList:
+            for bsNode in bsList:
+                targetList = cmds.listAttr(bsNode+".w", multi=True)
+                if targetList:
+                    bsDic[bsNode] = targetList
+        return bsDic
+
+
+    def dpFindCombinationTgtRelationship(self, bsNode, *args):
+        combinationTargetRelationship = {}
+        prefix = "Body_"
+        if bsNode:
+            targetList = cmds.listAttr(bsNode+".w", multi=True) 
+        for name in targetList:
+            nameLower = name.lower()
+            if "comb" in nameLower:
+                for a, b in self.combinationPossibleList:
+                    if a.lower() in nameLower and b.lower() in nameLower:
+                        print("COMBINATION = ", name)
+                        combinationTargetRelationship[name] = None
+            else:
+                print(name)
+                #TODO How to find the relationship between combination and the targets?
+
+        return combinationTargetRelationship
+    
 
     def dpConnectToBlendShape(self, ctrlList=None, bsList=None, *args):
         """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
         """
-        bsDic = {}
         resultList = []
         # get facialList attr from found dpAR controls
         facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
         # get target list from existing blendShape nodes
         if not bsList:
             bsList = cmds.ls(selection=False, type="blendShape")
-        if bsList:
-            for bsNode in bsList:
-                targetList = cmds.listAttr(bsNode+".w", multi=True)
-                if targetList:
-                    bsDic[bsNode] = targetList
+        bsDic = self.dpGetBsNodeDic(bsList)
         # connect them
-        if facialCtrlDic and bsDic:
-            for facialCtrl in list(facialCtrlDic.keys()):
-                for bsNode in list(bsDic.keys()):
-                    for facialAttr in facialCtrlDic[facialCtrl]:
-                        for targetAttr in bsDic[bsNode]:
-                            connectIt = False
-                            if targetAttr.endswith(facialAttr+"_Tgt"):
-                                connectIt = True
-                            elif targetAttr.endswith(facialAttr):
-                                connectIt = True
-                            elif facialAttr == targetAttr:
-                                connectIt = True
-                            # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
-                            if connectIt:
-                                cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
-                                print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
-                                resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
+        if bsDic:
+            if facialCtrlDic and bsDic:
+                for facialCtrl in list(facialCtrlDic.keys()):
+                    for bsNode in list(bsDic.keys()):
+                        for facialAttr in facialCtrlDic[facialCtrl]:
+                            for targetAttr in bsDic[bsNode]:
+                                connectIt = False
+                                if targetAttr.endswith(facialAttr+"_Tgt"):
+                                    connectIt = True
+                                elif targetAttr.endswith(facialAttr):
+                                    connectIt = True
+                                elif facialAttr == targetAttr:
+                                    connectIt = True
+                                # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
+                                if connectIt:
+                                    cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
+                                    print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
+                                    resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
+            else:
+                bsCombDic = self.dpFindCombinationTgtRelationship("Ball_BS")
+                for bs in bsCombDic.items():
+                    print(bs)
+                    
+                            
         if self.ui and resultList:
             self.dpUIinst.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.utils.closeUI('dpFacialConnectionWindow')
-
+    
 
     def dpConnectToJoints(self, ctrlList=None, *args):
         """ Connect the facial controllers attributes to the stored facial tweakers data.
@@ -381,3 +427,4 @@ class FacialConnection(object):
                     cmds.delete(connectedList[0])
         else:
             cmds.connectAttr(remap+".outValue", jntTarget+"."+toAttr, force=True)
+
