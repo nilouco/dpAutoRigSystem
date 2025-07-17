@@ -16,7 +16,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.3
+DP_HEAD_VERSION = 3.4
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -685,6 +685,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.select(self.headJnt)
                 if hasLips:
                     self.lCornerLipJnt = cmds.joint(name=lCornerLipJntName, scaleCompensate=False)
+                    cmds.select(self.headJnt)
                     self.rCornerLipJnt = cmds.joint(name=rCornerLipJntName, scaleCompensate=False)
                     cmds.select(self.headJnt)
                     if hasUpperHead:

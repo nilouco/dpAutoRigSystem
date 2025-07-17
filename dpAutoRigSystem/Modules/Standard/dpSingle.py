@@ -9,7 +9,7 @@ TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
 
-DP_SINGLE_VERSION = 2.5
+DP_SINGLE_VERSION = 2.6
 
 
 class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -232,7 +232,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.getHasIndirectSkin():
-                    self.hookSetup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], [side+self.userGuideName+"_Jxt"])
+                    self.hookSetup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], staticList=[side+self.userGuideName+"_Jxt"])
                 else:
                     self.hookSetup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], [side+self.userGuideName+"_Jnt"])
                 self.aStaticGrpList.append(self.toStaticHookGrp)
