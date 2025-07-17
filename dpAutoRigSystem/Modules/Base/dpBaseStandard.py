@@ -587,7 +587,8 @@ class BaseStandard(object):
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
         if self.dpUIinst.optionCtrl:
-            cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
+            if cmds.objExists(self.dpUIinst.optionCtrl):
+                cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
         else:
             cmds.connectAttr(self.moduleGrp+".message", self.guideNet+".linkedNode", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
