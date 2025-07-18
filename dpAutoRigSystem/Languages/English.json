@@ -766,6 +766,7 @@
     "m240_motionCaptureDesc"     : "Edit and manage the motion capture integration.",
     "m241_createSkeleton"        : "Create skeleton",
     "m242_mapBipedControllers"   : "Map biped controllers",
+    "m243_askBreakAutoRotate"    : "It'll break the autoRotation behaviors of the neck and clavicles.\nYou can redo the connections using the Redo AutoRotate button below.\nDo you want to continue?",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

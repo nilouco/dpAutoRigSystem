@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from functools import partial
 
 # global variables to this module:
 CLASS_NAME = "MotionCapture"
@@ -18,6 +19,8 @@ class MotionCapture(object):
         self.utils = dpUIinst.utils
         self.ctrls = dpUIinst.ctrls
         self.ui = ui
+        self.autoRotateAttrList = ["follow", "autoRotate"]
+        self.oldConnectedAttr = "oldConnected_"
         self.hikCharacterAttr = "Character"
         self.hikNode = self.hikGetLatestNode()
         print("self.hikNode starts =", self.hikNode)
@@ -49,13 +52,21 @@ class MotionCapture(object):
         cmds.text(label="WIP", parent=motionCaptureMainLayout)
         
 #        cmds.button(label=self.dpUIinst.lang['m241_createSkeleton'], annotation="WIP", width=220, command=self.hikCreateSkeleton, parent=motionCaptureMainLayout)
-        cmds.button(label="1 - Set FK mode", annotation="WIP", width=220, command=self.setFkMode, parent=motionCaptureMainLayout)
-        cmds.button(label="2 - Set T-Pose", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
-        cmds.button(label="3 - Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
-        cmds.button(label="4 - Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
-        cmds.button(label="5 - Create custom rig control", annotation="WIP", width=220, command=self.hikCreateCustomRigCtrl, parent=motionCaptureMainLayout)
-        cmds.button(label="6 - Set controllers", annotation="WIP", width=220, command=self.hikMapBipedControllers, parent=motionCaptureMainLayout)
-        cmds.button(label="Lock definition = NO???", annotation="WIP", width=220, command=self.hikLockDefinition, parent=motionCaptureMainLayout)
+        cmds.button(label="1 - Set FK mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 1), parent=motionCaptureMainLayout)
+        cmds.button(label="2 - Break autoRotate (clavicle, neck)", annotation="WIP", width=220, command=self.breakAutoRotate, parent=motionCaptureMainLayout)
+        cmds.button(label="3 - Set T-Pose = TODO", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
+        cmds.button(label="4 - Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
+        cmds.button(label="5 - Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
+        cmds.button(label="6 - Create custom rig control", annotation="WIP", width=220, command=self.hikCreateCustomRigCtrl, parent=motionCaptureMainLayout)
+        cmds.button(label="7 - Set controllers", annotation="WIP", width=220, command=self.hikMapBipedControllers, parent=motionCaptureMainLayout)
+        
+        cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
+        cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
+
+        cmds.button(label="BACK 1: remove mocap", annotation="WIP", width=220, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
+        cmds.button(label="BACK 2: redo autoRotate", annotation="WIP", width=220, command=self.redoAutoRotate, parent=motionCaptureMainLayout)
+        cmds.button(label="BACK 3: reset default pose = TODO", annotation="WIP", width=220, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
+        cmds.button(label="BACK 4: set Ik mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 0), parent=motionCaptureMainLayout)
         
         cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humaIkFL, 'HumanIk')))
         # call Window:
@@ -258,25 +269,65 @@ class MotionCapture(object):
         }
 
 
-    def setFkMode(self, *args):
+    def setCtrlMode(self, mode=1, *args):
         """
         """
-        print("wip set fkMode")
+        print("wip set ctrl mode")
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optCtrl:
             userDefAttrList = cmds.listAttr(optCtrl, userDefined=True)
             if userDefAttrList:
                 for attr in userDefAttrList:
                     if attr.endswith("Fk"):
-                        cmds.setAttr(optCtrl+"."+attr, 1)
+                        cmds.setAttr(optCtrl+"."+attr, mode)
         else:
-            print("There isn't an Option_Ctrl to setup Fk mode in the rig, sorry.")
+            print("There isn't an Option_Ctrl to setup Ik or Fk mode in the rig, sorry.")
+
+
+    def getAutoRotateCtrlList(self, *args):
+        """
+        """
+        ctrlList = self.ctrls.getControlNodeById("id_030_LimbClavicle")
+        ctrlList.extend(self.ctrls.getControlNodeById("id_022_HeadNeck"))
+        return ctrlList
+
+
+    def lockAutoRotateAttr(self, ctrl, value, *args):
+        """
+        """
+        for followAttr in self.autoRotateAttrList:
+            if followAttr in cmds.listAttr(ctrl):
+                cmds.setAttr(ctrl+"."+followAttr, lock=value)
+
+
+
+    def breakAutoRotate(self, *args):
+        """
+        """
+        print("wip break autoRotates here")
+        confirm = cmds.confirmDialog(title=self.dpUIinst.lang[TITLE], icon="question", message=self.dpUIinst.lang['m243_askBreakAutoRotate'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i072_no'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
+        if confirm == self.dpUIinst.lang['i071_yes']:
+            ctrlList = self.getAutoRotateCtrlList()
+            if ctrlList:
+                for ctrl in ctrlList:
+                    self.lockAutoRotateAttr(ctrl, True)
+                    zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                    for axis in ["X", "Y", "Z"]:
+                        connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
+                        if connectList:
+                            if not self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
+                                cmds.addAttr(zeroGrp, longName=self.oldConnectedAttr+"rotate"+axis, dataType="string")
+                            cmds.setAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis, connectList[0], type="string")
+                            cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
+
+
 
 
     def setTPose(self, *args):
         """
         """
-        print("wip set T-Pose")
+        print("wip set T-Pose ----- TODO")
+
 
 
 
@@ -301,19 +352,7 @@ class MotionCapture(object):
         return self.hikNode
     
 
-    def hikCreateSkeleton(self, *args):
-        """ Create humanIk skeleton.
-            Returns its latest HIKCharacterNode.
-        """
-        hikOldList = cmds.ls(type="HIKCharacterNode")
-        mel.eval("HIKCharacterControlsTool;")
-        mel.eval("hikCreateSkeleton;")
-        self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
-        print("self.hikNode =", self.hikNode)
-        return self.hikNode
-    
-    
-    
+  
     
     def hikAssignJointsToDefinition(self, *args):
         """ Map dpAR biped joints to HumanIk character skeleton.
@@ -344,7 +383,6 @@ class MotionCapture(object):
     def hikMapBipedControllers(self, *args):
         if self.hikNode:
             if self.utils.getAllGrp():
-
                 if not self.hikDic:
                     self.hikDic = self.hikGetDefaultMapDic()
                 #TODO get user defined dictionary to mapping
@@ -354,21 +392,12 @@ class MotionCapture(object):
                             cmds.select(self.hikDic[hikKey]["control"])
                             mel.eval('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
                 cmds.select(clear=True)
+                print("...mapped biped controllers --- done")
 
             else:
                 print("There's no dpAR in the scene to continue the HumanIk biped retargeting, sorry.")
         else:
             print("There's no HIKCharacterNode in the scene to use. Create one to continue, please.")
-
-    def hikLockDefinition(self, *args):
-        """ WIP starts
-        """
-        #WIP
-        print("wip here thanks")
-        if self.hikNode:
-            if cmds.objExists(self.hikNode):
-                cmds.select(self.hikNode)
-                mel.eval("hikToggleLockDefinition;")
 
 
     def hikCreateCustomRigCtrl(self, *args):
@@ -377,3 +406,37 @@ class MotionCapture(object):
         mel.eval('hikCreateCustomRig( hikGetCurrentCharacter() );')
         #TODO returns the hik customRig node
         
+
+
+    def hikRemoveMocap(self, *args):
+        """
+        """
+        print("wip removing HumanIk mocap")
+        mel.eval('hikDeleteCustomRig( hikGetCurrentCharacter() );')
+        mel.eval('hikDeleteDefinition();')
+
+    
+    
+    
+    def redoAutoRotate(self, *args):
+        """
+        """
+        print("wip recreating the autoRotate setup")
+        ctrlList = self.getAutoRotateCtrlList()
+        if ctrlList:
+            for ctrl in ctrlList:
+                self.lockAutoRotateAttr(ctrl, False)
+                zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                for axis in ["X", "Y", "Z"]:
+                    connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
+                    if connectList:
+                        cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
+                    if self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
+                        cmds.connectAttr(cmds.getAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis), zeroGrp+".rotate"+axis, force=True)
+                        cmds.deleteAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis)
+
+
+    def resetDefaultPose(self, *args):
+        """
+        """
+        print("wip --- back to default pose = TODO")
