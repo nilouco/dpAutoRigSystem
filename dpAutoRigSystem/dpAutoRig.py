@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.00.41"
-DPAR_UPDATELOG = "N597 - Remove empty transform checkout."
+DPAR_VERSION_5 = "5.01.01"
+DPAR_UPDATELOG = "N290 Ground control display direction"
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -48,6 +48,7 @@ from .Modules.Library import dpControls
 from .Modules.Library import dpSkinning
 from .Modules.Base import dpBaseStandard
 from .Modules.Base import dpBaseLayout
+from .Modules.Base import dpBaseCurve
 from .Tools import dpUpdateRigInfo
 from .Tools import dpReorderAttr
 from .Tools import dpCustomAttr
@@ -78,6 +79,7 @@ class Start(object):
         reload(dpSkinning)
         reload(dpBaseStandard)
         reload(dpBaseLayout)
+        reload(dpBaseCurve)
         reload(dpUpdateRigInfo)
         reload(dpReorderAttr)
         reload(dpCustomAttr)
@@ -2287,6 +2289,8 @@ class Start(object):
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
+        self.directionCtrl = BaseCurve.createCurve()
+        self.ctrls.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=self.directionCtrl, destinationList=self.globalCtrl, keepColor=True, force=False)
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
         needConnectPivotAttr = False
