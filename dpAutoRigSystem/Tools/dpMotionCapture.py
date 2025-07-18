@@ -49,10 +49,12 @@ class MotionCapture(object):
         cmds.text(label="WIP", parent=motionCaptureMainLayout)
         
 #        cmds.button(label=self.dpUIinst.lang['m241_createSkeleton'], annotation="WIP", width=220, command=self.hikCreateSkeleton, parent=motionCaptureMainLayout)
-        cmds.button(label="Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
-        cmds.button(label="Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
-        cmds.button(label="Create custom rig control", annotation="WIP", width=220, command=self.hikCreateCustomRigCtrl, parent=motionCaptureMainLayout)
-        cmds.button(label=self.dpUIinst.lang['m242_mapBipedControllers'], annotation="WIP", width=220, command=self.hikMapBipedControllers, parent=motionCaptureMainLayout)
+        cmds.button(label="1 - Set FK mode", annotation="WIP", width=220, command=self.setFkMode, parent=motionCaptureMainLayout)
+        cmds.button(label="2 - Set T-Pose", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
+        cmds.button(label="3 - Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
+        cmds.button(label="4 - Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
+        cmds.button(label="5 - Create custom rig control", annotation="WIP", width=220, command=self.hikCreateCustomRigCtrl, parent=motionCaptureMainLayout)
+        cmds.button(label="6 - Set controllers", annotation="WIP", width=220, command=self.hikMapBipedControllers, parent=motionCaptureMainLayout)
         cmds.button(label="Lock definition = NO???", annotation="WIP", width=220, command=self.hikLockDefinition, parent=motionCaptureMainLayout)
         
         cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humaIkFL, 'HumanIk')))
@@ -166,13 +168,13 @@ class MotionCapture(object):
                 "LeftHandPinky1"   : {"id"      : 66,
                                       "joint"   : "L_Finger_Pinky_00_Jnt",
                                       "control" : "L_Finger_Pinky_00_Ctrl"},
-                "LeftHandPinky2"   : {"id"      : 66,
+                "LeftHandPinky2"   : {"id"      : 67,
                                       "joint"   : "L_Finger_Pinky_01_Jnt",
                                       "control" : "L_Finger_Pinky_01_Ctrl"},
-                "LeftHandPinky3"   : {"id"      : 66,
+                "LeftHandPinky3"   : {"id"      : 68,
                                       "joint"   : "L_Finger_Pinky_02_Jnt",
                                       "control" : "L_Finger_Pinky_02_Ctrl"},
-                "LeftHandPinky4"   : {"id"      : 66,
+                "LeftHandPinky4"   : {"id"      : 69,
                                       "joint"   : "L_Finger_Pinky_03_Jnt",
                                       "control" : "L_Finger_Pinky_03_Ctrl"},
                 "RightShoulder"    : {"id"      : 19,
@@ -217,7 +219,7 @@ class MotionCapture(object):
                 "RightHandMiddle2" : {"id"      : 83,
                                       "joint"   : "R_Finger_Middle_01_Jnt",
                                       "control" : "R_Finger_Middle_01_Ctrl"},
-                "RightHandMiddle3" : {"id"      : 85,
+                "RightHandMiddle3" : {"id"      : 84,
                                       "joint"   : "R_Finger_Middle_02_Jnt",
                                       "control" : "R_Finger_Middle_02_Ctrl"},
                 "RightHandMiddle4" : {"id"      : 85,
@@ -255,6 +257,26 @@ class MotionCapture(object):
                                       "control" : "Head_Head_Ctrl"},
         }
 
+
+    def setFkMode(self, *args):
+        """
+        """
+        print("wip set fkMode")
+        optCtrl = self.utils.getNodeByMessage("optionCtrl")
+        if optCtrl:
+            userDefAttrList = cmds.listAttr(optCtrl, userDefined=True)
+            if userDefAttrList:
+                for attr in userDefAttrList:
+                    if attr.endswith("Fk"):
+                        cmds.setAttr(optCtrl+"."+attr, 1)
+        else:
+            print("There isn't an Option_Ctrl to setup Fk mode in the rig, sorry.")
+
+
+    def setTPose(self, *args):
+        """
+        """
+        print("wip set T-Pose")
 
 
 
@@ -330,9 +352,8 @@ class MotionCapture(object):
                     if not self.hikDic[hikKey]["id"] == 0: #reference
                         if cmds.objExists(self.hikDic[hikKey]["control"]):
                             cmds.select(self.hikDic[hikKey]["control"])
-                            print('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
                             mel.eval('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
-                        
+                cmds.select(clear=True)
 
             else:
                 print("There's no dpAR in the scene to continue the HumanIk biped retargeting, sorry.")
