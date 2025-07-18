@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-07-15",
+    "_updated"       : "2025-07-17",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -762,6 +762,10 @@
     "m236_canReorderUserDefAttr" : "On ne peut réorganiser que les attributs ajoutés par l'utilisateur.",
     "m237_selectChannelBoxAttr"  : "Veuillez sélectionner un ou plusieurs attributs dans la Channel Box, s'il vous plaît.",
     "m238_selectTransform"       : "Sélectionnez un ou plusieurs nodes de transform pour réorganiser les attributs, s'il vous plaît.",
+    "m239_motionCapture"         : "Capture de Mouvement",
+    "m240_motionCaptureDesc"     : "Modifiez et gérez l'intégration de la capture de mouvement.",
+    "m241_createSkeleton"        : "Creer squelette",
+    "m242_mapBipedControllers"   : "Relier contrôleurs de bipèdes",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
