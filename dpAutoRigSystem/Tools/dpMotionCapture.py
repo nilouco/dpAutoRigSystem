@@ -53,7 +53,7 @@ class MotionCapture(object):
         
 #        cmds.button(label=self.dpUIinst.lang['m241_createSkeleton'], annotation="WIP", width=220, command=self.hikCreateSkeleton, parent=motionCaptureMainLayout)
         cmds.button(label="1 - Set FK mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 1), parent=motionCaptureMainLayout)
-        cmds.button(label="2 - Break autoRotate (clavicle, neck)", annotation="WIP", width=220, command=self.breakAutoRotate, parent=motionCaptureMainLayout)
+        cmds.button(label="2 - Mute autoRotate (clavicle, neck)", annotation="WIP", width=220, command=self.muteAutoRotate, parent=motionCaptureMainLayout)
         cmds.button(label="3 - Set T-Pose = TODO", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
         cmds.button(label="4 - Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
         cmds.button(label="5 - Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
@@ -65,7 +65,7 @@ class MotionCapture(object):
 
         cmds.button(label="BACK 1: remove mocap", annotation="WIP", width=220, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
         cmds.button(label="BACK 2: redo autoRotate", annotation="WIP", width=220, command=self.redoAutoRotate, parent=motionCaptureMainLayout)
-        cmds.button(label="BACK 3: reset default pose = TODO", annotation="WIP", width=220, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
+        cmds.button(label="BACK 3: reset default pose", annotation="WIP", width=220, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
         cmds.button(label="BACK 4: set Ik mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 0), parent=motionCaptureMainLayout)
         
         cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humaIkFL, 'HumanIk')))
@@ -301,7 +301,7 @@ class MotionCapture(object):
 
 
 
-    def breakAutoRotate(self, *args):
+    def muteAutoRotate(self, *args):
         """
         """
         print("wip break autoRotates here")
@@ -312,13 +312,15 @@ class MotionCapture(object):
                 for ctrl in ctrlList:
                     self.lockAutoRotateAttr(ctrl, True)
                     zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                    for axis in ["X", "Y", "Z"]:
-                        connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
-                        if connectList:
-                            if not self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
-                                cmds.addAttr(zeroGrp, longName=self.oldConnectedAttr+"rotate"+axis, dataType="string")
-                            cmds.setAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis, connectList[0], type="string")
-                            cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
+                    for axis in self.dpUIinst.axisList:
+                        cmds.mute(zeroGrp+".rotate"+axis, force=True)
+                        
+#                        connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
+#                        if connectList:
+#                            if not self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
+#                                cmds.addAttr(zeroGrp, longName=self.oldConnectedAttr+"rotate"+axis, dataType="string")
+#                            cmds.setAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis, connectList[0], type="string")
+#                            cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
 
 
 
@@ -326,7 +328,67 @@ class MotionCapture(object):
     def setTPose(self, *args):
         """
         """
-        print("wip set T-Pose ----- TODO")
+        print("wip set T-Pose ----- WIP")
+
+        # WIP
+        # clavicle
+        beforeCtrlList = self.ctrls.getControlNodeById("id_030_LimbClavicle")
+        if beforeCtrlList:
+            clavList, dpIDList = [], []
+            for beforeCtrl in beforeCtrlList:
+                if self.dpUIinst.lang['c000_arm_before'] in beforeCtrl: #arm
+                    clavList.append(beforeCtrl)
+                    dpIDList.append(int(cmds.getAttr(beforeCtrl+".dpID").split(".")[1]))
+            if dpIDList[0] < dpIDList[1]: #listed left side first
+                lClav = clavList[0]
+                rClav = clavList[1]
+            else:
+                lClav = clavList[1]
+                rClav = clavList[0]
+            cmds.xform(lClav, rotation=(90, 0, 90), worldSpace=True) #left
+            #cmds.xform(rClav, rotation=(90, 0, 90), absolute=True, worldSpace=True) #left
+            
+            for axis in self.dpUIinst.axisList:
+                cmds.setAttr(rClav+".rotate"+axis, cmds.getAttr(lClav+".rotate"+axis)) #right
+        # arm
+        fkCtrlList = self.ctrls.getControlNodeById("id_031_LimbFk")
+        if fkCtrlList:
+            armList, dpIDArmList = [], []
+            for i in range(0, 4):
+                for fkCtrl in fkCtrlList:
+                    if i == 0:
+                        if self.dpUIinst.lang['c001_arm_main'] in fkCtrl:
+                            if not fkCtrl in armList:
+                                armList.append(fkCtrl)
+                                dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
+                    elif i == 1:
+                        if self.dpUIinst.lang['c002_arm_corner'] in fkCtrl:
+                            if not fkCtrl in armList:
+                                armList.append(fkCtrl)
+                                dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
+                    elif i == 2:
+                        if self.dpUIinst.lang['c004_arm_extrem'] in fkCtrl:
+                            if not fkCtrl in armList:
+                                armList.append(fkCtrl)
+                                dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
+            print("armLIst =", armList)
+            if dpIDArmList[0] < dpIDArmList[2]: #listed left side first
+                cmds.xform(armList[0], rotation=(90, 90, 0), worldSpace=True) #left
+                cmds.xform(armList[2], rotation=(90, 90, 0), worldSpace=True) #left
+                cmds.xform(armList[4], rotation=(90, 90, 0), worldSpace=True) #left
+                cmds.xform(armList[1], rotation=(-90, 90, 0), worldSpace=True) #right
+                cmds.xform(armList[3], rotation=(-90, 90, 0), worldSpace=True) #right
+                cmds.xform(armList[5], rotation=(-90, 90, 0), worldSpace=True) #right
+            else:
+                cmds.xform(armList[0], rotation=(-90, 90, 0), worldSpace=True) #right
+                cmds.xform(armList[2], rotation=(-90, 90, 0), worldSpace=True) #right
+                cmds.xform(armList[4], rotation=(-90, 90, 0), worldSpace=True) #right
+                cmds.xform(armList[1], rotation=(90, 90, 0), worldSpace=True) #left
+                cmds.xform(armList[3], rotation=(90, 90, 0), worldSpace=True) #left
+                cmds.xform(armList[5], rotation=(90, 90, 0), worldSpace=True) #left
+
+
+        
 
 
 
@@ -427,16 +489,34 @@ class MotionCapture(object):
             for ctrl in ctrlList:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in ["X", "Y", "Z"]:
-                    connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
-                    if connectList:
-                        cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
-                    if self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
-                        cmds.connectAttr(cmds.getAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis), zeroGrp+".rotate"+axis, force=True)
-                        cmds.deleteAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis)
+                for axis in self.dpUIinst.axisList:
+                    cmds.mute(zeroGrp+".rotate"+axis, disable=True)
+
+                    #connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
+                    #if connectList:
+                    #    cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
+                    #if self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
+                    #    cmds.connectAttr(cmds.getAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis), zeroGrp+".rotate"+axis, force=True)
+                    #    cmds.deleteAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis)
 
 
     def resetDefaultPose(self, *args):
         """
         """
-        print("wip --- back to default pose = TODO")
+        print("wip --- back to default pose")
+        if self.dpUIinst.checkOutInstanceList:
+            for checkOutInst in self.dpUIinst.checkOutInstanceList:
+                if "ResetPose" in str(checkOutInst):
+                    checkOutInst.verbose = False
+                    checkOutInst.runAction(False) #fix
+                    checkOutInst.endProgress()
+
+
+
+
+# TODO
+#
+# make hikDic translable - OMG
+#
+# set TPose translable
+# leg tPose ?
