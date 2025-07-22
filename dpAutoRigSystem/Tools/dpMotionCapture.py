@@ -18,12 +18,11 @@ class MotionCapture(object):
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
         self.ctrls = dpUIinst.ctrls
+        self.lang = self.dpUIinst.lang
         self.ui = ui
-        self.autoRotateAttrList = ["follow", "autoRotate"]
-        self.oldConnectedAttr = "oldConnected_"
+        self.autoRotateAttrList = [self.lang['c047_autoRotate'], self.lang['c032_follow']]
         self.hikCharacterAttr = "Character"
         self.hikNode = self.hikGetLatestNode()
-        print("self.hikNode starts =", self.hikNode)
         self.hikDic = None
         # call main function:
         if self.ui:
@@ -37,28 +36,50 @@ class MotionCapture(object):
         self.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 320
         mocap_winHeight = 460
-        dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title="dpAutoRigSystem - "+self.dpUIinst.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title="dpAutoRigSystem - "+self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
         mocapTabLayout = cmds.tabLayout('mocapTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=mocapMainLayout)
         cmds.formLayout('mocapMainLayout', edit=True, attachForm=((mocapTabLayout, 'top', 5), (mocapTabLayout, 'left', 0), (mocapTabLayout, 'bottom', 0), (mocapTabLayout, 'right', 0)))
 
-        humaIkFL = cmds.formLayout('humaIkFL', numberOfDivisions=100, parent=mocapTabLayout)
-        motionCaptureMainLayout = cmds.columnLayout('motionCaptureMainLayout', columnOffset=("both", 10), rowSpacing=10, parent=humaIkFL)
+        humanIkFL = cmds.formLayout('humanIkFL', numberOfDivisions=100, parent=mocapTabLayout)
+        motionCaptureMainLayout = cmds.columnLayout('motionCaptureMainLayout', columnOffset=("both", 10), rowSpacing=10, parent=humanIkFL)
         cmds.separator(height=5, style="none", horizontal=True, parent=motionCaptureMainLayout)
         
+        humanIkModeFL = cmds.frameLayout('humanIkModeFL', label="Ik/Fk "+self.lang['v003_mode'], collapsable=True, collapse=False, parent=motionCaptureMainLayout)
         
+        # radio buttons:
+        ikFkModeRCL = cmds.rowColumnLayout('ikFkModeRCL', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'center'), (2, 'center'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], parent=humanIkModeFL)
+        
+        spineModeCL = cmds.columnLayout('spineModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
+        self.spineModeRBC = cmds.radioCollection('self.spineModeRBC', parent=spineModeCL)
+        spineIk = cmds.radioButton("spineIk", label=self.lang['m011_spine']+" Ik", annotation="spineIk")
+        cmds.radioButton("spineFk", label=self.lang['m011_spine']+" FK", annotation="spineFk")
+        cmds.radioCollection(self.spineModeRBC, edit=True, select=spineIk)
+        
+        armModeCL = cmds.columnLayout('armModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
+        self.armModeRBC = cmds.radioCollection('self.armModeRBC', parent=armModeCL)
+        cmds.radioButton("armIk", label=self.lang['m028_arm']+" Ik", annotation="armIk")
+        armFk = cmds.radioButton("armFk", label=self.lang['m028_arm']+" FK", annotation="armFk")
+        cmds.radioCollection(self.armModeRBC, edit=True, select=armFk)
+
+        legModeCL = cmds.columnLayout('legModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
+        self.legModeRBC = cmds.radioCollection('self.legModeRBC', parent=legModeCL)
+        legIk = cmds.radioButton("legIk", label=self.lang['m030_leg']+" Ik", annotation="legIk")
+        cmds.radioButton("legFk", label=self.lang['m030_leg']+" FK", annotation="legFk")
+        cmds.radioCollection(self.legModeRBC, edit=True, select=legIk)
+
         cmds.separator(height=5, style="single", horizontal=True, parent=motionCaptureMainLayout)
-        cmds.text(label="WIP", parent=motionCaptureMainLayout)
-        
-#        cmds.button(label=self.dpUIinst.lang['m241_createSkeleton'], annotation="WIP", width=220, command=self.hikCreateSkeleton, parent=motionCaptureMainLayout)
+        cmds.text(label="Settings", parent=motionCaptureMainLayout)
+
         cmds.button(label="1 - Set FK mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 1), parent=motionCaptureMainLayout)
         cmds.button(label="2 - Mute autoRotate (clavicle, neck)", annotation="WIP", width=220, command=self.muteAutoRotate, parent=motionCaptureMainLayout)
-        cmds.button(label="3 - Set T-Pose = TODO", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
+        cmds.button(label="3 - Set T-Pose", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
         cmds.button(label="4 - Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
         cmds.button(label="5 - Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
         cmds.button(label="6 - Create custom rig control", annotation="WIP", width=220, command=self.hikCreateCustomRigCtrl, parent=motionCaptureMainLayout)
-        cmds.button(label="7 - Set controllers", annotation="WIP", width=220, command=self.hikMapBipedControllers, parent=motionCaptureMainLayout)
+        cmds.button(label="7 - Set controllers", annotation="WIP", width=220, command=self.hikMapBipedControllersByUI, parent=motionCaptureMainLayout)
+        cmds.button(label="8 - Set defined ikFk mode", annotation="WIP", width=220, command=self.setIkFkBipedControllersByUI, parent=motionCaptureMainLayout)
         
         cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
         cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
@@ -68,224 +89,248 @@ class MotionCapture(object):
         cmds.button(label="BACK 3: reset default pose", annotation="WIP", width=220, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
         cmds.button(label="BACK 4: set Ik mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 0), parent=motionCaptureMainLayout)
         
-        cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humaIkFL, 'HumanIk')))
+        cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humanIkFL, 'HumanIk')))
         # call Window:
         cmds.showWindow(dpMotionCaptureWin)
     
 
     def hikGetDefaultMapDic(self, *args):
-        """ Returns the default hik controllers mapping dictionary.
+        """ Returns the default hik controllers mapping dictionary accordly with the language.
         """
         return {
                 "Reference"        : {"id"      : 0,
                                       "joint"   : "Root_Ctrl",
                                       "control" : "Root_Ctrl"},
                 "Hips"             : {"id"      : 1,
-                                      "joint"   : "Spine_00_Base_Jnt",
-                                      "control" : "Spine_HipsA_Ctrl"},
+                                      "joint"   : self.lang['m011_spine']+"_00_"+self.lang['c106_base']+"_Jnt",
+                                      "control" : self.lang['m011_spine']+"_"+self.lang['c027_hips']+"A_Ctrl"},
                 "LeftUpLeg"        : {"id"      : 2,
-                                      "joint"   : "L_Leg_Leg_Jxt",
-                                      "control" : "L_Leg_Leg_Fk_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Jxt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "LeftLeg"          : {"id"      : 3,
-                                      "joint"   : "L_Leg_Knee_Jxt",
-                                      "control" : "L_Leg_Knee_Fk_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Jxt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "LeftFoot"         : {"id"      : 4,
-                                      "joint"   : "L_Foot_Ankle_Jnt",
-                                      "control" : "L_Leg_Ankle_Fk_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c038_foot']+"_"+self.lang['c009_leg_extrem']+"_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c009_leg_extrem']+"_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c009_leg_extrem']+"_Ik_Ctrl"},
                 "LeftToeBase"      : {"id"      : 16,
-                                      "joint"   : "L_Foot_Middle_Jnt",
-                                      "control" : "L_Foot_Middle_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Ctrl"},
                 "RightUpLeg"       : {"id"      : 5,
-                                      "joint"   : "R_Leg_Leg_Jxt",
-                                      "control" : "R_Leg_Leg_Fk_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Jxt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "RightLeg"         : {"id"      : 6,
-                                      "joint"   : "R_Leg_Knee_Jxt",
-                                      "control" : "R_Leg_Knee_Fk_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Jxt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "RightFoot"        : {"id"      : 7,
-                                      "joint"   : "R_Foot_Ankle_Jnt",
-                                      "control" : "R_Leg_Ankle_Fk_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c038_foot']+"_"+self.lang['c009_leg_extrem']+"_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c009_leg_extrem']+"_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c009_leg_extrem']+"_Ik_Ctrl"},
                 "RightToeBase"     : {"id"      : 17,
-                                      "joint"   : "R_Foot_Middle_Jnt",
-                                      "control" : "R_Foot_Middle_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Ctrl"},
                 "Spine"            : {"id"      : 8,
-                                      "joint"   : "Spine_01_Jnt",
-                                      "control" : "Spine_HipsA_Fk_Ctrl"},
+                                      "joint"   : self.lang['m011_spine']+"_01_Jnt",
+                                      "control" : self.lang['m011_spine']+"_"+self.lang['c027_hips']+"A_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c027_hips']+"B_Ctrl"},
                 "Spine1"           : {"id"      : 23,
-                                      "joint"   : "Spine_02_Jnt",
-                                      "control" : "Spine_Middle1_Fk_Ctrl"},
+                                      "joint"   : self.lang['m011_spine']+"_02_Jnt",
+                                      "control" : self.lang['m011_spine']+"_"+self.lang['c029_middle']+"1_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c029_middle']+"1_Ctrl"},
                 "Spine2"           : {"id"      : 24,
-                                      "joint"   : "Spine_04_Tip_Jnt",
-                                      "control" : "Spine_ChestA_Fk_Ctrl"},
+                                      "joint"   : self.lang['m011_spine']+"_04_"+self.lang['c120_tip']+"_Jnt",
+                                      "control" : self.lang['m011_spine']+"_"+self.lang['c028_chest']+"A_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl"},
                 "LeftShoulder"     : {"id"      : 18,
-                                      "joint"   : "L_Arm_00_Clavicle_Jnt",
-                                      "control" : "L_Arm_Clavicle_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_00_"+self.lang['c000_arm_before']+"_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c000_arm_before']+"_Ctrl"},
                 "LeftArm"          : {"id"      : 9,
-                                      "joint"   : "L_Arm_Shoulder_Jxt",
-                                      "control" : "L_Arm_Shoulder_Fk_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Jxt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "LeftForeArm"      : {"id"      : 10,
-                                      "joint"   : "L_Arm_Elbow_Jxt",
-                                      "control" : "L_Arm_Elbow_Fk_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Jxt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "LeftHand"         : {"id"      : 11,
-                                      "joint"   : "L_Arm_13_Wrist_Jnt",
-                                      "control" : "L_Arm_Wrist_Fk_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_13_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_10_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint2"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_09_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint3"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_17_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint4"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_14_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Ik_Ctrl"},
                 "LeftHandThumb1"   : {"id"      : 50,
-                                      "joint"   : "L_Finger_Thumb_00_Jnt",
-                                      "control" : "L_Finger_Thumb_00_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_00_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_00_Ctrl"},
                 "LeftHandThumb2"   : {"id"      : 51,
-                                      "joint"   : "L_Finger_Thumb_01_Jnt",
-                                      "control" : "L_Finger_Thumb_01_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_01_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_01_Ctrl"},
                 "LeftHandThumb3"   : {"id"      : 52,
-                                      "joint"   : "L_Finger_Thumb_02_Jnt",
-                                      "control" : "L_Finger_Thumb_02_Ctrl"},
-                #"LeftHandThumb4"   : {"id"      : 53,
-                #                      "joint"   : "",
-                #                      "control" : ""},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_02_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_02_Ctrl"},
                 "LeftHandIndex1"   : {"id"      : 54,
-                                      "joint"   : "L_Finger_Index_00_Jnt",
-                                      "control" : "L_Finger_Index_00_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_00_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_00_Ctrl"},
                 "LeftHandIndex2"   : {"id"      : 55,
-                                      "joint"   : "L_Finger_Index_01_Jnt",
-                                      "control" : "L_Finger_Index_01_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_01_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_01_Ctrl"},
                 "LeftHandIndex3"   : {"id"      : 56,
-                                      "joint"   : "L_Finger_Index_02_Jnt",
-                                      "control" : "L_Finger_Index_02_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_02_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_02_Ctrl"},
                 "LeftHandIndex4"   : {"id"      : 57,
-                                      "joint"   : "L_Finger_Index_03_Jnt",
-                                      "control" : "L_Finger_Index_03_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_03_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_03_Ctrl"},
                 "LeftHandMiddle1"  : {"id"      : 58,
-                                      "joint"   : "L_Finger_Middle_00_Jnt",
-                                      "control" : "L_Finger_Middle_00_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_00_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_00_Ctrl"},
                 "LeftHandMiddle2"  : {"id"      : 59,
-                                      "joint"   : "L_Finger_Middle_01_Jnt",
-                                      "control" : "L_Finger_Middle_01_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_01_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_01_Ctrl"},
                 "LeftHandMiddle3"  : {"id"      : 60,
-                                      "joint"   : "L_Finger_Middle_02_Jnt",
-                                      "control" : "L_Finger_Middle_02_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_02_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_02_Ctrl"},
                 "LeftHandMiddle4"  : {"id"      : 61,
-                                      "joint"   : "L_Finger_Middle_03_Jnt",
-                                      "control" : "L_Finger_Middle_03_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_03_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_03_Ctrl"},
                 "LeftHandRing1"    : {"id"      : 62,
-                                      "joint"   : "L_Finger_Ring_00_Jnt",
-                                      "control" : "L_Finger_Ring_00_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_00_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_00_Ctrl"},
                 "LeftHandRing2"    : {"id"      : 63,
-                                      "joint"   : "L_Finger_Ring_01_Jnt",
-                                      "control" : "L_Finger_Ring_01_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_01_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_01_Ctrl"},
                 "LeftHandRing3"    : {"id"      : 64,
-                                      "joint"   : "L_Finger_Ring_02_Jnt",
-                                      "control" : "L_Finger_Ring_02_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_02_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_02_Ctrl"},
                 "LeftHandRing4"    : {"id"      : 65,
-                                      "joint"   : "L_Finger_Ring_03_Jnt",
-                                      "control" : "L_Finger_Ring_03_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_03_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_03_Ctrl"},
                 "LeftHandPinky1"   : {"id"      : 66,
-                                      "joint"   : "L_Finger_Pinky_00_Jnt",
-                                      "control" : "L_Finger_Pinky_00_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_00_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_00_Ctrl"},
                 "LeftHandPinky2"   : {"id"      : 67,
-                                      "joint"   : "L_Finger_Pinky_01_Jnt",
-                                      "control" : "L_Finger_Pinky_01_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_01_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_01_Ctrl"},
                 "LeftHandPinky3"   : {"id"      : 68,
-                                      "joint"   : "L_Finger_Pinky_02_Jnt",
-                                      "control" : "L_Finger_Pinky_02_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_02_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_02_Ctrl"},
                 "LeftHandPinky4"   : {"id"      : 69,
-                                      "joint"   : "L_Finger_Pinky_03_Jnt",
-                                      "control" : "L_Finger_Pinky_03_Ctrl"},
+                                      "joint"   : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_03_Jnt",
+                                      "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_03_Ctrl"},
                 "RightShoulder"    : {"id"      : 19,
-                                      "joint"   : "R_Arm_00_Clavicle_Jnt",
-                                      "control" : "R_Arm_Clavicle_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_00_"+self.lang['c000_arm_before']+"_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c000_arm_before']+"_Ctrl"},
                 "RightArm"         : {"id"      : 12,
-                                      "joint"   : "R_Arm_Shoulder_Jxt",
-                                      "control" : "R_Arm_Shoulder_Fk_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Jxt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "RightForeArm"     : {"id"      : 13,
-                                      "joint"   : "R_Arm_Elbow_Jxt",
-                                      "control" : "R_Arm_Elbow_Fk_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Jxt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Fk_Ctrl",
+                                      "ikCtrl"  : ""},
                 "RightHand"        : {"id"      : 14,
-                                      "joint"   : "R_Arm_13_Wrist_Jnt",
-                                      "control" : "R_Arm_Wrist_Fk_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_13_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_10_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint2"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_09_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint3"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_17_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint4"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_14_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Fk_Ctrl",
+                                      "ikCtrl"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Ik_Ctrl"},
                 "RightHandThumb1"  : {"id"      : 74,
-                                      "joint"   : "R_Finger_Thumb_00_Jnt",
-                                      "control" : "R_Finger_Thumb_00_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_00_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_00_Ctrl"},
                 "RightHandThumb2"  : {"id"      : 75,
-                                    "joint"   : "R_Finger_Thumb_01_Jnt",
-                                    "control" : "R_Finger_Thumb_01_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_01_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_01_Ctrl"},
                 "RightHandThumb3"  : {"id"      : 76,
-                                      "joint"   : "R_Finger_Thumb_02_Jnt",
-                                      "control" : "R_Finger_Thumb_02_Ctrl"},
-                #"RightHandThumb4"  : {"id"      : 77,
-                #                      "joint"   : "",
-                #                      "control" : ""},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_02_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m036_thumb']+"_02_Ctrl"},
                 "RightHandIndex1"  : {"id"      : 78,
-                                      "joint"   : "R_Finger_Index_00_Jnt",
-                                      "control" : "R_Finger_Index_00_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_00_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_00_Ctrl"},
                 "RightHandIndex2"  : {"id"      : 79,
-                                      "joint"   : "R_Finger_Index_01_Jnt",
-                                      "control" : "R_Finger_Index_01_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_01_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_01_Ctrl"},
                 "RightHandIndex3"  : {"id"      : 80,
-                                      "joint"   : "R_Finger_Index_02_Jnt",
-                                      "control" : "R_Finger_Index_02_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_02_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_02_Ctrl"},
                 "RightHandIndex4"  : {"id"      : 81,
-                                      "joint"   : "R_Finger_Index_03_Jnt",
-                                      "control" : "R_Finger_Index_03_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_03_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m032_index']+"_03_Ctrl"},
                 "RightHandMiddle1" : {"id"      : 82,
-                                      "joint"   : "R_Finger_Middle_00_Jnt",
-                                      "control" : "R_Finger_Middle_00_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_00_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_00_Ctrl"},
                 "RightHandMiddle2" : {"id"      : 83,
-                                      "joint"   : "R_Finger_Middle_01_Jnt",
-                                      "control" : "R_Finger_Middle_01_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_01_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_01_Ctrl"},
                 "RightHandMiddle3" : {"id"      : 84,
-                                      "joint"   : "R_Finger_Middle_02_Jnt",
-                                      "control" : "R_Finger_Middle_02_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_02_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_02_Ctrl"},
                 "RightHandMiddle4" : {"id"      : 85,
-                                      "joint"   : "R_Finger_Middle_03_Jnt",
-                                      "control" : "R_Finger_Middle_03_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_03_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m033_middle']+"_03_Ctrl"},
                 "RightHandRing1"   : {"id"      : 86,
-                                      "joint"   : "R_Finger_Ring_00_Jnt",
-                                      "control" : "R_Finger_Ring_00_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_00_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_00_Ctrl"},
                 "RightHandRing2"   : {"id"      : 87,
-                                      "joint"   : "R_Finger_Ring_01_Jnt",
-                                      "control" : "R_Finger_Ring_01_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_01_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_01_Ctrl"},
                 "RightHandRing3"   : {"id"      : 88,
-                                      "joint"   : "R_Finger_Ring_02_Jnt",
-                                      "control" : "R_Finger_Ring_02_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_02_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_02_Ctrl"},
                 "RightHandRing4"   : {"id"      : 89,
-                                      "joint"   : "R_Finger_Ring_03_Jnt",
-                                      "control" : "R_Finger_Ring_03_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_03_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m034_ring']+"_03_Ctrl"},
                 "RightHandPinky1"  : {"id"      : 90,
-                                      "joint"   : "R_Finger_Pinky_00_Jnt",
-                                      "control" : "R_Finger_Pinky_00_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_00_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_00_Ctrl"},
                 "RightHandPinky2"  : {"id"      : 91,
-                                      "joint"   : "R_Finger_Pinky_01_Jnt",
-                                      "control" : "R_Finger_Pinky_01_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_01_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_01_Ctrl"},
                 "RightHandPinky3"  : {"id"      : 92,
-                                      "joint"   : "R_Finger_Pinky_02_Jnt",
-                                      "control" : "R_Finger_Pinky_02_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_02_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_02_Ctrl"},
                 "RightHandPinky4"  : {"id"      : 93,
-                                      "joint"   : "R_Finger_Pinky_03_Jnt",
-                                      "control" : "R_Finger_Pinky_03_Ctrl"},
+                                      "joint"   : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_03_Jnt",
+                                      "control" : self.lang['p003_right']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_03_Ctrl"},
                 "Neck"             : {"id"      : 20,
-                                      "joint"   : "Head_Neck_00_Jnt",
-                                      "control" : "Head_Neck_00_Ctrl"},
+                                      "joint"   : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_00_Jnt",
+                                      "control" : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_00_Ctrl"},
                 "Head"             : {"id"      : 15,
-                                      "joint"   : "Head_01_Head_Jnt",
-                                      "control" : "Head_Head_Ctrl"},
+                                      "joint"   : self.lang['c024_head']+"_01_"+self.lang['c024_head']+"_Jnt",
+                                      "control" : self.lang['c024_head']+"_"+self.lang['c024_head']+"_Ctrl"},
         }
 
 
+    def setIkFk(self, optCtrl, mode, *args):
+        """ Set ik or fk.
+        """
+        userDefAttrList = cmds.listAttr(optCtrl, userDefined=True)
+        if userDefAttrList:
+            for attr in userDefAttrList:
+                if attr.endswith("Fk"):
+                    cmds.setAttr(optCtrl+"."+attr, mode)
+
+
     def setCtrlMode(self, mode=1, *args):
+        """ Set dpAR rig to IK or Fk mode.
+            Default: mode = 1 = Fk.
         """
-        """
-        print("wip set ctrl mode")
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optCtrl:
-            userDefAttrList = cmds.listAttr(optCtrl, userDefined=True)
-            if userDefAttrList:
-                for attr in userDefAttrList:
-                    if attr.endswith("Fk"):
-                        cmds.setAttr(optCtrl+"."+attr, mode)
+            self.setIkFk(optCtrl, mode)
+            return optCtrl
         else:
             print("There isn't an Option_Ctrl to setup Ik or Fk mode in the rig, sorry.")
 
 
     def getAutoRotateCtrlList(self, *args):
-        """
+        """ Get and return the clavicle and neck controllers.
         """
         ctrlList = self.ctrls.getControlNodeById("id_030_LimbClavicle")
         ctrlList.extend(self.ctrls.getControlNodeById("id_022_HeadNeck"))
@@ -293,61 +338,43 @@ class MotionCapture(object):
 
 
     def lockAutoRotateAttr(self, ctrl, value, *args):
-        """
+        """ Lock or unlock the autoRotate attribute for the given controller.
         """
         for followAttr in self.autoRotateAttrList:
             if followAttr in cmds.listAttr(ctrl):
                 cmds.setAttr(ctrl+"."+followAttr, lock=value)
 
 
-
     def muteAutoRotate(self, *args):
+        """ Mute clavicle and neck autoRotate behavior.
         """
-        """
-        print("wip break autoRotates here")
-        confirm = cmds.confirmDialog(title=self.dpUIinst.lang[TITLE], icon="question", message=self.dpUIinst.lang['m243_askBreakAutoRotate'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i072_no'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
-        if confirm == self.dpUIinst.lang['i071_yes']:
-            ctrlList = self.getAutoRotateCtrlList()
-            if ctrlList:
-                for ctrl in ctrlList:
-                    self.lockAutoRotateAttr(ctrl, True)
-                    zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                    for axis in self.dpUIinst.axisList:
-                        cmds.mute(zeroGrp+".rotate"+axis, force=True)
-                        
-#                        connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
-#                        if connectList:
-#                            if not self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
-#                                cmds.addAttr(zeroGrp, longName=self.oldConnectedAttr+"rotate"+axis, dataType="string")
-#                            cmds.setAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis, connectList[0], type="string")
-#                            cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
-
-
+        ctrlList = self.getAutoRotateCtrlList()
+        if ctrlList:
+            for ctrl in ctrlList:
+                self.lockAutoRotateAttr(ctrl, True)
+                zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                for axis in self.dpUIinst.axisList:
+                    cmds.mute(zeroGrp+".rotate"+axis, force=True)
 
 
     def setTPose(self, *args):
+        """ Set the biped arms as TPose.
         """
-        """
-        print("wip set T-Pose ----- WIP")
-
-        # WIP
         # clavicle
         beforeCtrlList = self.ctrls.getControlNodeById("id_030_LimbClavicle")
         if beforeCtrlList:
             clavList, dpIDList = [], []
             for beforeCtrl in beforeCtrlList:
-                if self.dpUIinst.lang['c000_arm_before'] in beforeCtrl: #arm
+                if self.lang['c000_arm_before'] in beforeCtrl: #arm
                     clavList.append(beforeCtrl)
-                    dpIDList.append(int(cmds.getAttr(beforeCtrl+".dpID").split(".")[1]))
-            if dpIDList[0] < dpIDList[1]: #listed left side first
+                    if "dpID" in cmds.listAttr(beforeCtrl):
+                        dpIDList.append(int(cmds.getAttr(beforeCtrl+".dpID").split(".")[1]))
+            lClav = clavList[1]
+            rClav = clavList[0]
+            if (dpIDList and dpIDList[0] < dpIDList[1]) or clavList[0].startswith(self.lang['p002_left']): #listed left side first
                 lClav = clavList[0]
                 rClav = clavList[1]
-            else:
-                lClav = clavList[1]
-                rClav = clavList[0]
             cmds.xform(lClav, rotation=(90, 0, 90), worldSpace=True) #left
-            #cmds.xform(rClav, rotation=(90, 0, 90), absolute=True, worldSpace=True) #left
-            
             for axis in self.dpUIinst.axisList:
                 cmds.setAttr(rClav+".rotate"+axis, cmds.getAttr(lClav+".rotate"+axis)) #right
         # arm
@@ -357,22 +384,24 @@ class MotionCapture(object):
             for i in range(0, 4):
                 for fkCtrl in fkCtrlList:
                     if i == 0:
-                        if self.dpUIinst.lang['c001_arm_main'] in fkCtrl:
+                        if self.lang['c001_arm_main'] in fkCtrl:
                             if not fkCtrl in armList:
                                 armList.append(fkCtrl)
-                                dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
+                                if "dpID" in cmds.listAttr(fkCtrl):
+                                    dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
                     elif i == 1:
-                        if self.dpUIinst.lang['c002_arm_corner'] in fkCtrl:
+                        if self.lang['c002_arm_corner'] in fkCtrl:
                             if not fkCtrl in armList:
                                 armList.append(fkCtrl)
-                                dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
+                                if "dpID" in cmds.listAttr(fkCtrl):
+                                    dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
                     elif i == 2:
-                        if self.dpUIinst.lang['c004_arm_extrem'] in fkCtrl:
+                        if self.lang['c004_arm_extrem'] in fkCtrl:
                             if not fkCtrl in armList:
                                 armList.append(fkCtrl)
-                                dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
-            print("armLIst =", armList)
-            if dpIDArmList[0] < dpIDArmList[2]: #listed left side first
+                                if "dpID" in cmds.listAttr(fkCtrl):
+                                    dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
+            if (dpIDArmList and dpIDArmList[0] < dpIDArmList[2]) or armList[0].startswith(self.lang['p002_left']):
                 cmds.xform(armList[0], rotation=(90, 90, 0), worldSpace=True) #left
                 cmds.xform(armList[2], rotation=(90, 90, 0), worldSpace=True) #left
                 cmds.xform(armList[4], rotation=(90, 90, 0), worldSpace=True) #left
@@ -386,11 +415,14 @@ class MotionCapture(object):
                 cmds.xform(armList[1], rotation=(90, 90, 0), worldSpace=True) #left
                 cmds.xform(armList[3], rotation=(90, 90, 0), worldSpace=True) #left
                 cmds.xform(armList[5], rotation=(90, 90, 0), worldSpace=True) #left
-
-
-        
-
-
+        # ik
+        optCtrl = self.utils.getNodeByMessage("optionCtrl")
+        if optCtrl:
+            if "ikFkSnap" in cmds.listAttr(optCtrl):
+                cmds.setAttr(optCtrl+".ikFkSnap", 1)
+                self.setIkFk(optCtrl, 0)
+            else:
+                print("Need to set the TPose for the ik controllers.")
 
 
     def hikGetLatestNode(self, *args):
@@ -410,80 +442,88 @@ class MotionCapture(object):
         mel.eval("HIKCharacterControlsTool;")
         mel.eval("hikCreateDefinition;")
         self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
-        print("self.hikNode =", self.hikNode)
         return self.hikNode
     
 
-  
-    
     def hikAssignJointsToDefinition(self, *args):
-        """ Map dpAR biped joints to HumanIk character skeleton.
+        """ Map dpAR biped joints to HumanIk character definition.
         """
         if self.hikNode:
             if self.utils.getAllGrp():
                 oldRefNodeList = cmds.listConnections(self.hikNode+".Reference", source=True, destination=False)
                 if not self.hikDic:
                     self.hikDic = self.hikGetDefaultMapDic()
-                #TODO get user defined dictionary to mapping
                 for hikKey in self.hikDic.keys():
-                    if cmds.objExists(self.hikDic[hikKey]["joint"]):
-                        cmds.connectAttr(self.hikDic[hikKey]["joint"]+".message", self.hikNode+"."+hikKey, force=True)
-                        if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"]):
-                            cmds.addAttr(self.hikDic[hikKey]["joint"], longName=self.hikCharacterAttr, attributeType="message")
-                        for attr in self.dpUIinst.transformAttrList:
-                            cmds.setAttr(self.hikDic[hikKey]["joint"]+"."+attr, lock=False)
+                    for r in ["", "1", "2", "3", "4"]: #workaround to accept many ribbons renaming
+                        if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
+                            cmds.connectAttr(self.hikDic[hikKey]["joint"+r]+".message", self.hikNode+"."+hikKey, force=True)
+                            if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"+r]):
+                                cmds.addAttr(self.hikDic[hikKey]["joint"+r], longName=self.hikCharacterAttr, attributeType="message")
+                            for attr in self.dpUIinst.transformAttrList:
+                                cmds.setAttr(self.hikDic[hikKey]["joint"+r]+"."+attr, lock=False)
+                            break
                 if oldRefNodeList:
                     cmds.delete(oldRefNodeList[0])
-
-                print("here WIP mapping... done")
             else:
                 print("There's no dpAR in the scene to continue the HumanIk biped retargeting, sorry.")
         else:
             print("There's no HIKCharacterNode in the scene to use. Create one to continue, please.")
 
 
-    def hikMapBipedControllers(self, *args):
+    def hikMapBipedControllers(self, ikList=None, *args):
         if self.hikNode:
             if self.utils.getAllGrp():
                 if not self.hikDic:
                     self.hikDic = self.hikGetDefaultMapDic()
-                #TODO get user defined dictionary to mapping
                 for hikKey in self.hikDic.keys():
                     if not self.hikDic[hikKey]["id"] == 0: #reference
-                        if cmds.objExists(self.hikDic[hikKey]["control"]):
-                            cmds.select(self.hikDic[hikKey]["control"])
+                        #ik or fk
+                        ctrl = "control"
+                        if ikList and hikKey in ikList:
+                            ctrl = "ikCtrl"
+                        if cmds.objExists(self.hikDic[hikKey][ctrl]):
+                            cmds.select(self.hikDic[hikKey][ctrl])
                             mel.eval('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
                 cmds.select(clear=True)
-                print("...mapped biped controllers --- done")
-
             else:
                 print("There's no dpAR in the scene to continue the HumanIk biped retargeting, sorry.")
         else:
             print("There's no HIKCharacterNode in the scene to use. Create one to continue, please.")
 
 
+    def hikMapBipedControllersByUI(self, *args):
+        """ Ready the UI to set user defined definition to controllers as ik or fk.
+            By default:
+                spineMode = "spineIk"
+                armMode   = "armFk"
+                legMode   = "legIk"
+        """
+        ikList = []
+        if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+            ikList.extend(["Spine", "Spine1", "Spine2"])
+        if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
+            ikList.extend(["LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand"])
+        if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
+            ikList.extend(["LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"])
+        self.hikMapBipedControllers(ikList)
+
+
     def hikCreateCustomRigCtrl(self, *args):
-        """ WIP: pass hikNode?
+        """ Call humanIk to create a customRig node.
         """
         mel.eval('hikCreateCustomRig( hikGetCurrentCharacter() );')
-        #TODO returns the hik customRig node
-        
 
 
     def hikRemoveMocap(self, *args):
+        """ Remove HumanIk mocap integration from dpAR.
         """
-        """
-        print("wip removing HumanIk mocap")
         mel.eval('hikDeleteCustomRig( hikGetCurrentCharacter() );')
         mel.eval('hikDeleteDefinition();')
-
-    
     
     
     def redoAutoRotate(self, *args):
+        """ Reaply the clavicle and neck autoRotate behavior unmuting it.
         """
-        """
-        print("wip recreating the autoRotate setup")
         ctrlList = self.getAutoRotateCtrlList()
         if ctrlList:
             for ctrl in ctrlList:
@@ -492,18 +532,10 @@ class MotionCapture(object):
                 for axis in self.dpUIinst.axisList:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
 
-                    #connectList = cmds.listConnections(zeroGrp+".rotate"+axis, source=True, destination=False, plugs=True)
-                    #if connectList:
-                    #    cmds.disconnectAttr(connectList[0], zeroGrp+".rotate"+axis)
-                    #if self.oldConnectedAttr+"rotate"+axis in cmds.listAttr(zeroGrp):
-                    #    cmds.connectAttr(cmds.getAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis), zeroGrp+".rotate"+axis, force=True)
-                    #    cmds.deleteAttr(zeroGrp+"."+self.oldConnectedAttr+"rotate"+axis)
-
 
     def resetDefaultPose(self, *args):
+        """ Back rig to default pose calling the ResetPose validator.
         """
-        """
-        print("wip --- back to default pose")
         if self.dpUIinst.checkOutInstanceList:
             for checkOutInst in self.dpUIinst.checkOutInstanceList:
                 if "ResetPose" in str(checkOutInst):
@@ -512,11 +544,16 @@ class MotionCapture(object):
                     checkOutInst.endProgress()
 
 
-
-
-# TODO
-#
-# make hikDic translable - OMG
-#
-# set TPose translable
-# leg tPose ?
+    def setIkFkBipedControllersByUI(self, *args):
+        """ Set the ikFk attributes in the optionCtrl as the choose UI.
+        """
+        optCtrl = self.setCtrlMode() #fk
+        if optCtrl:
+            if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+                cmds.setAttr(optCtrl+"."+self.lang['m011_spine'].lower()+"Fk", 0)
+            if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
+                cmds.setAttr(optCtrl+"."+self.lang['p002_left'].lower()+self.lang['c037_arm']+"Fk", 0)
+                cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c037_arm']+"Fk", 0)
+            if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
+                cmds.setAttr(optCtrl+"."+self.lang['p002_left'].lower()+self.lang['c006_leg_main']+"Fk", 0)
+                cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c006_leg_main']+"Fk", 0)
