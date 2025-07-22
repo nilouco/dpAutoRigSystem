@@ -302,7 +302,9 @@ class MotionCapture(object):
                                       "joint"   : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_00_Jnt",
                                       "control" : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_00_Ctrl"},
                 "Head"             : {"id"      : 15,
-                                      "joint"   : self.lang['c024_head']+"_01_"+self.lang['c024_head']+"_Jnt",
+                                      "joint"   : self.lang['c024_head']+"_00_"+self.lang['c024_head']+"_Jnt",
+                                      "joint1"  : self.lang['c024_head']+"_01_"+self.lang['c024_head']+"_Jnt",
+                                      "joint2"  : self.lang['c024_head']+"_02_"+self.lang['c024_head']+"_Jnt",
                                       "control" : self.lang['c024_head']+"_"+self.lang['c024_head']+"_Ctrl"},
         }
 
@@ -421,6 +423,8 @@ class MotionCapture(object):
             if "ikFkSnap" in cmds.listAttr(optCtrl):
                 cmds.setAttr(optCtrl+".ikFkSnap", 1)
                 self.setIkFk(optCtrl, 0)
+                cmds.setAttr(optCtrl+".ikFkSnap", 0)
+                self.setIkFk(optCtrl, 1)
             else:
                 print("Need to set the TPose for the ik controllers.")
 
@@ -455,13 +459,16 @@ class MotionCapture(object):
                     self.hikDic = self.hikGetDefaultMapDic()
                 for hikKey in self.hikDic.keys():
                     for r in ["", "1", "2", "3", "4"]: #workaround to accept many ribbons renaming
-                        if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
-                            cmds.connectAttr(self.hikDic[hikKey]["joint"+r]+".message", self.hikNode+"."+hikKey, force=True)
-                            if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"+r]):
-                                cmds.addAttr(self.hikDic[hikKey]["joint"+r], longName=self.hikCharacterAttr, attributeType="message")
-                            for attr in self.dpUIinst.transformAttrList:
-                                cmds.setAttr(self.hikDic[hikKey]["joint"+r]+"."+attr, lock=False)
-                            break
+                        if "joint"+r in self.hikDic[hikKey].keys():
+                            if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
+                                cmds.connectAttr(self.hikDic[hikKey]["joint"+r]+".message", self.hikNode+"."+hikKey, force=True)
+                                if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"+r]):
+                                    cmds.addAttr(self.hikDic[hikKey]["joint"+r], longName=self.hikCharacterAttr, attributeType="message")
+                                for attr in self.dpUIinst.transformAttrList:
+                                    cmds.setAttr(self.hikDic[hikKey]["joint"+r]+"."+attr, lock=False)
+                                break
+                        else:
+                            print("There's no object to set joint definition:", str(self.hikDic[hikKey]["joint"]))
                 if oldRefNodeList:
                     cmds.delete(oldRefNodeList[0])
             else:
