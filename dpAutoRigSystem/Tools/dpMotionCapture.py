@@ -34,9 +34,9 @@ class MotionCapture(object):
         """
         # creating MotionCaptureUI Window:
         self.utils.closeUI('dpMotionCaptureWindow')
-        mocap_winWidth  = 320
-        mocap_winHeight = 460
-        dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title="dpAutoRigSystem - "+self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        mocap_winWidth  = 280
+        mocap_winHeight = 300
+        dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
         mocapTabLayout = cmds.tabLayout('mocapTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=mocapMainLayout)
@@ -46,7 +46,7 @@ class MotionCapture(object):
         cmds.separator(height=5, style="none", horizontal=True, parent=motionCaptureMainLayout)
         humanIkModeFL = cmds.frameLayout('humanIkModeFL', label="Ik/Fk "+self.lang['v003_mode'], collapsable=True, collapse=False, parent=motionCaptureMainLayout)
         # radio buttons:
-        ikFkModeRCL = cmds.rowColumnLayout('ikFkModeRCL', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'center'), (2, 'center'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], parent=humanIkModeFL)
+        ikFkModeRCL = cmds.rowColumnLayout('ikFkModeRCL', numberOfColumns=3, columnWidth=[(1, 90), (2, 80), (3, 70)], columnAlign=[(1, 'center'), (2, 'center'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 5), (3, 'both', 5)], parent=humanIkModeFL)
         # spine
         spineModeCL = cmds.columnLayout('spineModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
         self.spineModeRBC = cmds.radioCollection('self.spineModeRBC', parent=spineModeCL)
@@ -68,10 +68,10 @@ class MotionCapture(object):
         cmds.separator(parent=motionCaptureMainLayout)
         # processes buttons
         cmds.text(label=self.lang['i292_processes'], parent=motionCaptureMainLayout)
-        cmds.button(label=self.lang['m241_prepareTPose'], annotation="prepareTPose", width=220, command=self.prepareTPose, parent=motionCaptureMainLayout)
-        cmds.button(label=self.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=220, command=self.hikRetarget, parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['m241_prepareTPose'], annotation="prepareTPose", width=240, command=self.prepareTPose, parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.hikRetarget, parent=motionCaptureMainLayout)
         cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
-        cmds.button(label=self.lang['i046_remove']+" HumanIk", annotation="removeHumanIk", width=220, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['i046_remove']+" HumanIk", annotation="removeHumanIk", width=240, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
         cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humanIkFL, 'HumanIk')))
         # call Window:
         cmds.showWindow(dpMotionCaptureWin)
