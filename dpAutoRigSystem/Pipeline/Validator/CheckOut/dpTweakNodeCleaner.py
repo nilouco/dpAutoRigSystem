@@ -8,7 +8,7 @@ TITLE = "v130_tweakNodeCleaner"
 DESCRIPTION = "v131_tweakNodeCleanerDesc"
 ICON = "/Icons/dp_tweakNodeCleaner.png"
 
-DP_TWEAKNODECLEANER_VERSION = 1.0
+DP_TWEAKNODECLEANER_VERSION = 1.1
 
 
 class TweakNodeCleaner(dpBaseAction.ActionStartClass):
@@ -47,22 +47,23 @@ class TweakNodeCleaner(dpBaseAction.ActionStartClass):
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    # no conditional needed
-                    self.checkedObjList.append(item)
-                    self.foundIssueList.append(True)
-                    if self.firstMode:
-                        self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            if cmds.objExists(item):
-                                cmds.lockNode(item, lock=False)
-                                cmds.delete(item)
-                            cmds.select(clear=True)
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                        except:
+                    # check for edited control shape
+                    if not self.checkEditedControlPoints(item):
+                        self.checkedObjList.append(item)
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        else: #fix
+                            try:
+                                if cmds.objExists(item):
+                                    cmds.lockNode(item, lock=False)
+                                    cmds.delete(item)
+                                cmds.select(clear=True)
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
@@ -75,3 +76,17 @@ class TweakNodeCleaner(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         return self.dataLogDic
+
+
+    def checkEditedControlPoints(self, item, *args):
+        """ Check if there are edited control point in the given tweak node and return them.
+        """
+        if cmds.objExists(item):
+            pList = cmds.getAttr(item+".plist", multiIndices=True)
+            if pList:
+                for idx in pList:
+                    cpList = cmds.getAttr(item+".plist["+str(idx)+"].controlPoints", multiIndices=True)
+                    if cpList:
+                        for cp in cpList:
+                            if not cmds.getAttr(item+".plist["+str(idx)+"].controlPoints["+str(cp)+"]") == [0.0, 0.0, 0.0]:
+                                return True
