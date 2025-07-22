@@ -41,54 +41,37 @@ class MotionCapture(object):
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
         mocapTabLayout = cmds.tabLayout('mocapTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=mocapMainLayout)
         cmds.formLayout('mocapMainLayout', edit=True, attachForm=((mocapTabLayout, 'top', 5), (mocapTabLayout, 'left', 0), (mocapTabLayout, 'bottom', 0), (mocapTabLayout, 'right', 0)))
-
         humanIkFL = cmds.formLayout('humanIkFL', numberOfDivisions=100, parent=mocapTabLayout)
         motionCaptureMainLayout = cmds.columnLayout('motionCaptureMainLayout', columnOffset=("both", 10), rowSpacing=10, parent=humanIkFL)
         cmds.separator(height=5, style="none", horizontal=True, parent=motionCaptureMainLayout)
-        
         humanIkModeFL = cmds.frameLayout('humanIkModeFL', label="Ik/Fk "+self.lang['v003_mode'], collapsable=True, collapse=False, parent=motionCaptureMainLayout)
-        
         # radio buttons:
         ikFkModeRCL = cmds.rowColumnLayout('ikFkModeRCL', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'center'), (2, 'center'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], parent=humanIkModeFL)
-        
+        # spine
         spineModeCL = cmds.columnLayout('spineModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
         self.spineModeRBC = cmds.radioCollection('self.spineModeRBC', parent=spineModeCL)
         spineIk = cmds.radioButton("spineIk", label=self.lang['m011_spine']+" Ik", annotation="spineIk")
         cmds.radioButton("spineFk", label=self.lang['m011_spine']+" FK", annotation="spineFk")
         cmds.radioCollection(self.spineModeRBC, edit=True, select=spineIk)
-        
+        # arm
         armModeCL = cmds.columnLayout('armModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
         self.armModeRBC = cmds.radioCollection('self.armModeRBC', parent=armModeCL)
         cmds.radioButton("armIk", label=self.lang['m028_arm']+" Ik", annotation="armIk")
         armFk = cmds.radioButton("armFk", label=self.lang['m028_arm']+" FK", annotation="armFk")
         cmds.radioCollection(self.armModeRBC, edit=True, select=armFk)
-
+        # leg
         legModeCL = cmds.columnLayout('legModeCL', adjustableColumn=True, width=80, parent=ikFkModeRCL)
         self.legModeRBC = cmds.radioCollection('self.legModeRBC', parent=legModeCL)
         legIk = cmds.radioButton("legIk", label=self.lang['m030_leg']+" Ik", annotation="legIk")
         cmds.radioButton("legFk", label=self.lang['m030_leg']+" FK", annotation="legFk")
         cmds.radioCollection(self.legModeRBC, edit=True, select=legIk)
-
-        cmds.separator(height=5, style="single", horizontal=True, parent=motionCaptureMainLayout)
-        cmds.text(label="Settings", parent=motionCaptureMainLayout)
-
-        cmds.button(label="1 - Set FK mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 1), parent=motionCaptureMainLayout)
-        cmds.button(label="2 - Mute autoRotate (clavicle, neck)", annotation="WIP", width=220, command=self.muteAutoRotate, parent=motionCaptureMainLayout)
-        cmds.button(label="3 - Set T-Pose", annotation="WIP", width=220, command=self.setTPose, parent=motionCaptureMainLayout)
-        cmds.button(label="4 - Create Character Definition", annotation="WIP", width=220, command=self.hikCreateCharacterDefinition, parent=motionCaptureMainLayout)
-        cmds.button(label="5 - Assign joints to definition", annotation="WIP", width=220, command=self.hikAssignJointsToDefinition, parent=motionCaptureMainLayout)
-        cmds.button(label="6 - Create custom rig control", annotation="WIP", width=220, command=self.hikCreateCustomRigCtrl, parent=motionCaptureMainLayout)
-        cmds.button(label="7 - Set controllers", annotation="WIP", width=220, command=self.hikMapBipedControllersByUI, parent=motionCaptureMainLayout)
-        cmds.button(label="8 - Set defined ikFk mode", annotation="WIP", width=220, command=self.setIkFkBipedControllersByUI, parent=motionCaptureMainLayout)
-        
+        cmds.separator(parent=motionCaptureMainLayout)
+        # processes buttons
+        cmds.text(label=self.lang['i292_processes'], parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['m241_prepareTPose'], annotation="prepareTPose", width=220, command=self.prepareTPose, parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=220, command=self.hikRetarget, parent=motionCaptureMainLayout)
         cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
-        cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
-
-        cmds.button(label="BACK 1: remove mocap", annotation="WIP", width=220, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
-        cmds.button(label="BACK 2: redo autoRotate", annotation="WIP", width=220, command=self.redoAutoRotate, parent=motionCaptureMainLayout)
-        cmds.button(label="BACK 3: reset default pose", annotation="WIP", width=220, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
-        cmds.button(label="BACK 4: set Ik mode", annotation="WIP", width=220, command=partial(self.setCtrlMode, 0), parent=motionCaptureMainLayout)
-        
+        cmds.button(label=self.lang['i046_remove']+" HumanIk", annotation="removeHumanIk", width=220, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
         cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humanIkFL, 'HumanIk')))
         # call Window:
         cmds.showWindow(dpMotionCaptureWin)
@@ -309,6 +292,41 @@ class MotionCapture(object):
         }
 
 
+    def prepareTPose(self, *args):
+        """ Prepare the biped character rig to T-Pose in order to receive the mocap retargeting.
+        """
+        print(self.lang['c110_start']+" "+self.lang['m241_prepareTPose'])
+        self.setCtrlMode(1) #FK
+        self.muteAutoRotate()
+        self.setTPose()
+
+
+    def hikRetarget(self, *args):
+        """ Run the HumanIk retargeting processes.
+        """
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=5)
+        self.hikCreateCharacterDefinition()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
+        self.hikAssignJointsToDefinition()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
+        self.hikCreateCustomRigCtrl()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
+        self.hikMapBipedControllersByUI()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
+        self.setIkFkBipedControllersByUI()
+        self.utils.setProgress(endIt=True)
+
+
+    def hikRemoveMocap(self, *args):
+        """ Remove the HumanIk mocap nodes and reset the dpAR rig to default pose.
+        """
+        self.hikDeleteNodes()
+        self.unmuteAutoRotate()
+        self.resetDefaultPose()
+        print(self.lang['i046_remove']+" HumanIk")
+        self.utils.setProgress(endIt=True)
+
+
     def setIkFk(self, optCtrl, mode, *args):
         """ Set ik or fk.
         """
@@ -326,9 +344,10 @@ class MotionCapture(object):
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optCtrl:
             self.setIkFk(optCtrl, mode)
+            print(self.lang['m248_setIkFkMode']+" "+str(mode))
             return optCtrl
         else:
-            print("There isn't an Option_Ctrl to setup Ik or Fk mode in the rig, sorry.")
+            mel.eval('warning \"'+self.lang['m243_noOptCtrlToIkFk']+'\";')
 
 
     def getAutoRotateCtrlList(self, *args):
@@ -357,6 +376,7 @@ class MotionCapture(object):
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.dpUIinst.axisList:
                     cmds.mute(zeroGrp+".rotate"+axis, force=True)
+        print(self.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
 
     def setTPose(self, *args):
@@ -426,7 +446,9 @@ class MotionCapture(object):
                 cmds.setAttr(optCtrl+".ikFkSnap", 0)
                 self.setIkFk(optCtrl, 1)
             else:
-                print("Need to set the TPose for the ik controllers.")
+                mel.eval('warning \"'+self.lang['m244_setTPoseIssue']+' ikFkSnap'+'\";')
+        beforeCtrlList.extend(fkCtrlList)
+        print(self.lang['m250_trySetTPose']+" "+", ".join(beforeCtrlList))
 
 
     def hikGetLatestNode(self, *args):
@@ -446,6 +468,7 @@ class MotionCapture(object):
         mel.eval("HIKCharacterControlsTool;")
         mel.eval("hikCreateDefinition;")
         self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
+        print(self.lang['m251_createdCharDefinition']+" "+self.hikNode)
         return self.hikNode
     
 
@@ -468,13 +491,14 @@ class MotionCapture(object):
                                     cmds.setAttr(self.hikDic[hikKey]["joint"+r]+"."+attr, lock=False)
                                 break
                         else:
-                            print("There's no object to set joint definition:", str(self.hikDic[hikKey]["joint"]))
+                            mel.eval('warning \"'+self.lang['m245_jointDefinitionIssue']+str(self.hikDic[hikKey]["joint"])+'\";')
+                print(self.lang['m252_assignJointDefinition'])
                 if oldRefNodeList:
                     cmds.delete(oldRefNodeList[0])
             else:
-                print("There's no dpAR in the scene to continue the HumanIk biped retargeting, sorry.")
+                mel.eval('warning \"'+self.lang['m246_missingDpARToRetarget']+'\";')
         else:
-            print("There's no HIKCharacterNode in the scene to use. Create one to continue, please.")
+            mel.eval('warning \"'+self.lang['m247_missingHIKCharNode']+'\";')
 
 
     def hikMapBipedControllers(self, ikList=None, *args):
@@ -491,11 +515,12 @@ class MotionCapture(object):
                         if cmds.objExists(self.hikDic[hikKey][ctrl]):
                             cmds.select(self.hikDic[hikKey][ctrl])
                             mel.eval('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
+                print(self.lang['m253_assignCtrlDefinition'])
                 cmds.select(clear=True)
             else:
-                print("There's no dpAR in the scene to continue the HumanIk biped retargeting, sorry.")
+                mel.eval('warning \"'+self.lang['m246_missingDpARToRetarget']+'\";')
         else:
-            print("There's no HIKCharacterNode in the scene to use. Create one to continue, please.")
+            mel.eval('warning \"'+self.lang['m247_missingHIKCharNode']+'\";')
 
 
     def hikMapBipedControllersByUI(self, *args):
@@ -521,14 +546,14 @@ class MotionCapture(object):
         mel.eval('hikCreateCustomRig( hikGetCurrentCharacter() );')
 
 
-    def hikRemoveMocap(self, *args):
+    def hikDeleteNodes(self, *args):
         """ Remove HumanIk mocap integration from dpAR.
         """
         mel.eval('hikDeleteCustomRig( hikGetCurrentCharacter() );')
         mel.eval('hikDeleteDefinition();')
     
     
-    def redoAutoRotate(self, *args):
+    def unmuteAutoRotate(self, *args):
         """ Reaply the clavicle and neck autoRotate behavior unmuting it.
         """
         ctrlList = self.getAutoRotateCtrlList()
@@ -538,6 +563,7 @@ class MotionCapture(object):
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.dpUIinst.axisList:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
+            print(self.lang['i046_remove']+" "+self.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
 
     def resetDefaultPose(self, *args):
