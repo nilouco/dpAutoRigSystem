@@ -14,7 +14,7 @@ ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnor
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
-DP_CUSTOMATTR_VERSION = 1.7
+DP_CUSTOMATTR_VERSION = 1.8
 
 
 class CustomAttr(object):
@@ -234,7 +234,9 @@ class CustomAttr(object):
 
     def addAttr(self, attrIndex, itemList=None, attrName=None, shapes=True, descendents=False, *args):
         """ Create attributes in the selected node if they don't exists yet.
+            Return a list of created dpID.
         """
+        idList = []
         attr = None
         if not itemList:
             itemList = cmds.ls(selection=True)
@@ -267,8 +269,9 @@ class CustomAttr(object):
                             id = self.utils.generateID(item)
                             cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
                             cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
+                            idList.append(id)
                         elif not self.utils.validateID(item):
-                            self.updateID([item])
+                            idList.extend[self.updateID([item])]
                     else:
                         attr = ATTR_LIST[attrIndex]
                     if attr:
@@ -277,6 +280,7 @@ class CustomAttr(object):
                             cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
             if self.ui:
                 cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
+        return idList
 
 
     def removeAttrUI(self, *args):
@@ -345,7 +349,7 @@ class CustomAttr(object):
         """ Remove and Add a new dpID attribute.
         """
         self.removeAttr(ATTR_DPID, itemList)
-        self.addAttr(0, itemList)
+        return self.addAttr(0, itemList)
 
 
     def revealID(self, itemList=None, win=False, *args):

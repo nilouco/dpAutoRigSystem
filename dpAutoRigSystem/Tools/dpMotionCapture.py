@@ -304,7 +304,7 @@ class MotionCapture(object):
     def hikRetarget(self, *args):
         """ Run the HumanIk retargeting processes.
         """
-        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=5)
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=6)
         self.hikCreateCharacterDefinition()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikAssignJointsToDefinition()
@@ -314,6 +314,9 @@ class MotionCapture(object):
         self.hikMapBipedControllersByUI()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.setIkFkBipedControllersByUI()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
+        self.hikCreateJob()
+        cmds.select(clear=True)
         self.utils.setProgress(endIt=True)
 
 
@@ -468,6 +471,7 @@ class MotionCapture(object):
         mel.eval("HIKCharacterControlsTool;")
         mel.eval("hikCreateDefinition;")
         self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
+        self.dpID = self.dpUIinst.customAttr.addAttr(0, [self.hikNode])[0] #dpID
         print(self.lang['m251_createdCharDefinition']+" "+self.hikNode)
         return self.hikNode
     
@@ -590,3 +594,55 @@ class MotionCapture(object):
             if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
                 cmds.setAttr(optCtrl+"."+self.lang['p002_left'].lower()+self.lang['c006_leg_main']+"Fk", 0)
                 cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c006_leg_main']+"Fk", 0)
+
+
+    def hikCreateJob(self, *args):
+        """ Create a scriptJob to check if the HumanIkCharacterNode will be deleted to unmute autoRotate feature.
+        """
+        hikCleanerCode = '''
+from maya import cmds
+DP_MOTIONCAPTURE_VERSION = '''+str(DP_MOTIONCAPTURE_VERSION)+'''
+
+class HumanIKCleaner(object):
+    def __init__(self, hikNode, sn, ctrlList, attrList, *args):
+        self.hikNode = hikNode
+        self.myself = sn
+        self.ctrlList = ctrlList
+        self.attrList = attrList
+        cmds.scriptJob(nodeDeleted=(self.hikNode, self.jobDeletedMocap), killWithScene=False, compressUndo=True)
+
+    def jobDeletedMocap(self, *args):
+        """ Restore autoRotate feature in dpAR.
+        """
+        print("'''+self.lang['i046_remove']+''' HumanIk")
+        self.unmuteAutoRotate()
+        if cmds.objExists(self.myself):
+            cmds.delete(self.myself)
+            print("Deleted "+self.myself)
+
+    def unmuteAutoRotate(self, *args):
+        """ Reaply the clavicle and neck autoRotate behavior unmuting it.
+        """
+        if self.ctrlList:
+            for ctrl in self.ctrlList:
+                self.lockAutoRotateAttr(ctrl, False)
+                zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                for axis in ["X", "Y", "Z"]:
+                    cmds.mute(zeroGrp+".rotate"+axis, disable=True)
+            print("'''+self.lang['i046_remove']+''' '''+self.lang['m249_muteAutoRotate']+''' "+", ".join(self.ctrlList))
+
+    def lockAutoRotateAttr(self, ctrl, value, *args):
+        """ Lock or unlock the autoRotate attribute for the given controller.
+        """
+        for followAttr in self.attrList:
+            if followAttr in cmds.listAttr(ctrl):
+                cmds.setAttr(ctrl+"."+followAttr, lock=value)
+    
+# fire scriptNode
+for hik in cmds.ls(type="HIKCharacterNode"):
+    if cmds.objExists(hik+".dpID") and cmds.getAttr(hik+".dpID") == "'''+self.dpID+'''":
+        HumanIKCleaner(hik, "'''+self.hikNode+'_Cleaner_SN'+'''", '''+str(self.getAutoRotateCtrlList())+''', '''+str(self.autoRotateAttrList)+''')
+'''
+        sn = cmds.scriptNode(name=self.hikNode+'_Cleaner_SN', sourceType='python', scriptType=2, beforeScript=hikCleanerCode)
+        self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
+        cmds.scriptNode(sn, executeBefore=True)
