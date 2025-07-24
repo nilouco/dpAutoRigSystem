@@ -271,7 +271,7 @@ class CustomAttr(object):
                             cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
                             idList.append(id)
                         elif not self.utils.validateID(item):
-                            idList.extend[self.updateID([item])]
+                            idList.extend(self.updateID([item]))
                     else:
                         attr = ATTR_LIST[attrIndex]
                     if attr:
