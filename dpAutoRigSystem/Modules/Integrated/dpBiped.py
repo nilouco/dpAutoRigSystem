@@ -8,7 +8,7 @@ TITLE = "m026_biped"
 DESCRIPTION = "m027_bipedDesc"
 ICON = "/Icons/dp_biped.png"
 
-DP_BIPED_VERSION = 2.1
+DP_BIPED_VERSION = 2.2
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -226,7 +226,7 @@ def Biped(dpUIinst):
                 # set guides attributes to complete system
                 headInstance.changeDeformer(1)
                 headInstance.changeFacial(1)
-                correctiveGuideInstanceList = [armLimbInstance, legLimbInstance] + fingerInstanceList
+                correctiveGuideInstanceList = [armLimbInstance, legLimbInstance, eyeInstance] + fingerInstanceList
                 for instance in correctiveGuideInstanceList:
                     instance.setCorrective(1)
 
