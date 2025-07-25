@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.6
+DP_BASESTANDARD_VERSION = 2.7
 
 
 class BaseStandard(object):
@@ -522,16 +522,18 @@ class BaseStandard(object):
             self.getMirrorSideList()
     
 
-    def hookSetup(self, side, ctrlList, scalableList, staticList=None, *args):
+    def hookSetup(self, side, ctrlList, scalableList=None, staticList=None, *args):
         """ Generate the hook setup to find lists of controllers, scalable and static groups.
             Add message attributes to map hooked groups for the rigged module.
         """
         # create a masterModuleGrp to be checked if this rig exists:
         self.toCtrlHookGrp     = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
-        self.toScalableHookGrp = cmds.group(scalableList, name=side+self.userGuideName+"_Scalable_Grp")
+        self.toScalableHookGrp = cmds.group(empty=True, name=side+self.userGuideName+"_Scalable_Grp")
         self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
         if staticList:
             cmds.parent(staticList, self.toStaticHookGrp)
+        if scalableList:
+            cmds.parent(scalableList, self.toScalableHookGrp)
         self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
         # add hook attributes to be read when rigging integrated modules:
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
@@ -585,7 +587,8 @@ class BaseStandard(object):
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
         if self.dpUIinst.optionCtrl:
-            cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
+            if cmds.objExists(self.dpUIinst.optionCtrl):
+                cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
         else:
             cmds.connectAttr(self.moduleGrp+".message", self.guideNet+".linkedNode", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
