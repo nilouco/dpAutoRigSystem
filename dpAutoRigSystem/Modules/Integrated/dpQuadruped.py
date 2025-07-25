@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.2
+DP_QUADRUPED_VERSION = 2.3
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -307,6 +307,7 @@ def Quadruped(dpUIinst):
                 headInstance.changeFacial(1)
                 backLegLimbInstance.setCorrective(1)
                 frontLegLimbInstance.setCorrective(1)
+                eyeInstance.setCorrective(1)
                 
                 # woking with EAR system:
                 dpUIinst.utils.setProgress(doingName+earName)
