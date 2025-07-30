@@ -184,9 +184,9 @@ class RibbonClass(object):
         cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_PoC")
         if oriBLoc:
             cmds.delete(downLimb['constraints'][1])
-            cmds.parentConstraint(self.elbowBctrlCtrl, downLimb['locsList'][0], mo=True, w=1, name=downLimb['locsList'][2]+"_PaC")
+            cmds.parentConstraint(self.elbowBctrlCtrl, downLimb['locsList'][0], mo=True, w=1, name=downLimb['locsList'][2]+"_2_PaC")
             cmds.delete(downLimb['constraints'][3])
-            cmds.pointConstraint(self.elbowBctrlCtrl, downLimb['locsList'][3], mo=True, w=1, name=downLimb['locsList'][4]+"_PoC")
+            cmds.pointConstraint(self.elbowBctrlCtrl, downLimb['locsList'][3], mo=True, w=1, name=downLimb['locsList'][4]+"_2_PoC")
             
             cmds.delete(downBLimb['constraints'][0])
             cmds.parentConstraint(self.elbowBctrlCtrl, downBLimb['locsList'][2], mo=True, w=1, name=downBLimb['locsList'][2]+"_PaC")
