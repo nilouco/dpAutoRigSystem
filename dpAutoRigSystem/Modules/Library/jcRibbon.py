@@ -34,7 +34,7 @@ class RibbonClass(object):
         self.limbLengthAttr   = self.dpUIinst.lang['c113_length']
         
         
-    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
+    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, oriBLoc=None, *args):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
@@ -62,7 +62,7 @@ class RibbonClass(object):
         lista.append(cmds.listRelatives(lista[1], c=True)[0])
         auxLoc = cmds.duplicate(oriLoc, rr=True)
         midLoc = cmds.duplicate(oriLoc, rr=True)
-        
+
         cmds.delete(cmds.parentConstraint(lista[1], auxLoc, mo=False, w=1))
         cmds.delete(cmds.aimConstraint(lista[2], auxLoc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
         cmds.delete(cmds.orientConstraint(oriLoc, auxLoc, mo=False, skip=skipa, weight=1))
@@ -89,20 +89,38 @@ class RibbonClass(object):
         cmds.addAttr(upctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
         cmds.addAttr(downctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
         cmds.addAttr(downctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
+        
+        if oriBLoc:
+            lista.append(cmds.listRelatives(lista[2], c=True)[0])
+            auxBLoc = cmds.duplicate(oriBLoc, rr=True)
+            midBLoc = cmds.duplicate(oriBLoc, rr=True)
+            cmds.delete(cmds.parentConstraint(lista[2], auxBLoc, mo=False, w=1))
+            cmds.delete(cmds.aimConstraint(lista[3], auxBLoc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
+            cmds.delete(cmds.orientConstraint(oriBLoc, auxBLoc, mo=False, skip=skipa, weight=1))
+            cmds.delete(cmds.parentConstraint(lista[2], midBLoc, mo=False, w=1))
+            cmds.delete(cmds.orientConstraint(oriBLoc, midBLoc, mo=False, skip=skipa, weight=1))
+            downBctrlList = self.createBendCtrl(prefix+myName+'_DownB_Offset_Ctrl', r=self.ctrlRadius)
+            downBctrl = downBctrlList[0]
+            downBctrlCtrl = downBctrlList[1]
+            elbowBctrlList = self.createElbowCtrl(prefix+myName+'_'+cornerName+'B_Offset_Ctrl', armStyle=arm)
+            elbowBctrl = elbowBctrlList[0]
+            self.elbowBctrlCtrl = elbowBctrlList[1]
+            self.elbowBctrlZero0 = elbowBctrlList[2]
+            self.elbowBctrlZero1 = elbowBctrlList[3]
+            cmds.addAttr(downBctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
+            cmds.addAttr(downBctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
 
         if addArtic:
             # corner joint
-            cmds.select(clear=True)
-            self.cornerJxt = cmds.joint(name=prefix+myName+'_Corner_Jxt', scaleCompensate=False)
-            self.cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt', scaleCompensate=False, radius=1.5)
-            cmds.setAttr(self.cornerJxt+".segmentScaleCompensate", 1)
-            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 0) #jar
-            cmds.addAttr(self.cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
-            cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
-            cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
+            self.cornerJxt, self.cornerJnt = self.createCornerJoint(prefix, myName, "Corner", self.elbowctrlCtrl)
+            if oriBLoc:
+                self.cornerBJxt, self.cornerBJnt = self.createCornerJoint(prefix, myName, "CornerB", self.elbowBctrlCtrl)
             if not arm:
                 cmds.setAttr(self.cornerJnt+".rotateX", 180)
                 cmds.setAttr(self.cornerJnt+".rotateZ", 90)
+                if oriBLoc:
+                    cmds.setAttr(self.cornerBJnt+".rotateX", 180)
+                    cmds.setAttr(self.cornerBJnt+".rotateZ", 90)
             if side == 1:
                 if arm:
                     cmds.setAttr(self.cornerJnt+".rotateX", 180)
@@ -110,20 +128,13 @@ class RibbonClass(object):
                 else:
                     cmds.setAttr(self.cornerJnt+".rotateX", 0)
                     cmds.setAttr(self.cornerJnt+".rotateZ", -90)
+                    if oriBLoc:
+                        cmds.setAttr(self.cornerBJnt+".rotateX", 0)
+                        cmds.setAttr(self.cornerBJnt+".rotateZ", -90)
             if addCorrect:
-                for i in range(0, jcrNumber):
-                    cmds.select(self.cornerJnt)
-                    jcr = cmds.joint(name=self.cornerJnt[:self.cornerJnt.rfind("_")+1]+str(i)+"_Jcr")
-                    cmds.setAttr(jcr+".segmentScaleCompensate", 0)
-                    cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
-                    if jcrPosList:
-                        cmds.setAttr(jcr+".translateX", jcrPosList[i][0])
-                        cmds.setAttr(jcr+".translateY", jcrPosList[i][1])
-                        cmds.setAttr(jcr+".translateZ", jcrPosList[i][2])
-                    if jcrRotList:
-                        cmds.setAttr(jcr+".rotateX", jcrRotList[i][0])
-                        cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
-                        cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
+                self.addCorrectiveJoint(jcrNumber, self.cornerJnt, jcrPosList, jcrRotList)
+                if oriBLoc:
+                    self.addCorrectiveJoint(jcrNumber, self.cornerBJnt, jcrPosList, jcrRotList)
         
         if arm:
             upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
@@ -139,6 +150,9 @@ class RibbonClass(object):
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleY", downLimb['extraCtrlGrp']+".scaleX", force=True)
+            if oriBLoc:
+                downBLimb = self.createRibbon(name=prefix+myName+'_DownB', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[2], lista[3]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='DownB_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+                cmds.connectAttr(downBctrlCtrl+".scaleZ", downBLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(upctrlCtrl+".scaleZ", upLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(downctrlCtrl+".scaleZ", downLimb['extraCtrlGrp']+".scaleZ", force=True)
         
@@ -147,10 +161,17 @@ class RibbonClass(object):
         
         cmds.delete(cmds.parentConstraint(auxLoc, downctrl, mo=False, w=1))
         cmds.delete(cmds.pointConstraint(downLimb['middleCtrl'], downctrl, mo=False, w=1))
-        
+        if oriBLoc:
+            cmds.delete(cmds.parentConstraint(auxBLoc, downBctrl, mo=False, w=1))
+            cmds.delete(cmds.pointConstraint(downBLimb['middleCtrl'], downBctrl, mo=False, w=1))
+
         cmds.delete(cmds.parentConstraint(midLoc, elbowctrl, mo=False, w=1))
         orientConst = cmds.orientConstraint(lista[0], lista[1], elbowctrl, mo=False, w=1, name=elbowctrl+"_OrC")[0]
         cmds.setAttr(orientConst+".interpType", 2)
+        if oriBLoc:
+            cmds.delete(cmds.parentConstraint(midBLoc, elbowBctrl, mo=False, w=1))
+            orientBConst = cmds.orientConstraint(lista[1], lista[2], elbowBctrl, mo=False, w=1, name=elbowBctrl+"_OrC")[0]
+            cmds.setAttr(orientBConst+".interpType", 2)
 
         cmds.delete(upLimb['constraints'][1])
         cmds.parentConstraint(self.elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_PaC")
@@ -161,6 +182,23 @@ class RibbonClass(object):
         cmds.parentConstraint(self.elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_PaC")
         cmds.delete(downLimb['constraints'][2])
         cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_PoC")
+        if oriBLoc:
+            cmds.delete(downLimb['constraints'][1])
+            cmds.parentConstraint(self.elbowBctrlCtrl, downLimb['locsList'][0], mo=True, w=1, name=downLimb['locsList'][2]+"_PaC")
+            cmds.delete(downLimb['constraints'][3])
+            cmds.pointConstraint(self.elbowBctrlCtrl, downLimb['locsList'][3], mo=True, w=1, name=downLimb['locsList'][4]+"_PoC")
+            
+            cmds.delete(downBLimb['constraints'][0])
+            cmds.parentConstraint(self.elbowBctrlCtrl, downBLimb['locsList'][2], mo=True, w=1, name=downBLimb['locsList'][2]+"_PaC")
+            cmds.delete(downBLimb['constraints'][2])
+            cmds.pointConstraint(self.elbowBctrlCtrl, downBLimb['locsList'][4], mo=True, w=1, name=downBLimb['locsList'][4]+"_PoC")
+
+            downBPC = cmds.parentConstraint(cmds.listRelatives(downBLimb['middleCtrl'], p=True)[0], self.elbowBctrlCtrl, downBctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=downBctrl+"_PaC")[0]
+            cmds.orientConstraint(cmds.listRelatives(downBLimb['middleCtrl'], p=True)[0], downBctrl, mo=True, w=1, name=downBctrl+"_OrC")
+            cmds.setAttr(downBPC+'.interpType', 2)
+            cmds.connectAttr(self.elbowBctrlCtrl+'.autoBend', downBPC+'.'+self.elbowBctrlCtrl+'W1', force=True)
+            cmds.parentConstraint(cmds.listRelatives(downBctrl, c=True)[0], downBLimb['middleCtrl'], mo=True, w=1, name=downBLimb['middleCtrl']+"_PaC")
+            cmds.pointConstraint(lista[2], elbowBctrl, mo=True, w=1, name=elbowBctrl+"_PoC")
         
         upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_PaC")[0]
         cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrC")
@@ -178,11 +216,17 @@ class RibbonClass(object):
         
         upJntGrp = cmds.listRelatives(upLimb['skinJointsList'][0], p=True, f=True)
         downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
+        if oriBLoc:
+            downBJntGrp = cmds.listRelatives(downBLimb['skinJointsList'][0], p=True, f=True)
         
         limbJoints = list(upLimb['skinJointsList'])
         if addArtic:
             limbJoints.extend([self.cornerJxt])
         limbJoints.extend(downLimb['skinJointsList'])
+        if oriBLoc:
+            if addArtic:
+                limbJoints.extend([self.cornerBJxt])
+            limbJoints.extend(downBLimb['skinJointsList'])
         
         jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
         #Deactivate the segment scale compensate on the bone to prevent scaling problem.
@@ -194,6 +238,8 @@ class RibbonClass(object):
         limbJoints.pop(len(upLimb['skinJointsList']))
         if addArtic:
             limbJoints.insert(len(upLimb['skinJointsList']), self.cornerJnt)
+            if oriBLoc:
+                limbJoints.insert(len(upLimb['skinJointsList']), self.cornerBJnt)
         for i in range(len(limbJoints)):
             oldName = limbJoints[i][:-4]
             limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+articNumber)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
@@ -215,6 +261,13 @@ class RibbonClass(object):
         ctrlsGrp = cmds.group(upctrl, downctrl, elbowctrl, upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp'], n=prefix+myName+'_Ctrls_Grp')
         
         cmds.delete(midLoc, auxLoc)
+        if oriBLoc:
+            cmds.parent(downBLimb['scaleGrp'], scaleGrp)
+            cmds.setAttr(downBLimb['scaleGrp']+'.v', cmds.getAttr(downBLimb['finalGrp']+'.v'))
+            cmds.delete(downBJntGrp)
+            cmds.parent(downBLimb['finalGrp'], staticGrp)
+            cmds.parent(downBctrl, elbowBctrl, downBLimb['extraCtrlGrp'], ctrlsGrp)
+            cmds.delete(midBLoc, auxBLoc)
         
         # organizing joint nomenclature ('_Jnt', '_Jxt') and skin attributes (".dpAR_joint")
         # in order to quickly skin using dpAR_UI
@@ -229,7 +282,7 @@ class RibbonClass(object):
                 # rename joint
                 cmds.rename(item, item.replace('_Jnt', '_Jxt'))
         
-        if iniJxt:
+        if iniJxt: #arm elbow
             if cmds.objExists(iniJxt):
                 pac = cmds.parentConstraint(iniJxt, downLimb['bendGrpList'][0], mo=True, name=downLimb['bendGrpList'][0]+"_PaC")[0]
                 cmds.setAttr(pac+".interpType", 2) #shortest
@@ -247,12 +300,15 @@ class RibbonClass(object):
             cornerAutoRotateInvPinMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Pin_Inv_MD"))
             cornerAutoRotateInvMidMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Mid_Inv_MD"))
             self.toIDList.extend([cornerAutoRotateMD, cornerAutoRotateMM, cornerAutoRotateDM, cornerAutoRotateQtE, cornerAutoRotateRev, cornerAutoRotateInvPinMD, cornerAutoRotateInvMidMD])
-            extremLoc = cmds.spaceLocator(name=lista[2].replace("Jnt", "AutoRotate_Loc"))[0]
-            cmds.delete(cmds.parentConstraint(lista[2], extremLoc, maintainOffset=False))
+            idx = 2
+            if oriBLoc:
+                idx = 3
+            extremLoc = cmds.spaceLocator(name=lista[idx].replace("Jnt", "AutoRotate_Loc"))[0]
+            cmds.delete(cmds.parentConstraint(lista[idx], extremLoc, maintainOffset=False))
             cornerAutoRotGrp = cmds.group(extremLoc, name=extremLoc+"_Grp")
             extremOrigLoc = cmds.duplicate(extremLoc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
             for axis in ["X", "Y", "Z"]:
-                cmds.connectAttr(lista[2]+".rotate"+axis, extremLoc+".rotate"+axis, force=True)
+                cmds.connectAttr(lista[idx]+".rotate"+axis, extremLoc+".rotate"+axis, force=True)
                 cmds.setAttr(extremOrigLoc+".rotate"+axis, cmds.getAttr(extremLoc+".rotate"+axis))
             cmds.setAttr(cornerAutoRotGrp+".inheritsTransform", 0)
             cmds.setAttr(cornerAutoRotGrp+".visibility", 0)
@@ -276,13 +332,10 @@ class RibbonClass(object):
 
         # implementing pin setup to ribbon corner offset control:
         if elbowctrlList[2]:
-            worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero1, mo=True, name=self.elbowctrlZero1+"_PaC")[0]
-            pinRev = cmds.createNode('reverse', name=self.elbowctrlCtrl+"_Pin_Rev")
-            self.toIDList.append(pinRev)
-            cmds.connectAttr(self.elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
-            cmds.connectAttr(self.elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
-            cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
-            cmds.connectAttr(pinRev+".outputX", cornerAutoRotateInvPinMD+".input2Z", force=True)
+            self.pinCornerSetup(worldRef, elbowctrl, self.elbowctrlCtrl, self.elbowctrlZero1, cornerAutoRotateInvPinMD)
+        if oriBLoc:
+            if elbowBctrlList[2]:
+                self.pinCornerSetup(worldRef, elbowBctrl, self.elbowBctrlCtrl, self.elbowBctrlZero1, cornerAutoRotateInvPinMD)
         
         # autoRotate by twistBone control setup:
         if upLimb['upTwistBoneMD']:
@@ -296,25 +349,42 @@ class RibbonClass(object):
         if downLimb['bottomTwistBoneMD']:
             cmds.connectAttr(downctrlCtrl+".autoRotate", downLimb['bottomTwistBoneMD']+".input1Z", force=True)
             cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downLimb['twistAutoRotMD']+".input2X", force=True)
+        if oriBLoc:
+            if downBLimb['upTwistBoneMD']:
+                cmds.connectAttr(downBctrlCtrl+".autoRotate", downBLimb['upTwistBoneMD']+".input1Z", force=True)
+                cmds.connectAttr(downBctrlCtrl+".invert", downBLimb['twistBoneCnd']+".firstTerm", force=True)
+            if downBLimb['bottomTwistBoneMD']:
+                cmds.connectAttr(downBctrlCtrl+".autoRotate", downBLimb['bottomTwistBoneMD']+".input1Z", force=True)
+                cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downBLimb['twistAutoRotMD']+".input2X", force=True)
 
         self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
 
-        # extraCtrlList:
+        # result lists to return them:
         extraCtrlList = upLimb['extraCtrlList']
         extraCtrlList.extend(downLimb['extraCtrlList'])
+        resultBendGrpList = [upctrl, downctrl]
+        resultCtrlList = [upctrlCtrl, downctrlCtrl, self.elbowctrlCtrl]
+        resultExtraBendGrp = [upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']]
+        resultRotExtrem = downLimb['locsList'][3]
+        if oriBLoc:
+            extraCtrlList.extend(downBLimb['extraCtrlList'])
+            resultBendGrpList.append(downBctrl)
+            resultCtrlList.extend([downBctrlCtrl, self.elbowBctrlCtrl])
+            resultExtraBendGrp.append(downBLimb['extraCtrlGrp'])
+            resultRotExtrem = downBLimb['locsList'][3]
         
         return {'scaleGrp'      : scaleGrp,
                 'staticGrp'     : staticGrp,
                 'ctrlsGrp'      : ctrlsGrp,
-                'bendGrpList'   : [upctrl, downctrl],
-                'ctrlList'      : [upctrlCtrl, downctrlCtrl, self.elbowctrlCtrl],
-                'extraBendGrp'  : [upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']],
+                'bendGrpList'   : resultBendGrpList,
+                'ctrlList'      : resultCtrlList,
+                'extraBendGrp'  : resultExtraBendGrp,
                 'extraCtrlList' : extraCtrlList,
                 'twistBoneMD'   : upLimb['twistBoneMD'],
                 'jntGrp'        : jntGrp,
                 'rotFirst'      : upLimb['locsList'][4],
-                'rotExtrem'     : downLimb['locsList'][3],
+                'rotExtrem'     : resultRotExtrem,
                 'bottomPosPaC'  : [upLimb['locsList'][2], upLimb['constraints'][0]]
                 }
     
@@ -970,3 +1040,48 @@ class RibbonClass(object):
         #return the created joints and follicles
         cmds.parent(fols, rib)
         return results
+    
+
+    def createCornerJoint(self, prefix, myName, name, ctrl, *args):
+        """ Create and return the corner joint and jxt.
+        """
+        cmds.select(clear=True)
+        cornerJxt = cmds.joint(name=prefix+myName+'_'+name+'_Jxt', scaleCompensate=False)
+        cornerJnt = cmds.joint(name=prefix+myName+'_'+name+'_Jnt', scaleCompensate=False, radius=1.5)
+        cmds.setAttr(cornerJxt+".segmentScaleCompensate", 1)
+        cmds.setAttr(cornerJnt+".segmentScaleCompensate", 0) #jar
+        cmds.addAttr(cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
+        cmds.parentConstraint(ctrl, cornerJxt, mo=False, name=cornerJxt+"_PaC")
+        cmds.scaleConstraint(ctrl, cornerJxt, mo=False, name=cornerJxt+"_ScC")
+        return [cornerJxt, cornerJnt]
+
+
+    def addCorrectiveJoint(self, jcrNumber, cornerJnt, jcrPosList, jcrRotList):
+        """ Add corrective joint to the ribbon corner.
+        """
+        for i in range(0, jcrNumber):
+            cmds.select(cornerJnt)
+            jcr = cmds.joint(name=cornerJnt[:cornerJnt.rfind("_")+1]+str(i)+"_Jcr")
+            cmds.setAttr(jcr+".segmentScaleCompensate", 0)
+            cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+            if jcrPosList:
+                cmds.setAttr(jcr+".translateX", jcrPosList[i][0])
+                cmds.setAttr(jcr+".translateY", jcrPosList[i][1])
+                cmds.setAttr(jcr+".translateZ", jcrPosList[i][2])
+            if jcrRotList:
+                cmds.setAttr(jcr+".rotateX", jcrRotList[i][0])
+                cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
+                cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
+
+
+    def pinCornerSetup(self, worldRef, elbowctrl, elbowctrlCtrl, elbowctrlZero1, cornerAutoRotateInvPinMD, *args):
+        """ Create the pin setup for the given corner controller.
+        """
+        worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, elbowctrlZero1, mo=True, name=elbowctrlZero1+"_PaC")[0]
+        pinRev = cmds.createNode('reverse', name=elbowctrlCtrl+"_Pin_Rev")
+        self.toIDList.append(pinRev)
+        cmds.connectAttr(elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
+        cmds.connectAttr(elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
+        cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
+        cmds.connectAttr(pinRev+".outputX", cornerAutoRotateInvPinMD+".input2Z", force=True)
+        cmds.setAttr(worldRefPC+".interpType", 2) #shortest

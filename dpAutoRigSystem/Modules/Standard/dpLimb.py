@@ -16,7 +16,7 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
-DP_LIMB_VERSION = 3.6
+DP_LIMB_VERSION = 3.7
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -745,10 +745,10 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
                 toCornerBendList = []
                 
-                # getting type of limb:
+                # getting type of limb: (arm, leg)
                 self.getLimbType()
 
-                # getting style of the limb:
+                # getting style of the limb: (default, biped, quadruped, etc)
                 self.getLimbStyle()
 
                 # re-declaring guide names:
@@ -1489,6 +1489,10 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'
                         corner = side+self.userGuideName+"_"+cornerName+'_Jnt'
                         cornerJxt = side+self.userGuideName+"_"+cornerName+'_Jxt'
+
+                        cornerB = side+self.userGuideName+"_"+cornerBName+'_Jnt'
+                        cornerBJxt = side+self.userGuideName+"_"+cornerBName+'_Jxt'
+                        
                         splited = self.userGuideName.split('_')
                         prefix = ''.join(side)
                         name = ''
@@ -1507,9 +1511,17 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         else:
                             cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
-                        if self.limbTypeName == self.armName:
+                        if self.limbTypeName == self.armName: #biped arm
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, cornerJxt, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
-                        else:
+                        elif self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']: #quadruped
+#                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                            # WIP:
+
+                            locB = cmds.spaceLocator(n=side+self.userGuideName+'_auxBOriLoc', p=(0, 0, 0))[0]
+                            cmds.delete(cmds.parentConstraint(cornerB, locB, mo=False, w=1))
+
+                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)], oriBLoc=locB)
+                        else: #biped leg
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
                         if self.limbTypeName == self.armName:
@@ -1946,7 +1958,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.utils.setJointLabel(self.cornerJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
                         cmds.rename(self.cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
                         if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
+                            print(self.skinJointList[2], self.skinJointList[3])
                             cornerBJntList = self.utils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False)
+                            print("cornerBJntList - ", cornerBJntList)
                             self.utils.setJointLabel(cornerBJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                         self.ankleArticList.append([cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0], extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
