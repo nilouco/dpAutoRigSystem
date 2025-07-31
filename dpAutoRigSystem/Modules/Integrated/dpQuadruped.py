@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.2
+DP_QUADRUPED_VERSION = 2.3
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -324,6 +324,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earBaseInstance.annotation+".translateY", 0)
                 cmds.setAttr(earBaseInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(earBaseInstance.cvEndJoint+".translateZ", 0.5)
+                cmds.setAttr(earBaseInstance.moduleGrp+".deformedBy", 1)
 
                 dpUIinst.utils.setProgress(doingName+earName)
                 # create FkLine module instance:
@@ -366,6 +367,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earUpperInstance.moduleGrp+".scaleX", 0.4)
                 cmds.setAttr(earUpperInstance.moduleGrp+".scaleY", 0.4)
                 cmds.setAttr(earUpperInstance.moduleGrp+".scaleZ", 0.4)
+                cmds.setAttr(earUpperInstance.moduleGrp+".deformedBy", 1)
                 
                 dpUIinst.utils.setProgress(doingName+lowerName+earName)
                 # create FkLine module instance:
@@ -385,6 +387,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earLowerInstance.moduleGrp+".scaleX", 0.4)
                 cmds.setAttr(earLowerInstance.moduleGrp+".scaleY", 0.4)
                 cmds.setAttr(earLowerInstance.moduleGrp+".scaleZ", 0.4)
+                cmds.setAttr(earLowerInstance.moduleGrp+".deformedBy", 1)
 
                 # parent ears guides to spine and other ear guides:
                 cmds.parent(earBaseInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
