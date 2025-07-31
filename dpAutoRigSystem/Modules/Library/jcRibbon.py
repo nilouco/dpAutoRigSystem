@@ -151,7 +151,7 @@ class RibbonClass(object):
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleY", downLimb['extraCtrlGrp']+".scaleX", force=True)
             if oriBLoc:
-                downBLimb = self.createRibbon(name=prefix+myName+'_DownB', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[2], lista[3]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='DownB_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+                downBLimb = self.createRibbon(name=prefix+myName+'_DownB', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[2], lista[3]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='DownB_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm, oriBLoc=oriBLoc)
                 cmds.connectAttr(downBctrlCtrl+".scaleZ", downBLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(upctrlCtrl+".scaleZ", upLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(downctrlCtrl+".scaleZ", downLimb['extraCtrlGrp']+".scaleZ", force=True)
@@ -235,15 +235,16 @@ class RibbonClass(object):
             cmds.setAttr(nBone+".segmentScaleCompensate", 0)
         
         # fix renaming:
-        limbJoints.pop(len(upLimb['skinJointsList']))
         if addArtic:
+            limbJoints.pop(len(upLimb['skinJointsList']))
             limbJoints.insert(len(upLimb['skinJointsList']), self.cornerJnt)
             if oriBLoc:
-                limbJoints.insert(len(upLimb['skinJointsList']), self.cornerBJnt)
+                limbJoints.pop(len(upLimb['skinJointsList'])+len(downLimb['skinJointsList'])+1)
+                limbJoints.insert(len(upLimb['skinJointsList'])+len(downLimb['skinJointsList'])+1, self.cornerBJnt)
         for i in range(len(limbJoints)):
             oldName = limbJoints[i][:-4]
             limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+articNumber)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
-            if not "Corner" in oldName:
+            if not self.dpUIinst.lang['c043_corner'] in oldName:
                 childList = cmds.listRelatives(limbJoints[i], allDescendents=True)
                 if childList:
                     for childNode in childList:
@@ -430,7 +431,7 @@ class RibbonClass(object):
         return [grp, curve, zero0, zero1]
     
     
-    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, *args):
+    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, oriBLoc=None, *args):
         """ Main method to create the Ribbon system.
             centerUpDown = [0, 1, 2] # center, up, down ribbon part to change proportionList used in volumeVariation.
             Returns results in a dictionary.
@@ -802,6 +803,9 @@ class RibbonClass(object):
                 cmds.connectAttr(rbScaleClp+".outputR", rbBlendCB+".color1.color1R", force=True)
                 cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleY", force=True)
                 cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleZ", force=True)
+                if oriBLoc:
+                    cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerBJnt+".scaleY", force=True)
+                    cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerBJnt+".scaleZ", force=True)
         
         locatorsGrp = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')
         skinJntGrp = cmds.group(rb_Jnt, n=name+'_Jnt_Grp')
