@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from maya import OpenMaya as om
+from maya import OpenMaya
 import os
 import sys
 import re
@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.6
+DP_UTILS_VERSION = 3.7
 
 
 class Utils(object):
@@ -999,17 +999,17 @@ class Utils(object):
 
     def extract_world_scale_from_matrix(self, obj):
         world_matrix = cmds.getAttr(obj + ".worldMatrix")
-        mMat = om.MMatrix()
-        om.MScriptUtil.createMatrixFromList(world_matrix, mMat)
-        mTransform = om.MTransformationMatrix(mMat)
-        scale_util = om.MScriptUtil()
+        mMat = OpenMaya.MMatrix()
+        OpenMaya.MScriptUtil.createMatrixFromList(world_matrix, mMat)
+        mTransform = OpenMaya.MTransformationMatrix(mMat)
+        scale_util = OpenMaya.MScriptUtil()
         scale_util.createFromDouble(0.0, 0.0, 0.0)
         ptr = scale_util.asDoublePtr()
-        mTransform.getScale(ptr, om.MSpace.kWorld)
+        mTransform.getScale(ptr, OpenMaya.MSpace.kWorld)
 
-        x_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 0)
-        y_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 1)
-        z_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 2)
+        x_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 0)
+        y_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 1)
+        z_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 2)
 
         return [x_scale, y_scale, z_scale]
 
