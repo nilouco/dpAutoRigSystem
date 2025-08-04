@@ -307,6 +307,7 @@ def Quadruped(dpUIinst):
                 headInstance.changeFacial(1)
                 backLegLimbInstance.setCorrective(1)
                 frontLegLimbInstance.setCorrective(1)
+                eyeInstance.setCorrective(1)
                 
                 # woking with EAR system:
                 dpUIinst.utils.setProgress(doingName+earName)

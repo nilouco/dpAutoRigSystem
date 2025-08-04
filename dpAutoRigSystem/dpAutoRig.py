@@ -146,6 +146,7 @@ class Start(object):
         self.dpID = "dpID"
         self.jointEndAttr = "JEnd"
         self.transformAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
+        self.axisList = ["X", "Y", "Z"]
         self.loadedPath = False
         self.loadedStandard = False
         self.loadedIntegrated = False
