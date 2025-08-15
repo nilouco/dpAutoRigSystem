@@ -2661,7 +2661,6 @@ class Start(object):
                                     scaleConst        = self.integratedTaskDic[moduleDic]['scaleConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
                                     ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
-                                    middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
                                     fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
@@ -2676,7 +2675,6 @@ class Start(object):
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
                                     ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
                                     ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
-                                    jaxRotZMDList         = self.integratedTaskDic[fatherGuide]['jaxRotZMDList']
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
                                     cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
@@ -2727,7 +2725,7 @@ class Start(object):
                                         for axis in self.axisList:
                                             cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
                                             cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
-                                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE])
+                                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE, origLoc, actionLoc])
                                         if addCorrective:
                                             for netNode in ankleCorrectiveList:
                                                 if netNode:

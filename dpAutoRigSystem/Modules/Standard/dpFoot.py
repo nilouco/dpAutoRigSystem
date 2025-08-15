@@ -29,7 +29,6 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.scaleConstList = []
         self.footJntList = []
         self.ballRFList = []
-        self.middleFootCtrlList = []
         self.reverseFootAttrList = []
         self.aScalableGrp = []
 
@@ -271,7 +270,6 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleZ", -1)
                 self.footCtrlZeroList = self.utils.zeroOut([self.footCtrl, self.middleFootCtrl])
-                self.middleFootCtrlList.append(self.middleFootCtrl)
 
                 # mount hierarchy:
                 cmds.parent(self.footCtrlZeroList[1], self.RFECtrl, absolute=True)
@@ -472,7 +470,6 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 "scaleConstList": self.scaleConstList,
                 "footJntList": self.footJntList,
                 "ballRFList": self.ballRFList,
-                "middleFootCtrlList": self.middleFootCtrlList,
                 "reverseFootAttrList": self.reverseFootAttrList,
                 "scalableGrp": self.aScalableGrp,
             }
