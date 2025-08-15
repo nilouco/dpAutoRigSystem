@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.08"
-DPAR_UPDATELOG = "N841 - Quadruped leg extra ribbon and correctives."
+DPAR_VERSION_5 = "5.01.09"
+DPAR_UPDATELOG = "N928 - UniformScale flip issue fix."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2705,24 +2705,39 @@ class Start(object):
                                             cmds.parent(footJnt, footJntFather)
                                             cmds.parent(footJntChildrenList, footJnt)
                                             self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
-                                            if addCorrective:
-                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
-                                                if jaxRotZMDList:
-                                                    cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList[s]+".input1Z", force=True)
-                                                    self.utils.nodeRenamingTreatment(cmds.listConnections(jaxRotZMDList[s]+".input1Z", source=True, destination=False))
-                                                for netNode in ankleCorrectiveList:
-                                                    if netNode:
-                                                        if cmds.objExists(netNode):
-                                                            actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
-                                                            if actionLocList:
-                                                                cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
-                                                                actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
-                                                                cmds.delete(actionLocGrp+"_PaC")
-                                                                self.toIDList.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
-                                            else:
-                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
-                                            cmds.setAttr(oc+".interpType", 2) #shortest
-                                            self.toIDList.append(oc)
+                                        # extracting angle to avoid orientConstraint issue when uniform scaling
+                                        extractAngleMM  = cmds.createNode("multMatrix", name=ankleArticList[0]+"_ExtractAngle_MM")
+                                        extractAngleDM  = cmds.createNode("decomposeMatrix", name=ankleArticList[0]+"_ExtractAngle_DM")
+                                        extractAngleQtE = cmds.createNode("quatToEuler", name=ankleArticList[0]+"_ExtractAngle_QtE")
+                                        extractAngleMD  = cmds.createNode("multiplyDivide", name=ankleArticList[0]+"_ExtractAngle_MD")
+                                        origLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Orig_Loc")[0]
+                                        actionLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Action_Loc")[0]
+                                        cmds.matchTransform(origLoc, actionLoc, ankleArticList[2], position=True, rotation=True)
+                                        cmds.parent(origLoc, ankleArticList[2])
+                                        cmds.parent(actionLoc, footJnt)
+                                        cmds.setAttr(origLoc+".visibility", 0)
+                                        cmds.setAttr(actionLoc+".visibility", 0)
+                                        cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
+                                        cmds.connectAttr(origLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
+                                        cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
+                                        for axis in self.axisList:
+                                            cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
+                                            cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
+                                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE])
+                                        if addCorrective:
+                                            for netNode in ankleCorrectiveList:
+                                                if netNode:
+                                                    if cmds.objExists(netNode):
+                                                        actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
+                                                        if actionLocList:
+                                                            cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
+                                                            actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
+                                                            cmds.delete(actionLocGrp+"_PaC")
+                                                            self.toIDList.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
                                     # hide this controller shape
