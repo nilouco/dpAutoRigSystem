@@ -212,7 +212,7 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.matchTransform(self.RFDGrp, self.cvRFDLoc, position=True, rotation=True)
                 cmds.matchTransform(self.RFEGrp, self.cvRFELoc, position=True, rotation=True)
                 cmds.matchTransform(self.RFFGrp, self.cvRFFLoc, position=True, rotation=True)
-
+                
                 # edit ball controller shape
                 if s == 0: #left
                     tempBallCluster = cmds.cluster((cmds.listRelatives(self.RFFCtrl, children=True, type="shape")[0])+".cv[3:5]")[1]
@@ -247,12 +247,14 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 # creating ikHandles:
                 ikHandleAnkleList = cmds.ikHandle(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_IKH", startJoint=self.footJnt, endEffector=self.middleFootJxt, solver='ikRPsolver')
+                # match transformations again to avoid ikHandle rotate plane solver issue:
+                cmds.matchTransform(self.middleFootJxt, self.cvRFFLoc, position=True, rotation=True)
                 ikHandleMiddleList = cmds.ikHandle(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_IKH", startJoint=self.middleFootJxt, endEffector=self.endJnt, solver='ikRPsolver')
                 cmds.rename(ikHandleAnkleList[1], ikHandleAnkleList[0]+"_Eff")
                 cmds.rename(ikHandleMiddleList[1], ikHandleMiddleList[0]+"_Eff")
                 cmds.setAttr(ikHandleAnkleList[0]+'.visibility', 0)
                 cmds.setAttr(ikHandleMiddleList[0]+'.visibility', 0)
-
+                
                 # creating Fk controls:
                 self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Foot")
                 self.footCtrlList.append(self.footCtrl)
@@ -306,7 +308,7 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateZ", force=True)
                         else:
                             cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateY", force=True)
-
+                
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 self.utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
                 self.utils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
