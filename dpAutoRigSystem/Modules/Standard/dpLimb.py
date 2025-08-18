@@ -39,6 +39,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.ikPoleVectorCtrlZeroList = []
         self.ikHandleToRFGrpList = []
         self.ikHandleConstList = []
+        self.ikHandleGrpConstList = []
         self.ikFkBlendGrpToRevFootList = []
         self.worldRefList = []
         self.worldRefShapeList = []
@@ -1099,6 +1100,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ikHandleToRFGrpList.append(ikHandleGrp)
                 cmds.setAttr(self.ikHandleToRFGrp+'.visibility', 0)
                 cmds.parent(self.ikHandleToRFGrp, ikHandleGrp)
+                self.ikHandleGrpConstList.append(cmds.parentConstraint(self.ikExtremCtrl, ikHandleGrp, maintainOffset=True, name=ikHandleGrp+"_PaC"))
                 # for ikHandle not stretch group:
                 ikHandleNotStretchGrp = cmds.group(empty=True, name=side+self.userGuideName+"_NotStretch_IKH_Grp")
                 cmds.setAttr(ikHandleNotStretchGrp+'.visibility', 0)
@@ -2118,7 +2120,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 "ikCtrlZeroList": self.ikExtremCtrlZeroList,
                 "ikPoleVectorZeroList": self.ikPoleVectorCtrlZeroList,
                 "ikHandleGrpList": self.ikHandleToRFGrpList,
-                "ikHandleConstList": self.ikHandleConstList,
+                "ikHandleConstList": self.ikHandleConstList, 
+                "ikHandleGrpConstList": self.ikHandleGrpConstList, 
                 "ikFkBlendGrpToRevFootList": self.ikFkBlendGrpToRevFootList,
                 "worldRefList": self.worldRefList,
                 "worldRefShapeList": self.worldRefShapeList,
