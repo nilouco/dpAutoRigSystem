@@ -1332,6 +1332,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # hack to parent constraint offset recalculation (Update button on Attribute Editor):
                     cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, edit=True, maintainOffset=True)
                     cmds.setAttr(self.quadExtraCtrl+".autoOrient", 1)
+                    # another hack to avoid uniformScale flip issue
+                    cmds.scaleConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=True, name=quadExtraCtrlZero+"_ScC")
 
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
