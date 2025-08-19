@@ -16,7 +16,7 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
-DP_LIMB_VERSION = 3.7
+DP_LIMB_VERSION = 3.8
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -39,6 +39,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.ikPoleVectorCtrlZeroList = []
         self.ikHandleToRFGrpList = []
         self.ikHandleConstList = []
+        self.ikHandleGrpConstList = []
         self.ikFkBlendGrpToRevFootList = []
         self.worldRefList = []
         self.worldRefShapeList = []
@@ -57,7 +58,6 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.correctiveCtrlGrpList = []
         self.ankleArticList = []
         self.ankleCorrectiveList = []
-        self.jaxRotZMDList = []
 
 
     def createModuleLayout(self, *args):
@@ -1100,6 +1100,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ikHandleToRFGrpList.append(ikHandleGrp)
                 cmds.setAttr(self.ikHandleToRFGrp+'.visibility', 0)
                 cmds.parent(self.ikHandleToRFGrp, ikHandleGrp)
+                self.ikHandleGrpConstList.append(cmds.parentConstraint(self.ikExtremCtrl, ikHandleGrp, maintainOffset=True, name=ikHandleGrp+"_PaC"))
                 # for ikHandle not stretch group:
                 ikHandleNotStretchGrp = cmds.group(empty=True, name=side+self.userGuideName+"_NotStretch_IKH_Grp")
                 cmds.setAttr(ikHandleNotStretchGrp+'.visibility', 0)
@@ -1331,6 +1332,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # hack to parent constraint offset recalculation (Update button on Attribute Editor):
                     cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, edit=True, maintainOffset=True)
                     cmds.setAttr(self.quadExtraCtrl+".autoOrient", 1)
+                    # another hack to avoid uniformScale flip issue
+                    cmds.scaleConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=True, name=quadExtraCtrlZero+"_ScC")
 
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
@@ -1978,7 +1981,6 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         # expose ankle data to be replaced by foot connections when integrating modules
                         self.ankleArticList.append([extremJax, extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(extremCorrectiveNetList)
-                        self.jaxRotZMDList.append(jaxRotZMD)
 
                     else:
                         beforeJntList = self.utils.articulationJoint(beforeJxt, self.skinJointList[0])
@@ -1999,7 +2001,6 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.ankleArticList.append([cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0], extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(None)
                         cmds.setAttr(beforeJntList[0]+"_OrC.interpType", 1) #average
-                        self.jaxRotZMDList.append(None)
                     if s == 1:
                         for jar in [beforeJntList[0], mainJntList[0], extremJntList[0]]:
                             cmds.setAttr(jar+".rotateX", 180)
@@ -2121,7 +2122,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 "ikCtrlZeroList": self.ikExtremCtrlZeroList,
                 "ikPoleVectorZeroList": self.ikPoleVectorCtrlZeroList,
                 "ikHandleGrpList": self.ikHandleToRFGrpList,
-                "ikHandleConstList": self.ikHandleConstList,
+                "ikHandleConstList": self.ikHandleConstList, 
+                "ikHandleGrpConstList": self.ikHandleGrpConstList, 
                 "ikFkBlendGrpToRevFootList": self.ikFkBlendGrpToRevFootList,
                 "worldRefList": self.worldRefList,
                 "worldRefShapeList": self.worldRefShapeList,
@@ -2141,7 +2143,6 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 "addArticJoint": self.addArticJoint,
                 "addCorrective": self.addCorrective, 
                 "ankleArticList": self.ankleArticList,
-                "ankleCorrectiveList": self.ankleCorrectiveList,
-                "jaxRotZMDList": self.jaxRotZMDList
+                "ankleCorrectiveList": self.ankleCorrectiveList
             }
         }
