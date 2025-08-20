@@ -18,8 +18,10 @@ CAM_ROTX = -10
 CAM_ROTY = 30
 CAM_ROTZ = 0
 CTRL_LAYER = "Ctrl_Lyr"
+PREVIEW_WIDTH = 800
+PREVIEW_HEIGHT = 720
 
-DP_PACKAGER_VERSION = 1.9
+DP_PACKAGER_VERSION = 2.0
 
 
 class Packager(object):
@@ -82,11 +84,14 @@ class Packager(object):
                 return valuesList
 
     
-    def imager(self, pipeData, dpARVersion, date, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
+    def imager(self, pipeData, dpARVersion, date, rigPreview=RIGPREVIEW, cam=CAMERA, wRes=PREVIEW_WIDTH, hRes=PREVIEW_HEIGHT, *args):
         """ Save a rigging preview screenShot file with the given informations.
             Thanks Caio Hidaka for the help in this code!
             Returns the image preview path.
         """
+        # focus camera to frame the rig
+        self.frameCameraToPublish(cam)
+
         mayaVersion = cmds.about(installedVersion=True)
         # store current user settings
         currentGrid = cmds.grid(toggle=True, query=True)
@@ -96,6 +101,7 @@ class Packager(object):
         currentBGColorList = self.getDisplayRGBColorList('background')
         currentBGTopColorList = self.getDisplayRGBColorList('backgroundTop')
         currentBGBottomColorList = self.getDisplayRGBColorList('backgroundBottom')
+        currentRememberWindow = cmds.windowPref(query=True, enableAll=True)
         
         # save hudList to hide:
         h = 0
@@ -165,8 +171,9 @@ class Packager(object):
             b += 1
             
         # create a new persp viewport window to get the image from it
+        cmds.windowPref(enableAll=False) #to avoid open window with the wrong size
         self.utils.closeUI("dpImagerWindow")
-        dpImagerWindow = cmds.window('dpImagerWindow', width=720, height=720, menuBarVisible=False, titleBar=True, visible=True)
+        dpImagerWindow = cmds.window('dpImagerWindow', width=wRes, height=hRes, menuBarVisible=False, titleBar=True, visible=True, sizeable=False)
         cmds.paneLayout(parent=dpImagerWindow)
         dpImagerPanel = cmds.modelPanel(menuBarVisible=False, label='dpImagerPanel')
         cmds.modelEditor(dpImagerPanel, edit=True, displayAppearance='smoothShaded', allObjects=True)
@@ -177,9 +184,6 @@ class Packager(object):
         cmds.modelEditor(editor, edit=True, activeView=True)
         #cmds.refresh(force=True)
 
-        # focus camera to frame the rig
-        self.frameCameraToPublish(cam)
-        
         # take the screenShot
         width = 0
         height = 0
@@ -202,6 +206,7 @@ class Packager(object):
         cmds.displayRGBColor('background', currentBGColorList[0], currentBGColorList[1], currentBGColorList[2])
         cmds.displayRGBColor('backgroundTop', currentBGTopColorList[0], currentBGTopColorList[1], currentBGTopColorList[2])
         cmds.displayRGBColor('backgroundBottom', currentBGBottomColorList[0], currentBGBottomColorList[1], currentBGBottomColorList[2])
+        cmds.windowPref(enableAll=currentRememberWindow)
         # Unhide hudList
         for i in range(len(hudList)):
             cmds.headsUpDisplay(hudList[i], edit=True, visible=currentHUDVisList[i])
