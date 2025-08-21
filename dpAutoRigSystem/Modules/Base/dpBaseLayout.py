@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_BASELAYOUT_VERSION = 2.7
+DP_BASELAYOUT_VERSION = 2.8
 
 
 class BaseLayout(object):
@@ -441,6 +441,7 @@ class BaseLayout(object):
                     fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
                     if cmds.objExists(self.moduleGrp+".flip"):
                         cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
+                self.createPreviewMirror()
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
     
@@ -567,6 +568,10 @@ class BaseLayout(object):
                         # set values to guide base:
                         cmds.setAttr(guideChild+".mirrorAxis", self.mirrorAxis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
+                        for moduleInstance in self.dpUIinst.moduleInstancesList:
+                            if cmds.objExists(moduleInstance.moduleGrp):
+                                if cmds.getAttr(moduleInstance.moduleGrp+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
+                                    moduleInstance.createPreviewMirror()
                 
                 # duplicating the moduleGuide
                 duplicated = cmds.duplicate(self.moduleGrp, returnRootsOnly=True)[0]

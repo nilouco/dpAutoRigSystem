@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.3
+DP_QUADRUPED_VERSION = 2.4
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -199,6 +199,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(backFootInstance.cvRFFLoc+".translateZ", 1)
             # parent back foot guide to back leg ankle guide:
             cmds.parent(backFootInstance.moduleGrp, backLegLimbInstance.cvExtremLoc, absolute=True)
+            backFootInstance.checkFatherMirror()
             cmds.refresh()
             
             # working with FRONT LEG (A) system:
@@ -255,6 +256,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(frontFootInstance.cvRFFLoc+".translateZ", 1)
             # parent front foot guide to front leg ankle guide:
             cmds.parent(frontFootInstance.moduleGrp, frontLegLimbInstance.cvExtremLoc, absolute=True)
+            frontFootInstance.checkFatherMirror()
             cmds.refresh()
             
             # woking with TAIL system:
@@ -398,6 +400,8 @@ def Quadruped(dpUIinst):
                 # setting X mirror:
                 earBaseInstance.changeMirror("X")
                 cmds.setAttr(earBaseInstance.moduleGrp+".flip", 1)
+                earUpperInstance.checkFatherMirror()
+                earLowerInstance.checkFatherMirror()
                 cmds.refresh()
                 
                 # woking with Teeth system:
@@ -549,6 +553,7 @@ def Quadruped(dpUIinst):
                 toe1FrontInstance.displayAnnotation(0)
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
+                toe1FrontInstance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName+frontName)
@@ -569,8 +574,9 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe2FrontInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2FrontInstance.moduleGrp+".flip", 1)
                 toe2FrontInstance.displayAnnotation(0)
-                # parent toe1 guide to foot middle guide:
+                # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
+                toe2FrontInstance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName+frontName)
@@ -591,8 +597,9 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe3FrontInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3FrontInstance.moduleGrp+".flip", 1)
                 toe3FrontInstance.displayAnnotation(0)
-                # parent toe1 guide to foot middle guide:
+                # parent toe31 guide to foot middle guide:
                 cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
+                toe3FrontInstance.checkFatherMirror()
                 cmds.refresh()
 
                 dpUIinst.utils.setProgress(doingName+toeName+frontName)
@@ -615,6 +622,7 @@ def Quadruped(dpUIinst):
                 toe4FrontInstance.displayAnnotation(0)
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
+                toe4FrontInstance.checkFatherMirror()
                 cmds.refresh()
 
                 dpUIinst.utils.setProgress(doingName+toeName+backName)
@@ -637,6 +645,7 @@ def Quadruped(dpUIinst):
                 toe1BackInstance.displayAnnotation(0)
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
+                toe1BackInstance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName+backName)
@@ -659,6 +668,7 @@ def Quadruped(dpUIinst):
                 toe2BackInstance.displayAnnotation(0)
                 # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
+                toe2BackInstance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName+backName)
@@ -681,6 +691,7 @@ def Quadruped(dpUIinst):
                 toe3BackInstance.displayAnnotation(0)
                 # parent toe3 guide to foot middle guide:
                 cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
+                toe3BackInstance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName+backName)
@@ -703,6 +714,7 @@ def Quadruped(dpUIinst):
                 toe4BackInstance.displayAnnotation(0)
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
+                toe4BackInstance.checkFatherMirror()
                 cmds.refresh()
 
                 dpUIinst.utils.setProgress(doingName+breathName)
