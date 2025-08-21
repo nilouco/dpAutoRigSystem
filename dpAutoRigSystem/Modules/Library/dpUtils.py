@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.7
+DP_UTILS_VERSION = 3.8
 
 
 class Utils(object):
@@ -548,7 +548,10 @@ class Utils(object):
                                     cmds.parent(child, fatherList[0])
                                 else:
                                     cmds.parent(child, world=True)
-            cmds.delete(nodeGrpName)
+                else:
+                    cmds.delete(nodeGrpName)
+            else:
+                cmds.delete(nodeGrpName)
 
 
     def getGuideChildrenList(self, nodeName):
@@ -574,8 +577,8 @@ class Utils(object):
             nextLoop = True
             while nextLoop:
                 if cmds.objExists(parentList[0]+".guideBase") and cmds.getAttr(parentList[0]+".guideBase") == 1 and cmds.getAttr(parentList[0]+".mirrorEnable") == 1 and cmds.getAttr(parentList[0]+".mirrorAxis") != "off":
-                    return parentList[0]
                     nextLoop = False
+                    return parentList[0]
                 else:
                     parentList = cmds.listRelatives(parentList[0], parent=True, type='transform')
                     if parentList:
