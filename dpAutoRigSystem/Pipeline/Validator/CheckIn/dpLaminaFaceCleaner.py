@@ -10,7 +10,7 @@ TITLE = "v124_laminaFaceCleaner"
 DESCRIPTION = "v125_laminaFaceCleanerDesc"
 ICON = "/Icons/dp_laminaFaceCleaner.png"
 
-DP_LAMINAFACECLEANER_VERSION = 1.1
+DP_LAMINAFACECLEANER_VERSION = 1.2
 
 
 class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
@@ -111,11 +111,11 @@ class LaminaFaceCleaner(dpBaseAction.ActionStartClass):
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaFaceList))
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaList))
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaFaceList))
                     if self.firstMode:
-                        self.messageList.append("Lamina faces: "+str(laminaList))
-                        self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaList)+")\n---")
-                        cmds.select(laminaList)
+                        self.messageList.append("Lamina faces: "+str(laminaFaceList))
+                        self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaFaceList)+")\n---")
+                        cmds.select(laminaFaceList)
             else:
                 self.notFoundNodes()
         else:
