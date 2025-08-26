@@ -77,18 +77,19 @@ class OneSkeleton(object):
                             uniqueInfList = []
                             print("skinCluster List =", skinClusterList)
                             for skinClusterNode in skinClusterList:
-                                uniqueInfList.extend(cmds.skinCluster(skinClusterNode, query=True, influence=True))
+                                infList = cmds.skinCluster(skinClusterNode, query=True, influence=True)
+                                if infList:
+                                    for item in infList:
+                                        if not item in uniqueInfList:
+                                            uniqueInfList.append(item)
                             if uniqueInfList:
                                 print("uniqueInfList =", uniqueInfList)
-                                infList = list(set(uniqueInfList))
-                                print("infList =", infList)
-                                if infList:
-                                    newJointList = self.transferJoint(infList)
-                                    if newJointList:
-                                        newJointList.sort()
-                                        print("newJointList =", newJointList)
-                                        cmds.parent(newJointList, root)
-                                        cmds.select(root)
+                                newJointList = self.transferJoint(uniqueInfList)
+                                if newJointList:
+                                    newJointList.sort()
+                                    print("newJointList =", newJointList)
+                                    cmds.parent(newJointList, root)
+                                    cmds.select(root)
 
                         else:
                             print("there's no skinCluster nodes")
@@ -126,6 +127,11 @@ class OneSkeleton(object):
                 sourceNode, sourceAttr = src.split(".", 1)
                 destNode, destAttr = dest.split(".", 1)
                 if cmds.nodeType(destNode) in {"skinCluster", "dagPose"}:
+                    
+                    if not cmds.attributeQuery(sourceAttr, node=sourceNode, exists=True):
+                        print(f"Attribute {sourceAttr} does not exist on {sourceNode}")
+                        continue
+                    
                     if sourceAttr in cmds.listAttr(newJoint):
                         # Transfer connection to the new node
                         cmds.disconnectAttr(src, dest)
