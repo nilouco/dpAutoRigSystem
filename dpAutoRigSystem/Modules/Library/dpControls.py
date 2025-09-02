@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 2.9
+DP_CONTROLS_VERSION = 3.0
 
 
 class ControlClass(object):
@@ -1807,3 +1807,13 @@ class ControlClass(object):
         """
         self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
         self.mirrorShape()
+
+
+    def setScaleCompensate(self, value, ctrlList=None, *args):
+        """ Set the controllers scaleCompensate value.
+        """
+        if not ctrlList:
+            ctrlList = [c for c in self.getControlList() if "scaleCompensate" in cmds.listAttr(c)]
+        if ctrlList:
+            for ctrl in ctrlList:
+                cmds.setAttr(ctrl+".scaleCompensate", value)

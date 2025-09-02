@@ -90,6 +90,7 @@ class OneSkeleton(object):
                                     print("newJointList =", newJointList)
                                     cmds.parent(newJointList, root)
                                     cmds.select(root)
+                                self.ctrls.setScaleCompensate(False)
 
                         else:
                             print("there's no skinCluster nodes")
