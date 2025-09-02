@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-08-25",
+    "_updated"       : "2025-09-02",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -778,7 +778,7 @@
     "m252_assignJointDefinition" : "Assigned joints to HumanIk character definition.",
     "m253_assignCtrlDefinition"  : "Assigned controllers to HumanIk character definition.",
     "m254_oneSkeleton"           : "One Skeleton",
-    "m255_oneSkeletonDesc"       : "This tool will create a single skeleton of joints in one hierarchy.",
+    "m255_oneSkeletonDesc"       : "This tool will create a single skeleton of joints in one hierarchy.\nIt'll try to find skinned meshes in the Render_Grp.\nOtherwise, it'll get all skinned meshes in the scene to process.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

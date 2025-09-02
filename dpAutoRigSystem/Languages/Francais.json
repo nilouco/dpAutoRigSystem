@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-08-25",
+    "_updated"       : "2025-09-02",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -778,7 +778,7 @@
     "m252_assignJointDefinition" : "Joints attribuées à la définition du HumanIk character.",
     "m253_assignCtrlDefinition"  : "Contrôleurs assignés à la définition du HumanIk character.",
     "m254_oneSkeleton"           : "Un Squelette",
-    "m255_oneSkeletonDesc"       : "Cet outil créera un squelette unique de joints dans une hiérarchie.",
+    "m255_oneSkeletonDesc"       : "Cet outil créera un squelette unique de joints dans une hiérarchie.\nIl essaiera de trouver des meshes skinnés dans le Render_Grp.\nSinon, il obtiendra tous les meshes skinnés de la scène à traiter.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

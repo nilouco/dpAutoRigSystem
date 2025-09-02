@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-08-25",
+    "_updated"       : "2025-09-02",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -778,7 +778,7 @@
     "m252_assignJointDefinition" : "Associado joints à definição de character do HumanIk.",
     "m253_assignCtrlDefinition"  : "Associado controles à definição de character do HumanIk.",
     "m254_oneSkeleton"           : "Um Esqueleto",
-    "m255_oneSkeletonDesc"       : "Essa ferramenta vai criar uma única hierarquia de esqueleto de joints.",
+    "m255_oneSkeletonDesc"       : "Essa ferramenta vai criar uma única hierarquia de esqueleto de joints.\nEla tentará encontrar as meshes dentro do Render_Grp.\nSenão, ela vai encontrar todas as meshes da cena, para processar.",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

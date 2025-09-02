@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from itertools import zip_longest
 
 # global variables to this module:    
@@ -24,7 +25,6 @@ class OneSkeleton(object):
         # call main UI function
         if self.ui:
             name = self.oneSkeletonPromptDialog()
-            print("name =", name)
             if name:
                 self.createOneSkeleton(name)
 
@@ -53,58 +53,19 @@ class OneSkeleton(object):
         """
         if not root:
             root = self.rootName
-        if root:
-            
-            # WIP
-
-            print("name = ", root)
+        uniqueInfList = self.getInfList(self.getMeshList())
+        if uniqueInfList:
             if not cmds.objExists(root):
-                cmds.select(clear=True)
-                cmds.joint(name=root, scaleCompensate=False)
-                cmds.setAttr(root+".visibility", 0)
-                self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)
-            if self.utils.getAllGrp():
-                renderGrp = self.utils.getNodeByMessage("renderGrp")
-                if renderGrp:
-                    print("renderGrp =", renderGrp)
-
-                    meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
-                    if meshList:
-                        print("meshList =", meshList)
-                    
-                        skinClusterList = []
-                        for transformNode in list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True))):
-                            skinClusterList.extend(self.dpUIinst.skin.checkExistingDeformerNode(transformNode)[2])
-                        
-                        if skinClusterList:
-                            uniqueInfList = []
-                            print("skinCluster List =", skinClusterList)
-                            for skinClusterNode in skinClusterList:
-                                infList = cmds.skinCluster(skinClusterNode, query=True, influence=True)
-                                if infList:
-                                    for item in infList:
-                                        if not item in uniqueInfList:
-                                            uniqueInfList.append(item)
-                            if uniqueInfList:
-                                print("uniqueInfList =", uniqueInfList)
-                                newJointList = self.transferJoint(uniqueInfList)
-                                if newJointList:
-                                    newJointList.sort()
-                                    print("newJointList =", newJointList)
-                                    cmds.parent(newJointList, root)
-                                    cmds.select(root)
-                                self.ctrls.setControllerScaleCompensate(False)
-
-                        else:
-                            print("there's no skinCluster nodes")
-                    else:
-                        print("not found meshList")
-                else:
-                    print("there's no Render_Grp")
-            else:
-                print("there's no All_Grp")
+                self.createRootJoint(root)
+            newJointList = self.transferJoint(uniqueInfList)
+            if newJointList:
+                newJointList.sort()
+                cmds.parent(newJointList, root)
+                cmds.select(root)
+            self.ctrls.setControllerScaleCompensate(False)
+            self.utils.setProgress(endIt=True)
         else:
-            print("cant continue without a name")
+            mel.eval('warning \"'+self.dpUIinst.lang["v014_notFoundNodes"]+'\";')
 
 
     def grouper(self, iterable, n, fillvalue=None, *args):
@@ -121,7 +82,9 @@ class OneSkeleton(object):
             Returns the new created joint list.
         """
         newJointList = []
+        self.utils.setProgress(self.dpUIinst.lang['m254_oneSkeleton'], self.dpUIinst.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
         for sourceNode in sourceList:
+            self.utils.setProgress("Joint")
             cmds.select(clear=True)
             newJoint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             newJointList.append(newJoint)
@@ -131,11 +94,10 @@ class OneSkeleton(object):
                 sourceNode, sourceAttr = src.split(".", 1)
                 destNode, destAttr = dest.split(".", 1)
                 if cmds.nodeType(destNode) in {"skinCluster", "dagPose"}:
-                    
+                    # pass if the attribute doesn't exists in the source node
                     if not cmds.attributeQuery(sourceAttr, node=sourceNode, exists=True):
                         print(f"Attribute {sourceAttr} does not exist on {sourceNode}")
                         continue
-                    
                     if sourceAttr in cmds.listAttr(newJoint):
                         # Transfer connection to the new node
                         cmds.disconnectAttr(src, dest)
@@ -149,12 +111,51 @@ class OneSkeleton(object):
             scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC")[0]
             # Ensure the new joint doesn't have segmentScaleCompensate enabled
             # But do allow the scale constraint to compensate
+            cmds.refresh()
+            cmds.setAttr(f"{newJoint}.segmentScaleCompensate", False)
             try:
                 cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
             except:
                 pass
-            cmds.setAttr(f"{newJoint}.segmentScaleCompensate", False)
             cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
             # dpIDs
             self.dpUIinst.customAttr.addAttr(0, [newJoint, pac, scc]) #dpID
         return newJointList
+
+
+    def getMeshList(self, *args):
+        """ Returns the Render_Grp meshes or all meshes in the scene.
+        """
+        if self.utils.getAllGrp():
+            renderGrp = self.utils.getNodeByMessage("renderGrp")
+            if renderGrp:
+                meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
+                if meshList:
+                    return meshList
+        return cmds.ls(type="mesh")
+    
+    
+    def getInfList(self, meshList, *args):
+        """ Returns the influenceList of a given meshList.
+        """
+        uniqueInfList = []
+        skinClusterList = []
+        for transformNode in list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True))):
+            skinClusterList.extend(self.dpUIinst.skin.checkExistingDeformerNode(transformNode)[2] or [])
+        if skinClusterList:
+            for skinClusterNode in skinClusterList:
+                infList = cmds.skinCluster(skinClusterNode, query=True, influence=True)
+                if infList:
+                    for item in infList:
+                        if not item in uniqueInfList:
+                            uniqueInfList.append(item)
+        return uniqueInfList
+
+
+    def createRootJoint(self, root, *args):
+        """ Create a base joint as root.
+        """
+        cmds.select(clear=True)
+        cmds.joint(name=root, scaleCompensate=False)
+        cmds.setAttr(root+".visibility", 0)
+        self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)
