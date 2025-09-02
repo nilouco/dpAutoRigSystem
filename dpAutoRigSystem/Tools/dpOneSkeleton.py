@@ -23,7 +23,10 @@ class OneSkeleton(object):
         self.ui = ui
         # call main UI function
         if self.ui:
-            self.createOneSkeleton(self.oneSkeletonPromptDialog())
+            name = self.oneSkeletonPromptDialog()
+            print("name =", name)
+            if name:
+                self.createOneSkeleton(name)
 
     
     def oneSkeletonPromptDialog(self, *args):
@@ -57,7 +60,7 @@ class OneSkeleton(object):
             print("name = ", root)
             if not cmds.objExists(root):
                 cmds.select(clear=True)
-                cmds.joint(name=root)
+                cmds.joint(name=root, scaleCompensate=False)
                 cmds.setAttr(root+".visibility", 0)
                 self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)
             if self.utils.getAllGrp():
@@ -90,7 +93,7 @@ class OneSkeleton(object):
                                     print("newJointList =", newJointList)
                                     cmds.parent(newJointList, root)
                                     cmds.select(root)
-                                self.ctrls.setScaleCompensate(False)
+                                self.ctrls.setControllerScaleCompensate(False)
 
                         else:
                             print("there's no skinCluster nodes")
@@ -120,7 +123,7 @@ class OneSkeleton(object):
         newJointList = []
         for sourceNode in sourceList:
             cmds.select(clear=True)
-            newJoint = cmds.createNode("joint", name=self.prefix+sourceNode+self.suffix)
+            newJoint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             newJointList.append(newJoint)
             # Transfer skinCluster + bindPose connection from the original
             connectionList = cmds.listConnections(sourceNode, destination=True, source=False, connections=True, plugs=True) or []
@@ -146,6 +149,10 @@ class OneSkeleton(object):
             scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC")[0]
             # Ensure the new joint doesn't have segmentScaleCompensate enabled
             # But do allow the scale constraint to compensate
+            try:
+                cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
+            except:
+                pass
             cmds.setAttr(f"{newJoint}.segmentScaleCompensate", False)
             cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
             # dpIDs

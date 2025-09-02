@@ -1809,7 +1809,7 @@ class ControlClass(object):
         self.mirrorShape()
 
 
-    def setScaleCompensate(self, value, ctrlList=None, *args):
+    def setControllerScaleCompensate(self, value, ctrlList=None, *args):
         """ Set the controllers scaleCompensate value.
         """
         if not ctrlList:
