@@ -18,10 +18,10 @@ CAM_ROTX = -10
 CAM_ROTY = 30
 CAM_ROTZ = 0
 CTRL_LAYER = "Ctrl_Lyr"
-PREVIEW_WIDTH = 800
+PREVIEW_WIDTH = 1024
 PREVIEW_HEIGHT = 720
 
-DP_PACKAGER_VERSION = 2.0
+DP_PACKAGER_VERSION = 2.1
 
 
 class Packager(object):
@@ -50,20 +50,19 @@ class Packager(object):
     def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, rotZ=CAM_ROTZ, focusIt=None, *args):
         """ Prepare the given camera to frame correctly the viewport to publish.
         """
-        mel.eval('setNamedPanelLayout "Single Perspective View"; updateToolbox(); findNewCurrentModelView;')
         # set up rotation
         cmds.setAttr(cam+".rotateX", rotX)
         cmds.setAttr(cam+".rotateY", rotY)
         cmds.setAttr(cam+".rotateZ", rotZ)
         # frame all
-        cmds.viewFit(allObjects=True)
+        cmds.viewFit(allObjects=True, fitFactor=0.75)
         posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
         if not focusIt:
             focusIt = self.utils.getNodeByMessage("renderGrp")
         if focusIt:
             # frame render group
             cmds.select(focusIt)
-            cmds.viewFit()
+            cmds.viewFit(fitFactor=0.75)
             focusPosList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
             # get average
             posList = [(posList[0]+focusPosList[0])/2, (posList[1]+focusPosList[1])/2, (posList[2]+focusPosList[2])/2]
@@ -89,8 +88,7 @@ class Packager(object):
             Thanks Caio Hidaka for the help in this code!
             Returns the image preview path.
         """
-        # focus camera to frame the rig
-        self.frameCameraToPublish(cam)
+        mel.eval('setNamedPanelLayout "Single Perspective View"; updateToolbox();')
 
         mayaVersion = cmds.about(installedVersion=True)
         # store current user settings
@@ -180,20 +178,21 @@ class Packager(object):
         barLayout = cmds.modelPanel(dpImagerPanel, query=True, barLayout=True)
         cmds.frameLayout(barLayout, edit=True, collapse=True)
         cmds.showWindow(dpImagerWindow)
-        editor = cmds.modelPanel(dpImagerPanel, query=True, modelEditor=True)
-        cmds.modelEditor(editor, edit=True, activeView=True)
-        #cmds.refresh(force=True)
+        self.editor = cmds.modelPanel(dpImagerPanel, query=True, modelEditor=True)
+        cmds.modelEditor(self.editor, edit=True, activeView=True)
+        cmds.setFocus(self.editor)
+
+        # focus camera to frame the rig
+        self.frameCameraToPublish(cam)
 
         # take the screenShot
-        width = 0
-        height = 0
         currentFrame = int(cmds.currentTime(query=True))
         destinationFolder = pipeData['toClientPath']
         if not destinationFolder.endswith("/"):
             destinationFolder += "/"
         exportPath = "{}{}_{}.jpg".format(destinationFolder, pipeData['assetName'], rigPreview.replace(" ", ""))
         # playblast to make an image
-        cmds.playblast(frame=currentFrame, viewer=False, format="image", compression="jpg", showOrnaments=True, completeFilename=exportPath, widthHeight=[width, height], percent=100, forceOverwrite=False, quality=100, editorPanelName=dpImagerPanel)
+        cmds.playblast(frame=currentFrame, viewer=False, format="image", compression="jpg", showOrnaments=True, completeFilename=exportPath, widthHeight=[wRes, hRes], percent=100, forceOverwrite=False, quality=100, editorPanelName=dpImagerPanel)
         # clean up the UI
         cmds.deleteUI(dpImagerPanel, panel=True)
         self.utils.closeUI("dpImagerWindow")
