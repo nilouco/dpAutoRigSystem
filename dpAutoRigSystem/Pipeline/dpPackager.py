@@ -55,14 +55,14 @@ class Packager(object):
         cmds.setAttr(cam+".rotateY", rotY)
         cmds.setAttr(cam+".rotateZ", rotZ)
         # frame all
-        cmds.viewFit(allObjects=True, fitFactor=0.75)
+        cmds.viewFit(allObjects=True)
         posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
         if not focusIt:
             focusIt = self.utils.getNodeByMessage("renderGrp")
         if focusIt:
             # frame render group
             cmds.select(focusIt)
-            cmds.viewFit(fitFactor=0.75)
+            cmds.viewFit()
             focusPosList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
             # get average
             posList = [(posList[0]+focusPosList[0])/2, (posList[1]+focusPosList[1])/2, (posList[2]+focusPosList[2])/2]

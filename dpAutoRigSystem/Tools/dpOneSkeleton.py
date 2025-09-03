@@ -108,7 +108,22 @@ class OneSkeleton(object):
                 cmds.setAttr(f"{newJoint}.{attr}", value)
             # Constraint to the original
             pac = cmds.parentConstraint([sourceNode, newJoint], maintainOffset=False, name=newJoint+"_PaC")[0]
-            scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC")[0]
+            scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
+            # fixes for negative scale joints
+            parentList = cmds.listRelatives(sourceNode, parent=True)
+            if parentList:
+                if not "_Jar" in parentList[0]:
+                    for axis in ["X", "Y", "Z"]:
+                        if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
+                            for a in ["X", "Y", "Z"]:
+                                if not a == axis:
+                                    cmds.setAttr(scc+".offset"+a, -1)
+            # corrective joints
+            if "_Jcr" in newJoint:
+                for axis in ["X", "Y", "Z"]:
+                    if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
+                        cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
+                    cmds.setAttr(scc+".offset"+axis, 1)
             # Ensure the new joint doesn't have segmentScaleCompensate enabled
             # But do allow the scale constraint to compensate
             cmds.refresh()
