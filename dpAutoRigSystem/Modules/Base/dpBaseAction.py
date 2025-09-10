@@ -13,7 +13,7 @@ WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.65, 0.65)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
-DP_ACTIONSTARTCLASS_VERSION = 2.7
+DP_ACTIONSTARTCLASS_VERSION = 2.8
 
 
 class ActionStartClass(object):
@@ -291,7 +291,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
-        self.messageList.append(self.dpUIinst.lang['r063_maybeDoneIO'])
+        self.messageList.append(self.dpUIinst.lang['r063_maybeDoneIO']+": "+item)
 
 
     def getIOPath(self, ioDir, *args):
