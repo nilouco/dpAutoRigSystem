@@ -443,10 +443,6 @@ class ActionStartClass(object):
         """ Export given mesh list to alembic file.
             If curve argument is True, it'll also accept export nurbsCurve shapes.
         """
-        exportList = itemList.copy()
-        for item in itemList:
-            exportList.extend(cmds.listRelatives(item, allDescendents=True, children=True))
-        itemList = exportList
         try:
             if not path:
                 path = self.ioPath
