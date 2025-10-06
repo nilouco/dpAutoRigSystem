@@ -22,11 +22,11 @@ dpControlsHierarchy
 dpDisplayLayers
 dpResetPose
 dpJointEndCleaner
-dpBindPoseCleaner
 dpTweakNodeCleaner
 dpRemapValueToSetRange
 dpHideAllJoints
 dpPassthroughAttributes
 dpProxyCreator
 dpEmptyTransformCleaner
+dpBindPoseCleaner
 dpCleanup
