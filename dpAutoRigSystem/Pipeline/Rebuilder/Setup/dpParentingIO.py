@@ -8,7 +8,7 @@ TITLE = "r019_parentingIO"
 DESCRIPTION = "r020_parentingIODesc"
 ICON = "/Icons/dp_parentingIO.png"
 
-DP_PARENTINGIO_VERSION = 1.1
+DP_PARENTINGIO_VERSION = 1.2
 
 
 class ParentingIO(dpBaseAction.ActionStartClass):
@@ -56,6 +56,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                             # define data to export
                             parentDic = self.getParentingDataDic(transformList)
                             parentDic.update(self.getBrokenIDDataDic())
+                            parentDic.update(self.getModelDataDic())
                             self.exportDicToJsonFile(parentDic)
                         else:
                             self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
@@ -97,6 +98,16 @@ class ParentingIO(dpBaseAction.ActionStartClass):
         return {"Parent" : filteredList}
 
 
+    def getModelDataDic(self, *args):
+        """ Check if there's a model list to include in the dictionary data to avoid change parenting from them.
+        """
+        modelDataDic = {}
+        modelList = self.getModelToExportList()
+        if modelList:
+            modelDataDic["ModelList"] = modelList
+        return modelDataDic
+
+
     def importBrokenIDData(self, parentDic, *args):
         """ If there are broken nodes, we try to recreate them if needed.
             Return True if there are broken nodes.
@@ -108,11 +119,12 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     for item in parentDic["BrokenID"][nodeType].keys():
                         if not cmds.objExists(item):
-                            cmds.createNode(nodeType, name=item)
-                            if parentDic["BrokenID"][nodeType][item]:
-                                if cmds.objExists(parentDic["BrokenID"][nodeType][item]):
-                                    cmds.parent(item, parentDic["BrokenID"][nodeType][item])
-                            cmds.select(clear=True)
+                            if not self.checkIsFromModeling(parentDic, nodeType, item):
+                                cmds.createNode(nodeType, name=item)
+                                if parentDic["BrokenID"][nodeType][item]:
+                                    if cmds.objExists(parentDic["BrokenID"][nodeType][item]):
+                                        cmds.parent(item, parentDic["BrokenID"][nodeType][item])
+                                cmds.select(clear=True)
             return True
 
 
@@ -125,6 +137,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
             wellImportedList = []
             parentIssueList = []
             notFoundNodesList = []
+            modelChangedList = []
             # check parenting shaders
             for item in parentDic["Parent"]:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
@@ -133,32 +146,39 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                     shortItem = item[item.rfind("|")+1:]
                     if cmds.objExists(shortItem):
                         if len(cmds.ls(shortItem)) == 1:
-                            # get father name
-                            longFatherNode = item[:item.rfind("|")]
-                            shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
-                            currentFatherList = cmds.listRelatives(shortItem, parent=True)
-                            if cmds.objExists(longFatherNode):
-                                # simple parent to existing old father node in the ancient hierarchy
-                                cmds.parent(shortItem, longFatherNode)
-                                wellImportedList.append(shortItem)
-                            elif currentFatherList:
-                                if currentFatherList[0] == shortFatherNode:
-                                    # already child of the father node
+                            if not self.checkIsFromModeling(parentDic, "transform", item):
+                                # get father name
+                                longFatherNode = item[:item.rfind("|")]
+                                shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
+                                currentFatherList = cmds.listRelatives(shortItem, parent=True)
+                                if cmds.objExists(longFatherNode):
+                                    # simple parent to existing old father node in the ancient hierarchy
+                                    cmds.parent(shortItem, longFatherNode)
                                     wellImportedList.append(shortItem)
-                            elif cmds.objExists(shortFatherNode):
-                                if len(cmds.ls(shortFatherNode)) == 1:
-                                    # found unique father node in another hierarchy to parent
-                                    cmds.parent(shortItem, shortFatherNode)
-                                    wellImportedList.append(shortItem)
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
-                            #else: #root here
+                                elif currentFatherList:
+                                    if currentFatherList[0] == shortFatherNode:
+                                        # already child of the father node
+                                        wellImportedList.append(shortItem)
+                                elif cmds.objExists(shortFatherNode):
+                                    if len(cmds.ls(shortFatherNode)) == 1:
+                                        # found unique father node in another hierarchy to parent
+                                        cmds.parent(shortItem, shortFatherNode)
+                                        wellImportedList.append(shortItem)
+                                    else:
+                                        self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
+                            else: #root here
+                                modelChangedList.append(item)
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortItem)
                     else:
-                        notFoundNodesList.append(shortItem)
+                        if not self.checkIsFromModeling(parentDic, "transform", item):
+                            modelChangedList.append(item)
+                        else:
+                            notFoundNodesList.append(shortItem)
             if parentIssueList:
-                if wellImportedList:
+                if modelChangedList:
+                    self.maybeDoneIO(', '.join(modelChangedList))
+                elif wellImportedList:
                     self.wellDoneIO(self.latestDataFile)
                 else:
                     self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
@@ -166,3 +186,13 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                 self.wellDoneIO(self.latestDataFile)
         else:
             self.wellDoneIO(self.latestDataFile)
+
+
+    def checkIsFromModeling(self, parentDic, nodeType, item, *args):
+        """ Returns True if the item is from modeling.
+        """
+        if "ModelList" in parentDic.keys():
+            for modelNode in parentDic["ModelList"]:
+                if "BrokenID" in parentDic.keys() and nodeType in parentDic["BrokenID"].keys() and item in parentDic["BrokenID"][nodeType].keys():
+                    if modelNode in parentDic["BrokenID"][nodeType][item]:
+                        return True

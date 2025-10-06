@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.4
+DP_QUADRUPED_VERSION = 2.5
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -155,7 +155,8 @@ def Quadruped(dpUIinst):
             # change limb guide to back leg type:
             backLegLimbInstance.changeType(legName)
             # change limb guide to back leg style (quadruped):
-            backLegLimbInstance.changeStyle(quadrupedStyleName)
+            backLegLimbInstance.changeStyle(quadrupedStyleName) 
+            backLegLimbInstance.changeNumBend(3)
             # change name to back leg:
             backLegLimbInstance.editGuideModuleName(legName+backName)
             cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
@@ -210,6 +211,7 @@ def Quadruped(dpUIinst):
             frontLegLimbInstance.changeType(legName)
             # change limb guide to front leg style (biped):
             frontLegLimbInstance.changeStyle(quadrupedStyleName)
+            frontLegLimbInstance.changeNumBend(3)
             # change name to front leg:
             frontLegLimbInstance.editGuideModuleName(legName+frontName)
             cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
