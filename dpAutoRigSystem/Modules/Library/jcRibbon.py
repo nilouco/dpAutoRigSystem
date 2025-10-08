@@ -16,7 +16,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_RIBBONCLASS_VERSION = 2.8
+DP_RIBBONCLASS_VERSION = 2.09
 
 
 class RibbonClass(object):
@@ -83,7 +83,10 @@ class RibbonClass(object):
         self.elbowctrlZero0 = elbowctrlList[2]
         self.elbowctrlZero1 = elbowctrlList[3]
         
-        cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
+        atbValue = 0.25
+        if arm:
+            atbValue = 0.75
+        cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=atbValue, max=1, keyable=True)
         cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
         cmds.addAttr(upctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
         cmds.addAttr(upctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
