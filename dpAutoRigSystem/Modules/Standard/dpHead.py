@@ -16,7 +16,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.4
+DP_HEAD_VERSION = 3.04
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

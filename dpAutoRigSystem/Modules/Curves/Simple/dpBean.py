@@ -7,7 +7,7 @@ TITLE = "m127_bean"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_bean.png"
 
-DP_BEAN_VERSION = 1.3
+DP_BEAN_VERSION = 1.03
 
 
 class Bean(dpBaseCurve.BaseCurve):

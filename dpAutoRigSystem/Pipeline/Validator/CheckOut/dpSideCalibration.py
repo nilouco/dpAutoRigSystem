@@ -8,7 +8,7 @@ TITLE = "v044_sideCalibration"
 DESCRIPTION = "v045_sideCalibrationDesc"
 ICON = "/Icons/dp_sideCalibration.png"
 
-DP_SIDECALIBRATION_VERSION = 1.4
+DP_SIDECALIBRATION_VERSION = 1.04
 
 
 class SideCalibration(dpBaseAction.ActionStartClass):

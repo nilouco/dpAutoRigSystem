@@ -8,7 +8,7 @@ TITLE = "v048_unlockIniShadGrp"
 DESCRIPTION = "v049_unlockIniShadGrpDesc"
 ICON = "/Icons/dp_unlockInitialShadingGroup.png"
 
-DP_UNLOCKINITIALSHADINGGROUP_VERSION = 1.2
+DP_UNLOCKINITIALSHADINGGROUP_VERSION = 1.02
 
 
 class UnlockInitialShadingGroup(dpBaseAction.ActionStartClass):

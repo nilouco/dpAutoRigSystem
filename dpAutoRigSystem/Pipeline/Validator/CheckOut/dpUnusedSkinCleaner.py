@@ -8,7 +8,7 @@ TITLE = "v082_unusedSkinCleaner"
 DESCRIPTION = "v083_unusedSkinCleanerDesc"
 ICON = "/Icons/dp_unusedSkinCleaner.png"
 
-DP_UNUSEDSKINCLEANER_VERSION = 1.3
+DP_UNUSEDSKINCLEANER_VERSION = 1.03
 
 
 class UnusedSkinCleaner(dpBaseAction.ActionStartClass):

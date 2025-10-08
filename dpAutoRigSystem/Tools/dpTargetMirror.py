@@ -9,7 +9,7 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 ICON = "/Icons/dp_targetMirror.png"
 
-DP_TARGETMIRROR_VERSION = 2.6
+DP_TARGETMIRROR_VERSION = 2.06
 
 
 class TargetMirror(object):

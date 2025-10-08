@@ -7,7 +7,7 @@ TITLE = "m117_ballonFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ballonFlat.png"
 
-DP_BALLONFLAT_VERSION = 1.3
+DP_BALLONFLAT_VERSION = 1.03
 
 
 class BallonFlat(dpBaseCurve.BaseCurve):

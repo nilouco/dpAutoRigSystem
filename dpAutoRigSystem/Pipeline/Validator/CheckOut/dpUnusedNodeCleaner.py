@@ -9,7 +9,7 @@ TITLE = "v084_unusedNodeCleaner"
 DESCRIPTION = "v085_unusedNodeCleanerDesc"
 ICON = "/Icons/dp_unusedNodeCleaner.png"
 
-DP_UNUSEDNODECLEANER_VERSION = 1.2
+DP_UNUSEDNODECLEANER_VERSION = 1.02
 
 
 class UnusedNodeCleaner(dpBaseAction.ActionStartClass):

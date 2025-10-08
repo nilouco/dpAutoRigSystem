@@ -8,7 +8,7 @@ TITLE = "v038_namespaceCleaner"
 DESCRIPTION = "v039_namespaceCleanerDesc"
 ICON = "/Icons/dp_namespaceCleaner.png"
 
-DP_NAMESPACECLEANER_VERSION = 1.2
+DP_NAMESPACECLEANER_VERSION = 1.02
 
 
 class NamespaceCleaner(dpBaseAction.ActionStartClass):

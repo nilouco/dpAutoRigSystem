@@ -33,7 +33,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.8
+DP_RIVET_VERSION = 2.08
 
 
 class Rivet(object):

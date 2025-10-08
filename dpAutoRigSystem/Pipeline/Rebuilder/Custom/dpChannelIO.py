@@ -8,7 +8,7 @@ TITLE = "r064_channelIO"
 DESCRIPTION = "r065_channelIODesc"
 ICON = "/Icons/dp_channelIO.png"
 
-DP_CHANNELIO_VERSION = 1.0
+DP_CHANNELIO_VERSION = 1.00
 
 
 class ChannelIO(dpBaseAction.ActionStartClass):

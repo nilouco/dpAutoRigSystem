@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_BASELAYOUT_VERSION = 2.8
+DP_BASELAYOUT_VERSION = 2.08
 
 
 class BaseLayout(object):

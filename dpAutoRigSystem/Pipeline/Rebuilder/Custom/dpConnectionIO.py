@@ -8,7 +8,7 @@ TITLE = "r045_connectionIO"
 DESCRIPTION = "r046_connectionIODesc"
 ICON = "/Icons/dp_connectionIO.png"
 
-DP_CONNECTIONIO_VERSION = 1.0
+DP_CONNECTIONIO_VERSION = 1.00
 
 
 class ConnectionIO(dpBaseAction.ActionStartClass):

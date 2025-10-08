@@ -16,7 +16,7 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
-DP_LIMB_VERSION = 3.8
+DP_LIMB_VERSION = 3.08
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

@@ -7,7 +7,7 @@ TITLE = "m108_clipStraightFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipStraightFlat.png"
 
-DP_CLIPSTRAIGHTFLAT_VERSION = 1.3
+DP_CLIPSTRAIGHTFLAT_VERSION = 1.03
 
 
 class ClipStraightFlat(dpBaseCurve.BaseCurve):

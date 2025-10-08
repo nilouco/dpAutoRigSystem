@@ -8,7 +8,7 @@ TITLE = "v136_remapValueToSetRange"
 DESCRIPTION = "v137_remapValueToSetRangeDesc"
 ICON = "/Icons/dp_remapValueToSetRange.png"
 
-DP_REMAPVALUETOSETRANGE_VERSION = 1.0
+DP_REMAPVALUETOSETRANGE_VERSION = 1.00
 
 
 class RemapValueToSetRange(dpBaseAction.ActionStartClass):

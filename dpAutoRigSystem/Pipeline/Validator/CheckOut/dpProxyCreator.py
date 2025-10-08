@@ -11,7 +11,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.6
+DP_PROXYCREATOR_VERSION = 1.06
 
 
 class ProxyCreator(dpBaseAction.ActionStartClass):

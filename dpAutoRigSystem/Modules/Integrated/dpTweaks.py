@@ -8,7 +8,7 @@ TITLE = "m081_tweaks"
 DESCRIPTION = "m082_tweaksDesc"
 ICON = "/Icons/dp_tweaks.png"
 
-DP_TWEAKS_VERSION = 2.2
+DP_TWEAKS_VERSION = 2.02
 
 
 def getUserDetail(opt1, opt2, cancel, default, userMessage):

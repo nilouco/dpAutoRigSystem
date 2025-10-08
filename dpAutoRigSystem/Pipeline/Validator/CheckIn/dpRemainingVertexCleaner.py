@@ -9,7 +9,7 @@ TITLE = "v134_remainingVertexCleaner"
 DESCRIPTION = "v135_remainingVertexCleanerDesc"
 ICON = "/Icons/dp_remainingVertexCleaner.png"
 
-DP_REMAININGVERTEXCLEANER_VERSION = 1.0
+DP_REMAININGVERTEXCLEANER_VERSION = 1.00
 
 
 class RemainingVertexCleaner(dpBaseAction.ActionStartClass):

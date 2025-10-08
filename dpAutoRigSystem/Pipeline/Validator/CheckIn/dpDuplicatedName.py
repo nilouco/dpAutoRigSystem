@@ -8,7 +8,7 @@ TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 
-DP_DUPLICATEDNAME_VERSION = 1.3
+DP_DUPLICATEDNAME_VERSION = 1.03
 
 
 class DuplicatedName(dpBaseAction.ActionStartClass):

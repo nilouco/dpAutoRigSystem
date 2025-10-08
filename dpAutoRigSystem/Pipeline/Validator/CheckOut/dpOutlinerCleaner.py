@@ -8,7 +8,7 @@ TITLE = "v076_outlinerCleaner"
 DESCRIPTION = "v077_outlinerCleanerDesc"
 ICON = "/Icons/dp_outlinerCleaner.png"
 
-DP_OUTLINERCLEANER_VERSION = 1.3
+DP_OUTLINERCLEANER_VERSION = 1.03
 
 
 class OutlinerCleaner(dpBaseAction.ActionStartClass):

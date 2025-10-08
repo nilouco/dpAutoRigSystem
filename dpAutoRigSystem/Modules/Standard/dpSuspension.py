@@ -9,7 +9,7 @@ TITLE = "m153_suspension"
 DESCRIPTION = "m154_suspensionDesc"
 ICON = "/Icons/dp_suspension.png"
 
-DP_SUSPENSION_VERSION = 2.2
+DP_SUSPENSION_VERSION = 2.02
 
 
 class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

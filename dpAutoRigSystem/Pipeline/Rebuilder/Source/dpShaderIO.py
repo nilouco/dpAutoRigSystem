@@ -8,7 +8,7 @@ TITLE = "r008_shaderIO"
 DESCRIPTION = "r009_shaderIODesc"
 ICON = "/Icons/dp_shaderIO.png"
 
-DP_SHADERIO_VERSION = 1.2
+DP_SHADERIO_VERSION = 1.02
 
 
 class ShaderIO(dpBaseAction.ActionStartClass):

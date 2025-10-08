@@ -9,7 +9,7 @@ TITLE = "v052_vaccineCleaner"
 DESCRIPTION = "v053_vaccineCleanerDesc"
 ICON = "/Icons/dp_vaccineCleaner.png"
 
-DP_VACCINECLEANER_VERSION = 1.2
+DP_VACCINECLEANER_VERSION = 1.02
 
 
 class VaccineCleaner(dpBaseAction.ActionStartClass):

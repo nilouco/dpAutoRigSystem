@@ -9,7 +9,7 @@ TITLE = "m239_motionCapture"
 DESCRIPTION = "m240_motionCaptureDesc"
 ICON = "/Icons/dp_motionCapture.png"
 
-DP_MOTIONCAPTURE_VERSION = 1.0
+DP_MOTIONCAPTURE_VERSION = 1.00
 
 
 class MotionCapture(object):

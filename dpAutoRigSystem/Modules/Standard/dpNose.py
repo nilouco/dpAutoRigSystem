@@ -9,7 +9,7 @@ TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 ICON = "/Icons/dp_nose.png"
 
-DP_NOSE_VERSION = 2.3
+DP_NOSE_VERSION = 2.03
 
 
 class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

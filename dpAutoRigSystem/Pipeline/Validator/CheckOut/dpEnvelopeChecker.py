@@ -9,7 +9,7 @@ TITLE = "v094_envelopeChecker"
 DESCRIPTION = "v095_envelopeCheckerDesc"
 ICON = "/Icons/dp_envelopeChecker.png"
 
-DP_ENVELOPECHECKER_VERSION = 1.1
+DP_ENVELOPECHECKER_VERSION = 1.01
 
 
 class EnvelopeChecker(dpBaseAction.ActionStartClass):

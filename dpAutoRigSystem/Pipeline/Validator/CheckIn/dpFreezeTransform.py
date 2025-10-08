@@ -8,7 +8,7 @@ TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 ICON = '/Icons/dp_freezeTransform.png'
 
-DP_FREEZETRANSFORM_VERSION = 1.7
+DP_FREEZETRANSFORM_VERSION = 1.07
 
 
 class FreezeTransform(dpBaseAction.ActionStartClass):

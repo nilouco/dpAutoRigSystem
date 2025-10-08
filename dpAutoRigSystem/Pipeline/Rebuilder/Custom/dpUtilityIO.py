@@ -8,7 +8,7 @@ TITLE = "r054_utilityIO"
 DESCRIPTION = "r055_utilityIODesc"
 ICON = "/Icons/dp_utilityIO.png"
 
-DP_UTILITYIO_VERSION = 1.0
+DP_UTILITYIO_VERSION = 1.00
 
 
 class UtilityIO(dpBaseAction.ActionStartClass):

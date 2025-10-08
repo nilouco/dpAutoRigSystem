@@ -10,7 +10,7 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
-DP_CHAIN_VERSION = 2.5
+DP_CHAIN_VERSION = 2.05
 
 
 class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

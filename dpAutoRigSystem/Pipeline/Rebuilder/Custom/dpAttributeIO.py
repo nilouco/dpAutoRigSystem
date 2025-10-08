@@ -8,7 +8,7 @@ TITLE = "r043_attributeIO"
 DESCRIPTION = "r044_attributeIODesc"
 ICON = "/Icons/dp_attributeIO.png"
 
-DP_ATTRIBUTEIO_VERSION = 1.0
+DP_ATTRIBUTEIO_VERSION = 1.00
 
 
 class AttributeIO(dpBaseAction.ActionStartClass):

@@ -10,7 +10,7 @@ TITLE = "v124_laminaFaceCleaner"
 DESCRIPTION = "v125_laminaFaceCleanerDesc"
 ICON = "/Icons/dp_laminaFaceCleaner.png"
 
-DP_LAMINAFACECLEANER_VERSION = 1.2
+DP_LAMINAFACECLEANER_VERSION = 1.02
 
 
 class LaminaFaceCleaner(dpBaseAction.ActionStartClass):

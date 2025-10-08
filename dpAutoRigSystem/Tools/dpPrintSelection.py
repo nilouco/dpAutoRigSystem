@@ -8,7 +8,7 @@ TITLE = "m053_printSel"
 DESCRIPTION = "m054_printSelDesc"
 ICON = "/Icons/dp_printSelection.png"
 
-DP_PRINTSELECTION_VERSION = 2.0
+DP_PRINTSELECTION_VERSION = 2.00
 
 
 class PrintSelection(object):

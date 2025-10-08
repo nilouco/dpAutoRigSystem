@@ -8,7 +8,7 @@ TITLE = "v046_brokenNetCleaner"
 DESCRIPTION = "v047_brokenNetCleanerDesc"
 ICON = "/Icons/dp_brokenNetCleaner.png"
 
-DP_BROKENNETCLEANER_VERSION = 1.4
+DP_BROKENNETCLEANER_VERSION = 1.04
 
 
 class BrokenNetCleaner(dpBaseAction.ActionStartClass):

@@ -10,7 +10,7 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.2
+DP_HEADDEFORMER_VERSION = 4.02
 
 
 class HeadDeformer(object):

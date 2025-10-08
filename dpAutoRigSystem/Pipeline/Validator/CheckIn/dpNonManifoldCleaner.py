@@ -9,7 +9,7 @@ TITLE = "v101_nonManifoldCleaner"
 DESCRIPTION = "v102_nonManifoldCleanerDesc"
 ICON = "/Icons/dp_nonManifoldCleaner.png"
 
-DP_NONMANIFOLDCLEANER_VERSION = 1.0
+DP_NONMANIFOLDCLEANER_VERSION = 1.00
 
 
 class NonManifoldCleaner(dpBaseAction.ActionStartClass):

@@ -12,7 +12,7 @@ TITLE = "v107_passthroughAttributes"
 DESCRIPTION = "v108_passthroughAttributesDesc"
 ICON = "/Icons/dp_passthroughAttributes.png"
 
-DP_PASSTHROUGHATTRIBUTES_VERSION = 1.0
+DP_PASSTHROUGHATTRIBUTES_VERSION = 1.00
 
 
 class PassthroughAttributes(dpBaseAction.ActionStartClass):

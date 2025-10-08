@@ -8,7 +8,7 @@ TITLE = "v034_exitEditMode"
 DESCRIPTION = "v035_exitEditModeDesc"
 ICON = "/Icons/dp_exitEditMode.png"
 
-DP_EXITEDITMODE_VERSION = 1.3
+DP_EXITEDITMODE_VERSION = 1.03
 
 
 class ExitEditMode(dpBaseAction.ActionStartClass):

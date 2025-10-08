@@ -7,7 +7,7 @@ TITLE = "m100_square"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_square.png"
 
-DP_SQUARE_VERSION = 1.3
+DP_SQUARE_VERSION = 1.03
 
 
 class Square(dpBaseCurve.BaseCurve):

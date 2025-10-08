@@ -8,7 +8,7 @@ TITLE = "v109_scalableDeformerChecker"
 DESCRIPTION = "v110_scalableDeformerCheckerDesc"
 ICON = "/Icons/dp_scalableDeformerChecker.png"
 
-DP_SCALABLEDEFORMERCHECKER_VERSION = 1.0
+DP_SCALABLEDEFORMERCHECKER_VERSION = 1.00
 
 
 class ScalableDeformerChecker(dpBaseAction.ActionStartClass):

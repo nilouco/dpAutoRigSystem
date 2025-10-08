@@ -15,7 +15,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.1
+DP_FACIALCONNECTION_VERSION = 1.01
 
 
 class FacialConnection(object):

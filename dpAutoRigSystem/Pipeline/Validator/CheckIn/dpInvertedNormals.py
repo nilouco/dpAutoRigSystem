@@ -9,7 +9,7 @@ TITLE = "v086_invertedNormals"
 DESCRIPTION = "v087_invertedNormalsDesc"
 ICON = "/Icons/dp_invertedNormals.png"
 
-DP_INVERTEDNORMALS_VERSION = 1.1
+DP_INVERTEDNORMALS_VERSION = 1.01
 
 
 class InvertedNormals(dpBaseAction.ActionStartClass):

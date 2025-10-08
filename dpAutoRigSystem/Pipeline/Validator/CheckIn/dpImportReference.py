@@ -8,7 +8,7 @@ TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
 ICON = "/Icons/dp_importReference.png"
 
-DP_IMPORTREFERENCE_VERSION = 1.3
+DP_IMPORTREFERENCE_VERSION = 1.03
 
 
 class ImportReference(dpBaseAction.ActionStartClass):

@@ -7,7 +7,7 @@ TITLE = "m110_circle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_circle.png"
 
-DP_CIRCLE_VERSION = 1.3
+DP_CIRCLE_VERSION = 1.03
 
 
 class Circle(dpBaseCurve.BaseCurve):

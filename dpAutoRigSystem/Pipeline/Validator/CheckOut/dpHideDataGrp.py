@@ -8,7 +8,7 @@ TITLE = "v028_hideDataGrp"
 DESCRIPTION = "v029_hideDataGrpDesc"
 ICON = "/Icons/dp_hideDataGrp.png"
 
-DP_HIDEDATAGRP_VERSION = 1.2
+DP_HIDEDATAGRP_VERSION = 1.02
 
 
 class HideDataGrp(dpBaseAction.ActionStartClass):

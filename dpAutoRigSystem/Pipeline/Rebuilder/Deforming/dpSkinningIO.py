@@ -9,7 +9,7 @@ TITLE = "r016_skinningIO"
 DESCRIPTION = "r017_skinningIODesc"
 ICON = "/Icons/dp_skinningIO.png"
 
-DP_SKINNINGIO_VERSION = 1.0
+DP_SKINNINGIO_VERSION = 1.00
 
 
 class SkinningIO(dpBaseAction.ActionStartClass):

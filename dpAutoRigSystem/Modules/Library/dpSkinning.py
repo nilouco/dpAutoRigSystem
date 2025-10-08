@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from . import dpWeights
 
-DP_SKINNING_VERSION = 1.8
+DP_SKINNING_VERSION = 1.08
 
 
 class Skinning(dpWeights.Weights):

@@ -14,7 +14,7 @@ from maya import cmds
 from maya.api import OpenMaya
 import math
 
-DP_IKFKSNAP_VERSION = 2.3
+DP_IKFKSNAP_VERSION = 2.03
 
 
 

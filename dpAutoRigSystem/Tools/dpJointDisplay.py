@@ -10,7 +10,7 @@ DESCRIPTION = "m234_jointDisplayDesc"
 ICON = "/Icons/dp_jointDisplay.png"
 
 
-DP_JOINTDISPLAY_VERSION = 1.0
+DP_JOINTDISPLAY_VERSION = 1.00
 
 
 class JointDisplay(object):

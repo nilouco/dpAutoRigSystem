@@ -8,7 +8,7 @@ TITLE = "v117_colorPerVertexCleaner"
 DESCRIPTION = "v118_colorPerVertexCleanerDesc"
 ICON = "/Icons/dp_colorPerVertexCleaner.png"
 
-DP_COLORPERVERTEX_VERSION = 1.0
+DP_COLORPERVERTEX_VERSION = 1.00
 
 
 class ColorPerVertexCleaner(dpBaseAction.ActionStartClass):

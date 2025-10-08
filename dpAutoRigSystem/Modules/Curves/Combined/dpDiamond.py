@@ -9,7 +9,7 @@ TITLE = "m105_diamond"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamond.png"
 
-DP_DIAMOND_VERSION = 1.7
+DP_DIAMOND_VERSION = 1.07
 
 
 class Diamond(dpBaseCurve.BaseCurve):

@@ -8,7 +8,7 @@ TITLE = "v088_softenEdges"
 DESCRIPTION = "v089_softenEdgesDesc"
 ICON = "/Icons/dp_softenEdges.png"
 
-DP_SOFTENEDGES_VERSION = 1.2
+DP_SOFTENEDGES_VERSION = 1.02
 
 
 class SoftenEdges(dpBaseAction.ActionStartClass):

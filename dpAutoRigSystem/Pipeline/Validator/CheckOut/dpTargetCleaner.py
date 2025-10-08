@@ -10,7 +10,7 @@ ICON = "/Icons/dp_targetCleaner.png"
 
 DPKEEPITATTR = "dpKeepIt"
 
-DP_TARGETCLEANER_VERSION = 1.9
+DP_TARGETCLEANER_VERSION = 1.09
 
 
 class TargetCleaner(dpBaseAction.ActionStartClass):

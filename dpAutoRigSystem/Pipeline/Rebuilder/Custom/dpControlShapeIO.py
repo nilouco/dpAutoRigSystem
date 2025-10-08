@@ -8,7 +8,7 @@ TITLE = "r014_controlShapeIO"
 DESCRIPTION = "r015_controlShapeIODesc"
 ICON = "/Icons/dp_controlShapeIO.png"
 
-DP_CONTROLSHAPEIO_VERSION = 1.0
+DP_CONTROLSHAPEIO_VERSION = 1.00
 
 
 class ControlShapeIO(dpBaseAction.ActionStartClass):

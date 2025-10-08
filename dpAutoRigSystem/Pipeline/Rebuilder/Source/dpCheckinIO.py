@@ -7,7 +7,7 @@ TITLE = "r021_checkinIO"
 DESCRIPTION = "r022_checkinIODesc"
 ICON = "/Icons/dp_checkinIO.png"
 
-DP_CHECKINIO_VERSION = 1.0
+DP_CHECKINIO_VERSION = 1.00
 
 
 class CheckinIO(dpBaseAction.ActionStartClass):

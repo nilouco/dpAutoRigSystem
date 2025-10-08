@@ -8,7 +8,7 @@ TITLE = "v115_hideAllJoints"
 DESCRIPTION = "v116_hideAllJointsDesc"
 ICON = "/Icons/dp_hideAllJoints.png"
 
-DP_HIDEALLJOINTS_VERSION = 1.0
+DP_HIDEALLJOINTS_VERSION = 1.00
 
 
 class HideAllJoints(dpBaseAction.ActionStartClass):

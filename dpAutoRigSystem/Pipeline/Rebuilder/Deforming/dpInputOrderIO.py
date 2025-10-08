@@ -8,7 +8,7 @@ TITLE = "r035_inputOrderIO"
 DESCRIPTION = "r036_inputOrderIODesc"
 ICON = "/Icons/dp_inputOrderIO.png"
 
-DP_INPUTORDERIO_VERSION = 1.1
+DP_INPUTORDERIO_VERSION = 1.01
 
 
 class InputOrderIO(dpBaseAction.ActionStartClass):

@@ -7,7 +7,7 @@ TITLE = "m112_arrowFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrowFlat.png"
 
-DP_ARROWFLAT_VERSION = 1.3
+DP_ARROWFLAT_VERSION = 1.03
 
 
 class ArrowFlat(dpBaseCurve.BaseCurve):

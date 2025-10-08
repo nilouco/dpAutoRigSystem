@@ -12,7 +12,7 @@ ICON = "/Icons/dp_guideIO.png"
 
 MODULES = "Modules.Standard"
 
-DP_GUIDEIO_VERSION = 1.2
+DP_GUIDEIO_VERSION = 1.02
 
 
 class GuideIO(dpBaseAction.ActionStartClass):

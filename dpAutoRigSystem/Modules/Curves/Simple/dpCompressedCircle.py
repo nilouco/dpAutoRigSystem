@@ -7,7 +7,7 @@ TITLE = "m119_compressedCircle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_compressedCircle.png"
 
-DP_COMPRESSEDCIRCLE_VERSION = 1.3
+DP_COMPRESSEDCIRCLE_VERSION = 1.03
 
 
 class CompressedCircle(dpBaseCurve.BaseCurve):

@@ -7,7 +7,7 @@ TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
 
-DP_ISOLATE_VERSION = 1.3
+DP_ISOLATE_VERSION = 1.03
 
 
 class Isolate(object):

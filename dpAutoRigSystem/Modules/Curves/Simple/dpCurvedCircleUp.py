@@ -7,7 +7,7 @@ TITLE = "m124_curvedCircleUp"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_curvedCircleUp.png"
 
-DP_CURVEDCIRCLEUP_VERSION = 1.3
+DP_CURVEDCIRCLEUP_VERSION = 1.03
 
 
 class CurvedCircleUp(dpBaseCurve.BaseCurve):

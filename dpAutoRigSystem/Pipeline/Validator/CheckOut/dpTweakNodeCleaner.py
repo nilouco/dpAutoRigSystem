@@ -8,7 +8,7 @@ TITLE = "v130_tweakNodeCleaner"
 DESCRIPTION = "v131_tweakNodeCleanerDesc"
 ICON = "/Icons/dp_tweakNodeCleaner.png"
 
-DP_TWEAKNODECLEANER_VERSION = 1.1
+DP_TWEAKNODECLEANER_VERSION = 1.01
 
 
 class TweakNodeCleaner(dpBaseAction.ActionStartClass):

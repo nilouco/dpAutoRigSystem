@@ -14,7 +14,7 @@ TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 
-DP_WHEEL_VERSION = 2.5
+DP_WHEEL_VERSION = 2.05
 
 
 class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

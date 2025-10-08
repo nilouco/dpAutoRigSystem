@@ -9,7 +9,7 @@ TITLE = "r048_componentTagIO"
 DESCRIPTION = "r049_componentTagIODesc"
 ICON = "/Icons/dp_componentTagIO.png"
 
-DP_COMPONENTTAGIO_VERSION = 1.0
+DP_COMPONENTTAGIO_VERSION = 1.00
 
 
 class ComponentTagIO(dpBaseAction.ActionStartClass):

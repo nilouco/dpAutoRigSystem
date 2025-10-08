@@ -8,7 +8,7 @@ TITLE = "v140_parentedGeometry"
 DESCRIPTION = "v141_parentedGeometryDesc"
 ICON = "/Icons/dp_parentedGeometry.png"
 
-DP_PARENTEDGEOMETRY_VERSION = 1.0
+DP_PARENTEDGEOMETRY_VERSION = 1.00
 
 
 class ParentedGeometry(dpBaseAction.ActionStartClass):

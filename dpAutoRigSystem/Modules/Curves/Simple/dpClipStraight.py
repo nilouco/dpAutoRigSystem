@@ -7,7 +7,7 @@ TITLE = "m109_clipStraight"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipStraight.png"
 
-DP_CLIPSTRAIGHT_VERSION = 1.3
+DP_CLIPSTRAIGHT_VERSION = 1.03
 
 
 class ClipStraight(dpBaseCurve.BaseCurve):

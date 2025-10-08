@@ -7,7 +7,7 @@ TITLE = "m131_plus"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_plus.png"
 
-DP_PLUS_VERSION = 1.3
+DP_PLUS_VERSION = 1.03
 
 
 class Plus(dpBaseCurve.BaseCurve):

@@ -8,7 +8,7 @@ TITLE = "m214_renamer"
 DESCRIPTION = "m215_renamerDesc"
 ICON = "/Icons/dp_renamer.png"
 
-DP_RENAMER_VERSION = 1.1
+DP_RENAMER_VERSION = 1.01
 
 
 class Renamer():
