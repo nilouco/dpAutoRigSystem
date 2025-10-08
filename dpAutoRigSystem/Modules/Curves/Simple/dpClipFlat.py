@@ -7,7 +7,7 @@ TITLE = "m107_clipFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipFlat.png"
 
-DP_CLIPFLAT_VERSION = 1.3
+DP_CLIPFLAT_VERSION = 1.03
 
 
 class ClipFlat(dpBaseCurve.BaseCurve):

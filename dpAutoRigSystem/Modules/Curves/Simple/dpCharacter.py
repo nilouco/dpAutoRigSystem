@@ -7,7 +7,7 @@ TITLE = "m125_character"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_character.png"
 
-DP_CHARACTER_VERSION = 1.3
+DP_CHARACTER_VERSION = 1.03
 
 
 class Character(dpBaseCurve.BaseCurve):

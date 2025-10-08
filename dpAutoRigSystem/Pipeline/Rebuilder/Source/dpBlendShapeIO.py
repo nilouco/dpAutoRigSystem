@@ -9,7 +9,7 @@ TITLE = "r030_blendShapeIO"
 DESCRIPTION = "r031_blendShapeIODesc"
 ICON = "/Icons/dp_blendShapeIO.png"
 
-DP_BLENDSHAPEIO_VERSION = 1.1
+DP_BLENDSHAPEIO_VERSION = 1.01
 
 
 class BlendShapeIO(dpBaseAction.ActionStartClass):

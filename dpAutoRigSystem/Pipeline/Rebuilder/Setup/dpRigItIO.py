@@ -7,7 +7,7 @@ TITLE = "r028_rigItIO"
 DESCRIPTION = "r029_rigItIODesc"
 ICON = "/Icons/dp_rigItIO.png"
 
-DP_RIGITIO_VERSION = 1.0
+DP_RIGITIO_VERSION = 1.00
 
 
 class RigItIO(dpBaseAction.ActionStartClass):

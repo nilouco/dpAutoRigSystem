@@ -8,7 +8,7 @@ TITLE = "r023_supportNodeIO"
 DESCRIPTION = "r024_supportNodeIODesc"
 ICON = "/Icons/dp_supportNodeIO.png"
 
-DP_SUPPORTNODEIO_VERSION = 1.2
+DP_SUPPORTNODEIO_VERSION = 1.02
 
 
 class SupportNodeIO(dpBaseAction.ActionStartClass):

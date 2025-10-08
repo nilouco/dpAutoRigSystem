@@ -8,7 +8,7 @@ TITLE = "r052_drivenKeyIO"
 DESCRIPTION = "r053_drivenKeyIODesc"
 ICON = "/Icons/dp_drivenKeyIO.png"
 
-DP_DRIVENKEYIO_VERSION = 1.0
+DP_DRIVENKEYIO_VERSION = 1.00
 
 
 class DrivenKeyIO(dpBaseAction.ActionStartClass):

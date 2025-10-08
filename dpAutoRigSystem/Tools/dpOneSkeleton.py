@@ -9,7 +9,7 @@ TITLE = "m254_oneSkeleton"
 DESCRIPTION = "m255_oneSkeletonDesc"
 ICON = "/Icons/dp_oneSkeleton.png"
 
-DP_ONESKELETON_VERSION = 1.0
+DP_ONESKELETON_VERSION = 1.00
 
 
 class OneSkeleton(object):

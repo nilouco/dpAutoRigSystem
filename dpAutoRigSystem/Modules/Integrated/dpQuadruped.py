@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.5
+DP_QUADRUPED_VERSION = 2.05
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

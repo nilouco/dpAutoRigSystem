@@ -8,7 +8,7 @@ TITLE = "v058_unknownNodesCleaner"
 DESCRIPTION = "v059_unknownNodesCleanerDesc"
 ICON = "/Icons/dp_unknownNodesCleaner.png"
 
-DP_UNKNOWNNODESCLEANER_VERSION = 1.3
+DP_UNKNOWNNODESCLEANER_VERSION = 1.03
 
 
 class UnknownNodesCleaner(dpBaseAction.ActionStartClass):

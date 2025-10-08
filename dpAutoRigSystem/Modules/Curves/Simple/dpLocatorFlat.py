@@ -7,7 +7,7 @@ TITLE = "m133_locatorFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_locatorFlat.png"
 
-DP_LOCATORFLAT_VERSION = 1.3
+DP_LOCATORFLAT_VERSION = 1.03
 
 
 class LocatorFlat(dpBaseCurve.BaseCurve):

@@ -7,7 +7,7 @@ TITLE = "m102_triangle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_triangle.png"
 
-DP_TRIANGLE_VERSION = 1.3
+DP_TRIANGLE_VERSION = 1.03
 
 
 class Triangle(dpBaseCurve.BaseCurve):

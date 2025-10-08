@@ -10,7 +10,7 @@ TITLE = "r033_deformationIO"
 DESCRIPTION = "r034_deformationIODesc"
 ICON = "/Icons/dp_deformationIO.png"
 
-DP_DEFORMATIONIO_VERSION = 1.2
+DP_DEFORMATIONIO_VERSION = 1.02
 
 
 class DeformationIO(dpBaseAction.ActionStartClass):

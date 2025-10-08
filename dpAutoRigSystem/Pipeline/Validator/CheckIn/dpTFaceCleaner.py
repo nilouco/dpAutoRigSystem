@@ -10,7 +10,7 @@ TITLE = "v128_tFaceCleaner"
 DESCRIPTION = "v129_tFaceCleanerDesc"
 ICON = "/Icons/dp_tFaceCleaner.png"
 
-DP_TFACECLEANER_VERSION = 1.0
+DP_TFACECLEANER_VERSION = 1.00
 
 
 class TFaceCleaner(dpBaseAction.ActionStartClass):

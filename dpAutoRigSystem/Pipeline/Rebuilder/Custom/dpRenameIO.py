@@ -8,7 +8,7 @@ TITLE = "r056_renameIO"
 DESCRIPTION = "r057_renameIODesc"
 ICON = "/Icons/dp_renameIO.png"
 
-DP_RENAMEIO_VERSION = 1.0
+DP_RENAMEIO_VERSION = 1.00
 
 
 class RenameIO(dpBaseAction.ActionStartClass):

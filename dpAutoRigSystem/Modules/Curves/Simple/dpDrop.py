@@ -7,7 +7,7 @@ TITLE = "m128_drop"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_drop.png"
 
-DP_DROP_VERSION = 1.3
+DP_DROP_VERSION = 1.03
 
 
 class Drop(dpBaseCurve.BaseCurve):

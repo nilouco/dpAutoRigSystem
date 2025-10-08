@@ -8,7 +8,7 @@ TITLE = "v105_cycleChecker"
 DESCRIPTION = "v106_cycleCheckerDesc"
 ICON = "/Icons/dp_cycleChecker.png"
 
-DP_CYCLECHECKER_VERSION = 1.0
+DP_CYCLECHECKER_VERSION = 1.00
 
 
 class CycleChecker(dpBaseAction.ActionStartClass):

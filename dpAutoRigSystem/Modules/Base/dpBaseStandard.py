@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.7
+DP_BASESTANDARD_VERSION = 2.07
 
 
 class BaseStandard(object):

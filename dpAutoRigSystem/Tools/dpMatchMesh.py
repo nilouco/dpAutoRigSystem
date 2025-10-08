@@ -9,7 +9,7 @@ TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
 
-DP_MATCHMESH_VERSION = 3.0
+DP_MATCHMESH_VERSION = 3.00
 
 
 class MatchMesh(object):

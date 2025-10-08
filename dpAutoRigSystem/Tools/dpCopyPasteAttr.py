@@ -9,7 +9,7 @@ TITLE = "m135_copyPasteAttr"
 DESCRIPTION = "m136_copyPasteAttrDesc"
 ICON = "/Icons/dp_copyPasteAttr.png"
 
-DP_COPYPASTEATTR_VERSION = 2.2
+DP_COPYPASTEATTR_VERSION = 2.02
 
 
 class CopyPasteAttr(object):

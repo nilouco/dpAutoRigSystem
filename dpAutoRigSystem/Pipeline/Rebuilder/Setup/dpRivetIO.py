@@ -10,7 +10,7 @@ TITLE = "r039_rivetIO"
 DESCRIPTION = "r040_rivetIODesc"
 ICON = "/Icons/dp_rivetIO.png"
 
-DP_RIVETIO_VERSION = 1.0
+DP_RIVETIO_VERSION = 1.00
 
 
 class RivetIO(dpBaseAction.ActionStartClass):

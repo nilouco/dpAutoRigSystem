@@ -15,7 +15,7 @@ PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
 
-DP_EYE_VERSION = 2.6
+DP_EYE_VERSION = 2.06
 
 
 class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

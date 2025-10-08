@@ -7,7 +7,7 @@ TITLE = "m175_zipperFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_zipperFlat.png"
 
-DP_ZIPPERFLAT_VERSION = 1.3
+DP_ZIPPERFLAT_VERSION = 1.03
 
 
 class ZipperFlat(dpBaseCurve.BaseCurve):

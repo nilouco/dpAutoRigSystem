@@ -9,7 +9,7 @@ TITLE = "m116_ball"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ball.png"
 
-DP_BALL_VERSION = 1.5
+DP_BALL_VERSION = 1.05
 
 
 class Ball(dpBaseCurve.BaseCurve):

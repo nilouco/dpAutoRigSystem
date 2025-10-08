@@ -9,7 +9,7 @@ TITLE = "m114_dodecagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_dodecagram.png"
 
-DP_DODECAGRAM_VERSION = 1.5
+DP_DODECAGRAM_VERSION = 1.05
 
 
 class Dodecagram(dpBaseCurve.BaseCurve):

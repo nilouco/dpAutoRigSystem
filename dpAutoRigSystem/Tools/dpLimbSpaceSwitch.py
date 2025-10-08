@@ -7,7 +7,7 @@ TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 ICON = "/Icons/dp_limbSpaceSwitch.png"
 
-DP_LIMBSPACESWITCH_VERSION = 2.4
+DP_LIMBSPACESWITCH_VERSION = 2.04
 
 
 class LimbSpaceSwitch(object):

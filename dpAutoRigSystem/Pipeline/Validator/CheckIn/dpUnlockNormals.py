@@ -8,7 +8,7 @@ TITLE = "v078_unlockNormals"
 DESCRIPTION = "v079_unlockNormalsDesc"
 ICON = "/Icons/dp_unlockNormals.png"
 
-DP_UNLOCKNORMALS_VERSION = 1.2
+DP_UNLOCKNORMALS_VERSION = 1.02
 
 
 class UnlockNormals(dpBaseAction.ActionStartClass):

@@ -7,7 +7,7 @@ TITLE = "m115_locator"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_locator.png"
 
-DP_LOCATOR_VERSION = 1.3
+DP_LOCATOR_VERSION = 1.03
 
 
 class Locator(dpBaseCurve.BaseCurve):

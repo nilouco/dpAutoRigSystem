@@ -8,7 +8,7 @@ TITLE = "r070_visibilityIO"
 DESCRIPTION = "r071_visibilityIODesc"
 ICON = "/Icons/dp_visibilityIO.png"
 
-DP_VISIBILITYIO_VERSION = 1.0
+DP_VISIBILITYIO_VERSION = 1.00
 
 
 class VisibilityIO(dpBaseAction.ActionStartClass):

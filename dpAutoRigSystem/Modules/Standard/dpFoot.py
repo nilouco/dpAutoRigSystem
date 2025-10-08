@@ -9,7 +9,7 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
-DP_FOOT_VERSION = 2.6
+DP_FOOT_VERSION = 2.06
 
 
 class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

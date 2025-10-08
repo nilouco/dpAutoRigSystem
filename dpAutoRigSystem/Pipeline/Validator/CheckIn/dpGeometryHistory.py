@@ -8,7 +8,7 @@ TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 ICON = "/Icons/dp_geometryHistory.png"
 
-DP_GEOMETRYHISTORY_VERSION = 1.5
+DP_GEOMETRYHISTORY_VERSION = 1.05
 
 
 class GeometryHistory(dpBaseAction.ActionStartClass):

@@ -9,7 +9,7 @@ TITLE = "v122_borderGap"
 DESCRIPTION = "v123_borderGapDesc"
 ICON = "/Icons/dp_borderGap.png"
 
-DP_BORDERGAP_VERSION = 1.0
+DP_BORDERGAP_VERSION = 1.00
 
 
 class BorderGap(dpBaseAction.ActionStartClass):

@@ -9,7 +9,7 @@ TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
 
-DP_SINGLE_VERSION = 2.6
+DP_SINGLE_VERSION = 2.06
 
 
 class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

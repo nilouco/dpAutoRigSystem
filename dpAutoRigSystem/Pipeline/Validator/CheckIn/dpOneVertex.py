@@ -9,7 +9,7 @@ TITLE = "v132_oneVertex"
 DESCRIPTION = "v133_oneVertexDesc"
 ICON = "/Icons/dp_oneVertex.png"
 
-DP_ONEVERTEX_VERSION = 2.0
+DP_ONEVERTEX_VERSION = 2.00
 
 
 class OneVertex(dpBaseAction.ActionStartClass):

@@ -8,7 +8,7 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-DP_DISPLAYLAYERS_VERSION = 1.5
+DP_DISPLAYLAYERS_VERSION = 1.05
 
 
 class DisplayLayers(dpBaseAction.ActionStartClass):

@@ -12,7 +12,7 @@ ICON = "/Icons/dp_controlsHierarchy.png"
 
 HIERARCHY_PATH = "dpHierarchy"
 
-DP_CONTROLSHIERARCHY_VERSION = 1.5
+DP_CONTROLSHIERARCHY_VERSION = 1.05
 
 
 class ControlsHierarchy(dpBaseAction.ActionStartClass):

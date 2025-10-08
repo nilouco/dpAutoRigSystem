@@ -9,7 +9,7 @@ TITLE = "m087_reorderAttr"
 DESCRIPTION = "m088_reoderAttrDesc"
 ICON = "/Icons/dp_reorderAttr.png"
 
-DP_REORDERATTR_VERSION = 1.3
+DP_REORDERATTR_VERSION = 1.03
 
 
 class ReorderAttr(object):

@@ -8,7 +8,7 @@ TITLE = "v111_jointEndCleaner"
 DESCRIPTION = "v112_jointEndCleanerDesc"
 ICON = "/Icons/dp_jointEndCleaner.png"
 
-DP_JOINTENDCLEANER_VERSION = 1.1
+DP_JOINTENDCLEANER_VERSION = 1.01
 
 
 class JointEndCleaner(dpBaseAction.ActionStartClass):

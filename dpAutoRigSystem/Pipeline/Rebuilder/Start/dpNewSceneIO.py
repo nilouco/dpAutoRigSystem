@@ -8,7 +8,7 @@ TITLE = "r025_newSceneIO"
 DESCRIPTION = "r026_newSceneIODesc"
 ICON = "/Icons/dp_newSceneIO.png"
 
-DP_NEWSCENEIO_VERSION = 1.0
+DP_NEWSCENEIO_VERSION = 1.00
 
 
 class NewSceneIO(dpBaseAction.ActionStartClass):

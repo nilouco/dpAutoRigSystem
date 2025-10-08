@@ -28,7 +28,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_SOFTIK_VERSION = 2.1
+DP_SOFTIK_VERSION = 2.01
 
 
 class SoftIkClass(object):

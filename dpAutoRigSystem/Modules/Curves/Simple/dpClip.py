@@ -7,7 +7,7 @@ TITLE = "m106_clip"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clip.png"
 
-DP_CLIP_VERSION = 1.3
+DP_CLIP_VERSION = 1.03
 
 
 class Clip(dpBaseCurve.BaseCurve):

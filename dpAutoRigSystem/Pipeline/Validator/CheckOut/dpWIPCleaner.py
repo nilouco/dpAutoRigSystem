@@ -8,7 +8,7 @@ TITLE = "v009_wipCleaner"
 DESCRIPTION = "v010_wipCleanerDesc"
 ICON = "/Icons/dp_wipCleaner.png"
 
-DP_WIPCLEANER_VERSION = 1.3
+DP_WIPCLEANER_VERSION = 1.03
 
 
 class WIPCleaner(dpBaseAction.ActionStartClass):

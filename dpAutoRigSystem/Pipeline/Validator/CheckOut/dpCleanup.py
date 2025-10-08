@@ -8,7 +8,7 @@ TITLE = "v096_cleanup"
 DESCRIPTION = "v097_cleanupDesc"
 ICON = "/Icons/dp_cleanup.png"
 
-DP_CLEANUP_VERSION = 1.0
+DP_CLEANUP_VERSION = 1.00
 
 
 class Cleanup(dpBaseAction.ActionStartClass):

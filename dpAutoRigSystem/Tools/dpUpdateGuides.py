@@ -7,7 +7,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DP_UPDATEGUIDES_VERSION = 1.8
+DP_UPDATEGUIDES_VERSION = 1.08
 
 
 class UpdateGuides(object):

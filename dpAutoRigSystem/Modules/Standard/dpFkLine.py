@@ -9,7 +9,7 @@ TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
 
-DP_FKLINE_VERSION = 2.6
+DP_FKLINE_VERSION = 2.06
 
 
 class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

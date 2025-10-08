@@ -8,7 +8,7 @@ TITLE = "v113_bindPoseCleaner"
 DESCRIPTION = "v114_bindPoseCleanerDesc"
 ICON = "/Icons/dp_bindPoseCleaner.png"
 
-DP_BINDPOSECLEANER_VERSION = 1.0
+DP_BINDPOSECLEANER_VERSION = 1.00
 
 
 class BindPoseCleaner(dpBaseAction.ActionStartClass):

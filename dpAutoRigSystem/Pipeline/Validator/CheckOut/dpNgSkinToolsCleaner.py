@@ -8,7 +8,7 @@ TITLE = "v026_ngskintoolsCleaner"
 DESCRIPTION = "v027_ngskintoolsCleanerDesc"
 ICON = "/Icons/dp_ngskintoolsCleaner.png"
 
-DP_NGSKINTOOLSCLEANER_VERSION = 1.2
+DP_NGSKINTOOLSCLEANER_VERSION = 1.02
 
 
 class NgSkinToolsCleaner(dpBaseAction.ActionStartClass):

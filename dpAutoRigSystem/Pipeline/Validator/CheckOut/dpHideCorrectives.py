@@ -8,7 +8,7 @@ TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
 ICON = "/Icons/dp_hideCorrectives.png"
 
-DP_HIDECORRECTIVES_VERSION = 1.3
+DP_HIDECORRECTIVES_VERSION = 1.03
 
 
 class HideCorrectives(dpBaseAction.ActionStartClass):

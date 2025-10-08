@@ -7,7 +7,7 @@ TITLE = "m057_updateRigInfo"
 DESCRIPTION = "m058_updateRigInfoDesc"
 ICON = "/Icons/dp_updateRigInfo.png"
 
-DP_UPDATERIGINFO_VERSION = 2.0
+DP_UPDATERIGINFO_VERSION = 2.00
 
 
 class UpdateRigInfo(object):

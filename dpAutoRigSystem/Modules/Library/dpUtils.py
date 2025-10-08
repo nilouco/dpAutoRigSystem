@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.8
+DP_UTILS_VERSION = 3.08
 
 
 class Utils(object):

@@ -9,7 +9,7 @@ TITLE = "m104_octagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_octagram.png"
 
-DP_OCTAGRAM_VERSION = 1.5
+DP_OCTAGRAM_VERSION = 1.05
 
 
 class Octagram(dpBaseCurve.BaseCurve):

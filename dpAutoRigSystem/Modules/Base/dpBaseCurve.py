@@ -2,7 +2,7 @@
 from maya import cmds
 from maya import mel
 
-DP_BASECURVE_VERSION = 2.3
+DP_BASECURVE_VERSION = 2.03
 
 
 class BaseCurve(object):

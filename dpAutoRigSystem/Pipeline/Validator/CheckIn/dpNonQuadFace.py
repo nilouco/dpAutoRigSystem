@@ -9,7 +9,7 @@ TITLE = "v119_nonQuadFace"
 DESCRIPTION = "v120_nonQuadFaceDesc"
 ICON = "/Icons/dp_nonQuadFace.png"
 
-DP_NONQUADFACE_VERSION = 1.0
+DP_NONQUADFACE_VERSION = 1.00
 
 
 class NonQuadFace(dpBaseAction.ActionStartClass):

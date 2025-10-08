@@ -7,7 +7,7 @@ TITLE = "m134_piramid"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_piramid.png"
 
-DP_PIRAMID_VERSION = 1.3
+DP_PIRAMID_VERSION = 1.03
 
 
 class Piramid(dpBaseCurve.BaseCurve):

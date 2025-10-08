@@ -8,7 +8,7 @@ TITLE = "r041_calibrationIO"
 DESCRIPTION = "r042_calibrationIODesc"
 ICON = "/Icons/dp_calibrationIO.png"
 
-DP_CALIBRATIONIO_VERSION = 1.0
+DP_CALIBRATIONIO_VERSION = 1.00
 
 
 class CalibrationIO(dpBaseAction.ActionStartClass):

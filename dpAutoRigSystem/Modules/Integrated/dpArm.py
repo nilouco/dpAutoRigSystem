@@ -8,7 +8,7 @@ TITLE = "m028_arm"
 DESCRIPTION = "m029_armDesc"
 ICON = "/Icons/dp_arm.png"
 
-DP_ARM_VERSION = 2.1
+DP_ARM_VERSION = 2.01
 
 
 def Arm(dpUIinst):

@@ -8,7 +8,7 @@ TITLE = "r019_parentingIO"
 DESCRIPTION = "r020_parentingIODesc"
 ICON = "/Icons/dp_parentingIO.png"
 
-DP_PARENTINGIO_VERSION = 1.2
+DP_PARENTINGIO_VERSION = 1.02
 
 
 class ParentingIO(dpBaseAction.ActionStartClass):

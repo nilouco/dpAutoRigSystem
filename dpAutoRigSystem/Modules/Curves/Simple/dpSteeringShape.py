@@ -7,7 +7,7 @@ TITLE = "m161_steeringShape"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_steeringShape.png"
 
-DP_STEERINGSHAPE_VERSION = 1.2
+DP_STEERINGSHAPE_VERSION = 1.02
 
 
 class SteeringShape(dpBaseCurve.BaseCurve):

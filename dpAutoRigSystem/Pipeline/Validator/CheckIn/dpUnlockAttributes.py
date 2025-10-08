@@ -8,7 +8,7 @@ TITLE = 'v092_unlockAttributes'
 DESCRIPTION = 'v093_unlockAttributesDesc'
 ICON = '/Icons/dp_unlockAttributes.png'
 
-DP_UNLOCKATTRIBUTES_VERSION = 1.2
+DP_UNLOCKATTRIBUTES_VERSION = 1.02
 
 
 class UnlockAttributes(dpBaseAction.ActionStartClass):

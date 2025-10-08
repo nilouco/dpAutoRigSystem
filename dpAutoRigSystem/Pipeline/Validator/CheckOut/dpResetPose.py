@@ -24,7 +24,7 @@ ATTR_TYPE = {
                 "doubleLinear" : 2
             }
 
-DP_RESETPOSE_VERSION = 1.4
+DP_RESETPOSE_VERSION = 1.04
 
 
 class ResetPose(dpBaseAction.ActionStartClass):

@@ -9,7 +9,7 @@ TITLE = "v103_pruneSkinWeights"
 DESCRIPTION = "v104_pruneSkinWeightsDesc"
 ICON = "/Icons/dp_pruneSkinWeights.png"
 
-DP_PRUNESKINWEIGHTS_VERSION = 1.1
+DP_PRUNESKINWEIGHTS_VERSION = 1.01
 
 
 class PruneSkinWeights(dpBaseAction.ActionStartClass):

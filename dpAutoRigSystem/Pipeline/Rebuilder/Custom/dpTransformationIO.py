@@ -8,7 +8,7 @@ TITLE = "r037_transformationIO"
 DESCRIPTION = "r038_transformationIODesc"
 ICON = "/Icons/dp_transformationIO.png"
 
-DP_TRANSFORMATIONIO_VERSION = 1.1
+DP_TRANSFORMATIONIO_VERSION = 1.01
 
 
 class TransformationIO(dpBaseAction.ActionStartClass):

@@ -8,7 +8,7 @@ TITLE = "r061_offsetMatrixIO"
 DESCRIPTION = "r062_offsetMatrixIODesc"
 ICON = "/Icons/dp_offsetMatrixIO.png"
 
-DP_OFFSETMATRIXIO_VERSION = 1.0
+DP_OFFSETMATRIXIO_VERSION = 1.00
 
 
 class OffsetMatrixIO(dpBaseAction.ActionStartClass):

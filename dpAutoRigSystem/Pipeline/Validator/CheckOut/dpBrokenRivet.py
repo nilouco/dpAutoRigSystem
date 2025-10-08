@@ -12,7 +12,7 @@ TITLE = "v126_brokenRivet"
 DESCRIPTION = "v127_brokenRivetDesc"
 ICON = "/Icons/dp_brokenRivet.png"
 
-DP_BROKENRIVET_VERSION = 1.0
+DP_BROKENRIVET_VERSION = 1.00
 
 
 class BrokenRivet(dpBaseAction.ActionStartClass):

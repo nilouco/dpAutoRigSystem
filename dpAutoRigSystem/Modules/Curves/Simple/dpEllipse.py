@@ -7,7 +7,7 @@ TITLE = "m122_ellipse"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ellipse.png"
 
-DP_ELLIPSE_VERSION = 1.3
+DP_ELLIPSE_VERSION = 1.03
 
 
 class Ellipse(dpBaseCurve.BaseCurve):
