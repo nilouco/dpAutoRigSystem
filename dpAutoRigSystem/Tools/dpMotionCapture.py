@@ -9,7 +9,7 @@ TITLE = "m239_motionCapture"
 DESCRIPTION = "m240_motionCaptureDesc"
 ICON = "/Icons/dp_motionCapture.png"
 
-DP_MOTIONCAPTURE_VERSION = 1.00
+DP_MOTIONCAPTURE_VERSION = 1.01
 
 
 class MotionCapture(object):
@@ -118,14 +118,10 @@ class MotionCapture(object):
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Ctrl"},
                 "Spine"            : {"id"      : 8,
-                                      "joint"   : self.lang['m011_spine']+"_01_Jnt",
-                                      "control" : self.lang['m011_spine']+"_"+self.lang['c027_hips']+"A_Fk_Ctrl",
-                                      "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c027_hips']+"B_Ctrl"},
-                "Spine1"           : {"id"      : 23,
                                       "joint"   : self.lang['m011_spine']+"_02_Jnt",
                                       "control" : self.lang['m011_spine']+"_"+self.lang['c029_middle']+"1_Fk_Ctrl",
                                       "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c029_middle']+"1_Ctrl"},
-                "Spine2"           : {"id"      : 24,
+                "Spine1"           : {"id"      : 23,
                                       "joint"   : self.lang['m011_spine']+"_04_"+self.lang['c120_tip']+"_Jnt",
                                       "control" : self.lang['m011_spine']+"_"+self.lang['c028_chest']+"A_Fk_Ctrl",
                                       "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl"},
@@ -314,6 +310,7 @@ class MotionCapture(object):
         self.hikMapBipedControllersByUI()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.setIkFkBipedControllersByUI()
+        self.hikMapCustomChest()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikCreateJob()
         cmds.select(clear=True)
@@ -594,6 +591,16 @@ class MotionCapture(object):
             if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
                 cmds.setAttr(optCtrl+"."+self.lang['p002_left'].lower()+self.lang['c006_leg_main']+"Fk", 0)
                 cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c006_leg_main']+"Fk", 0)
+
+
+    def hikMapCustomChest(self, *args):
+        """ Set HumanIk Chest controller.
+        """
+        cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"A_Fk_Ctrl")
+        if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+            cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl")
+        mel.eval('hikCustomRigAssignEffector 1000;')
+        cmds.select(clear=True)
 
 
     def hikCreateJob(self, *args):
