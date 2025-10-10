@@ -280,6 +280,9 @@ class MotionCapture(object):
                 "Neck"             : {"id"      : 20,
                                       "joint"   : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_00_Jnt",
                                       "control" : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_00_Ctrl"},
+                "Neck1"            : {"id"      : 32,
+                                      "joint"   : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_01_Jnt",
+                                      "control" : self.lang['c024_head']+"_"+self.lang['c023_neck']+"_01_Ctrl"},
                 "Head"             : {"id"      : 15,
                                       "joint"   : self.lang['c024_head']+"_00_"+self.lang['c024_head']+"_Jnt",
                                       "joint1"  : self.lang['c024_head']+"_01_"+self.lang['c024_head']+"_Jnt",
@@ -310,6 +313,7 @@ class MotionCapture(object):
         self.hikMapBipedControllersByUI()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.setIkFkBipedControllersByUI()
+        self.hikMapCustomHead()
         self.hikMapCustomChest()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikCreateJob()
@@ -591,6 +595,13 @@ class MotionCapture(object):
             if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
                 cmds.setAttr(optCtrl+"."+self.lang['p002_left'].lower()+self.lang['c006_leg_main']+"Fk", 0)
                 cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c006_leg_main']+"Fk", 0)
+
+
+    def hikMapCustomHead(self, *args):
+        """ Set HumanIk Head controller to rotate only.
+        """
+        #cmds.select(self.lang['c024_head']+"_"+self.lang['c024_head']+"_Ctrl")
+        mel.eval('hikControlRigSelectionChangedCallback; hikCustomRigAddRemoveMapping( "T", 0 );')
 
 
     def hikMapCustomChest(self, *args):
