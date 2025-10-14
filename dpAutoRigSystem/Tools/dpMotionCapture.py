@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from functools import partial
+from ..Modules.Library import dpIkFkSnap
 
 # global variables to this module:
 CLASS_NAME = "MotionCapture"
@@ -24,6 +24,9 @@ class MotionCapture(object):
         self.hikCharacterAttr = "Character"
         self.hikNode = self.hikGetLatestNode()
         self.hikDic = None
+        if self.dpUIinst.dev:
+            from importlib import reload
+            reload(dpIkFkSnap)
         # call main function:
         if self.ui:
             self.dpMotionCaptureUI(self)
@@ -303,7 +306,7 @@ class MotionCapture(object):
     def hikRetarget(self, *args):
         """ Run the HumanIk retargeting processes.
         """
-        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=6)
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=8)
         self.hikCreateCharacterDefinition()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikAssignJointsToDefinition()
@@ -313,7 +316,9 @@ class MotionCapture(object):
         self.hikMapBipedControllersByUI()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.setIkFkBipedControllersByUI()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikMapCustomHead()
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikMapCustomChest()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikCreateJob()
@@ -339,6 +344,25 @@ class MotionCapture(object):
             for attr in userDefAttrList:
                 if attr.endswith("Fk"):
                     cmds.setAttr(optCtrl+"."+attr, mode)
+
+
+    def runIkFkSnap(self, *args):
+        """ Execute the ikFkSnap script nodes.
+        """
+        netList = self.utils.getNetworkNodeByAttr("dpIkFkSnapNet")
+        if netList:
+            for net in netList:
+                # declare needed variables:
+                worldRef = cmds.listConnections(net+".worldRef")[0]
+                fkCtrlList = cmds.listConnections(net+".fkCtrlList")
+                ikCornerCtrl = cmds.listConnections(net+".ikPoleVectorCtrl")[0]
+                ikExtremCtrl = cmds.listConnections(net+".ikExtremCtrl")[0]
+                ikExtremSubCtrl = cmds.listConnections(net+".ikExtremSubCtrl")[0]
+                ikJointList = cmds.listConnections(net+".ikJointList")
+                # make an ikFkSnap instance without create another network node.
+                ikFkSnapInst = dpIkFkSnap.IkFkSnapClass(self.dpUIinst, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'], creation=False)
+                # snap from Fk to Ik (that means move ik to fk position)                
+                ikFkSnapInst.snapFkToIk()
 
 
     def setCtrlMode(self, mode=1, *args):
@@ -443,12 +467,10 @@ class MotionCapture(object):
                 cmds.xform(armList[5], rotation=(90, 90, 0), worldSpace=True) #left
         # ik
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
+        print("Option_Ctrl =", optCtrl)
         if optCtrl:
             if "ikFkSnap" in cmds.listAttr(optCtrl):
-                cmds.setAttr(optCtrl+".ikFkSnap", 1)
-                self.setIkFk(optCtrl, 0)
-                cmds.setAttr(optCtrl+".ikFkSnap", 0)
-                self.setIkFk(optCtrl, 1)
+                self.runIkFkSnap()
             else:
                 mel.eval('warning \"'+self.lang['m244_setTPoseIssue']+' ikFkSnap'+'\";')
         beforeCtrlList.extend(fkCtrlList)

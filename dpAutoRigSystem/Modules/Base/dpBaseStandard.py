@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.07
+DP_BASESTANDARD_VERSION = 2.08
 
 
 class BaseStandard(object):
@@ -698,7 +698,9 @@ class BaseStandard(object):
                         if cmds.objExists(nodeName[0]):
                             guideDic[nodeName[0]] = self.getNodeData(nodeName[0])
                             if buildIt:
+                                cmds.lockNode(self.guideNet, lock=False)
                                 cmds.deleteAttr(self.guideNet+"."+beforeAttr)
+                                cmds.lockNode(self.guideNet, lock=True)
                 afterDataDic["GuideData"] = guideDic
                 cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
                 if buildIt:
