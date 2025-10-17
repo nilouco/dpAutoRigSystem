@@ -477,6 +477,15 @@ class MotionCapture(object):
             cmds.xform(legList[3], rotation=(-90, 0, 90), worldSpace=True) #right leg
             cmds.xform(legList[4], rotation=(-90, 0, 90), worldSpace=True) #right knee
             cmds.xform(legList[5], rotation=(0, 90, 90), worldSpace=True) #right ankle
+        # fingers
+        fingerCtrlList = self.ctrls.getControlNodeById("id_015_FingerMain") or []
+        fingerCtrlList.extend(self.ctrls.getControlNodeById("id_016_FingerFk"))
+        if fingerCtrlList:
+            fingerCtrlList = [f for f in fingerCtrlList if not "_00_" in f and not self.lang['m036_thumb'] in f]
+            for fingerCtrl in fingerCtrlList:
+                zeroGrp = fingerCtrl.replace("_Ctrl", "_SDK_Zero_0_Grp")
+                if cmds.objExists(zeroGrp):
+                    cmds.setAttr(fingerCtrl+".rotateY", (-1)*cmds.getAttr(zeroGrp+".rotateY"))
         # ik
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optCtrl:
