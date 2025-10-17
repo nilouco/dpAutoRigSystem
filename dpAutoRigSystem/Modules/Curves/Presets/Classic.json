@@ -105,6 +105,7 @@
     "id_098_HeadDeformerSub"     : {"type" : "Square",           "degree" : 3},
     "id_099_RootPivot"           : {"type" : "Locator",          "degree" : 3},
     "id_100_HeadDeformerRadius"  : {"type" : "Ball",             "degree" : 1},
-    "id_101_LimbExtremOrient"    : {"type" : "Square",           "degree" : 3}
+    "id_101_LimbExtremOrient"    : {"type" : "Square",           "degree" : 3},
+    "id_102_GroundDirection"     : {"type" : "Triangle",         "degree" : 1}
 
 }
