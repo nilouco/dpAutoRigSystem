@@ -407,67 +407,78 @@ class MotionCapture(object):
         print(self.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
 
-    def setTPose(self, *args):
-        """ Set the biped arms as TPose.
+    def getOrderedByTimeID(self, itemList, *args):
+        """ Return ordered list of the given item list by the time in the dpID.
         """
-        # clavicle
+        orderedList, idList = [], []
+        for item in itemList:
+            if "dpID" in cmds.listAttr(item):
+                idList.append(int(cmds.getAttr(item+".dpID").split(".")[1])) #time
+        if idList:
+            tmpList, orderedList = zip(*sorted(zip(idList, itemList)))
+        return orderedList
+
+
+    def setTPose(self, *args):
+        """ Set the biped arms as TPose and align leg and feet as vertical to front direction.
+        """
+        # clavicle/hips
         beforeCtrlList = self.ctrls.getControlNodeById("id_030_LimbClavicle")
         if beforeCtrlList:
-            clavList, dpIDList = [], []
+            clavList, hipList = [], []
             for beforeCtrl in beforeCtrlList:
                 if self.lang['c000_arm_before'] in beforeCtrl: #arm
                     clavList.append(beforeCtrl)
-                    if "dpID" in cmds.listAttr(beforeCtrl):
-                        dpIDList.append(int(cmds.getAttr(beforeCtrl+".dpID").split(".")[1]))
-            lClav = clavList[1]
-            rClav = clavList[0]
-            if (dpIDList and dpIDList[0] < dpIDList[1]) or clavList[0].startswith(self.lang['p002_left']): #listed left side first
-                lClav = clavList[0]
-                rClav = clavList[1]
-            cmds.xform(lClav, rotation=(90, 0, 90), worldSpace=True) #left
+                else: #leg
+                    hipList.append(beforeCtrl)
+            clavList = self.getOrderedByTimeID(clavList)
+            hipList = self.getOrderedByTimeID(hipList)
+            cmds.xform(clavList[0], rotation=(90, 0, 90), worldSpace=True) #left clavicle
+            cmds.xform(hipList[0], rotation=(90, 0, 0), worldSpace=True) #left hips
             for axis in self.dpUIinst.axisList:
-                cmds.setAttr(rClav+".rotate"+axis, cmds.getAttr(lClav+".rotate"+axis)) #right
-        # arm
+                cmds.setAttr(clavList[1]+".rotate"+axis, cmds.getAttr(clavList[0]+".rotate"+axis)) #right clavicle
+                cmds.setAttr(hipList[1]+".rotate"+axis, cmds.getAttr(hipList[0]+".rotate"+axis)) #right hips
+        # arm/leg
         fkCtrlList = self.ctrls.getControlNodeById("id_031_LimbFk")
         if fkCtrlList:
-            armList, dpIDArmList = [], []
-            for i in range(0, 4):
-                for fkCtrl in fkCtrlList:
-                    if i == 0:
-                        if self.lang['c001_arm_main'] in fkCtrl:
-                            if not fkCtrl in armList:
-                                armList.append(fkCtrl)
-                                if "dpID" in cmds.listAttr(fkCtrl):
-                                    dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
-                    elif i == 1:
-                        if self.lang['c002_arm_corner'] in fkCtrl:
-                            if not fkCtrl in armList:
-                                armList.append(fkCtrl)
-                                if "dpID" in cmds.listAttr(fkCtrl):
-                                    dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
-                    elif i == 2:
-                        if self.lang['c004_arm_extrem'] in fkCtrl:
-                            if not fkCtrl in armList:
-                                armList.append(fkCtrl)
-                                if "dpID" in cmds.listAttr(fkCtrl):
-                                    dpIDArmList.append(int(cmds.getAttr(fkCtrl+".dpID").split(".")[1]))
-            if (dpIDArmList and dpIDArmList[0] < dpIDArmList[2]) or armList[0].startswith(self.lang['p002_left']):
-                cmds.xform(armList[0], rotation=(90, 90, 0), worldSpace=True) #left
-                cmds.xform(armList[2], rotation=(90, 90, 0), worldSpace=True) #left
-                cmds.xform(armList[4], rotation=(90, 90, 0), worldSpace=True) #left
-                cmds.xform(armList[1], rotation=(-90, 90, 0), worldSpace=True) #right
-                cmds.xform(armList[3], rotation=(-90, 90, 0), worldSpace=True) #right
-                cmds.xform(armList[5], rotation=(-90, 90, 0), worldSpace=True) #right
-            else:
-                cmds.xform(armList[0], rotation=(-90, 90, 0), worldSpace=True) #right
-                cmds.xform(armList[2], rotation=(-90, 90, 0), worldSpace=True) #right
-                cmds.xform(armList[4], rotation=(-90, 90, 0), worldSpace=True) #right
-                cmds.xform(armList[1], rotation=(90, 90, 0), worldSpace=True) #left
-                cmds.xform(armList[3], rotation=(90, 90, 0), worldSpace=True) #left
-                cmds.xform(armList[5], rotation=(90, 90, 0), worldSpace=True) #left
+            armList, legList = [], []
+            for fkCtrl in fkCtrlList:
+                if self.lang['c001_arm_main'] in fkCtrl:
+                    if not fkCtrl in armList:
+                        armList.append(fkCtrl)
+                if self.lang['c006_leg_main'] in fkCtrl:
+                    if not fkCtrl in legList:
+                        legList.append(fkCtrl)
+                if self.lang['c002_arm_corner'] in fkCtrl:
+                    if not fkCtrl in armList:
+                        armList.append(fkCtrl)
+                if self.lang['c007_leg_corner'] in fkCtrl:
+                    if not fkCtrl in legList:
+                        legList.append(fkCtrl)
+                if self.lang['c004_arm_extrem'] in fkCtrl:
+                    if not fkCtrl in armList:
+                        armList.append(fkCtrl)
+                if self.lang['c009_leg_extrem'] in fkCtrl:
+                    if not fkCtrl in legList:
+                        legList.append(fkCtrl)
+            armList = self.getOrderedByTimeID(armList)
+            legList = self.getOrderedByTimeID(legList)
+            # arm
+            cmds.xform(armList[0], rotation=(90, 90, 0), worldSpace=True) #left shoulder
+            cmds.xform(armList[1], rotation=(90, 90, 0), worldSpace=True) #left elbow
+            cmds.xform(armList[2], rotation=(90, 90, 0), worldSpace=True) #left wrist
+            cmds.xform(armList[3], rotation=(-90, 90, 0), worldSpace=True) #right shoulder
+            cmds.xform(armList[4], rotation=(-90, 90, 0), worldSpace=True) #right elbow
+            cmds.xform(armList[5], rotation=(-90, 90, 0), worldSpace=True) #right wrist
+            # leg
+            cmds.xform(legList[0], rotation=(90, 0, 90), worldSpace=True) #left leg
+            cmds.xform(legList[1], rotation=(90, 0, 90), worldSpace=True) #left knee
+            cmds.xform(legList[2], rotation=(0, -90, 90), worldSpace=True) #left ankle
+            cmds.xform(legList[3], rotation=(-90, 0, 90), worldSpace=True) #right leg
+            cmds.xform(legList[4], rotation=(-90, 0, 90), worldSpace=True) #right knee
+            cmds.xform(legList[5], rotation=(0, 90, 90), worldSpace=True) #right ankle
         # ik
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
-        print("Option_Ctrl =", optCtrl)
         if optCtrl:
             if "ikFkSnap" in cmds.listAttr(optCtrl):
                 self.runIkFkSnap()
