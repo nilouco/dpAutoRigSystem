@@ -2289,13 +2289,14 @@ class Start(object):
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
-        self.directionCtrl = self.getBaseCtrl("id_102_GroundDirection", "directionCtrl", self.prefix+"GroundDirection_Ctrl", self.ctrls.dpCheckLinearUnit(2))
-        print('Created Ground Direction Ctrl--------------------')
-        print('Start TransferShape--------------------')
-
-        self.ctrls.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=self.directionCtrl, destinationList=self.globalCtrl, keepColor=True, force=False)
-
-        print('Control--------------------')
+        # Create and add groundDirection shape control
+        self.groundDirectionCtrl = self.getBaseCtrl("id_102_GroundDirection", "groundDirectionCtrl", self.prefix+"GroundDirection_Ctrl", self.ctrls.dpCheckLinearUnit(4))
+        cmds.setAttr(self.groundDirectionCtrl + '.ry',-90)
+        cmds.setAttr(self.groundDirectionCtrl + '.tz',16)
+        cmds.select(self.groundDirectionCtrl)
+        cmds.makeIdentity( apply=True )
+        self.ctrls.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=self.groundDirectionCtrl, destinationList=[self.globalCtrl], keepColor=True, force=False)
+        # Create root control
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
         needConnectPivotAttr = False
