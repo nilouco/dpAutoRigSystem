@@ -648,6 +648,7 @@ class MotionCapture(object):
         """
         mel.eval('hikCustomRigToolWidget -e -sl '+str(id)+';')
         mel.eval('hikControlRigSelectionChangedCallback;')
+        mel.eval('hikUpdateCustomRigUI')
         if not t == None:
             mel.eval('hikCustomRigAddRemoveMapping( "T", '+str(t)+' );')
         if not r == None:
@@ -663,9 +664,12 @@ class MotionCapture(object):
             for hikKey in self.hikDic.keys():
                 if finger in hikKey:
                     if cmds.objExists(self.hikDic[hikKey]["control"]):
-                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #activate rotate
-                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], t=0) #disable translate
-        self.hikSetCustomMap(15, t=0) #Head rotate only
+                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Finger add rotate
+                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], t=0) #Finger remove translate
+        self.hikSetCustomMap(15, t=0) #Head remove translate, let it rotate only
+        self.hikSetCustomMap(8,  r=1) #Spine add rotate
+        self.hikSetCustomMap(20, r=1) #Neck add rotate
+        self.hikSetCustomMap(32, r=1) #Neck1 add rotate
     
     
     def hikMapCustomChest(self, *args):
