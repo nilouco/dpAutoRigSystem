@@ -306,7 +306,7 @@ class MotionCapture(object):
     def hikRetarget(self, *args):
         """ Run the HumanIk retargeting processes.
         """
-        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=9)
+        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=8)
         self.hikCreateCharacterDefinition()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikAssignJointsToDefinition()
@@ -317,13 +317,12 @@ class MotionCapture(object):
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.setIkFkBipedControllersByUI()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
-        self.hikMapCustomHead()
+        self.hikMapCustomElements()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikMapCustomChest()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
-        #self.hikMapCustomFingers()
-        self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikCreateJob()
+        mel.eval('hikCustomRigToolWidget -e -sl -1;') #unselect
         cmds.select(clear=True)
         self.utils.setProgress(endIt=True)
 
@@ -644,14 +643,31 @@ class MotionCapture(object):
                 cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c006_leg_main']+"Fk", 0)
 
 
-    def hikMapCustomHead(self, *args):
-        """ Set HumanIk Head controller to rotate only.
+    def hikSetCustomMap(self, id, t=None, r=None, *args):
+        """ Set custom map to translate and/or rotate for the given HumanIk item ID.
         """
-        cmds.select(self.lang['c024_head']+"_"+self.lang['c024_head']+"_Ctrl")
-        mel.eval('hikControlRigSelectionChangedCallback; hikSetCustomRigMapMode( "T", 0 );')
-        cmds.select(clear=True)
+        mel.eval('hikCustomRigToolWidget -e -sl '+str(id)+';')
+        mel.eval('hikControlRigSelectionChangedCallback;')
+        if not t == None:
+            mel.eval('hikCustomRigAddRemoveMapping( "T", '+str(t)+' );')
+        if not r == None:
+            mel.eval('hikCustomRigAddRemoveMapping( "R", '+str(r)+' );')
+        mel.eval('hikUpdateCustomRigUI')
 
 
+    def hikMapCustomElements(self, *args):
+        """ Set cutom HumanIk controllers properly mapping.
+        """
+        fingerList = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
+        for finger in fingerList:
+            for hikKey in self.hikDic.keys():
+                if finger in hikKey:
+                    if cmds.objExists(self.hikDic[hikKey]["control"]):
+                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #activate rotate
+                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], t=0) #disable translate
+        self.hikSetCustomMap(15, t=0) #Head rotate only
+    
+    
     def hikMapCustomChest(self, *args):
         """ Set HumanIk Chest controller.
         """
@@ -659,27 +675,6 @@ class MotionCapture(object):
         if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
             cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl")
         mel.eval('hikControlRigSelectionChangedCallback; hikCustomRigAssignEffector 1000;')
-        cmds.select(clear=True)
-
-
-    def hikMapCustomFingers(self, *args):
-        """ Set HumanIk Head controller to rotate only.
-        """
-        fingerList = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
-        for finger in fingerList:
-            for hikKey in self.hikDic.keys():
-                if finger in hikKey:
-                    if cmds.objExists(self.hikDic[hikKey]["control"]):
-
-                        print("finger =", finger, self.hikDic[hikKey]["control"], self.hikDic[hikKey])
-
-                        cmds.select(self.hikDic[hikKey]["control"])
-                        mel.eval('hikControlRigSelectionChangedCallback; hikSetCustomRigMapMode( "R", 1 );')
-                        
-                        #mel.eval('HIKCharacterControlsTool;')
-                        #mel.eval('hikCustomRigAddRemoveMapping( "T", 0 );')
-                        #mel.eval('hikUpdateCurrentSourceFromUI; hikUpdateContextualUI;')
-                        
         cmds.select(clear=True)
     
 
