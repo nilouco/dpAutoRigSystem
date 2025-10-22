@@ -38,7 +38,7 @@ class MotionCapture(object):
         # creating MotionCaptureUI Window:
         self.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 280
-        mocap_winHeight = 300
+        mocap_winHeight = 390
         dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
@@ -73,7 +73,13 @@ class MotionCapture(object):
         cmds.text(label=self.lang['i292_processes'], parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['m241_prepareTPose'], annotation="prepareTPose", width=240, command=self.prepareTPose, parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.hikRetarget, parent=motionCaptureMainLayout)
-        cmds.separator(height=5, style="in", horizontal=True, parent=motionCaptureMainLayout)
+        # animation buttons
+        cmds.separator(style='in', height=10, width=240, parent=motionCaptureMainLayout)
+        cmds.text(label=self.lang['i185_animation'], parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['i360_snapIkFromBakedFk'], annotation="Snap Ik timeline", width=240, command=self.hikSnapIkTimeline, parent=motionCaptureMainLayout)
+        # clear buttons
+        cmds.separator(style='in', height=10, width=240, parent=motionCaptureMainLayout)
+        cmds.text(label=self.lang['v096_cleanup'], parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['i046_remove']+" HumanIk", annotation="removeHumanIk", width=240, command=self.hikRemoveMocap, parent=motionCaptureMainLayout)
         cmds.tabLayout(mocapTabLayout, edit=True, tabLabel=((humanIkFL, 'HumanIk')))
         # call Window:
@@ -467,8 +473,9 @@ class MotionCapture(object):
                     cmds.setAttr(optCtrl+"."+attr, mode)
 
 
-    def runIkFkSnap(self, *args):
+    def runIkFkSnap(self, key=True, *args):
         """ Execute the ikFkSnap script nodes.
+            It's very usefull to transfer baked fk animation to ik controllers.
         """
         netList = self.utils.getNetworkNodeByAttr("dpIkFkSnapNet")
         if netList:
@@ -484,6 +491,9 @@ class MotionCapture(object):
                 ikFkSnapInst = dpIkFkSnap.IkFkSnapClass(self.dpUIinst, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'], creation=False)
                 # snap from Fk to Ik (that means move ik to fk position)                
                 ikFkSnapInst.snapFkToIk()
+                del ikFkSnapInst
+                if key:
+                    cmds.setKeyframe([ikExtremCtrl, ikCornerCtrl], attribute=["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"])
 
 
     def setCtrlMode(self, mode=1, *args):
@@ -611,7 +621,7 @@ class MotionCapture(object):
         optCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optCtrl:
             if "ikFkSnap" in cmds.listAttr(optCtrl):
-                self.runIkFkSnap()
+                self.runIkFkSnap(False)
             else:
                 mel.eval('warning \"'+self.lang['m244_setTPoseIssue']+' ikFkSnap'+'\";')
         beforeCtrlList.extend(fkCtrlList)
@@ -855,3 +865,25 @@ for hik in cmds.ls(type="HIKCharacterNode"):
         sn = cmds.scriptNode(name=self.hikNode+'_Cleaner_SN', sourceType='python', scriptType=2, beforeScript=hikCleanerCode)
         self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
         cmds.scriptNode(sn, executeBefore=True)
+
+
+    def hikSnapIkTimeline(self, start=None, end=None, *args):
+        """ Run to all timeline and snap ik from baked fk.
+        """
+        optCtrl = self.utils.getNodeByMessage("optionCtrl")
+        if optCtrl:
+            if "ikFkSnap" in cmds.listAttr(optCtrl):
+                startFrame = start
+                endFrame = end
+                if start == None:
+                    startFrame = int(cmds.playbackOptions(query=True, minTime=True))
+                if end == None:
+                    endFrame = int(cmds.playbackOptions(query=True, maxTime=True))
+                self.utils.setProgress("HumanIk - Snap ikFk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=(endFrame-startFrame))
+                initialTime = cmds.currentTime(query=True)
+                for t in range(startFrame, endFrame+1):
+                    self.utils.setProgress("Timeline")
+                    cmds.currentTime(t)
+                    self.runIkFkSnap()
+                cmds.currentTime(initialTime)
+                self.utils.setProgress(endIt=True)
