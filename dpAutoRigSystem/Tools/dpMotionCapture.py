@@ -311,15 +311,22 @@ class MotionCapture(object):
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_Up_03"+"_Ctrl"},
                 "LeafLeftArmRoll5" : {"id"      : 208,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_Up_04"+"_Ctrl"},
                 "LeafLeftForeArmRoll1" : {"id"  : 177,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_08"+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_Down_00"+"_Ctrl"},
                 "LeafLeftForeArmRoll2" : {"id"  : 185,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_09"+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_07"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_Down_01"+"_Ctrl"},
                 "LeafLeftForeArmRoll3" : {"id"  : 193,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_10"+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_08"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_Down_02"+"_Ctrl"},
                 "LeafLeftForeArmRoll4" : {"id"  : 201,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_11"+"_Jnt",
@@ -341,15 +348,22 @@ class MotionCapture(object):
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_Up_03"+"_Ctrl"},
                 "LeafRightArmRoll5": {"id"      : 210,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_Up_04"+"_Ctrl"},
                 "LeafRightForeArmRoll1" : {"id" : 179,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_08"+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_Down_00"+"_Ctrl"},
                 "LeafRightForeArmRoll2" : {"id" : 187,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_09"+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_07"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_Down_01"+"_Ctrl"},
                 "LeafRightForeArmRoll3" : {"id" : 195,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_10"+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_08"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_Down_02"+"_Ctrl"},
                 "LeafRightForeArmRoll4" : {"id" : 203,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_11"+"_Jnt",
@@ -371,15 +385,22 @@ class MotionCapture(object):
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_Up_03"+"_Ctrl"},
                 "LeafLeftUpLegRoll5" : {"id"    : 204,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_Up_04"+"_Ctrl"},
                 "LeafLeftLegRoll1" : {"id"      : 173,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_08"+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_Down_00"+"_Ctrl"},
                 "LeafLeftLegRoll2" : {"id"      : 181,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_09"+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_07"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_Down_01"+"_Ctrl"},
                 "LeafLeftLegRoll3" : {"id"      : 189,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_10"+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_08"+"_Jnt",
+                                      "needJnt" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_Down_02"+"_Ctrl"},
                 "LeafLeftLegRoll4" : {"id"      : 197,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_11"+"_Jnt",
@@ -401,15 +422,22 @@ class MotionCapture(object):
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_Up_03"+"_Ctrl"},
                 "LeafRightUpLegRoll5": {"id"    : 206,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_Up_04"+"_Ctrl"},
                 "LeafRightLegRoll1" : {"id"     : 175,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_08"+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_06"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_Down_00"+"_Ctrl"},
                 "LeafRightLegRoll2" : {"id"     : 183,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_09"+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_07"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_Down_01"+"_Ctrl"},
                 "LeafRightLegRoll3" : {"id"     : 191,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_10"+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_08"+"_Jnt",
+                                      "needJnt" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_12"+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_Down_02"+"_Ctrl"},
                 "LeafRightLegRoll4" : {"id"     : 199,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_11"+"_Jnt",
@@ -662,6 +690,9 @@ class MotionCapture(object):
                     for r in ["", "1", "2", "3", "4"]: #workaround to accept many ribbons renaming
                         if "joint"+r in self.hikDic[hikKey].keys():
                             if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
+                                if r == "" and "needJnt" in self.hikDic[hikKey].keys():
+                                    if not cmds.objExists(self.hikDic[hikKey]["needJnt"]):
+                                        continue
                                 cmds.connectAttr(self.hikDic[hikKey]["joint"+r]+".message", self.hikNode+"."+hikKey, force=True)
                                 if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"+r]):
                                     cmds.addAttr(self.hikDic[hikKey]["joint"+r], longName=self.hikCharacterAttr, attributeType="message")
@@ -773,17 +804,26 @@ class MotionCapture(object):
                 cmds.setAttr(optCtrl+"."+self.lang['p003_right'].lower()+self.lang['c006_leg_main']+"Fk", 0)
 
 
+    def hikCheckExists(self, id, dataKey="control", *args):
+        """ Return True of False if the object inside the dataKey exists or not.
+        """
+        for hikKey in self.hikDic.keys():
+            if id == self.hikDic[hikKey]["id"]:
+                return cmds.objExists(self.hikDic[hikKey][dataKey])
+
+
     def hikSetCustomMap(self, id, t=None, r=None, *args):
         """ Set custom map to translate and/or rotate for the given HumanIk item ID.
         """
-        mel.eval('hikCustomRigToolWidget -e -sl '+str(id)+';')
-        mel.eval('hikControlRigSelectionChangedCallback;')
-        mel.eval('hikUpdateCustomRigUI')
-        if not t == None:
-            mel.eval('hikCustomRigAddRemoveMapping( "T", '+str(t)+' );')
-        if not r == None:
-            mel.eval('hikCustomRigAddRemoveMapping( "R", '+str(r)+' );')
-        mel.eval('hikUpdateCustomRigUI')
+        if self.hikCheckExists(id):
+            mel.eval('hikCustomRigToolWidget -e -sl '+str(id)+';')
+            mel.eval('hikControlRigSelectionChangedCallback;')
+            mel.eval('hikUpdateCustomRigUI')
+            if not t == None:
+                mel.eval('hikCustomRigAddRemoveMapping( "T", '+str(t)+' );')
+            if not r == None:
+                mel.eval('hikCustomRigAddRemoveMapping( "R", '+str(r)+' );')
+            mel.eval('hikUpdateCustomRigUI')
 
 
     def hikMapCustomElements(self, *args):
@@ -793,12 +833,10 @@ class MotionCapture(object):
         for hikKey in self.hikDic.keys():
             for finger in fingerList:
                 if finger in hikKey:
-                    if cmds.objExists(self.hikDic[hikKey]["control"]):
-                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Finger add rotate
-                        self.hikSetCustomMap(self.hikDic[hikKey]["id"], t=0) #Finger remove translate
+                    self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Finger add rotate
+                    self.hikSetCustomMap(self.hikDic[hikKey]["id"], t=0) #Finger remove translate
             if "Roll" in hikKey:
-                if cmds.objExists(self.hikDic[hikKey]["control"]):
-                    self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Ribbon add rotate
+                self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Ribbon add rotate
         self.hikSetCustomMap(15, t=0) #Head remove translate, let it rotate only
         self.hikSetCustomMap(8,  r=1) #Spine add rotate
         self.hikSetCustomMap(20, r=1) #Neck add rotate
