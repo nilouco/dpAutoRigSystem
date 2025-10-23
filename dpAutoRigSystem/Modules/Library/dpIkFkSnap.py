@@ -14,12 +14,12 @@ from maya import cmds
 from maya.api import OpenMaya
 import math
 
-DP_IKFKSNAP_VERSION = 2.03
+DP_IKFKSNAP_VERSION = 2.04
 
 
 
 class IkFkSnapClass(object):
-    def __init__(self, dpUIinst, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, *args):
+    def __init__(self, dpUIinst, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, creation=True, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.netName = netName
@@ -29,22 +29,28 @@ class IkFkSnapClass(object):
         self.ikPoleVectorCtrl = ikCtrlList[0]
         self.ikExtremCtrl = ikCtrlList[1]
         self.ikExtremSubCtrl = ikCtrlList[2]
-        self.fkCtrlList = fkCtrlList[1:]
-        self.ikJointList = ikJointList[1:-1]
+        self.fkCtrlList = fkCtrlList
+        self.ikJointList = ikJointList
         self.revFootAttrList = revFootAttrList
         self.uniformScaleAttr = uniformScaleAttr
-        # calculate the initial ikFk extrem offset
-        self.extremOffsetMatrix = self.getOffsetMatrix(self.ikExtremCtrl, self.fkCtrlList[-1])
-        # store data
-        self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
-        self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
-        self.dpUIinst.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
-        self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
-        self.storeIkFkSnapData()
-        if dpDev:
-            cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
+        if creation:
+            self.fkCtrlList = fkCtrlList[1:]
+            self.ikJointList = ikJointList[1:-1]
+            # calculate the initial ikFk extrem offset
+            self.extremOffsetMatrix = self.getOffsetMatrix(self.ikExtremCtrl, self.fkCtrlList[-1])
+            # store data
+            self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
+            self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
+            self.dpUIinst.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
+            self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
+            self.storeIkFkSnapData()
+            if dpDev:
+                cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
+            else:
+                self.generateScriptNode()
         else:
-            self.generateScriptNode()
+            self.ikBeforeCtrl = cmds.listConnections(netName+".ikBeforeCtrl")[0]
+            self.extremOffsetMatrix = cmds.getAttr(netName+".extremOffset")
     
 
     ###
@@ -148,6 +154,7 @@ class IkFkSnapClass(object):
 
     def snapIkToFk(self, *args):
         """ Switch from ik to fk keeping the same position.
+            That means move the fk to the ik position.
         """
         self.bakeFollowRotation(self.ikBeforeCtrl)
         self.bakeFollowRotation(self.fkCtrlList[0])
@@ -159,11 +166,13 @@ class IkFkSnapClass(object):
 
     def snapFkToIk(self, *args):
         """ Switch from fk to ik keeping the same position.
+            That means move the ik to the fk position.
         """
         self.bakeFollowRotation(self.ikBeforeCtrl)
         self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
         self.zeroKeyAttrValue(self.ikExtremSubCtrl, ["tx", "ty", "tz", "rx", "ry", "rz"])
         self.transferAttrFromTo(self.fkCtrlList[2], self.ikExtremCtrl, [self.uniformScaleAttr])
+        
         # extrem ctrl
         fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
         toIkM = OpenMaya.MMatrix(self.extremOffsetMatrix) * fkM #need redefine to load matrix in scriptNode
