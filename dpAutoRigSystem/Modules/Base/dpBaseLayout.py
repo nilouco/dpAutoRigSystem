@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_BASELAYOUT_VERSION = 2.08
+DP_BASELAYOUT_VERSION = 2.09
 
 
 class BaseLayout(object):
@@ -531,6 +531,10 @@ class BaseLayout(object):
 
     
     def createPreviewMirror(self, *args):
+        """ Just create the mirror preview nodes.
+            It runs recursively.
+        """
+        selList = cmds.ls(selection=True)
         # re-declaring guideMirror and previewMirror groups:
         self.previewMirrorGrpName = self.moduleGrp[:self.moduleGrp.find(":")]+'_MirrorGrp'
         if cmds.objExists(self.previewMirrorGrpName):
@@ -663,8 +667,7 @@ class BaseLayout(object):
             # set a negative value to the scale mirror axis:
             for axis in self.mirrorAxis:
                 cmds.setAttr(self.previewMirrorGrp+'.scale'+axis, -1)
-        
-        cmds.select(self.moduleGrp)
+        cmds.select(selList)
 
 
     def changeDeformedBy(self, item, *args):
