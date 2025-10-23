@@ -38,7 +38,7 @@ class MotionCapture(object):
         # creating MotionCaptureUI Window:
         self.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 280
-        mocap_winHeight = 390
+        mocap_winHeight = 420
         dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
@@ -47,6 +47,7 @@ class MotionCapture(object):
         humanIkFL = cmds.formLayout('humanIkFL', numberOfDivisions=100, parent=mocapTabLayout)
         motionCaptureMainLayout = cmds.columnLayout('motionCaptureMainLayout', columnOffset=("both", 10), rowSpacing=10, parent=humanIkFL)
         cmds.separator(height=5, style="none", horizontal=True, parent=motionCaptureMainLayout)
+        self.mapRibbonCB = cmds.checkBox("mapRibbonCB", label=self.lang['i361_mapRibbon'], value=False, parent=motionCaptureMainLayout)
         humanIkModeFL = cmds.frameLayout('humanIkModeFL', label="Ik/Fk "+self.lang['v003_mode'], collapsable=True, collapse=False, parent=motionCaptureMainLayout)
         # radio buttons:
         ikFkModeRCL = cmds.rowColumnLayout('ikFkModeRCL', numberOfColumns=3, columnWidth=[(1, 90), (2, 80), (3, 70)], columnAlign=[(1, 'center'), (2, 'center'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 5), (3, 'both', 5)], parent=humanIkModeFL)
@@ -457,21 +458,23 @@ class MotionCapture(object):
         self.setTPose()
 
 
-    def hikRetarget(self, *args):
+    def hikRetarget(self, rib=False, *args):
         """ Run the HumanIk retargeting processes.
         """
+        if self.ui:
+            rib = cmds.checkBox(self.mapRibbonCB, query=True, value=True)
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk", self.lang['m239_motionCapture'], addOne=False, addNumber=False, max=8)
         self.hikCreateCharacterDefinition()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
-        self.hikAssignJointsToDefinition()
+        self.hikAssignJointsToDefinition(rib)
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikCreateCustomRigCtrl()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
-        self.hikMapBipedControllersByUI()
+        self.hikMapBipedControllersByUI(rib)
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.setIkFkBipedControllersByUI()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
-        self.hikMapCustomElements()
+        self.hikMapCustomElements(rib)
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
         self.hikMapCustomChest()
         self.utils.setProgress(self.lang['m242_retargeting']+" HumanIk")
@@ -678,7 +681,7 @@ class MotionCapture(object):
         return self.hikNode
     
 
-    def hikAssignJointsToDefinition(self, *args):
+    def hikAssignJointsToDefinition(self, rib=False, *args):
         """ Map dpAR biped joints to HumanIk character definition.
         """
         if self.hikNode:
@@ -687,6 +690,9 @@ class MotionCapture(object):
                 if not self.hikDic:
                     self.hikDic = self.hikGetDefaultMapDic()
                 for hikKey in self.hikDic.keys():
+                    if "Roll" in hikKey: #ribbon
+                        if not rib:
+                            continue
                     for r in ["", "1", "2", "3", "4"]: #workaround to accept many ribbons renaming
                         if "joint"+r in self.hikDic[hikKey].keys():
                             if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
@@ -710,7 +716,7 @@ class MotionCapture(object):
             mel.eval('warning \"'+self.lang['m247_missingHIKCharNode']+'\";')
 
 
-    def hikMapBipedControllers(self, ikList=None, *args):
+    def hikMapBipedControllers(self, ikList=None, rib=False, *args):
         """ Map the HumanIk biped controllers to the definition.
         """
         if self.hikNode:
@@ -718,6 +724,9 @@ class MotionCapture(object):
                 if not self.hikDic:
                     self.hikDic = self.hikGetDefaultMapDic()
                 for hikKey in self.hikDic.keys():
+                    if "Roll" in hikKey: #ribbon
+                        if not rib:
+                            continue
                     if not self.hikDic[hikKey]["id"] == 0: #reference
                         #ik or fk
                         ctrl = "control"
@@ -735,7 +744,7 @@ class MotionCapture(object):
             mel.eval('warning \"'+self.lang['m247_missingHIKCharNode']+'\";')
 
 
-    def hikMapBipedControllersByUI(self, *args):
+    def hikMapBipedControllersByUI(self, rib=False, *args):
         """ Ready the UI to set user defined definition to controllers as ik or fk.
             By default:
                 spineMode = "spineIk"
@@ -749,7 +758,7 @@ class MotionCapture(object):
             ikList.extend(["LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand"])
         if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
             ikList.extend(["LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"])
-        self.hikMapBipedControllers(ikList)
+        self.hikMapBipedControllers(ikList, rib)
 
 
     def hikCreateCustomRigCtrl(self, *args):
@@ -826,7 +835,7 @@ class MotionCapture(object):
             mel.eval('hikUpdateCustomRigUI')
 
 
-    def hikMapCustomElements(self, *args):
+    def hikMapCustomElements(self, rib=False, *args):
         """ Set cutom HumanIk controllers properly mapping.
         """
         fingerList = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
@@ -836,7 +845,8 @@ class MotionCapture(object):
                     self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Finger add rotate
                     self.hikSetCustomMap(self.hikDic[hikKey]["id"], t=0) #Finger remove translate
             if "Roll" in hikKey:
-                self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Ribbon add rotate
+                if rib:
+                    self.hikSetCustomMap(self.hikDic[hikKey]["id"], r=1) #Ribbon add rotate
         self.hikSetCustomMap(15, t=0) #Head remove translate, let it rotate only
         self.hikSetCustomMap(8,  r=1) #Spine add rotate
         self.hikSetCustomMap(20, r=1) #Neck add rotate
