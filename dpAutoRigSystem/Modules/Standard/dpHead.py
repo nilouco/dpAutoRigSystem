@@ -16,7 +16,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.04
+DP_HEAD_VERSION = 3.05
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -1280,14 +1280,18 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             ctrlAttr = sideName+"_"+attr
                         facialAttrList.append(ctrlAttr)
                         if directConnection:
-                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0, minValue=0, maxValue=1)
+                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0)
                             cmds.setAttr(fCtrl+"."+attr, keyable=True)
                         else:
+                            if not "intensity" in cmds.listAttr(fCtrl):
+                                cmds.addAttr(fCtrl, longName="intensity", attributeType="float", defaultValue=1)
+                                cmds.setAttr(fCtrl+".intensity", keyable=True)
                             cmds.addAttr(fCtrl, longName=ctrlAttr, attributeType="float", defaultValue=0)
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
                             clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
-                            self.toIDList.extend([calibrateMD, clp, invMD])
+                            intensityMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Intensity_MD")
+                            self.toIDList.extend([calibrateMD, clp, invMD, intensityMD])
                             if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
@@ -1320,7 +1324,9 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             else:
                                 cmds.connectAttr(calibrateMD+".outputX", clp+".input.inputR", force=True)
                             cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)
-                            cmds.connectAttr(invMD+".outputX", fCtrl+"."+ctrlAttr, force=True)
+                            cmds.connectAttr(invMD+".outputX", intensityMD+".input1X", force=True)
+                            cmds.connectAttr(fCtrl+".intensity", intensityMD+".input2X", force=True)
+                            cmds.connectAttr(intensityMD+".outputX", fCtrl+"."+ctrlAttr, force=True)
                             cmds.setAttr(fCtrl+"."+ctrlAttr, lock=True)
             if facialAttrList:
                 self.ctrls.setStringAttrFromList(fCtrl, facialAttrList, "facialList")
