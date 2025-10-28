@@ -10,7 +10,7 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.02
+DP_HEADDEFORMER_VERSION = 4.03
 
 
 class HeadDeformer(object):
@@ -104,6 +104,10 @@ class HeadDeformer(object):
             # get a list of selected items
             hdList = cmds.ls(selection=True)
         if hdList:
+            for hdNode in hdList:
+                if not cmds.objExists(hdNode):
+                    cmds.polyCube(name=hdNode, constructionHistory=False)
+                    print(self.dpUIinst.lang["i304_new"], "=", hdNode)
             cmds.select(hdList)
             # lattice deformer
             latticeDefList = cmds.lattice(name=deformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
@@ -413,7 +417,7 @@ class HeadDeformer(object):
             # rename unitConversion nodes
             self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
             # add ignoreTranformIO attribute
-            self.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, mainCtrlGrp, arrowCtrlGrp], self.utils.ignoreTransformIOAttr)
+            self.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, arrowCtrlGrp], self.utils.ignoreTransformIOAttr)
             # add dpID attributes
             self.toIDList.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
             for deformerList in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:
