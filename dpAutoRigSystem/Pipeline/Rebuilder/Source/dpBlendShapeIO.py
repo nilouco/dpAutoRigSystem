@@ -9,7 +9,7 @@ TITLE = "r030_blendShapeIO"
 DESCRIPTION = "r031_blendShapeIODesc"
 ICON = "/Icons/dp_blendShapeIO.png"
 
-DP_BLENDSHAPEIO_VERSION = 1.01
+DP_BLENDSHAPEIO_VERSION = 1.02
 
 
 class BlendShapeIO(dpBaseAction.ActionStartClass):
@@ -232,7 +232,7 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                     if tgtAlreadyExists:
                         tgt = cmds.rename("|"+tgt, "dpTemp_"+tgt)
                         if cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")):
-                            plugOut = cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")[0]+".worldMesh[0]", destination=True, source=False, plugs=True)
+                            plugOut = cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")[0]+".worldMesh[0]", destination=True, source=False, plugs=True)[0]
                             cmds.connectAttr(cmds.listRelatives(target, children=True, type="mesh")[0]+".worldMesh[0]", plugOut, force=True)
                         #elif cmds.listConnections(cmds.listRelatives(tgt, children=True, type="shape")):
                             #TODO edit to accept nurbsShape blendShapes like Zipper

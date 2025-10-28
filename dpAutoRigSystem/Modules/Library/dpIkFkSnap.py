@@ -14,7 +14,7 @@ from maya import cmds
 from maya.api import OpenMaya
 import math
 
-DP_IKFKSNAP_VERSION = 2.04
+DP_IKFKSNAP_VERSION = 2.05
 
 
 
@@ -46,8 +46,7 @@ class IkFkSnapClass(object):
             self.storeIkFkSnapData()
             if dpDev:
                 cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
-            else:
-                self.generateScriptNode()
+            self.generateScriptNode()
         else:
             self.ikBeforeCtrl = cmds.listConnections(netName+".ikBeforeCtrl")[0]
             self.extremOffsetMatrix = cmds.getAttr(netName+".extremOffset")
