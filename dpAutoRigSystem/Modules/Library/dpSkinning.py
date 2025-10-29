@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from . import dpWeights
 
-DP_SKINNING_VERSION = 1.08
+DP_SKINNING_VERSION = 1.09
 
 
 class Skinning(dpWeights.Weights):
@@ -265,19 +265,21 @@ class Skinning(dpWeights.Weights):
         """
         needToCreateSkinCluster = True
         incomingJointList = skinWeightDic[item][skinClusterName]['skinInfList']
-        missingJntList = self.createMissingJoints(incomingJointList)
-        skinClusterInfoList = self.checkExistingDeformerNode(item)
-        if skinClusterInfoList[0]:
-            for scNode in skinClusterInfoList[2]:
-                if scNode == skinClusterName:
-                    if missingJntList:
-                        for jnt in missingJntList:
-                            # add influence
-                            cmds.skinCluster(item, edit=True, addInfluence=jnt, lockWeights=True, weight=0.0)
-                            needToCreateSkinCluster = False
-                    else:
-                        cmds.lockNode(scNode, lock=False)
-                        cmds.delete(scNode)
+        if cmds.objExists(skinClusterName):
+            if cmds.listConnections(skinClusterName+".outputGeometry", destination=True, source=False):
+                needToCreateSkinCluster = False
+                missingJntList = self.createMissingJoints(incomingJointList)
+                skinClusterInfoList = self.checkExistingDeformerNode(item)
+                if skinClusterInfoList[0]:
+                    for scNode in skinClusterInfoList[2]:
+                        if scNode == skinClusterName:
+                            if missingJntList:
+                                for jnt in missingJntList:
+                                    # add influence
+                                    cmds.skinCluster(item, edit=True, addInfluence=jnt, lockWeights=True, weight=0.0)
+            else:
+                cmds.lockNode(skinClusterName, lock=False)
+                cmds.delete(skinClusterName)
         if needToCreateSkinCluster:
             if cmds.about(version=True) >= "2024": #accepting multiple skinClusters
                 scNode = cmds.skinCluster(incomingJointList, item, multi=True, name=skinClusterName, toSelectedBones=True, skinMethod=skinWeightDic[item][skinClusterName]['skinMethodToUse'], obeyMaxInfluences=skinWeightDic[item][skinClusterName]['skinMaintainMaxInf'], maximumInfluences=skinWeightDic[item][skinClusterName]['skinMaxInf'])[0]
@@ -422,7 +424,7 @@ class Skinning(dpWeights.Weights):
         if itemList and path:
             for item in itemList:
                 filename = path[0]+"/"+self.ioStartName+"_"+self.getIOFileName(item)+".json"
-                if cmds.listRelatives(item, children=True, allDescendents=True, type="item"):
+                if cmds.listRelatives(item, children=True, allDescendents=True, shapes=True):
                     if export:
                         skinClusterDic = self.getSkinWeightData([item])
                         self.dpUIinst.pipeliner.saveJsonFile(skinClusterDic, filename)
