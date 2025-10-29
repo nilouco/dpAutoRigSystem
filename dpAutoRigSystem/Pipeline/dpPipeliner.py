@@ -10,7 +10,7 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.16
+DP_PIPELINER_VERSION = 1.17
 
 
 class Pipeliner(object):
@@ -54,9 +54,12 @@ class Pipeliner(object):
     def getJsonContent(self, jsonPath, *args):
         """ Open, read, close and return the json file content.
         """
-        dic = open(jsonPath, "r", encoding='utf-8')
-        content = json.loads(dic.read())
-        dic.close()
+        try:
+            dic = open(jsonPath, "r", encoding='utf-8')
+            content = json.loads(dic.read())
+            dic.close()
+        except:
+            content = None
         return content
 
 
