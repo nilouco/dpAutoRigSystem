@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.08
+DP_UTILS_VERSION = 3.09
 
 
 class Utils(object):
@@ -1532,7 +1532,8 @@ class Utils(object):
         """
         if itemList:
             for item in itemList:
-                cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)
+                if not self.dpUIinst.jointEndAttr in cmds.listAttr(item):
+                    cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)
         
 
     def createLocatorInItemPosition(self, item, *args):
