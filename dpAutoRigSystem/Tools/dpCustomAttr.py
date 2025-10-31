@@ -14,7 +14,7 @@ ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnor
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
-DP_CUSTOMATTR_VERSION = 1.08
+DP_CUSTOMATTR_VERSION = 1.09
 
 
 class CustomAttr(object):
@@ -278,7 +278,7 @@ class CustomAttr(object):
                         if not cmds.attributeQuery(attr, node=item, exists=True):
                             cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
                             cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
-            if self.ui:
+            if self.ui and cmds.textFieldButtonGrp("addCustomAttrTFG", exists=True):
                 cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
         return idList
 
