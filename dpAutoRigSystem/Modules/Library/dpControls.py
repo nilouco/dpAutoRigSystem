@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.00
+DP_CONTROLS_VERSION = 3.01
 
 
 class ControlClass(object):
@@ -1351,7 +1351,7 @@ class ControlClass(object):
             if path and "dpData" in path:
                 currentPath = path.split("dpData")[0]
             else:
-                print(self.dpUIinst.lang['i201_saveScene'])
+                mel.eval('warning \"'+self.dpUIinst.lang['i201_saveScene']+'\";')
                 return
         if not nodeList:
             nodeList = self.getControlList()
@@ -1417,7 +1417,7 @@ class ControlClass(object):
                     print('Exported shapes to: {0}'.format(path))
                 cmds.undoInfo(closeChunk=True)
         else:
-            print(self.dpUIinst.lang['i202_noControls'])
+            mel.eval('warning \"'+self.dpUIinst.lang['i202_noControls']+'\";')
         if ui:
             # Close progress window
             self.utils.setProgress(endIt=True)
