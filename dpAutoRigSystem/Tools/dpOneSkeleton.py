@@ -9,7 +9,7 @@ TITLE = "m254_oneSkeleton"
 DESCRIPTION = "m255_oneSkeletonDesc"
 ICON = "/Icons/dp_oneSkeleton.png"
 
-DP_ONESKELETON_VERSION = 1.00
+DP_ONESKELETON_VERSION = 1.01
 
 
 class OneSkeleton(object):
@@ -155,6 +155,9 @@ class OneSkeleton(object):
         """
         uniqueInfList = []
         skinClusterList = []
+        if not cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True):
+            mel.eval('warning \"'+self.dpUIinst.lang['i041_meshConnEmpty']+'\";')
+            return
         for transformNode in list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True))):
             skinClusterList.extend(self.dpUIinst.skin.checkExistingDeformerNode(transformNode)[2] or [])
         if skinClusterList:
