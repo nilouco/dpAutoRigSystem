@@ -8,7 +8,7 @@ TITLE = "v076_outlinerCleaner"
 DESCRIPTION = "v077_outlinerCleanerDesc"
 ICON = "/Icons/dp_outlinerCleaner.png"
 
-DP_OUTLINERCLEANER_VERSION = 1.03
+DP_OUTLINERCLEANER_VERSION = 1.04
 
 
 class OutlinerCleaner(dpBaseAction.ActionStartClass):
@@ -40,6 +40,11 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             hiddenList = [self.dpUIinst.tempGrp, self.dpUIinst.guideMirrorGrp]
+            
+            
+            #TODO = get node by attribute (dpTemp)
+
+
             if not objList:
                 objList = cmds.ls(selection=False, type="transform")
             if objList:

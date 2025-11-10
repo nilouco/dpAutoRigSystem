@@ -302,7 +302,7 @@ class ActionStartClass(object):
             return self.pipeliner.pipeData['assetPath']+"/"+self.pipeliner.pipeData[ioDir]
 
 
-    def getExportedList(self, objList=None, subFolder="", askHasData=False, *args):
+    def getExportedList(self, objList=None, subFolder="", askHasData=False, getAny=False, *args):
         """ Returns the exported file list in the current asset folder IO or the given objList.
         """
         exportedList = None
@@ -315,11 +315,14 @@ class ActionStartClass(object):
                 exportedList = objList
                 if not type(objList) == list:
                     exportedList = [objList]
+            elif getAny:
+                if os.path.exists(self.ioPath):
+                    exportedList = next(os.walk(self.ioPath))[2]
             else:
                 if os.path.exists(self.ioPath+"/"+subFolder):
                     exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
             if exportedList:
-                if subFolder:
+                if subFolder or getAny:
                     return exportedList
                 assetName = self.pipeliner.pipeData["assetName"]
                 for item in exportedList:
