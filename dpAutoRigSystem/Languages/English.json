@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-10-23",
+    "_updated"       : "2025-11-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -171,7 +171,7 @@
     "i003_prefix"               : "Prefix for all nodes.",
     "i004_defaultRL"            : "Use Default Render Layer (masterLayer).",
     "i005_footerRigging"        : "modules will be created in this Rig",
-    "i006_aboutDesc"            : "\nAbout dpAutoRig System:\n\nThis script is a Python program to\nautomate the Rigging process.\n\nIt was write in order to help you to develop\nmany types of rigs by yourself.\nIts arquitecture is modular, multilingual and object oriented\nthat means you can create any type of Rigging parts\nand combine them as you want...\n\nIf you have any suggestion or comment, please contact me.\nI hope you enjoy it   :)\n\nIt is FREE !!!",
+    "i006_aboutDesc"            : "\nAbout dpAutoRig System:\n\nThis script is a Python program to\nautomate the Rigging process.\n\nIt was written in order to help you to develop\nmany types of rigs by yourself.\nIts arquitecture is modular, multilingual and object oriented,\nwhich means you can create any type of Rigging parts\nand combine them however you want...\n\nIf you have any suggestions or comments, please contact me.\nI hope you enjoy it   :)\n\nIt is FREE !!!",
     "i007_authorDesc"           : "\nAuthor: Danilo Pinheiro (nilouco)\n\nHe's a simple person who likes 3D\nand really want the best of all...\n\nContact information:\ne-mail: nilouco@gmail.com\nportfolio: https://nilouco.blogspot.com\n\nPlease, any feedback will be very appreciated   :)\n\nThank you very much!",
     "i008_errorUI"              : "Cannot load dpAutoRig UI window..., please try save the dpAutoRigSystem folder in MAYA_PATH directory and verify if you did not changed any file.",
     "i009_displayJointsCB"      : "Display joints after rig.",
@@ -996,7 +996,7 @@
     "v120_nonQuadFaceDesc"             : "This validator will find non quad polygon faces.\nIt won't be possible to fix it automatically, sorry.",
     "v121_sharePythonSelect"           : "Please share with modelers this Python command to select the identified:",
     "v122_borderGap"                   : "Border gap",
-    "v123_borderGapDesc"               : "This validator will find borders or holes in the mesh.\nIt won't be possible to if it automatically, sorry.\nBut you can try to use the fill hole Maya command to try fix it.",
+    "v123_borderGapDesc"               : "This validator will find borders or holes in the mesh.\nIt won't be possible to fix it automatically, sorry.\nBut you can try to use the fill hole Maya command to try to fix it.",
     "v124_laminaFaceCleaner"           : "Lamina face cleaner",
     "v125_laminaFaceCleanerDesc"       : "This validator will verify if there are some lamina faces in the meshes.\nIt'll cleanup them.",
     "v126_brokenRivet"                 : "Broken Rivets",
