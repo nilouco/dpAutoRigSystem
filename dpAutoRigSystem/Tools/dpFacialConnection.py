@@ -15,7 +15,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.01
+DP_FACIALCONNECTION_VERSION = 1.02
 
 
 class FacialConnection(object):
@@ -179,10 +179,10 @@ class FacialConnection(object):
                     geoList.append(geo)
                 else:
                     cmds.parent(geo, facialGrp)
+                self.dpUIinst.customAttr.addAttr(0, [geo], descendents=True) #dpID
             geoGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
             cmds.parent(geoList, geoGrp)
             cmds.parent(facialGrp, geoGrp)
-            self.dpUIinst.customAttr.addAttr(0, [geoGrp], descendents=True) #dpID
             if self.ui and resultList:
                 self.dpUIinst.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
