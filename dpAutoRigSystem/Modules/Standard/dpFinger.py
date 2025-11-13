@@ -303,8 +303,8 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                     cmds.setAttr(articJntList[0]+".scaleZ", -1)
                             else:
                                 articJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt)
-                                self.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                                 cmds.connectAttr(self.scaleCompensateCond+".outColorR", articJntList[0]+".segmentScaleCompensate", force=True)
+                            self.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     
                     if n == self.nJoints:
