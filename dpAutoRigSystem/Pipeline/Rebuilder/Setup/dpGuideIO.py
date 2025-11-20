@@ -12,7 +12,7 @@ ICON = "/Icons/dp_guideIO.png"
 
 MODULES = "Modules.Standard"
 
-DP_GUIDEIO_VERSION = 1.02
+DP_GUIDEIO_VERSION = 1.03
 
 
 class GuideIO(dpBaseAction.ActionStartClass):
@@ -58,7 +58,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                             netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                             netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
                         if netList:
-                            self.dpUIinst.ctrls.unPinGuide()
+                            self.dpUIinst.ctrls.unPinGuide(force=True)
                             self.exportDicToJsonFile(self.getGuideDataDic(netList))
                         else:
                             self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])

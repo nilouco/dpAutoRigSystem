@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.01
+DP_CONTROLS_VERSION = 3.02
 
 
 class ControlClass(object):
@@ -1181,15 +1181,17 @@ class ControlClass(object):
                 self.createPinGuide(guideBase)
 
 
-    def unPinGuide(self, guideList=None, *args):
+    def unPinGuide(self, guideList=None, force=False, *args):
         """ Remove pinGuide setup.
-            We expect to have the scriptJob running here to clean-up the pin setup.
+            We expect to have the scriptJob running here to clean-up the pin setup, or just force it to run.
         """
         if not guideList:
             guideList = [guide for guide in cmds.ls(selection=False, type="transform") if "pinGuide" in cmds.listAttr(guide)]
         if guideList:
             for guide in guideList:
                 cmds.setAttr(guide+".pinGuide", 0)
+                if force:
+                    self.jobPinGuide(guide)
 
 
     def storeLockedList(self, ctrlName, *args):
