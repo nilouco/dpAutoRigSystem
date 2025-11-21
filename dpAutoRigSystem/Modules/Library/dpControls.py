@@ -536,18 +536,18 @@ class ControlClass(object):
                 cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
 
 
-    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", *args):
+    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", pin=True, *args):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.getControlInstance(cvType)
         curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
-            self.addGuideAttrs(curve, color)
+            self.addGuideAttrs(curve, color, pin)
         return curve
 
 
     #@dpUtils.profiler
-    def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
+    def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, pin=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
         # create locator curve:
@@ -578,7 +578,7 @@ class ControlClass(object):
         cmds.setAttr(locCtrl+".rotateZ", rot[2])
         cmds.makeIdentity(locCtrl, rotate=True, apply=True)
         if guide:
-            self.addGuideAttrs(locCtrl)
+            self.addGuideAttrs(locCtrl, pin=pin)
         cmds.select(clear=True)
         return locCtrl
 
@@ -1086,7 +1086,7 @@ class ControlClass(object):
         cmds.parent(clusterHandle, self.dpUIinst.tempGrp)
 
 
-    def addGuideAttrs(self, ctrlName, color="blue", *args):
+    def addGuideAttrs(self, ctrlName, color="blue", pin=True, *args):
         """ Add and set attributes to this control curve be used as a guide.
         """
         # create an attribute to be used as guide by module:
@@ -1097,7 +1097,8 @@ class ControlClass(object):
         # shapeSize setup:
         self.shapeSizeSetup(ctrlName)
         # pinGuide:
-        self.createPinGuide(ctrlName)
+        if pin:
+            self.createPinGuide(ctrlName)
 
 
     def createPinGuide(self, ctrlName, *args):
