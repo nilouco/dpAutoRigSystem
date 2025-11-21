@@ -226,9 +226,12 @@ class ControlClass(object):
                     self.colorShape([item], "cyan")
                     isGuide = True
                 if not isGuide or not cmds.objectType(item) in self.shapeTypeList:
-                    cmds.setAttr(item+".overrideEnabled", 0)
-                    cmds.setAttr(item+".overrideRGBColors", 0)
-                    cmds.setAttr(item+".useOutlinerColor", 0)
+                    removeItemList = [item]
+                    removeItemList.extend(cmds.listRelatives(item, children=True, shapes=True) or [])
+                    for node in removeItemList:
+                        cmds.setAttr(node+".overrideEnabled", 0)
+                        cmds.setAttr(node+".overrideRGBColors", 0)
+                        cmds.setAttr(node+".useOutlinerColor", 0)
                 if "guideColorIndex" in cmds.listAttr(item):
                     cmds.setAttr(item+".guideColorIndex", 0)
                     cmds.setAttr(item+".guideColorR", self.colorList[0][0])
