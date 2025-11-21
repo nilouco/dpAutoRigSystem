@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.01
+DP_CONTROLS_VERSION = 3.02
 
 
 class ControlClass(object):
@@ -226,9 +226,12 @@ class ControlClass(object):
                     self.colorShape([item], "cyan")
                     isGuide = True
                 if not isGuide or not cmds.objectType(item) in self.shapeTypeList:
-                    cmds.setAttr(item+".overrideEnabled", 0)
-                    cmds.setAttr(item+".overrideRGBColors", 0)
-                    cmds.setAttr(item+".useOutlinerColor", 0)
+                    removeItemList = [item]
+                    removeItemList.extend(cmds.listRelatives(item, children=True, shapes=True) or [])
+                    for node in removeItemList:
+                        cmds.setAttr(node+".overrideEnabled", 0)
+                        cmds.setAttr(node+".overrideRGBColors", 0)
+                        cmds.setAttr(node+".useOutlinerColor", 0)
                 if "guideColorIndex" in cmds.listAttr(item):
                     cmds.setAttr(item+".guideColorIndex", 0)
                     cmds.setAttr(item+".guideColorR", self.colorList[0][0])
@@ -536,18 +539,18 @@ class ControlClass(object):
                 cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
 
 
-    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", *args):
+    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", pin=True, *args):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.getControlInstance(cvType)
         curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
-            self.addGuideAttrs(curve, color)
+            self.addGuideAttrs(curve, color, pin)
         return curve
 
 
     #@dpUtils.profiler
-    def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
+    def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, pin=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
         # create locator curve:
@@ -578,7 +581,7 @@ class ControlClass(object):
         cmds.setAttr(locCtrl+".rotateZ", rot[2])
         cmds.makeIdentity(locCtrl, rotate=True, apply=True)
         if guide:
-            self.addGuideAttrs(locCtrl)
+            self.addGuideAttrs(locCtrl, pin=pin)
         cmds.select(clear=True)
         return locCtrl
 
@@ -1086,7 +1089,7 @@ class ControlClass(object):
         cmds.parent(clusterHandle, self.dpUIinst.tempGrp)
 
 
-    def addGuideAttrs(self, ctrlName, color="blue", *args):
+    def addGuideAttrs(self, ctrlName, color="blue", pin=True, *args):
         """ Add and set attributes to this control curve be used as a guide.
         """
         # create an attribute to be used as guide by module:
@@ -1097,7 +1100,8 @@ class ControlClass(object):
         # shapeSize setup:
         self.shapeSizeSetup(ctrlName)
         # pinGuide:
-        self.createPinGuide(ctrlName)
+        if pin:
+            self.createPinGuide(ctrlName)
 
 
     def createPinGuide(self, ctrlName, *args):
@@ -1181,15 +1185,17 @@ class ControlClass(object):
                 self.createPinGuide(guideBase)
 
 
-    def unPinGuide(self, guideList=None, *args):
+    def unPinGuide(self, guideList=None, force=False, *args):
         """ Remove pinGuide setup.
-            We expect to have the scriptJob running here to clean-up the pin setup.
+            We expect to have the scriptJob running here to clean-up the pin setup, or just force it to run.
         """
         if not guideList:
             guideList = [guide for guide in cmds.ls(selection=False, type="transform") if "pinGuide" in cmds.listAttr(guide)]
         if guideList:
             for guide in guideList:
                 cmds.setAttr(guide+".pinGuide", 0)
+                if force:
+                    self.jobPinGuide(guide)
 
 
     def storeLockedList(self, ctrlName, *args):

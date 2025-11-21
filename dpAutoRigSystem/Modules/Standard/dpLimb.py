@@ -16,7 +16,7 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
-DP_LIMB_VERSION = 3.08
+DP_LIMB_VERSION = 3.09
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -110,7 +110,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Before", r=0.3, d=1, guide=True)
-        self.cvMainLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Main", r=0.5, d=1, guide=True)
+        self.cvMainLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Main", r=0.5, d=1, guide=True, pin=False)
         self.cvCornerLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Corner", r=0.3, d=1, guide=True)
         self.cvCornerBLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_CornerB", r=0.5, d=1, guide=True)
         self.cvExtremLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Extrem", r=0.5, d=1, guide=True)

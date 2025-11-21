@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.26"
-DPAR_UPDATELOG = "N955 - Jar joint label fix."
+DPAR_VERSION_5 = "5.01.27"
+DPAR_UPDATELOG = "N956 - Rebuild pinned guides fix."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2395,19 +2395,6 @@ class Start(object):
                 if verbose and not self.rebuilding:
                     self.utils.setProgress(endIt=True)
                 self.utils.closeUI(dpRAttr.winName)
-
-    
-    def unPinAllGuides(self, *args):
-        """ Brute force to un pin all guides.
-            Useful to clean up guides before start the rigAll process.
-        """
-        pConstList = cmds.ls(selection=False, type="parentConstraint")
-        if pConstList:
-            for pConst in pConstList:
-                if "PinGuide" in pConst:
-                    pinnedGuide = cmds.listRelatives(pConst, parent=True, type="transform")[0]
-                    self.ctrls.setLockHide([pinnedGuide], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'], l=False)
-                    cmds.delete(pConst)
     
     
     def rigAll(self, integrate=None, *args):
@@ -2452,9 +2439,6 @@ class Start(object):
                         return
                     else:
                         break
-            
-            # force unPin all Guides:
-            self.unPinAllGuides()
             
             # clear all duplicated names in order to run without find same names if they exists:
             if cmds.objExists(self.guideMirrorGrp):

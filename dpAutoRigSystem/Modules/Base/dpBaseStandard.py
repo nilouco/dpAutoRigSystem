@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.08
+DP_BASESTANDARD_VERSION = 2.09
 
 
 class BaseStandard(object):
@@ -481,7 +481,7 @@ class BaseStandard(object):
                 pass
 
             # unPinGuides before Rig them:
-            self.ctrls.unPinGuide([self.moduleGrp])
+            self.ctrls.unPinGuide([self.moduleGrp], force=True)
             
             # RIG:
             self.utils.useDefaultRenderLayer()
@@ -681,6 +681,7 @@ class BaseStandard(object):
     def serializeGuide(self, buildIt=True, *args):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
+        self.ctrls.unPinGuide(force=True)
         if not self.serialized:
             afterDataDic, guideDic = {}, {}
             beforeList = self.getBeforeList()
