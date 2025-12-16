@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.27"
-DPAR_UPDATELOG = "N956 - Rebuild pinned guides fix."
+DPAR_VERSION_5 = "5.01.28"
+DPAR_UPDATELOG = "N095 - Update wiki documentation 5."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -506,7 +506,7 @@ class Start(object):
         #optionsMainFL - frameLayout:
         self.allUIs["optionsMainFL"] = cmds.frameLayout('optionsMainFL', label=self.lang['i002_options'], collapsable=True, collapse=True, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["rigOptionsLayout"] = cmds.columnLayout('rigOptionsLayout', adjustableColumn=True, columnOffset=('left', 5), parent=self.allUIs["optionsMainFL"])
-        self.allUIs["prefixLayout"] = cmds.rowColumnLayout('prefixLayout', numberOfColumns=2, columnWidth=[(1, 40), (2, 100)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["prefixLayout"] = cmds.rowColumnLayout('prefixLayout', numberOfColumns=2, columnWidth=[(1, 40), (2, 200)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["prefixTextField"] = cmds.textField('prefixTextField', text="", parent= self.allUIs["prefixLayout"], changeCommand=self.setPrefix)
         self.allUIs["prefixText"] = cmds.text('prefixText', align='left', label=self.lang['i003_prefix'], parent=self.allUIs["prefixLayout"])
         cmds.setParent(self.allUIs["rigOptionsLayout"])
