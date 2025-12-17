@@ -171,7 +171,7 @@
     "i003_prefix"               : "Prefix for all nodes.",
     "i004_defaultRL"            : "Use Default Render Layer (masterLayer).",
     "i005_footerRigging"        : "modules will be created in this rig",
-    "i006_aboutDesc"            : "\nAbout dpAutoRig System:\n\nThis script is a Python program to\nautomate the rigging process.\n\nIt was written to help us develop\nvarious types of rigs on our own.\nIts arquitecture is modular, multilingual, and object oriented,\nwhich means you can create any type of rigging parts\nand combine them however you want...\n\nIf you have any suggestions or comments, please contact us.\nI hope you enjoy it   :)\n\nIt is FREE !!!",
+    "i006_aboutDesc"            : "\nAbout dpAutoRigSystem:\n\nThis script is a Python program to\nautomate the rigging process.\n\nIt was written to help us develop\nvarious types of rigs on our own.\nIts arquitecture is modular, multilingual, and object oriented,\nwhich means you can create any type of rigging parts\nand combine them however you want...\n\nIf you have any suggestions or comments, please contact us.\nI hope you enjoy it   :)\n\nIt is FREE !!!",
     "i007_authorDesc"           : "\nAuthor: Danilo Pinheiro (nilouco)\n\nHe's a simple person who likes 3D\nand really wants the best of all...\n\nContact information:\ne-mail: nilouco@gmail.com\nportfolio: https://nilouco.blogspot.com\n\nPlease, any feedback will be very appreciated   :)\n\nThank you very much!",
     "i008_errorUI"              : "Cannot load dpAutoRig UI window..., please try saving the dpAutoRigSystem folder in MAYA_PATH directory and verify if you did not change any file.",
     "i009_displayJointsCB"      : "Display joints after creating the rig.",
