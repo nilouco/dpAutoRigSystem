@@ -7,6 +7,7 @@ CLASS_NAME = "CustomAttr"
 TITLE = "m212_customAttr"
 DESCRIPTION = "m213_customAttrDesc"
 ICON = "/Icons/dp_customAttr.png"
+WIKI = "06-‐-Tools#-custom-attributes"
 
 ATTR_START = "dp"
 ATTR_DPID = "dpID"
@@ -14,7 +15,7 @@ ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnor
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
-DP_CUSTOMATTR_VERSION = 1.09
+DP_CUSTOMATTR_VERSION = 1.10
 
 
 class CustomAttr(object):

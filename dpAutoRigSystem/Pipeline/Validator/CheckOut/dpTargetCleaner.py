@@ -7,10 +7,11 @@ CLASS_NAME = "TargetCleaner"
 TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
+WIKI = "07-‐-Validator#-blendshape-target-cleaner"
 
 DPKEEPITATTR = "dpKeepIt"
 
-DP_TARGETCLEANER_VERSION = 1.09
+DP_TARGETCLEANER_VERSION = 1.10
 
 
 class TargetCleaner(dpBaseAction.ActionStartClass):

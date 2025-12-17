@@ -7,8 +7,9 @@ CLASS_NAME = "BindPoseCleaner"
 TITLE = "v113_bindPoseCleaner"
 DESCRIPTION = "v114_bindPoseCleanerDesc"
 ICON = "/Icons/dp_bindPoseCleaner.png"
+WIKI = "07-‐-Validator#-bindpose-cleaner"
 
-DP_BINDPOSECLEANER_VERSION = 1.00
+DP_BINDPOSECLEANER_VERSION = 1.01
 
 
 class BindPoseCleaner(dpBaseAction.ActionStartClass):

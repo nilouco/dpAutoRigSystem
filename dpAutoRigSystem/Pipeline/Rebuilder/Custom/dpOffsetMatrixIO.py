@@ -7,8 +7,9 @@ CLASS_NAME = "OffsetMatrixIO"
 TITLE = "r061_offsetMatrixIO"
 DESCRIPTION = "r062_offsetMatrixIODesc"
 ICON = "/Icons/dp_offsetMatrixIO.png"
+WIKI = "10-‐-Rebuilder#-offset-matrix"
 
-DP_OFFSETMATRIXIO_VERSION = 1.00
+DP_OFFSETMATRIXIO_VERSION = 1.01
 
 
 class OffsetMatrixIO(dpBaseAction.ActionStartClass):

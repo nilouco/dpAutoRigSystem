@@ -8,8 +8,9 @@ CLASS_NAME = "RemainingVertexCleaner"
 TITLE = "v134_remainingVertexCleaner"
 DESCRIPTION = "v135_remainingVertexCleanerDesc"
 ICON = "/Icons/dp_remainingVertexCleaner.png"
+WIKI = "07-‐-Validator#-remaining-vertex-cleaner"
 
-DP_REMAININGVERTEXCLEANER_VERSION = 1.00
+DP_REMAININGVERTEXCLEANER_VERSION = 1.01
 
 
 class RemainingVertexCleaner(dpBaseAction.ActionStartClass):

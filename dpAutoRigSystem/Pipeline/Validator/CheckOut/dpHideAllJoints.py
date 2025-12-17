@@ -7,8 +7,9 @@ CLASS_NAME = "HideAllJoints"
 TITLE = "v115_hideAllJoints"
 DESCRIPTION = "v116_hideAllJointsDesc"
 ICON = "/Icons/dp_hideAllJoints.png"
+WIKI = "07-‐-Validator#-hide-all-joints"
 
-DP_HIDEALLJOINTS_VERSION = 1.00
+DP_HIDEALLJOINTS_VERSION = 1.01
 
 
 class HideAllJoints(dpBaseAction.ActionStartClass):

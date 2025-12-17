@@ -11,8 +11,9 @@ CLASS_NAME = "PassthroughAttributes"
 TITLE = "v107_passthroughAttributes"
 DESCRIPTION = "v108_passthroughAttributesDesc"
 ICON = "/Icons/dp_passthroughAttributes.png"
+WIKI = "07-‐-Validator#-pasthrough-attributes"
 
-DP_PASSTHROUGHATTRIBUTES_VERSION = 1.00
+DP_PASSTHROUGHATTRIBUTES_VERSION = 1.01
 
 
 class PassthroughAttributes(dpBaseAction.ActionStartClass):

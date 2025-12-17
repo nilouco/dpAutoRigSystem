@@ -8,8 +8,9 @@ CLASS_NAME = "MatchMesh"
 TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
+WIKI = "06-‐-Tools#-match-mesh"
 
-DP_MATCHMESH_VERSION = 3.01
+DP_MATCHMESH_VERSION = 3.02
 
 
 class MatchMesh(object):

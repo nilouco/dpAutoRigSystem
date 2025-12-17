@@ -10,11 +10,12 @@ CLASS_NAME = "CorrectionManager"
 TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
+WIKI = "06-‐-Tools#-correction-manager"
 
 ANGLE = "Angle"
 DISTANCE = "Distance"
 
-DP_CORRECTIONMANAGER_VERSION = 2.11
+DP_CORRECTIONMANAGER_VERSION = 2.12
 
 
 class CorrectionManager(object):

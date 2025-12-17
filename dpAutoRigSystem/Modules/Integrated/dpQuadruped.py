@@ -8,8 +8,9 @@ CLASS_NAME = "Quadruped"
 TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
+WIKI = "03-‐-Guides#-quadruped"
 
-DP_QUADRUPED_VERSION = 2.05
+DP_QUADRUPED_VERSION = 2.06
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

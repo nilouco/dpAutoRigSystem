@@ -7,8 +7,9 @@ CLASS_NAME = "RenameIO"
 TITLE = "r056_renameIO"
 DESCRIPTION = "r057_renameIODesc"
 ICON = "/Icons/dp_renameIO.png"
+WIKI = "10-‐-Rebuilder#-rename"
 
-DP_RENAMEIO_VERSION = 1.00
+DP_RENAMEIO_VERSION = 1.01
 
 
 class RenameIO(dpBaseAction.ActionStartClass):

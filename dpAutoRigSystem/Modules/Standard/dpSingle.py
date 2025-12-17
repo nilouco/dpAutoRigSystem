@@ -8,8 +8,9 @@ CLASS_NAME = "Single"
 TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
+WIKI = "03-‐-Guides#-single"
 
-DP_SINGLE_VERSION = 2.06
+DP_SINGLE_VERSION = 2.07
 
 
 class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

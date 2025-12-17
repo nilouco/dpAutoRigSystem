@@ -8,8 +8,9 @@ CLASS_NAME = "VaccineCleaner"
 TITLE = "v052_vaccineCleaner"
 DESCRIPTION = "v053_vaccineCleanerDesc"
 ICON = "/Icons/dp_vaccineCleaner.png"
+WIKI = "07-‐-Validator#-vaccine-cleaner"
 
-DP_VACCINECLEANER_VERSION = 1.02
+DP_VACCINECLEANER_VERSION = 1.03
 
 
 class VaccineCleaner(dpBaseAction.ActionStartClass):

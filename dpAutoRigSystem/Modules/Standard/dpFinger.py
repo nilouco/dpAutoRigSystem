@@ -8,8 +8,9 @@ CLASS_NAME = "Finger"
 TITLE = "m007_finger"
 DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
+WIKI = "03-‐-Guides#-finger"
 
-DP_FINGER_VERSION = 2.02
+DP_FINGER_VERSION = 2.03
 
 
 class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

@@ -7,8 +7,9 @@ CLASS_NAME = "DisplayLayers"
 TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
+WIKI = "07-‐-Validator#-display-layers"
 
-DP_DISPLAYLAYERS_VERSION = 1.05
+DP_DISPLAYLAYERS_VERSION = 1.06
 
 
 class DisplayLayers(dpBaseAction.ActionStartClass):

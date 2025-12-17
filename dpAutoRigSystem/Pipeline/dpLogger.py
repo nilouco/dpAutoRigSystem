@@ -3,7 +3,7 @@ from maya import cmds
 import time
 from functools import partial
 
-DP_LOGGER_VERSION = 1.01
+DP_LOGGER_VERSION = 1.02
 
 
 class Logger(object):
@@ -18,7 +18,7 @@ class Logger(object):
         self.utils = dpUIinst.utils
         
 
-    def infoWin(self, title, description, text, align, width, height, buttonList=False, *args):
+    def infoWin(self, title, description, text, align, width, height, buttonList=False, wiki=None, *args):
         """ Create a window showing the text info with the description about any module.
         """
         # declaring variables:
@@ -44,6 +44,9 @@ class Logger(object):
                     cmds.button(label=buttonList[0], command=partial(buttonList[1], buttonList[2]), parent=infoLayout)
                 else:
                     noneText = cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout)
+        if wiki:
+            cmds.separator(style='none', height=20, parent=infoLayout)
+            cmds.button(label="Wiki", command=partial(self.utils.visitWebSite, self.dpUIinst.wikiURL+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow(dpInfoWin)
 

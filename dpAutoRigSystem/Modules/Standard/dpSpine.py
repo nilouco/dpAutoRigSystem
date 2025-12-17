@@ -8,8 +8,9 @@ CLASS_NAME = "Spine"
 TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
+WIKI = "03-‐-Guides#-spine"
 
-DP_SPINE_VERSION = 2.05
+DP_SPINE_VERSION = 2.06
 
 
 class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

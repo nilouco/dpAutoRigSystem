@@ -8,8 +8,9 @@ CLASS_NAME = "MotionCapture"
 TITLE = "m239_motionCapture"
 DESCRIPTION = "m240_motionCaptureDesc"
 ICON = "/Icons/dp_motionCapture.png"
+WIKI = "06-‐-Tools#-motion-capture"
 
-DP_MOTIONCAPTURE_VERSION = 1.01
+DP_MOTIONCAPTURE_VERSION = 1.02
 
 
 class MotionCapture(object):

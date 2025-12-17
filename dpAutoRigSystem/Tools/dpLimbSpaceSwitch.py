@@ -6,8 +6,9 @@ CLASS_NAME = "LimbSpaceSwitch"
 TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 ICON = "/Icons/dp_limbSpaceSwitch.png"
+WIKI = "06-‐-Tools#-limb-space-switch"
 
-DP_LIMBSPACESWITCH_VERSION = 2.04
+DP_LIMBSPACESWITCH_VERSION = 2.05
 
 
 class LimbSpaceSwitch(object):

@@ -6,8 +6,9 @@ CLASS_NAME = "UpdateGuides"
 TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
+WIKI = "06-‐-Tools#-update-guides"
 
-DP_UPDATEGUIDES_VERSION = 1.08
+DP_UPDATEGUIDES_VERSION = 1.09
 
 
 class UpdateGuides(object):

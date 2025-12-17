@@ -7,8 +7,9 @@ CLASS_NAME = "ControllerTag"
 TITLE = "v073_controllerTag"
 DESCRIPTION = "v074_controllerTagDesc"
 ICON = "/Icons/dp_controllerTag.png"
+WIKI = "07-‐-Validator#-controller-tag"
 
-DP_CONTROLLERTAG_VERSION = 1.01
+DP_CONTROLLERTAG_VERSION = 1.02
 
 
 class ControllerTag(dpBaseAction.ActionStartClass):

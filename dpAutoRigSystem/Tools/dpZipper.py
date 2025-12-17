@@ -8,11 +8,12 @@ CLASS_NAME = "Zipper"
 TITLE = "m061_zipper"
 DESCRIPTION = "m062_zipperDesc"
 ICON = "/Icons/dp_zipper.png"
+WIKI = "06-‐-Tools#-zipper"
 
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DP_ZIPPER_VERSION = 2.20
+DP_ZIPPER_VERSION = 2.21
 
 
 class Zipper(object):

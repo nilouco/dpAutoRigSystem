@@ -8,8 +8,9 @@ CLASS_NAME = "Steering"
 TITLE = "m158_steering"
 DESCRIPTION = "m159_steeringDesc"
 ICON = "/Icons/dp_steering.png"
+WIKI = "03-‐-Guides#-steering"
 
-DP_STEERING_VERSION = 2.02
+DP_STEERING_VERSION = 2.03
 
 
 class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

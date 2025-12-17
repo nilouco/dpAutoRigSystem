@@ -7,8 +7,9 @@ CLASS_NAME = "HideCorrectives"
 TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
 ICON = "/Icons/dp_hideCorrectives.png"
+WIKI = "07-‐-Validator#-hide-correctives"
 
-DP_HIDECORRECTIVES_VERSION = 1.03
+DP_HIDECORRECTIVES_VERSION = 1.04
 
 
 class HideCorrectives(dpBaseAction.ActionStartClass):

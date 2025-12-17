@@ -7,8 +7,9 @@ CLASS_NAME = 'FreezeTransform'
 TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 ICON = '/Icons/dp_freezeTransform.png'
+WIKI = "07-‐-Validator#-freeze-transform"
 
-DP_FREEZETRANSFORM_VERSION = 1.07
+DP_FREEZETRANSFORM_VERSION = 1.08
 
 
 class FreezeTransform(dpBaseAction.ActionStartClass):

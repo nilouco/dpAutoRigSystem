@@ -8,8 +8,9 @@ CLASS_NAME = "Nose"
 TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 ICON = "/Icons/dp_nose.png"
+WIKI = "03-‐-Guides#-nose"
 
-DP_NOSE_VERSION = 2.03
+DP_NOSE_VERSION = 2.04
 
 
 class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

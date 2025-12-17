@@ -9,10 +9,9 @@ CLASS_NAME = "ControlsHierarchy"
 TITLE = "v060_controlsHierarchy"
 DESCRIPTION = "v061_controlsHierarchyDesc"
 ICON = "/Icons/dp_controlsHierarchy.png"
+WIKI = "07-‐-Validator#-controls-hierarchy"
 
-
-
-DP_CONTROLSHIERARCHY_VERSION = 1.06
+DP_CONTROLSHIERARCHY_VERSION = 1.07
 
 
 class ControlsHierarchy(dpBaseAction.ActionStartClass):

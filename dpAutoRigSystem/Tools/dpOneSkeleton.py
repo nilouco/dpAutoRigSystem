@@ -8,8 +8,9 @@ CLASS_NAME = "OneSkeleton"
 TITLE = "m254_oneSkeleton"
 DESCRIPTION = "m255_oneSkeletonDesc"
 ICON = "/Icons/dp_oneSkeleton.png"
+WIKI = "06-‐-Tools#-one-skeleton"
 
-DP_ONESKELETON_VERSION = 1.01
+DP_ONESKELETON_VERSION = 1.02
 
 
 class OneSkeleton(object):

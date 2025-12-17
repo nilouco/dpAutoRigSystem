@@ -7,8 +7,9 @@ CLASS_NAME = "Cleanup"
 TITLE = "v096_cleanup"
 DESCRIPTION = "v097_cleanupDesc"
 ICON = "/Icons/dp_cleanup.png"
+WIKI = "07-‐-Validator#-cleanup"
 
-DP_CLEANUP_VERSION = 1.00
+DP_CLEANUP_VERSION = 1.01
 
 
 class Cleanup(dpBaseAction.ActionStartClass):

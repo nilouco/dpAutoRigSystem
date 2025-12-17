@@ -7,8 +7,9 @@ CLASS_NAME = "EmptyTransformCleaner"
 TITLE = "v138_emptyTransformCleaner"
 DESCRIPTION = "v139_emptyTransformCleanerDesc"
 ICON = "/Icons/dp_emptyTransformCleaner.png"
+WIKI = "07-‐-Validator#-empty-transform-cleaner"
 
-DP_EMPTYTRANSFORMCLEANER_VERSION = 1.00
+DP_EMPTYTRANSFORMCLEANER_VERSION = 1.01
 
 
 class EmptyTransformCleaner(dpBaseAction.ActionStartClass):

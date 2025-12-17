@@ -7,8 +7,9 @@ CLASS_NAME = "SupportNodeIO"
 TITLE = "r023_supportNodeIO"
 DESCRIPTION = "r024_supportNodeIODesc"
 ICON = "/Icons/dp_supportNodeIO.png"
+WIKI = "10-‐-Rebuilder#-support-node"
 
-DP_SUPPORTNODEIO_VERSION = 1.02
+DP_SUPPORTNODEIO_VERSION = 1.03
 
 
 class SupportNodeIO(dpBaseAction.ActionStartClass):

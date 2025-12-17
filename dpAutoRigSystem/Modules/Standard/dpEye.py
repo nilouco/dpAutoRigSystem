@@ -8,6 +8,7 @@ CLASS_NAME = "Eye"
 TITLE = "m063_eye"
 DESCRIPTION = "m064_eyeDesc"
 ICON = "/Icons/dp_eye.png"
+WIKI = "03-‐-Guides#-eye"
 
 EYELID = "eyelid"
 IRIS = "iris"
@@ -15,7 +16,7 @@ PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
 
-DP_EYE_VERSION = 2.06
+DP_EYE_VERSION = 2.07
 
 
 class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

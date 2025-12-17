@@ -7,8 +7,9 @@ CLASS_NAME = "UnlockInitialShadingGroup"
 TITLE = "v048_unlockIniShadGrp"
 DESCRIPTION = "v049_unlockIniShadGrpDesc"
 ICON = "/Icons/dp_unlockInitialShadingGroup.png"
+WIKI = "07-‐-Validator#-unlock-initialshadinggroup"
 
-DP_UNLOCKINITIALSHADINGGROUP_VERSION = 1.02
+DP_UNLOCKINITIALSHADINGGROUP_VERSION = 1.03
 
 
 class UnlockInitialShadingGroup(dpBaseAction.ActionStartClass):

@@ -7,8 +7,9 @@ CLASS_NAME = "JointEndCleaner"
 TITLE = "v111_jointEndCleaner"
 DESCRIPTION = "v112_jointEndCleanerDesc"
 ICON = "/Icons/dp_jointEndCleaner.png"
+WIKI = "07-‐-Validator#-joint-end-cleaner"
 
-DP_JOINTENDCLEANER_VERSION = 1.01
+DP_JOINTENDCLEANER_VERSION = 1.02
 
 
 class JointEndCleaner(dpBaseAction.ActionStartClass):

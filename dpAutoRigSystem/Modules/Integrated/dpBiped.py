@@ -7,8 +7,9 @@ CLASS_NAME = "Biped"
 TITLE = "m026_biped"
 DESCRIPTION = "m027_bipedDesc"
 ICON = "/Icons/dp_biped.png"
+WIKI = "03-‐-Guides#-biped"
 
-DP_BIPED_VERSION = 2.03
+DP_BIPED_VERSION = 2.04
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

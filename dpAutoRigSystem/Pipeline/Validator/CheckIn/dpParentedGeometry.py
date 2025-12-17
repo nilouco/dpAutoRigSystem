@@ -7,8 +7,9 @@ CLASS_NAME = "ParentedGeometry"
 TITLE = "v140_parentedGeometry"
 DESCRIPTION = "v141_parentedGeometryDesc"
 ICON = "/Icons/dp_parentedGeometry.png"
+WIKI = "07-‐-Validator#-parented-geometry"
 
-DP_PARENTEDGEOMETRY_VERSION = 1.00
+DP_PARENTEDGEOMETRY_VERSION = 1.01
 
 
 class ParentedGeometry(dpBaseAction.ActionStartClass):

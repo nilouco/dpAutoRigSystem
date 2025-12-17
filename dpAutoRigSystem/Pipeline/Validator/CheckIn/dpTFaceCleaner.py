@@ -9,8 +9,9 @@ CLASS_NAME = "TFaceCleaner"
 TITLE = "v128_tFaceCleaner"
 DESCRIPTION = "v129_tFaceCleanerDesc"
 ICON = "/Icons/dp_tFaceCleaner.png"
+WIKI = "07-‐-Validator#-t-face-cleaner"
 
-DP_TFACECLEANER_VERSION = 1.00
+DP_TFACECLEANER_VERSION = 1.01
 
 
 class TFaceCleaner(dpBaseAction.ActionStartClass):

@@ -7,8 +7,9 @@ CLASS_NAME = "ParentingIO"
 TITLE = "r019_parentingIO"
 DESCRIPTION = "r020_parentingIODesc"
 ICON = "/Icons/dp_parentingIO.png"
+WIKI = "10-‐-Rebuilder#-parenting"
 
-DP_PARENTINGIO_VERSION = 1.02
+DP_PARENTINGIO_VERSION = 1.03
 
 
 class ParentingIO(dpBaseAction.ActionStartClass):

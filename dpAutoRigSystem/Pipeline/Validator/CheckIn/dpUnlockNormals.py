@@ -7,8 +7,9 @@ CLASS_NAME = "UnlockNormals"
 TITLE = "v078_unlockNormals"
 DESCRIPTION = "v079_unlockNormalsDesc"
 ICON = "/Icons/dp_unlockNormals.png"
+WIKI = "07-‐-Validator#-unlock-normals"
 
-DP_UNLOCKNORMALS_VERSION = 1.02
+DP_UNLOCKNORMALS_VERSION = 1.03
 
 
 class UnlockNormals(dpBaseAction.ActionStartClass):

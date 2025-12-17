@@ -7,8 +7,9 @@ CLASS_NAME = "PrintSelection"
 TITLE = "m053_printSel"
 DESCRIPTION = "m054_printSelDesc"
 ICON = "/Icons/dp_printSelection.png"
+WIKI = "06-‐-Tools#-print-selection"
 
-DP_PRINTSELECTION_VERSION = 2.00
+DP_PRINTSELECTION_VERSION = 2.01
 
 
 class PrintSelection(object):

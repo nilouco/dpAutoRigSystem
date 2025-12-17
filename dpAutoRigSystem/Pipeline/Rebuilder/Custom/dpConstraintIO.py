@@ -7,8 +7,9 @@ CLASS_NAME = "ConstraintIO"
 TITLE = "r050_constraintIO"
 DESCRIPTION = "r051_constraintIODesc"
 ICON = "/Icons/dp_constraintIO.png"
+WIKI = "10-‐-Rebuilder#-constraint"
 
-DP_CONSTRAINTIO_VERSION = 1.01
+DP_CONSTRAINTIO_VERSION = 1.02
 
 
 class ConstraintIO(dpBaseAction.ActionStartClass):
