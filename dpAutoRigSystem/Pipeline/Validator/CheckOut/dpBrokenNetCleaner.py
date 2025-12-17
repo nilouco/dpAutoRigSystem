@@ -7,8 +7,9 @@ CLASS_NAME = "BrokenNetCleaner"
 TITLE = "v046_brokenNetCleaner"
 DESCRIPTION = "v047_brokenNetCleanerDesc"
 ICON = "/Icons/dp_brokenNetCleaner.png"
+WIKI = "07-‐-Validator#-broken-network-cleaner"
 
-DP_BROKENNETCLEANER_VERSION = 1.04
+DP_BROKENNETCLEANER_VERSION = 1.05
 
 
 class BrokenNetCleaner(dpBaseAction.ActionStartClass):

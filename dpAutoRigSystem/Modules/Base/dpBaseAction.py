@@ -170,7 +170,9 @@ class ActionStartClass(object):
         buttonCommand = self.dpUIinst.packager.openFolder
         buttonArgument = self.ioPath
         if cmds.iconTextButton(self.infoITB, query=True, exists=True):
-            cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument]))
+            #functools.partial(<bound method Logger.infoWin of <dpAutoRigSystem.Pipeline.dpLogger.Logger object at 0x00000259E390BD10>>, 'r003_modelIO', 'r004_modelIODesc', None, 'center', 305, 250, wiki='10-‐-Rebuilder#-model')
+            thisWiki = str(cmds.iconTextButton(self.infoITB, query=True, command=True)).split("wiki='")[1][:-2]
+            cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument], wiki=thisWiki))
 
 
     def getLatestExportedData(self, *args):

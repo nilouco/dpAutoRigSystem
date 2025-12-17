@@ -7,8 +7,9 @@ CLASS_NAME = "OutlinerCleaner"
 TITLE = "v076_outlinerCleaner"
 DESCRIPTION = "v077_outlinerCleanerDesc"
 ICON = "/Icons/dp_outlinerCleaner.png"
+WIKI = "07-‐-Validator#-outliner-cleaner"
 
-DP_OUTLINERCLEANER_VERSION = 1.04
+DP_OUTLINERCLEANER_VERSION = 1.05
 
 
 class OutlinerCleaner(dpBaseAction.ActionStartClass):

@@ -13,8 +13,9 @@ CLASS_NAME = "Wheel"
 TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
+WIKI = "03-‐-Guides#-wheel"
 
-DP_WHEEL_VERSION = 2.05
+DP_WHEEL_VERSION = 2.06
 
 
 class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

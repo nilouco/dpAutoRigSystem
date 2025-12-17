@@ -8,8 +8,9 @@ CLASS_NAME = "UnusedNodeCleaner"
 TITLE = "v084_unusedNodeCleaner"
 DESCRIPTION = "v085_unusedNodeCleanerDesc"
 ICON = "/Icons/dp_unusedNodeCleaner.png"
+WIKI = "07-‐-Validator#-unused-node-cleaner"
 
-DP_UNUSEDNODECLEANER_VERSION = 1.03
+DP_UNUSEDNODECLEANER_VERSION = 1.04
 
 
 class UnusedNodeCleaner(dpBaseAction.ActionStartClass):

@@ -7,8 +7,9 @@ CLASS_NAME = "NewSceneIO"
 TITLE = "r025_newSceneIO"
 DESCRIPTION = "r026_newSceneIODesc"
 ICON = "/Icons/dp_newSceneIO.png"
+WIKI = "10-‐-Rebuilder#-new-scene"
 
-DP_NEWSCENEIO_VERSION = 1.00
+DP_NEWSCENEIO_VERSION = 1.01
 
 
 class NewSceneIO(dpBaseAction.ActionStartClass):

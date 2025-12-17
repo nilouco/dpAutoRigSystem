@@ -7,8 +7,9 @@ CLASS_NAME = 'OverrideCleaner'
 TITLE = 'v090_overrideCleaner'
 DESCRIPTION = 'v091_overrideCleanerDesc'
 ICON = '/Icons/dp_overrideCleaner.png'
+WIKI = "07-‐-Validator#-override-cleaner"
 
-DP_OVERRIDECLEANER_VERSION = 1.03
+DP_OVERRIDECLEANER_VERSION = 1.04
 
 
 class OverrideCleaner(dpBaseAction.ActionStartClass):

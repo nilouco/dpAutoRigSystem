@@ -8,8 +8,9 @@ CLASS_NAME = "Foot"
 TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
+WIKI = "03-‐-Guides#-foot"
 
-DP_FOOT_VERSION = 2.06
+DP_FOOT_VERSION = 2.07
 
 
 class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

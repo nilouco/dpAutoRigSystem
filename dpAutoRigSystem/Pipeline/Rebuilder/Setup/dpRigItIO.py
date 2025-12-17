@@ -6,8 +6,9 @@ CLASS_NAME = "RigItIO"
 TITLE = "r028_rigItIO"
 DESCRIPTION = "r029_rigItIODesc"
 ICON = "/Icons/dp_rigItIO.png"
+WIKI = "10-‐-Rebuilder#-rig-it"
 
-DP_RIGITIO_VERSION = 1.00
+DP_RIGITIO_VERSION = 1.01
 
 
 class RigItIO(dpBaseAction.ActionStartClass):

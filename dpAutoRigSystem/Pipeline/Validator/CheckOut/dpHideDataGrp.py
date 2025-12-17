@@ -7,8 +7,9 @@ CLASS_NAME = "HideDataGrp"
 TITLE = "v028_hideDataGrp"
 DESCRIPTION = "v029_hideDataGrpDesc"
 ICON = "/Icons/dp_hideDataGrp.png"
+WIKI = "07-‐-Validator#-hide-data_grp"
 
-DP_HIDEDATAGRP_VERSION = 1.02
+DP_HIDEDATAGRP_VERSION = 1.03
 
 
 class HideDataGrp(dpBaseAction.ActionStartClass):

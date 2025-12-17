@@ -8,8 +8,9 @@ CLASS_NAME = "FkLine"
 TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
+WIKI = "03-‐-Guides#-finger"
 
-DP_FKLINE_VERSION = 2.06
+DP_FKLINE_VERSION = 2.07
 
 
 class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

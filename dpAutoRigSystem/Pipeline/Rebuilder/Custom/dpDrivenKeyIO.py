@@ -7,8 +7,9 @@ CLASS_NAME = "DrivenKeyIO"
 TITLE = "r052_drivenKeyIO"
 DESCRIPTION = "r053_drivenKeyIODesc"
 ICON = "/Icons/dp_drivenKeyIO.png"
+WIKI = "10-‐-Rebuilder#-driven-key"
 
-DP_DRIVENKEYIO_VERSION = 1.00
+DP_DRIVENKEYIO_VERSION = 1.01
 
 
 class DrivenKeyIO(dpBaseAction.ActionStartClass):

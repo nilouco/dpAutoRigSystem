@@ -10,13 +10,14 @@ CLASS_NAME = "Head"
 TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
+WIKI = "03-‐-Guides#-head"
 
 JAW = "jaw"
 CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.05
+DP_HEAD_VERSION = 3.06
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):

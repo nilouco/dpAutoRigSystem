@@ -7,8 +7,9 @@ CLASS_NAME = "ExitEditMode"
 TITLE = "v034_exitEditMode"
 DESCRIPTION = "v035_exitEditModeDesc"
 ICON = "/Icons/dp_exitEditMode.png"
+WIKI = "07-‐-Validator#-exit-edit-mode"
 
-DP_EXITEDITMODE_VERSION = 1.03
+DP_EXITEDITMODE_VERSION = 1.04
 
 
 class ExitEditMode(dpBaseAction.ActionStartClass):

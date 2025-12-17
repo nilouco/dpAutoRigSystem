@@ -9,8 +9,9 @@ CLASS_NAME = "RivetIO"
 TITLE = "r039_rivetIO"
 DESCRIPTION = "r040_rivetIODesc"
 ICON = "/Icons/dp_rivetIO.png"
+WIKI = "10-‐-Rebuilder#-rivet"
 
-DP_RIVETIO_VERSION = 1.00
+DP_RIVETIO_VERSION = 1.01
 
 
 class RivetIO(dpBaseAction.ActionStartClass):

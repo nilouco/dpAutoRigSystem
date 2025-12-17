@@ -7,8 +7,9 @@ CLASS_NAME = "NgSkinToolsCleaner"
 TITLE = "v026_ngskintoolsCleaner"
 DESCRIPTION = "v027_ngskintoolsCleanerDesc"
 ICON = "/Icons/dp_ngskintoolsCleaner.png"
+WIKI = "07-‐-Validator#-ngskintools-cleaner"
 
-DP_NGSKINTOOLSCLEANER_VERSION = 1.02
+DP_NGSKINTOOLSCLEANER_VERSION = 1.03
 
 
 class NgSkinToolsCleaner(dpBaseAction.ActionStartClass):

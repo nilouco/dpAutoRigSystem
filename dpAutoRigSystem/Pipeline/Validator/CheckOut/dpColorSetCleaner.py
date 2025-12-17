@@ -7,8 +7,9 @@ CLASS_NAME = "ColorSetCleaner"
 TITLE = "v030_colorSetCleaner"
 DESCRIPTION = "v031_colorSetCleanerDesc"
 ICON = "/Icons/dp_colorSetCleaner.png"
+WIKI = "07-‐-Validator#-colorset-cleaner"
 
-DP_COLORSETCLEANER_VERSION = 1.04
+DP_COLORSETCLEANER_VERSION = 1.05
 
 
 class ColorSetCleaner(dpBaseAction.ActionStartClass):

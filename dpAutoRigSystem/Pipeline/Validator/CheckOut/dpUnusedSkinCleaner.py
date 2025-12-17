@@ -7,8 +7,9 @@ CLASS_NAME = "UnusedSkinCleaner"
 TITLE = "v082_unusedSkinCleaner"
 DESCRIPTION = "v083_unusedSkinCleanerDesc"
 ICON = "/Icons/dp_unusedSkinCleaner.png"
+WIKI = "07-‐-Validator#-unused-skin-cleaner"
 
-DP_UNUSEDSKINCLEANER_VERSION = 1.03
+DP_UNUSEDSKINCLEANER_VERSION = 1.04
 
 
 class UnusedSkinCleaner(dpBaseAction.ActionStartClass):

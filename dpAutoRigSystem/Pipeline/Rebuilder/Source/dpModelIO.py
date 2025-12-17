@@ -7,8 +7,9 @@ CLASS_NAME = "ModelIO"
 TITLE = "r003_modelIO"
 DESCRIPTION = "r004_modelIODesc"
 ICON = "/Icons/dp_modelIO.png"
+WIKI = "10-‐-Rebuilder#-model"
 
-DP_MODELIO_VERSION = 1.01
+DP_MODELIO_VERSION = 1.02
 
 
 class ModelIO(dpBaseAction.ActionStartClass):

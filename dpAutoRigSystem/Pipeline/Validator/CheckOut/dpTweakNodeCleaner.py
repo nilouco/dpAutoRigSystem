@@ -7,8 +7,9 @@ CLASS_NAME = "TweakNodeCleaner"
 TITLE = "v130_tweakNodeCleaner"
 DESCRIPTION = "v131_tweakNodeCleanerDesc"
 ICON = "/Icons/dp_tweakNodeCleaner.png"
+WIKI = "07-‐-Validator#-tweak-node-cleaner"
 
-DP_TWEAKNODECLEANER_VERSION = 1.01
+DP_TWEAKNODECLEANER_VERSION = 1.02
 
 
 class TweakNodeCleaner(dpBaseAction.ActionStartClass):

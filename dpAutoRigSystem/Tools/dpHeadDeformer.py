@@ -7,10 +7,12 @@ CLASS_NAME = "HeadDeformer"
 TITLE = "m051_headDef"
 DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
+WIKI = "06-‐-Tools#-head-deformer"
+
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.03
+DP_HEADDEFORMER_VERSION = 4.04
 
 
 class HeadDeformer(object):

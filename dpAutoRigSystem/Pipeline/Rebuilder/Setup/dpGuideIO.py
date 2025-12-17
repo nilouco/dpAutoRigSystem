@@ -9,10 +9,11 @@ CLASS_NAME = "GuideIO"
 TITLE = "r012_guideIO"
 DESCRIPTION = "r013_guideIODesc"
 ICON = "/Icons/dp_guideIO.png"
+WIKI = "10-‐-Rebuilder#-guide"
 
 MODULES = "Modules.Standard"
 
-DP_GUIDEIO_VERSION = 1.03
+DP_GUIDEIO_VERSION = 1.04
 
 
 class GuideIO(dpBaseAction.ActionStartClass):

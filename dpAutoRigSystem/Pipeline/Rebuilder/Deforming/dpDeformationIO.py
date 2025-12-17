@@ -9,8 +9,9 @@ CLASS_NAME = "DeformationIO"
 TITLE = "r033_deformationIO"
 DESCRIPTION = "r034_deformationIODesc"
 ICON = "/Icons/dp_deformationIO.png"
+WIKI = "10-‐-Rebuilder#-deformation"
 
-DP_DEFORMATIONIO_VERSION = 1.02
+DP_DEFORMATIONIO_VERSION = 1.03
 
 
 class DeformationIO(dpBaseAction.ActionStartClass):

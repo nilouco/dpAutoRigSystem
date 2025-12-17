@@ -8,8 +8,9 @@ CLASS_NAME = "ReorderAttr"
 TITLE = "m087_reorderAttr"
 DESCRIPTION = "m088_reoderAttrDesc"
 ICON = "/Icons/dp_reorderAttr.png"
+WIKI = "06-‐-Tools#-reorder-attributes"
 
-DP_REORDERATTR_VERSION = 1.03
+DP_REORDERATTR_VERSION = 1.04
 
 
 class ReorderAttr(object):

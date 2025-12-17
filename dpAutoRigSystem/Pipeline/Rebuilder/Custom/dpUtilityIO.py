@@ -7,8 +7,9 @@ CLASS_NAME = "UtilityIO"
 TITLE = "r054_utilityIO"
 DESCRIPTION = "r055_utilityIODesc"
 ICON = "/Icons/dp_utilityIO.png"
+WIKI = "10-‐-Rebuilder#-utility"
 
-DP_UTILITYIO_VERSION = 1.00
+DP_UTILITYIO_VERSION = 1.01
 
 
 class UtilityIO(dpBaseAction.ActionStartClass):

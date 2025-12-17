@@ -6,8 +6,9 @@ CLASS_NAME = "UpdateRigInfo"
 TITLE = "m057_updateRigInfo"
 DESCRIPTION = "m058_updateRigInfoDesc"
 ICON = "/Icons/dp_updateRigInfo.png"
+WIKI = "06-‐-Tools#-update-rig-info"
 
-DP_UPDATERIGINFO_VERSION = 2.00
+DP_UPDATERIGINFO_VERSION = 2.01
 
 
 class UpdateRigInfo(object):

@@ -132,13 +132,13 @@ class Start(object):
         self.masterAttr = "masterGrp"
         self.moduleNamespaceAttr = "moduleNamespace"
         self.moduleInstanceInfoAttr = "moduleInstanceInfo"
-        self.dpARWebSiteURL = "https://nilouco.blogspot.com"
         self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
         self.gitHubURL = "https://github.com/nilouco/dpAutoRigSystem"
         self.masterURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
         self.whatsChangedURL = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
         self.donateURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
         self.locationURL = "https://ipinfo.io/json"
+        self.wikiURL = "https://github.com/nilouco/dpAutoRigSystem/wiki/"
         self.tempGrp = "dpAR_Temp_Grp"
         self.guideMirrorGrp = "dpAR_GuideMirror_Grp"
         self.dpData = "dpData"
@@ -455,14 +455,14 @@ class Start(object):
         cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
         # help menu:
         self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-        cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+        cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', DPAR_VERSION_5, 'center', 305, 250))
         cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
         cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[self.englishName]['_collaborators'], 'center', 305, 250))
         cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
         cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
         cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
         cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-        cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, self.dpARWebSiteURL))
+        cmds.menuItem('help_MI', label='Wiki...', command=partial(self.utils.visitWebSite, self.wikiURL))
         
         # -- Layout
         
@@ -1424,6 +1424,8 @@ class Start(object):
             path = self.dpARpath
         iconDir = path+icon
         guideName = guide.CLASS_NAME
+        if not "WIKI" in dir(guide):
+            guide.WIKI = None
         
         # creating a basic layout for guide buttons:
         if guideDir == self.curvesSimpleFolder.replace("/", ".") or guideDir == self.curvesCombinedFolder.replace("/", "."):
@@ -1473,11 +1475,11 @@ class Start(object):
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
-                rebuilderInstance.infoITB = cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                rebuilderInstance.infoITB = cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
                 rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.iconX, height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.lang['r058_deleteDataAnn'], parent=moduleLayout)
                 rebuilderInstance.updateActionButtons(color=False)
             else:
-                cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
         cmds.setParent('..')
     
     

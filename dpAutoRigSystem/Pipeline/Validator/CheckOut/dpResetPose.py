@@ -7,6 +7,7 @@ CLASS_NAME = "ResetPose"
 TITLE = "v032_resetPose"
 DESCRIPTION = "v033_resetPoseDesc"
 ICON = "/Icons/dp_resetPose.png"
+WIKI = "07-‐-Validator#-reset-pose"
 
 TO_IGNORE = ["rotateOrder", "pinGuide", "editMode"]
 ATTR_TYPE = {
@@ -24,7 +25,7 @@ ATTR_TYPE = {
                 "doubleLinear" : 2
             }
 
-DP_RESETPOSE_VERSION = 1.04
+DP_RESETPOSE_VERSION = 1.05
 
 
 class ResetPose(dpBaseAction.ActionStartClass):

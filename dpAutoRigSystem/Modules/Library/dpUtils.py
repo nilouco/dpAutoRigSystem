@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.09
+DP_UTILS_VERSION = 3.10
 
 
 class Utils(object):
@@ -796,12 +796,12 @@ class Utils(object):
         return [4, None, None]
 
 
-    def visitWebSite(self, website, *args):
-        """ Start browser with the given website address.
+    def visitWebSite(self, URL, *args):
+        """ Start browser with the given website URL address.
         """
-        #webSiteString = "start "+website
+        #webSiteString = "start "+URL
         #os.popen(webSiteString)
-        webbrowser.open(website, new=2)
+        webbrowser.open(URL, new=2)
         
         
     def checkLoadedPlugin(self, pluginName, message="Not loaded plugin", *args):

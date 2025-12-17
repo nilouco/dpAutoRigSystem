@@ -7,8 +7,9 @@ CLASS_NAME = "Leg"
 TITLE = "m030_leg"
 DESCRIPTION = "m031_legDesc"
 ICON = "/Icons/dp_leg.png"
+WIKI = "03-‐-Guides#-leg"
 
-DP_LEG_VERSION = 2.01
+DP_LEG_VERSION = 2.02
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

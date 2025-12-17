@@ -8,9 +8,9 @@ CLASS_NAME = "JointDisplay"
 TITLE = "m233_jointDisplay"
 DESCRIPTION = "m234_jointDisplayDesc"
 ICON = "/Icons/dp_jointDisplay.png"
+WIKI = "06-‐-Tools#-joint-display"
 
-
-DP_JOINTDISPLAY_VERSION = 1.00
+DP_JOINTDISPLAY_VERSION = 1.01
 
 
 class JointDisplay(object):

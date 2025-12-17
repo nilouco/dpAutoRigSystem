@@ -7,8 +7,9 @@ CLASS_NAME = "SoftenEdges"
 TITLE = "v088_softenEdges"
 DESCRIPTION = "v089_softenEdgesDesc"
 ICON = "/Icons/dp_softenEdges.png"
+WIKI = "07-‐-Validator#-soften-edges"
 
-DP_SOFTENEDGES_VERSION = 1.02
+DP_SOFTENEDGES_VERSION = 1.03
 
 
 class SoftenEdges(dpBaseAction.ActionStartClass):

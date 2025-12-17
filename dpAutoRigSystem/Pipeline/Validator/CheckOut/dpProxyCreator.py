@@ -7,11 +7,12 @@ CLASS_NAME = "ProxyCreator"
 TITLE = "m230_proxyCreator"
 DESCRIPTION = "m231_proxyCreatorDesc"
 ICON = "/Icons/dp_proxyCreator.png"
+WIKI = "07-‐-Validator#-proxy-creator"
 
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.06
+DP_PROXYCREATOR_VERSION = 1.07
 
 
 class ProxyCreator(dpBaseAction.ActionStartClass):

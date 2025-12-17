@@ -8,8 +8,9 @@ CLASS_NAME = "BlendShapeIO"
 TITLE = "r030_blendShapeIO"
 DESCRIPTION = "r031_blendShapeIODesc"
 ICON = "/Icons/dp_blendShapeIO.png"
+WIKI = "10-‐-Rebuilder#-blendshape"
 
-DP_BLENDSHAPEIO_VERSION = 1.02
+DP_BLENDSHAPEIO_VERSION = 1.03
 
 
 class BlendShapeIO(dpBaseAction.ActionStartClass):
