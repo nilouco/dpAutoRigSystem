@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.10
+DP_UTILS_VERSION = 3.11
 
 
 class Utils(object):
@@ -218,27 +218,31 @@ class Utils(object):
                 return str(max(numberList)+1).zfill(pad)
 
 
-    def findModuleLastNumber(self, className, typeName):
-        """ Find the last used number of this type of module.
+    def findModuleLastNumber(self, className, typeName, guideNet=False):
+        """ Find the last used number of this type of module or guideNet.
             Return its highest number.
         """
         # work with rigged modules in the scene:
-        numberList = []
+        nodeList, numberList = [], []
         guideTypeCount = 0
-        # list all transforms and find the existing value in them names:
-        transformList = cmds.ls(selection=False, transforms=True)
-        for transform in transformList:
-            if cmds.objExists(transform+"."+typeName):
-                if cmds.getAttr(transform+"."+typeName) == className:
-                    numberList.append(className)
-            # try check if there is a masterGrp and get its counter:
-            if cmds.objExists(transform+"."+self.dpUIinst.masterAttr) and cmds.getAttr(transform+"."+self.dpUIinst.masterAttr) == 1:
-                guideTypeCount = cmds.getAttr(transform+'.dp'+className+'Count')
+        if guideNet:
+            nodeList = self.getNetworkNodeByAttr("dpGuideNet")
+        else:
+            nodeList = cmds.ls(selection=False, transforms=True)
+        if nodeList:
+            for node in nodeList:
+                if cmds.objExists(node+"."+typeName):
+                    if cmds.getAttr(node+"."+typeName) == className:
+                        numberList.append(className)
+        # try check if there is a masterGrp and get its counter:
+        allGrp = self.getAllGrp()
+        if allGrp:
+            guideTypeCount = cmds.getAttr(allGrp+'.dp'+className+'Count')
         if guideTypeCount > len(numberList):
             return guideTypeCount
         else:
             return len(numberList)
-        
+    
         
     def normalizeText(self, enteredText="", prefixMax=4):
         """ Analisys the enteredText to conform it in order to use in Application (Maya).

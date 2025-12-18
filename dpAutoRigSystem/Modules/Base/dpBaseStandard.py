@@ -462,7 +462,7 @@ class BaseStandard(object):
             # joint labelling:
             self.jointLabelAdd = 0
         # store the number of this guide by module type
-        self.dpAR_count = self.utils.findModuleLastNumber(self.guideModuleName, "dpAR_type")+1
+        self.dpAR_count = self.utils.findModuleLastNumber(self.guideModuleName, "moduleType", True)
 
 
     def rigModule(self, *args):

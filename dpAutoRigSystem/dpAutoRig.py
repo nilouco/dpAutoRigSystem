@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.28"
-DPAR_UPDATELOG = "N095 - Update wiki documentation 5."
+DPAR_VERSION_5 = "5.01.29"
+DPAR_UPDATELOG = "N673 - Hand poses."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -3190,7 +3190,7 @@ class Start(object):
                     self.toIDList = list(set(self.toIDList))
                     self.customAttr.addAttr(0, self.toIDList, descendents=True)
 
-                # atualise the number of rigged guides by type
+                # actualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0
                     guideNetList = cmds.ls(selection=False, type="network")
