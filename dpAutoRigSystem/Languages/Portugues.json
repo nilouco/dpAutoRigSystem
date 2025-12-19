@@ -530,6 +530,7 @@
     "i360_snapIkFromBakedFk"    : "Timeline: Snap ik de baked fk keyframes",
     "i361_mapRibbon"            : "Mapear os ribbons de membros",
     "i362_sHierarchyAnn"        : "O diretório onde será exportado ou importado os dados de hierarquia de controles.",
+    "i363_addedFingerHandPose"  : "Adicionado atributos de Pose de Dedos da Mão com sucesso.\nObrigado.",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Módulo Linha Fk:\n\nEsse módulo cria uma cadeia de joints\ncom o número de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é útil para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

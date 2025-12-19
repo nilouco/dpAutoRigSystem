@@ -1515,7 +1515,7 @@ class Start(object):
         return guideInstance
     
     
-    def initExtraModule(self, guideModule, guideDir=None, *args):
+    def initExtraModule(self, guideModule, guideDir=None, hidden=False, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
@@ -1530,7 +1530,10 @@ class Start(object):
         # get the CLASS_NAME from extraModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this extraModule as an Instance:
-        guideInstance = guideClass(self)
+        if hidden:
+            guideInstance = guideClass(self, ui=False)
+        else:
+            guideInstance = guideClass(self)
         return guideInstance
     
     
@@ -3299,7 +3302,7 @@ class Start(object):
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpLimbSpaceSwitch", self.toolsFolder)
             # add fingers hand pose:
-            self.initExtraModule("dpFingerHandPose", self.toolsFolder)
+            self.initExtraModule("dpFingerHandPose", self.toolsFolder, hidden=True)
 
             # show dialogBox if detected a bug:
             if integrate == 1:

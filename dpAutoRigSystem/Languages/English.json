@@ -530,6 +530,7 @@
     "i360_snapIkFromBakedFk"    : "Timeline: Snap ik from baked fk keyframes",
     "i361_mapRibbon"            : "Map limb ribbons",
     "i362_sHierarchyAnn"        : "The folder to export and import controllers hierarchy data.",
+    "i363_addedFingerHandPose"  : "Added Finger Hand Pose attributes with success.\nThanks.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of desired joints.\n\nWhen rigged, the controllers will be FK (forward kinematics),\nIK (inverse kinematics), or dynamic.\n\nThis is useful to create tails, ears, hair\nor simple controllers to objects.",

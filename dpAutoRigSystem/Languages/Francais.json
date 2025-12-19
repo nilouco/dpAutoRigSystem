@@ -530,6 +530,7 @@
     "i360_snapIkFromBakedFk"    : "Timeline: Snap ik de baked fk keyframes",
     "i361_mapRibbon"            : "Maper des ribbons de membres",
     "i362_sHierarchyAnn"        : "Le dossier ou on va importer et exporter les donnés de l'hierarchie des controlleurs.",
+    "i363_addedFingerHandPose"  : "C'était ajouté des attributs de Pose de Doigts de la Main avec succès.\nMerci.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crée une chaîne de joints\navec le nombre de joints désiré.\n\nLorsque riggés, les contrôles seront FK (forward kinematics),\nik (inverse kinematics) ou dynamiques.\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

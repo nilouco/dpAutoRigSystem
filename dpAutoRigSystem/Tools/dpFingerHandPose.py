@@ -12,7 +12,7 @@ DP_FINGERHANDPOSE_VERSION = 1.00
 
 
 class FingerHandPose(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, dpUIinst, ui=True, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
@@ -32,6 +32,7 @@ class FingerHandPose(object):
         spreadName = dpUIinst.lang['c130_spread']
         relaxName = dpUIinst.lang['c131_relax']
         handAttrList = [curlName, sideName, scratchName, spreadName, relaxName]
+        handCtrlList = []
         
         # find nodes
         allGrp = self.dpUIinst.utils.getAllGrp()
@@ -40,6 +41,7 @@ class FingerHandPose(object):
                 for side in sideList:
                     handCtrl = side+armName+"_"+wristName+"_ToParent_Ctrl"
                     if cmds.objExists(handCtrl): #there's an arm
+                        handCtrlList.append(handCtrl)
                         for attr in handAttrList:
                             if not attr in cmds.listAttr(handCtrl):
                                 cmds.addAttr(handCtrl, longName=attr, attributeType="double", minValue=-1, maxValue=1, defaultValue=0, keyable=True)
@@ -99,3 +101,6 @@ class FingerHandPose(object):
                 newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
             self.toIDList.extend(newDrivenKeyList)
             self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+            if ui: #verbose
+                cmds.select(handCtrlList)
+                self.dpUIinst.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)
