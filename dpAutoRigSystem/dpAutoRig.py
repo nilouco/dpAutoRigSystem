@@ -3298,6 +3298,8 @@ class Start(object):
                 
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpLimbSpaceSwitch", self.toolsFolder)
+            # add fingers hand pose:
+            self.initExtraModule("dpFingerHandPose", self.toolsFolder)
 
             # show dialogBox if detected a bug:
             if integrate == 1:

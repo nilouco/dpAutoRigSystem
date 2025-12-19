@@ -10,7 +10,7 @@ DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
 WIKI = "03-‐-Guides#-finger"
 
-DP_FINGER_VERSION = 2.03
+DP_FINGER_VERSION = 2.04
 
 
 class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -253,14 +253,16 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # hide visibility attribute:
                     cmds.setAttr(self.fingerCtrl+'.visibility', keyable=False)
                     # put another group over the control in order to use this to connect values from mainFingerCtrl:
-                    self.sdkGrp = cmds.group(self.fingerCtrl, name=side+self.userGuideName+"_%02d_SDK_Grp"%(n))
-                    self.utils.addCustomAttr([self.sdkGrp], self.utils.ignoreTransformIOAttr)
+                    self.poseGrp = cmds.group(self.fingerCtrl, name=side+self.userGuideName+"_%02d_Pose_Grp"%(n))
+                    self.sdkGrp = cmds.group(self.poseGrp, name=side+self.userGuideName+"_%02d_SDK_Grp"%(n))
+                    self.utils.addCustomAttr([self.poseGrp, self.sdkGrp], self.utils.ignoreTransformIOAttr)
                     if n == 1:
-                        # change pivot of this group to control pivot:
+                        # change pivot of those groups to control pivot:
                         pivotPos = cmds.xform(self.fingerCtrl, query=True, worldSpace=True, rotatePivot=True)
-                        cmds.setAttr(self.sdkGrp+'.rotatePivotX', pivotPos[0])
-                        cmds.setAttr(self.sdkGrp+'.rotatePivotY', pivotPos[1])
-                        cmds.setAttr(self.sdkGrp+'.rotatePivotZ', pivotPos[2])
+                        for grp in [self.poseGrp, self.sdkGrp]:
+                            cmds.setAttr(grp+'.rotatePivotX', pivotPos[0])
+                            cmds.setAttr(grp+'.rotatePivotY', pivotPos[1])
+                            cmds.setAttr(grp+'.rotatePivotZ', pivotPos[2])
                     # position and orientation of joint and control:
                     tempDel = cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False)
                     cmds.delete(tempDel)
