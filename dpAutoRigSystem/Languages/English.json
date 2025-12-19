@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-12-16",
+    "_updated"       : "2025-12-19",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -139,6 +139,10 @@
     "c125_last"              : "Last",
     "c126_display"           : "Display",
     "c127_eyeSocket"         : "EyeSocket",
+    "c128_curl"              : "curl",
+    "c129_scratch"           : "scratch",
+    "c130_spread"            : "spread",
+    "c131_relax"             : "relax",
     
     "e000_guideNotFound"           : "Guide not found in this scene.",
     "e001_guideNotChecked"         : "Guide(s) not found in the respective folder...",
@@ -526,6 +530,7 @@
     "i360_snapIkFromBakedFk"    : "Timeline: Snap ik from baked fk keyframes",
     "i361_mapRibbon"            : "Map limb ribbons",
     "i362_sHierarchyAnn"        : "The folder to export and import controllers hierarchy data.",
+    "i363_addedFingerHandPose"  : "Added Finger Hand Pose attributes with success.\nThanks.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of desired joints.\n\nWhen rigged, the controllers will be FK (forward kinematics),\nIK (inverse kinematics), or dynamic.\n\nThis is useful to create tails, ears, hair\nor simple controllers to objects.",
@@ -782,6 +787,8 @@
     "m253_assignCtrlDefinition"  : "Assigned controllers to HumanIk character definition.",
     "m254_oneSkeleton"           : "One Skeleton",
     "m255_oneSkeletonDesc"       : "This tool will create a single skeleton of joints in one hierarchy.\nIt'll try to find skinned meshes in the Render_Grp.\nOtherwise, it'll get all skinned meshes in the scene to process.",
+    "m256_fingerHandPose"        : "Finger Hand Pose",
+    "m257_fingerHandPoseDesc"    : "This tool will create hand poses for fingers.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with a number, whitespace, or have special characters, sorry.",
     "p002_left"       : "L",
