@@ -16,7 +16,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.03
+DP_FACIALCONNECTION_VERSION = 1.04
 
 
 class FacialConnection(object):
@@ -156,6 +156,8 @@ class FacialConnection(object):
                         dismissString=btCancel)
                 if result == btContinue:
                     prefix = cmds.promptDialog(query=True, text=True)
+                    if not prefix:
+                        prefix = baseName
             if not prefix.endswith("_"):
                 prefix = prefix+"_"
             prefix = prefix.capitalize()
@@ -234,7 +236,11 @@ class FacialConnection(object):
                                 connectIt = True
                             # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
                             if connectIt:
-                                cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
+                                connectionList = cmds.listConnections(facialCtrl+"."+facialAttr, source=False, destination=True)
+                                if connectionList:
+                                    cmds.connectAttr(connectionList[0]+".outputR", bsNode+"."+targetAttr, force=True)
+                                else:
+                                    cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
                                 print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
                                 resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
         if self.ui and resultList:

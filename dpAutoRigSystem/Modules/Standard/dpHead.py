@@ -17,7 +17,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.06
+DP_HEAD_VERSION = 3.07
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -1224,7 +1224,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     
     
     def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
-        """ Important function to receive called parameters and create the specific asked control.
+        """ Important method to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
                 axisDirectionList = [-1, 1, -1, 1, -1, 1] # neg, pos, neg, pos, neg, pos
@@ -1271,7 +1271,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.connectAttr(invZMD+".outputZ", fCtrlGrp+".scaleZ", force=True)
             else:
                 cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
-            # start work with custom attributes
+            # start working with custom attributes
             facialAttrList = []
             if attrList:
                 for a, attr in enumerate(attrList):
@@ -1280,19 +1280,29 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         if sideName:
                             ctrlAttr = sideName+"_"+attr
                         facialAttrList.append(ctrlAttr)
+                        clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
+                        # TODO: to be uncommented by 2026-12-24
+                        #self.toIDList.append(clp)
                         if directConnection:
+                            if not "minValue" in cmds.listAttr(fCtrl):
+                                for c, clampAttr in enumerate(["minValue", "maxValue"]):
+                                   cmds.addAttr(fCtrl, longName=clampAttr, attributeType="float", defaultValue=c, keyable=False)
+                                   cmds.setAttr(fCtrl+"."+clampAttr, channelBox=True)
+                                   calibrationList.append(clampAttr)
                             cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0)
                             cmds.setAttr(fCtrl+"."+attr, keyable=True)
+                            cmds.connectAttr(fCtrl+"."+attr, clp+".input.inputR", force=True)
+                            cmds.connectAttr(fCtrl+".minValue", clp+".minR", force=True)
+                            cmds.connectAttr(fCtrl+".maxValue", clp+".maxR", force=True)
                         else:
                             if not "intensity" in cmds.listAttr(fCtrl):
                                 cmds.addAttr(fCtrl, longName="intensity", attributeType="float", defaultValue=1)
                                 cmds.setAttr(fCtrl+".intensity", keyable=True)
                             cmds.addAttr(fCtrl, longName=ctrlAttr, attributeType="float", defaultValue=0)
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
-                            clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
                             intensityMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Intensity_MD")
-                            self.toIDList.extend([calibrateMD, clp, invMD, intensityMD])
+                            self.toIDList.extend([calibrateMD, invMD, intensityMD])
                             if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
