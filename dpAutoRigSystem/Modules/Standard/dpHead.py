@@ -17,7 +17,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.06
+DP_HEAD_VERSION = 3.07
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -1222,9 +1222,57 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.renameUnitConversion()
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
+
+    def createFaceMinMaxSN(self, fCtrl, *args):
+        """ Creates a scriptNode to set the min and max values to the given Face_Ctrl.
+        """
+        minMaxCode = '''from maya import cmds
+DP_HEAD_VERSION = '''+str(DP_HEAD_VERSION)+'''
+class MinMaxValues(object):
+    def __init__(self, headNet, *args):
+        self.faceCtrl = cmds.listConnections(headNet+".faceCtrl")[0]
+        cmds.scriptJob(attributeChange=(self.faceCtrl+".minValue", self.setMinMaxValues), killWithScene=False, compressUndo=True)
+        cmds.scriptJob(attributeChange=(self.faceCtrl+".maxValue", self.setMinMaxValues), killWithScene=False, compressUndo=True)
+
+    def setMinMaxValues(self, *args):
+        extraAttrList = list(set(cmds.listAttr(self.faceCtrl, userDefined=True, keyable=True)) - set(["minValue", "maxValue"]))
+        if extraAttrList:
+            minimumValue = cmds.getAttr(self.faceCtrl+".minValue")
+            maximumValue = cmds.getAttr(self.faceCtrl+".maxValue")
+            if minimumValue > maximumValue:
+                cmds.setAttr(self.faceCtrl+".minValue", maximumValue)
+                minimumValue = maximumValue
+            for extraAttr in extraAttrList:
+                cmds.addAttr(self.faceCtrl+"."+extraAttr, edit=True, minValue=minimumValue, maxValue=maximumValue)
+                if cmds.getAttr(self.faceCtrl+"."+extraAttr) < minimumValue:
+                    cmds.setAttr(self.faceCtrl+"."+extraAttr, minimumValue)
+                if cmds.getAttr(self.faceCtrl+"."+extraAttr) > maximumValue:
+                    cmds.setAttr(self.faceCtrl+"."+extraAttr, maximumValue)
+
+# fire scriptNode
+for net in cmds.ls(type="network"):
+    if cmds.objExists(net+".dpNetwork") and cmds.getAttr(net+".dpNetwork") == 1:
+        if cmds.objExists(net+".dpGuideNet") and cmds.getAttr(net+".dpGuideNet") == 1:
+            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+cmds.getAttr(self.guideNet+".dpID")+'''":
+                MinMaxValues(net)
+        '''
+        cmds.lockNode(self.guideNet, lock=False)
+        cmds.addAttr(self.guideNet, longName="faceCtrl", attributeType="message")
+        cmds.addAttr(self.guideNet, longName="minMaxScriptNode", attributeType="message")
+        cmds.addAttr(fCtrl, longName="guideNet", attributeType="message")
+        cmds.connectAttr(fCtrl+".message", self.guideNet+".faceCtrl", force=True)
+        cmds.connectAttr(self.guideNet+".message", fCtrl+".guideNet", force=True)
+        sn = cmds.scriptNode(name=self.guideNet.replace("Net", 'MinMax_SN'), sourceType='python', scriptType=2, beforeScript=minMaxCode)
+        self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
+        cmds.addAttr(sn, longName="guideNet", attributeType="message")
+        cmds.connectAttr(sn+".message", self.guideNet+".minMaxScriptNode", force=True)
+        cmds.connectAttr(self.guideNet+".message", sn+".guideNet", force=True)
+        cmds.scriptNode(sn, executeBefore=True)
+        cmds.lockNode(self.guideNet, lock=True)
+
     
     def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
-        """ Important function to receive called parameters and create the specific asked control.
+        """ Important method to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
                 axisDirectionList = [-1, 1, -1, 1, -1, 1] # neg, pos, neg, pos, neg, pos
@@ -1271,7 +1319,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.connectAttr(invZMD+".outputZ", fCtrlGrp+".scaleZ", force=True)
             else:
                 cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
-            # start work with custom attributes
+            # start working with custom attributes
             facialAttrList = []
             if attrList:
                 for a, attr in enumerate(attrList):
@@ -1280,19 +1328,29 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         if sideName:
                             ctrlAttr = sideName+"_"+attr
                         facialAttrList.append(ctrlAttr)
+                        clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
+                        # TODO: to be decommented by 2026-12-24
+                        #self.toIDList.append(clp)
                         if directConnection:
-                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0)
+                            if not "minValue" in cmds.listAttr(fCtrl):
+                                for c, clampAttr in enumerate(["minValue", "maxValue"]):
+                                   cmds.addAttr(fCtrl, longName=clampAttr, attributeType="float", defaultValue=c, keyable=False)
+                                   cmds.setAttr(fCtrl+"."+clampAttr, channelBox=True)
+                                   calibrationList.append(clampAttr)
+                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", minValue=0, maxValue=1, defaultValue=0)
                             cmds.setAttr(fCtrl+"."+attr, keyable=True)
+                            cmds.connectAttr(fCtrl+"."+attr, clp+".input.inputR", force=True)
+                            cmds.connectAttr(fCtrl+".minValue", clp+".minR", force=True)
+                            cmds.connectAttr(fCtrl+".maxValue", clp+".maxR", force=True)
                         else:
                             if not "intensity" in cmds.listAttr(fCtrl):
                                 cmds.addAttr(fCtrl, longName="intensity", attributeType="float", defaultValue=1)
                                 cmds.setAttr(fCtrl+".intensity", keyable=True)
                             cmds.addAttr(fCtrl, longName=ctrlAttr, attributeType="float", defaultValue=0)
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
-                            clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
                             intensityMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Intensity_MD")
-                            self.toIDList.extend([calibrateMD, clp, invMD, intensityMD])
+                            self.toIDList.extend([calibrateMD, invMD, intensityMD])
                             if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
@@ -1329,6 +1387,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             cmds.connectAttr(fCtrl+".intensity", intensityMD+".input2X", force=True)
                             cmds.connectAttr(intensityMD+".outputX", fCtrl+"."+ctrlAttr, force=True)
                             cmds.setAttr(fCtrl+"."+ctrlAttr, lock=True)
+                if directConnection:
+                    self.createFaceMinMaxSN(fCtrl)
             if facialAttrList:
                 self.ctrls.setStringAttrFromList(fCtrl, facialAttrList, "facialList")
             if calibrationList:
