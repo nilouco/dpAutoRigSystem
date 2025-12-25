@@ -13,7 +13,7 @@ WIKI = "10-‐-Rebuilder#-guide"
 
 MODULES = "Modules.Standard"
 
-DP_GUIDEIO_VERSION = 1.04
+DP_GUIDEIO_VERSION = 1.05
 
 
 class GuideIO(dpBaseAction.ActionStartClass):
@@ -132,7 +132,46 @@ class GuideIO(dpBaseAction.ActionStartClass):
         """ Run instance code to Guide_Base node configuration or just set the simple attributes.
         """
         directionList = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
-        customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style", "rigType", "numBendJoints", "facial", "facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace", "deformer", "deformedBy", "worldSize"]
+        customAttrList = ["flip",
+                          "mainControls",
+                          "nMain",
+                          "dynamic",
+                          "corrective",
+                          "alignWorld",
+                          "additional",
+                          "softIk",
+                          "nostril",
+                          "indirectSkin",
+                          "holder",
+                          "sdkLocator",
+                          "startFrame",
+                          "showControls",
+                          "steering",
+                          "degree",
+                          "eyelid",
+                          "iris",
+                          "pupil",
+                          "specular",
+                          "lidPivot",
+                          "style",
+                          "rigType",
+                          "numBendJoints",
+                          "facial",
+                          "facialBrow",
+                          "facialEyelid",
+                          "facialMouth",
+                          "facialLips",
+                          "facialSneer",
+                          "facialGrimace",
+                          "facialFace",
+                          "deformer",
+                          "deformedBy",
+                          "worldSize",
+                          "jaw",
+                          "chin",
+                          "lips",
+                          "upperHead"
+                          ]
         for item in list(self.netDic["GuideData"]):
             if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                 for baseAttr in list(self.netDic["GuideData"][item]):
