@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2025-07-11",
+    "_updated"    : "2025-12-25",
 
     "BorderGap"                 : false,
     "ColorPerVertexCleaner"     : false,
@@ -10,6 +10,7 @@
     "FreezeTransform"           : false,
     "GeometryHistory"           : false,
     "ImportReference"           : false,
+    "IntermediateObject"        : false,
     "InvertedNormals"           : false,
     "LaminaFaceCleaner"         : false,
     "NamespaceCleaner"          : false,

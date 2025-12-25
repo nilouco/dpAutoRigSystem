@@ -2,7 +2,7 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2025-07-11",
+    "_updated"    : "2025-12-25",
 
     "BorderGap"                 : true,
     "ColorPerVertexCleaner"     : true,
@@ -10,6 +10,7 @@
     "FreezeTransform"           : true,
     "GeometryHistory"           : true,
     "ImportReference"           : true,
+    "IntermediateObject"        : true,
     "InvertedNormals"           : true,
     "LaminaFaceCleaner"         : true,
     "NamespaceCleaner"          : true,
