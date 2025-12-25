@@ -238,7 +238,10 @@ class FacialConnection(object):
                             if connectIt:
                                 connectionList = cmds.listConnections(facialCtrl+"."+facialAttr, source=False, destination=True)
                                 if connectionList:
-                                    cmds.connectAttr(connectionList[0]+".outputR", bsNode+"."+targetAttr, force=True)
+                                    if cmds.objectType(connectionList[0]) == "clamp":
+                                        cmds.connectAttr(connectionList[0]+".outputR", bsNode+"."+targetAttr, force=True)
+                                    else:
+                                        cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
                                 else:
                                     cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
                                 print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
