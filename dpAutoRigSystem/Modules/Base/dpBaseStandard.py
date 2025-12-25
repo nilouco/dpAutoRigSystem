@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.09
+DP_BASESTANDARD_VERSION = 2.10
 
 
 class BaseStandard(object):
@@ -570,7 +570,7 @@ class BaseStandard(object):
         else:
             guideNumber = self.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
-        self.dpUIinst.customAttr.addAttr(0, [self.guideNet]) #dpID
+        self.dpID = self.dpUIinst.customAttr.addAttr(0, [self.guideNet])[0] #dpID
         for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
