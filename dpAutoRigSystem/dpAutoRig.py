@@ -2290,8 +2290,9 @@ class Start(object):
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         # Create and add groundDirection shape control
-        self.groundDirectionCtrl = self.getBaseCtrl("id_102_GroundDirection", "groundDirectionCtrl", self.prefix+"GroundDirection_Ctrl", self.ctrls.dpCheckLinearUnit(4))
-        cmds.setAttr(self.groundDirectionCtrl + '.ry',-90)
+        self.groundDirectionCtrl = self.ctrls.cvControl("id_102_GroundDirection", "groundDirectionCtrl", r=self.ctrls.dpCheckLinearUnit(4), dir="+X", rot=(0, -90, 0))
+        # self.groundDirectionCtrl = self.getBaseCtrl("id_102_GroundDirection", "groundDirectionCtrl", self.prefix+"GroundDirection_Ctrl", self.ctrls.dpCheckLinearUnit(4))
+        # cmds.setAttr(self.groundDirectionCtrl + '.ry',-90)
         cmds.setAttr(self.groundDirectionCtrl + '.tz',16)
         cmds.select(self.groundDirectionCtrl)
         cmds.makeIdentity( apply=True )
