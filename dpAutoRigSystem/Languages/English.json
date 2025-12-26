@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-12-25",
+    "_updated"       : "2025-12-26",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -789,8 +789,6 @@
     "m255_oneSkeletonDesc"       : "This tool will create a single skeleton of joints in one hierarchy.\nIt'll try to find skinned meshes in the Render_Grp.\nOtherwise, it'll get all skinned meshes in the scene to process.",
     "m256_fingerHandPose"        : "Finger Hand Pose",
     "m257_fingerHandPoseDesc"    : "This tool will create hand poses for fingers.",
-    "m258_intermediateObject"    : "Intermediate Object",
-    "m259_intermediateObjectDesc": "This checkin validator will reveal if there are intermediate object meshes.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with a number, whitespace, or have special characters, sorry.",
     "p002_left"       : "L",
@@ -1024,6 +1022,14 @@
     "v138_emptyTransformCleaner"       : "Empty transform cleaner",
     "v139_emptyTransformCleanerDesc"   : "This validator will verify if it has any transforms without a son or connection and delete them.",
     "v140_parentedGeometry"            : "Parented geometry",
-    "v141_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy."
+    "v141_parentedGeometryDesc"        : "This validator will verify if there are some parented geometries in the hierarchy.",
+    "v142_intermediateObject"          : "Intermediate Object",
+    "v143_intermediateObjectDesc"      : "This checkin validator will reveal if there are intermediate object meshes.",
+    "v144_dataSetCleaner"              : "Data_Grp set cleaner",
+    "v145_dataSetCleanerDesc"          : "This checkout validator will remove all sets from nodes in the Data_Grp.",
+    "v146_nodeEditorInfoCleaner"       : "Node Editor Info cleaner",
+    "v147_nodeEditoInfoCleanerDesc"    : "This checkout validator deletes the nodeGraphEditorInfo nodes in the scene.",
+    "v148_unusedDeformerCleaner"       : "Unused deformer cleaner",
+    "v149_unusedDeformerCleanerDesc"   : "This checkout validator will remove the unused deformer nodes in the scene."
   
 }

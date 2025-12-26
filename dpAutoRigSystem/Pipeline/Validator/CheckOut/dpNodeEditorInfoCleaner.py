@@ -3,23 +3,23 @@ from maya import cmds
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
-CLASS_NAME = "IntermediateObject"
-TITLE = "v142_intermediateObject"
-DESCRIPTION = "v143_intermediateObjectDesc"
-ICON = "/Icons/dp_intermediateObject.png"
-WIKI = "07-‐-Validator#-intermediate-object"
+CLASS_NAME = "NodeEditorInfoCleaner"
+TITLE = "v146_nodeEditorInfoCleaner"
+DESCRIPTION = "v147_nodeEditoInfoCleanerDesc"
+ICON = "/Icons/dp_nodeEditorInfoCleaner.png"
+WIKI = "07-‐-Validator#-nodeeditorinfo-cleaner"
 
-DP_INTERMEDIATEOBJECT_VERSION = 1.01
+DP_NODEEDITORINFOCLEANER_VERSION = 1.00
 
 
-class IntermediateObject(dpBaseAction.ActionStartClass):
+class NodeEditorInfoCleaner(dpBaseAction.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_INTERMEDIATEOBJECT_VERSION
+        self.version = DP_NODEEDITORINFOCLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     
 
@@ -41,13 +41,14 @@ class IntermediateObject(dpBaseAction.ActionStartClass):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="mesh", intermediateObjects=True)
+                toCheckList = objList
             else:
-                toCheckList = cmds.ls(selection=False, type="mesh", intermediateObjects=True) #all intermediateObject meshes in the scene
+                toCheckList = cmds.ls(selection=False, type='nodeGraphEditorInfo')
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    # conditional to check here
                     self.checkedObjList.append(item)
                     self.foundIssueList.append(True)
                     if self.firstMode:
@@ -55,7 +56,8 @@ class IntermediateObject(dpBaseAction.ActionStartClass):
                     else: #fix
                         try:
                             cmds.lockNode(item, lock=False)
-                            cmds.setAttr(item+".intermediateObject", 0)
+                            cmds.delete(item)
+                            cmds.select(clear=True)
                             self.resultOkList.append(True)
                             self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                         except:

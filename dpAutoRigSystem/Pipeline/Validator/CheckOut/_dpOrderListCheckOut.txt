@@ -4,7 +4,9 @@ dpKeyframeCleaner
 dpNgSkinToolsCleaner
 dpBrokenNetCleaner
 dpColorSetCleaner
+dpDataSetCleaner
 dpHideDataGrp
+dpNodeEditorInfoCleaner
 dpOutlinerCleaner
 dpSideCalibration
 dpTargetCleaner
@@ -12,6 +14,7 @@ dpUnknownNodesCleaner
 dpUnusedNodeCleaner
 dpPruneSkinWeights
 dpUnusedSkinCleaner
+dpUnusedDeformerCleaner
 dpEnvelopeChecker
 dpScalableDeformerChecker
 dpWIPCleaner

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-12-25",
+    "_updated"       : "2025-12-26",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -789,8 +789,6 @@
     "m255_oneSkeletonDesc"       : "Cet outil créera un squelette unique de joints dans une hiérarchie.\nIl essaiera de trouver des meshes skinnés dans le Render_Grp.\nSinon, il obtiendra tous les meshes skinnés de la scène à traiter.",
     "m256_fingerHandPose"        : "Poser des Doigts de la Main",
     "m257_fingerHandPoseDesc"    : "Cet outil créera des poses des doigts pour la main du perso.",
-    "m258_intermediateObject"    : "Objet Intermédiaires",
-    "m259_intermediateObjectDesc": "Ce validateur révélera s'il existe des meshes d'objets intermédiaires.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -1023,6 +1021,13 @@
     "v138_emptyTransformCleaner"       : "Supprimer les transformations vides",
     "v139_emptyTransformCleanerDesc"   : "Ce validateur vérifiera s'il y a des transformations sans fils ou connexion et les supprimera.",
     "v140_parentedGeometry"            : "Géométrie parentée",
-    "v141_parentedGeometryDesc"        : "Ce validateur vérifie la présence de géométries parentées dans la hiérarchie."
-
+    "v141_parentedGeometryDesc"        : "Ce validateur vérifie la présence de géométries parentées dans la hiérarchie.",
+    "v142_intermediateObject"          : "Objet Intermédiaires",
+    "v143_intermediateObjectDesc"      : "Ce validateur révélera s'il existe des meshes d'objets intermédiaires.",
+    "v144_dataSetCleaner"              : "Data_Grp set nettoyeur",
+    "v145_dataSetCleanerDesc"          : "Ce validateur va effacer tous les sets de nodes dans le Data_Grp.",
+    "v146_nodeEditorInfoCleaner"       : "Node Editor Info nettoyeur",
+    "v147_nodeEditoInfoCleanerDesc"    : "Ce validateur va effacer tous les nodes de nodeGraphEditorInfo dans la scene scene.",
+    "v148_unusedDeformerCleaner"       : "Unused deformer nettoyeur",
+    "v149_unusedDeformerCleanerDesc"   : "Ce validateur va effacer tous les nodes de déformeurs sans utilisation dans la scene."
 }
