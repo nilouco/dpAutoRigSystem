@@ -7,7 +7,7 @@ CLASS_NAME = "DataSetCleaner"
 TITLE = "v144_dataSetCleaner"
 DESCRIPTION = "v145_dataSetCleanerDesc"
 ICON = "/Icons/dp_dataSetCleaner.png"
-WIKI = "07-‐-Validator#-data-set-cleaner"
+WIKI = "07-‐-Validator#-data_grp-set-cleaner"
 
 DP_DATASETCLEANER_VERSION = 1.00
 

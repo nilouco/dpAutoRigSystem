@@ -7,7 +7,7 @@ CLASS_NAME = "NodeEditorInfoCleaner"
 TITLE = "v146_nodeEditorInfoCleaner"
 DESCRIPTION = "v147_nodeEditoInfoCleanerDesc"
 ICON = "/Icons/dp_nodeEditorInfoCleaner.png"
-WIKI = "07-‐-Validator#-nodeeditorinfo-cleaner"
+WIKI = "07-‐-Validator#-node-editor-info-cleaner"
 
 DP_NODEEDITORINFOCLEANER_VERSION = 1.00
 
