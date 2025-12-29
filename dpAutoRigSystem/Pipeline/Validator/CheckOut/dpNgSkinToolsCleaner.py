@@ -9,7 +9,7 @@ DESCRIPTION = "v027_ngskintoolsCleanerDesc"
 ICON = "/Icons/dp_ngskintoolsCleaner.png"
 WIKI = "07-‐-Validator#-ngskintools-cleaner"
 
-DP_NGSKINTOOLSCLEANER_VERSION = 1.03
+DP_NGSKINTOOLSCLEANER_VERSION = 1.04
 
 
 class NgSkinToolsCleaner(dpBaseAction.ActionStartClass):
@@ -55,6 +55,7 @@ class NgSkinToolsCleaner(dpBaseAction.ActionStartClass):
                         self.resultOkList.append(False)
                     else: #fix
                         try:
+                            cmds.lockNode(item, lock=False)
                             cmds.delete(item)
                             cmds.select(clear=True)
                             self.resultOkList.append(True)
