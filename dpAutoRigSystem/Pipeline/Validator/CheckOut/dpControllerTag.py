@@ -9,7 +9,7 @@ DESCRIPTION = "v074_controllerTagDesc"
 ICON = "/Icons/dp_controllerTag.png"
 WIKI = "07-‐-Validator#-controller-tag"
 
-DP_CONTROLLERTAG_VERSION = 1.02
+DP_CONTROLLERTAG_VERSION = 1.03
 
 
 class ControllerTag(dpBaseAction.ActionStartClass):
@@ -21,6 +21,9 @@ class ControllerTag(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_CONTROLLERTAG_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        # path to get the hierarchy json from controller hierarchy validator
+        self.ioDir = "s_hierarchyIO"
+        self.startName = "dpHierarchy"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -47,6 +50,11 @@ class ControllerTag(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 firstFixed = False
+                # Get file info
+                self.ioPath = self.getIOPath(self.ioDir)
+                if self.ioPath:
+                    # get last hierarchy dic, extracted from controls hierarchy json
+                    self.lastHierarchyDic = self.importLatestJsonFile(self.getExportedList(getAny=True))
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     # conditional to check here
@@ -63,6 +71,8 @@ class ControllerTag(dpBaseAction.ActionStartClass):
                             try:
                                 # tag as controller
                                 cmds.controller(item, isController=True)
+                                if self.lastHierarchyDic:
+                                    self.addParentControllerTag(item)
                                 if not firstFixed:
                                     self.resultOkList.append(True)
                                     self.messageList.append(self.dpUIinst.lang['v004_fixed']+": Controllers.")
@@ -82,3 +92,28 @@ class ControllerTag(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         return self.dataLogDic
+
+
+    def addParentControllerTag(self, item, *args):
+        """ Add parent controller tag to the item, using Controls Hierarchy json to find the parent.  
+        """
+        parentCtrl = None
+        # Find parent from last hierarchy dic
+        for possibleParent, childrenList in self.lastHierarchyDic.items():
+            if not childrenList:
+                continue
+            if item in childrenList:
+                parentCtrl = possibleParent
+                break
+        # return if no parent found
+        if not parentCtrl:
+            return
+        # add controller tag to parent if not already tagged
+        if not cmds.controller(parentCtrl, query=True, isController=True):
+            cmds.controller(parentCtrl, isController=True)
+        # check if there's already a parent tag
+        currentParent = cmds.controller(item, query=True, pickWalkUp=True)
+        if currentParent == parentCtrl:
+            return
+        # controller tag command to set parent
+        cmds.controller(item, parentCtrl, parent=True)
