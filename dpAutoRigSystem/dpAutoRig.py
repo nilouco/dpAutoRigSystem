@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.33"
-DPAR_UPDATELOG = "New validator checkout modules:\nN916 - Cleanup unused deformers.\nN920 - Cleanup sets from Data_Grp.\nN921 - Cleanup MayaNodeEditorSavedTabsInfo."
+DPAR_VERSION_5 = "5.01.34"
+DPAR_UPDATELOG = "N964 - Fixed pin saved guide issue."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -237,7 +237,7 @@ class Start(object):
             - SelectionChanged
             - WorkspaceChanged = not documented
         """
-        #cmds.scriptJob(event=('SceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        cmds.scriptJob(event=('SceneOpened', partial(self.refreshMainUI, clearSel=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         #cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
@@ -852,7 +852,7 @@ class Start(object):
         cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
     
     
-    def refreshMainUI(self, savedScene=False, resetButtons=True, *args):
+    def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
@@ -878,6 +878,8 @@ class Start(object):
             cmds.select(clear=True)
             if self.selList:
                 cmds.select(self.selList)
+        if clearSel:
+            cmds.select(clear=True)
         self.rebuilding = False
 
 
