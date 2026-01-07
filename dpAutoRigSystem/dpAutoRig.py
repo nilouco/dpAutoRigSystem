@@ -2336,6 +2336,7 @@ class Start(object):
         cmds.connectAttr(self.globalCtrl+".message", self.masterCtrl+".parentTag", force=True)
         cmds.connectAttr(self.masterCtrl+".message", self.rootCtrl+".parentTag", force=True)
         cmds.connectAttr(self.rootCtrl+".message", self.optionCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.rootCtrl+".message", self.rootPivotCtrl+".parentTag", force=True)
 
         # set lock and hide attributes
         self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
@@ -3209,7 +3210,34 @@ class Start(object):
                                 typeCounter = typeCounter + 1
                     if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
-        
+                
+                # parentTag
+                missingParentTagCtrlList = [c for c in self.ctrls.getControlList() if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
+                guideSourceDic = {}
+                for ctrl in self.ctrls.getControlList():
+                    if "guideSource" in cmds.listAttr(ctrl):
+                        guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
+                for pTagCtrl in missingParentTagCtrlList:
+                    if not pTagCtrl == self.globalCtrl:
+                        guideSource = cmds.getAttr(pTagCtrl+".guideSource")
+                        guideBase = guideSource.split(":")[0]+":Guide_Base"
+                        parentNode = self.hookDic[guideBase]['parentNode']
+                        fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                        if parentNode:
+                            foundCtrl = guideSourceDic[parentNode]
+                            if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
+                                if pTagCtrl.startswith(mirrorNameList[0]):
+                                    if not foundCtrl.startswith(mirrorNameList[0]):
+                                        foundCtrl = mirrorNameList[0]+foundCtrl[2:]
+                                else:
+                                    if not foundCtrl.startswith(mirrorNameList[1]):
+                                        foundCtrl = mirrorNameList[1]+foundCtrl[2:]
+                            if cmds.objExists(foundCtrl):
+                                cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
+                        else:
+                            cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
+
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
