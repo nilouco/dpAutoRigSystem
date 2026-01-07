@@ -11,7 +11,7 @@ DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 WIKI = "03-‐-Guides#-chain"
 
-DP_CHAIN_VERSION = 2.06
+DP_CHAIN_VERSION = 2.07
 
 
 class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -356,7 +356,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n+1)
                     
                     # create a Fk control:
-                    self.fkCtrl = self.ctrls.cvControl("id_082_ChainFk", side+self.userGuideName+"_%02d_Fk_Ctrl"%n, r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc"+str(n+1))
+                    self.fkCtrl = self.ctrls.cvControl("id_082_ChainFk", side+self.userGuideName+"_%02d_Fk_Ctrl"%n, r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc"+str(n+1), parentTag=self.getParentToTag(self.fkCtrlList))
                     self.fkCtrlList.append(self.fkCtrl)
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.guide, self.fkJointList[n], maintainOffset=False))
@@ -384,7 +384,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # add extrem_toParent_Ctrl
                 if n == (self.nJoints-1):
-                    self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd")
+                    self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd", parentTag=self.fkCtrlList[-1])
                     cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
                     cmds.addAttr(self.toParentExtremCtrl, longName=self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
                     cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
@@ -518,7 +518,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             # connect output of rotate in Z to ikSplineHandle roll attribute:
                             cmds.connectAttr(mainTwistMatrixMD+".outputZ", self.ikSplineHandle+".roll", force=True)
 
-                    ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc"+str(c))
+                    ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc"+str(c), parentTag=self.getParentToTag(self.ikCtrlList, self.ikCtrlMain))
                     self.ikCtrlList.append(ikCtrl)
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
                     ikCtrlZero = self.utils.zeroOut([ikCtrl])[0]
@@ -531,7 +531,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
-                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd")
+                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd", parentTag=self.ikCtrlList[-1])
                         self.ctrls.colorShape([self.ikCtrlLast], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
                         ikCtrlLastZero = self.utils.zeroOut([self.ikCtrlLast])[0]
@@ -551,7 +551,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # first ik control:
-                        self.ikCtrlFirst = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_Base")
+                        self.ikCtrlFirst = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_Base", parentTag=self.ikCtrlMain)
                         self.ctrls.colorShape([self.ikCtrlFirst], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlFirst, maintainOffset=False))
                         ikCtrlFirstZero = self.utils.zeroOut([self.ikCtrlFirst])[0]
@@ -561,6 +561,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.connectAttr(self.ikCtrlFirst+".scaleX", self.ikJointList[0]+".scaleX", force=True)
                         cmds.connectAttr(self.ikCtrlFirst+".scaleY", self.ikJointList[0]+".scaleY", force=True)
                         cmds.connectAttr(self.ikCtrlFirst+".scaleZ", self.ikJointList[0]+".scaleZ", force=True)
+                cmds.connectAttr(self.ikCtrlFirst+".message", self.ikCtrlList[0]+".parentTag", force=True)
                 
                 # ik controls position:
                 cmds.pointConstraint(self.ikCtrlFirst, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")

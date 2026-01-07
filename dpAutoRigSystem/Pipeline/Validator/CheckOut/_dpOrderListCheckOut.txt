@@ -20,8 +20,8 @@ dpScalableDeformerChecker
 dpWIPCleaner
 dpExitEditMode
 dpHideCorrectives
-dpControlsHierarchy
 dpControllerTag
+dpControlsHierarchy
 dpDisplayLayers
 dpResetPose
 dpJointEndCleaner

@@ -15,7 +15,7 @@ DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 WIKI = "03-‐-Guides#-wheel"
 
-DP_WHEEL_VERSION = 2.06
+DP_WHEEL_VERSION = 2.07
 
 
 class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -177,9 +177,9 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(self.wheelCtrl, constructionHistory=True)
                 
                 # create defaults controls shape
-                self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
-                self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_InsideLoc")
-                self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_OutsideLoc")
+                self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
+                self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_InsideLoc", parentTag=self.mainCtrl)
+                self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_OutsideLoc", parentTag=self.mainCtrl)
                 self.mainCtrlList.append(self.mainCtrl)
                 self.wheelCtrlList.append(self.wheelCtrl)
 
@@ -356,9 +356,9 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
                 # deform controls:
-                upperDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
-                middleDefCtrl = self.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
-                lowerDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.guideName+"_CenterLoc")
+                upperDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
+                middleDefCtrl = self.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
+                lowerDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
                 defCtrlGrpList = self.utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.userGuideName+"_Ctrl_Grp")
                 

@@ -17,7 +17,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.07
+DP_HEAD_VERSION = 3.08
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -630,12 +630,12 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # creating controllers:
                 for n in range(0, self.nJoints):
-                    neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z", guideSource=self.guideName+"_Neck"+str(n))
+                    neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z", guideSource=self.guideName+"_Neck"+str(n), parentTag=self.getParentToTag(self.neckCtrlList))
                     if n > 0:
                         cmds.parent(neckCtrl, self.neckCtrlList[-1])
                     self.neckCtrlList.append(neckCtrl)
-                self.headCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree, guideSource=self.guideName+"_Head")
-                self.headSubCtrl = self.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree, guideSource=self.guideName+"_Head")
+                self.headCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree, guideSource=self.guideName+"_Head", parentTag=self.neckCtrlList[-1])
+                self.headSubCtrl = self.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree, guideSource=self.guideName+"_Head", parentTag=self.headCtrl)
                 toFlipList = [self.headCtrl, self.headSubCtrl]
                 # hiding visibility attributes:
                 self.ctrls.setLockHide([self.headCtrl, self.headSubCtrl], ['v'], l=False)
@@ -659,8 +659,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.upperHeadJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head'])
                     cmds.setAttr(self.upperEndJnt+".translateY", 0.3*self.ctrlRadius)
                     dpARJointList.extend([self.upperJawJnt, self.upperHeadJnt])
-                    self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperJaw")
-                    self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperHead")
+                    self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperJaw", parentTag=self.headSubCtrl)
+                    self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperHead", parentTag=self.upperJawCtrl)
                     toFlipList.extend([self.upperJawCtrl, self.upperHeadCtrl])
                     self.ctrls.setLockHide([self.upperJawCtrl, self.upperHeadCtrl], ['v'], l=False)
                     cmds.select(self.headJnt)
@@ -668,7 +668,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.jawJnt = cmds.joint(name=jawJntName, scaleCompensate=False)
                     self.utils.setJointLabel(self.jawJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c025_jaw'])
                     dpARJointList.extend([self.jawJnt])
-                    self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.ctrlRadius *0.5), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Jaw")
+                    self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.ctrlRadius *0.5), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Jaw", parentTag=self.headSubCtrl)
                     toFlipList.extend([self.jawCtrl])
                     self.ctrls.setLockHide([self.jawCtrl], ['v'], l=False)
                     if hasChin:
@@ -679,8 +679,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.utils.setJointLabel(self.chinJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c026_chin'])
                         self.utils.setJointLabel(self.chewJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c048_chew'])
                         dpARJointList.extend([self.chinJnt, self.chewJnt])
-                        self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.13), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chin")
-                        self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.08), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chew")
+                        self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.13), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chin", parentTag=self.jawCtrl)
+                        self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.08), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chew", parentTag=self.chinCtrl)
                         toFlipList.extend([self.chinCtrl, self.chewCtrl])
                         self.ctrls.setLockHide([self.chinCtrl, self.chewCtrl], ['v'], l=False)
                     cmds.select(self.headJnt)
@@ -701,10 +701,10 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.upperLipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip'])
                     self.utils.setJointLabel(self.lowerLipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['c039_lip'])
                     dpARJointList.extend([self.lCornerLipJnt, self.rCornerLipJnt, self.upperLipJnt, self.lowerLipJnt])
-                    self.lCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LCornerLip")
-                    self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip")
-                    self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
-                    self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip")
+                    self.lCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LCornerLip", parentTag=self.headSubCtrl)
+                    self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip", parentTag=self.headSubCtrl)
+                    self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip", parentTag=self.headSubCtrl)
+                    self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip", parentTag=self.headSubCtrl)
                     toFlipList.extend([self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl])
                     self.ctrls.setLockHide([self.upperLipCtrl, self.lowerLipCtrl], ['v'], l=False)
                 dpARJointList.extend(self.neckJointList)
@@ -1193,6 +1193,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
                     hdNet = self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet)
                     self.addNodeToGuideNet([hdNet], ["hdNet"])
+                    cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
                 elif cmds.objExists(self.guideName+"_DeformerCube_MD"):
                     cmds.delete(self.guideName+"_DeformerCube_MD")
 
@@ -1293,7 +1294,7 @@ for net in cmds.ls(type="network"):
             return None, None
         else:
             # create control calling dpControls function:
-            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector)
+            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector, parentTag=self.headSubCtrl)
             # add head or jaw influence attribute
             if headDefInfluence:
                 self.ctrls.addDefInfluenceAttrs(fCtrl, 1)                

@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.02
+DP_CONTROLS_VERSION = 3.03
 
 
 class ControlClass(object):
@@ -495,7 +495,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, parentTag=None, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -523,6 +523,8 @@ class ControlClass(object):
             if guideSource:
                 cmds.addAttr(curve, longName="guideSource", dataType="string")
                 cmds.setAttr(curve+".guideSource", guideSource, type="string")
+            if parentTag:
+                cmds.connectAttr(parentTag+".message", curve+".parentTag", force=True)
             return curve
 
 

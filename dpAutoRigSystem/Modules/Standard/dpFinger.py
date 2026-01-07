@@ -10,7 +10,7 @@ DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
 WIKI = "03-‐-Guides#-finger"
 
-DP_FINGER_VERSION = 2.04
+DP_FINGER_VERSION = 2.05
 
 
 class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -170,7 +170,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.scalableGrpList, self.ikCtrlZeroList = [], []
             # run for all sides
             for s, side in enumerate(self.sideList):
-                self.skinJointList = []
+                self.skinJointList, self.ctrlList = [], []
                 self.base = side+self.userGuideName+'_Guide_Base'
                 if self.addArticJoint:
                     if self.addCorrective:
@@ -193,7 +193,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     # create a control:
                     if n == 1:
-                        self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90), guideSource=self.guideName+"_JointLoc"+str(n))
+                        self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90), guideSource=self.guideName+"_JointLoc"+str(n), parentTag=self.ctrlList[0])
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
@@ -230,7 +230,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.skinJointList[0]+".segmentScaleCompensate", force=True)
                     else:
-                        self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n))
+                        self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n), parentTag=self.getParentToTag(self.ctrlList))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         if n == self.nJoints:
                             self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
@@ -245,6 +245,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 # problably we are creating other base controls
                                 cmds.scale(2, 0.5, 1, self.fingerCtrl, relative=True)
                                 cmds.makeIdentity(self.fingerCtrl, apply=True)
+                    self.ctrlList.append(self.fingerCtrl)
 
                     # scaleCompensate attribute:
                     if n > 1:
@@ -404,7 +405,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
                     endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.dpUIinst.jointEndAttr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
                     cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
-                    self.ikCtrl = self.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.guideName+"_JointEnd")
+                    self.ikCtrl = self.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.ctrlList[1])
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)

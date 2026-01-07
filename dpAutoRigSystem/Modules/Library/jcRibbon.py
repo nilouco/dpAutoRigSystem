@@ -16,7 +16,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_RIBBONCLASS_VERSION = 2.09
+DP_RIBBONCLASS_VERSION = 2.10
 
 
 class RibbonClass(object):
@@ -159,6 +159,10 @@ class RibbonClass(object):
         cmds.connectAttr(upctrlCtrl+".scaleZ", upLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(downctrlCtrl+".scaleZ", downLimb['extraCtrlGrp']+".scaleZ", force=True)
         
+        # parentTag
+        cmds.connectAttr(upctrlCtrl+".message", upLimb['extraCtrlList'][0]+".parentTag", force=True)
+        cmds.connectAttr(downctrlCtrl+".message", downLimb['extraCtrlList'][0]+".parentTag", force=True)
+
         cmds.delete(cmds.parentConstraint(oriLoc, upctrl, mo=False, w=1))
         cmds.delete(cmds.pointConstraint(upLimb['middleCtrl'], upctrl, mo=False, w=1))
         
@@ -711,7 +715,7 @@ class RibbonClass(object):
             
             # create extra control
             extraName = jnt[:-4] #removed _Jnt suffix
-            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.limbInstance.moduleGrp)
+            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.limbInstance.moduleGrp, parentTag=self.limbInstance.getParentToTag(extraCtrlList))
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)

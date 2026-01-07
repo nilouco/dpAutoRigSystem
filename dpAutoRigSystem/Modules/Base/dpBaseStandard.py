@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.10
+DP_BASESTANDARD_VERSION = 2.11
 
 
 class BaseStandard(object):
@@ -738,6 +738,14 @@ class BaseStandard(object):
         cmds.setAttr(self.wsRef+".visibility", False)
         cmds.setAttr(self.wsRef+".template", 1)
         cmds.parent(self.wsRef, self.dpUIinst.tempGrp)
+
+
+    def getParentToTag(self, itemList, returnItem=None, *args):
+        """ Return the latest item from given list or the second given param.
+        """
+        if itemList:
+            return itemList[-1]
+        return returnItem
 
 
     # Getters:
