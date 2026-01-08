@@ -3219,24 +3219,33 @@ class Start(object):
                         guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
                 for pTagCtrl in missingParentTagCtrlList:
                     if not pTagCtrl == self.globalCtrl:
-                        guideSource = cmds.getAttr(pTagCtrl+".guideSource")
-                        guideBase = guideSource.split(":")[0]+":Guide_Base"
-                        parentNode = self.hookDic[guideBase]['parentNode']
-                        fatherGuide = self.hookDic[guideBase]['fatherGuide']
-                        if parentNode:
-                            foundCtrl = guideSourceDic[parentNode]
-                            if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
-                                mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
-                                if pTagCtrl.startswith(mirrorNameList[0]):
-                                    if not foundCtrl.startswith(mirrorNameList[0]):
-                                        foundCtrl = mirrorNameList[0]+foundCtrl[2:]
-                                else:
-                                    if not foundCtrl.startswith(mirrorNameList[1]):
-                                        foundCtrl = mirrorNameList[1]+foundCtrl[2:]
-                            if cmds.objExists(foundCtrl):
-                                cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
-                        else:
-                            cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
+                        if not cmds.getAttr(pTagCtrl+".controlID") == "id_092_Correctives":
+                            guideSource = cmds.getAttr(pTagCtrl+".guideSource")
+                            guideBase = guideSource.split(":")[0]+":Guide_Base"
+                            parentNode = self.hookDic[guideBase]['parentNode']
+                            fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                            if parentNode:
+                                if not parentNode in guideSourceDic.keys():
+                                    replaceList = ["_JointLoc1", "_Head", "Neck0", "Main", "_cvTopLoc1", "_Foot", "_CenterLoc", "_JointLocA", "_JointLocB"]
+                                    for endName in replaceList:
+                                        if parentNode.replace("_Base", endName) in guideSourceDic.keys():
+                                            parentNode = parentNode.replace("_Base", endName)
+                                            break
+                                if not parentNode in guideSourceDic.keys():
+                                    continue
+                                foundCtrl = guideSourceDic[parentNode]
+                                if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                    mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
+                                    if pTagCtrl.startswith(mirrorNameList[0]):
+                                        if not foundCtrl.startswith(mirrorNameList[0]):
+                                            foundCtrl = mirrorNameList[0]+foundCtrl[2:]
+                                    else:
+                                        if not foundCtrl.startswith(mirrorNameList[1]):
+                                            foundCtrl = mirrorNameList[1]+foundCtrl[2:]
+                                if cmds.objExists(foundCtrl):
+                                    cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
+                            else:
+                                cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
 
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
