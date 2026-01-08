@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.11
+DP_UTILS_VERSION = 3.12
 
 
 class Utils(object):
@@ -292,8 +292,8 @@ class Utils(object):
         if userDefAttrList:
             for userDefAttr in userDefAttrList:
                 delIt = True
-                if "originedFrom" in userDefAttr:
-                    if keepOriginedFrom:
+                if keepOriginedFrom:
+                    if "originedFrom" in userDefAttr or "guideSource" in userDefAttr:
                         delIt = False
                 if delIt:
                     try:
@@ -352,7 +352,7 @@ class Utils(object):
         """
         if nodeList and attrName:
             for node in nodeList:
-                if not cmds.objExists(node+"."+attrName):
+                if not attrName in cmds.listAttr(node):
                     cmds.addAttr(node, longName=attrName, attributeType=attrType, keyable=keyableAttr, defaultValue=defaultValueAttr)
 
 
@@ -1571,3 +1571,13 @@ class Utils(object):
                     cmds.sets(item+".vtx[*]", remove=setNode)
                     cmds.sets(item+".f[*]", remove=setNode)
                     cmds.sets(item+".e[*]", remove=setNode)
+
+
+    def replaceItemSuffix(self, item, sourceDic, suffixList=None, *args):
+        """ Return found replaced item suffix in the given dictionary.
+        """
+        if not suffixList:
+            suffixList = ["_JointLoc1", "_Head", "Neck0", "Main", "_cvTopLoc1", "_Foot", "_CenterLoc", "_JointLocA", "_JointLocB"]
+        for endName in suffixList:
+            if item.replace("_Base", endName) in sourceDic.keys():
+                return item.replace("_Base", endName)

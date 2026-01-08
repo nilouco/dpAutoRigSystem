@@ -3213,8 +3213,11 @@ class Start(object):
                 
                 # parentTag
                 missingParentTagCtrlList = [c for c in self.ctrls.getControlList() if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
+                holderCtrlList = self.ctrls.getControlList("dpHolder")
+                allCtrlList = self.ctrls.getControlList()
+                allCtrlList.extend(holderCtrlList)
                 guideSourceDic = {}
-                for ctrl in self.ctrls.getControlList():
+                for ctrl in allCtrlList:
                     if "guideSource" in cmds.listAttr(ctrl):
                         guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
                 for pTagCtrl in missingParentTagCtrlList:
@@ -3226,14 +3229,19 @@ class Start(object):
                             fatherGuide = self.hookDic[guideBase]['fatherGuide']
                             if parentNode:
                                 if not parentNode in guideSourceDic.keys():
-                                    replaceList = ["_JointLoc1", "_Head", "Neck0", "Main", "_cvTopLoc1", "_Foot", "_CenterLoc", "_JointLocA", "_JointLocB"]
-                                    for endName in replaceList:
-                                        if parentNode.replace("_Base", endName) in guideSourceDic.keys():
-                                            parentNode = parentNode.replace("_Base", endName)
-                                            break
+                                    parentNode = self.utils.replaceItemSuffix(parentNode, guideSourceDic)
                                 if not parentNode in guideSourceDic.keys():
                                     continue
                                 foundCtrl = guideSourceDic[parentNode]
+                                if foundCtrl in holderCtrlList: #holder
+                                    guideSource = cmds.getAttr(foundCtrl+".guideSource")
+                                    guideBase = guideSource.split(":")[0]+":Guide_Base"
+                                    parentNode = self.hookDic[guideBase]['parentNode']
+                                    fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                    parentNode = self.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                    if not parentNode in guideSourceDic.keys():
+                                        continue
+                                    foundCtrl = guideSourceDic[parentNode]
                                 if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
                                     mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
                                     if pTagCtrl.startswith(mirrorNameList[0]):
