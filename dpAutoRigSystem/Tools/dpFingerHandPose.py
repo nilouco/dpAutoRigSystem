@@ -8,7 +8,7 @@ DESCRIPTION = "m257_fingerHandPoseDesc"
 ICON = "/Icons/dp_fingerHandPose.png"
 WIKI = "06-‐-Tools#-finger-hand-pose"
 
-DP_FINGERHANDPOSE_VERSION = 1.00
+DP_FINGERHANDPOSE_VERSION = 1.01
 
 
 class FingerHandPose(object):
@@ -62,7 +62,7 @@ class FingerHandPose(object):
                                     cmds.setDrivenKeyframe(fingerGrp+".rotateX", currentDriver=handCtrl+"."+sideName, driverValue=0, value=0)
                                     cmds.setDrivenKeyframe(fingerGrp+".rotateX", currentDriver=handCtrl+"."+sideName, driverValue=1, value=45)
                                     # Relax
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+relaxName, driverValue=-1, value=-10*n*(f+1))
+                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+relaxName, driverValue=-1, value=(-1*n-f)*(f+1)-10)
                                     cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+relaxName, driverValue=0, value=0)
                                     cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+relaxName, driverValue=1, value=40*(1/(n*(f+1))))
                             # Scratch
