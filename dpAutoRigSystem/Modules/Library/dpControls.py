@@ -360,7 +360,7 @@ class ControlClass(object):
         if objList and attrList:
             for obj in objList:
                 for attr in attrList:
-                    if cmds.objExists(obj+"."+attr):
+                    if attr in cmds.listAttr(obj):
                         try:
                             # set lock and hide of given attributes:
                             cmds.setAttr(obj+"."+attr, keyable=False, channelBox=True)
@@ -463,7 +463,7 @@ class ControlClass(object):
         ctrlList = []
         allTransformList = cmds.ls(selection=False, type="transform")
         for item in allTransformList:
-            if cmds.objExists(item+".controlID"):
+            if "controlID" in cmds.listAttr(item):
                 if cmds.getAttr(item+".controlID") == ctrlType:
                     ctrlList.append(item)
         return ctrlList
@@ -495,7 +495,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, parentTag=None, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -523,6 +523,8 @@ class ControlClass(object):
             if guideSource:
                 cmds.addAttr(curve, longName="guideSource", dataType="string")
                 cmds.setAttr(curve+".guideSource", guideSource, type="string")
+            if parentTag:
+                cmds.connectAttr(parentTag+".message", curve+".parentTag", force=True)
             return curve
 
 
@@ -736,7 +738,7 @@ class ControlClass(object):
                 # store attribute values in a dic:
                 self.attrValueDic = {}
                 for attr in attrList:
-                    if cmds.objExists(sourceItem+'.'+attr):
+                    if attr in cmds.listAttr(sourceItem):
                         value = cmds.getAttr(sourceItem+'.'+attr)
                         self.attrValueDic[attr] = value
                 if verbose:
@@ -924,7 +926,7 @@ class ControlClass(object):
             transformList = cmds.ls(selection=True, type="transform")
         if transformList:
             for item in transformList:
-                if cmds.objExists(item+"."+DPCONTROL) and cmds.getAttr(item+"."+DPCONTROL) == 1:
+                if DPCONTROL in cmds.listAttr(item) and cmds.getAttr(item+"."+DPCONTROL) == 1:
                     # getting current control values from stored attributes:
                     curType = cmds.getAttr(item+".className")
                     curSize = cmds.getAttr(item+".size")
@@ -968,7 +970,7 @@ class ControlClass(object):
         ctrlList, ctrlIDList = [], []
         allTransformList = cmds.ls(selection=False, type='transform')
         for item in allTransformList:
-            if cmds.objExists(item+"."+DPCONTROL):
+            if DPCONTROL in cmds.listAttr(item):
                 if cmds.getAttr(item+"."+DPCONTROL) == 1:
                     ctrlList.append(item)
         if ctrlList:
@@ -1179,7 +1181,7 @@ class ControlClass(object):
             childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")
             if childrenList:
                 for childNode in childrenList:
-                    if cmds.objExists(childNode+".pinGuide"):
+                    if "pinGuide" in cmds.listAttr(childNode):
                         self.createPinGuide(childNode)
             if "pinGuide" in cmds.listAttr(guideBase):
                 self.createPinGuide(guideBase)
@@ -1202,7 +1204,7 @@ class ControlClass(object):
         """ Store a string of a list of found locked attributes.
         """
         lockedAttrStr = ""
-        if not cmds.objExists(ctrlName+".lockedList"):
+        if not "lockedList" in cmds.listAttr(ctrlName):
             cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
         lockedAttrList = cmds.listAttr(ctrlName, locked=True)
         if lockedAttrList:
@@ -1213,7 +1215,7 @@ class ControlClass(object):
     def restoreLockedList(self, ctrlName, *args):
         """ Lock again the stored attributes.
         """
-        if cmds.objExists(ctrlName+".lockedList"):
+        if "lockedList" in cmds.listAttr(ctrlName):
             lockedAttr = cmds.getAttr(ctrlName+".lockedList")
             if lockedAttr:
                 lockedAttrList = lockedAttr.split(";")
@@ -1242,7 +1244,7 @@ class ControlClass(object):
             for item in refNodeList:
                 self.utils.setProgress(max=len(refNodeList), addOne=False, addNumber=False)
                 self.utils.setProgress(self.dpUIinst.lang['i215_setAttr'], addOne=True)
-                if cmds.objExists(item+".calibrationList"):
+                if "calibrationList" in cmds.listAttr(item):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
             for sourceRefNode in sourceRefNodeList:
@@ -1318,7 +1320,7 @@ class ControlClass(object):
         if cmds.objExists(nodeName):
             if attrList:
                 calibrationAttr = ';'.join(attrList)
-                if not cmds.objExists(nodeName+"."+attrName):
+                if not attrName in cmds.listAttr(nodeName):
                     cmds.addAttr(nodeName, longName=attrName, dataType="string")
                 cmds.setAttr(nodeName+"."+attrName, calibrationAttr, type="string")
 
@@ -1327,20 +1329,26 @@ class ControlClass(object):
         """ Return the list from a string if it exists in the given nodeName.
             Useful to ready calibrationList attributes by default.
         """
-        if cmds.objExists(nodeName+"."+attrName):
+        if attrName in cmds.listAttr(nodeName):
             return list(cmds.getAttr(nodeName+"."+attrName).split(";"))
 
 
-    def getControlList(self, *args):
+    def getControlList(self, attr=None, *args):
         """ List all dpControl transforms that has active .dpControl attribute.
+            If have a given attr, it'll filter if there are nodes with this attribute.
             Returns a list of them.
         """
         nodeList = []
         allList = cmds.ls(selection=False, type="transform")
         if allList:
-            for item in allList:
-                if cmds.objExists(item+"."+DPCONTROL) and cmds.getAttr(item+"."+DPCONTROL):
-                    nodeList.append(item)
+            if attr:
+                for item in allList:
+                    if attr in cmds.listAttr(item):
+                        nodeList.append(item)
+            else:
+                for item in allList:
+                    if DPCONTROL in cmds.listAttr(item) and cmds.getAttr(item+"."+DPCONTROL):
+                        nodeList.append(item)
         return nodeList
 
 
@@ -1624,14 +1632,14 @@ class ControlClass(object):
         """
         if ctrlList:
             for ctrl in ctrlList:
-                if cmds.objExists(ctrl+".rotateOrder"):
+                if "rotateOrder" in cmds.listAttr(ctrl):
                     cmds.setAttr(ctrl+".rotateOrder", keyable=False, channelBox=True)
 
 
     def setSubControlDisplay(self, ctrl, subCtrl, defValue, *args):
         """ Set the shapes visibility of sub control.
         """
-        if not cmds.objExists(ctrl+".subControlDisplay"):
+        if not "subControlDisplay" in cmds.listAttr(ctrl):
             cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="short", minValue=0, maxValue=1, defaultValue=defValue)
             cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
         subShapeList = cmds.listRelatives(subCtrl, children=True, type="shape")
@@ -1669,7 +1677,7 @@ class ControlClass(object):
                                     cmds.refresh()
                         self.utils.setProgress(endIt=True)
             else:
-                if cmds.objExists(nodeName+"."+DPCONTROL) and cmds.getAttr(nodeName+"."+DPCONTROL) == 1:
+                if DPCONTROL in cmds.listAttr(nodeName) and cmds.getAttr(nodeName+"."+DPCONTROL) == 1:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
                         # do mirror algorithm

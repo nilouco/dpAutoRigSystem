@@ -9,7 +9,7 @@ DESCRIPTION = "v074_controllerTagDesc"
 ICON = "/Icons/dp_controllerTag.png"
 WIKI = "07-‐-Validator#-controller-tag"
 
-DP_CONTROLLERTAG_VERSION = 1.02
+DP_CONTROLLERTAG_VERSION = 1.03
 
 
 class ControllerTag(dpBaseAction.ActionStartClass):
@@ -46,27 +46,27 @@ class ControllerTag(dpBaseAction.ActionStartClass):
                 toCheckList = self.dpUIinst.ctrls.getControlList()
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                firstFixed = False
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    # conditional to check here
-                    if not cmds.controller(item, query=True, isController=True):
-                        # found issue here
-                        if not firstFixed:
-                            self.checkedObjList.append(item+" + controllers")
-                            self.foundIssueList.append(True)
+                    if not cmds.getAttr(item+".controlID") == "id_092_Correctives":
                         if self.firstMode:
-                            self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v075_missingControllerTags'])
-                            break
+                            # conditional to check here
+                            if not cmds.controller(item, query=True, isController=True):
+                                self.checkedObjList.append(item+" + controllers")
+                                self.foundIssueList.append(True)
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v075_missingControllerTags'])
+                                break
                         else: #fix
                             try:
                                 # tag as controller
                                 cmds.controller(item, isController=True)
-                                if not firstFixed:
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": Controllers.")
-                                    firstFixed = True
+                                result = self.addParentControllerTag(item)
+                                self.resultOkList.append(True)
+                                if result:
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+result)
+                                else:
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
                                 self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
@@ -82,3 +82,13 @@ class ControllerTag(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         return self.dataLogDic
+
+
+    def addParentControllerTag(self, item, *args):
+        """ Add parent controller tag to the given item.
+        """
+        if "parentTag" in cmds.listAttr(item):
+            parentCtrlList = cmds.listConnections(item+".parentTag", source=True, destination=False)
+            if parentCtrlList:
+                cmds.controller(item, parentCtrlList[0], parent=True)
+                return ("Tagged parent = "+item+" --> "+parentCtrlList[0])

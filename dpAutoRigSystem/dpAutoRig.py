@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.35"
-DPAR_UPDATELOG = "N965 - Finger relax pose improvement."
+DPAR_VERSION_5 = "5.01.36"
+DPAR_UPDATELOG = "N963 - Added parent tag feature on Controller Tag checkout validator."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2334,6 +2334,12 @@ class Start(object):
         else:
             self.rigScaleMD = self.prefix+'RigScale_MD'
 
+        # parent Tag
+        cmds.connectAttr(self.globalCtrl+".message", self.masterCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.masterCtrl+".message", self.rootCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.rootCtrl+".message", self.optionCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.rootCtrl+".message", self.rootPivotCtrl+".parentTag", force=True)
+
         # set lock and hide attributes
         self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
         self.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
@@ -3206,7 +3212,52 @@ class Start(object):
                                 typeCounter = typeCounter + 1
                     if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
-        
+                
+                # parentTag
+                missingParentTagCtrlList = [c for c in self.ctrls.getControlList() if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
+                holderCtrlList = self.ctrls.getControlList("dpHolder")
+                allCtrlList = self.ctrls.getControlList()
+                allCtrlList.extend(holderCtrlList)
+                guideSourceDic = {}
+                for ctrl in allCtrlList:
+                    if "guideSource" in cmds.listAttr(ctrl):
+                        guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
+                for pTagCtrl in missingParentTagCtrlList:
+                    if not pTagCtrl == self.globalCtrl:
+                        if not cmds.getAttr(pTagCtrl+".controlID") == "id_092_Correctives":
+                            if "guideSource" in cmds.listAttr(pTagCtrl):
+                                guideSource = cmds.getAttr(pTagCtrl+".guideSource")
+                                guideBase = guideSource.split(":")[0]+":Guide_Base"
+                                parentNode = self.hookDic[guideBase]['parentNode']
+                                fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                if parentNode:
+                                    if not parentNode in guideSourceDic.keys():
+                                        parentNode = self.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                    if not parentNode in guideSourceDic.keys():
+                                        continue
+                                    foundCtrl = guideSourceDic[parentNode]
+                                    if foundCtrl in holderCtrlList: #holder
+                                        guideSource = cmds.getAttr(foundCtrl+".guideSource")
+                                        guideBase = guideSource.split(":")[0]+":Guide_Base"
+                                        parentNode = self.hookDic[guideBase]['parentNode']
+                                        fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                        parentNode = self.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                        if not parentNode in guideSourceDic.keys():
+                                            continue
+                                        foundCtrl = guideSourceDic[parentNode]
+                                    if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                        mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
+                                        if pTagCtrl.startswith(mirrorNameList[0]):
+                                            if not foundCtrl.startswith(mirrorNameList[0]):
+                                                foundCtrl = mirrorNameList[0]+foundCtrl[2:]
+                                        else:
+                                            if not foundCtrl.startswith(mirrorNameList[1]):
+                                                foundCtrl = mirrorNameList[1]+foundCtrl[2:]
+                                    if cmds.objExists(foundCtrl):
+                                        cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
+                                else:
+                                    cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
+
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 

@@ -10,7 +10,7 @@ DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 WIKI = "03-‐-Guides#-foot"
 
-DP_FOOT_VERSION = 2.07
+DP_FOOT_VERSION = 2.08
 
 
 class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -184,14 +184,31 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(self.middleFootJxt+".segmentScaleCompensate", 0)
                 cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
+                # creating Fk controls:
+                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Foot")
+                self.footCtrlList.append(self.footCtrl)
+                cmds.setAttr(self.footCtrl+".rotateOrder", 1)
+                self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
+                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfF")
+                cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
+                cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
+                cmds.matchTransform(self.footCtrl, self.cvFootLoc, position=True, rotation=True)
+                cmds.matchTransform(self.middleFootCtrl, self.cvRFFLoc, position=True, rotation=True)
+                if s == 1:
+                    cmds.setAttr(self.middleFootCtrl+".scaleX", -1)
+                    cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
+                    cmds.setAttr(self.middleFootCtrl+".scaleZ", -1)
+                self.footCtrlZeroList = self.utils.zeroOut([self.footCtrl, self.middleFootCtrl])
+
                 # reverse foot controls:
-                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
-                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
-                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
-                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
-                self.RFECtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+bottomRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
-                self.RFFCtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, rot=(0, 90, 0))
+                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, parentTag=self.middleFootCtrl)
+                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, parentTag=self.middleFootCtrl)
+                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
+                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
+                self.RFECtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+bottomRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
+                self.RFFCtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, rot=(0, 90, 0), parentTag=self.footCtrl)
                 self.ballRFList.append(self.RFFCtrl)
+                cmds.connectAttr(self.RFFCtrl+".message", self.middleFootCtrl+".parentTag", force=True)
                 
                 # reverse foot groups:
                 self.RFAGrp = cmds.group(self.RFACtrl, name=self.RFACtrl+"_Grp")
@@ -255,24 +272,6 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.rename(ikHandleMiddleList[1], ikHandleMiddleList[0]+"_Eff")
                 cmds.setAttr(ikHandleAnkleList[0]+'.visibility', 0)
                 cmds.setAttr(ikHandleMiddleList[0]+'.visibility', 0)
-                
-                # creating Fk controls:
-                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Foot")
-                self.footCtrlList.append(self.footCtrl)
-                cmds.setAttr(self.footCtrl+".rotateOrder", 1)
-
-                self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
-
-                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfF")
-                cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
-                cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
-                cmds.matchTransform(self.footCtrl, self.cvFootLoc, position=True, rotation=True)
-                cmds.matchTransform(self.middleFootCtrl, self.cvRFFLoc, position=True, rotation=True)
-                if s == 1:
-                    cmds.setAttr(self.middleFootCtrl+".scaleX", -1)
-                    cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
-                    cmds.setAttr(self.middleFootCtrl+".scaleZ", -1)
-                self.footCtrlZeroList = self.utils.zeroOut([self.footCtrl, self.middleFootCtrl])
 
                 # mount hierarchy:
                 cmds.parent(self.footCtrlZeroList[1], self.RFECtrl, absolute=True)

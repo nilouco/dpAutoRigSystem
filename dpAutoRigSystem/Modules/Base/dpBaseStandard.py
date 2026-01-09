@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.10
+DP_BASESTANDARD_VERSION = 2.11
 
 
 class BaseStandard(object):
@@ -374,6 +374,7 @@ class BaseStandard(object):
     def addFkMainCtrls(self, side, ctrlList, *args):
         """ Implement the fk main controllers.
         """
+        mainCtrlList = []
         # getting and calculating values
         totalToAddMain = 1
         self.nMain = cmds.getAttr(self.base+".nMain")
@@ -390,7 +391,8 @@ class BaseStandard(object):
                 currentCtrlZero = cmds.listRelatives(currentCtrl, parent=True)[0]
                 if n == startAt:
                     # create a main controller
-                    mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree)
+                    mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.guideName+"_Base", parentTag=self.getParentToTag(mainCtrlList))
+                    mainCtrlList.append(mainCtrl)
                     self.ctrls.colorShape([mainCtrl], "cyan")
                     cmds.addAttr(mainCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     # position
@@ -738,6 +740,14 @@ class BaseStandard(object):
         cmds.setAttr(self.wsRef+".visibility", False)
         cmds.setAttr(self.wsRef+".template", 1)
         cmds.parent(self.wsRef, self.dpUIinst.tempGrp)
+
+
+    def getParentToTag(self, itemList, returnItem=None, *args):
+        """ Return the latest item from given list or the second given param.
+        """
+        if itemList:
+            return itemList[-1]
+        return returnItem
 
 
     # Getters:

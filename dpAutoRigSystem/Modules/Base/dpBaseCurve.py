@@ -2,7 +2,7 @@
 from maya import cmds
 from maya import mel
 
-DP_BASECURVE_VERSION = 2.03
+DP_BASECURVE_VERSION = 2.04
 
 
 class BaseCurve(object):
@@ -86,6 +86,8 @@ class BaseCurve(object):
             cmds.setAttr(cvNode+".cvRotX", self.cvRot[0])
             cmds.setAttr(cvNode+".cvRotY", self.cvRot[1])
             cmds.setAttr(cvNode+".cvRotZ", self.cvRot[2])
+        if not dpGuide:
+            cmds.addAttr(cvNode, longName="parentTag", attributeType='message')
     
     
     def createCurve(self, cvName, cvDegree, cvPointList, cvKnot, cvPeriodic, dpGuide, *args):

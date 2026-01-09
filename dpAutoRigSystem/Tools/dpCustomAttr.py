@@ -11,11 +11,11 @@ WIKI = "06-‐-Tools#-custom-attributes"
 
 ATTR_START = "dp"
 ATTR_DPID = "dpID"
-ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt", "dpDeleteIt", "dpHeadDeformerInfluence", "dpJawDeformerInfluence", "dpNotTransformIO"]
+ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt", "dpDeleteIt", "dpHeadDeformerInfluence", "dpJawDeformerInfluence", "dpNotTransformIO", "dpHolder"]
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
-DP_CUSTOMATTR_VERSION = 1.10
+DP_CUSTOMATTR_VERSION = 1.11
 
 
 class CustomAttr(object):

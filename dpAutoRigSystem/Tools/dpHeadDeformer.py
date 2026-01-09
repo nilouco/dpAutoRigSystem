@@ -12,7 +12,7 @@ WIKI = "06-‐-Tools#-head-deformer"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.04
+DP_HEADDEFORMER_VERSION = 4.05
 
 
 class HeadDeformer(object):
@@ -173,7 +173,7 @@ class HeadDeformer(object):
             arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", deformerName+"_Ctrl", 0.25*bBoxSize, d=0)
 
             # main control curve and shape
-            mainCtrl = self.ctrls.cvControl("id_097_HeadDeformerMain", mainCtrlName+"_Ctrl", 0.57*bBoxSize, d=0)
+            mainCtrl = self.ctrls.cvControl("id_097_HeadDeformerMain", mainCtrlName+"_Ctrl", 0.57*bBoxSize, d=0, parentTag=arrowCtrl)
             mainCtrlShape = cmds.listRelatives(mainCtrl, shapes=True)[0]
             
             # add control intensity and calibrate attributes
@@ -246,8 +246,8 @@ class HeadDeformer(object):
             # arrange lattice deform points percent
             cmds.percent(topClusterList[0], [latticeDefList[1]+".pt[0:5][2][0]", latticeDefList[1]+".pt[0:5][2][1]", latticeDefList[1]+".pt[0:5][2][2]", latticeDefList[1]+".pt[0:5][2][3]", latticeDefList[1]+".pt[0:5][2][4]", latticeDefList[1]+".pt[0:5][2][5]"], value=0.5)
             # symmetry controls
-            centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90))
-            topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0))
+            centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90), parentTag=arrowCtrl)
+            topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0), parentTag=arrowCtrl)
             symmetryCtrlZeroList = self.utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
             for axis in axisList:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
@@ -267,7 +267,7 @@ class HeadDeformer(object):
                 self.toIDList.extend(subClusterList)
                 cmds.parent(self.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
-                subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0))
+                subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0), parentTag=arrowCtrl)
                 subCtrlList.append(subCtrl)
                 ctrlSubZeroList = self.utils.zeroOut([subCtrl])[0]
                 subCtrlGrpList.append(ctrlSubZeroList)
