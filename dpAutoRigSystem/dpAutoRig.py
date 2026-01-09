@@ -237,7 +237,7 @@ class Start(object):
             - SelectionChanged
             - WorkspaceChanged = not documented
         """
-        #cmds.scriptJob(event=('SceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        cmds.scriptJob(event=('SceneOpened', partial(self.refreshMainUI, clearSel=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         #cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
@@ -852,7 +852,7 @@ class Start(object):
         cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
     
     
-    def refreshMainUI(self, savedScene=False, resetButtons=True, *args):
+    def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
@@ -878,6 +878,8 @@ class Start(object):
             cmds.select(clear=True)
             if self.selList:
                 cmds.select(self.selList)
+        if clearSel:
+            cmds.select(clear=True)
         self.rebuilding = False
 
 
