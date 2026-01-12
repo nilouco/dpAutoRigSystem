@@ -360,8 +360,6 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.fkCtrlList.append(self.fkCtrl)
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.guide, self.fkJointList[n], maintainOffset=False))
-#                    cmds.delete(cmds.parentConstraint(self.guide, self.ikJointList[n], maintainOffset=False))
-#                    cmds.delete(cmds.parentConstraint(self.guide, self.skinJointList[n], maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.guide, self.fkCtrl, maintainOffset=False))
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.utils.zeroOut([self.fkCtrl])[0]
@@ -493,21 +491,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.setAttr(ikCtrlMainZero+".rotateX", guideBaseRX)
                         cmds.setAttr(ikCtrlMainZero+".rotateY", guideBaseRY)
                         cmds.setAttr(ikCtrlMainZero+".rotateZ", guideBaseRZ)
-                        
                         self.fixMirrorFlipping(ikCtrlMainZero, s, -1)
-                        # fixing flip mirror:
-#                        if s == 1:
-#                            if self.getModuleAttr("flip"):
-#                                cmds.setAttr(ikCtrlMainZero+".scaleZ", -1)
-#                                for axis in self.mirrorAxis:
-#                                    cmds.setAttr(ikCtrlMainZero+'.scale'+axis, -1)
-#                            else:
-#                                cmds.setAttr(ikCtrlMainZero+".scaleX", -1)
-#                                cmds.setAttr(ikCtrlMainZero+".scaleY", -1)
-#                                cmds.setAttr(ikCtrlMainZero+".scaleZ", -1)
-
-                        
-
 
                         # loading Maya matrix node
                         loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
@@ -553,6 +537,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.fixMirrorFlipping(ikCtrlLastZero, s, -1, "X")
                         self.fixMirrorFlipping(ikCtrlLastZero, s, -1, "Y")
                         self.fixMirrorFlipping(ikCtrlLastZero, s, 1, "Z")
+                        if self.mirrorAxis == "Y":
+                            self.fixMirrorFlipping(ikCtrlLastZero, s, -1, "Z")
                         cmds.parent(ikCtrlZero, self.ikCtrlLast)
                     elif not c == 0:
                         if c == 2:
@@ -575,6 +561,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.fixMirrorFlipping(ikCtrlFirstZero, s, -1, "X")
                         self.fixMirrorFlipping(ikCtrlFirstZero, s, -1, "Y")
                         self.fixMirrorFlipping(ikCtrlFirstZero, s, 1, "Z")
+                        if self.mirrorAxis == "Y":
+                            self.fixMirrorFlipping(ikCtrlFirstZero, s, -1, "Z")
                         cmds.parent(ikCtrlZero, self.ikCtrlFirst)
                 cmds.connectAttr(self.ikCtrlFirst+".message", self.ikCtrlList[0]+".parentTag", force=True)
                 
@@ -730,6 +718,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if not axis:
                     if self.mirrorAxis == "X":
                         cmds.setAttr(item+".scaleZ", value)
+                    elif self.mirrorAxis == "Y":
+                        cmds.setAttr(item+".scaleZ", -value)
                 else:
                     cmds.setAttr(item+".scale"+axis, value)
 
