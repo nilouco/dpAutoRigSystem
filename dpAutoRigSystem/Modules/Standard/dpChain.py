@@ -414,7 +414,6 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 for n in range(0, self.nJoints):
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Guide_JointLoc"+str(n+1), self.skinJointList[n], maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Guide_JointLoc"+str(n+1), self.ikJointList[n], maintainOffset=False))
-                    
                     # freezeTransformations (rotates):
                     cmds.makeIdentity(self.skinJointList[n], self.ikJointList[n], self.fkJointList[n], apply=True, rotate=True)
                     # fk control leads fk joint:
@@ -425,7 +424,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.connectAttr(self.fkCtrlList[n]+".scaleZ", self.fkJointList[n]+".scaleZ", force=True)
                     else:
                         self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
-                
+                if self.mirrorAxis == "Z":
+                    cmds.setAttr(self.ikJointList[0]+".rotateZ", 180)
                 # puting endJoints in the correct position:
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.ikJointList[-1], maintainOffset=False))
@@ -720,6 +720,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.setAttr(item+".scaleZ", value)
                     elif self.mirrorAxis == "Y":
                         cmds.setAttr(item+".scaleZ", -value)
+                    elif self.mirrorAxis == "Z":
+                        cmds.setAttr(item+".scaleZ", value)
                 else:
                     cmds.setAttr(item+".scale"+axis, value)
 
