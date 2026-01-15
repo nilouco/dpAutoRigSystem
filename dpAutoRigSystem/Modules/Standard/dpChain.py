@@ -503,10 +503,13 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             # need to keep ikMainLocGrp at the world without any transformation to use it to extract ikMainCtrl rotateZ properly:
                             cmds.setAttr(ikMainLocGrp+".inheritsTransform", 0)
                             cmds.setAttr(ikMainLocGrp+".visibility", 0)
+                            cmds.delete(cmds.parentConstraint(self.ikCtrlMain, ikMainLocGrp, maintainOffset=False, skipTranslate=("x", "y", "z")))
                             self.ctrls.setLockHide([ikMainLocGrp], ['rx', 'ry', 'rz'], l=True, k=True)
                             cmds.parentConstraint(self.ikCtrlMain, ikMainLoc, maintainOffset=False, skipTranslate=("x", "y", "z"), name=ikMainLoc+"_PaC")
                             mainTwistMatrixMD = self.utils.twistBoneMatrix(ikMainLocGrp, ikMainLoc, "ikCtrlMain_TwistMatrix")
                             cmds.setAttr(mainTwistMatrixMD+".input1Z", 1)
+                            if s == 1:
+                                cmds.setAttr(mainTwistMatrixMD+".input1Z", -1)
                             # connect output of rotate in Z to ikSplineHandle roll attribute:
                             cmds.connectAttr(mainTwistMatrixMD+".outputZ", self.ikSplineHandle+".roll", force=True)
 
