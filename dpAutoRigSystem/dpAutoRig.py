@@ -911,7 +911,8 @@ class Start(object):
             if cmds.objExists(moduleInstance.moduleGrp):
                 if moduleInstance.selectButton:
                     currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
-                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
+                    if currentColorList:
+                        cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
                     if selectedGuideNodeList:
                         for selectedGuide in selectedGuideNodeList:
                             selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.moduleInstanceInfoAttr)
