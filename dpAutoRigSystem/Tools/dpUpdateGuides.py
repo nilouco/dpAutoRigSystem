@@ -8,7 +8,7 @@ DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 WIKI = "06-‐-Tools#-update-guides"
 
-DP_UPDATEGUIDES_VERSION = 1.09
+DP_UPDATEGUIDES_VERSION = 1.10
 
 
 class UpdateGuides(object):
@@ -513,15 +513,18 @@ class UpdateGuides(object):
         reverseFootFList = cmds.ls("*:"+reverseFootF)
         if reverseFootFList:
             for f in reverseFootFList:
-                e = f.replace(reverseFootF, reverseFootE)
-                for attr in ["tx", "ty", "tz"]:
-                    cmds.setAttr(f+".translate."+attr, cmds.getAttr(e+"."+attr))
-                toeList = cmds.listRelatives(e, children=True, type="transform")
-                if toeList:
-                    cmds.matchTransform(e, f, position=True, rotation=True)
-                    cmds.parent(toeList, f)
-                for attr in ["tx", "ty", "tz"]:
-                    cmds.setAttr(e+".translate."+attr, 0)
+                guideVersion = cmds.getAttr(f+".version")
+                if int(guideVersion.split(".")[0]) == 4:
+                    if float(guideVersion.split(".")[1]+"."+guideVersion.split(".")[2]) < 1.25:
+                        e = f.replace(reverseFootF, reverseFootE)
+                        for attr in ["tx", "ty", "tz"]:
+                            cmds.setAttr(f+"."+attr, cmds.getAttr(e+"."+attr))
+                        toeList = cmds.listRelatives(e, children=True, type="transform")
+                        if toeList:
+                            cmds.matchTransform(e, f, position=True, rotation=True)
+                            cmds.parent(toeList, f)
+                        for attr in ["tx", "ty", "tz"]:
+                            cmds.setAttr(e+"."+attr, 0)
 
 
     def doUpdate(self, *args):
