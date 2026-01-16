@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.03
+DP_CONTROLS_VERSION = 3.04
 
 
 class ControlClass(object):
@@ -253,7 +253,10 @@ class ControlClass(object):
         """
         currentRGBList = []
         for attr in ['R', 'G', 'B']:
-            currentRGBList.append(cmds.getAttr(instance.moduleGrp+".guideColor"+attr))
+            if "guideColor"+attr in cmds.listAttr(instance.moduleGrp):
+                currentRGBList.append(cmds.getAttr(instance.moduleGrp+".guideColor"+attr))
+            else:
+                break
         return currentRGBList
 
 

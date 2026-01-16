@@ -8,7 +8,7 @@ DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 WIKI = "06-‐-Tools#-update-guides"
 
-DP_UPDATEGUIDES_VERSION = 1.09
+DP_UPDATEGUIDES_VERSION = 1.10
 
 
 class UpdateGuides(object):
@@ -45,7 +45,7 @@ class UpdateGuides(object):
     def summaryUI(self):
         """ Update Guides Summary UI for log info.
         """
-        self.closeExistWin('updateSummary')
+        self.utils.closeUI('updateSummary')
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
         updateSummaryCL = cmds.columnLayout('updateSummaryCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
@@ -68,17 +68,11 @@ class UpdateGuides(object):
         cmds.showWindow('updateSummary')
 
 
-    def closeExistWin(self, winName, *args):
-        """ Close existing window.
-        """
-        if cmds.window(winName, query=True, exists=True):
-            cmds.deleteUI(winName, window=True)
-
-
     def updateGuidesUI(self):
         """ Main Update Guides UI.
         """
-        self.closeExistWin('updateGuidesWindow')
+        self.utils.closeUI('updateGuidesWindow')
+        self.utils.closeUI('updateSummary')
         cmds.window('updateGuidesWindow', title="Guides Info")
         updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
         cmds.text(label='DPAR '+self.dpUIinst.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
@@ -254,6 +248,9 @@ class UpdateGuides(object):
             elif attr == 'mirrorName':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.changeMirrorName(value)
+            elif attr == 'displayAnnotation':
+                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance.displayAnnotation(value)
             elif attr == 'rigType':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.rigType = value
@@ -487,7 +484,7 @@ class UpdateGuides(object):
     
 
     def doDelete(self, *args):
-        self.closeExistWin('updateSummary')
+        self.utils.closeUI('updateSummary')
         for guide in self.updateData:
             try:
                 cmds.parent(guide, world=True)
@@ -510,24 +507,34 @@ class UpdateGuides(object):
         """
         reverseFootE = "Guide_RfE"
         reverseFootF = "Guide_RfF"
+        reverseFootEList = cmds.ls("*:"+reverseFootE)
         reverseFootFList = cmds.ls("*:"+reverseFootF)
         if reverseFootFList:
-            for f in reverseFootFList:
-                e = f.replace(reverseFootF, reverseFootE)
-                for attr in ["tx", "ty", "tz"]:
-                    cmds.setAttr(f+".translate."+attr, cmds.getAttr(e+"."+attr))
-                toeList = cmds.listRelatives(e, children=True, type="transform")
-                if toeList:
-                    cmds.matchTransform(e, f, position=True, rotation=True)
-                    cmds.parent(toeList, f)
-                for attr in ["tx", "ty", "tz"]:
-                    cmds.setAttr(e+".translate."+attr, 0)
+            needPatch = False
+            if reverseFootEList:
+                for rfE in reverseFootEList:
+                    guideVersion = cmds.getAttr(rfE+".version")
+                    if int(guideVersion.split(".")[0]) == 4:
+                        if float(guideVersion.split(".")[1]+"."+guideVersion.split(".")[2]) < 4.25:
+                            needPatch = True
+                            break
+            if needPatch:
+                for f in reverseFootFList:
+                    e = f.replace(reverseFootF, reverseFootE)
+                    for attr in ["tx", "ty", "tz"]:
+                        cmds.setAttr(f+"."+attr, cmds.getAttr(e+"."+attr))
+                    toeList = cmds.listRelatives(e, children=True, type="transform")
+                    if toeList:
+                        cmds.matchTransform(e, f, position=True, rotation=True)
+                        cmds.parent(toeList, f)
+                    for attr in ["tx", "ty", "tz"]:
+                        cmds.setAttr(e+"."+attr, 0)
 
 
     def doUpdate(self, *args):
         """ Main method to update the guides in the scene.
         """
-        self.closeExistWin('updateGuidesWindow')
+        self.utils.closeUI('updateGuidesWindow')
         # Starts progress bar feedback
         self.utils.setProgress(self.dpUIinst.lang['m198_renameOldGuides'], self.dpUIinst.lang['m186_updateGuides'], 7, addOne=False)
         # Rename guides to discard as *_OLD

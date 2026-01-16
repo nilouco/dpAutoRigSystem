@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.11
+DP_BASESTANDARD_VERSION = 2.12
 
 
 class BaseStandard(object):
@@ -253,7 +253,8 @@ class BaseStandard(object):
                     pass
                 cmds.setAttr(self.moduleGrp+".customName", self.customName, type='string')
                 cmds.setAttr(self.annotation+".text", self.customName, type='string')
-                cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
+                if self.guideNet:
+                    cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
                 # set userGuideName:
                 self.userGuideName = self.customName
                 

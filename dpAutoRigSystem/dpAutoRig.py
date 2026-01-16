@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.37"
-DPAR_UPDATELOG = "N661 - Chain module flipping right ik/fk blend fix."
+DPAR_VERSION_5 = "5.01.38"
+DPAR_UPDATELOG = "N966 - Fixed UpdateGuides wrong reverseFootF."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -911,7 +911,8 @@ class Start(object):
             if cmds.objExists(moduleInstance.moduleGrp):
                 if moduleInstance.selectButton:
                     currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
-                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
+                    if currentColorList:
+                        cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
                     if selectedGuideNodeList:
                         for selectedGuide in selectedGuideNodeList:
                             selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.moduleInstanceInfoAttr)
