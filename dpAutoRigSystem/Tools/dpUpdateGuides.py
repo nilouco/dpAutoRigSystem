@@ -248,6 +248,9 @@ class UpdateGuides(object):
             elif attr == 'mirrorName':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.changeMirrorName(value)
+            elif attr == 'displayAnnotation':
+                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance.displayAnnotation(value)
             elif attr == 'rigType':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.rigType = value
