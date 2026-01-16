@@ -11,7 +11,7 @@ DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 WIKI = "03-‐-Guides#-chain"
 
-DP_CHAIN_VERSION = 2.07
+DP_CHAIN_VERSION = 2.08
 
 
 class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -47,7 +47,6 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="dynamic", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
@@ -305,8 +304,6 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            # articulation joint:
-            self.addArticJoint = self.getArticulation()
             # dynamic:
             self.addDynamic = self.getModuleAttr("dynamic")
             # run for all sides
@@ -399,21 +396,21 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # invert scale for right side before:
                 if s == 1:
-                    # fix flipping issue for right side:
-                    for f in range(1, len(self.fkCtrlList)):
-                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleX", -1)
-                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleY", -1)
-                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleZ", -1)
-                        attrList = ["tx", "ty", "tz", "rx", "ry", "rz"]
-                        for attr in attrList:
-                            attrValue = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
-                            cmds.setAttr(self.fkZeroGrpList[f]+"."+attr, -1*attrValue)
+                    if self.getModuleAttr("flip"):
+                        # fix flipping issue for FK right side:
+                        for f in range(1, len(self.fkCtrlList)):
+                            cmds.setAttr(self.fkZeroGrpList[0]+".scaleX", -1)
+                            cmds.setAttr(self.fkZeroGrpList[0]+".scaleY", -1)
+                            cmds.setAttr(self.fkZeroGrpList[0]+".scaleZ", -1)
+                            attrList = ["tx", "ty", "tz", "rx", "ry", "rz"]
+                            for attr in attrList:
+                                attrValue = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
+                                cmds.setAttr(self.fkZeroGrpList[f]+"."+attr, -1*attrValue)
                 
                 # working with position, orientation of joints and make an orientConstraint for Fk controls:
                 for n in range(0, self.nJoints):
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Guide_JointLoc"+str(n+1), self.skinJointList[n], maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Guide_JointLoc"+str(n+1), self.ikJointList[n], maintainOffset=False))
-                    
                     # freezeTransformations (rotates):
                     cmds.makeIdentity(self.skinJointList[n], self.ikJointList[n], self.fkJointList[n], apply=True, rotate=True)
                     # fk control leads fk joint:
@@ -424,18 +421,13 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.connectAttr(self.fkCtrlList[n]+".scaleZ", self.fkJointList[n]+".scaleZ", force=True)
                     else:
                         self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
-                
+
+                if self.mirrorAxis == "Z":
+                    cmds.setAttr(self.ikJointList[0]+".rotateZ", 180)
                 # puting endJoints in the correct position:
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.ikJointList[-1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.fkJointList[-1], maintainOffset=False))
-
-                # add articulationJoint:
-                if n > 0:
-                    if self.addArticJoint:
-                        artJntList = self.utils.articulationJoint(self.skinJointList[n-1], self.skinJointList[n]) #could call to create corrective joints. See parameters to implement it, please.
-                        self.utils.setJointLabel(artJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%n)
-                cmds.select(self.skinJointList[n])
                 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", headDef=self.headDefValue, guideSource=self.guideName+"_Base")
@@ -490,16 +482,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.setAttr(ikCtrlMainZero+".rotateX", guideBaseRX)
                         cmds.setAttr(ikCtrlMainZero+".rotateY", guideBaseRY)
                         cmds.setAttr(ikCtrlMainZero+".rotateZ", guideBaseRZ)
-                        
-                        # fixing flip mirror:
-                        if s == 1:
-                            if self.getModuleAttr("flip"):
-                                for axis in self.mirrorAxis:
-                                    cmds.setAttr(ikCtrlMainZero+'.scale'+axis, -1)
-                            else:
-                                cmds.setAttr(ikCtrlMainZero+".scaleX", -1)
-                                cmds.setAttr(ikCtrlMainZero+".scaleY", -1)
-                                cmds.setAttr(ikCtrlMainZero+".scaleZ", -1)
+                        self.fixMirrorFlipping(ikCtrlMainZero, s, -1)
 
                         # loading Maya matrix node
                         loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
@@ -511,10 +494,13 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             # need to keep ikMainLocGrp at the world without any transformation to use it to extract ikMainCtrl rotateZ properly:
                             cmds.setAttr(ikMainLocGrp+".inheritsTransform", 0)
                             cmds.setAttr(ikMainLocGrp+".visibility", 0)
+                            cmds.delete(cmds.parentConstraint(self.ikCtrlMain, ikMainLocGrp, maintainOffset=False, skipTranslate=("x", "y", "z")))
                             self.ctrls.setLockHide([ikMainLocGrp], ['rx', 'ry', 'rz'], l=True, k=True)
                             cmds.parentConstraint(self.ikCtrlMain, ikMainLoc, maintainOffset=False, skipTranslate=("x", "y", "z"), name=ikMainLoc+"_PaC")
                             mainTwistMatrixMD = self.utils.twistBoneMatrix(ikMainLocGrp, ikMainLoc, "ikCtrlMain_TwistMatrix")
                             cmds.setAttr(mainTwistMatrixMD+".input1Z", 1)
+                            if s == 1:
+                                cmds.setAttr(mainTwistMatrixMD+".input1Z", -1)
                             # connect output of rotate in Z to ikSplineHandle roll attribute:
                             cmds.connectAttr(mainTwistMatrixMD+".outputZ", self.ikSplineHandle+".roll", force=True)
 
@@ -526,6 +512,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
                     cmds.rotate(0, 0, 0, ikCtrlZero)
                     cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
+                    self.fixMirrorFlipping(ikCtrlZero, s, 1)
 
                     if c == 4: #last
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
@@ -536,12 +523,17 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
                         ikCtrlLastZero = self.utils.zeroOut([self.ikCtrlLast])[0]
                         cmds.parent(ikCtrlLastZero, self.ikCtrlMain)
-                        cmds.parent(ikCtrlZero, self.ikCtrlLast)
                         self.ctrls.setLockHide([self.ikCtrlLast], ["v"])
                         cmds.orientConstraint(self.ikCtrlLast, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
                         cmds.connectAttr(self.ikCtrlLast+".scaleX", self.ikJointList[-2]+".scaleX", force=True)
                         cmds.connectAttr(self.ikCtrlLast+".scaleY", self.ikJointList[-2]+".scaleY", force=True)
                         cmds.connectAttr(self.ikCtrlLast+".scaleZ", self.ikJointList[-2]+".scaleZ", force=True)
+                        self.fixMirrorFlipping(ikCtrlLastZero, s, -1, "X")
+                        self.fixMirrorFlipping(ikCtrlLastZero, s, -1, "Y")
+                        self.fixMirrorFlipping(ikCtrlLastZero, s, 1, "Z")
+                        if self.mirrorAxis == "Y":
+                            self.fixMirrorFlipping(ikCtrlLastZero, s, -1, "Z")
+                        cmds.parent(ikCtrlZero, self.ikCtrlLast)
                     elif not c == 0:
                         if c == 2:
                             self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "sx", "sy", "sz", "v", "ro"])
@@ -556,11 +548,16 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlFirst, maintainOffset=False))
                         ikCtrlFirstZero = self.utils.zeroOut([self.ikCtrlFirst])[0]
                         cmds.parent(ikCtrlFirstZero, self.ikCtrlMain)
-                        cmds.parent(ikCtrlZero, self.ikCtrlFirst)
                         self.ctrls.setLockHide([self.ikCtrlFirst], ["v"])
                         cmds.connectAttr(self.ikCtrlFirst+".scaleX", self.ikJointList[0]+".scaleX", force=True)
                         cmds.connectAttr(self.ikCtrlFirst+".scaleY", self.ikJointList[0]+".scaleY", force=True)
                         cmds.connectAttr(self.ikCtrlFirst+".scaleZ", self.ikJointList[0]+".scaleZ", force=True)
+                        self.fixMirrorFlipping(ikCtrlFirstZero, s, -1, "X")
+                        self.fixMirrorFlipping(ikCtrlFirstZero, s, -1, "Y")
+                        self.fixMirrorFlipping(ikCtrlFirstZero, s, 1, "Z")
+                        if self.mirrorAxis == "Y":
+                            self.fixMirrorFlipping(ikCtrlFirstZero, s, -1, "Z")
+                        cmds.parent(ikCtrlZero, self.ikCtrlFirst)
                 cmds.connectAttr(self.ikCtrlFirst+".message", self.ikCtrlList[0]+".parentTag", force=True)
                 
                 # ik controls position:
@@ -706,7 +703,23 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.renameUnitConversion()
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
-    
+
+    def fixMirrorFlipping(self, item, s, value=-1, axis=None, *args):
+        """ Just flip the controller to fix the mirror issue.
+        """
+        if s == 1:
+            if self.getModuleAttr("flip"):
+                if not axis:
+                    if self.mirrorAxis == "X":
+                        cmds.setAttr(item+".scaleZ", value)
+                    elif self.mirrorAxis == "Y":
+                        cmds.setAttr(item+".scaleZ", -value)
+                    elif self.mirrorAxis == "Z":
+                        cmds.setAttr(item+".scaleZ", value)
+                else:
+                    cmds.setAttr(item+".scale"+axis, value)
+
+
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
