@@ -47,7 +47,6 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="dynamic", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
@@ -305,8 +304,6 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            # articulation joint:
-            self.addArticJoint = self.getArticulation()
             # dynamic:
             self.addDynamic = self.getModuleAttr("dynamic")
             # run for all sides
@@ -424,19 +421,13 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.connectAttr(self.fkCtrlList[n]+".scaleZ", self.fkJointList[n]+".scaleZ", force=True)
                     else:
                         self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
+
                 if self.mirrorAxis == "Z":
                     cmds.setAttr(self.ikJointList[0]+".rotateZ", 180)
                 # puting endJoints in the correct position:
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.ikJointList[-1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.fkJointList[-1], maintainOffset=False))
-
-                # add articulationJoint:
-                if n > 0:
-                    if self.addArticJoint:
-                        artJntList = self.utils.articulationJoint(self.skinJointList[n-1], self.skinJointList[n]) #could call to create corrective joints. See parameters to implement it, please.
-                        self.utils.setJointLabel(artJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%n)
-                cmds.select(self.skinJointList[n])
                 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", headDef=self.headDefValue, guideSource=self.guideName+"_Base")
