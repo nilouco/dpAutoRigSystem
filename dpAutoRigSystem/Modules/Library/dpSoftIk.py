@@ -28,7 +28,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_SOFTIK_VERSION = 2.01
+DP_SOFTIK_VERSION = 2.02
 
 
 class SoftIkClass(object):
@@ -136,8 +136,9 @@ class SoftIkClass(object):
             cmds.connectAttr(stretchBC+".outputG", softIkRigScaleMD+".input1X", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
-                cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+axis, force=True)
-                cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+axis, force=True)
+                for k in ["X", "Y", "Z"]:
+                    cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+k, force=True)
+                    cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1
         
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
