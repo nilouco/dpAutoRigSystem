@@ -17,7 +17,7 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 WIKI = "03-‐-Guides#-limb"
 
-DP_LIMB_VERSION = 3.11
+DP_LIMB_VERSION = 3.12
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -1394,7 +1394,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.skinJointList[3]+'.rotateZ', forearmMD+'.input2X')
                     cmds.connectAttr(forearmMD+'.outputX', forearmGrp+'.rotateZ')
                     ikExtremOrientPaC = cmds.parentConstraint(forearmCtrl, self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, name=self.extremOrientCtrlZero+"_PaC")[0]
-                    ikExtremOrientPacW0 = forearmCtrl+"W0"
+                    ikExtremOrientPaCW0 = forearmCtrl+"W0"
 
                 # creating a group to receive the reverseFootCtrlGrp (if module integration is on):
                 self.ikFkBlendGrpToRevFoot = cmds.group(empty=True, name=side+self.userGuideName+"_IkFkBlendGrpToRevFoot_Grp")
@@ -1541,8 +1541,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
                         if self.limbTypeName == self.armName:
-                            ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, name=self.extremOrientCtrlZero+"_PaC")[0]
-                            ikExtremOrientPacW0 = self.bendGrps["extraCtrlList"][-1]+"W0"
+                            ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.extremOrientCtrlZero+"_PaC")[0]
+                            ikExtremOrientPaCW0 = self.bendGrps["extraCtrlList"][-1]+"W0"
+                            cmds.pointConstraint(self.skinJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, name=self.extremOrientCtrlZero+"_PoC")
 
                         cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
                         cmds.parent(self.bendGrps['scaleGrp'], self.toScalableHookGrp)
@@ -1600,7 +1601,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(orientRevNode+".outputX", orientMDNode+".input1X")
                     cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", orientMDNode+".input2X")
                     cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", orientMDNode+".input2Y")
-                    cmds.connectAttr(orientMDNode+".outputX", ikExtremOrientPaC+"."+ikExtremOrientPacW0)
+                    cmds.connectAttr(orientMDNode+".outputX", ikExtremOrientPaC+"."+ikExtremOrientPaCW0)
                     cmds.connectAttr(orientMDNode+".outputY", ikExtremOrientPaC+"."+self.ikExtremSubCtrl+"W1")
                     cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", ikExtremOrientPaC+"."+self.fkJointList[-2]+"W2")
 
