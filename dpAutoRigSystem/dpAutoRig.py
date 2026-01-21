@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.40"
-DPAR_UPDATELOG = "N537 - Fixed Limb stretchable off issue."
+DPAR_VERSION_5 = "5.01.41"
+DPAR_UPDATELOG = "N290 - Ground control display direction.\nN906 - Up a bit the ground controllers shapes."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -48,6 +48,7 @@ from .Modules.Library import dpControls
 from .Modules.Library import dpSkinning
 from .Modules.Base import dpBaseStandard
 from .Modules.Base import dpBaseLayout
+from .Modules.Base import dpBaseCurve
 from .Tools import dpUpdateRigInfo
 from .Tools import dpReorderAttr
 from .Tools import dpCustomAttr
@@ -78,6 +79,7 @@ class Start(object):
         reload(dpSkinning)
         reload(dpBaseStandard)
         reload(dpBaseLayout)
+        reload(dpBaseCurve)
         reload(dpUpdateRigInfo)
         reload(dpReorderAttr)
         reload(dpCustomAttr)
@@ -2297,7 +2299,8 @@ class Start(object):
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
-        self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
+        # Create root control
+        self.rootCtrl = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
         needConnectPivotAttr = False
         if (self.ctrlCreated):
@@ -2305,6 +2308,16 @@ class Start(object):
             self.rootPivotCtrlGrp = self.utils.zeroOut([self.rootPivotCtrl])[0]
             cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
             self.changeRootToCtrlsVisConstraint()
+            self.ctrls.createGroundDirectionShape(self.globalCtrl, 2, 15, 1)
+            self.ctrls.createGroundDirectionShape(self.masterCtrl, 1, 11, 0)
+            self.ctrls.createGroundDirectionShape(self.rootCtrl, 1, 8, 0)
+            cmds.setAttr(self.masterCtrl+".directionDisplay", 1)
+            cmds.setAttr(self.rootCtrl+".directionDisplay", 1)
+            tempGroundCtrlCluster = cmds.cluster(self.globalCtrl, self.masterCtrl, self.rootCtrl)[1] #handle
+            cmds.setAttr(tempGroundCtrlCluster+".translateY", 0.1)
+            cmds.delete(self.globalCtrl, self.masterCtrl, self.rootCtrl, constructionHistory=True)
+            cmds.setAttr(self.masterCtrl+".directionDisplay", 0)
+            cmds.setAttr(self.rootCtrl+".directionDisplay", 0)
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
