@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.12
+DP_UTILS_VERSION = 3.13
 
 
 class Utils(object):
@@ -492,10 +492,10 @@ class Utils(object):
             nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
             nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
             nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
-            cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
-            cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
+            cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PoC")
+            cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PoC")
             cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
-            pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
+            pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PoC")[0]
             # create distanceBetween node:
             distBet = cmds.createNode("distanceBetween", n=name)
             # connect aPos to the distance between point1:
