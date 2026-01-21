@@ -2291,12 +2291,15 @@ class Start(object):
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         # Create and add groundDirection shape control
         self.groundDirectionCtrl = self.ctrls.cvControl("id_102_GroundDirection", "groundDirectionCtrl", r=self.ctrls.dpCheckLinearUnit(4), dir="+X", rot=(0, -90, 0))
-        # self.groundDirectionCtrl = self.getBaseCtrl("id_102_GroundDirection", "groundDirectionCtrl", self.prefix+"GroundDirection_Ctrl", self.ctrls.dpCheckLinearUnit(4))
-        # cmds.setAttr(self.groundDirectionCtrl + '.ry',-90)
         cmds.setAttr(self.groundDirectionCtrl + '.tz',16)
         cmds.select(self.groundDirectionCtrl)
-        cmds.makeIdentity( apply=True )
+        cmds.makeIdentity(apply=True)
         self.ctrls.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=self.groundDirectionCtrl, destinationList=[self.globalCtrl], keepColor=True, force=False)
+        # Add ground direction visibility attribute and connect
+        cmds.addAttr(self.globalCtrl, longName="directionVisibility", attributeType="long", defaultValue=1, minValue=0, maxValue=1)
+        cmds.setAttr(self.globalCtrl + ".directionVisibility", keyable=True)
+        directionShape = cmds.listRelatives(self.globalCtrl, shapes=True)
+        cmds.connectAttr(self.globalCtrl + ".directionVisibility", directionShape[-1] + ".visibility")
         # Create root control
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
