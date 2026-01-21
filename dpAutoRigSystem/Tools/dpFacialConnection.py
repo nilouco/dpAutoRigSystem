@@ -9,13 +9,14 @@ CLASS_NAME = "FacialConnection"
 TITLE = "m085_facialConnection"
 DESCRIPTION = "m086_facialConnectionDesc"
 ICON = "/Icons/dp_facialConnection.png"
+WIKI = "06-‐-Tools#-facial-connection"
 
 MIDDLE = "Middle"
 SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.1
+DP_FACIALCONNECTION_VERSION = 1.04
 
 
 class FacialConnection(object):
@@ -155,6 +156,8 @@ class FacialConnection(object):
                         dismissString=btCancel)
                 if result == btContinue:
                     prefix = cmds.promptDialog(query=True, text=True)
+                    if not prefix:
+                        prefix = baseName
             if not prefix.endswith("_"):
                 prefix = prefix+"_"
             prefix = prefix.capitalize()
@@ -179,10 +182,10 @@ class FacialConnection(object):
                     geoList.append(geo)
                 else:
                     cmds.parent(geo, facialGrp)
+                self.dpUIinst.customAttr.addAttr(0, [geo], descendents=True) #dpID
             geoGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
             cmds.parent(geoList, geoGrp)
             cmds.parent(facialGrp, geoGrp)
-            self.dpUIinst.customAttr.addAttr(0, [geoGrp], descendents=True) #dpID
             if self.ui and resultList:
                 self.dpUIinst.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
@@ -233,7 +236,14 @@ class FacialConnection(object):
                                 connectIt = True
                             # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
                             if connectIt:
-                                cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
+                                connectionList = cmds.listConnections(facialCtrl+"."+facialAttr, source=False, destination=True)
+                                if connectionList:
+                                    if cmds.objectType(connectionList[0]) == "clamp":
+                                        cmds.connectAttr(connectionList[0]+".outputR", bsNode+"."+targetAttr, force=True)
+                                    else:
+                                        cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
+                                else:
+                                    cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
                                 print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
                                 resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
         if self.ui and resultList:

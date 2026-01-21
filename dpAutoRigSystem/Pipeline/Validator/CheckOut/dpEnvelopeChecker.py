@@ -8,8 +8,9 @@ CLASS_NAME = "EnvelopeChecker"
 TITLE = "v094_envelopeChecker"
 DESCRIPTION = "v095_envelopeCheckerDesc"
 ICON = "/Icons/dp_envelopeChecker.png"
+WIKI = "07-‐-Validator#-envelope-checker"
 
-DP_ENVELOPECHECKER_VERSION = 1.1
+DP_ENVELOPECHECKER_VERSION = 1.02
 
 
 class EnvelopeChecker(dpBaseAction.ActionStartClass):

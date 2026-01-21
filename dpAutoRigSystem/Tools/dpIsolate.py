@@ -6,8 +6,9 @@ CLASS_NAME = "Isolate"
 TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
+WIKI = "06-‐-Tools#-isolate"
 
-DP_ISOLATE_VERSION = 1.3
+DP_ISOLATE_VERSION = 1.04
 
 
 class Isolate(object):

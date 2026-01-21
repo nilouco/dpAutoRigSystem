@@ -7,7 +7,7 @@ TITLE = "m130_roundUp"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_roundUp.png"
 
-DP_ROUNDUP_VERSION = 1.3
+DP_ROUNDUP_VERSION = 1.03
 
 
 class RoundUp(dpBaseCurve.BaseCurve):

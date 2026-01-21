@@ -7,8 +7,9 @@ CLASS_NAME = "ChannelIO"
 TITLE = "r064_channelIO"
 DESCRIPTION = "r065_channelIODesc"
 ICON = "/Icons/dp_channelIO.png"
+WIKI = "10-‐-Rebuilder#-channel"
 
-DP_CHANNELIO_VERSION = 1.0
+DP_CHANNELIO_VERSION = 1.01
 
 
 class ChannelIO(dpBaseAction.ActionStartClass):

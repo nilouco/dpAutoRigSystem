@@ -7,8 +7,9 @@ CLASS_NAME = "Car"
 TITLE = "m163_car"
 DESCRIPTION = "m164_carDesc"
 ICON = "/Icons/dp_car.png"
+WIKI = "03-‐-Guides#-car"
 
-DP_CAR_VERSION = 2.1
+DP_CAR_VERSION = 2.02
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

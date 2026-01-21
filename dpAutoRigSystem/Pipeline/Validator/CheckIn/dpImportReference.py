@@ -7,8 +7,9 @@ CLASS_NAME = "ImportReference"
 TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
 ICON = "/Icons/dp_importReference.png"
+WIKI = "07-‐-Validator#-import-referenced-file"
 
-DP_IMPORTREFERENCE_VERSION = 1.3
+DP_IMPORTREFERENCE_VERSION = 1.04
 
 
 class ImportReference(dpBaseAction.ActionStartClass):

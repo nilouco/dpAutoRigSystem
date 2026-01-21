@@ -9,7 +9,7 @@ TITLE = "m103_hexagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_hexagram.png"
 
-DP_HEXAGRAM_VERSION = 1.5
+DP_HEXAGRAM_VERSION = 1.05
 
 
 class Hexagram(dpBaseCurve.BaseCurve):

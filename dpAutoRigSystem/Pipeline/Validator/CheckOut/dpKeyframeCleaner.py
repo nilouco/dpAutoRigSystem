@@ -7,8 +7,9 @@ CLASS_NAME = "KeyframeCleaner"
 TITLE = "v040_keyframeCleaner"
 DESCRIPTION = "v041_keyframeCleanerDesc"
 ICON = "/Icons/dp_keyframeCleaner.png"
+WIKI = "07-‐-Validator#-keyframe-cleaner"
 
-DP_KEYFRAMECLEANER_VERSION = 1.2
+DP_KEYFRAMECLEANER_VERSION = 1.03
 
 
 class KeyframeCleaner(dpBaseAction.ActionStartClass):

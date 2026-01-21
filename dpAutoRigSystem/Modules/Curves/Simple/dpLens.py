@@ -7,7 +7,7 @@ TITLE = "m126_lens"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_lens.png"
 
-DP_LENS_VERSION = 1.3
+DP_LENS_VERSION = 1.03
 
 
 class Lens(dpBaseCurve.BaseCurve):

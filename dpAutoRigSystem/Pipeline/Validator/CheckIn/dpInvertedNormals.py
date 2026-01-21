@@ -8,8 +8,9 @@ CLASS_NAME = "InvertedNormals"
 TITLE = "v086_invertedNormals"
 DESCRIPTION = "v087_invertedNormalsDesc"
 ICON = "/Icons/dp_invertedNormals.png"
+WIKI = "07-‐-Validator#-inverted-normals"
 
-DP_INVERTEDNORMALS_VERSION = 1.1
+DP_INVERTEDNORMALS_VERSION = 1.02
 
 
 class InvertedNormals(dpBaseAction.ActionStartClass):

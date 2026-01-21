@@ -8,8 +8,9 @@ CLASS_NAME = "CopyPasteAttr"
 TITLE = "m135_copyPasteAttr"
 DESCRIPTION = "m136_copyPasteAttrDesc"
 ICON = "/Icons/dp_copyPasteAttr.png"
+WIKI = "06-‐-Tools#-copy-paste-attribute"
 
-DP_COPYPASTEATTR_VERSION = 2.2
+DP_COPYPASTEATTR_VERSION = 2.03
 
 
 class CopyPasteAttr(object):

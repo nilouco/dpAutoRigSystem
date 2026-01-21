@@ -7,7 +7,7 @@ TITLE = "m118_spitFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_spitFlat.png"
 
-DP_SPITFLAT_VERSION = 1.3
+DP_SPITFLAT_VERSION = 1.03
 
 
 class SpitFlat(dpBaseCurve.BaseCurve):

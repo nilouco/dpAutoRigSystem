@@ -7,7 +7,7 @@ TITLE = "m207_plusOpen"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_plusOpen.png"
 
-DP_PLUSOPEN_VERSION = 1.1
+DP_PLUSOPEN_VERSION = 1.01
 
 
 class PlusOpen(dpBaseCurve.BaseCurve):

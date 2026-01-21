@@ -11,8 +11,9 @@ CLASS_NAME = "BrokenRivet"
 TITLE = "v126_brokenRivet"
 DESCRIPTION = "v127_brokenRivetDesc"
 ICON = "/Icons/dp_brokenRivet.png"
+WIKI = "07-‐-Validator#-broken-rivets"
 
-DP_BROKENRIVET_VERSION = 1.0
+DP_BROKENRIVET_VERSION = 1.01
 
 
 class BrokenRivet(dpBaseAction.ActionStartClass):

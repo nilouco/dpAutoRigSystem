@@ -7,7 +7,7 @@ TITLE = "m121_squashTop"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_squashTop.png"
 
-DP_SQUASHTOP_VERSION = 1.3
+DP_SQUASHTOP_VERSION = 1.03
 
 
 class SquashTop(dpBaseCurve.BaseCurve):

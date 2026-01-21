@@ -28,7 +28,7 @@
 # importing libraries:
 from maya import cmds
 
-DP_SOFTIK_VERSION = 2.1
+DP_SOFTIK_VERSION = 2.03
 
 
 class SoftIkClass(object):
@@ -66,7 +66,8 @@ class SoftIkClass(object):
         lengthStartMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Start_MD")
         lenghtOutputMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Output_MD")
         softIkRigScaleMD = cmds.createNode("multiplyDivide", name=userName+"_SoftIk_RigScale_MD")
-        self.toIDList.extend([self.calibrateMD, softRmV, daMD, xMinusDaPMA, negateXMinusMD, divByDSoftMD, powEMD, oneMinusPowEPMD, timesDSoftMD, plusDAPMA, daCnd, distDiffPMA, lengthStartMD, lenghtOutputMD, softIkRigScaleMD])
+        softIkRigScaleClp = cmds.createNode("clamp", name=userName+"_SoftIk_RigScale_Clp")
+        self.toIDList.extend([self.calibrateMD, softRmV, daMD, xMinusDaPMA, negateXMinusMD, divByDSoftMD, powEMD, oneMinusPowEPMD, timesDSoftMD, plusDAPMA, daCnd, distDiffPMA, lengthStartMD, lenghtOutputMD, softIkRigScaleMD, softIkRigScaleClp])
         
         # set default values and operations:
         cmds.setAttr(powEMD+".input1X", 2.718281828)
@@ -83,6 +84,7 @@ class SoftIkClass(object):
         cmds.setAttr(plusDAPMA+".operation", 1) #sum
         cmds.setAttr(daCnd+".operation", 5) #less or equal
         cmds.setAttr(distDiffPMA+".operation", 2) #substract
+        cmds.setAttr(softIkRigScaleClp+".maxR", 1000000)
 
         # make connections:
         cmds.connectAttr(ctrlName+".softIk_"+self.dpUIinst.lang['c111_calibrate'], self.calibrateMD+".input1X", force=True)
@@ -110,7 +112,8 @@ class SoftIkClass(object):
         cmds.connectAttr(plusDAPMA+".output1D", daCnd+".colorIfTrueR", force=True)
         cmds.connectAttr(daCnd+".outColorR", distDiffPMA+".input1D[0]", force=True)
         cmds.connectAttr(distBetween+".distance", distDiffPMA+".input1D[1]", force=True)        
-        cmds.connectAttr(distDiffPMA+".output1D", softIkRigScaleMD+".input1X", force=True)
+        cmds.connectAttr(distDiffPMA+".output1D", softIkRigScaleClp+".inputR", force=True)
+        cmds.connectAttr(softIkRigScaleClp+".outputR", softIkRigScaleMD+".input1X", force=True)
         cmds.connectAttr(worldRef+".scaleX", softIkRigScaleMD+".input2X", force=True)
         cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
 
@@ -133,11 +136,13 @@ class SoftIkClass(object):
             cmds.connectAttr(softRatioMD+".outputX", stretchBC+".color1R", force=True)
             cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
             cmds.connectAttr(ctrlName+"."+self.dpUIinst.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
-            cmds.connectAttr(stretchBC+".outputG", softIkRigScaleMD+".input1X", force=True)
+            cmds.connectAttr(stretchBC+".outputG", softIkRigScaleClp+".inputR", force=True)
+            cmds.connectAttr(softIkRigScaleClp+".outputR", softIkRigScaleMD+".input1X", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
-                cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+axis, force=True)
-                cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+axis, force=True)
+                for k in ["X", "Y", "Z"]:
+                    cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+k, force=True)
+                    cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1
         
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID

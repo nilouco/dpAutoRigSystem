@@ -7,8 +7,9 @@ CLASS_NAME = "ShaderIO"
 TITLE = "r008_shaderIO"
 DESCRIPTION = "r009_shaderIODesc"
 ICON = "/Icons/dp_shaderIO.png"
+WIKI = "10-‐-Rebuilder#-shader"
 
-DP_SHADERIO_VERSION = 1.1
+DP_SHADERIO_VERSION = 1.03
 
 
 class ShaderIO(dpBaseAction.ActionStartClass):
@@ -23,6 +24,7 @@ class ShaderIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_shaderIO"
         self.startName = "dpShader"
+        self.mayaDefaultShader = "openPBRSurface"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -46,17 +48,21 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     self.customAttrList = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
-                                        "longitudinalWidthR", "longitudinalShiftR", "intensityR", "longitudinalWidthTT", "intensityTT", "longitudinalShiftTT", "azimuthalWidthTT",
+                                            "longitudinalWidthR", "longitudinalShiftR", "intensityR", "longitudinalWidthTT", "intensityTT", "longitudinalShiftTT", "azimuthalWidthTT",
                                             "longitudinalWidthTT", "angle", "spreadX", "spreadY", "fresnelRefractiveIndex", "specularShift", "scatter", "scatterPower", 
                                             "tubeDirection", "highlightSize", "roughness", "refractions", "refractiveIndex", "refractionLimit", "reflectionLimit", "reflectivity",
                                             "specularRollOff", "eccentricity", "diffuse", "cosinePower", "base", "diffuseRoughness", "metalness", "specular", "specularRoughness",
                                             "specularIOR", "specularAnisotropy", "specularRotation", "transmission", "transmissionDepth", "transmissionScatterAnisotropy", 
                                             "transmissionDispersion", "transmissionExtraRoughness", "subsurface", "subsurfaceScale", "subsurfaceAnisotropy", "coat", "coatRoughness", 
                                             "coatIOR", "coatAnisotropy", "coatRotation", "coatAffectColor", "coatAffectRoughness", "sheen", "sheenRoughness", "emission", "thinFilmThickness",
-                                            "thinFilmIOR", "thinWalled"]
+                                            "thinFilmIOR", "thinWalled",
+                                            "baseWeight", "baseDiffuseRoughness", "baseMetalness", "specularWeight", "specularRoughnessAnisotropy", "transmissionWeight",
+                                            "transmissionDispersionScale", "transmissionDispersionAbbeNumber", "subsurfaceWeight", "subsurfaceScatterAnisotropy", "fuzzWeight",
+                                            "fuzzRoughness", "coatWeight", "coatRoughnessAnisotropy", "coatDarkening", "thinFilmWeight", "emissionLuminance", "geometryThinWalled"]
                     self.vectorColorList = ["outColor", "outTransparency", "outGlowColor", "outMatteOpacity", "colorTT", "colorTRT", "tipColorD", "rootColorD", "whiteness", "reflectedColor",
-                                            "specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "subsurfaceRadius", "coatColor", "sheenColor", "emissionColor",
-                                            "ambientColor", "incandescence", ]
+                                            "specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "coatColor", "sheenColor", "emissionColor",
+                                            "ambientColor", "incandescence", "baseColor", "fuzzColor"]
+                    self.changedTypeList = ["subsurfaceRadius", "subsurfaceRadiusScale"]
                     if self.firstMode: #export
                         shaderList = None
                         if objList:
@@ -106,19 +112,28 @@ class ShaderIO(dpBaseAction.ActionStartClass):
             cmds.hyperShade(objects=shader)
             assignedList = cmds.ls(selection=True)
             if assignedList:
+                # color
                 colorAttr = "color"
-                transparencyAttr = "transparency"
-                if not cmds.objExists(shader+"."+colorAttr): #support standardShader
+                if not colorAttr in cmds.listAttr(shader): #support standardShader
                     colorAttr = "baseColor"
-                    transparencyAttr = "opacity"
-                if cmds.objExists(shader+"."+colorAttr):
+                if colorAttr in cmds.listAttr(shader):
                     shaderConnectionList = cmds.listConnections(shader+"."+colorAttr, destination=False, source=True)
                     if shaderConnectionList:
                         fileNode = shaderConnectionList[0]
                         texture = cmds.getAttr(fileNode+".fileTextureName")
                     else:
                         color = cmds.getAttr(shader+"."+colorAttr)[0]
-                transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                # transparency
+                transparencyAttr = "transparency"
+                if not transparencyAttr in cmds.listAttr(shader): #support standardShader
+                    transparencyAttr = "opacity"
+                    if not transparencyAttr in cmds.listAttr(shader): #support openPBRShader
+                        transparencyAttr = "geometryOpacity"
+                        transparency = cmds.getAttr(shader+"."+transparencyAttr)
+                    else:
+                        transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                else:
+                    transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
                 # data dictionary to export
                 shaderDic[shader] = {"assigned"        : assignedList,
                                     "color"            : color,
@@ -131,12 +146,16 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                                     }
                 # custom shader attributes
                 for attr in self.customAttrList:
-                    if cmds.objExists(shader+"."+attr):
+                    if attr in cmds.listAttr(shader):
                         shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
                 # custom vector color attributes
                 for attr in self.vectorColorList:
-                    if cmds.objExists(shader+"."+attr):
+                    if attr in cmds.listAttr(shader):
                         shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
+                # changed type shader attributes
+                for attr in self.changedTypeList:
+                    if attr in cmds.listAttr(shader):
+                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
             cmds.select(clear=True)
         return shaderDic
 
@@ -158,13 +177,22 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                     colorList = shaderDic[item]['color']
                     cmds.setAttr(shader+"."+shaderDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
                 transparencyList = shaderDic[item]['transparency']
-                cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
+                if shaderDic[item]['transparencyAttr'] == "geometryOpacity": #support OpenPBRShader
+                    cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList)
+                else:
+                    cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
                 for attr in self.customAttrList:
-                    if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
+                    if attr in cmds.listAttr(shader) and shaderDic[item][attr]:
                         cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
                 for attr in self.vectorColorList:
-                    if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
+                    if attr in cmds.listAttr(shader) and shaderDic[item][attr]:
                         cmds.setAttr(shader+"."+attr, shaderDic[item][attr][0], shaderDic[item][attr][1], shaderDic[item][attr][2], type="double3")
+                for attr in self.changedTypeList: #exception to conform Maya2024 standardSurface and Maya2026 openPBRshader - float or vector attribute types
+                    if attr in cmds.listAttr(shader) and shaderDic[item][attr]:
+                        try:
+                            cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
+                        except:
+                            cmds.setAttr(shader+"."+attr, shaderDic[item][attr][0][0], shaderDic[item][attr][0][1], shaderDic[item][attr][0][2], type="double3")
             # apply shader to meshes
             for mesh in shaderDic[item]['assigned']:
                 if cmds.objExists(mesh):

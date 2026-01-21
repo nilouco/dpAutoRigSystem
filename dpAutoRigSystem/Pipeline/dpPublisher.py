@@ -4,7 +4,7 @@ from maya import mel
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.11
+DP_PUBLISHER_VERSION = 1.12
 
 
 class Publisher(object):
@@ -113,7 +113,7 @@ class Publisher(object):
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = self.dpUIinst.checkAddOnsInstanceList
+        toCheckValidatorList = self.dpUIinst.checkAddOnsInstanceList.copy()
         toCheckValidatorList.extend(self.dpUIinst.checkInInstanceList)
         toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
         toCheckValidatorList.extend(self.dpUIinst.checkFinishingInstanceList)

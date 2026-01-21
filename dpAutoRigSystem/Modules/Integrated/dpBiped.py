@@ -7,8 +7,9 @@ CLASS_NAME = "Biped"
 TITLE = "m026_biped"
 DESCRIPTION = "m027_bipedDesc"
 ICON = "/Icons/dp_biped.png"
+WIKI = "03-‐-Guides#-biped"
 
-DP_BIPED_VERSION = 2.1
+DP_BIPED_VERSION = 2.04
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -159,6 +160,7 @@ def Biped(dpUIinst):
             cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
             # parent foot guide to leg ankle guide:
             cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
+            footInstance.checkFatherMirror()
             cmds.refresh()
             
             # working with ARM system:
@@ -216,6 +218,7 @@ def Biped(dpUIinst):
                     cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
                 # parent finger guide to the arm wrist guide:
                 cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
+                fingerInstance.checkFatherMirror()
                 cmds.refresh()
             
             #
@@ -226,7 +229,7 @@ def Biped(dpUIinst):
                 # set guides attributes to complete system
                 headInstance.changeDeformer(1)
                 headInstance.changeFacial(1)
-                correctiveGuideInstanceList = [armLimbInstance, legLimbInstance] + fingerInstanceList
+                correctiveGuideInstanceList = [armLimbInstance, legLimbInstance, eyeInstance] + fingerInstanceList
                 for instance in correctiveGuideInstanceList:
                     instance.setCorrective(1)
 
@@ -394,6 +397,7 @@ def Biped(dpUIinst):
                 toe1Instance.displayAnnotation(0)
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                toe1Instance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName)
@@ -416,6 +420,7 @@ def Biped(dpUIinst):
                 toe2Instance.displayAnnotation(0)
                 # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                toe2Instance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName)
@@ -438,6 +443,7 @@ def Biped(dpUIinst):
                 toe3Instance.displayAnnotation(0)
                 # parent toe3 guide to foot middle guide:
                 cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                toe3Instance.checkFatherMirror()
                 cmds.refresh()
 
                 dpUIinst.utils.setProgress(doingName+toeName)
@@ -460,6 +466,7 @@ def Biped(dpUIinst):
                 toe4Instance.displayAnnotation(0)
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                toe4Instance.checkFatherMirror()
                 cmds.refresh()
                 
                 dpUIinst.utils.setProgress(doingName+toeName)
@@ -482,6 +489,7 @@ def Biped(dpUIinst):
                 toe5Instance.displayAnnotation(0)
                 # parent toe5 guide to foot middle guide:
                 cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                toe5Instance.checkFatherMirror()
                 cmds.refresh()
                 
                 # working with Breath system:

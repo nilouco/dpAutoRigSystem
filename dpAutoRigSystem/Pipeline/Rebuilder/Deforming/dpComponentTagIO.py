@@ -8,8 +8,9 @@ CLASS_NAME = "ComponentTagIO"
 TITLE = "r048_componentTagIO"
 DESCRIPTION = "r049_componentTagIODesc"
 ICON = "/Icons/dp_componentTagIO.png"
+WIKI = "10-‐-Rebuilder#-componenttag"
 
-DP_COMPONENTTAGIO_VERSION = 1.0
+DP_COMPONENTTAGIO_VERSION = 1.01
 
 
 class ComponentTagIO(dpBaseAction.ActionStartClass):

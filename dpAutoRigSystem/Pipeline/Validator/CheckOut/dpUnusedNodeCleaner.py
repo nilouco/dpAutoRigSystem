@@ -8,8 +8,9 @@ CLASS_NAME = "UnusedNodeCleaner"
 TITLE = "v084_unusedNodeCleaner"
 DESCRIPTION = "v085_unusedNodeCleanerDesc"
 ICON = "/Icons/dp_unusedNodeCleaner.png"
+WIKI = "07-‐-Validator#-unused-node-cleaner"
 
-DP_UNUSEDNODECLEANER_VERSION = 1.2
+DP_UNUSEDNODECLEANER_VERSION = 1.04
 
 
 class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
@@ -47,7 +48,7 @@ class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 if len(toCheckList) > 3: #discarding default materials
                     # getting data to analyse
-                    defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1']
+                    defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1', 'openPBR_shader1']
                     allMatList = list(set(toCheckList) - set(defaultMatList))
                     usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
                     # conditional to check here

@@ -8,8 +8,9 @@ CLASS_NAME = "NonManifoldCleaner"
 TITLE = "v101_nonManifoldCleaner"
 DESCRIPTION = "v102_nonManifoldCleanerDesc"
 ICON = "/Icons/dp_nonManifoldCleaner.png"
+WIKI = "07-‐-Validator#-nonmanifold-cleaner"
 
-DP_NONMANIFOLDCLEANER_VERSION = 1.0
+DP_NONMANIFOLDCLEANER_VERSION = 1.01
 
 
 class NonManifoldCleaner(dpBaseAction.ActionStartClass):

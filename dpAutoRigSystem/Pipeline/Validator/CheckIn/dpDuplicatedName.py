@@ -7,8 +7,9 @@ CLASS_NAME = "DuplicatedName"
 TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
+WIKI = "07-‐-Validator#-duplicated-name"
 
-DP_DUPLICATEDNAME_VERSION = 1.3
+DP_DUPLICATEDNAME_VERSION = 1.04
 
 
 class DuplicatedName(dpBaseAction.ActionStartClass):

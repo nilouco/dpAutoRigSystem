@@ -9,7 +9,7 @@ TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_eyeFlat.png"
 
-DP_EYEFLAT_VERSION = 1.3
+DP_EYEFLAT_VERSION = 1.03
 
 
 class EyeFlat(dpBaseCurve.BaseCurve):

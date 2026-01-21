@@ -7,8 +7,9 @@ CLASS_NAME = "TransformationIO"
 TITLE = "r037_transformationIO"
 DESCRIPTION = "r038_transformationIODesc"
 ICON = "/Icons/dp_transformationIO.png"
+WIKI = "10-‐-Rebuilder#-transformation"
 
-DP_TRANSFORMATIONIO_VERSION = 1.1
+DP_TRANSFORMATIONIO_VERSION = 1.02
 
 
 class TransformationIO(dpBaseAction.ActionStartClass):

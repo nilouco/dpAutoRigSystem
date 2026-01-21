@@ -7,7 +7,7 @@ TITLE = "m120_quadrigram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_quadrigram.png"
 
-DP_QUADRIGRAM_VERSION = 1.3
+DP_QUADRIGRAM_VERSION = 1.03
 
 
 class Quadrigram(dpBaseCurve.BaseCurve):

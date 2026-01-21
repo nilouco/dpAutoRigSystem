@@ -6,8 +6,9 @@ CLASS_NAME = "CheckinIO"
 TITLE = "r021_checkinIO"
 DESCRIPTION = "r022_checkinIODesc"
 ICON = "/Icons/dp_checkinIO.png"
+WIKI = "10-‐-Rebuilder#-checkin"
 
-DP_CHECKINIO_VERSION = 1.0
+DP_CHECKINIO_VERSION = 1.01
 
 
 class CheckinIO(dpBaseAction.ActionStartClass):

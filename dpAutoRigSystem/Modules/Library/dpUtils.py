@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from maya import OpenMaya as om
+from maya import OpenMaya
 import os
 import sys
 import re
@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.5
+DP_UTILS_VERSION = 3.13
 
 
 class Utils(object):
@@ -218,27 +218,31 @@ class Utils(object):
                 return str(max(numberList)+1).zfill(pad)
 
 
-    def findModuleLastNumber(self, className, typeName):
-        """ Find the last used number of this type of module.
+    def findModuleLastNumber(self, className, typeName, guideNet=False):
+        """ Find the last used number of this type of module or guideNet.
             Return its highest number.
         """
         # work with rigged modules in the scene:
-        numberList = []
+        nodeList, numberList = [], []
         guideTypeCount = 0
-        # list all transforms and find the existing value in them names:
-        transformList = cmds.ls(selection=False, transforms=True)
-        for transform in transformList:
-            if cmds.objExists(transform+"."+typeName):
-                if cmds.getAttr(transform+"."+typeName) == className:
-                    numberList.append(className)
-            # try check if there is a masterGrp and get its counter:
-            if cmds.objExists(transform+"."+self.dpUIinst.masterAttr) and cmds.getAttr(transform+"."+self.dpUIinst.masterAttr) == 1:
-                guideTypeCount = cmds.getAttr(transform+'.dp'+className+'Count')
+        if guideNet:
+            nodeList = self.getNetworkNodeByAttr("dpGuideNet")
+        else:
+            nodeList = cmds.ls(selection=False, transforms=True)
+        if nodeList:
+            for node in nodeList:
+                if cmds.objExists(node+"."+typeName):
+                    if cmds.getAttr(node+"."+typeName) == className:
+                        numberList.append(className)
+        # try check if there is a masterGrp and get its counter:
+        allGrp = self.getAllGrp()
+        if allGrp:
+            guideTypeCount = cmds.getAttr(allGrp+'.dp'+className+'Count')
         if guideTypeCount > len(numberList):
             return guideTypeCount
         else:
             return len(numberList)
-        
+    
         
     def normalizeText(self, enteredText="", prefixMax=4):
         """ Analisys the enteredText to conform it in order to use in Application (Maya).
@@ -288,8 +292,8 @@ class Utils(object):
         if userDefAttrList:
             for userDefAttr in userDefAttrList:
                 delIt = True
-                if "originedFrom" in userDefAttr:
-                    if keepOriginedFrom:
+                if keepOriginedFrom:
+                    if "originedFrom" in userDefAttr or "guideSource" in userDefAttr:
                         delIt = False
                 if delIt:
                     try:
@@ -348,7 +352,7 @@ class Utils(object):
         """
         if nodeList and attrName:
             for node in nodeList:
-                if not cmds.objExists(node+"."+attrName):
+                if not attrName in cmds.listAttr(node):
                     cmds.addAttr(node, longName=attrName, attributeType=attrType, keyable=keyableAttr, defaultValue=defaultValueAttr)
 
 
@@ -386,7 +390,7 @@ class Utils(object):
         """
         if objName != "":
             if cmds.objExists(objName):
-                if not cmds.objExists(objName+"."+hookType):
+                if not hookType in cmds.listAttr(objName):
                     cmds.addAttr(objName, longName=hookType, attributeType='bool')
                     cmds.setAttr(objName+"."+hookType, 1)
                 if addNotTransformIO:
@@ -488,10 +492,10 @@ class Utils(object):
             nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
             nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
             nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
-            cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
-            cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
+            cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PoC")
+            cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PoC")
             cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
-            pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
+            pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PoC")[0]
             # create distanceBetween node:
             distBet = cmds.createNode("distanceBetween", n=name)
             # connect aPos to the distance between point1:
@@ -548,7 +552,10 @@ class Utils(object):
                                     cmds.parent(child, fatherList[0])
                                 else:
                                     cmds.parent(child, world=True)
-            cmds.delete(nodeGrpName)
+                else:
+                    cmds.delete(nodeGrpName)
+            else:
+                cmds.delete(nodeGrpName)
 
 
     def getGuideChildrenList(self, nodeName):
@@ -574,8 +581,8 @@ class Utils(object):
             nextLoop = True
             while nextLoop:
                 if cmds.objExists(parentList[0]+".guideBase") and cmds.getAttr(parentList[0]+".guideBase") == 1 and cmds.getAttr(parentList[0]+".mirrorEnable") == 1 and cmds.getAttr(parentList[0]+".mirrorAxis") != "off":
-                    return parentList[0]
                     nextLoop = False
+                    return parentList[0]
                 else:
                     parentList = cmds.listRelatives(parentList[0], parent=True, type='transform')
                     if parentList:
@@ -793,12 +800,12 @@ class Utils(object):
         return [4, None, None]
 
 
-    def visitWebSite(self, website, *args):
-        """ Start browser with the given website address.
+    def visitWebSite(self, URL, *args):
+        """ Start browser with the given website URL address.
         """
-        #webSiteString = "start "+website
+        #webSiteString = "start "+URL
         #os.popen(webSiteString)
-        webbrowser.open(website, new=2)
+        webbrowser.open(URL, new=2)
         
         
     def checkLoadedPlugin(self, pluginName, message="Not loaded plugin", *args):
@@ -999,17 +1006,17 @@ class Utils(object):
 
     def extract_world_scale_from_matrix(self, obj):
         world_matrix = cmds.getAttr(obj + ".worldMatrix")
-        mMat = om.MMatrix()
-        om.MScriptUtil.createMatrixFromList(world_matrix, mMat)
-        mTransform = om.MTransformationMatrix(mMat)
-        scale_util = om.MScriptUtil()
+        mMat = OpenMaya.MMatrix()
+        OpenMaya.MScriptUtil.createMatrixFromList(world_matrix, mMat)
+        mTransform = OpenMaya.MTransformationMatrix(mMat)
+        scale_util = OpenMaya.MScriptUtil()
         scale_util.createFromDouble(0.0, 0.0, 0.0)
         ptr = scale_util.asDoublePtr()
-        mTransform.getScale(ptr, om.MSpace.kWorld)
+        mTransform.getScale(ptr, OpenMaya.MSpace.kWorld)
 
-        x_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 0)
-        y_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 1)
-        z_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 2)
+        x_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 0)
+        y_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 1)
+        z_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 2)
 
         return [x_scale, y_scale, z_scale]
 
@@ -1529,7 +1536,8 @@ class Utils(object):
         """
         if itemList:
             for item in itemList:
-                cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)
+                if not self.dpUIinst.jointEndAttr in cmds.listAttr(item):
+                    cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)
         
 
     def createLocatorInItemPosition(self, item, *args):
@@ -1563,3 +1571,13 @@ class Utils(object):
                     cmds.sets(item+".vtx[*]", remove=setNode)
                     cmds.sets(item+".f[*]", remove=setNode)
                     cmds.sets(item+".e[*]", remove=setNode)
+
+
+    def replaceItemSuffix(self, item, sourceDic, suffixList=None, *args):
+        """ Return found replaced item suffix in the given dictionary.
+        """
+        if not suffixList:
+            suffixList = ["_JointLoc1", "_Head", "Neck0", "Main", "_cvTopLoc1", "_Foot", "_CenterLoc", "_JointLocA", "_JointLocB"]
+        for endName in suffixList:
+            if item.replace("_Base", endName) in sourceDic.keys():
+                return item.replace("_Base", endName)

@@ -7,8 +7,9 @@ CLASS_NAME = "GeometryHistory"
 TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 ICON = "/Icons/dp_geometryHistory.png"
+WIKI = "07-‐-Validator#-geometry-history"
 
-DP_GEOMETRYHISTORY_VERSION = 1.5
+DP_GEOMETRYHISTORY_VERSION = 1.06
 
 
 class GeometryHistory(dpBaseAction.ActionStartClass):

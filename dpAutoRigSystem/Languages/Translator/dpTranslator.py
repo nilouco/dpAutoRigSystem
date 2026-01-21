@@ -4,7 +4,7 @@ import datetime
 import re
 
 
-DPT_VERSION = 1.5
+DPT_VERSION = 1.05
 
 
 

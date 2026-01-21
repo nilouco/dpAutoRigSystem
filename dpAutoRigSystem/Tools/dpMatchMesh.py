@@ -8,8 +8,9 @@ CLASS_NAME = "MatchMesh"
 TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
+WIKI = "06-‐-Tools#-match-mesh"
 
-DP_MATCHMESH_VERSION = 3.0
+DP_MATCHMESH_VERSION = 3.02
 
 
 class MatchMesh(object):
@@ -24,6 +25,8 @@ class MatchMesh(object):
     def dpMatchMesh(self, *args):
         """ Get selection and transfere vertices information.
         """
+        # declaring variables
+        fromTransformDic, toTransformDic = {}, {}
         # get a list of selected items
         selList = cmds.ls(selection=True)
         
@@ -31,10 +34,28 @@ class MatchMesh(object):
             cmds.warning(self.dpUIinst.lang['i040_notMatchSel'])
         else:
             # declaring current variables
-            fromMesh = selList[0]
-            toMesh = selList[1]
+            fromFather = None
+            fromTransform = selList.copy()[0]
+            toTransform = selList.copy()[1]
+            fromMesh = selList.copy()[0]
+            toMesh = selList.copy()[1]
             gotMeshes = True
             
+            # getting transforms
+            if cmds.objectType(selList[0]) != "transform":
+                parentList = cmds.listRelatives(selList[0], allParents=True, type="transform")
+                if parentList:
+                    fromTransform = parentList[0]
+            if cmds.objectType(selList[1]) != "transform":
+                parentList = cmds.listRelatives(selList[1], allParents=True, type="transform")
+                if parentList:
+                    toTransform = parentList
+            
+            # getting fromTransform father
+            fromFatherList = cmds.listRelatives(fromTransform, allParents=True, type="transform")
+            if fromFatherList:
+                fromFather = fromFatherList[0]
+
             # getting meshes
             if cmds.objectType(selList[0]) != "mesh":
                 childrenList = cmds.listRelatives(selList[0], children=True, type="mesh")
@@ -50,6 +71,11 @@ class MatchMesh(object):
                     gotMeshes = False
             
             if gotMeshes:
+                # storing transformation data
+                for attr in self.dpUIinst.transformAttrList[:-1]:
+                    fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
+                    toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
+
                 # get list of mesh vertices proccess
                 # selecting meshes
                 cmds.select([fromMesh, toMesh])
@@ -74,6 +100,21 @@ class MatchMesh(object):
                 # verify the same number of vertices
                 if fromMeshFn.numVertices() == toMeshFn.numVertices():
                     
+                    # put fromTransform in the same location then toTransform
+                    if fromFather != None:
+                        cmds.parent(fromTransform, world=True)
+                    for attr in self.dpUIinst.transformAttrList[:-1]:
+                        cmds.setAttr(fromTransform+"."+attr, lock=False)
+                        cmds.setAttr(toTransform+"."+attr, lock=False)
+                        if "scale" in attr:
+                            cmds.setAttr(fromTransform+"."+attr, 1)
+                            cmds.setAttr(toTransform+"."+attr, 1)
+                        else:
+                            cmds.setAttr(fromTransform+"."+attr, 0)
+                            cmds.setAttr(toTransform+"."+attr, 0)
+                    tempToDeleteA = cmds.parentConstraint(fromTransform, toTransform, maintainOffset=False)
+                    tempToDeleteB = cmds.scaleConstraint(fromTransform, toTransform, maintainOffset=False)
+                    cmds.delete(tempToDeleteA, tempToDeleteB)
                     # getting vertices as points
                     fromMeshFn.getPoints(fromVerticeList)
                     toMeshFn.getPoints(toVerticeList)
@@ -94,6 +135,13 @@ class MatchMesh(object):
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
                     
                     self.utils.setProgress(endIt=True)
+
+                    if fromFather != None:
+                        cmds.parent(fromTransform, fromFather)
+                    # restore transformation data
+                    for attr in self.dpUIinst.transformAttrList[:-1]:
+                        cmds.setAttr(fromTransform+"."+attr, fromTransformDic[attr])
+                        cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
 
                     if not cancelled:
                         cmds.select(selList)
