@@ -2,6 +2,8 @@
 from maya import cmds
 from maya import mel
 from ..Modules.Library import dpIkFkSnap
+from importlib import reload
+
 
 # global variables to this module:
 CLASS_NAME = "MotionCapture"
@@ -10,7 +12,7 @@ DESCRIPTION = "m240_motionCaptureDesc"
 ICON = "/Icons/dp_motionCapture.png"
 WIKI = "06-‐-Tools#-motion-capture"
 
-DP_MOTIONCAPTURE_VERSION = 1.02
+DP_MOTIONCAPTURE_VERSION = 1.03
 
 
 class MotionCapture(object):
@@ -26,7 +28,6 @@ class MotionCapture(object):
         self.hikNode = self.hikGetLatestNode()
         self.hikDic = None
         if self.dpUIinst.dev:
-            from importlib import reload
             reload(dpIkFkSnap)
         # call main function:
         if self.ui:

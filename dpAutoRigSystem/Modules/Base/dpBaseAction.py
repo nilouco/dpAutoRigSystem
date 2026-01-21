@@ -1,10 +1,10 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from functools import partial
 import os
 import getpass
 import shutil
-from functools import partial
 
 # global variables to this module:
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
@@ -13,7 +13,7 @@ WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.65, 0.65)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
-DP_ACTIONSTARTCLASS_VERSION = 2.08
+DP_ACTIONSTARTCLASS_VERSION = 2.09
 
 
 class ActionStartClass(object):

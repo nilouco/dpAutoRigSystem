@@ -20,8 +20,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-import json
 from functools import partial
+import json
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -34,7 +34,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.09
+DP_RIVET_VERSION = 2.10
 
 
 class Rivet(object):

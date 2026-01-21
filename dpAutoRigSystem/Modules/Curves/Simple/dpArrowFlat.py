@@ -1,5 +1,6 @@
 # importing libraries:
 from ...Base import dpBaseCurve
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "ArrowFlat"
@@ -7,7 +8,7 @@ TITLE = "m112_arrowFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrowFlat.png"
 
-DP_ARROWFLAT_VERSION = 1.03
+DP_ARROWFLAT_VERSION = 1.04
 
 
 class ArrowFlat(dpBaseCurve.BaseCurve):
@@ -18,6 +19,8 @@ class ArrowFlat(dpBaseCurve.BaseCurve):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpBaseCurve)
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):

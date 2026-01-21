@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
+from importlib import reload
 import os
 
 # global variables to this module:
@@ -10,7 +11,7 @@ DESCRIPTION = "v053_vaccineCleanerDesc"
 ICON = "/Icons/dp_vaccineCleaner.png"
 WIKI = "07-‐-Validator#-vaccine-cleaner"
 
-DP_VACCINECLEANER_VERSION = 1.03
+DP_VACCINECLEANER_VERSION = 1.04
 
 
 class VaccineCleaner(dpBaseAction.ActionStartClass):
@@ -22,6 +23,8 @@ class VaccineCleaner(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_VACCINECLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpBaseAction)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "NewSceneIO"
@@ -9,7 +10,7 @@ DESCRIPTION = "r026_newSceneIODesc"
 ICON = "/Icons/dp_newSceneIO.png"
 WIKI = "10-‐-Rebuilder#-new-scene"
 
-DP_NEWSCENEIO_VERSION = 1.01
+DP_NEWSCENEIO_VERSION = 1.02
 
 
 class NewSceneIO(dpBaseAction.ActionStartClass):
@@ -21,6 +22,8 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_NEWSCENEIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpBaseAction)
         self.startName = "dpNewScene"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']

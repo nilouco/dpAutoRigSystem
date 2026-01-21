@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import OpenMaya
+from io import TextIOWrapper
+from importlib import reload
 import os
 import sys
 import re
@@ -14,10 +16,8 @@ import getpass
 import datetime
 import stat
 import unicodedata
-from io import TextIOWrapper
-from importlib import reload
 
-DP_UTILS_VERSION = 3.13
+DP_UTILS_VERSION = 3.14
 
 
 class Utils(object):

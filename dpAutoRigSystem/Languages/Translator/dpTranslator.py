@@ -3,9 +3,7 @@ from maya import cmds
 import datetime
 import re
 
-
-DPT_VERSION = 1.05
-
+DP_TRANSLATOR_VERSION = 1.06
 
 
 class Translator(object):
@@ -208,13 +206,13 @@ class Translator(object):
                 self.newLangList.append(contactName)
                 self.newLangList.append(date)
                 self.newLangList.append(self.newLangName)
-                self.newLangList.append("dpTranslator v"+str(DPT_VERSION))
+                self.newLangList.append("dpTranslator v"+str(DP_TRANSLATOR_VERSION))
                 self.newLangList.append(date)
                 # fill newLangList it "" (nothing) in order to generate all list array and just update its values:
                 for i in range(self.langIndex, self.keyLen+1):
                     self.newLangList.append("empty")
                 # starting result string:
-                self.resultString = '{"_author":"'+self.authorName+'","_contact":"'+contactName+'","_date":"'+date+'","_language":"'+self.newLangName+'","_translator":"dpTranslator v'+str(DPT_VERSION)+'","_updated":"'+date+'"'
+                self.resultString = '{"_author":"'+self.authorName+'","_contact":"'+contactName+'","_date":"'+date+'","_language":"'+self.newLangName+'","_translator":"dpTranslator v'+str(DP_TRANSLATOR_VERSION)+'","_updated":"'+date+'"'
 
                 self.dpClearTranslatorUI(1)
                 self.dpGetLangStringUI()

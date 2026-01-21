@@ -2,6 +2,7 @@
 from maya import cmds
 from functools import partial
 from ..Modules.Library import dpControls
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "CopyPasteAttr"
@@ -10,7 +11,7 @@ DESCRIPTION = "m136_copyPasteAttrDesc"
 ICON = "/Icons/dp_copyPasteAttr.png"
 WIKI = "06-‐-Tools#-copy-paste-attribute"
 
-DP_COPYPASTEATTR_VERSION = 2.03
+DP_COPYPASTEATTR_VERSION = 2.04
 
 
 class CopyPasteAttr(object):
@@ -18,6 +19,8 @@ class CopyPasteAttr(object):
         # defining variables
         self.dpUIinst = dpUIinst
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        if self.dpUIinst.dev:
+            reload(dpControls)
         # call main function
         self.copyPasteAttrUI()
     

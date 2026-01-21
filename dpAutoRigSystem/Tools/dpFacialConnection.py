@@ -2,7 +2,6 @@
 from maya import cmds
 from maya import mel
 import os
-import json
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -16,7 +15,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.04
+DP_FACIALCONNECTION_VERSION = 1.05
 
 
 class FacialConnection(object):

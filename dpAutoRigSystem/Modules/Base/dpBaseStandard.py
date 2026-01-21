@@ -3,13 +3,14 @@ from maya import cmds
 from maya import mel
 from ..Library import dpControls
 from ...Tools import dpCorrectionManager
+from importlib import reload
 
 class RigType(object):
     biped = "biped"
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.12
+DP_BASESTANDARD_VERSION = 2.13
 
 
 class BaseStandard(object):
@@ -40,6 +41,9 @@ class BaseStandard(object):
         self.axisList = ["X", "Y", "Z"]
         # utils
         self.utils = dpUIinst.utils
+        if self.dpUIinst.dev:
+            reload(dpControls)
+            reload(dpCorrectionManager)
         # calling dpControls:
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.moduleGrp)
         # starting correctionManager:

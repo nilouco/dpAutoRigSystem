@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "AttributeIO"
@@ -9,7 +10,7 @@ DESCRIPTION = "r044_attributeIODesc"
 ICON = "/Icons/dp_attributeIO.png"
 WIKI = "10-‐-Rebuilder#-new-scene"
 
-DP_ATTRIBUTEIO_VERSION = 1.01
+DP_ATTRIBUTEIO_VERSION = 1.02
 
 
 class AttributeIO(dpBaseAction.ActionStartClass):
@@ -21,6 +22,8 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_ATTRIBUTEIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpBaseAction)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_attributeIO"
         self.startName = "dpAttribute"

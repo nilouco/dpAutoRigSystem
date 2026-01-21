@@ -2,6 +2,7 @@
 from maya import cmds
 from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "BorderGap"
@@ -10,7 +11,7 @@ DESCRIPTION = "v123_borderGapDesc"
 ICON = "/Icons/dp_borderGap.png"
 WIKI = "07-‐-Validator#-border-gap"
 
-DP_BORDERGAP_VERSION = 1.01
+DP_BORDERGAP_VERSION = 1.02
 
 
 class BorderGap(dpBaseAction.ActionStartClass):
@@ -22,7 +23,9 @@ class BorderGap(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_BORDERGAP_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-    
+        if self.dpUIinst.dev:
+            reload(dpBaseAction)
+
 
     def runAction(self, firstMode=True, objList=None, *args):
         """ Main method to process this validator instructions.
