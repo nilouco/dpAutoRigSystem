@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 2.9
+DP_CONTROLS_VERSION = 3.06
 
 
 class ControlClass(object):
@@ -1807,3 +1807,17 @@ class ControlClass(object):
         """
         self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
         self.mirrorShape()
+
+
+    def createGroundDirectionShape(self, ctrl, radius, translate, value, *args):
+        """ Create and add groundDirection shape control.
+        """
+        groundDirectionCtrl = self.cvControl("id_102_GroundDirection", "groundDirectionCtrl", r=self.dpCheckLinearUnit(radius), dir="+X", rot=(0, -90, 0))
+        cmds.setAttr(groundDirectionCtrl+'.tz', self.dpCheckLinearUnit(translate))
+        cmds.makeIdentity(groundDirectionCtrl, apply=True)
+        self.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=groundDirectionCtrl, destinationList=[ctrl], keepColor=True, force=False)
+        # Add ground direction visibility attribute and connect
+        cmds.addAttr(ctrl, longName="directionDisplay", attributeType="long", defaultValue=value, minValue=0, maxValue=1, keyable=False)
+        cmds.setAttr(ctrl+".directionDisplay", channelBox=True)
+        directionShapeList = cmds.listRelatives(ctrl, shapes=True)
+        cmds.connectAttr(ctrl+".directionDisplay", directionShapeList[-1]+".visibility")
