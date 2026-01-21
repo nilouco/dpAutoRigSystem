@@ -3,6 +3,7 @@ from maya import cmds
 from maya import mel
 from ...Pipeline.Validator.CheckOut import dpResetPose
 from functools import partial
+from importlib import reload
 import os
 import getpass
 import datetime
@@ -12,7 +13,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.04
+DP_CONTROLS_VERSION = 3.05
 
 
 class ControlClass(object):
@@ -21,10 +22,18 @@ class ControlClass(object):
         """
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.attrValueDic = {}
-        self.moduleGrp = moduleGrp
         self.utils = dpUIinst.utils
+        self.moduleGrp = moduleGrp
+        self.loadVariables()
+        if self.dpUIinst.dev:
+            reload(dpResetPose)
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
+
+
+    def loadVariables(self, *args):
+        """ Just load class variables here.
+        """
+        self.attrValueDic = {}
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"

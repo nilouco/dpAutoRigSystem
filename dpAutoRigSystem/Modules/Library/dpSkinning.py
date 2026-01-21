@@ -2,15 +2,18 @@
 from maya import cmds
 from maya import mel
 from . import dpWeights
+from importlib import reload
 
 DP_SKINNING_VERSION = 1.09
 
 
 class Skinning(dpWeights.Weights):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dpUIinst, *args, **kwargs):
         """ Initialize the class.
         """
-        dpWeights.Weights.__init__(self, *args, **kwargs)
+        if dpUIinst.dev:
+            reload(dpWeights)
+        dpWeights.Weights.__init__(self, dpUIinst, *args, **kwargs)
         # defining variables:
         self.skinInfoAttrList = ['skinningMethod', 'maintainMaxInfluences', 'maxInfluences']
         self.jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']

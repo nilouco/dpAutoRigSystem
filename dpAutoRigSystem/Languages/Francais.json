@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-12-26",
+    "_updated"       : "2026-01-21",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -156,7 +156,7 @@
     "e009_failDownloadUpdate"      : "Ce n'est pas possible de télécharger le\nfichier de mise à jour, désolé.\n\nVérifier votre connection avec l'internet\nou la permission pour salvegarder dans le dossier\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e010_failInstallUpdate"       : "Ce n'est pas possible d'installer\nle mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou essayer de le faire à la main\npar le téléchargement de la nouvelle version\ndu site web GitHub\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e011_notSelShape"             : "Il y a rien selectionné pour ajouter ou remplacer des formes, désolé.",
-    "e012_cantLoadRibbon"          : "Ce n'est pas possible charger l'extention jcRibbon pour creer des controlleurs bend dans le Limb module, désolé.",
+    "e012_00000"                   : "",
     "e013_cantLoadIkSpringSolver"  : "Ce n'est pas possible de charger le plugin ikSpringSolver, sorry.\nOn utilise le ikRPSolver par default.",
     "e014_cantLoadQuatNode"        : "Ce n'est pas possible de charger le plugin QuatNode.\nOn utilise le Limb par default.",
     "e015_selectToCopyAttr"        : "Selectionner un objet pour copier les attributes, s'il vous plaît.",

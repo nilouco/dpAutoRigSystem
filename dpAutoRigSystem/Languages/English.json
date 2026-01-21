@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-12-26",
+    "_updated"       : "2026-01-21",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -156,7 +156,7 @@
     "e009_failDownloadUpdate"      : "Can't download the update file, sorry.\n\nCheck your internet connection\nor permission to save in the folder\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e010_failInstallUpdate"       : "Can't install the update, sorry.\n\nCheck your internet connection\nor try to do it manually\nby downloading the new version from the GitHub website.\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e011_notSelShape"             : "Nothing is selected to add or replace shapes, sorry.",
-    "e012_cantLoadRibbon"          : "Can't load jcRibbon extension to create bend in Limb module, sorry.",
+    "e012_00000"                   : "",
     "e013_cantLoadIkSpringSolver"  : "Can't load ikSpringSolver plugin, sorry.\nApplied default ikRPSolver instead.",
     "e014_cantLoadQuatNode"        : "Can't load QuatNode plugin, sorry.\nApplied default Limb instead.",
     "e015_selectToCopyAttr"        : "Select one object to copy attributes, please.",

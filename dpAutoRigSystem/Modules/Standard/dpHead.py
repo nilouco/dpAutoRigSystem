@@ -4,6 +4,7 @@ from ..Base import dpBaseStandard
 from ..Base import dpBaseLayout
 from ...Tools import dpFacialConnection
 from ...Tools import dpHeadDeformer
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -17,7 +18,7 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.08
+DP_HEAD_VERSION = 3.09
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -29,13 +30,28 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["ICON"] = ICON
         self.facialAttrList = ["facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
-        # declare variables
+        self.loadVariables()
+        if self.dpUIinst.dev:
+            self.reloadModules()
+        self.dpFacialConnect = dpFacialConnection.FacialConnection(self.dpUIinst, ui=False)
+        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.dpUIinst, ui=False)
+
+
+    def reloadModules(self, *args):
+        """ DEV reloading modules.
+        """ 
+        reload(dpFacialConnection)
+        reload(dpHeadDeformer)
+
+
+    def loadVariables(self, *args):
+        """ Just load class variables here.
+        """
+        # declare variable
         self.correctiveCtrlGrpList = []
         self.aInnerCtrls = []
         self.redeclareVariables(self.guideName)
         self.facialFactor = 0.15
-        self.dpFacialConnect = dpFacialConnection.FacialConnection(self.dpUIinst, ui=False)
-        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.dpUIinst, ui=False)
 
     
     def createModuleLayout(self, *args):

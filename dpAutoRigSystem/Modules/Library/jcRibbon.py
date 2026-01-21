@@ -16,29 +16,30 @@
 # importing libraries:
 from maya import cmds
 
-DP_RIBBONCLASS_VERSION = 2.10
+DP_RIBBONCLASS_VERSION = 2.11
 
 
 class RibbonClass(object):
-    def __init__(self, dpUIinst, limbInstance, *args):
+    def __init__(self, dpUIinst, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
+        self.ctrls = dpUIinst.ctrls
+        
+        
+    def addRibbonToLimb(self, limbInstance, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, oriBLoc=None, *args):
+        """ Create the Ribbon system to be added in the Limb module.
+            Returns a dictionary with all nodes needed to be integrated.
+        """
         self.limbInstance = limbInstance
         self.ctrlRadius = limbInstance.ctrlRadius
         self.curveDegree = limbInstance.curveDegree
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
         self.limbManualVVAttr = self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation']
         self.limbVVAttr       = self.dpUIinst.lang['m019_limb'].lower()+"_"+self.dpUIinst.lang['c031_volumeVariation']
         self.limbMinVVAttr    = self.dpUIinst.lang['m019_limb'].lower()+"Min_"+self.dpUIinst.lang['c031_volumeVariation']
         self.limbLengthAttr   = self.dpUIinst.lang['c113_length']
-        
-        
-    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, oriBLoc=None, *args):
-        """ Create the Ribbon system to be added in the Limb module.
-            Returns a dictionary with all nodes needed to be integrated.
-        """
         self.toIDList = []
+
         cornerName = self.dpUIinst.lang['c007_leg_corner']
         if arm:
             cornerName = self.dpUIinst.lang['c002_arm_corner']

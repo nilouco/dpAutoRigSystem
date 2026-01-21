@@ -2,6 +2,7 @@
 from maya import cmds
 from maya import mel
 from ...Base import dpBaseCurve
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "Arrow"
@@ -9,7 +10,7 @@ TITLE = "m113_arrow"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrow.png"
 
-DP_ARROW_VERSION = 1.05
+DP_ARROW_VERSION = 1.06
 
 
 class Arrow(dpBaseCurve.BaseCurve):
@@ -20,6 +21,8 @@ class Arrow(dpBaseCurve.BaseCurve):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpBaseCurve)
         # dependence module list:
         self.checkModuleList = ['dpArrowFlat']
     

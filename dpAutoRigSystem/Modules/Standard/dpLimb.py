@@ -4,6 +4,7 @@ from ..Base import dpBaseStandard
 from ..Base import dpBaseLayout
 from ..Library import dpSoftIk
 from ..Library import dpIkFkSnap
+from ..Library import jcRibbon
 from ...Tools import dpCorrectionManager
 from functools import partial
 from importlib import reload
@@ -17,7 +18,7 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 WIKI = "03-‐-Guides#-limb"
 
-DP_LIMB_VERSION = 3.12
+DP_LIMB_VERSION = 3.13
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -29,8 +30,26 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.armName = "Arm"
         self.legName = "Leg"
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
+        self.loadVariables()
+        if self.dpUIinst.dev:
+            self.reloadModules()
         self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst)
         self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
+        self.ribbon = jcRibbon.RibbonClass(self.dpUIinst, self)
+        
+        
+    def reloadModules(self, *args):
+        """ DEV reloading modules.
+        """ 
+        reload(dpSoftIk)
+        reload(dpIkFkSnap)
+        reload(jcRibbon)
+        reload(dpCorrectionManager)
+
+
+    def loadVariables(self, *args):
+        """ Just load class variables here.
+        """
         # declare variable
         self.integratedActionsDic = {}
         self.bendGrps = None
@@ -1494,105 +1513,93 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.hookSetup(side, ctrlHookList, [self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1]], [ikHandleGrp, ikHandleNotStretchGrp, ikHandleACGrp, poleVectorLocatorsGrp])
                 
                 # Ribbon feature by James do Carmo, thanks!
-                loadedRibbon = False
                 # (James) add bend to limb
                 if self.getHasBend():
-                    try:
-                        from ..Library import jcRibbon
-                        if self.dpUIinst.dev:
-                            reload(jcRibbon)
-                        RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self)
-                        loadedRibbon = True
-                    except Exception as e:
-                        print(e)
-                        print(self.dpUIinst.lang['e012_cantLoadRibbon'])
+                    num = self.getBendJoints()
+                    iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'
+                    corner = side+self.userGuideName+"_"+cornerName+'_Jnt'
+                    cornerJxt = side+self.userGuideName+"_"+cornerName+'_Jxt'
+                    cornerB = side+self.userGuideName+"_"+cornerBName+'_Jnt'
                     
-                    if loadedRibbon:
-                        num = self.getBendJoints()
-                        iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'
-                        corner = side+self.userGuideName+"_"+cornerName+'_Jnt'
-                        cornerJxt = side+self.userGuideName+"_"+cornerName+'_Jxt'
-                        cornerB = side+self.userGuideName+"_"+cornerBName+'_Jnt'
-                        
-                        splited = self.userGuideName.split('_')
-                        prefix = ''.join(side)
-                        name = ''
-                        if len(splited) > 1:
-                            prefix += splited[0]
-                            name += splited[1]
+                    splited = self.userGuideName.split('_')
+                    prefix = ''.join(side)
+                    name = ''
+                    if len(splited) > 1:
+                        prefix += splited[0]
+                        name += splited[1]
+                    else:
+                        name += self.userGuideName
+                    loc = cmds.spaceLocator(n=side+self.userGuideName+'_auxOriLoc', p=(0, 0, 0))[0]
+                    cmds.delete(cmds.parentConstraint(iniJoint, loc, mo=False, w=1))
+                    if name == self.dpUIinst.lang['c006_leg_main']:  # leg
+                        if s == 0:  # left side (or first side = original)
+                            cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
                         else:
-                            name += self.userGuideName
-                        loc = cmds.spaceLocator(n=side+self.userGuideName+'_auxOriLoc', p=(0, 0, 0))[0]
-                        cmds.delete(cmds.parentConstraint(iniJoint, loc, mo=False, w=1))
-                        if name == self.dpUIinst.lang['c006_leg_main']:  # leg
-                            if s == 0:  # left side (or first side = original)
-                                cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
-                            else:
-                                cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(-1, 0, 0)))
-                        else:
-                            cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
+                            cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(-1, 0, 0)))
+                    else:
+                        cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
-                        if self.limbTypeName == self.armName: #biped arm
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, cornerJxt, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
-                        elif self.quadruped:
-                            locB = cmds.spaceLocator(n=side+self.userGuideName+'_auxBOriLoc', p=(0, 0, 0))[0]
-                            cmds.delete(cmds.parentConstraint(cornerB, locB, mo=False, w=1))
-                            cmds.delete(cmds.aimConstraint(cmds.listRelatives(cornerB, children=True)[0], locB, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)], oriBLoc=locB)
-                            cmds.delete(locB)
-                        else: #biped leg
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
-                        cmds.delete(loc)
+                    if self.limbTypeName == self.armName: #biped arm
+                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, cornerJxt, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                    elif self.quadruped:
+                        locB = cmds.spaceLocator(n=side+self.userGuideName+'_auxBOriLoc', p=(0, 0, 0))[0]
+                        cmds.delete(cmds.parentConstraint(cornerB, locB, mo=False, w=1))
+                        cmds.delete(cmds.aimConstraint(cmds.listRelatives(cornerB, children=True)[0], locB, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
+                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)], oriBLoc=locB)
+                        cmds.delete(locB)
+                    else: #biped leg
+                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                    cmds.delete(loc)
 
-                        if self.limbTypeName == self.armName:
-                            ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.extremOrientCtrlZero+"_PaC")[0]
-                            ikExtremOrientPaCW0 = self.bendGrps["extraCtrlList"][-1]+"W0"
-                            cmds.pointConstraint(self.skinJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, name=self.extremOrientCtrlZero+"_PoC")
+                    if self.limbTypeName == self.armName:
+                        ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.extremOrientCtrlZero+"_PaC")[0]
+                        ikExtremOrientPaCW0 = self.bendGrps["extraCtrlList"][-1]+"W0"
+                        cmds.pointConstraint(self.skinJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, name=self.extremOrientCtrlZero+"_PoC")
 
-                        cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
-                        cmds.parent(self.bendGrps['scaleGrp'], self.toScalableHookGrp)
-                        cmds.parent(self.bendGrps['staticGrp'], self.toStaticHookGrp)
+                    cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
+                    cmds.parent(self.bendGrps['scaleGrp'], self.toScalableHookGrp)
+                    cmds.parent(self.bendGrps['staticGrp'], self.toStaticHookGrp)
 
-                        self.bendGrpList = self.bendGrps['bendGrpList']
-                        self.extraBendList = self.bendGrps['extraBendGrp']
+                    self.bendGrpList = self.bendGrps['bendGrpList']
+                    self.extraBendList = self.bendGrps['extraBendGrp']
 
-                        if self.bendGrpList:
-                            if not cmds.objExists(self.worldRef+".bends"):
-                                cmds.addAttr(self.worldRef, longName='bends', attributeType='long', minValue=0, maxValue=1, defaultValue=1, keyable=True)
-                                cmds.addAttr(self.worldRef, longName='extraBends', attributeType='long', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                            for bendGrpNode in self.bendGrpList:
-                                cmds.connectAttr(self.worldRef+".bends", bendGrpNode+".visibility", force=True)
-                            for extraBendGrp in self.extraBendList:
-                                cmds.connectAttr(self.worldRef+".extraBends", extraBendGrp+".visibility", force=True)
-                        if self.bendGrps['ctrlList']:
-                            for offsetCtrl in self.bendGrps['ctrlList']:
-                                cmds.connectAttr(self.fkCtrlList[0]+".message", offsetCtrl+".parentTag", force=True)
+                    if self.bendGrpList:
+                        if not cmds.objExists(self.worldRef+".bends"):
+                            cmds.addAttr(self.worldRef, longName='bends', attributeType='long', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                            cmds.addAttr(self.worldRef, longName='extraBends', attributeType='long', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                        for bendGrpNode in self.bendGrpList:
+                            cmds.connectAttr(self.worldRef+".bends", bendGrpNode+".visibility", force=True)
+                        for extraBendGrp in self.extraBendList:
+                            cmds.connectAttr(self.worldRef+".extraBends", extraBendGrp+".visibility", force=True)
+                    if self.bendGrps['ctrlList']:
+                        for offsetCtrl in self.bendGrps['ctrlList']:
+                            cmds.connectAttr(self.fkCtrlList[0]+".message", offsetCtrl+".parentTag", force=True)
 
-                        # correct joint skin naming:
-                        for jntIndex in range(1, len(self.skinJointList) - 2):
-                            self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
-                        
-                        # implementing auto rotate twist bones:
-                        # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
-                        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
-                        if loadedQuatNode and loadedMatrixPlugin:
-                            twistBoneMD = self.bendGrps['twistBoneMD']
-                            shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
-                            shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
-                            cmds.setAttr(shoulderChildLoc+".visibility", 0)
-                            cmds.setAttr(shoulderParentLoc+".visibility", 0)
-                            cmds.delete(cmds.parentConstraint(self.skinJointList[1], shoulderParentLoc, mo=False))
-                            cmds.parent(shoulderParentLoc, self.skinJointList[0])
-                            cmds.parent(shoulderChildLoc, self.skinJointList[1], relative=True)
-                            self.utils.twistBoneMatrix(shoulderParentLoc, shoulderChildLoc, self.skinJointList[1], twistBoneMD)
-                        
-                        # fix autoRotate flipping issue:
-                        if s == 0: #left
-                            cmds.setAttr(self.bendGrps['ctrlList'][0]+".invert", 1) #upCtrl
-                            cmds.setAttr(self.bendGrps['ctrlList'][1]+".invert", 1) #downCtrl
-                            if self.quadruped:
-                                cmds.setAttr(self.bendGrps['ctrlList'][3]+".invert", 1) #downBCtrl
+                    # correct joint skin naming:
+                    for jntIndex in range(1, len(self.skinJointList) - 2):
+                        self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
+                    
+                    # implementing auto rotate twist bones:
+                    # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
+                    loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+                    loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+                    if loadedQuatNode and loadedMatrixPlugin:
+                        twistBoneMD = self.bendGrps['twistBoneMD']
+                        shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
+                        shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
+                        cmds.setAttr(shoulderChildLoc+".visibility", 0)
+                        cmds.setAttr(shoulderParentLoc+".visibility", 0)
+                        cmds.delete(cmds.parentConstraint(self.skinJointList[1], shoulderParentLoc, mo=False))
+                        cmds.parent(shoulderParentLoc, self.skinJointList[0])
+                        cmds.parent(shoulderChildLoc, self.skinJointList[1], relative=True)
+                        self.utils.twistBoneMatrix(shoulderParentLoc, shoulderChildLoc, self.skinJointList[1], twistBoneMD)
+                    
+                    # fix autoRotate flipping issue:
+                    if s == 0: #left
+                        cmds.setAttr(self.bendGrps['ctrlList'][0]+".invert", 1) #upCtrl
+                        cmds.setAttr(self.bendGrps['ctrlList'][1]+".invert", 1) #downCtrl
+                        if self.quadruped:
+                            cmds.setAttr(self.bendGrps['ctrlList'][3]+".invert", 1) #downBCtrl
 
                 # orient controller nodes
                 if self.limbTypeName == self.armName:

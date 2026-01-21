@@ -3,6 +3,7 @@ from maya import cmds
 from maya import mel
 from ..Base import dpBaseStandard
 from ..Base import dpBaseLayout
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "Chain"
@@ -11,7 +12,7 @@ DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 WIKI = "03-‐-Guides#-chain"
 
-DP_CHAIN_VERSION = 2.08
+DP_CHAIN_VERSION = 2.09
 
 
 class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -22,6 +23,9 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpBaseStandard)
+            reload(dpBaseLayout)
         self.worldRefList = []
         self.worldRefShapeList = []
         self.currentNJoints = 5
