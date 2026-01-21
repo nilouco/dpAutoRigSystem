@@ -70,9 +70,9 @@ class Start(object):
 
 
     def reloadModules(self, *args):
-        """ DEV reloading modules.
+        """ Dev reloading modules.
         """ 
-        print("DEV mode = True")
+        print("Dev mode = True")
         reload(dpUtils)
         reload(dpControls)
         reload(dpSkinning)
@@ -450,11 +450,12 @@ class Start(object):
         cmds.menuItem('createControlPreset_MI', label='Controllers Preset', command=partial(self.createPreset, "controls", self.curvesPresetsFolder, True))
         cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", self.validatorPresetsFolder, False))
         # window menu:
-        self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
+        self.allUIs["windowMenu"] = cmds.menu('windowMenu', label='Window')
+        cmds.menuItem('devMode_MI', label='Dev mode', checkBox=self.dev, command=self.reloadDevModeUI)
         cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.reloadMainUI)
         cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
         # help menu:
-        self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
+        self.allUIs["helpMenu"] = cmds.menu('helpMenu', label='Help', helpMenu=True)
         cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', DPAR_VERSION_5, 'center', 305, 250))
         cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
         cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[self.englishName]['_collaborators'], 'center', 305, 250))
@@ -463,7 +464,9 @@ class Start(object):
         cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
         cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
         cmds.menuItem('help_MI', label='Wiki...', command=partial(self.utils.visitWebSite, self.wikiURL))
-        
+        if self.dev:
+            self.allUIs["devMenu"] = cmds.menu('devMenu', label='Dev')
+            cmds.menuItem('verbose_MI', label='Verbose', checkBox=True, command=self.changeVerbose)
         # -- Layout
         
         # create the main layout:
@@ -851,6 +854,23 @@ class Start(object):
         cmds.optionVar(stringValue=("dpAutoRigLastLanguage", idiom))
         cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
     
+
+    def reloadDevModeUI(self, *args):
+        """ Reload the system code as development mode.
+        """
+        value = cmds.menuItem('devMode_MI', query=True, checkBox=True)
+        if value:
+            cmds.evalDeferred("reload(dpAutoRigSystem); autoRig = dpAutoRig.Start(True); autoRig.ui();", lowestPriority=True)
+        else:
+            cmds.evalDeferred("autoRig = dpAutoRig.Start(); autoRig.ui();", lowestPriority=True)
+
+
+    def changeVerbose(self, *args):
+        """ Set the dev verbose variable.
+        """
+        self.verbose = cmds.menuItem('verbose_MI', query=True, checkBox=True)
+        print("Verbose =", self.verbose)
+
     
     def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
