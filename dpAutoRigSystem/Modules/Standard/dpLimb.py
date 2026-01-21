@@ -1356,6 +1356,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.parent(self.distBetweenList[2], self.distBetweenList[3], self.distBetweenList[4], distBetGrp)
                 cmds.connectAttr(self.ikExtremCtrl+"."+self.dpUIinst.lang['c113_length'], self.worldRef+"."+self.dpUIinst.lang['c113_length'], force=True)
                 cmds.parentConstraint(self.skinJointList[0], self.distBetweenList[4], maintainOffset=True, name=self.distBetweenList[4]+"_PaC")
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlendRevOutputX', self.distBetweenList[5]+"."+self.ikStretchExtremLoc+"W0", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', self.distBetweenList[5]+"."+self.distBetweenList[4]+"W1", force=True)
 
                 # (James) if we use the ribbon controls we won't implement the forearm control
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
@@ -1540,6 +1542,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         else: #biped leg
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
+
                         if self.limbTypeName == self.armName:
                             ikExtremOrientPaC = cmds.parentConstraint(self.bendGrps["extraCtrlList"][-1], self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.extremOrientCtrlZero+"_PaC")[0]
                             ikExtremOrientPaCW0 = self.bendGrps["extraCtrlList"][-1]+"W0"
