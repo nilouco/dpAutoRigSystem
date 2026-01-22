@@ -137,7 +137,6 @@ class SoftIkClass(object):
             cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
             cmds.connectAttr(ctrlName+"."+self.dpUIinst.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
             cmds.connectAttr(stretchBC+".outputG", softIkRigScaleClp+".inputR", force=True)
-            cmds.connectAttr(softIkRigScaleClp+".outputR", softIkRigScaleMD+".input1X", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
                 for k in ["X", "Y", "Z"]:

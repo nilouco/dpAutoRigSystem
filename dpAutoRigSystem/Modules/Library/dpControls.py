@@ -12,7 +12,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.06
+DP_CONTROLS_VERSION = 3.07
 
 
 class ControlClass(object):
@@ -842,9 +842,13 @@ class ControlClass(object):
                         if defList:
                             self.utils.reapplyDeformers(dupSourceItem, defList)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
-                        for dupSourceShape in dupSourceShapeList:
+                        for d, dupSourceShape in enumerate(dupSourceShapeList):
                             if needKeepVis:
-                                cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
+                                if "Global" in destTransform or "Master" in destTransform or "Root" in destTransform: #directionDisplay attribute exception
+                                    if not d == 0:
+                                        cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
+                                else:
+                                    cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
                             if not force:
                                 cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
                             elif cmds.objExists(dupSourceShape):
