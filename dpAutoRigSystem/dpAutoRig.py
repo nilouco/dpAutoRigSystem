@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.42"
+DPAR_VERSION_5 = "5.02.00"
 DPAR_UPDATELOG = "N699 - Dev mode reload."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
@@ -61,12 +61,12 @@ import platform
 class Start(object):
     def __init__(self, dev=False, *args, **kwargs):
         self.dev = dev
+        self.verbose = dev
         self.dpARVersion = DPAR_VERSION_5
         self.dpARLoadingWindow()
         self.loadVariables()
         if self.dev:
             self.reloadModules()
-        #self.ui()
 
 
     def reloadModules(self, *args):
@@ -91,7 +91,8 @@ class Start(object):
     def loadVariables(self, *args):
         """ Just load class variables here.
         """
-        print("Loading variables ...")
+        if self.verbose:
+            print("Loading variables ...")
         self.englishName = "English"
         self.baseName = "dpAR_"
         self.eyeName = "Eye"
@@ -202,7 +203,7 @@ class Start(object):
         self.startScriptJobs()
         self.utils.closeUI("dpARLoadWin")
         cmds.select(startSelList)
-        print("dpAutoRigSystem "+self.lang['i346_loadedSuccess']+"\n----------")
+        print("dpAutoRigSystem "+self.lang['i346_loadedSuccess'])
 
 
     def ui(self, *args):
@@ -214,7 +215,7 @@ class Start(object):
         self.labelText += " - "+self.dpARVersion
         if self.dev:
             self.labelText += " ~ dev"
-        uiCallScript = "import dpAutoRigSystem;from dpAutoRigSystem import dpAutoRig;autoRig = dpAutoRig.Start("+str(self.dev)+");autoRig.showUI();"
+        uiCallScript = "import dpAutoRigSystem; from dpAutoRigSystem import dpAutoRig; ar = dpAutoRig.Start("+str(self.dev)+"); ar.showUI();"
         cmds.workspaceControl("dpAutoRigSystemWC", 
                             retain=False,
                             floating=False,
@@ -266,9 +267,10 @@ class Start(object):
     def dpARLoadingWindow(self, *args):
         """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
         """
-        print("\n----------")
         loadingString = "Loading dpAutoRigSystem v%s ... " %self.dpARVersion
-        print(loadingString)
+        if self.verbose:
+            print("\n----------")
+            print(loadingString)
         path = os.path.dirname(__file__)
         randImage = random.randint(0,7)
         self.clearDPARLoadingWindow()
@@ -466,7 +468,7 @@ class Start(object):
         cmds.menuItem('help_MI', label='Wiki...', command=partial(self.utils.visitWebSite, self.wikiURL))
         if self.dev:
             self.allUIs["devMenu"] = cmds.menu('devMenu', label='Dev')
-            cmds.menuItem('verbose_MI', label='Verbose', checkBox=True, command=self.changeVerbose)
+            cmds.menuItem('verbose_MI', label='Verbose', checkBox=self.verbose, command=self.changeVerbose)
         # -- Layout
         
         # create the main layout:
@@ -852,7 +854,7 @@ class Start(object):
         """
         cmds.optionVar(remove="dpAutoRigLastLanguage")
         cmds.optionVar(stringValue=("dpAutoRigLastLanguage", idiom))
-        cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
+        cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.dev)+"); ar.ui();", lowestPriority=True)
     
 
     def reloadDevModeUI(self, *args):
@@ -860,9 +862,9 @@ class Start(object):
         """
         value = cmds.menuItem('devMode_MI', query=True, checkBox=True)
         if value:
-            cmds.evalDeferred("reload(dpAutoRigSystem); autoRig = dpAutoRig.Start(True); autoRig.ui();", lowestPriority=True)
+            cmds.evalDeferred("from importlib import reload; reload(dpAutoRigSystem); ar = dpAutoRig.Start(True); ar.ui();", lowestPriority=True)
         else:
-            cmds.evalDeferred("autoRig = dpAutoRig.Start(); autoRig.ui();", lowestPriority=True)
+            cmds.evalDeferred("ar = dpAutoRig.Start(); ar.ui();", lowestPriority=True)
 
 
     def changeVerbose(self, *args):
@@ -1302,7 +1304,7 @@ class Start(object):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        print("\n", self.lang['i084_checkUpdate'])
+        print("\n"+self.lang['i084_checkUpdate'])
         
         # compare current version with GitHub master
         rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, self.rawURL)
@@ -1346,7 +1348,8 @@ class Start(object):
             # find path where 'dpAutoRig.py' is been executed:
             path = self.dpARpath
         if not self.loadedPath:
-            print("dpAutoRigPath: "+path)
+            if self.verbose:
+                print("dpAutoRigPath: "+path)
             self.loadedPath = True
         # list all guide modules:
         guideModuleList = self.utils.findAllModules(path, guideDir)
@@ -1367,50 +1370,65 @@ class Start(object):
                 return guideModuleList
             # avoid print again the same message:
             if guideDir == self.standardFolder and not self.loadedStandard:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedStandard = True
             if guideDir == self.integratedFolder and not self.loadedIntegrated:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedIntegrated = True
             if guideDir == self.curvesSimpleFolder and not self.loadedCurveShape:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedCurveShape = True
             if guideDir == self.curvesCombinedFolder and not self.loadedCombined:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedCombined = True
             if guideDir == self.toolsFolder and not self.loadedTools:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedTools = True
             if guideDir == self.checkInFolder and not self.loadedCheckIn:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckIn = True
             if guideDir == self.checkOutFolder and not self.loadedCheckOut:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckOut = True
             if guideDir == self.rebuilderFolder and not self.loadedRebuilder:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedRebuilder = True
             if guideDir == self.startFolder and not self.loadedStart:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedStart = True
             if guideDir == self.sourceFolder and not self.loadedSource:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedSource = True
             if guideDir == self.setupFolder and not self.loadedSetup:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedSetup = True
             if guideDir == self.deformingFolder and not self.loadedDeforming:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedDeforming = True
             if guideDir == self.customFolder and not self.loadedCustom:
-                print(guideDir+" : "+str(guideModuleList))
+                if self.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
                 self.loadedCustom = True
             if guideDir == "":
                 if not "Finishing" in layout and not self.loadedAddOns:
-                    print(path+" : "+str(guideModuleList))
+                    if self.verbose:
+                        print(path+" : "+str(guideModuleList))
                     self.loadedAddOns = True
                 elif not self.loadedFinishing:
-                    print(path+" : "+str(guideModuleList))
+                    if self.verbose:
+                        print(path+" : "+str(guideModuleList))
                     self.loadedFinishing = True
         return guideModuleList
     

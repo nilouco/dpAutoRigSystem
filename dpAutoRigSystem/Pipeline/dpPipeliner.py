@@ -10,7 +10,7 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.18
+DP_PIPELINER_VERSION = 1.19
 
 
 class Pipeliner(object):
@@ -898,14 +898,16 @@ class Pipeliner(object):
             try:
                 cmds.frameLayout(self.dpUIinst.allUIs["assetLayout"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
                 cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.pipeData['assetName'])
-                print(self.dpUIinst.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
+                if self.dpUIinst.verbose:
+                    print(self.dpUIinst.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
             except:
                 pass
         else:
             try:
                 cmds.frameLayout(self.dpUIinst.allUIs["assetLayout"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.dpUIinst.lang['i305_none'])
                 cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.dpUIinst.lang['i305_none'])
-                print(self.dpUIinst.lang['r027_noAssetContext'])
+                if self.dpUIinst.verbose:
+                    print(self.dpUIinst.lang['r027_noAssetContext'])
             except:
                 pass
 
