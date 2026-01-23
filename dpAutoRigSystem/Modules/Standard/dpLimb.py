@@ -17,7 +17,7 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 WIKI = "03-‐-Guides#-limb"
 
-DP_LIMB_VERSION = 3.12
+DP_LIMB_VERSION = 3.13
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -2013,6 +2013,10 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.ankleArticList.append([cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0], extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(None)
                         cmds.setAttr(beforeJntList[0]+"_OrC.interpType", 1) #average
+                    if extremJntList:
+                        extremJaxList = cmds.listRelatives(extremJntList[0], parent=True, type="joint")
+                        if extremJaxList:
+                            cmds.setAttr(extremJaxList[0]+".segmentScaleCompensate", 1)
                     if s == 1:
                         for jar in [beforeJntList[0], mainJntList[0], extremJntList[0]]:
                             cmds.setAttr(jar+".rotateX", 180)
