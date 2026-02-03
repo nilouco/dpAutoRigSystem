@@ -497,8 +497,6 @@ class FacialConnection(object):
         tgtsForRecept = tgtList[2:]
         bsRecept = cmds.blendShape(tgtsForRecept, receptTgt, foc=True, name=prefix+self.bsReceptSuffix)[0]
         bsMain = cmds.blendShape(receptTgt, fromMesh, foc=True, name=prefix+self.bsSuffix)[0]
-        print(bsMain, receptTgt)
-        print(bsRecept, tweakTarget)
         cmds.setAttr(f"{bsMain}.{receptTgt}", 1)
         cmds.setAttr(f"{bsRecept}.{tweakTarget}", 1)
         if combTgt:
@@ -530,6 +528,7 @@ class FacialConnection(object):
             region = prefixParts[1]
             drivers = []
             # TODO: indentify and create relation also with right side targets
+            # Also consider to remove the addAttr with the targetName
             for baseName in baseTargets:
                 if cmds.attributeQuery("targetName", node=baseName, exists=True):
                     baseNameAttr = cmds.getAttr(baseName+".targetName")
@@ -560,3 +559,15 @@ class FacialConnection(object):
             inputWeights = cmds.combinationShape(query=True, blendShape=bsNode, combinationTargetIndex=combIndex, exist=True)    
             if not inputWeights:
                 cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
+
+
+    def decomposeTgtName(self, tgtName, *args):
+        """ Decomposes a target name into its side and base name.
+            e.g. L_MouthSmile -> L, MouthSmile
+        """
+        side = None
+        baseName = tgtName
+        if tgtName[1] == "_":
+            side = tgtName[0]
+            baseName = tgtName[2:]
+        return side, baseName
