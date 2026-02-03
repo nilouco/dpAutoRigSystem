@@ -8,8 +8,9 @@ CLASS_NAME = "Single"
 TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
+WIKI = "03-‐-Guides#-single"
 
-DP_SINGLE_VERSION = 2.6
+DP_SINGLE_VERSION = 2.07
 
 
 class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -180,6 +181,9 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.lang['c046_holder']+"_Grp")
                         self.utils.removeUserDefinedAttr(self.singleCtrl, True)
+                        #cmds.addAttr(self.singleCtrl, longName="dpHolder", attributeType="bool", defaultValue=1)
+                        #self.dpUIinst.customAttr.addAttr("custom", [self.singleCtrl], "dpHolder")
+                        self.utils.addCustomAttr([self.singleCtrl], "dpHolder")
                         self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.dpUIinst.lang['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)

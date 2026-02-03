@@ -9,7 +9,7 @@ TITLE = "m123_ovalDisc"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ovalDisc.png"
 
-DP_OVALDISC_VERSION = 1.5
+DP_OVALDISC_VERSION = 1.05
 
 
 class OvalDisc(dpBaseCurve.BaseCurve):

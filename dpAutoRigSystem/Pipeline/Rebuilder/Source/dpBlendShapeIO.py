@@ -8,8 +8,9 @@ CLASS_NAME = "BlendShapeIO"
 TITLE = "r030_blendShapeIO"
 DESCRIPTION = "r031_blendShapeIODesc"
 ICON = "/Icons/dp_blendShapeIO.png"
+WIKI = "10-‐-Rebuilder#-blendshape"
 
-DP_BLENDSHAPEIO_VERSION = 1.0
+DP_BLENDSHAPEIO_VERSION = 1.03
 
 
 class BlendShapeIO(dpBaseAction.ActionStartClass):
@@ -142,11 +143,12 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                             i += 1
                         # continue writing relevant or just info data
                         vertices = cmds.polyEvaluate(shapeNode, vertex=True)
-                        rawWeightList = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bsNode, s, t, vertices-1))
-                        if not len(rawWeightList) == rawWeightList.count(1.0):
-                            for w, weight in enumerate(rawWeightList):
-                                if not weight == 1.0:
-                                    weightDic[w] = weight
+                        if type(vertices) == "int": #to accept non polygon blendShapes like curves by Zipper
+                            rawWeightList = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bsNode, s, t, vertices-1))
+                            if not len(rawWeightList) == rawWeightList.count(1.0):
+                                for w, weight in enumerate(rawWeightList):
+                                    if not weight == 1.0:
+                                        weightDic[w] = weight
                     # data dictionary to export
                     bsDic[bsNode]["targets"][i] = { "name"           : target,
                                                     "deleted"        : False,
@@ -230,8 +232,11 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                     tgt = cmds.sculptTarget(bsNode, edit=True, regenerate=True, target=int(i))[0]
                     if tgtAlreadyExists:
                         tgt = cmds.rename("|"+tgt, "dpTemp_"+tgt)
-                        plugOut = cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")[0]+".worldMesh[0]", destination=True, source=False, plugs=True)[0]
-                        cmds.connectAttr(cmds.listRelatives(target, children=True, type="mesh")[0]+".worldMesh[0]", plugOut, force=True)
+                        if cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")):
+                            plugOut = cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")[0]+".worldMesh[0]", destination=True, source=False, plugs=True)[0]
+                            cmds.connectAttr(cmds.listRelatives(target, children=True, type="mesh")[0]+".worldMesh[0]", plugOut, force=True)
+                        #elif cmds.listConnections(cmds.listRelatives(tgt, children=True, type="shape")):
+                            #TODO edit to accept nurbsShape blendShapes like Zipper
                         cmds.delete(tgt)
                     else:
                         cmds.rename(cmds.listRelatives(tgt, children=True, type="mesh")[0], bsDic[bsNode]["targets"][i]["name"]+"Shape")

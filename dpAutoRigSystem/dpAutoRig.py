@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.05"
-DPAR_UPDATELOG = "N925 - OneVertex better performance."
+DPAR_VERSION_5 = "5.01.42"
+DPAR_UPDATELOG = "N537 - Fix the Limb extreme Jax segmentScaleCompensate."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -48,6 +48,7 @@ from .Modules.Library import dpControls
 from .Modules.Library import dpSkinning
 from .Modules.Base import dpBaseStandard
 from .Modules.Base import dpBaseLayout
+from .Modules.Base import dpBaseCurve
 from .Tools import dpUpdateRigInfo
 from .Tools import dpReorderAttr
 from .Tools import dpCustomAttr
@@ -78,6 +79,7 @@ class Start(object):
         reload(dpSkinning)
         reload(dpBaseStandard)
         reload(dpBaseLayout)
+        reload(dpBaseCurve)
         reload(dpUpdateRigInfo)
         reload(dpReorderAttr)
         reload(dpCustomAttr)
@@ -132,13 +134,13 @@ class Start(object):
         self.masterAttr = "masterGrp"
         self.moduleNamespaceAttr = "moduleNamespace"
         self.moduleInstanceInfoAttr = "moduleInstanceInfo"
-        self.dpARWebSiteURL = "https://nilouco.blogspot.com"
         self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
         self.gitHubURL = "https://github.com/nilouco/dpAutoRigSystem"
         self.masterURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
         self.whatsChangedURL = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
         self.donateURL = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
         self.locationURL = "https://ipinfo.io/json"
+        self.wikiURL = "https://github.com/nilouco/dpAutoRigSystem/wiki/"
         self.tempGrp = "dpAR_Temp_Grp"
         self.guideMirrorGrp = "dpAR_GuideMirror_Grp"
         self.dpData = "dpData"
@@ -146,6 +148,7 @@ class Start(object):
         self.dpID = "dpID"
         self.jointEndAttr = "JEnd"
         self.transformAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
+        self.axisList = ["X", "Y", "Z"]
         self.loadedPath = False
         self.loadedStandard = False
         self.loadedIntegrated = False
@@ -193,13 +196,14 @@ class Start(object):
     def showUI(self, *args):
         """ Call mainUI method and the following instructions to check optionVars, refresh UI elements, start the scriptJobs and close loading window.
         """
+        startSelList = cmds.ls(selection=True)
         self.mainUI()
         self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
         self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
         self.refreshMainUI()
         self.startScriptJobs()
-        cmds.select(clear=True)
         self.utils.closeUI("dpARLoadWin")
+        cmds.select(startSelList)
         print("dpAutoRigSystem "+self.lang['i346_loadedSuccess']+"\n----------")
 
 
@@ -235,7 +239,7 @@ class Start(object):
             - SelectionChanged
             - WorkspaceChanged = not documented
         """
-        #cmds.scriptJob(event=('SceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=True, compressUndo=True)
+        cmds.scriptJob(event=('SceneOpened', partial(self.refreshMainUI, clearSel=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         #cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
@@ -453,14 +457,14 @@ class Start(object):
         cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
         # help menu:
         self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-        cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+        cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', DPAR_VERSION_5, 'center', 305, 250))
         cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
         cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[self.englishName]['_collaborators'], 'center', 305, 250))
         cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
         cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
         cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
         cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-        cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, self.dpARWebSiteURL))
+        cmds.menuItem('help_MI', label='Wiki...', command=partial(self.utils.visitWebSite, self.wikiURL))
         
         # -- Layout
         
@@ -504,7 +508,7 @@ class Start(object):
         #optionsMainFL - frameLayout:
         self.allUIs["optionsMainFL"] = cmds.frameLayout('optionsMainFL', label=self.lang['i002_options'], collapsable=True, collapse=True, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["rigOptionsLayout"] = cmds.columnLayout('rigOptionsLayout', adjustableColumn=True, columnOffset=('left', 5), parent=self.allUIs["optionsMainFL"])
-        self.allUIs["prefixLayout"] = cmds.rowColumnLayout('prefixLayout', numberOfColumns=2, columnWidth=[(1, 40), (2, 100)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["prefixLayout"] = cmds.rowColumnLayout('prefixLayout', numberOfColumns=2, columnWidth=[(1, 40), (2, 200)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["prefixTextField"] = cmds.textField('prefixTextField', text="", parent= self.allUIs["prefixLayout"], changeCommand=self.setPrefix)
         self.allUIs["prefixText"] = cmds.text('prefixText', align='left', label=self.lang['i003_prefix'], parent=self.allUIs["prefixLayout"])
         cmds.setParent(self.allUIs["rigOptionsLayout"])
@@ -850,7 +854,7 @@ class Start(object):
         cmds.evalDeferred("autoRig = dpAutoRig.Start("+str(self.dev)+"); autoRig.ui();", lowestPriority=True)
     
     
-    def refreshMainUI(self, savedScene=False, resetButtons=True, *args):
+    def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
@@ -876,6 +880,8 @@ class Start(object):
             cmds.select(clear=True)
             if self.selList:
                 cmds.select(self.selList)
+        if clearSel:
+            cmds.select(clear=True)
         self.rebuilding = False
 
 
@@ -907,7 +913,8 @@ class Start(object):
             if cmds.objExists(moduleInstance.moduleGrp):
                 if moduleInstance.selectButton:
                     currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
-                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
+                    if currentColorList:
+                        cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
                     if selectedGuideNodeList:
                         for selectedGuide in selectedGuideNodeList:
                             selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.moduleInstanceInfoAttr)
@@ -1422,6 +1429,8 @@ class Start(object):
             path = self.dpARpath
         iconDir = path+icon
         guideName = guide.CLASS_NAME
+        if not "WIKI" in dir(guide):
+            guide.WIKI = None
         
         # creating a basic layout for guide buttons:
         if guideDir == self.curvesSimpleFolder.replace("/", ".") or guideDir == self.curvesCombinedFolder.replace("/", "."):
@@ -1471,11 +1480,11 @@ class Start(object):
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
-                rebuilderInstance.infoITB = cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                rebuilderInstance.infoITB = cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
                 rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.iconX, height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.lang['r058_deleteDataAnn'], parent=moduleLayout)
                 rebuilderInstance.updateActionButtons(color=False)
             else:
-                cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                cmds.iconTextButton(image=self.iconInfo, height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
         cmds.setParent('..')
     
     
@@ -1511,7 +1520,7 @@ class Start(object):
         return guideInstance
     
     
-    def initExtraModule(self, guideModule, guideDir=None, *args):
+    def initExtraModule(self, guideModule, guideDir=None, hidden=False, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
@@ -1526,7 +1535,10 @@ class Start(object):
         # get the CLASS_NAME from extraModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this extraModule as an Instance:
-        guideInstance = guideClass(self)
+        if hidden:
+            guideInstance = guideClass(self, ui=False)
+        else:
+            guideInstance = guideClass(self)
         return guideInstance
     
     
@@ -2287,7 +2299,8 @@ class Start(object):
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
-        self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
+        # Create root control
+        self.rootCtrl = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
         needConnectPivotAttr = False
         if (self.ctrlCreated):
@@ -2295,6 +2308,16 @@ class Start(object):
             self.rootPivotCtrlGrp = self.utils.zeroOut([self.rootPivotCtrl])[0]
             cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
             self.changeRootToCtrlsVisConstraint()
+            self.ctrls.createGroundDirectionShape(self.globalCtrl, 2, 15, 1)
+            self.ctrls.createGroundDirectionShape(self.masterCtrl, 1, 11, 0)
+            self.ctrls.createGroundDirectionShape(self.rootCtrl, 1, 8, 0)
+            cmds.setAttr(self.masterCtrl+".directionDisplay", 1)
+            cmds.setAttr(self.rootCtrl+".directionDisplay", 1)
+            tempGroundCtrlCluster = cmds.cluster(self.globalCtrl, self.masterCtrl, self.rootCtrl)[1] #handle
+            cmds.setAttr(tempGroundCtrlCluster+".translateY", 0.1)
+            cmds.delete(self.globalCtrl, self.masterCtrl, self.rootCtrl, constructionHistory=True)
+            cmds.setAttr(self.masterCtrl+".directionDisplay", 0)
+            cmds.setAttr(self.rootCtrl+".directionDisplay", 0)
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
@@ -2324,6 +2347,13 @@ class Start(object):
             cmds.parent(self.ctrlsVisGrp, self.rootCtrl)
         else:
             self.rigScaleMD = self.prefix+'RigScale_MD'
+
+        # parent Tag
+        if "parentTag" in cmds.listAttr(self.globalCtrl):
+            cmds.connectAttr(self.globalCtrl+".message", self.masterCtrl+".parentTag", force=True)
+            cmds.connectAttr(self.masterCtrl+".message", self.rootCtrl+".parentTag", force=True)
+            cmds.connectAttr(self.rootCtrl+".message", self.optionCtrl+".parentTag", force=True)
+            cmds.connectAttr(self.rootCtrl+".message", self.rootPivotCtrl+".parentTag", force=True)
 
         # set lock and hide attributes
         self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
@@ -2393,19 +2423,6 @@ class Start(object):
                 if verbose and not self.rebuilding:
                     self.utils.setProgress(endIt=True)
                 self.utils.closeUI(dpRAttr.winName)
-
-    
-    def unPinAllGuides(self, *args):
-        """ Brute force to un pin all guides.
-            Useful to clean up guides before start the rigAll process.
-        """
-        pConstList = cmds.ls(selection=False, type="parentConstraint")
-        if pConstList:
-            for pConst in pConstList:
-                if "PinGuide" in pConst:
-                    pinnedGuide = cmds.listRelatives(pConst, parent=True, type="transform")[0]
-                    self.ctrls.setLockHide([pinnedGuide], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'], l=False)
-                    cmds.delete(pConst)
     
     
     def rigAll(self, integrate=None, *args):
@@ -2450,9 +2467,6 @@ class Start(object):
                         return
                     else:
                         break
-            
-            # force unPin all Guides:
-            self.unPinAllGuides()
             
             # clear all duplicated names in order to run without find same names if they exists:
             if cmds.objExists(self.guideMirrorGrp):
@@ -2660,12 +2674,12 @@ class Start(object):
                                     scaleConst        = self.integratedTaskDic[moduleDic]['scaleConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
                                     ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
-                                    middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
                                     fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
                                     ikHandleGrp           = self.integratedTaskDic[fatherGuide]['ikHandleGrpList'][s]
                                     ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
+                                    ikHandleGrpConstList  = self.integratedTaskDic[fatherGuide]['ikHandleGrpConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
@@ -2675,10 +2689,9 @@ class Start(object):
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
                                     ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
                                     ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
-                                    jaxRotZMDList         = self.integratedTaskDic[fatherGuide]['jaxRotZMDList']
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
-                                    cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
+                                    cmds.delete(ikHandleConstList, ikHandleGrpConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
                                     cmds.cycleCheck(evaluation=True)
                                     cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
@@ -2704,24 +2717,39 @@ class Start(object):
                                             cmds.parent(footJnt, footJntFather)
                                             cmds.parent(footJntChildrenList, footJnt)
                                             self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
-                                            if addCorrective:
-                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
-                                                if jaxRotZMDList:
-                                                    cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList[s]+".input1Z", force=True)
-                                                    self.utils.nodeRenamingTreatment(cmds.listConnections(jaxRotZMDList[s]+".input1Z", source=True, destination=False))
-                                                for netNode in ankleCorrectiveList:
-                                                    if netNode:
-                                                        if cmds.objExists(netNode):
-                                                            actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
-                                                            if actionLocList:
-                                                                cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
-                                                                actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
-                                                                cmds.delete(actionLocGrp+"_PaC")
-                                                                self.toIDList.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
-                                            else:
-                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
-                                            cmds.setAttr(oc+".interpType", 2) #shortest
-                                            self.toIDList.append(oc)
+                                        # extracting angle to avoid orientConstraint issue when uniform scaling
+                                        extractAngleMM  = cmds.createNode("multMatrix", name=ankleArticList[0]+"_ExtractAngle_MM")
+                                        extractAngleDM  = cmds.createNode("decomposeMatrix", name=ankleArticList[0]+"_ExtractAngle_DM")
+                                        extractAngleQtE = cmds.createNode("quatToEuler", name=ankleArticList[0]+"_ExtractAngle_QtE")
+                                        extractAngleMD  = cmds.createNode("multiplyDivide", name=ankleArticList[0]+"_ExtractAngle_MD")
+                                        origLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Orig_Loc")[0]
+                                        actionLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Action_Loc")[0]
+                                        cmds.matchTransform(origLoc, actionLoc, ankleArticList[2], position=True, rotation=True)
+                                        cmds.parent(origLoc, ankleArticList[2])
+                                        cmds.parent(actionLoc, footJnt)
+                                        cmds.setAttr(origLoc+".visibility", 0)
+                                        cmds.setAttr(actionLoc+".visibility", 0)
+                                        cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
+                                        cmds.connectAttr(origLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
+                                        cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
+                                        cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
+                                        for axis in self.axisList:
+                                            cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
+                                            cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
+                                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE, origLoc, actionLoc])
+                                        if addCorrective:
+                                            for netNode in ankleCorrectiveList:
+                                                if netNode:
+                                                    if cmds.objExists(netNode):
+                                                        actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
+                                                        if actionLocList:
+                                                            cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
+                                                            actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
+                                                            cmds.delete(actionLocGrp+"_PaC")
+                                                            self.toIDList.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
                                     # hide this controller shape
@@ -3188,7 +3216,7 @@ class Start(object):
                     self.toIDList = list(set(self.toIDList))
                     self.customAttr.addAttr(0, self.toIDList, descendents=True)
 
-                # atualise the number of rigged guides by type
+                # actualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0
                     guideNetList = cmds.ls(selection=False, type="network")
@@ -3199,7 +3227,53 @@ class Start(object):
                                 typeCounter = typeCounter + 1
                     if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
-        
+                
+                # parentTag
+                missingParentTagCtrlList = [c for c in self.ctrls.getControlList("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
+                holderCtrlList = self.ctrls.getControlList("dpHolder")
+                allCtrlList = self.ctrls.getControlList()
+                allCtrlList.extend(holderCtrlList)
+                guideSourceDic = {}
+                for ctrl in allCtrlList:
+                    if "guideSource" in cmds.listAttr(ctrl):
+                        guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
+                for pTagCtrl in missingParentTagCtrlList:
+                    if not pTagCtrl == self.globalCtrl:
+                        if "controlID" in cmds.listAttr(pTagCtrl):
+                            if not cmds.getAttr(pTagCtrl+".controlID") == "id_092_Correctives":
+                                if "guideSource" in cmds.listAttr(pTagCtrl):
+                                    guideSource = cmds.getAttr(pTagCtrl+".guideSource")
+                                    guideBase = guideSource.split(":")[0]+":Guide_Base"
+                                    parentNode = self.hookDic[guideBase]['parentNode']
+                                    fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                    if parentNode:
+                                        if not parentNode in guideSourceDic.keys():
+                                            parentNode = self.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                        if not parentNode in guideSourceDic.keys():
+                                            continue
+                                        foundCtrl = guideSourceDic[parentNode]
+                                        if foundCtrl in holderCtrlList: #holder
+                                            guideSource = cmds.getAttr(foundCtrl+".guideSource")
+                                            guideBase = guideSource.split(":")[0]+":Guide_Base"
+                                            parentNode = self.hookDic[guideBase]['parentNode']
+                                            fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                            parentNode = self.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                            if not parentNode in guideSourceDic.keys():
+                                                continue
+                                            foundCtrl = guideSourceDic[parentNode]
+                                        if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                            mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
+                                            if pTagCtrl.startswith(mirrorNameList[0]):
+                                                if not foundCtrl.startswith(mirrorNameList[0]):
+                                                    foundCtrl = mirrorNameList[0]+foundCtrl[2:]
+                                            else:
+                                                if not foundCtrl.startswith(mirrorNameList[1]):
+                                                    foundCtrl = mirrorNameList[1]+foundCtrl[2:]
+                                        if cmds.objExists(foundCtrl):
+                                            cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
+                                    else:
+                                        cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
+
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
@@ -3296,6 +3370,8 @@ class Start(object):
                 
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpLimbSpaceSwitch", self.toolsFolder)
+            # add fingers hand pose:
+            self.initExtraModule("dpFingerHandPose", self.toolsFolder, hidden=True)
 
             # show dialogBox if detected a bug:
             if integrate == 1:

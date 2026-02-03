@@ -7,7 +7,7 @@ TITLE = "m208_starFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_starFlat.png"
 
-DP_STARFLAT_VERSION = 1.1
+DP_STARFLAT_VERSION = 1.01
 
 
 class StarFlat(dpBaseCurve.BaseCurve):

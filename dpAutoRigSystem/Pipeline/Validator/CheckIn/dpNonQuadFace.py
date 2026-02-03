@@ -8,8 +8,9 @@ CLASS_NAME = "NonQuadFace"
 TITLE = "v119_nonQuadFace"
 DESCRIPTION = "v120_nonQuadFaceDesc"
 ICON = "/Icons/dp_nonQuadFace.png"
+WIKI = "07-‐-Validator#-non-quad-face"
 
-DP_NONQUADFACE_VERSION = 1.0
+DP_NONQUADFACE_VERSION = 1.01
 
 
 class NonQuadFace(dpBaseAction.ActionStartClass):

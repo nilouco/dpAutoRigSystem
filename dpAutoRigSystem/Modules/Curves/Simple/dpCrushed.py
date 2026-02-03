@@ -7,7 +7,7 @@ TITLE = "m129_crushed"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_crushed.png"
 
-DP_CRUSHED_VERSION = 1.3
+DP_CRUSHED_VERSION = 1.03
 
 
 class Crushed(dpBaseCurve.BaseCurve):

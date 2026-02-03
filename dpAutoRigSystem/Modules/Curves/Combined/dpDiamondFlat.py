@@ -9,7 +9,7 @@ TITLE = "m177_diamondFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamondFlat.png"
 
-DP_DIAMONDFLAT_VERSION = 1.7
+DP_DIAMONDFLAT_VERSION = 1.07
 
 
 class DiamondFlat(dpBaseCurve.BaseCurve):

@@ -7,8 +7,9 @@ CLASS_NAME = "SupportNodeIO"
 TITLE = "r023_supportNodeIO"
 DESCRIPTION = "r024_supportNodeIODesc"
 ICON = "/Icons/dp_supportNodeIO.png"
+WIKI = "10-‐-Rebuilder#-support-node"
 
-DP_SUPPORTNODEIO_VERSION = 1.1
+DP_SUPPORTNODEIO_VERSION = 1.03
 
 
 class SupportNodeIO(dpBaseAction.ActionStartClass):
@@ -91,4 +92,6 @@ class SupportNodeIO(dpBaseAction.ActionStartClass):
                 itemList.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
                 if itemList:
                     geoList.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.utils.getSuffixNumberList(n)[1].endswith("Base")] or [])
+        if cmds.objExists("Zipper_Curves_Grp"):
+            geoList.extend(cmds.listRelatives("Zipper_Curves_Grp", children=True))
         return geoList

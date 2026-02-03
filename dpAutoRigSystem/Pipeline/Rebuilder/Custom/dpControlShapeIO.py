@@ -7,8 +7,9 @@ CLASS_NAME = "ControlShapeIO"
 TITLE = "r014_controlShapeIO"
 DESCRIPTION = "r015_controlShapeIODesc"
 ICON = "/Icons/dp_controlShapeIO.png"
+WIKI = "10-‐-Rebuilder#-controller-shape"
 
-DP_CONTROLSHAPEIO_VERSION = 1.0
+DP_CONTROLSHAPEIO_VERSION = 1.01
 
 
 class ControlShapeIO(dpBaseAction.ActionStartClass):

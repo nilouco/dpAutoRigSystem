@@ -10,7 +10,7 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.16
+DP_PIPELINER_VERSION = 1.18
 
 
 class Pipeliner(object):
@@ -54,9 +54,12 @@ class Pipeliner(object):
     def getJsonContent(self, jsonPath, *args):
         """ Open, read, close and return the json file content.
         """
-        dic = open(jsonPath, "r", encoding='utf-8')
-        content = json.loads(dic.read())
-        dic.close()
+        try:
+            dic = open(jsonPath, "r", encoding='utf-8')
+            content = json.loads(dic.read())
+            dic.close()
+        except:
+            content = None
         return content
 
 
@@ -165,7 +168,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2025-01-16",
+        "updated" : "2025-11-10",
         
         "f_drive"            : "",
         "f_studio"           : "",
@@ -200,6 +203,7 @@ class Pipeliner(object):
         "s_calibrationIO"    : self.dpUIinst.dpData+"/dpCalibration",
         "s_visibilityIO"     : self.dpUIinst.dpData+"/dpVisibility",
         "s_channelIO"        : self.dpUIinst.dpData+"/dpChannel",
+        "s_hierarchyIO"      : self.dpUIinst.dpData+"/dpHierarchy",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
         "s_webhook"          : "",
@@ -242,7 +246,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2025-01-09",
+        "updated" : "2025-11-10",
         
         "f_drive"            : "i228_fDriveAnn",
         "f_studio"           : "i229_fStudioAnn",
@@ -277,6 +281,7 @@ class Pipeliner(object):
         "s_calibrationIO"    : "i324_sCalibrationIOAnn",
         "s_visibilityIO"     : "i356_sVisibilityIOAnn",
         "s_channelIO"        : "i347_sChannelIOAnn",
+        "s_hierarchyIO"      : "i362_sHierarchyAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
         "s_prefix"           : "i239_sPrefixAnn",

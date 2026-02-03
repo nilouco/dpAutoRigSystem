@@ -7,8 +7,9 @@ CLASS_NAME = "ModelIO"
 TITLE = "r003_modelIO"
 DESCRIPTION = "r004_modelIODesc"
 ICON = "/Icons/dp_modelIO.png"
+WIKI = "10-‐-Rebuilder#-model"
 
-DP_MODELIO_VERSION = 1.0
+DP_MODELIO_VERSION = 1.02
 
 
 class ModelIO(dpBaseAction.ActionStartClass):
@@ -52,10 +53,13 @@ class ModelIO(dpBaseAction.ActionStartClass):
                             if objList:
                                 meshList = objList
                             else:
-                                meshList = self.getModelToExportList()
+                                meshList = self.utils.filterTransformList(self.getModelToExportList(), verbose=self.verbose, title=self.dpUIinst.lang[self.title])
                             if meshList:
                                 self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
+                                constraintDataDic = self.removeConstraints(meshList)
                                 self.exportAlembicFile(meshList)
+                                if constraintDataDic:
+                                    self.importConstraintData(constraintDataDic, False)
                             else:
                                 self.maybeDoneIO("Render_Grp")
                         else: #import

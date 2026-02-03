@@ -7,8 +7,9 @@ CLASS_NAME = "ShaderIO"
 TITLE = "r008_shaderIO"
 DESCRIPTION = "r009_shaderIODesc"
 ICON = "/Icons/dp_shaderIO.png"
+WIKI = "10-‐-Rebuilder#-shader"
 
-DP_SHADERIO_VERSION = 1.2
+DP_SHADERIO_VERSION = 1.03
 
 
 class ShaderIO(dpBaseAction.ActionStartClass):

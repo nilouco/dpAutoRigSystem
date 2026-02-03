@@ -9,7 +9,7 @@ TITLE = "m113_arrow"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrow.png"
 
-DP_ARROW_VERSION = 1.5
+DP_ARROW_VERSION = 1.05
 
 
 class Arrow(dpBaseCurve.BaseCurve):

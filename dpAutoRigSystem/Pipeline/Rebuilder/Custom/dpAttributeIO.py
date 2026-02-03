@@ -7,8 +7,9 @@ CLASS_NAME = "AttributeIO"
 TITLE = "r043_attributeIO"
 DESCRIPTION = "r044_attributeIODesc"
 ICON = "/Icons/dp_attributeIO.png"
+WIKI = "10-‐-Rebuilder#-new-scene"
 
-DP_ATTRIBUTEIO_VERSION = 1.0
+DP_ATTRIBUTEIO_VERSION = 1.01
 
 
 class AttributeIO(dpBaseAction.ActionStartClass):

@@ -8,8 +8,9 @@ CLASS_NAME = "OneVertex"
 TITLE = "v132_oneVertex"
 DESCRIPTION = "v133_oneVertexDesc"
 ICON = "/Icons/dp_oneVertex.png"
+WIKI = "07-‐-Validator#-one-vertex"
 
-DP_ONEVERTEX_VERSION = 2.0
+DP_ONEVERTEX_VERSION = 2.01
 
 
 class OneVertex(dpBaseAction.ActionStartClass):

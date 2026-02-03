@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_BASELAYOUT_VERSION = 2.7
+DP_BASELAYOUT_VERSION = 2.09
 
 
 class BaseLayout(object):
@@ -441,6 +441,7 @@ class BaseLayout(object):
                     fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
                     if cmds.objExists(self.moduleGrp+".flip"):
                         cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
+                self.createPreviewMirror()
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
     
@@ -530,6 +531,10 @@ class BaseLayout(object):
 
     
     def createPreviewMirror(self, *args):
+        """ Just create the mirror preview nodes.
+            It runs recursively.
+        """
+        selList = cmds.ls(selection=True)
         # re-declaring guideMirror and previewMirror groups:
         self.previewMirrorGrpName = self.moduleGrp[:self.moduleGrp.find(":")]+'_MirrorGrp'
         if cmds.objExists(self.previewMirrorGrpName):
@@ -567,6 +572,10 @@ class BaseLayout(object):
                         # set values to guide base:
                         cmds.setAttr(guideChild+".mirrorAxis", self.mirrorAxis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
+                        for moduleInstance in self.dpUIinst.moduleInstancesList:
+                            if cmds.objExists(moduleInstance.moduleGrp):
+                                if cmds.getAttr(moduleInstance.moduleGrp+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
+                                    moduleInstance.createPreviewMirror()
                 
                 # duplicating the moduleGuide
                 duplicated = cmds.duplicate(self.moduleGrp, returnRootsOnly=True)[0]
@@ -658,8 +667,7 @@ class BaseLayout(object):
             # set a negative value to the scale mirror axis:
             for axis in self.mirrorAxis:
                 cmds.setAttr(self.previewMirrorGrp+'.scale'+axis, -1)
-        
-        cmds.select(self.moduleGrp)
+        cmds.select(selList)
 
 
     def changeDeformedBy(self, item, *args):

@@ -9,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_BASESTANDARD_VERSION = 2.7
+DP_BASESTANDARD_VERSION = 2.12
 
 
 class BaseStandard(object):
@@ -253,7 +253,8 @@ class BaseStandard(object):
                     pass
                 cmds.setAttr(self.moduleGrp+".customName", self.customName, type='string')
                 cmds.setAttr(self.annotation+".text", self.customName, type='string')
-                cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
+                if self.guideNet:
+                    cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
                 # set userGuideName:
                 self.userGuideName = self.customName
                 
@@ -374,6 +375,7 @@ class BaseStandard(object):
     def addFkMainCtrls(self, side, ctrlList, *args):
         """ Implement the fk main controllers.
         """
+        mainCtrlList = []
         # getting and calculating values
         totalToAddMain = 1
         self.nMain = cmds.getAttr(self.base+".nMain")
@@ -390,7 +392,8 @@ class BaseStandard(object):
                 currentCtrlZero = cmds.listRelatives(currentCtrl, parent=True)[0]
                 if n == startAt:
                     # create a main controller
-                    mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree)
+                    mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.guideName+"_Base", parentTag=self.getParentToTag(mainCtrlList))
+                    mainCtrlList.append(mainCtrl)
                     self.ctrls.colorShape([mainCtrl], "cyan")
                     cmds.addAttr(mainCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     # position
@@ -462,7 +465,7 @@ class BaseStandard(object):
             # joint labelling:
             self.jointLabelAdd = 0
         # store the number of this guide by module type
-        self.dpAR_count = self.utils.findModuleLastNumber(self.guideModuleName, "dpAR_type")+1
+        self.dpAR_count = self.utils.findModuleLastNumber(self.guideModuleName, "moduleType", True)
 
 
     def rigModule(self, *args):
@@ -481,7 +484,7 @@ class BaseStandard(object):
                 pass
 
             # unPinGuides before Rig them:
-            self.ctrls.unPinGuide([self.moduleGrp])
+            self.ctrls.unPinGuide([self.moduleGrp], force=True)
             
             # RIG:
             self.utils.useDefaultRenderLayer()
@@ -570,7 +573,7 @@ class BaseStandard(object):
         else:
             guideNumber = self.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
-        self.dpUIinst.customAttr.addAttr(0, [self.guideNet]) #dpID
+        self.dpID = self.dpUIinst.customAttr.addAttr(0, [self.guideNet])[0] #dpID
         for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
@@ -681,6 +684,7 @@ class BaseStandard(object):
     def serializeGuide(self, buildIt=True, *args):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
+        self.ctrls.unPinGuide(force=True)
         if not self.serialized:
             afterDataDic, guideDic = {}, {}
             beforeList = self.getBeforeList()
@@ -698,7 +702,9 @@ class BaseStandard(object):
                         if cmds.objExists(nodeName[0]):
                             guideDic[nodeName[0]] = self.getNodeData(nodeName[0])
                             if buildIt:
+                                cmds.lockNode(self.guideNet, lock=False)
                                 cmds.deleteAttr(self.guideNet+"."+beforeAttr)
+                                cmds.lockNode(self.guideNet, lock=True)
                 afterDataDic["GuideData"] = guideDic
                 cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
                 if buildIt:
@@ -735,6 +741,14 @@ class BaseStandard(object):
         cmds.setAttr(self.wsRef+".visibility", False)
         cmds.setAttr(self.wsRef+".template", 1)
         cmds.parent(self.wsRef, self.dpUIinst.tempGrp)
+
+
+    def getParentToTag(self, itemList, returnItem=None, *args):
+        """ Return the latest item from given list or the second given param.
+        """
+        if itemList:
+            return itemList[-1]
+        return returnItem
 
 
     # Getters:

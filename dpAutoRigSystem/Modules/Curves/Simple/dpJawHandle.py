@@ -7,7 +7,7 @@ TITLE = "m132_jawHandle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_jawHandle.png"
 
-DP_JAWHANDLE_VERSION = 1.3
+DP_JAWHANDLE_VERSION = 1.03
 
 
 class JawHandle(dpBaseCurve.BaseCurve):

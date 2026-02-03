@@ -7,8 +7,9 @@ CLASS_NAME = "ConnectionIO"
 TITLE = "r045_connectionIO"
 DESCRIPTION = "r046_connectionIODesc"
 ICON = "/Icons/dp_connectionIO.png"
+WIKI = "10-‐-Rebuilder#-connection"
 
-DP_CONNECTIONIO_VERSION = 1.0
+DP_CONNECTIONIO_VERSION = 1.01
 
 
 class ConnectionIO(dpBaseAction.ActionStartClass):

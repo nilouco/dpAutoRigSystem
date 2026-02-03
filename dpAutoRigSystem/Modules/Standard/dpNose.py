@@ -8,8 +8,9 @@ CLASS_NAME = "Nose"
 TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 ICON = "/Icons/dp_nose.png"
+WIKI = "03-‐-Guides#-nose"
 
-DP_NOSE_VERSION = 2.3
+DP_NOSE_VERSION = 2.05
 
 
 class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -239,7 +240,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTopLoc1")
+                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTopLoc1", parentTag=self.getParentToTag(self.centerList))
                     self.centerList.append(self.noseCtrl)
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.utils.zeroOut([self.noseCtrl])[0]
@@ -341,14 +342,14 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
                 
                 # creating controls:
-                self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvMiddleLoc")
-                self.tipCtrl = self.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.ctrlRadius * 0.3), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTipLoc")
-                self.bottomCtrl = self.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, dir="-Y", headDef=self.headDefValue, guideSource=self.guideName+"_cvBottomLoc")
-                self.lSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.guideName+"_cvLSideLoc")
-                self.rSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.guideName+"_cvRSideLoc")
+                self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvMiddleLoc", parentTag=self.centerList[-1])
+                self.tipCtrl = self.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.ctrlRadius * 0.3), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTipLoc", parentTag=self.centerList[-1])
+                self.bottomCtrl = self.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, dir="-Y", headDef=self.headDefValue, guideSource=self.guideName+"_cvBottomLoc", parentTag=self.centerList[-1])
+                self.lSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.guideName+"_cvLSideLoc", parentTag=self.centerList[-1])
+                self.rSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.guideName+"_cvRSideLoc", parentTag=self.centerList[-1])
                 if self.addNostril:
-                    self.lNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvLNostrilLoc")
-                    self.rNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvRNostrilLoc")
+                    self.lNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvLNostrilLoc", parentTag=self.lSideCtrl)
+                    self.rNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvRNostrilLoc", parentTag=self.rSideCtrl)
                     self.leftList.append(self.lNostrilCtrl)
                     self.rightList.append(self.rNostrilCtrl)
                 self.centerList.append(self.middleCtrl)

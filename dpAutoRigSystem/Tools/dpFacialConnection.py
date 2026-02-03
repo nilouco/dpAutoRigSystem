@@ -10,13 +10,14 @@ CLASS_NAME = "FacialConnection"
 TITLE = "m085_facialConnection"
 DESCRIPTION = "m086_facialConnectionDesc"
 ICON = "/Icons/dp_facialConnection.png"
+WIKI = "06-‐-Tools#-facial-connection"
 
 MIDDLE = "Middle"
 SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 1.2
+DP_FACIALCONNECTION_VERSION = 2.00
 
 
 class FacialConnection(object):

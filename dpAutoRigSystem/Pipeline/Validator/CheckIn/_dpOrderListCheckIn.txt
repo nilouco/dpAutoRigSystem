@@ -4,6 +4,7 @@ dpNamespaceCleaner
 dpUnlockInitialShadingGroup
 dpShowBPCleaner
 dpDuplicatedName
+dpIntermediateObject
 dpParentedGeometry
 dpOneVertex
 dpTFaceCleaner

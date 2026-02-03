@@ -7,8 +7,9 @@ CLASS_NAME = "Arm"
 TITLE = "m028_arm"
 DESCRIPTION = "m029_armDesc"
 ICON = "/Icons/dp_arm.png"
+WIKI = "03-‐-Guides#-arm"
 
-DP_ARM_VERSION = 2.1
+DP_ARM_VERSION = 2.02
 
 
 def Arm(dpUIinst):

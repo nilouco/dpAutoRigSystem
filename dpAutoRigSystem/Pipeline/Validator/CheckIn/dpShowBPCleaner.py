@@ -7,8 +7,9 @@ CLASS_NAME = "ShowBPCleaner"
 TITLE = "v050_showBPCleaner"
 DESCRIPTION = "v051_showBPCleanerDesc"
 ICON = "/Icons/dp_showBPCleaner.png"
+WIKI = "07-‐-Validator#-showbp-cleaner"
 
-DP_SHOWBPCLEANER_VERSION = 1.2
+DP_SHOWBPCLEANER_VERSION = 1.03
 
 
 class ShowBPCleaner(dpBaseAction.ActionStartClass):

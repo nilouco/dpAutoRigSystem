@@ -7,7 +7,7 @@ TITLE = "m111_cube"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_cube.png"
 
-DP_CUBE_VERSION = 1.3
+DP_CUBE_VERSION = 1.03
 
 
 class Cube(dpBaseCurve.BaseCurve):

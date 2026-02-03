@@ -7,8 +7,9 @@ CLASS_NAME = "UnknownNodesCleaner"
 TITLE = "v058_unknownNodesCleaner"
 DESCRIPTION = "v059_unknownNodesCleanerDesc"
 ICON = "/Icons/dp_unknownNodesCleaner.png"
+WIKI = "07-‐-Validator#-unknown-nodes-cleaner"
 
-DP_UNKNOWNNODESCLEANER_VERSION = 1.3
+DP_UNKNOWNNODESCLEANER_VERSION = 1.04
 
 
 class UnknownNodesCleaner(dpBaseAction.ActionStartClass):

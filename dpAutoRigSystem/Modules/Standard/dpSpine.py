@@ -8,8 +8,9 @@ CLASS_NAME = "Spine"
 TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
+WIKI = "03-‐-Guides#-spine"
 
-DP_SPINE_VERSION = 2.5
+DP_SPINE_VERSION = 2.07
 
 
 class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -201,7 +202,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     hipsFkCtrlCVPos = 0.4*self.ctrlRadius
                 cmds.move(0, hipsFkCtrlCVPos, 0, self.hipsFkCtrl+"0Shape.cv[0:5]", relative=True, worldSpace=True, worldSpaceDistance=True)
                 
-                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc1")
+                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_Base")
                 self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+chestName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
                 cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
@@ -507,6 +508,9 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
                 cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
                 
+                # parent tag
+                self.addParentTagInfo()
+
                 # adding size feature:
                 for a, b in zip(sizeCtrlList, sizeGrpList):
                     self.connectSizeAxis(a, b)
@@ -532,6 +536,24 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.deleteModule()
         self.renameUnitConversion()
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+
+
+    def addParentTagInfo(self, *args):
+        """ Set the parentTag connections for existing controllers.
+        """
+        for i in range(2, len(self.aInnerCtrls[0])-1):
+            cmds.connectAttr(self.aInnerCtrls[0][i+1]+".message", self.aInnerCtrls[0][i]+".parentTag", force=True) #middles
+        for j in range(4, len(self.aOuterCtrls[0])-1):
+            cmds.connectAttr(self.aOuterCtrls[0][j+1]+".message", self.aOuterCtrls[0][j]+".parentTag", force=True) #fks
+        cmds.connectAttr(self.aInnerCtrls[0][2]+".message", self.hipsBCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.hipsBCtrl+".message", self.hipsACtrl+".parentTag", force=True)
+        cmds.connectAttr(self.hipsBCtrl+".message", self.baseCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.aOuterCtrls[0][4]+".message", self.hipsFkCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.chestFkCtrl+".message", self.aOuterCtrls[0][-1]+".parentTag", force=True)
+        cmds.connectAttr(self.chestBCtrl+".message", self.aInnerCtrls[0][-1]+".parentTag", force=True)
+        cmds.connectAttr(self.tipCtrl+".message", self.chestFkCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.chestBCtrl+".message", self.tipCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.chestACtrl+".message", self.chestBCtrl+".parentTag", force=True)
 
 
     def connectSizeAxis(self, fromNode, toNode, *args):

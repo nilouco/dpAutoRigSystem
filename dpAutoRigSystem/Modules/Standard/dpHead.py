@@ -10,13 +10,14 @@ CLASS_NAME = "Head"
 TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
+WIKI = "03-‐-Guides#-head"
 
 JAW = "jaw"
 CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.4
+DP_HEAD_VERSION = 3.08
 
 
 class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -629,12 +630,12 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # creating controllers:
                 for n in range(0, self.nJoints):
-                    neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z", guideSource=self.guideName+"_Neck"+str(n))
+                    neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z", guideSource=self.guideName+"_Neck"+str(n), parentTag=self.getParentToTag(self.neckCtrlList))
                     if n > 0:
                         cmds.parent(neckCtrl, self.neckCtrlList[-1])
                     self.neckCtrlList.append(neckCtrl)
-                self.headCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree, guideSource=self.guideName+"_Head")
-                self.headSubCtrl = self.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree, guideSource=self.guideName+"_Head")
+                self.headCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree, guideSource=self.guideName+"_Head", parentTag=self.neckCtrlList[-1])
+                self.headSubCtrl = self.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree, guideSource=self.guideName+"_Head", parentTag=self.headCtrl)
                 toFlipList = [self.headCtrl, self.headSubCtrl]
                 # hiding visibility attributes:
                 self.ctrls.setLockHide([self.headCtrl, self.headSubCtrl], ['v'], l=False)
@@ -658,8 +659,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.upperHeadJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head'])
                     cmds.setAttr(self.upperEndJnt+".translateY", 0.3*self.ctrlRadius)
                     dpARJointList.extend([self.upperJawJnt, self.upperHeadJnt])
-                    self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperJaw")
-                    self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperHead")
+                    self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperJaw", parentTag=self.headSubCtrl)
+                    self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_UpperHead", parentTag=self.upperJawCtrl)
                     toFlipList.extend([self.upperJawCtrl, self.upperHeadCtrl])
                     self.ctrls.setLockHide([self.upperJawCtrl, self.upperHeadCtrl], ['v'], l=False)
                     cmds.select(self.headJnt)
@@ -667,7 +668,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.jawJnt = cmds.joint(name=jawJntName, scaleCompensate=False)
                     self.utils.setJointLabel(self.jawJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c025_jaw'])
                     dpARJointList.extend([self.jawJnt])
-                    self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.ctrlRadius *0.5), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Jaw")
+                    self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.ctrlRadius *0.5), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Jaw", parentTag=self.headSubCtrl)
                     toFlipList.extend([self.jawCtrl])
                     self.ctrls.setLockHide([self.jawCtrl], ['v'], l=False)
                     if hasChin:
@@ -678,8 +679,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.utils.setJointLabel(self.chinJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c026_chin'])
                         self.utils.setJointLabel(self.chewJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c048_chew'])
                         dpARJointList.extend([self.chinJnt, self.chewJnt])
-                        self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.13), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chin")
-                        self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.08), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chew")
+                        self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.13), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chin", parentTag=self.jawCtrl)
+                        self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.08), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_Chew", parentTag=self.chinCtrl)
                         toFlipList.extend([self.chinCtrl, self.chewCtrl])
                         self.ctrls.setLockHide([self.chinCtrl, self.chewCtrl], ['v'], l=False)
                     cmds.select(self.headJnt)
@@ -700,10 +701,10 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.upperLipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip'])
                     self.utils.setJointLabel(self.lowerLipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['c039_lip'])
                     dpARJointList.extend([self.lCornerLipJnt, self.rCornerLipJnt, self.upperLipJnt, self.lowerLipJnt])
-                    self.lCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LCornerLip")
-                    self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip")
-                    self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
-                    self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip")
+                    self.lCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LCornerLip", parentTag=self.headSubCtrl)
+                    self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip", parentTag=self.headSubCtrl)
+                    self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip", parentTag=self.headSubCtrl)
+                    self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip", parentTag=self.headSubCtrl)
                     toFlipList.extend([self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl])
                     self.ctrls.setLockHide([self.upperLipCtrl, self.lowerLipCtrl], ['v'], l=False)
                 dpARJointList.extend(self.neckJointList)
@@ -1192,6 +1193,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
                     hdNet = self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet)
                     self.addNodeToGuideNet([hdNet], ["hdNet"])
+                    cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
                 elif cmds.objExists(self.guideName+"_DeformerCube_MD"):
                     cmds.delete(self.guideName+"_DeformerCube_MD")
 
@@ -1221,9 +1223,57 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.renameUnitConversion()
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
+
+    def createFaceMinMaxSN(self, fCtrl, *args):
+        """ Creates a scriptNode to set the min and max values to the given Face_Ctrl.
+        """
+        minMaxCode = '''from maya import cmds
+DP_HEAD_VERSION = '''+str(DP_HEAD_VERSION)+'''
+class MinMaxValues(object):
+    def __init__(self, headNet, *args):
+        self.faceCtrl = cmds.listConnections(headNet+".faceCtrl")[0]
+        cmds.scriptJob(attributeChange=(self.faceCtrl+".minValue", self.setMinMaxValues), killWithScene=False, compressUndo=True)
+        cmds.scriptJob(attributeChange=(self.faceCtrl+".maxValue", self.setMinMaxValues), killWithScene=False, compressUndo=True)
+
+    def setMinMaxValues(self, *args):
+        extraAttrList = list(set(cmds.listAttr(self.faceCtrl, userDefined=True, keyable=True)) - set(["minValue", "maxValue"]))
+        if extraAttrList:
+            minimumValue = cmds.getAttr(self.faceCtrl+".minValue")
+            maximumValue = cmds.getAttr(self.faceCtrl+".maxValue")
+            if minimumValue > maximumValue:
+                cmds.setAttr(self.faceCtrl+".minValue", maximumValue)
+                minimumValue = maximumValue
+            for extraAttr in extraAttrList:
+                cmds.addAttr(self.faceCtrl+"."+extraAttr, edit=True, minValue=minimumValue, maxValue=maximumValue)
+                if cmds.getAttr(self.faceCtrl+"."+extraAttr) < minimumValue:
+                    cmds.setAttr(self.faceCtrl+"."+extraAttr, minimumValue)
+                if cmds.getAttr(self.faceCtrl+"."+extraAttr) > maximumValue:
+                    cmds.setAttr(self.faceCtrl+"."+extraAttr, maximumValue)
+
+# fire scriptNode
+for net in cmds.ls(type="network"):
+    if cmds.objExists(net+".dpNetwork") and cmds.getAttr(net+".dpNetwork") == 1:
+        if cmds.objExists(net+".dpGuideNet") and cmds.getAttr(net+".dpGuideNet") == 1:
+            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+cmds.getAttr(self.guideNet+".dpID")+'''":
+                MinMaxValues(net)
+        '''
+        cmds.lockNode(self.guideNet, lock=False)
+        cmds.addAttr(self.guideNet, longName="faceCtrl", attributeType="message")
+        cmds.addAttr(self.guideNet, longName="minMaxScriptNode", attributeType="message")
+        cmds.addAttr(fCtrl, longName="guideNet", attributeType="message")
+        cmds.connectAttr(fCtrl+".message", self.guideNet+".faceCtrl", force=True)
+        cmds.connectAttr(self.guideNet+".message", fCtrl+".guideNet", force=True)
+        sn = cmds.scriptNode(name=self.guideNet.replace("Net", 'MinMax_SN'), sourceType='python', scriptType=2, beforeScript=minMaxCode)
+        self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
+        cmds.addAttr(sn, longName="guideNet", attributeType="message")
+        cmds.connectAttr(sn+".message", self.guideNet+".minMaxScriptNode", force=True)
+        cmds.connectAttr(self.guideNet+".message", sn+".guideNet", force=True)
+        cmds.scriptNode(sn, executeBefore=True)
+        cmds.lockNode(self.guideNet, lock=True)
+
     
     def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
-        """ Important function to receive called parameters and create the specific asked control.
+        """ Important method to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
                 axisDirectionList = [-1, 1, -1, 1, -1, 1] # neg, pos, neg, pos, neg, pos
@@ -1244,7 +1294,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             return None, None
         else:
             # create control calling dpControls function:
-            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector)
+            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector, parentTag=self.headSubCtrl)
             # add head or jaw influence attribute
             if headDefInfluence:
                 self.ctrls.addDefInfluenceAttrs(fCtrl, 1)                
@@ -1270,7 +1320,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.connectAttr(invZMD+".outputZ", fCtrlGrp+".scaleZ", force=True)
             else:
                 cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
-            # start work with custom attributes
+            # start working with custom attributes
             facialAttrList = []
             if attrList:
                 for a, attr in enumerate(attrList):
@@ -1279,15 +1329,29 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         if sideName:
                             ctrlAttr = sideName+"_"+attr
                         facialAttrList.append(ctrlAttr)
+                        clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
+                        # TODO: to be decommented by 2026-12-24
+                        #self.toIDList.append(clp)
                         if directConnection:
-                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0, minValue=0, maxValue=1)
+                            if not "minValue" in cmds.listAttr(fCtrl):
+                                for c, clampAttr in enumerate(["minValue", "maxValue"]):
+                                   cmds.addAttr(fCtrl, longName=clampAttr, attributeType="float", defaultValue=c, keyable=False)
+                                   cmds.setAttr(fCtrl+"."+clampAttr, channelBox=True)
+                                   calibrationList.append(clampAttr)
+                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", minValue=0, maxValue=1, defaultValue=0)
                             cmds.setAttr(fCtrl+"."+attr, keyable=True)
+                            cmds.connectAttr(fCtrl+"."+attr, clp+".input.inputR", force=True)
+                            cmds.connectAttr(fCtrl+".minValue", clp+".minR", force=True)
+                            cmds.connectAttr(fCtrl+".maxValue", clp+".maxR", force=True)
                         else:
+                            if not "intensity" in cmds.listAttr(fCtrl):
+                                cmds.addAttr(fCtrl, longName="intensity", attributeType="float", defaultValue=1)
+                                cmds.setAttr(fCtrl+".intensity", keyable=True)
                             cmds.addAttr(fCtrl, longName=ctrlAttr, attributeType="float", defaultValue=0)
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
-                            clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
-                            self.toIDList.extend([calibrateMD, clp, invMD])
+                            intensityMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Intensity_MD")
+                            self.toIDList.extend([calibrateMD, invMD, intensityMD])
                             if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
@@ -1320,8 +1384,12 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             else:
                                 cmds.connectAttr(calibrateMD+".outputX", clp+".input.inputR", force=True)
                             cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)
-                            cmds.connectAttr(invMD+".outputX", fCtrl+"."+ctrlAttr, force=True)
+                            cmds.connectAttr(invMD+".outputX", intensityMD+".input1X", force=True)
+                            cmds.connectAttr(fCtrl+".intensity", intensityMD+".input2X", force=True)
+                            cmds.connectAttr(intensityMD+".outputX", fCtrl+"."+ctrlAttr, force=True)
                             cmds.setAttr(fCtrl+"."+ctrlAttr, lock=True)
+                if directConnection:
+                    self.createFaceMinMaxSN(fCtrl)
             if facialAttrList:
                 self.ctrls.setStringAttrFromList(fCtrl, facialAttrList, "facialList")
             if calibrationList:

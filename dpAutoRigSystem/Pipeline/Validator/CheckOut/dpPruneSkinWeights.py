@@ -8,8 +8,9 @@ CLASS_NAME = "PruneSkinWeights"
 TITLE = "v103_pruneSkinWeights"
 DESCRIPTION = "v104_pruneSkinWeightsDesc"
 ICON = "/Icons/dp_pruneSkinWeights.png"
+WIKI = "07-‐-Validator#-prune-skin-weights"
 
-DP_PRUNESKINWEIGHTS_VERSION = 1.1
+DP_PRUNESKINWEIGHTS_VERSION = 1.02
 
 
 class PruneSkinWeights(dpBaseAction.ActionStartClass):

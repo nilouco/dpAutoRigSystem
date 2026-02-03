@@ -8,8 +8,9 @@ CLASS_NAME = "SkinningIO"
 TITLE = "r016_skinningIO"
 DESCRIPTION = "r017_skinningIODesc"
 ICON = "/Icons/dp_skinningIO.png"
+WIKI = "10-‐-Rebuilder#-skinning"
 
-DP_SKINNINGIO_VERSION = 1.0
+DP_SKINNINGIO_VERSION = 1.01
 
 
 class SkinningIO(dpBaseAction.ActionStartClass):

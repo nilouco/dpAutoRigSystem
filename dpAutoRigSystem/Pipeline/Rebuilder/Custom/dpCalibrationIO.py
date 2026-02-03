@@ -7,8 +7,9 @@ CLASS_NAME = "CalibrationIO"
 TITLE = "r041_calibrationIO"
 DESCRIPTION = "r042_calibrationIODesc"
 ICON = "/Icons/dp_calibrationIO.png"
+WIKI = "10-‐-Rebuilder#-calibration"
 
-DP_CALIBRATIONIO_VERSION = 1.0
+DP_CALIBRATIONIO_VERSION = 1.01
 
 
 class CalibrationIO(dpBaseAction.ActionStartClass):

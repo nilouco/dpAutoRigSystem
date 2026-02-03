@@ -28,12 +28,13 @@ CLASS_NAME = "Rivet"
 TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
 ICON = "/Icons/dp_rivet.png"
+WIKI = "06-‐-Tools#-rivet"
 
 RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.8
+DP_RIVET_VERSION = 2.09
 
 
 class Rivet(object):
