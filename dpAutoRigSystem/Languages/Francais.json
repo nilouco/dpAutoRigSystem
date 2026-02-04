@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2025-12-26",
+    "_updated"       : "2026-02-04",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -789,6 +789,15 @@
     "m255_oneSkeletonDesc"       : "Cet outil créera un squelette unique de joints dans une hiérarchie.\nIl essaiera de trouver des meshes skinnés dans le Render_Grp.\nSinon, il obtiendra tous les meshes skinnés de la scène à traiter.",
     "m256_fingerHandPose"        : "Poser des Doigts de la Main",
     "m257_fingerHandPoseDesc"    : "Cet outil créera des poses des doigts pour la main du perso.",
+    "m258_createBSNode"          : "Creer BlendShape Node",
+    "m259_createBSNodeDesc"      : "Il cree et connecte un node BlendShape entre le maillage de base, le récept et les cibles.",
+    "m260_combinationTargets"    : "Ajouter des cibles combinées",
+    "m261_combinationTargetsDesc": "Il cree et relie des cibles combinées pour la bouche et les sourcils.",
+    "m262_tweakTargetOnly"       : "Cible tweak uniquement",
+    "m263_tweakTargetOnlyDesc"   : "Il cree la cible de tweak sans aucune cible faciale.",
+    "m264_rebuildTargetsText"    : "Sélectionner l'ancien mesh et le nouveau mesh pour:",
+    "m265_rebuildTargets"        : "Reconstruire les Cibles",
+    "m266_rebuildTargetsDesc"    : "D'abord sélectionnez l'ancien mesh avec le node blendShape et ensuite le nouveau.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

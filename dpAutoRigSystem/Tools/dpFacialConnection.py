@@ -37,9 +37,6 @@ class FacialConnection(object):
                             "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
                             "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
         self.combinationTargetList = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
-        self.mouthTgts = ["MouthSmile", "MouthSad", "MouthWide", "MouthNarrow"]
-        self.browTgts = ["BrowUp", "BrowDown", "BrowSad", "BrowFrown"]
-        self.combinationPossibleList = [('Smile', 'Wide'), ('Smile', 'Narrow'), ('Sad', 'Wide'), ('Sad', 'Narrow'), ('Up', 'Sad'), ('Up', 'Frown'), ('Down', 'Sad'), ('Down', 'Frown')]
         # call main function:
         if self.ui:
             self.dpFacialConnectionUI(self)
@@ -121,16 +118,19 @@ class FacialConnection(object):
         """
         # creating targetMirrorUI Window:
         self.utils.closeUI('dpFacialConnectionWindow')
-        facialCtrl_winWidth  = 220
-        facialCtrl_winHeight = 250
+        facialCtrl_winWidth  = 230
+        facialCtrl_winHeight = 330
         dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.dpUIinst.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
         cmds.separator(height=5, style="in", horizontal=True, parent=facialCtrlLayout)
-        cmds.button(label=self.dpUIinst.lang["m140_createTargets"], annotation=self.dpUIinst.lang['m141_createTargetsDesc'], width=220, command=self.dpCreateTargetsFromUI, align="center", parent=facialCtrlLayout)
-        self.createBsNodeCB = cmds.checkBox(label="Create BlendShape node", annotation=self.dpUIinst.lang['m141_createTargetsDesc'], value=1, parent=facialCtrlLayout)
-        self.combinationTgtCB = cmds.checkBox(label="Combination targets", annotation=self.dpUIinst.lang['m141_createTargetsDesc'], value=1, parent=facialCtrlLayout)
-        self.tweakTgtOnlyCB = cmds.checkBox(label="Tweak target only", annotation=self.dpUIinst.lang['m141_createTargetsDesc'], value=0, changeCommand=self.dpDisableCombination, parent=facialCtrlLayout)
+        cmds.button(label=self.dpUIinst.lang['m140_createTargets'], annotation=self.dpUIinst.lang["m141_createTargetsDesc"], width=220, command=self.dpCreateTargetsFromUI, align="center", parent=facialCtrlLayout)
+        self.createBsNodeCB = cmds.checkBox(label=self.dpUIinst.lang['m258_createBSNode'], annotation=self.dpUIinst.lang["m259_createBSNodeDesc"], value=1, parent=facialCtrlLayout)
+        self.combinationTgtCB = cmds.checkBox(label=self.dpUIinst.lang['m260_combinationTargets'], annotation=self.dpUIinst.lang["m261_combinationTargetsDesc"], value=1, parent=facialCtrlLayout)
+        self.tweakTgtOnlyCB = cmds.checkBox(label=self.dpUIinst.lang['m262_tweakTargetOnly'], annotation=self.dpUIinst.lang["m263_tweakTargetOnlyDesc"], value=0, changeCommand=self.dpDisableCombination, parent=facialCtrlLayout)
+        cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
+        cmds.text(label=self.dpUIinst.lang['m264_rebuildTargetsText'], parent=facialCtrlLayout)
+        cmds.button(label=self.dpUIinst.lang['m265_rebuildTargets'], annotation=self.dpUIinst.lang["m266_rebuildTargetsDesc"], width=220, command=self.dpRebuildTargets, parent=facialCtrlLayout)
         cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
         cmds.text(label=self.dpUIinst.lang['m142_connectFacialAttr'], parent=facialCtrlLayout)
         cmds.button(label=self.dpUIinst.lang['m170_blendShapes']+" - "+self.dpUIinst.lang['i185_animation'], annotation="Create selected facial controls.", width=220, command=self.dpConnectToBlendShape, parent=facialCtrlLayout)
@@ -140,14 +140,17 @@ class FacialConnection(object):
     
 
     def dpCreateTargetsFromUI(self, *args):
+        """ Get UI values and call the dpCreateTargets function.
+        """
         createBsNode = cmds.checkBox(self.createBsNodeCB, query=True, value=True)
         combinationTgt = cmds.checkBox(self.combinationTgtCB, query=True, value=True)
         tweakTgtOnly = cmds.checkBox(self.tweakTgtOnlyCB, query=True, value=True)
         # call run function
         self.dpCreateTargets(fromMesh=None, baseName="Head", createBsNode=createBsNode, combinationTargets=combinationTgt,  tweakTgtOnly=tweakTgtOnly)
-    
+ 
+   
     def dpDisableCombination(self, value, *args):
-        """ If the tweakTgtOnlyCB is checked, disable the combinationTgtCB.
+        """ If the tweakTgtOnlyCB is checked, turn off and disable the combinationTgtCB.
         """
         value = cmds.checkBox(self.tweakTgtOnlyCB, query=True, value=True)
         if value:
@@ -171,7 +174,6 @@ class FacialConnection(object):
         if fromMesh:
             geoList, resultList = [], []
             for geoBase in fromMeshList:
-                print("Creating targets for:", geoBase)
                 prefix = baseName
                 if self.ui:
                     btContinue = self.dpUIinst.lang['i174_continue']
@@ -185,44 +187,49 @@ class FacialConnection(object):
                             dismissString=btCancel)
                     if result == btContinue:
                         prefix = cmds.promptDialog(query=True, text=True)
-                if prefix == "":
+                if prefix == "": # if no name provided in the promptDialog, use the geoBase name
                     prefix = geoBase
                 if not prefix.endswith("_"):
                     prefix = prefix+"_"
                 prefix = prefix.capitalize()
                 suffix = "_Tgt"
-                # create target meshes
+                # get default list of targets to be created:
                 tgtList = list(self.defaultTargetList)
+                # if the tweakTgtOnly is not checked, add facial targets to the list
                 if not tweakTgtOnly:
                     tgtList.extend(self.facialTargetList)
+                    # if the combinationTargets is checked, add combination targets to the list
                     if combinationTargets:
                         tgtList.extend(self.combinationTargetList)
                 if len(tgtList)>3:
+                    # create facial target group if there's more than 3 targets to be created (Base, Recept, Tweaks)
                     facialTgtGrp = cmds.group(empty=True, name=prefix+"Facial_Tgt_Grp")
                 tgtGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
+                # turn off deformers envelope to avoid incorrect base mesh duplication
                 self.turnDeformersEnvelope(turnOn=False)
                 facialTgtList = []
                 createdTgts = []
                 for t, tgt in enumerate(tgtList):
+                    # duplicate, rename and assign initial shader to target
                     newGeo = self.dpDuplicateRenameAndInitShaderTgt(geoBase, prefix, tgt, suffix)
                     createdTgts.append(newGeo)
-                    if t == 0:
+                    if t == 0: # base target
                         cmds.setAttr(newGeo+".visibility", 0)
                         geoList.append(newGeo)
                         cmds.parent(newGeo, tgtGrp)
-                    elif t == 1:
+                    elif t == 1: # recept target
                         geoList.append(newGeo)
                         cmds.parent(newGeo, tgtGrp)
-                    elif t == 2:
+                    elif t == 2: # tweak target
                         geoList.append(newGeo)
                         cmds.parent(newGeo, tgtGrp)
-                    else:
+                    else: # facial targets
                         cmds.parent(newGeo, facialTgtGrp)
                         facialTgtList.append(newGeo)
                 if facialTgtList:
                     cmds.parent(facialTgtGrp, tgtGrp)
-
                 self.turnDeformersEnvelope(turnOn=True)
+                # if createBsNode is checked, it will create the blendShape node connecting combination if needed
                 if createBsNode:
                     if combinationTargets:
                         self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=True)
@@ -236,14 +243,11 @@ class FacialConnection(object):
     
 
     def dpDuplicateRenameAndInitShaderTgt(self, fromMesh, prefix, tgt, suffix, *args):
-        """ Duplicate the given mesh and rename it to the target name.
+        """ Duplicate the given mesh, rename and assign initial shading to the target.
         """
         dup = cmds.duplicate(fromMesh)[0]
         newTgt = cmds.rename(dup, prefix+tgt+suffix)
         self.dpUIinst.customAttr.addAttr(0, [newTgt], descendents=True) #dpID
-        cmds.addAttr(newTgt, longName="dpTarget", attributeType="bool", defaultValue=1, keyable=False)
-        cmds.addAttr(newTgt, longName="targetName", dataType="string")
-        cmds.setAttr(newTgt+".targetName", tgt, type="string")
         cmds.select(newTgt)
         cmds.hyperShade(newTgt, assign="initialShadingGroup")
         connectedPlug = cmds.listConnections(newTgt+".drawOverride", destination=False, source=True, plugs=True)
@@ -266,6 +270,8 @@ class FacialConnection(object):
     
 
     def dpGetBsNodeDic(self, bsList):
+        """ Return the blendShape nodes dic with their target.
+        """        
         bsDic = {}
         if bsList:
             for bsNode in bsList:
@@ -305,12 +311,12 @@ class FacialConnection(object):
                                     print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
                                     resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
             for bsNode in list(bsDic.keys()):
+                # check and connect combination targets if any
                 combinationsDic = self.dpFindCombinationTgtRelationship(bsNode)
-                print("combinationsDic:", combinationsDic)
-                self.connectCombinationTargets(bsNode, combinationsDic)
-                               
-                    
-                            
+                combResultList = self.connectCombinationTargets(bsNode, combinationsDic)
+                if combResultList:
+                    for result in combResultList:
+                        resultList.append(result)
         if self.ui and resultList:
             self.dpUIinst.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.utils.closeUI('dpFacialConnectionWindow')
@@ -459,23 +465,24 @@ class FacialConnection(object):
 
 
     def nodeHasEnvelope(self, node,*args):
+        """ Check if the given node has an envelope attribute. Avoid tweak nodes.
+        """
         if cmds.nodeType(node) != "tweak":
             return cmds.attributeQuery('envelope', node=node, exists=True)
 
 
     def envelopeIsValid(self, node, *args):
+        """ Check if the given node envelope attribute is not connected, nodeState is normal and not user defined.
+        """
         notConnected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
         nodeStateNormal = cmds.getAttr(node+".nodeState") == 0
         notUserDefined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
         return notConnected and nodeStateNormal and notUserDefined
 
 
-    def verifyEnvelope(node):
-        envelopeValue = cmds.getAttr(f"{node}.envelope")
-        return envelopeValue < 1
-
-
     def turnDeformersEnvelope(self, turnOn=False, *args):
+        """ Turn on/off envelope attribute in the scene, to avoind miss deformation in base mesh duplication.
+        """
         checkedObjList = []
         allNodesList = cmds.ls()
         allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
@@ -496,53 +503,56 @@ class FacialConnection(object):
         receptTgt = tgtList[1]
         tweakTarget = tgtList[2]
         tgtsForRecept = tgtList[2:]
+        # create Recept blendshape node with facial targets
         bsRecept = cmds.blendShape(tgtsForRecept, receptTgt, foc=True, name=prefix+self.bsReceptSuffix)[0]
+        # create blendShape node from recept to main mesh
         bsMain = cmds.blendShape(receptTgt, fromMesh, foc=True, name=prefix+self.bsSuffix)[0]
+        # turning on the targets to make it easier to work
         cmds.setAttr(f"{bsMain}.{receptTgt}", 1)
         cmds.setAttr(f"{bsRecept}.{tweakTarget}", 1)
         if combTgt:
+            # check and connect combination targets if any
             combinationsDic = self.dpFindCombinationTgtRelationship(bsRecept)
             self.connectCombinationTargets(bsRecept, combinationsDic)
 
 
     def dpFindCombinationTgtRelationship(self, bsNode, *args):
+        """ Find combination targets in the given blendShape node and their respective driver targets.
+        """
         combinationTargetRelationship = {}
         if bsNode:
             targetList = cmds.listAttr(bsNode+".w", multi=True) or []
         baseTargets = []
         comboTargets = []
+        # separate in lists between base or combination target to further classification
         for target in targetList:
-            if cmds.attributeQuery("targetName", node=target, exists=True):
-                name = cmds.getAttr(target+".targetName")
-            nameLower = name.lower()
-            if "comb" in nameLower:
+            targetCheck = self.decomposeTgtName(target)
+            if targetCheck[0] == True:
                 comboTargets.append(target)
             else:
                 baseTargets.append(target)
         for combName in comboTargets:
-            if cmds.attributeQuery("targetName", node=combName, exists=True):
-                combNameAttr = cmds.getAttr(combName+".targetName")
-            combLower = combNameAttr.lower()
-            prefix, combPart = combLower.split("comb_")
-            prefixParts = prefix.split("_", 1)
-            side = prefixParts[0]
-            region = prefixParts[1]
+            combTgtRaw = self.decomposeTgtName(combName)[-1]
+            combLower = combTgtRaw.lower()
+            # splitting using "comb_" to get prefix e.g: l_mouth and combination part e.g. smilewide
+            prefix, combPart = combLower.split("comb_") 
             drivers = []
-            # TODO: indentify and create relation also with right side targets
-            # Also consider to remove the addAttr with the targetName
             for baseName in baseTargets:
-                if cmds.attributeQuery("targetName", node=baseName, exists=True):
-                    baseNameAttr = cmds.getAttr(baseName+".targetName")
+                baseNameAttr = self.decomposeTgtName(baseName)[-1]
                 baseLower = baseNameAttr.lower()
+                # when the base target match the combination part prefix, it will replace same prefix for blank
+                # it will be remained only the suffix to compare e.g smile
                 baseSuffix = baseLower.replace(prefix, "")
-                if baseSuffix and baseSuffix in combPart:
+                if baseSuffix and baseSuffix in combPart: # if it finds the suffix in the combination part, it's a driver
                     drivers.append(baseName)
-                if len(drivers)>=2:
+                if len(drivers)>=2: # its necessary more than two drivers per combination target
                     combinationTargetRelationship[combName] = drivers
         return combinationTargetRelationship
     
 
     def getBlendShapeTargetIndex(self, bsNode, targetName, *args):
+        """ Get the blendShape target index from its name.
+        """         
         aliasList = cmds.aliasAttr(bsNode, q=True) or []
         for i in range(0, len(aliasList), 2):
             if aliasList[i] == targetName:
@@ -551,24 +561,106 @@ class FacialConnection(object):
     
 
     def connectCombinationTargets(self, bsNode, combinationsDic, *args):
+        """ Connect combination targets in the given blendShape node using the combinationsDic information.
+        """
+        resultList = []
         for combTgt, drivers in combinationsDic.items():
             combIndex = self.getBlendShapeTargetIndex(bsNode, combTgt)
             driverIdxList = []
-            for i, driverTgt in enumerate(drivers):
+            for driverTgt in drivers:
                 driverIndex = self.getBlendShapeTargetIndex(bsNode, driverTgt)
                 driverIdxList.append(driverIndex) 
             inputWeights = cmds.combinationShape(query=True, blendShape=bsNode, combinationTargetIndex=combIndex, exist=True)    
+            # check if combination target is already connected
             if not inputWeights:
-                cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
+                # add combination only if the target is not locked
+                if not cmds.getAttr(bsNode+"."+combTgt, lock=True):
+                    cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
+                    print(self.dpUIinst.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
+                    resultList.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
+        return resultList
 
 
     def decomposeTgtName(self, tgtName, *args):
-        """ Decomposes a target name into its side and base name.
-            e.g. L_MouthSmile -> L, MouthSmile
+        """ Decomposes a target name into its side and if it is a combination target, also [-1] will return the raw tgt name.
+            e.g. Head_L_MouthSmile -> False, L, L_MouthSmile
         """
+        comb = None
         side = None
-        baseName = tgtName
-        if tgtName[1] == "_":
-            side = tgtName[0]
-            baseName = tgtName[2:]
-        return side, baseName
+        if tgtName:
+            nameSplitted = tgtName.split("_")[1:-1]
+            if len(nameSplitted)>2: # combination target
+                side = nameSplitted[0]    
+                combRegion = nameSplitted[1]
+                tgtRaw = nameSplitted[2]
+                tgt = f"{side}_{combRegion}_{tgtRaw}"
+                comb = True   
+            elif len(nameSplitted)==1: # symetrical target
+                comb = False
+                side = False
+                tgt = nameSplitted[0]
+            elif len(nameSplitted)==2: # sided target
+                comb = False
+                side = nameSplitted[0]    
+                tgtRaw = nameSplitted[1]
+                tgt = f"{side}_{tgtRaw}"
+        return comb, side, tgt
+    
+
+    def dpRebuildTargets(self, *args):
+        """ Rebuild the blendShape targets from an old mesh to a new one.
+        """
+        selectionList = cmds.ls(selection=True, type="transform")
+        if selectionList and len(selectionList) == 2:
+            if self.utils.dpCheckGeometry(selectionList[0]) and self.utils.dpCheckGeometry(selectionList[1]):
+                oldMesh = selectionList[0]
+                newMesh = selectionList[1]
+                bsNode = cmds.ls(cmds.listHistory(oldMesh), type="blendShape")
+                if bsNode:
+                    targetList = cmds.listAttr(bsNode[0]+".w", multi=True)
+                    if targetList:
+                        # progress window
+                        progressAmount = 0
+                        cmds.progressWindow(title="Rebuilding targets", progress=progressAmount, status='Doing: 0%', isInterruptable=True)
+                        cancelled = False
+                        nbTarget = len(targetList)
+                        reconnectList = []
+                        cmds.select([newMesh, oldMesh])
+                        mel.eval("CreateWrap;")
+                        tgtGrp = cmds.group(name="New_Tgt_Grp", empty=True)
+                        # clear selection
+                        cmds.select(clear=True)
+                        for item in targetList:
+                            # update progress window
+                            progressAmount += 1
+                            # check if the dialog has been cancelled
+                            if cmds.progressWindow(query=True, isCancelled=True):
+                                cancelled = True
+                                break
+                            cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
+                            if not item == oldMesh:
+                                hasConnection = cmds.listConnections(bsNode[0]+"."+item, source=True, destination=False, plugs=True)
+                                if hasConnection:
+                                    cmds.disconnectAttr(hasConnection[0], bsNode[0]+"."+item)
+                                    reconnectList.append(hasConnection[0])
+                                else:
+                                    reconnectList.append(None)
+                                # set blendShape slider as 1
+                                cmds.setAttr(bsNode[0]+"."+item, 1)
+                                tgt = cmds.duplicate(newMesh, name=item)[0]
+                                cmds.parent(tgt, tgtGrp)
+                                # back to zero
+                                cmds.setAttr(bsNode[0]+"."+item, 0)
+                                if hasConnection:
+                                    cmds.connectAttr(hasConnection[0], bsNode[0]+"."+item)
+                                # clear undo
+                                mel.eval("flushUndo;")
+                        cmds.delete(newMesh, constructionHistory=True)
+                        cmds.blendShape(targetList, newMesh, topologyCheck=False, name=newMesh+"_BS")
+                        for p, plug in enumerate(reconnectList):
+                            if plug:
+                                cmds.connectAttr(plug, newMesh+"_BS."+targetList[p], force=True)
+                        if cmds.objExists(oldMesh+"Base"):
+                            cmds.delete(oldMesh+"Base")
+                        cmds.progressWindow(endProgress=True)
+                        cmds.select(clear=True)

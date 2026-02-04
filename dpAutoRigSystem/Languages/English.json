@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2025-12-26",
+    "_updated"       : "2026-02-04",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -789,6 +789,15 @@
     "m255_oneSkeletonDesc"       : "This tool will create a single skeleton of joints in one hierarchy.\nIt'll try to find skinned meshes in the Render_Grp.\nOtherwise, it'll get all skinned meshes in the scene to process.",
     "m256_fingerHandPose"        : "Finger Hand Pose",
     "m257_fingerHandPoseDesc"    : "This tool will create hand poses for fingers.",
+    "m258_createBSNode"          : "Create BlendShape Node",
+    "m259_createBSNodeDesc"      : "It creates and connects a blendShape node between base mesh, recept and targets",
+    "m260_combinationTargets"    : "Add combination targets",
+    "m261_combinationTargetsDesc": "It creates and connects combination targets for mouth and brow targets",
+    "m262_tweakTargetOnly"       : "Tweak target only",
+    "m263_tweakTargetOnlyDesc"   : "It creates the tweak target without any facial target",
+    "m264_rebuildTargetsText"    : "Select old mesh and new mesh to:",
+    "m265_rebuildTargets"        : "Rebuild Targets",
+    "m266_rebuildTargetsDesc"    : "First select the old mesh with the blendShape node and than the new one.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with a number, whitespace, or have special characters, sorry.",
     "p002_left"       : "L",
