@@ -621,7 +621,7 @@ class FacialConnection(object):
                     if targetList:
                         # progress window
                         progressAmount = 0
-                        cmds.progressWindow(title="Rebuilding targets", progress=progressAmount, status='Doing: 0%', isInterruptable=True)
+                        self.utils.setProgress('Rebuilding Target: '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang["m265_rebuildTargets"], len(targetList), addOne=False, addNumber=False)
                         cancelled = False
                         nbTarget = len(targetList)
                         reconnectList = []
@@ -630,6 +630,7 @@ class FacialConnection(object):
                         tgtGrp = cmds.group(name="New_Tgt_Grp", empty=True)
                         # clear selection
                         cmds.select(clear=True)
+                        newTgtList = []
                         for item in targetList:
                             # update progress window
                             progressAmount += 1
@@ -647,8 +648,11 @@ class FacialConnection(object):
                                     reconnectList.append(None)
                                 # set blendShape slider as 1
                                 cmds.setAttr(bsNode[0]+"."+item, 1)
+                                # renaming old target
+                                cmds.rename(item, item+"_Old")
                                 tgt = cmds.duplicate(newMesh, name=item)[0]
                                 cmds.parent(tgt, tgtGrp)
+                                newTgtList.append(tgt)
                                 # back to zero
                                 cmds.setAttr(bsNode[0]+"."+item, 0)
                                 if hasConnection:
@@ -656,10 +660,11 @@ class FacialConnection(object):
                                 # clear undo
                                 mel.eval("flushUndo;")
                         cmds.delete(newMesh, constructionHistory=True)
-                        cmds.blendShape(targetList, newMesh, topologyCheck=False, name=newMesh+"_BS")
+                        cmds.rename(bsNode[0], bsNode[0]+"_Old")
+                        cmds.blendShape(newTgtList, newMesh, topologyCheck=False, name=bsNode[0])
                         for p, plug in enumerate(reconnectList):
                             if plug:
-                                cmds.connectAttr(plug, newMesh+"_BS."+targetList[p], force=True)
+                                cmds.connectAttr(plug, bsNode[0]+"."+newTgtList[p], force=True)
                         if cmds.objExists(oldMesh+"Base"):
                             cmds.delete(oldMesh+"Base")
                         cmds.progressWindow(endProgress=True)
