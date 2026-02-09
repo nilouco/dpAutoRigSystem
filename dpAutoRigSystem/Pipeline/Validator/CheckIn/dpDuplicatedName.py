@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from collections import defaultdict
 from ....Modules.Base import dpBaseAction
 
 # global variables to this module:
@@ -9,7 +10,7 @@ DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 WIKI = "07-‐-Validator#-duplicated-name"
 
-DP_DUPLICATEDNAME_VERSION = 1.04
+DP_DUPLICATEDNAME_VERSION = 1.05
 
 
 class DuplicatedName(dpBaseAction.ActionStartClass):
@@ -43,60 +44,41 @@ class DuplicatedName(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = cmds.ls(selection=False, long=False)
+                toCheckList = cmds.ls(dag=True, long=True)
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                foundDuplicated = False
-                for node in toCheckList:
-                    if "|" in node:
-                        foundDuplicated = True
-                        break
-                if foundDuplicated:
-                    # analisys the elements in the allObjectList in order to put it with ordenation from children to grandfather (inverted hierarchy)
-                    sizeList = []
-                    orderedObjList = []
-                    for i, element in enumerate(toCheckList):
-                        # find the number of ocorrences of "|" in the string (element)
-                        number = element.count("|")
-                        # add to a list another list with number and element
-                        sizeList.append([number, element])
-                    # sort (put in alphabetic order to A-Z) and reverse (invert the order to Z-A)
-                    sizeList.sort()
-                    sizeList.reverse()
-                    # add the elements to the final orderedObjList
-                    for n, value in enumerate(sizeList):
-                        orderedObjList.append(sizeList[n][1])
-                    # prepare a list with nodeNames to iteration
-                    shortNameList = []
-                    for longName in orderedObjList:
-                        # verify if there are childrens in order to get the shortNames
-                        if "|" in longName:
-                            shortNameList.append(longName[longName.rfind("|")+1:])
-                        else:
-                            shortNameList.append(longName)
-                    # compare each obj in the list with the others, deleting it from the original list in order to avoid compare itself
-                    n = 0
-                    for i, obj in enumerate(shortNameList):
+                # Dictionary {shortName: [Full paths]}
+                names = defaultdict(list)
+                for obj in toCheckList:
+                    short = obj.split("|")[-1]
+                    names[short].append(obj)
+                # Filter only duplicates
+                duplicates = {k:v for k,v in names.items() if len(v) > 1}
+                if duplicates:
+                    for name, paths in duplicates.items():
                         self.utils.setProgress(self.dpUIinst.lang[self.title])
-                        # use another list without the first element to compare it the item repeats
-                        anotherList = shortNameList[i+1:]
-                        for item in anotherList:
-                            if cmds.objExists(orderedObjList[i]):
-                                if obj == item:
-                                    # found issue here
-                                    self.checkedObjList.append(orderedObjList[i])
-                                    self.foundIssueList.append(True)
-                                    if self.firstMode:
-                                        self.resultOkList.append(False)
-                                    else: #fix
-                                        try:
-                                            cmds.rename(orderedObjList[i], obj+str(n))
-                                            n += 1
-                                            self.resultOkList.append(True)
-                                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+orderedObjList[i])
-                                        except:
-                                            self.resultOkList.append(False)
-                                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+orderedObjList[i])
+                        # found issue here
+                        self.checkedObjList.append(name)
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
+                            self.resultOkList.append(False)
+                        else: #fix
+                            try:
+                                for path in paths:
+                                    if cmds.objExists(path):
+                                        renamedOkay = False
+                                        for i in range(1, len(paths)+1):
+                                            if not cmds.objExists(name+str(i)):
+                                                cmds.rename(path, name+str(i))
+                                                renamedOkay = True
+                                                break
+                                        if not renamedOkay:
+                                            raise NameError
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+name)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+name)
             else:
                 self.notFoundNodes()
         else:
