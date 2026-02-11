@@ -64,16 +64,13 @@ class DuplicatedName(dpBaseAction.ActionStartClass):
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                for path in paths:
+                                for p, path in enumerate(paths):
+                                    if p == 0:
+                                        continue
                                     if cmds.objExists(path):
-                                        renamedOkay = False
                                         for i in range(1, len(paths)+1):
-                                            if not cmds.objExists(name+str(i)):
-                                                cmds.rename(path, name+str(i))
-                                                renamedOkay = True
-                                                break
-                                        if not renamedOkay:
-                                            raise NameError
+                                            if not cmds.objExists(name+"_"+str(i)):
+                                                self.renameNodeAndChildren(path, i)
                                     self.resultOkList.append(True)
                                     self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+name)
                             except:
@@ -91,3 +88,18 @@ class DuplicatedName(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         return self.dataLogDic
+
+
+    def renameNodeAndChildren(self, item, i, *args):
+        """ Rename the given item node and it's children with the given number as suffix.
+        """
+        if cmds.objExists(item):
+            if cmds.objectType(item) == "transform":
+                childrenList = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, type="transform")
+                if childrenList:
+                    childrenList = self.reorderList(childrenList)
+                    for child in childrenList:
+                        if cmds.objExists(child):
+                            cmds.rename(child, child[child.rfind("|")+1:]+"_"+str(i))
+                cmds.rename(item, item[item.rfind("|")+1:]+"_"+str(i))
+            return True
