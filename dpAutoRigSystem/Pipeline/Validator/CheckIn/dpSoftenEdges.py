@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
-from ....Modules.Library import zeSoftHardEdges
 
 # global variables to this module:
 CLASS_NAME = "SoftenEdges"
@@ -10,7 +9,7 @@ DESCRIPTION = "v089_softenEdgesDesc"
 ICON = "/Icons/dp_softenEdges.png"
 WIKI = "07-‐-Validator#-soften-edges"
 
-DP_SOFTENEDGES_VERSION = 1.04
+DP_SOFTENEDGES_VERSION = 1.03
 
 
 class SoftenEdges(dpBaseAction.ActionStartClass):
@@ -22,7 +21,6 @@ class SoftenEdges(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_SOFTENEDGES_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        self.softHardEdges = zeSoftHardEdges.ConvertNormals(self.dpUIinst)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -51,24 +49,30 @@ class SoftenEdges(dpBaseAction.ActionStartClass):
                 for mesh in allMeshList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     if cmds.objExists(mesh):
-                        #cmds.select(mesh)
+                        cmds.select(mesh)
                         # set selection only non-smoothed edges
-                        #if cmds.polySelectConstraint(type=0x8000, mode=3, smoothness=1, query=True): #hard edges
-                        print("hardEdges = ", self.softHardEdges.getHardEdges(mesh))
-                        if self.softHardEdges.getHardEdges(mesh):
-                            self.checkedObjList.append(mesh)
-                            self.foundIssueList.append(True)
-                            if self.firstMode:
-                                self.resultOkList.append(False)
-                            else: #fix
-                                try:
-                                    cmds.polySoftEdge(mesh, angle=180, constructionHistory=False)
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
-                                except:
+                        cmds.polySelectConstraint(type=0x8000, mode=3, smoothness=1)
+                        hardenEdges = cmds.ls(selection=True)
+                        cmds.polySelectConstraint(mode=0)
+                        if hardenEdges:
+                            # converts the selected edges to faces
+                            toFace = cmds.polyListComponentConversion(hardenEdges, toFace=True, internal=True)
+                            # check if there's any non-smoothed edges
+                            if toFace:
+                                self.checkedObjList.append(mesh)
+                                self.foundIssueList.append(True)
+                                if self.firstMode:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
-                        #cmds.select(clear=True)
+                                else: #fix
+                                    try:
+                                        cmds.polySoftEdge(mesh, angle=180, constructionHistory=False)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+                        cmds.select(clear=True)
+        
             else:
                 self.notFoundNodes()
         else:
