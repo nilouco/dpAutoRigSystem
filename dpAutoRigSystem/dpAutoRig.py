@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.43"
-DPAR_UPDATELOG = "N854 - Check rigged duplicated names.\nIt makes the Duplicated Names checkin validator really faster than before!"
+DPAR_VERSION_5 = "5.01.44"
+DPAR_UPDATELOG = "N978 - Unlock normals and keep soft and hard edges state."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
@@ -2311,13 +2311,6 @@ class Start(object):
             self.ctrls.createGroundDirectionShape(self.globalCtrl, 2, 15, 1)
             self.ctrls.createGroundDirectionShape(self.masterCtrl, 1, 11, 0)
             self.ctrls.createGroundDirectionShape(self.rootCtrl, 1, 8, 0)
-            cmds.setAttr(self.masterCtrl+".directionDisplay", 1)
-            cmds.setAttr(self.rootCtrl+".directionDisplay", 1)
-            tempGroundCtrlCluster = cmds.cluster(self.globalCtrl, self.masterCtrl, self.rootCtrl)[1] #handle
-            cmds.setAttr(tempGroundCtrlCluster+".translateY", 0.1)
-            cmds.delete(self.globalCtrl, self.masterCtrl, self.rootCtrl, constructionHistory=True)
-            cmds.setAttr(self.masterCtrl+".directionDisplay", 0)
-            cmds.setAttr(self.rootCtrl+".directionDisplay", 0)
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)

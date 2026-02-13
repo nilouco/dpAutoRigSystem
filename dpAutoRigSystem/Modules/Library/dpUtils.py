@@ -17,7 +17,7 @@ import unicodedata
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.13
+DP_UTILS_VERSION = 3.14
 
 
 class Utils(object):
@@ -1581,3 +1581,13 @@ class Utils(object):
         for endName in suffixList:
             if item.replace("_Base", endName) in sourceDic.keys():
                 return item.replace("_Base", endName)
+
+
+    def getMDagPathbyName(self, item):
+        """ Returns the OpenMaya MDagPath of the given item name.
+        """
+        selectionList = OpenMaya.MSelectionList()
+        selectionList.add(item)
+        dagPath = OpenMaya.MDagPath()
+        selectionList.getDagPath(0, dagPath)
+        return dagPath
