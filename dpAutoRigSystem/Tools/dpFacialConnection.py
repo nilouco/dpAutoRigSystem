@@ -1,9 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from functools import partial
 import os
-import json
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -34,8 +32,8 @@ class FacialConnection(object):
         self.bsSuffix = "BS"
         self.defaultTargetList = ["Base", "Recept", "Tweaks",]
         self.facialTargetList = ["L_BrowUp", "L_BrowDown", "L_BrowSad", "L_BrowFrown", "L_EyelidsClose",  "L_EyelidsOpen",
-                            "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
-                            "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
+                                 "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
+                                 "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
         self.combinationTargetList = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
         # call main function:
         if self.ui:
@@ -179,16 +177,18 @@ class FacialConnection(object):
                     btContinue = self.dpUIinst.lang['i174_continue']
                     btCancel = self.dpUIinst.lang['i132_cancel']
                     result = cmds.promptDialog(
-                            title=self.dpUIinst.lang['m006_name'],
-                            message=self.dpUIinst.lang['i144_prefix']+":",
-                            button=[btContinue, btCancel],
-                            defaultButton=btContinue,
-                            cancelButton=btCancel,
-                            dismissString=btCancel)
+                                                title=self.dpUIinst.lang['m006_name'],
+                                                message=self.dpUIinst.lang['i144_prefix']+":",
+                                                button=[btContinue, btCancel],
+                                                defaultButton=btContinue,
+                                                cancelButton=btCancel,
+                                                dismissString=btCancel)
                     if result == btContinue:
                         prefix = cmds.promptDialog(query=True, text=True)
                 if prefix == "": # if no name provided in the promptDialog, use the geoBase name
                     prefix = geoBase
+                    if "|" in geoBase:
+                        prefix = geoBase[geoBase.rfind("|")+1:]
                 if not prefix.endswith("_"):
                     prefix = prefix+"_"
                 prefix = prefix.capitalize()
@@ -201,7 +201,7 @@ class FacialConnection(object):
                     # if the combinationTargets is checked, add combination targets to the list
                     if combinationTargets:
                         tgtList.extend(self.combinationTargetList)
-                if len(tgtList)>3:
+                if len(tgtList) > 3:
                     # create facial target group if there's more than 3 targets to be created (Base, Recept, Tweaks)
                     facialTgtGrp = cmds.group(empty=True, name=prefix+"Facial_Tgt_Grp")
                 tgtGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
@@ -231,10 +231,7 @@ class FacialConnection(object):
                 self.turnDeformersEnvelope(turnOn=True)
                 # if createBsNode is checked, it will create the blendShape node connecting combination if needed
                 if createBsNode:
-                    if combinationTargets:
-                        self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=True)
-                    else:
-                        self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=False)
+                    self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=combinationTargets)
             if self.ui and resultList:
                 self.dpUIinst.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
@@ -504,9 +501,14 @@ class FacialConnection(object):
         tweakTarget = tgtList[2]
         tgtsForRecept = tgtList[2:]
         # create Recept blendshape node with facial targets
-        bsRecept = cmds.blendShape(tgtsForRecept, receptTgt, foc=True, name=prefix+self.bsReceptSuffix)[0]
+        bsRecept = cmds.blendShape(tgtsForRecept, receptTgt, frontOfChain=True, name=prefix+self.bsReceptSuffix)[0]
         # create blendShape node from recept to main mesh
-        bsMain = cmds.blendShape(receptTgt, fromMesh, foc=True, name=prefix+self.bsSuffix)[0]
+        bsMain = cmds.blendShape(receptTgt, fromMesh, frontOfChain=True, name=prefix+self.bsSuffix)[0]
+        # store prefix to define names further
+        cmds.addAttr(bsRecept, longName="dpPrefix", dataType="string")
+        cmds.addAttr(bsMain, longName="dpPrefix", dataType="string")
+        cmds.setAttr(bsRecept+".dpPrefix", prefix, type="string")
+        cmds.setAttr(bsMain+".dpPrefix", prefix, type="string")
         # turning on the targets to make it easier to work
         cmds.setAttr(f"{bsMain}.{receptTgt}", 1)
         cmds.setAttr(f"{bsRecept}.{tweakTarget}", 1)
@@ -519,35 +521,39 @@ class FacialConnection(object):
     def dpFindCombinationTgtRelationship(self, bsNode, *args):
         """ Find combination targets in the given blendShape node and their respective driver targets.
         """
+        prefix = None
         combinationTargetRelationship = {}
         if bsNode:
             targetList = cmds.listAttr(bsNode+".w", multi=True) or []
-        baseTargets = []
-        comboTargets = []
-        # separate in lists between base or combination target to further classification
-        for target in targetList:
-            targetCheck = self.decomposeTgtName(target)
-            if targetCheck[0] == True:
-                comboTargets.append(target)
-            else:
-                baseTargets.append(target)
-        for combName in comboTargets:
-            combTgtRaw = self.decomposeTgtName(combName)[-1]
-            combLower = combTgtRaw.lower()
-            # splitting using "comb_" to get prefix e.g: l_mouth and combination part e.g. smilewide
-            prefix, combPart = combLower.split("comb_") 
-            drivers = []
-            for baseName in baseTargets:
-                baseNameAttr = self.decomposeTgtName(baseName)[-1]
-                baseLower = baseNameAttr.lower()
-                # when the base target match the combination part prefix, it will replace same prefix for blank
-                # it will be remained only the suffix to compare e.g smile
-                baseSuffix = baseLower.replace(prefix, "")
-                if baseSuffix and baseSuffix in combPart: # if it finds the suffix in the combination part, it's a driver
-                    drivers.append(baseName)
-                if len(drivers)>=2: # its necessary more than two drivers per combination target
-                    combinationTargetRelationship[combName] = drivers
-        return combinationTargetRelationship
+            if "dpPrefix" in cmds.listAttr(bsNode):
+                prefix = cmds.getAttr(bsNode+".dpPrefix")
+        if prefix: #only pass if the blendShape node was created by this current tool version
+            baseTargets = []
+            comboTargets = []
+            # separate in lists between base or combination target to further classification
+            for target in targetList:
+                targetCheck = self.decomposeTgtName(target, prefix)
+                if targetCheck[0] == True:
+                    comboTargets.append(target)
+                else:
+                    baseTargets.append(target)
+            for combName in comboTargets:
+                combTgtRaw = self.decomposeTgtName(combName, prefix)[-1]
+                combLower = combTgtRaw.lower()
+                # splitting using "comb_" to get beforeComb name e.g: l_mouth and combination part e.g. smilewide
+                beforeComb, combPart = combLower.split("comb_")
+                drivers = []
+                for baseName in baseTargets:
+                    baseNameAttr = self.decomposeTgtName(baseName, prefix)[-1]
+                    baseLower = baseNameAttr.lower()
+                    # when the base target match the combination part prefix, it will replace same prefix for blank
+                    # it will be remained only the suffix to compare e.g smile
+                    baseSuffix = baseLower.replace(beforeComb, "")
+                    if baseSuffix and baseSuffix in combPart: # if it finds the suffix in the combination part, it's a driver
+                        drivers.append(baseName)
+                    if len(drivers) >= 2: # its necessary more than two drivers per combination target
+                        combinationTargetRelationship[combName] = drivers
+            return combinationTargetRelationship
     
 
     def getBlendShapeTargetIndex(self, bsNode, targetName, *args):
@@ -564,42 +570,45 @@ class FacialConnection(object):
         """ Connect combination targets in the given blendShape node using the combinationsDic information.
         """
         resultList = []
-        for combTgt, drivers in combinationsDic.items():
-            combIndex = self.getBlendShapeTargetIndex(bsNode, combTgt)
-            driverIdxList = []
-            for driverTgt in drivers:
-                driverIndex = self.getBlendShapeTargetIndex(bsNode, driverTgt)
-                driverIdxList.append(driverIndex) 
-            inputWeights = cmds.combinationShape(query=True, blendShape=bsNode, combinationTargetIndex=combIndex, exist=True)    
-            # check if combination target is already connected
-            if not inputWeights:
-                # add combination only if the target is not locked
-                if not cmds.getAttr(bsNode+"."+combTgt, lock=True):
-                    cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
-                    print(self.dpUIinst.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
-                    resultList.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
+        if combinationsDic:
+            for combTgt, drivers in combinationsDic.items():
+                combIndex = self.getBlendShapeTargetIndex(bsNode, combTgt)
+                driverIdxList = []
+                for driverTgt in drivers:
+                    driverIndex = self.getBlendShapeTargetIndex(bsNode, driverTgt)
+                    driverIdxList.append(driverIndex) 
+                inputWeights = cmds.combinationShape(query=True, blendShape=bsNode, combinationTargetIndex=combIndex, exist=True)    
+                # check if combination target is already connected
+                if not inputWeights:
+                    # add combination only if the target is not locked
+                    if not cmds.getAttr(bsNode+"."+combTgt, lock=True):
+                        cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
+                        print(self.dpUIinst.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
+                        resultList.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
         return resultList
 
 
-    def decomposeTgtName(self, tgtName, *args):
+    def decomposeTgtName(self, tgtName, prefix, *args):
         """ Decomposes a target name into its side and if it is a combination target, also [-1] will return the raw tgt name.
             e.g. Head_L_MouthSmile -> False, L, L_MouthSmile
         """
         comb = None
         side = None
         if tgtName:
-            nameSplitted = tgtName.split("_")[1:-1]
-            if len(nameSplitted)>2: # combination target
+            if prefix:
+                tgtName = tgtName.replace(prefix, "")
+            nameSplitted = tgtName.split("_")[:-1]
+            if len(nameSplitted) > 2: # combination target
                 side = nameSplitted[0]    
                 combRegion = nameSplitted[1]
                 tgtRaw = nameSplitted[2]
                 tgt = f"{side}_{combRegion}_{tgtRaw}"
                 comb = True   
-            elif len(nameSplitted)==1: # symetrical target
+            elif len(nameSplitted) == 1: # symetrical target
                 comb = False
                 side = False
                 tgt = nameSplitted[0]
-            elif len(nameSplitted)==2: # sided target
+            elif len(nameSplitted) == 2: # sided target
                 comb = False
                 side = nameSplitted[0]    
                 tgtRaw = nameSplitted[1]

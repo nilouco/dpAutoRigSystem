@@ -9,7 +9,7 @@ DESCRIPTION = "r009_shaderIODesc"
 ICON = "/Icons/dp_shaderIO.png"
 WIKI = "10-‐-Rebuilder#-shader"
 
-DP_SHADERIO_VERSION = 1.03
+DP_SHADERIO_VERSION = 1.04
 
 
 class ShaderIO(dpBaseAction.ActionStartClass):
@@ -129,7 +129,11 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                     transparencyAttr = "opacity"
                     if not transparencyAttr in cmds.listAttr(shader): #support openPBRShader
                         transparencyAttr = "geometryOpacity"
-                        transparency = cmds.getAttr(shader+"."+transparencyAttr)
+                        if not transparencyAttr in cmds.listAttr(shader): #support surfaceShader
+                            transparencyAttr = "outTransparency"
+                            transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                        else:
+                            transparency = cmds.getAttr(shader+"."+transparencyAttr)
                     else:
                         transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
                 else:
