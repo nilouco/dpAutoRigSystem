@@ -28,13 +28,12 @@ CLASS_NAME = "Rivet"
 TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
 ICON = "/Icons/dp_rivet.png"
-WIKI = "06-‐-Tools#-rivet"
 
 RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.09
+DP_RIVET_VERSION = 2.8
 
 
 class Rivet(object):
@@ -371,7 +370,6 @@ class Rivet(object):
         if needToRemove:
             if len(needToRemove) > 0:
                 removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i316_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
-
                 if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
                     self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
@@ -418,7 +416,7 @@ class Rivet(object):
         else:
             selectedList = cmds.ls(selection=True)
         if selectedList:
-            if self.dpCheckGeometry(selectedList[0]):
+            if self.utils.dpCheckGeometry(selectedList[0]):
                 self.geoToAttach = selectedList[0]
                 cmds.textField(self.geoToAttachTF, edit=True, text=self.geoToAttach)
                 self.dpLoadUVSet(self.geoToAttach)
@@ -474,29 +472,7 @@ class Rivet(object):
         if selItemList:
             for item in selItemList:
                 cmds.textScrollList(self.itemScrollList, edit=True, removeItem=item)
-    
-    
-    def dpCheckGeometry(self, item, *args):
-        isGeometry = False
-        if item:
-            if cmds.objExists(item):
-                childList = cmds.listRelatives(item, children=True)
-                if childList:
-                    self.itemType = cmds.objectType(childList[0])
-                    if self.itemType == "mesh" or self.itemType == "nurbsSurface":
-                        if self.itemType == "mesh":
-                            self.meshNode = childList[0]
-                        isGeometry = True
-                    else:
-                        mel.eval("warning \""+item+" is not a geometry.\";")
-                else:
-                    mel.eval("warning \"Select the transform node instead of "+item+" shape, please.\";")
-            else:
-                mel.eval("warning \""+item+" does not exists, maybe it was deleted, sorry.\";")
-        else:
-            mel.eval("warning \"Not found "+item+"\";")
-        return isGeometry
-    
+      
     
     def dpChangeInvert(self, value, *args):
         cmds.checkBox(self.invertTCB, edit=True, enable=value)
