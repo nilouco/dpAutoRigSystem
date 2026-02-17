@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
+from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
+from ....Modules.Library import zeSoftHardEdges
 
 # global variables to this module:
 CLASS_NAME = "UnlockNormals"
@@ -9,7 +11,7 @@ DESCRIPTION = "v079_unlockNormalsDesc"
 ICON = "/Icons/dp_unlockNormals.png"
 WIKI = "07-‐-Validator#-unlock-normals"
 
-DP_UNLOCKNORMALS_VERSION = 1.03
+DP_UNLOCKNORMALS_VERSION = 2.00
 
 
 class UnlockNormals(dpBaseAction.ActionStartClass):
@@ -21,6 +23,7 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_UNLOCKNORMALS_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        self.softHardEdges = zeSoftHardEdges.ConvertNormals(self.dpUIinst)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -58,13 +61,13 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
                                 self.resultOkList.append(False)
                             else: #fix
                                 try:
-                                    cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True)
+                                    #cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True) #it doesn't keep the soft and hard edges when importing mesh
+                                    self.softHardEdges.setSoftHard(mesh)
                                     self.resultOkList.append(True)
                                     self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
                                 except:
                                     self.resultOkList.append(False)
                                     self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
-        
             else:
                 self.notFoundNodes()
         else:

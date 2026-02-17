@@ -1607,3 +1607,13 @@ class Utils(object):
         else:
             mel.eval("warning \"Not found "+item+"\";")
         return isGeometry
+      
+      
+    def getMDagPathbyName(self, item):
+        """ Returns the OpenMaya MDagPath of the given item name.
+        """
+        selectionList = OpenMaya.MSelectionList()
+        selectionList.add(item)
+        dagPath = OpenMaya.MDagPath()
+        selectionList.getDagPath(0, dagPath)
+        return dagPath

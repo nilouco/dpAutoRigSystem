@@ -2311,13 +2311,6 @@ class Start(object):
             self.ctrls.createGroundDirectionShape(self.globalCtrl, 2, 15, 1)
             self.ctrls.createGroundDirectionShape(self.masterCtrl, 1, 11, 0)
             self.ctrls.createGroundDirectionShape(self.rootCtrl, 1, 8, 0)
-            cmds.setAttr(self.masterCtrl+".directionDisplay", 1)
-            cmds.setAttr(self.rootCtrl+".directionDisplay", 1)
-            tempGroundCtrlCluster = cmds.cluster(self.globalCtrl, self.masterCtrl, self.rootCtrl)[1] #handle
-            cmds.setAttr(tempGroundCtrlCluster+".translateY", 0.1)
-            cmds.delete(self.globalCtrl, self.masterCtrl, self.rootCtrl, constructionHistory=True)
-            cmds.setAttr(self.masterCtrl+".directionDisplay", 0)
-            cmds.setAttr(self.rootCtrl+".directionDisplay", 0)
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
