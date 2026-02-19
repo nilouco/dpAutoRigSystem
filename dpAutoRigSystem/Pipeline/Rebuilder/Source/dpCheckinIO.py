@@ -8,7 +8,7 @@ DESCRIPTION = "r022_checkinIODesc"
 ICON = "/Icons/dp_checkinIO.png"
 WIKI = "10-‐-Rebuilder#-checkin"
 
-DP_CHECKINIO_VERSION = 1.01
+DP_CHECKINIO_VERSION = 1.02
 
 
 class CheckinIO(dpBaseAction.ActionStartClass):
@@ -49,7 +49,7 @@ class CheckinIO(dpBaseAction.ActionStartClass):
             else: #import
                 try:
                     # clean up geometries
-                    validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
+                    validatorToRunList = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
                     self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
                     self.wellDoneIO(", ".join(validatorToRunList))
                 except Exception as e:

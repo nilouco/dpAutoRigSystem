@@ -1581,3 +1581,38 @@ class Utils(object):
         for endName in suffixList:
             if item.replace("_Base", endName) in sourceDic.keys():
                 return item.replace("_Base", endName)
+
+
+    def dpCheckGeometry(self, item, *args):
+        """ Check if the given item is a geometry.
+            Return True if it's geometry or False if it isn't.
+        """
+        isGeometry = False
+        if item:
+            if cmds.objExists(item):
+                childList = cmds.listRelatives(item, children=True)
+                if childList:
+                    self.itemType = cmds.objectType(childList[0])
+                    if self.itemType == "mesh" or self.itemType == "nurbsSurface":
+                        if self.itemType == "mesh":
+                            self.meshNode = childList[0]
+                        isGeometry = True
+                    else:
+                        mel.eval("warning \""+item+" is not a geometry.\";")
+                else:
+                    mel.eval("warning \"Select the transform node instead of "+item+" shape, please.\";")
+            else:
+                mel.eval("warning \""+item+" does not exists, maybe it was deleted, sorry.\";")
+        else:
+            mel.eval("warning \"Not found "+item+"\";")
+        return isGeometry
+      
+      
+    def getMDagPathbyName(self, item):
+        """ Returns the OpenMaya MDagPath of the given item name.
+        """
+        selectionList = OpenMaya.MSelectionList()
+        selectionList.add(item)
+        dagPath = OpenMaya.MDagPath()
+        selectionList.getDagPath(0, dagPath)
+        return dagPath

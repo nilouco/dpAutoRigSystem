@@ -4,7 +4,7 @@ from maya import mel
 from . import dpWeights
 from importlib import reload
 
-DP_SKINNING_VERSION = 1.09
+DP_SKINNING_VERSION = 1.10
 
 
 class Skinning(dpWeights.Weights):
@@ -268,10 +268,10 @@ class Skinning(dpWeights.Weights):
         """
         needToCreateSkinCluster = True
         incomingJointList = skinWeightDic[item][skinClusterName]['skinInfList']
+        missingJntList = self.createMissingJoints(incomingJointList)
         if cmds.objExists(skinClusterName):
             if cmds.listConnections(skinClusterName+".outputGeometry", destination=True, source=False):
                 needToCreateSkinCluster = False
-                missingJntList = self.createMissingJoints(incomingJointList)
                 skinClusterInfoList = self.checkExistingDeformerNode(item)
                 if skinClusterInfoList[0]:
                     for scNode in skinClusterInfoList[2]:

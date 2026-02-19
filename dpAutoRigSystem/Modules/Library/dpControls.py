@@ -13,7 +13,7 @@ SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_CONTROLS_VERSION = 3.05
+DP_CONTROLS_VERSION = 3.07
 
 
 class ControlClass(object):
@@ -851,9 +851,13 @@ class ControlClass(object):
                         if defList:
                             self.utils.reapplyDeformers(dupSourceItem, defList)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
-                        for dupSourceShape in dupSourceShapeList:
+                        for d, dupSourceShape in enumerate(dupSourceShapeList):
                             if needKeepVis:
-                                cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
+                                if "Global" in destTransform or "Master" in destTransform or "Root" in destTransform: #directionDisplay attribute exception
+                                    if not d == 0:
+                                        cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
+                                else:
+                                    cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
                             if not force:
                                 cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
                             elif cmds.objExists(dupSourceShape):
@@ -1834,7 +1838,7 @@ class ControlClass(object):
         self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
         self.mirrorShape()
 
-
+        
     def setControllerScaleCompensate(self, value, ctrlList=None, *args):
         """ Set the controllers scaleCompensate value.
         """
@@ -1843,3 +1847,18 @@ class ControlClass(object):
         if ctrlList:
             for ctrl in ctrlList:
                 cmds.setAttr(ctrl+".scaleCompensate", value)
+                
+
+    def createGroundDirectionShape(self, ctrl, radius, translate, value, *args):
+        """ Create and add groundDirection shape control.
+        """
+        groundDirectionCtrl = self.cvControl("id_102_GroundDirection", "groundDirectionCtrl", r=self.dpCheckLinearUnit(radius), dir="+X", rot=(0, -90, 0))
+        cmds.setAttr(groundDirectionCtrl+'.tz', self.dpCheckLinearUnit(translate))
+        cmds.makeIdentity(groundDirectionCtrl, apply=True)
+        self.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=groundDirectionCtrl, destinationList=[ctrl], keepColor=True, force=False)
+        # Add ground direction visibility attribute and connect
+        cmds.addAttr(ctrl, longName="directionDisplay", attributeType="long", defaultValue=value, minValue=0, maxValue=1, keyable=False)
+        cmds.setAttr(ctrl+".directionDisplay", channelBox=True)
+        directionShapeList = cmds.listRelatives(ctrl, shapes=True)
+        cmds.connectAttr(ctrl+".directionDisplay", directionShapeList[-1]+".visibility")
+  
