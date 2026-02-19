@@ -3,6 +3,7 @@ from maya import cmds
 import json
 from ....Modules.Base import dpBaseAction
 from ....Tools import dpRivet
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "RivetIO"
@@ -23,6 +24,8 @@ class RivetIO(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_RIVETIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpRivet)
         self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_rivetIO"

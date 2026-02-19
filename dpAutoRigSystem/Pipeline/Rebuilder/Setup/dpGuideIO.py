@@ -2,6 +2,7 @@
 from maya import cmds
 from ....Modules.Base import dpBaseAction
 from ....Tools import dpHeadDeformer
+from importlib import reload
 import ast
 
 # global variables to this module:
@@ -28,6 +29,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_guideIO"
         self.startName = "dpGuide"
+        if self.dpUIinst.dev:
+            reload(dpHeadDeformer)
         self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.dpUIinst, ui=False)
     
 

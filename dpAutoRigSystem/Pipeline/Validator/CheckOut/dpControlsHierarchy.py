@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ....Modules.Base import dpBaseAction
-import json
-import os
 
 # global variables to this module:
 CLASS_NAME = "ControlsHierarchy"
@@ -11,7 +9,7 @@ DESCRIPTION = "v061_controlsHierarchyDesc"
 ICON = "/Icons/dp_controlsHierarchy.png"
 WIKI = "07-‐-Validator#-controls-hierarchy"
 
-DP_CONTROLSHIERARCHY_VERSION = 1.07
+DP_CONTROLSHIERARCHY_VERSION = 1.08
 
 
 class ControlsHierarchy(dpBaseAction.ActionStartClass):

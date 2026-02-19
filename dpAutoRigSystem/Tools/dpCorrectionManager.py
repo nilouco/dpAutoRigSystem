@@ -16,7 +16,7 @@ WIKI = "06-‐-Tools#-correction-manager"
 ANGLE = "Angle"
 DISTANCE = "Distance"
 
-DP_CORRECTIONMANAGER_VERSION = 2.13
+DP_CORRECTIONMANAGER_VERSION = 2.14
 
 
 class CorrectionManager(object):
@@ -26,6 +26,7 @@ class CorrectionManager(object):
         self.ui = ui
         self.utils = dpUIinst.utils
         if self.dpUIinst.dev:
+            reload(dpRivet)
             reload(dpControls)
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.correctionManagerName = self.dpUIinst.lang['m068_correctionManager']

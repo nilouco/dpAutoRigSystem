@@ -5,6 +5,7 @@ from maya.api import OpenMaya
 from ....Modules.Base import dpBaseAction
 from ....Tools import dpRivet
 import random
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "BrokenRivet"
@@ -25,6 +26,8 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_BROKENRIVET_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(dpRivet)
         self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
 
 

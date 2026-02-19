@@ -3,6 +3,7 @@ from maya import cmds
 from maya import OpenMaya
 from ....Modules.Base import dpBaseAction
 from ....Modules.Library import zeSoftHardEdges
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "UnlockNormals"
@@ -23,6 +24,8 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_UNLOCKNORMALS_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
+        if self.dpUIinst.dev:
+            reload(zeSoftHardEdges)
         self.softHardEdges = zeSoftHardEdges.ConvertNormals(self.dpUIinst)
     
 

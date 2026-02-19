@@ -3,6 +3,7 @@ from maya import cmds
 from maya import mel
 from ....Modules.Base import dpBaseAction
 from ....Modules.Library import dpWeights
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "DeformationIO"
@@ -26,6 +27,8 @@ class DeformationIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_deformationIO"
         self.startName = "dpDeformation"
+        if self.dpUIinst.dev:
+            reload(dpWeights)
         self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 

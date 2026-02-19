@@ -2,6 +2,7 @@
 from maya import cmds
 from ....Modules.Base import dpBaseAction
 from ....Modules.Library import dpWeights
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "ComponentTagIO"
@@ -25,6 +26,8 @@ class ComponentTagIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_componentTagIO"
         self.startName = "dpComponentTag"
+        if self.dpUIinst.dev:
+            reload(dpWeights)
         self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 
