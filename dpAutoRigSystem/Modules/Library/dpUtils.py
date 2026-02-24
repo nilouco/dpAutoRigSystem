@@ -29,7 +29,7 @@ class Utils(object):
         self.dpOrderList = "dpOrderList"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
         self.progress = False
-        self.dpID = self.dpUIinst.dpID
+        self.dpID = self.dpUIinst.data.dp_id
         self.defineDics()
 
 

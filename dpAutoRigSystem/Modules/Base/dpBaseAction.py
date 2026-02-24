@@ -46,7 +46,7 @@ class ActionStartClass(object):
         self.ioDir = None
         self.maybeDone = False
         self.infoText = self.dpUIinst.lang['i305_none']
-        self.dpID = self.dpUIinst.dpID
+        self.dpID = self.dpUIinst.data.dp_id
         self.constraintTypeList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
         # returned lists
         self.checkedObjList = []

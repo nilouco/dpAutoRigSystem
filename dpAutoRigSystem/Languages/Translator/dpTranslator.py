@@ -3,18 +3,16 @@ from maya import cmds
 import datetime
 import re
 
-DP_TRANSLATOR_VERSION = 1.06
+DP_TRANSLATOR_VERSION = 1.07
 
 
 class Translator(object):
-    def __init__(self, dpUIinst, langDic, langName, *args):
+    def __init__(self, dpUIinst):
         """ Initialize the module class defining variables to use creating languages.
         """
         # declaring variables
         self.dpUIinst = dpUIinst
-        self.languagesFolder = dpUIinst.languagesFolder
-        self.langDic = langDic
-        self.langName = langName
+        self.languagesFolder = dpUIinst.data.language_folder
         self.translatorString = "dpAutoRigSystem - "+self.dpUIinst.lang['t000_translator']
         self.sourceLangList = list(self.dpUIinst.lang)
         self.keyLen = len(self.sourceLangList) - 1
@@ -191,7 +189,7 @@ class Translator(object):
             
             # verify if we have an existing language with the same name:
             confirmSameLangName = self.dpUIinst.lang['i071_yes']
-            if self.newLangName in self.langDic:
+            if self.newLangName in self.dpUIinst.data.lang_data:
                 confirmSameLangName = cmds.confirmDialog(
                                                         title=self.dpUIinst.lang['t000_translator'],
                                                         message=self.dpUIinst.lang['i135_existingName'], 

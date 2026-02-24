@@ -36,7 +36,7 @@ class Pipeliner(object):
     def refreshAssetData(self, *args):
         """ Load the asset data from saved file in the pipeline.
         """
-        if not self.dpUIinst.rebuilding:
+        if not self.dpUIinst.data.rebuilding:
             self.pipeData = self.getPipelineData()
             self.getPipeFileName()
             self.refreshProjectUI()
@@ -179,31 +179,31 @@ class Pipeliner(object):
         "s_presets"          : "dpPresets",
         "s_addOns"           : "dpAddOns",
         "s_finishing"        : "dpFinishing",
-        "s_hist"             : self.dpUIinst.dpData+"/dpHist",
-        "s_modelIO"          : self.dpUIinst.dpData+"/dpModel",
-        "s_supportNodeIO"    : self.dpUIinst.dpData+"/dpSupportNode",
-        "s_blendShapeIO"     : self.dpUIinst.dpData+"/dpBlendShape",
-        "s_shaderIO"         : self.dpUIinst.dpData+"/dpShader",
-        "s_guideIO"          : self.dpUIinst.dpData+"/dpGuide",
-        "s_rivetIO"          : self.dpUIinst.dpData+"/dpRivet",
-        "s_parentingIO"      : self.dpUIinst.dpData+"/dpParenting",
-        "s_skinningIO"       : self.dpUIinst.dpData+"/dpSkinning",
-        "s_deformationIO"    : self.dpUIinst.dpData+"/dpDeformation",
-        "s_componentTagIO"   : self.dpUIinst.dpData+"/dpComponentTag",
-        "s_inputOrderIO"     : self.dpUIinst.dpData+"/dpInputOrder",
-        "s_renameIO"         : self.dpUIinst.dpData+"/dpRename",
-        "s_transformationIO" : self.dpUIinst.dpData+"/dpTransformation",
-        "s_controlShapeIO"   : self.dpUIinst.dpData+"/dpControlShape",
-        "s_attributeIO"      : self.dpUIinst.dpData+"/dpAttribute",
-        "s_constraintIO"     : self.dpUIinst.dpData+"/dpConstraint",
-        "s_utilityIO"        : self.dpUIinst.dpData+"/dpUtility",
-        "s_drivenKeyIO"      : self.dpUIinst.dpData+"/dpDrivenKey",
-        "s_offsetMatrixIO"   : self.dpUIinst.dpData+"/dpOffsetMatrix",
-        "s_connectionIO"     : self.dpUIinst.dpData+"/dpConnection",
-        "s_calibrationIO"    : self.dpUIinst.dpData+"/dpCalibration",
-        "s_visibilityIO"     : self.dpUIinst.dpData+"/dpVisibility",
-        "s_channelIO"        : self.dpUIinst.dpData+"/dpChannel",
-        "s_hierarchyIO"      : self.dpUIinst.dpData+"/dpHierarchy",
+        "s_hist"             : self.dpUIinst.data.dp_data+"/dpHist",
+        "s_modelIO"          : self.dpUIinst.data.dp_data+"/dpModel",
+        "s_supportNodeIO"    : self.dpUIinst.data.dp_data+"/dpSupportNode",
+        "s_blendShapeIO"     : self.dpUIinst.data.dp_data+"/dpBlendShape",
+        "s_shaderIO"         : self.dpUIinst.data.dp_data+"/dpShader",
+        "s_guideIO"          : self.dpUIinst.data.dp_data+"/dpGuide",
+        "s_rivetIO"          : self.dpUIinst.data.dp_data+"/dpRivet",
+        "s_parentingIO"      : self.dpUIinst.data.dp_data+"/dpParenting",
+        "s_skinningIO"       : self.dpUIinst.data.dp_data+"/dpSkinning",
+        "s_deformationIO"    : self.dpUIinst.data.dp_data+"/dpDeformation",
+        "s_componentTagIO"   : self.dpUIinst.data.dp_data+"/dpComponentTag",
+        "s_inputOrderIO"     : self.dpUIinst.data.dp_data+"/dpInputOrder",
+        "s_renameIO"         : self.dpUIinst.data.dp_data+"/dpRename",
+        "s_transformationIO" : self.dpUIinst.data.dp_data+"/dpTransformation",
+        "s_controlShapeIO"   : self.dpUIinst.data.dp_data+"/dpControlShape",
+        "s_attributeIO"      : self.dpUIinst.data.dp_data+"/dpAttribute",
+        "s_constraintIO"     : self.dpUIinst.data.dp_data+"/dpConstraint",
+        "s_utilityIO"        : self.dpUIinst.data.dp_data+"/dpUtility",
+        "s_drivenKeyIO"      : self.dpUIinst.data.dp_data+"/dpDrivenKey",
+        "s_offsetMatrixIO"   : self.dpUIinst.data.dp_data+"/dpOffsetMatrix",
+        "s_connectionIO"     : self.dpUIinst.data.dp_data+"/dpConnection",
+        "s_calibrationIO"    : self.dpUIinst.data.dp_data+"/dpCalibration",
+        "s_visibilityIO"     : self.dpUIinst.data.dp_data+"/dpVisibility",
+        "s_channelIO"        : self.dpUIinst.data.dp_data+"/dpChannel",
+        "s_hierarchyIO"      : self.dpUIinst.data.dp_data+"/dpHierarchy",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
         "s_webhook"          : "",
@@ -1214,7 +1214,7 @@ class Pipeliner(object):
         """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
         """
         # declaring variables:
-        self.replaceDPData_title     = 'dpAutoRig - '+self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData+" - "+self.dpUIinst.lang['i303_asset']
+        self.replaceDPData_title     = 'dpAutoRig - '+self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.data.dp_data+" - "+self.dpUIinst.lang['i303_asset']
         self.replaceDPData_winWidth  = 220
         self.replaceDPData_winHeight = 330+(len(self.existDataList)*16)
         self.replaceDPData_align     = "left"
