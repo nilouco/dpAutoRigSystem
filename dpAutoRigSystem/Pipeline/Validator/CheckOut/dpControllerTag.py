@@ -9,7 +9,7 @@ DESCRIPTION = "v074_controllerTagDesc"
 ICON = "/Icons/dp_controllerTag.png"
 WIKI = "07-‐-Validator#-controller-tag"
 
-DP_CONTROLLERTAG_VERSION = 1.03
+DP_CONTROLLERTAG_VERSION = 1.04
 
 
 class ControllerTag(dpBaseAction.ActionStartClass):
@@ -48,6 +48,8 @@ class ControllerTag(dpBaseAction.ActionStartClass):
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if not "controlID" in cmds.listAttr(item):
+                        continue
                     if not cmds.getAttr(item+".controlID") == "id_092_Correctives":
                         if self.firstMode:
                             # conditional to check here
