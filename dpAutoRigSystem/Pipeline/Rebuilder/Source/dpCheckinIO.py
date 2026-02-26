@@ -50,7 +50,7 @@ class CheckinIO(dpBaseAction.ActionStartClass):
                 try:
                     # clean up geometries
                     validatorToRunList = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
+                    self.runActionsInSilence(validatorToRunList, self.dpUIinst.data.checkin_instances, False, objList) #fix
                     self.wellDoneIO(", ".join(validatorToRunList))
                 except Exception as e:
                     self.notWorkedWellIO(str(e))

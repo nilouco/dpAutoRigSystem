@@ -792,8 +792,8 @@ class MotionCapture(object):
     def resetDefaultPose(self, *args):
         """ Back rig to default pose calling the ResetPose validator.
         """
-        if self.dpUIinst.checkOutInstanceList:
-            for checkOutInst in self.dpUIinst.checkOutInstanceList:
+        if self.dpUIinst.data.checkout_instances:
+            for checkOutInst in self.dpUIinst.data.checkout_instances:
                 if "ResetPose" in str(checkOutInst):
                     checkOutInst.verbose = False
                     checkOutInst.runAction(False) #fix

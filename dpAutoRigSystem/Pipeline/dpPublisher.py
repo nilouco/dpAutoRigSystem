@@ -113,9 +113,9 @@ class Publisher(object):
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = self.dpUIinst.checkAddOnsInstanceList.copy()
-        toCheckValidatorList.extend(self.dpUIinst.checkInInstanceList)
-        toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
+        toCheckValidatorList = self.dpUIinst.data.checkaddon_instances.copy()
+        toCheckValidatorList.extend(self.dpUIinst.data.checkin_instances)
+        toCheckValidatorList.extend(self.dpUIinst.data.checkout_instances)
         toCheckValidatorList.extend(self.dpUIinst.checkFinishingInstanceList)
         if toCheckValidatorList:
             validationResultDataList = self.dpUIinst.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)

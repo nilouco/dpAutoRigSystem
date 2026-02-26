@@ -280,7 +280,7 @@ class Utils(object):
             Set to use it if need.
         """
         # analisys to use the defaultRenderLayer:
-        useDefaultRL = cmds.checkBox('defaultRenderLayerCB', query=True, value=True)
+        useDefaultRL = cmds.checkBox('rig_default_render_layer_cb', query=True, value=True)
         if useDefaultRL:
             cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
@@ -930,7 +930,7 @@ class Utils(object):
         """ Return the All_Grp if it exists in the scene.
         """
         if not masterAttr:
-            masterAttr = self.dpUIinst.masterAttr
+            masterAttr = self.dpUIinst.data.master_attr
         allTransformList = cmds.ls(selection=False, type="transform")
         if allTransformList:
             for transform in allTransformList:
@@ -1139,7 +1139,7 @@ class Utils(object):
         """ Creates a json file as a Validator Preset and returns it.
         """
         resultString = None
-        validatorsList = self.dpUIinst.checkInInstanceList + self.dpUIinst.checkOutInstanceList + self.dpUIinst.checkAddOnsInstanceList
+        validatorsList = self.dpUIinst.data.checkin_instances + self.dpUIinst.data.checkout_instances + self.dpUIinst.data.checkaddon_instances
         if validatorsList:
             resultDialog = cmds.promptDialog(
                                                 title=self.dpUIinst.lang['i129_createPreset'],

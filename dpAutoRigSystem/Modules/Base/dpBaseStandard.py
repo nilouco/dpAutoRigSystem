@@ -70,7 +70,7 @@ class BaseStandard(object):
         if not layoutName:
             layoutName = self.userGuideName
         self.moduleLayoutName = self.dpUIinst.lang[self.title]+" - "+layoutName
-        self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="modulesLayoutA")
+        self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
         self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
         # here we have just the column layouts to be populated by modules.
     
@@ -111,7 +111,7 @@ class BaseStandard(object):
         baseIntegerAttrList = ['degree']
         for baseIntAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntAttr, attributeType='short')
-        cmds.setAttr(self.moduleGrp+".degree", self.dpUIinst.degreeOption)
+        cmds.setAttr(self.moduleGrp+".degree", self.dpUIinst.data.degree_option)
         
         baseIntegerAttrList = ['guideColorIndex']
         for baseIntegerAttr in baseIntegerAttrList:
@@ -593,9 +593,9 @@ class BaseStandard(object):
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
-        if self.dpUIinst.optionCtrl:
-            if cmds.objExists(self.dpUIinst.optionCtrl):
-                cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
+        optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+        if optionCtrl:
+            cmds.connectAttr(optionCtrl+".message", self.guideNet+".linkedNode", force=True)
         else:
             cmds.connectAttr(self.moduleGrp+".message", self.guideNet+".linkedNode", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
@@ -716,8 +716,9 @@ class BaseStandard(object):
                     self.serialized = True
         else: #update linked node to avoid cleanup this network if it's broken
             cmds.lockNode(self.guideNet, lock=False)
-            if self.dpUIinst.optionCtrl:
-                cmds.connectAttr(self.dpUIinst.optionCtrl+".message", self.guideNet+".linkedNode", force=True)
+            optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+            if optionCtrl:
+                cmds.connectAttr(optionCtrl+".message", self.guideNet+".linkedNode", force=True)
             else:
                 cmds.connectAttr(self.toStaticHookGrp+".message", self.guideNet+".linkedNode", force=True)
             cmds.lockNode(self.guideNet, lock=True)
@@ -744,7 +745,7 @@ class BaseStandard(object):
         cmds.connectAttr(self.wsRef+".worldMatrix[0]", self.moduleGrp+".offsetParentMatrix", force=True)
         cmds.setAttr(self.wsRef+".visibility", False)
         cmds.setAttr(self.wsRef+".template", 1)
-        cmds.parent(self.wsRef, self.dpUIinst.tempGrp)
+        cmds.parent(self.wsRef, self.dpUIinst.data.temp_grp)
 
 
     def getParentToTag(self, itemList, returnItem=None, *args):

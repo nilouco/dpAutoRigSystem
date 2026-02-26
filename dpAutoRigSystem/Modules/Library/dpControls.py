@@ -45,7 +45,7 @@ class ControlClass(object):
         """ Create the dpAR temp group if it doesn't exists.
         """
         if not tempGrp:
-            tempGrp = self.dpUIinst.tempGrp
+            tempGrp = self.dpUIinst.data.temp_grp
         if not cmds.objExists(tempGrp):
             cmds.group(name=tempGrp, empty=True)
             cmds.setAttr(tempGrp+".visibility", 0)
@@ -501,8 +501,9 @@ class ControlClass(object):
         """ Find the loaded control instance by name.
             Return the instance found.
         """
-        if self.dpUIinst.controlInstanceList:
-            for instance in self.dpUIinst.controlInstanceList:
+        print("instanceName =", instanceName)
+        if self.dpUIinst.data.control_instances:
+            for instance in self.dpUIinst.data.control_instances:
                 if instance.guideModuleName == instanceName:
                     return instance
 
@@ -557,6 +558,8 @@ class ControlClass(object):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.getControlInstance(cvType)
+        print("cvType =", cvType)
+        print("curveInstance =", curveInstance)
         curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
             self.addGuideAttrs(curve, color, pin)
@@ -1104,7 +1107,7 @@ class ControlClass(object):
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
         # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
-        cmds.parent(clusterHandle, self.dpUIinst.tempGrp)
+        cmds.parent(clusterHandle, self.dpUIinst.data.temp_grp)
 
 
     def addGuideAttrs(self, ctrlName, color="blue", pin=True, *args):
@@ -1168,14 +1171,14 @@ class ControlClass(object):
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
             pcName = ctrlName+"_PinGuide_PaC"
             if pinValue:
-                if cmds.objExists(self.dpUIinst.tempGrp):
+                if cmds.objExists(self.dpUIinst.data.temp_grp):
                     if not cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True):
                         self.storeLockedList(ctrlName)
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
                         for attr in self.dpUIinst.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=False)
-                        pc = cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)[0]
+                        pc = cmds.parentConstraint(self.dpUIinst.data.temp_grp, ctrlName, maintainOffset=True, name=pcName)[0]
                         cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
                         for attr in self.dpUIinst.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=True)

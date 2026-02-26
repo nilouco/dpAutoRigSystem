@@ -40,7 +40,7 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            hiddenList = [self.dpUIinst.tempGrp, self.dpUIinst.guideMirrorGrp]
+            hiddenList = [self.dpUIinst.data.temp_grp, self.dpUIinst.guideMirrorGrp]
             
             
             #TODO = get node by attribute (dpTemp)

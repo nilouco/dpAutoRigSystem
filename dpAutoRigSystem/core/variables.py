@@ -9,6 +9,7 @@ class Data:
     language_option_var: str = "dpAutoRigLastLanguage"
     controller_option_var: str = "dpAutoRigLastControllerPreset"
     validator_option_var: str = "dpAutoRigLastValidatorPreset"
+    degree_option_var: str = "dpAutoRigLastDegreeOption"
     
     base_name: str = "dpAR_"
     eye_name: str = "Eye"
@@ -66,7 +67,6 @@ class Data:
     dp_data: str = "dpData"
     dp_log: str = "dpLog"
     dp_id: str = "dpID"
-    option_ctrl: str = None
 
     loaded_path: bool = False
     loaded_standard: bool = False
@@ -76,7 +76,7 @@ class Data:
     loaded_tools: bool = False
     loaded_checkin: bool = False
     loaded_checkout: bool = False
-    loaded_addons: bool = False
+    loaded_addon: bool = False
     loaded_finishing: bool = False
     loaded_rebuilder: bool = False
     loaded_start: bool = False
@@ -94,11 +94,12 @@ class Data:
     agree_terms: int = 1
 
     transform_attrs: list = field(default_factory=lambda: ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"])
+    rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
     axis: list = field(default_factory=lambda: ["X", "Y", "Z"])
     to_ids: list = field(default_factory=list)
     control_instances: list = field(default_factory=list)
     checkin_instances: list = field(default_factory=list)
     checkout_instances: list = field(default_factory=list)
-    checkaddons_instances: list = field(default_factory=list)
+    checkaddon_instances: list = field(default_factory=list)
     checkfinishing_instances: list = field(default_factory=list)
     rebuilder_instances: list = field(default_factory=list)

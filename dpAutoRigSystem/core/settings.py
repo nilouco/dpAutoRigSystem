@@ -28,7 +28,7 @@ class Configuration(object):
         
         """ Find all json files in the given path and get contents used for each file.
             Create a dictionary with dictionaries of all file found.
-            Return a list with the name of the found files.
+            Return a list with the name of the found files and a dictionary with the content.
         """
         # declare the resulted list:
         items = []

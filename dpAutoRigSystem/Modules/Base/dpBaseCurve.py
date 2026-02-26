@@ -25,7 +25,7 @@ class BaseCurve(object):
         self.cvKnotList = None
         self.cvPeriodic = None
         self.suffix = "Ctrl"
-        self.curvesSimpleFolder = dpUIinst.curvesSimpleFolder
+        self.curvesSimpleFolder = dpUIinst.data.curves_simple_folder
         self.utils = dpUIinst.utils
         self.ctrls = dpUIinst.ctrls
     
@@ -36,21 +36,21 @@ class BaseCurve(object):
             [cvName, cvSize, cvDegree, cvDirection, cvAction]
         """
         # here we will use all info from UI elements in order to call the correct action to do:
-        customName = cmds.textFieldGrp(self.dpUIinst.allUIs["controlNameTFG"], query=True, text=True)
+        customName = cmds.textFieldGrp("ctr_name_tfg", query=True, text=True)
         self.cvName = cvName
         if customName:
             self.cvName = customName
         # action
-        self.cvAction = cmds.radioButtonGrp(self.dpUIinst.allUIs["controlActionRBG"], query=True, select=True)
+        self.cvAction = cmds.radioButtonGrp("ctr_action_rgb", query=True, select=True)
         # degree
-        degreeRBGValue = cmds.radioButtonGrp(self.dpUIinst.allUIs["degreeRBG"], query=True, select=True)
+        degreeRBGValue = cmds.radioButtonGrp("ctr_degree_rgb", query=True, select=True)
         self.cvDegree = 1 #linear
         if degreeRBGValue == 2:
             self.cvDegree = 3 #cubic
         # size
-        self.cvSize = cmds.floatSliderGrp(self.dpUIinst.allUIs["controlSizeFSG"], query=True, value=True)
+        self.cvSize = cmds.floatSliderGrp("ctr_size_fsg", query=True, value=True)
         # direction
-        self.cvDirection = cmds.optionMenuGrp(self.dpUIinst.allUIs["directionOMG"], query=True, value=True)
+        self.cvDirection = cmds.optionMenuGrp("ctr_direction_omg", query=True, value=True)
         return [self.cvName, self.cvSize, self.cvDegree, self.cvDirection, self.cvAction]
     
     

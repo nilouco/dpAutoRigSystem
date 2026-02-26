@@ -68,11 +68,18 @@ class Start(object):
         self.dpARVersion = DPAR_VERSION_5
         self.loading_window(intro)
         self.reload_modules()
+        # TODO load_system()
         self.load_variables()
         self.load_settings()
 
         self.wip()
         
+        # load system
+            # load variables
+            # load library
+            # load tools
+            # loads ...
+
         self.main_ui = main.UI(self)
 
 
@@ -180,30 +187,30 @@ class Start(object):
         # self.suspensionName = "Suspension"
         # self.noseName = "Nose"
         # self.chainName = "Chain"
-        # self.guideBaseName = "Guide_Base"
+        # self.data.guide_base_name = "Guide_Base"
         # self.plusInfoWinName = "dpPlusInfoWindow"
         # self.colorOverrideWinName = "dpColorOverrideWindow"
-        # self.toolsFolder = "Tools"
+        # self.data.tools_folder = "Tools"
         # self.languagesFolder = "Languages"
-        # self.standardFolder = "Modules/Standard"
-        # self.integratedFolder = "Modules/Integrated"
-        # self.curvesSimpleFolder = "Modules/Curves/Simple"
-        # self.curvesCombinedFolder = "Modules/Curves/Combined"
+        # self.data.standard_folder = "Modules/Standard"
+        # self.data.integrated_folder = "Modules/Integrated"
+        # self.data.curves_simple_folder = "Modules/Curves/Simple"
+        # self.data.curves_combined_folder = "Modules/Curves/Combined"
         # self.curvesPresetsFolder = "Modules/Curves/Presets"
         # self.validatorFolder = "Pipeline/Validator"
-        # self.checkInFolder = "Pipeline/Validator/CheckIn"
-        # self.checkOutFolder = "Pipeline/Validator/CheckOut"
+        # self.data.checkin_folder = "Pipeline/Validator/CheckIn"
+        # self.data.checkout_folder = "Pipeline/Validator/CheckOut"
         # self.validatorPresetsFolder = "Pipeline/Validator/Presets"
-        # self.rebuilderFolder =  "Pipeline/Rebuilder"
-        # self.startFolder =  "Pipeline/Rebuilder/Start"
-        # self.sourceFolder =  "Pipeline/Rebuilder/Source"
-        # self.setupFolder =  "Pipeline/Rebuilder/Setup"
-        # self.deformingFolder =  "Pipeline/Rebuilder/Deforming"
-        # self.customFolder =  "Pipeline/Rebuilder/Custom"
-        # self.guideBaseAttr = "guideBase"
-        # self.masterAttr = "masterGrp"
-        # self.moduleNamespaceAttr = "moduleNamespace"
-        # self.moduleInstanceInfoAttr = "moduleInstanceInfo"
+        # self.data.rebuilder_folder =  "Pipeline/Rebuilder"
+        # self.data.start_folder =  "Pipeline/Rebuilder/Start"
+        # self.data.source_folder =  "Pipeline/Rebuilder/Source"
+        # self.data.setup_folder =  "Pipeline/Rebuilder/Setup"
+        # self.data.deforming_folder =  "Pipeline/Rebuilder/Deforming"
+        # self.data.custom_folder =  "Pipeline/Rebuilder/Custom"
+        # self.data.guide_base_attr = "guideBase"
+        # self.data.master_attr = "masterGrp"
+        # self.data.module_namespace_attr = "moduleNamespace"
+        # self.data.module_instance_info_attr = "moduleInstanceInfo"
         # self.rawURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
         # self.gitHubURL = "https://github.com/nilouco/dpAutoRigSystem"
         # self.masterURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
@@ -217,33 +224,33 @@ class Start(object):
         # self.dpLog = "dpLog"
         # self.dpID = "dpID"
         # self.jointEndAttr = "JEnd"
-        # self.transformAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
+        # self.data.transform_attrs = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
         # self.axisList = ["X", "Y", "Z"]
-        # self.loadedPath = False
-        # self.loadedStandard = False
-        # self.loadedIntegrated = False
-        # self.loadedCurveShape = False
-        # self.loadedCombined = False
-        # self.loadedTools = False
-        # self.loadedCheckIn = False
-        # self.loadedCheckOut = False
-        # self.loadedAddOns = False
-        # self.loadedFinishing = False
-        # self.loadedRebuilder = False
-        # self.loadedStart = False
-        # self.loadedSource = False
-        # self.loadedSetup = False
-        # self.loadedDeforming = False
-        # self.loadedCustom = False
-        # self.rebuilding = False
+        # self.data.loaded_path = False
+        # self.data.loaded_standard = False
+        # self.data.loaded_integrated = False
+        # self.data.loaded_curve_shape = False
+        # self.data.loaded_combined = False
+        # self.data.loaded_tools = False
+        # self.data.loaded_checkin = False
+        # self.data.loaded_checkout = False
+        # self.data.loaded_addon = False
+        # self.data.loaded_finishing = False
+        # self.data.loaded_rebuilder = False
+        # self.data.loaded_start = False
+        # self.data.loaded_source = False
+        # self.data.loaded_setup = False
+        # self.data.loaded_deforming = False
+        # self.data.loaded_custom = False
+        # self.data.rebuilding = False
         # self.moduleFLCollapseStatus = False
         # self.rebuilderFLCollapseStatus = False
         # self.collapseEditSelModFL = False
         # self.toIDList = []
         # self.controlInstanceList = []
-        # self.checkInInstanceList = []
-        # self.checkOutInstanceList = []
-        # self.checkAddOnsInstanceList = []
+        # self.data.checkin_instances = []
+        # self.data.checkout_instances = []
+        # self.data.checkaddon_instances = []
         # self.checkFinishingInstanceList = []
         # self.rebuilderInstanceList = []
         # self.degreeOption = 0
@@ -308,7 +315,7 @@ class Start(object):
     #     cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
     #     cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
     #     cmds.scriptJob(event=('workspaceChanged', self.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-    #     self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+    #     self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='language_menu', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
     #     self.ctrls.startCorrectiveEditMode()
     #     self.jobSelectedGuide()
 
@@ -409,18 +416,18 @@ class Start(object):
     
     def getCurrentMenuValue(self, itemList, *args):
         for item in itemList:
-            if cmds.menuItem(item+"_MI", query=True, radioButton=True):
+            if cmds.menuItem(item+"_mi", query=True, radioButton=True):
                 return item
     
     
-    def changeOptionDegree(self, degreeOption, *args):
+    def changeOptionDegree(self, degree_value, *args):
         """ Set optionVar to choosen menu item.
         """
-        cmds.optionVar(stringValue=('dpAutoRigLastDegreeOption', degreeOption))
-        self.degreeOption = int(degreeOption[0])
+        self.opt.set_option_var('dpAutoRigLastDegreeOption', degree_value)
+        self.data.degree_option = int(degree_value[0])
         for modInst in self.moduleInstancesList:
             if "degree" in cmds.listAttr(modInst.moduleGrp):
-                cmds.setAttr(modInst.moduleGrp+".degree", self.degreeOption)
+                cmds.setAttr(modInst.moduleGrp+".degree", self.data.degree_option)
     
     
     # def mainUI(self):
@@ -549,10 +556,10 @@ class Start(object):
     #     self.allUIs["guidesLayoutA"] = cmds.columnLayout("guidesLayoutA", adjustableColumn=True, width=140, rowSpacing=3, parent=self.allUIs["colMiddleLeftA"])
     #     # here will be populated by guides of modules and scripts...
     #     self.allUIs["i030_standard"] = cmds.text(self.lang['i030_standard'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-    #     self.guideModuleList = self.startGuideModules(self.standardFolder, "start", "guidesLayoutA")
+    #     self.guideModuleList = self.startGuideModules(self.data.standard_folder, "start", "guidesLayoutA")
     #     cmds.separator(style='doubleDash', height=10, parent=self.allUIs["guidesLayoutA"])
     #     self.allUIs["i031_integrated"] = cmds.text(self.lang['i031_integrated'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-    #     self.startGuideModules(self.integratedFolder, "start", "guidesLayoutA")
+    #     self.startGuideModules(self.data.integrated_folder, "start", "guidesLayoutA")
     #     cmds.setParent(self.allUIs["riggingTabLayout"])
     #     #colMiddleRightA - scrollLayout - modulesLayout:
     #     self.allUIs["colMiddleRightA"] = cmds.scrollLayout("colMiddleRightA", width=120, parent=self.allUIs["riggingTabLayout"])
@@ -631,11 +638,11 @@ class Start(object):
     #     self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
     #     cmds.radioButton(label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms) #all geometries
     #     selGeoms = cmds.radioButton(label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms)
-    #     self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
+    #     'skin_geo_long_name_cb' = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
     #     self.allUIs["displaySkinLogWin"] = cmds.checkBox('displaySkinLogWin', label=self.lang['i286_displaySkinLog'], align='left', value=1, parent=self.allUIs["colSkinRightA"])
     #     cmds.separator(style="none", height=2, parent=self.allUIs["colSkinRightA"])
     #     self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
-    #     self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinRightA"] )
+    #    'skin_geo_text_sl' = cmds.textScrollList( 'modelsTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinRightA"] )
     #     cmds.radioCollection(self.allUIs["geomCollection"], edit=True, select=selGeoms)
     #     cmds.setParent(self.allUIs["skinCreateFL"])
     #     #footerB - columnLayout:
@@ -723,11 +730,11 @@ class Start(object):
     #     self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.lang['i100_curveShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
     #     self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
     #     # here we populate the control module layout with the items from Controllers folder:
-    #     self.startGuideModules(self.curvesSimpleFolder, "start", "controlModuleLayout")
+    #     self.startGuideModules(self.data.curves_simple_folder, "start", "controlModuleLayout")
     #     self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.lang['i118_combinedShapes'], collapsable=True, collapse=True, parent=self.allUIs["createControllerLayout"])
     #     self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
     #     # here we populate the control module layout with the items from Controllers folder:
-    #     self.startGuideModules(self.curvesCombinedFolder, "start", "combinedControlModuleLayout")
+    #     self.startGuideModules(self.data.curves_combined_folder, "start", "combinedControlModuleLayout")
     #     # editSeletedController - frameLayout:
     #     self.allUIs["editSelectedControllerFL"] = cmds.frameLayout('editSelectedControllerFL', label=self.lang['i011_editSelected']+" "+self.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent=self.allUIs["controllerLayout"])
     #     self.allUIs["editSelectedController3Layout"] = cmds.paneLayout("editSelectedController3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
@@ -780,7 +787,7 @@ class Start(object):
     #     self.allUIs["toolsTabLayout"] = cmds.formLayout('toolsTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
     #     self.allUIs["toolsMainLayout"] = cmds.scrollLayout("toolsMainLayout", parent=self.allUIs["toolsTabLayout"])
     #     self.allUIs["toolsLayout"] = cmds.columnLayout("toolsLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["toolsMainLayout"])
-    #     self.startGuideModules(self.toolsFolder, "start", "toolsLayout")
+    #     self.startGuideModules(self.data.tools_folder, "start", "toolsLayout")
     #     # edit formLayout in order to get a good scalable window:
     #     cmds.formLayout( self.allUIs["toolsTabLayout"], edit=True,
     #                     attachForm=[(self.allUIs["toolsMainLayout"], 'top', 20), (self.allUIs["toolsMainLayout"], 'left', 5), (self.allUIs["toolsMainLayout"], 'right', 5), (self.allUIs["toolsMainLayout"], 'bottom', 5)]
@@ -793,21 +800,21 @@ class Start(object):
     #     self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
     #     self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label=self.lang['i208_checkin'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
     #     # check-in
-    #     self.startGuideModules(self.checkInFolder, "start", "validatorCheckInLayout")
+    #     self.startGuideModules(self.data.checkin_folder, "start", "validatorCheckInLayout")
     #     cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
-    #     self.allUIs["selectAllCheckinCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=False, changeCommand=partial(self.changeActiveAllModules, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
+    #     self.allUIs["selectAllCheckinCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=False, changeCommand=partial(self.changeActiveAllModules, self.data.checkin_instances), parent=self.allUIs["validatorCheckInLayout"])
     #     self.allUIs["selectedCheckInPL"] = cmds.paneLayout("selectedCheckInPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
-    #     self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckInPL"])
-    #     self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckInPL"])
+    #     self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.data.checkin_instances, True, True), parent=self.allUIs["selectedCheckInPL"])
+    #     self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.data.checkin_instances, False, True), parent=self.allUIs["selectedCheckInPL"])
     #     cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
     #     # check-out
     #     self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.lang['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-    #     self.startGuideModules(self.checkOutFolder, "start", "validatorCheckOutLayout")
+    #     self.startGuideModules(self.data.checkout_folder, "start", "validatorCheckOutLayout")
     #     cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
-    #     self.allUIs["selectAllCheckoutCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
+    #     self.allUIs["selectAllCheckoutCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllModules, self.data.checkout_instances), parent=self.allUIs["validatorCheckOutLayout"])
     #     self.allUIs["selectedCheckOutPL"] = cmds.paneLayout("selectedCheckOutPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
-    #     self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOutPL"])
-    #     self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOutPL"])
+    #     self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.data.checkout_instances, True, True), parent=self.allUIs["selectedCheckOutPL"])
+    #     self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.data.checkout_instances, False, True), parent=self.allUIs["selectedCheckOutPL"])
     #     # pipeline check-addons
     #     if self.pipeliner.pipeData['addOnsPath']:
     #         if self.getValidatorsAddOns():
@@ -815,10 +822,10 @@ class Start(object):
     #             self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.lang['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
     #             self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsPath'])
     #             cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
-    #             self.allUIs["selectAllAddonCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
+    #             self.allUIs["selectAllAddonCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllModules, self.data.checkaddon_instances), parent=self.allUIs["validatorAddOnsLayout"])
     #             self.allUIs["selectedCheckAddOnsPL"] = cmds.paneLayout("selectedCheckAddOnsPL", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-    #             self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOnsPL"])
-    #             self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOnsPL"])
+    #             self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.data.checkaddon_instances, True, True), parent=self.allUIs["selectedCheckAddOnsPL"])
+    #             self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.data.checkaddon_instances, False, True), parent=self.allUIs["selectedCheckAddOnsPL"])
     #     # pipeline check-finishing
     #     if self.pipeliner.pipeData['finishingPath']:
     #         if self.getValidatorsAddOns("finishingPath"):
@@ -865,18 +872,18 @@ class Start(object):
     #     self.allUIs["triCollapseRebuilderITB"] = cmds.iconTextButton("triCollapseRebuilderITB", image=self.triDownIcon, annotation=self.lang['i348_triangleIconAnn'], command=partial(self.collapseAllFL, "triCollapseRebuilderITB", 1), width=17, height=17, style='iconOnly', align='right', parent=self.allUIs["processesLayout"])
     #     self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
     #     self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
-    #     self.startGuideModules(self.rebuilderFolder, "start", "rebuilderLayout")
+    #     self.startGuideModules(self.data.rebuilder_folder, "start", "rebuilderLayout")
     #     cmds.separator(style='none', parent=self.allUIs["rebuilderLayout"])
     #     self.allUIs["rebuilderStartLayout"] = cmds.frameLayout('rebuilderStartLayout', label=self.lang['c110_start'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
-    #     self.startGuideModules(self.startFolder, "start", "rebuilderStartLayout")
+    #     self.startGuideModules(self.data.start_folder, "start", "rebuilderStartLayout")
     #     self.allUIs["rebuilderSourceLayout"] = cmds.frameLayout('rebuilderSourceLayout', label=self.lang['i331_source'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
-    #     self.startGuideModules(self.sourceFolder, "start", "rebuilderSourceLayout")
+    #     self.startGuideModules(self.data.source_folder, "start", "rebuilderSourceLayout")
     #     self.allUIs["rebuilderSetupLayout"] = cmds.frameLayout('rebuilderSetupLayout', label=self.lang['i332_setup'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
-    #     self.startGuideModules(self.setupFolder, "start", "rebuilderSetupLayout")
+    #     self.startGuideModules(self.data.setup_folder, "start", "rebuilderSetupLayout")
     #     self.allUIs["rebuilderDeformingLayout"] = cmds.frameLayout('rebuilderDeformingLayout', label=self.lang['i333_deforming'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
-    #     self.startGuideModules(self.deformingFolder, "start", "rebuilderDeformingLayout")
+    #     self.startGuideModules(self.data.deforming_folder, "start", "rebuilderDeformingLayout")
     #     self.allUIs["rebuilderCustomLayout"] = cmds.frameLayout('rebuilderCustomLayout', label=self.lang['i334_custom'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, width=360, parent=self.allUIs["rebuilderLayout"])
-    #     self.startGuideModules(self.customFolder, "start", "rebuilderCustomLayout")
+    #     self.startGuideModules(self.data.custom_folder, "start", "rebuilderCustomLayout")
     #     cmds.separator(style='none', parent=self.allUIs["rebuilderLayout"])
     #     self.rebuilderFLList = ["rebuilderStartLayout", "rebuilderSourceLayout", "rebuilderSetupLayout", "rebuilderDeformingLayout", "rebuilderCustomLayout"]
     #     self.collapseAllFL("triCollapseRebuilderITB", 1) #close all = hack to start opened to get the right width then collapse them
@@ -929,35 +936,35 @@ class Start(object):
     #     print("Verbose =", self.verbose)
 
     
-    # def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
-    #     """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
-    #         Useful to rebuilding process when creating a new scene
-    #     """
-    #     if savedScene:
-    #         self.selList = cmds.ls(selection=True)
-    #         self.rebuilding = False
-    #     self.populateCreatedGuideModules()
-    #     self.checkImportedGuides()
-    #     self.checkGuideNets()
-    #     self.populateJoints()
-    #     self.populateGeoms()
-    #     if not self.rebuilding:
-    #         if resetButtons:
-    #             self.resetAllButtonColors()
-    #         self.pipeliner.refreshAssetData()
-    #         for rebuildInstance in self.rebuilderInstanceList:
-    #             rebuildInstance.updateActionButtons(color=False)
-    #     try:
-    #         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
-    #     except:
-    #         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
-    #     if savedScene:
-    #         cmds.select(clear=True)
-    #         if self.selList:
-    #             cmds.select(self.selList)
-    #     if clearSel:
-    #         cmds.select(clear=True)
-    #     self.rebuilding = False
+    def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
+        """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
+            Useful to rebuilding process when creating a new scene
+        """
+        if savedScene:
+            self.selList = cmds.ls(selection=True)
+            self.data.rebuilding = False
+        self.populateCreatedGuideModules()
+        self.checkImportedGuides()
+        self.checkGuideNets()
+#        self.populateJoints()
+#        self.populateGeoms()
+#        if not self.data.rebuilding:
+#            if resetButtons:
+#                self.resetAllButtonColors()
+#            self.pipeliner.refreshAssetData()
+#            for rebuildInstance in self.rebuilderInstanceList:
+#                rebuildInstance.updateActionButtons(color=False)
+#        try:
+#            self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
+#        except:
+#            self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
+#        if savedScene:
+#            cmds.select(clear=True)
+#            if self.selList:
+#                cmds.select(self.selList)
+#        if clearSel:
+#            cmds.select(clear=True)
+#        self.data.rebuilding = False
 
 
     def jobSelectedGuide(self):
@@ -973,7 +980,7 @@ class Start(object):
             updatedGuideNodeList = []
             needUpdateSelect = False
             for selectedItem in selectedList:
-                if cmds.objExists(selectedItem+"."+self.guideBaseAttr) and cmds.getAttr(selectedItem+"."+self.guideBaseAttr) == 1:
+                if cmds.objExists(selectedItem+"."+self.data.guide_base_attr) and cmds.getAttr(selectedItem+"."+self.data.guide_base_attr) == 1:
                     if not ":" in selectedItem[selectedItem.rfind("|"):]:
                         newGuide = self.setupDuplicatedGuide(selectedItem)
                         updatedGuideNodeList.append(newGuide)
@@ -992,7 +999,7 @@ class Start(object):
                         cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
                     if selectedGuideNodeList:
                         for selectedGuide in selectedGuideNodeList:
-                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.moduleInstanceInfoAttr)
+                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.data.module_instance_info_attr)
                             if selectedGuideInfo == str(moduleInstance):
                                 cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                                 self.selectedModuleInstanceList.append(moduleInstance)
@@ -1013,7 +1020,7 @@ class Start(object):
     def resetAllButtonColors(self, *args):
         """ Just reset the button colors to default for each validator or rebuilder module.
         """
-        buttonInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList + self.checkFinishingInstanceList + self.rebuilderInstanceList
+        buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
         if buttonInstanceList:
             for item in buttonInstanceList:
                 item.resetButtonColors()
@@ -1085,10 +1092,10 @@ class Start(object):
             selectedItem = selectedItem[selectedItem.rfind("|"):]
 
         # getting duplicated item values
-        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+self.moduleNamespaceAttr)
-        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+self.moduleInstanceInfoAttr)
+        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+self.data.module_namespace_attr)
+        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+self.data.module_instance_info_attr)
         # generating naming values
-        origGuideName = moduleNamespaceValue+":"+self.guideBaseName
+        origGuideName = moduleNamespaceValue+":"+self.data.guide_base_name
         thatClassName = moduleNamespaceValue.partition("__")[0]
         thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
         thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
@@ -1098,19 +1105,19 @@ class Start(object):
         # initializing a new module instance
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
-        newGuideNamespace = cmds.getAttr(newGuideName+"."+self.moduleNamespaceAttr)
+        newGuideNamespace = cmds.getAttr(newGuideName+"."+self.data.module_namespace_attr)
         
         # reset radius as original
-        origRadius = cmds.getAttr(moduleNamespaceValue+":"+self.guideBaseName+"_RadiusCtrl.translateX")
+        origRadius = cmds.getAttr(moduleNamespaceValue+":"+self.data.guide_base_name+"_RadiusCtrl.translateX")
         cmds.setAttr(newGuideName+"_RadiusCtrl.translateX", origRadius)
         
         # getting a good attribute list
         toSetAttrList = cmds.listAttr(selectedItem)
         currentAttrList = toSetAttrList.copy()
-        guideBaseAttrIdx = toSetAttrList.index(self.guideBaseAttr)
+        guideBaseAttrIdx = toSetAttrList.index(self.data.guide_base_attr)
         toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
-        toSetAttrList.remove(self.guideBaseAttr)
-        toSetAttrList.remove(self.moduleNamespaceAttr)
+        toSetAttrList.remove(self.data.guide_base_attr)
+        toSetAttrList.remove(self.data.module_namespace_attr)
         toSetAttrList.remove(customNameAttr)
         toSetAttrList.remove(mirrorAxisAttr)
         # check for special attributes
@@ -1150,7 +1157,7 @@ class Start(object):
             for child in childrenList:
                 if not "|Guide_Base|Guide_Base" in child:
                     newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
-                    for transfAttr in self.transformAttrList:
+                    for transfAttr in self.data.transform_attrs:
                         try:
                             isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
                             cmds.setAttr(newChild+"."+transfAttr, lock=False)
@@ -1161,7 +1168,7 @@ class Start(object):
                             pass
         
         # set transformation for Guide_Base
-        for transfAttr in self.transformAttrList:
+        for transfAttr in self.data.transform_attrs:
             cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
         
         # setting new guide attributes
@@ -1186,7 +1193,7 @@ class Start(object):
         """ This function is responsable to list all joints or only dpAR joints in the interface in order to use in skinning.
         """
         # get current jointType (all or just dpAutoRig joints):
-        jntSelectedRadioButton = cmds.radioCollection(self.allUIs["jntCollection"], query=True, select=True)
+        jntSelectedRadioButton = cmds.radioCollection('skin_joint_rc', query=True, select=True)
         chooseJnt = cmds.radioButton(jntSelectedRadioButton, query=True, annotation=True)
         
         # list joints to be populated:
@@ -1194,24 +1201,24 @@ class Start(object):
         allJointList = cmds.ls(selection=False, type="joint")
         if chooseJnt == "allJoints":
             jointList = allJointList
-            cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=False)
-            cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=False)
-            cmds.checkBox(self.allUIs["_JadCB"], edit=True, enable=False)
-            cmds.checkBox(self.allUIs["_JcrCB"], edit=True, enable=False)
-            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=False)
+            cmds.checkBox('skin_jnt_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jar_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jad_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jcr_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jis_cb', edit=True, enable=False)
         elif chooseJnt == "dpARJoints":
-            cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=True)
-            cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=True)
-            cmds.checkBox(self.allUIs["_JadCB"], edit=True, enable=True)
-            cmds.checkBox(self.allUIs["_JcrCB"], edit=True, enable=True)
-            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=True)
-            displayJnt = cmds.checkBox(self.allUIs["_JntCB"], query=True, value=True)
-            displayJar = cmds.checkBox(self.allUIs["_JarCB"], query=True, value=True)
-            displayJad = cmds.checkBox(self.allUIs["_JadCB"], query=True, value=True)
-            displayJcr = cmds.checkBox(self.allUIs["_JcrCB"], query=True, value=True)
-            displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
+            cmds.checkBox('skin_jnt_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jar_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jad_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jcr_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jis_cb', edit=True, enable=True)
+            displayJnt = cmds.checkBox('skin_jnt_cb', query=True, value=True)
+            displayJar = cmds.checkBox('skin_jar_cb', query=True, value=True)
+            displayJad = cmds.checkBox('skin_jad_cb', query=True, value=True)
+            displayJcr = cmds.checkBox('skin_jcr_cb', query=True, value=True)
+            displayJis = cmds.checkBox('skin_jis_cb', query=True, value=True)
             for jointNode in allJointList:
-                if cmds.objExists(jointNode+'.'+self.baseName+'joint'):
+                if cmds.objExists(jointNode+'.'+self.data.base_name+'joint'):
                     if displayJnt:
                         if jointNode.endswith("_Jnt"):
                             jointList.append(jointNode)
@@ -1229,7 +1236,7 @@ class Start(object):
                             jointList.append(jointNode)
         
         # sort joints by name filter:
-        jointName = cmds.textField(self.allUIs["jointNameTF"], query=True, text=True)
+        jointName = cmds.textField('skin_joint_name_tf', query=True, text=True)
         if jointList:
             if jointName:
                 sortedJointList = self.utils.filterName(jointName, jointList, " ")
@@ -1237,8 +1244,8 @@ class Start(object):
                 sortedJointList = jointList
         
         # populate the list:
-        cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, removeAll=True)
-        cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=sortedJointList)
+        cmds.textScrollList('skin_joint_tsl', edit=True, removeAll=True)
+        cmds.textScrollList('skin_joint_tsl', edit=True, append=sortedJointList)
         # atualize of footerB text:
         self.actualizeSkinFooter()
         
@@ -1247,11 +1254,11 @@ class Start(object):
         """ This function is responsable to list all geometries or only selected geometries in the interface in order to use in skinning.
         """
         # get current geomType (all or just selected):
-        geomSelectedRadioButton = cmds.radioCollection(self.allUIs["geomCollection"], query=True, select=True)
+        geomSelectedRadioButton = cmds.radioCollection('skin_geo_rc', query=True, select=True)
         chooseGeom = cmds.radioButton(geomSelectedRadioButton, query=True, annotation=True)
         
         # get user preference as long or short name:
-        displayGeoLongName = cmds.checkBox(self.allUIs["geoLongName"], query=True, value=True)
+        displayGeoLongName = cmds.checkBox('skin_geo_long_name_cb', query=True, value=True)
         
         # list geometries to be populated:
         geomList, shortNameList, sameNameList, sortedGeoList = [], [], [], []
@@ -1270,9 +1277,9 @@ class Start(object):
                                 if not transformNameList[0] in geomList:
                                     if chooseGeom == "allGeoms":
                                         geomList.append(transformNameList[0])
-                                        cmds.checkBox(self.allUIs["geoLongName"], edit=True, value=True, enable=False)
+                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
                                     elif chooseGeom == "selGeoms":
-                                        cmds.checkBox(self.allUIs["geoLongName"], edit=True, enable=True)
+                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
                                         if transformNameList[0] in currentSelectedList or meshName in currentSelectedList:
                                             if displayGeoLongName:
                                                 geomList.append(transformNameList[0])
@@ -1296,7 +1303,7 @@ class Start(object):
                 geomList.append(sameName)
         
         # sort geometries by name filter:
-        geoName = cmds.textField(self.allUIs["geoNameTF"], query=True, text=True)
+        geoName = cmds.textField('skin_geo_name_tf', query=True, text=True)
         if geomList:
             if geoName:
                 sortedGeoList = self.utils.filterName(geoName, geomList, " ")
@@ -1304,11 +1311,11 @@ class Start(object):
                 sortedGeoList = geomList
         
         # populate the list:
-        cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, removeAll=True)
+        cmds.textScrollList('skin_geo_text_sl', edit=True, removeAll=True)
         if sameNameList:
-            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, lineFont=[(len(sortedGeoList)-len(sameNameList)-2, 'boldLabelFont'), (len(sortedGeoList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(sortedGeoList)-len(sameNameList), 'obliqueLabelFont')], append=sortedGeoList)
+            cmds.textScrollList('skin_geo_text_sl', edit=True, lineFont=[(len(sortedGeoList)-len(sameNameList)-2, 'boldLabelFont'), (len(sortedGeoList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(sortedGeoList)-len(sameNameList), 'obliqueLabelFont')], append=sortedGeoList)
         else:
-            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=sortedGeoList)
+            cmds.textScrollList('skin_geo_text_sl', edit=True, append=sortedGeoList)
         # atualize of footerB text:
         self.actualizeSkinFooter()
     
@@ -1317,13 +1324,13 @@ class Start(object):
         """ This function reloads the list all selected geometries in the interface in order to use in skinning if necessary.
         """
         # store current selected items in the geometry list to skin:
-        geomSelectedList = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
+        geomSelectedList = cmds.textScrollList('skin_geo_text_sl', query=True, selectItem=True)
         # populate again the list of geometries:
         self.populateGeoms()
         # re-select the old selected items in the list if possible:
         if geomSelectedList:
             try:
-                cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, selectItem=geomSelectedList)
+                cmds.textScrollList('skin_geo_text_sl', edit=True, selectItem=geomSelectedList)
             except:
                 pass
     
@@ -1333,24 +1340,24 @@ class Start(object):
         """
         try:
             # get the number of selected items for each textScrollLayout:
-            nSelectedJoints = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, numberOfSelectedItems=True)
-            nSelectedGeoms  = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, numberOfSelectedItems=True)
+            nSelectedJoints = cmds.textScrollList('skin_joint_tsl', query=True, numberOfSelectedItems=True)
+            nSelectedGeoms  = cmds.textScrollList('skin_geo_text_sl', query=True, numberOfSelectedItems=True)
             
             # verify if there are not any selected items:
             if nSelectedJoints == 0:
-                nJointItems = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, numberOfItems=True)
+                nJointItems = cmds.textScrollList('skin_joint_tsl', query=True, numberOfItems=True)
                 if nJointItems != 0:
                     nSelectedJoints = nJointItems
             if nSelectedGeoms == 0:
-                nGeomItems = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, numberOfItems=True)
+                nGeomItems = cmds.textScrollList('skin_geo_text_sl', query=True, numberOfItems=True)
                 if nGeomItems != 0:
                     nSelectedGeoms = nGeomItems
             
             # edit the footerB text:
             if nSelectedJoints != 0 and nSelectedGeoms != 0:
-                cmds.text(self.allUIs["footerBText"], edit=True, label=str(nSelectedJoints)+" "+self.lang['i025_joints']+" "+str(nSelectedGeoms)+" "+self.lang['i024_geometries'])
+                cmds.text('skin_footer_txt', edit=True, label=str(nSelectedJoints)+" "+self.lang['i025_joints']+" "+str(nSelectedGeoms)+" "+self.lang['i024_geometries'])
             else:
-                cmds.text(self.allUIs["footerBText"], edit=True, label=self.lang['i029_skinNothing'])
+                cmds.text('skin_footer_txt', edit=True, label=self.lang['i029_skinNothing'])
         except:
             pass
     
@@ -1386,10 +1393,10 @@ class Start(object):
             dpAR_Temp_Grp
             dpAR_GuideMirror_Grp
         """
-        if cmds.objExists(self.tempGrp):
-            cmds.setAttr(self.tempGrp+".hiddenInOutliner", value)
-        if cmds.objExists(self.guideMirrorGrp):
-            cmds.setAttr(self.guideMirrorGrp+".hiddenInOutliner", value)
+        if cmds.objExists(self.data.temp_grp):
+            cmds.setAttr(self.data.temp_grp+".hiddenInOutliner", value)
+        if cmds.objExists(self.data.guide_mirror_grp):
+            cmds.setAttr(self.data.guide_mirror_grp+".hiddenInOutliner", value)
         mel.eval('source AEdagNodeCommon;')
         mel.eval('AEdagNodeCommonRefreshOutliners();')
     
@@ -1402,10 +1409,10 @@ class Start(object):
         if not path:
             # find path where 'dpAutoRig.py' is been executed:
             path = self.dpARpath
-        if not self.loadedPath:
+        if not self.data.loaded_path:
             if self.verbose:
                 print("dpAutoRigPath: "+path)
-            self.loadedPath = True
+            self.data.loaded_path = True
         # list all guide modules:
         guideModuleList = self.utils.findAllModules(path, guideDir)
         if guideModuleList:
@@ -1424,67 +1431,67 @@ class Start(object):
             elif action == "exists":
                 return guideModuleList
             # avoid print again the same message:
-            if guideDir == self.standardFolder and not self.loadedStandard:
+            if guideDir == self.data.standard_folder and not self.data.loaded_standard:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedStandard = True
-            if guideDir == self.integratedFolder and not self.loadedIntegrated:
+                self.data.loaded_standard = True
+            if guideDir == self.data.integrated_folder and not self.data.loaded_integrated:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedIntegrated = True
-            if guideDir == self.curvesSimpleFolder and not self.loadedCurveShape:
+                self.data.loaded_integrated = True
+            if guideDir == self.data.curves_simple_folder and not self.data.loaded_curve_shape:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedCurveShape = True
-            if guideDir == self.curvesCombinedFolder and not self.loadedCombined:
+                self.data.loaded_curve_shape = True
+            if guideDir == self.data.curves_combined_folder and not self.data.loaded_combined:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedCombined = True
-            if guideDir == self.toolsFolder and not self.loadedTools:
+                self.data.loaded_combined = True
+            if guideDir == self.data.tools_folder and not self.data.loaded_tools:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedTools = True
-            if guideDir == self.checkInFolder and not self.loadedCheckIn:
+                self.data.loaded_tools = True
+            if guideDir == self.data.checkin_folder and not self.data.loaded_checkin:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedCheckIn = True
-            if guideDir == self.checkOutFolder and not self.loadedCheckOut:
+                self.data.loaded_checkin = True
+            if guideDir == self.data.checkout_folder and not self.data.loaded_checkout:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedCheckOut = True
-            if guideDir == self.rebuilderFolder and not self.loadedRebuilder:
+                self.data.loaded_checkout = True
+            if guideDir == self.data.rebuilder_folder and not self.data.loaded_rebuilder:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedRebuilder = True
-            if guideDir == self.startFolder and not self.loadedStart:
+                self.data.loaded_rebuilder = True
+            if guideDir == self.data.start_folder and not self.data.loaded_start:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedStart = True
-            if guideDir == self.sourceFolder and not self.loadedSource:
+                self.data.loaded_start = True
+            if guideDir == self.data.source_folder and not self.data.loaded_source:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedSource = True
-            if guideDir == self.setupFolder and not self.loadedSetup:
+                self.data.loaded_source = True
+            if guideDir == self.data.setup_folder and not self.data.loaded_setup:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedSetup = True
-            if guideDir == self.deformingFolder and not self.loadedDeforming:
+                self.data.loaded_setup = True
+            if guideDir == self.data.deforming_folder and not self.data.loaded_deforming:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedDeforming = True
-            if guideDir == self.customFolder and not self.loadedCustom:
+                self.data.loaded_deforming = True
+            if guideDir == self.data.custom_folder and not self.data.loaded_custom:
                 if self.verbose:
                     print(guideDir+" : "+str(guideModuleList))
-                self.loadedCustom = True
+                self.data.loaded_custom = True
             if guideDir == "":
-                if not "Finishing" in layout and not self.loadedAddOns:
+                if not "Finishing" in layout and not self.data.loaded_addon:
                     if self.verbose:
                         print(path+" : "+str(guideModuleList))
-                    self.loadedAddOns = True
-                elif not self.loadedFinishing:
+                    self.data.loaded_addon = True
+                elif not self.data.loaded_finishing:
                     if self.verbose:
                         print(path+" : "+str(guideModuleList))
-                    self.loadedFinishing = True
+                    self.data.loaded_finishing = True
         return guideModuleList
     
     
@@ -1510,7 +1517,6 @@ class Start(object):
             errorString = self.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
             mel.eval('warning \"'+errorString+'\";')
             return
-
         # getting data from guide module:
         title = self.lang[guide.TITLE]
         description = self.lang[guide.DESCRIPTION]
@@ -1524,50 +1530,49 @@ class Start(object):
             guide.WIKI = None
         
         # creating a basic layout for guide buttons:
-        if guideDir == self.curvesSimpleFolder.replace("/", ".") or guideDir == self.curvesCombinedFolder.replace("/", "."):
+        if guideDir == self.data.curves_simple_folder.replace("/", ".") or guideDir == self.data.curves_combined_folder.replace("/", "."):
             ctrlInstance = self.initExtraModule(guideModule, guideDir)
-            cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, ctrlInstance, True), parent=self.allUIs[layout])
-            self.controlInstanceList.append(ctrlInstance)
+            cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, ctrlInstance, True), parent=layout)
+            self.data.control_instances.append(ctrlInstance)
         else:
             isRebuilder = False
-            if guideDir == self.rebuilderFolder.replace("/", ".") or guideDir == self.startFolder.replace("/", ".") or guideDir == self.sourceFolder.replace("/", ".") or guideDir == self.setupFolder.replace("/", ".") or guideDir == self.deformingFolder.replace("/", ".") or guideDir == self.customFolder.replace("/", "."):
+            if guideDir == self.data.rebuilder_folder.replace("/", ".") or guideDir == self.data.start_folder.replace("/", ".") or guideDir == self.data.source_folder.replace("/", ".") or guideDir == self.data.setup_folder.replace("/", ".") or guideDir == self.data.deforming_folder.replace("/", ".") or guideDir == self.data.custom_folder.replace("/", "."):
                 isRebuilder = True
-                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=self.allUIs[layout])
+                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=layout)
             else:
-                moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
+                moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
             cmds.image(image=iconDir, width=32, parent=moduleLayout)
-
-            if guideDir == self.standardFolder.replace("/", "."):
+            if guideDir == self.data.standard_folder.replace("/", "."):
                 '''
                 We need to passe the rigType parameters because the cmds.button command will send a False parameter that
                 will be stock in the rigType if we don't pass the parameter
                 https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
                 '''
-                cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, dpBaseStandard.RigType.biped), parent=moduleLayout)
-            elif guideDir == self.integratedFolder.replace("/", "."):
+                cmds.button(title+'_bt', label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, dpBaseStandard.RigType.biped), parent=moduleLayout)
+            elif guideDir == self.data.integrated_folder.replace("/", "."):
                 cmds.button(label=title, height=32, command=partial(self.execIntegratedGuide, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == self.toolsFolder:
+            elif guideDir == self.data.tools_folder:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == self.checkInFolder.replace("/", ".") or guideDir == self.checkOutFolder.replace("/", ".") or guideDir == "": #addOns
+            elif guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
                 validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
                 validatorInstance.firstBT = cmds.button(label=validatorInstance.firstBTLabel, width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
                 validatorInstance.secondBT = cmds.button(label=validatorInstance.secondBTLabel.capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
-                if guideDir == self.checkInFolder.replace("/", "."):
-                    self.checkInInstanceList.append(validatorInstance)
-                elif guideDir == self.checkOutFolder.replace("/", "."):
-                    self.checkOutInstanceList.append(validatorInstance)
+                if guideDir == self.data.checkin_folder.replace("/", "."):
+                    self.data.checkin_instances.append(validatorInstance)
+                elif guideDir == self.data.checkout_folder.replace("/", "."):
+                    self.data.checkout_instances.append(validatorInstance)
                 else: #addOns
                     if "Finishing" in layout: #workaround to define this module as finishing addOn to run after all.
-                        self.checkFinishingInstanceList.append(validatorInstance)
+                        self.data.checkfinishing_instances.append(validatorInstance)
                     else:
-                        self.checkAddOnsInstanceList.append(validatorInstance)
+                        self.data.checkaddon_instances.append(validatorInstance)
                     if validatorInstance.customName:
                         cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
                         #validatorInstance.title = validatorInstance.customName
             if isRebuilder:
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
-                self.rebuilderInstanceList.append(rebuilderInstance)
+                self.data.rebuilder_instances.append(rebuilderInstance)
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
@@ -1591,9 +1596,9 @@ class Start(object):
         cmds.namespace(setNamespace=":")
         # generate the current moduleName added the next new number suffix:
         if number:
-            userSpecName = self.baseName+str(number)
+            userSpecName = self.data.base_name+str(number)
         else:
-            userSpecName = self.baseName+self.utils.findLastNumber()
+            userSpecName = self.data.base_name+self.utils.findLastNumber()
         # especific import command for guides storing theses guides modules in a variable:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
@@ -1656,11 +1661,11 @@ class Start(object):
     def clearGuideLayout(self, *args):
         """ Clear current guide layout before reload modules.
         """
-        cmds.frameLayout(self.allUIs['editSelectedModuleLayoutA'], edit=True, label=self.lang['i011_editSelected'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
-        cmds.deleteUI(self.allUIs["modulesLayoutA"])
-        cmds.deleteUI(self.allUIs["selectedModuleLayout"])
-        self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
-        self.allUIs["selectedModuleLayout"] = cmds.columnLayout('selectedModuleLayout', adjustableColumn=True, parent=self.allUIs["editSelectedModuleLayoutA"])
+        cmds.frameLayout('edit_selected_module_fl', edit=True, label=self.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
+        cmds.deleteUI('rig_guides_inst_cl')
+        cmds.deleteUI('selected_module_layout')
+        cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
+        cmds.columnLayout('selected_module_layout', adjustableColumn=True, parent='edit_selected_module_fl')
 
 
     def populateCreatedGuideModules(self, *args):
@@ -1674,7 +1679,7 @@ class Start(object):
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find path where 'dpAutoRig.py' is been executed:
         path = self.dpARpath
-        guideDir = self.standardFolder
+        guideDir = self.data.standard_folder
         # find all module names:
         moduleNameInfo = self.utils.findAllModuleNames(path, guideDir)
         validModules = moduleNameInfo[0]
@@ -1689,7 +1694,7 @@ class Start(object):
                 if module in validModuleNames:
                     index = validModuleNames.index(module)
                     # check if there is this module guide base in the scene:
-                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.guideBaseName
+                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.data.guide_base_name
                     if cmds.objExists(curGuideName):
                         self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
                     else:
@@ -1701,7 +1706,7 @@ class Start(object):
         if self.allGuidesList:
             sortedAllGuidesList = sorted(self.allGuidesList, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
-            guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.standardFolder.replace("/", ".")
+            guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.data.standard_folder.replace("/", ".")
             # this list will be used to rig all modules pressing the RIG button:
             for module in sortedAllGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
@@ -1727,7 +1732,7 @@ class Start(object):
                 self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text(self.allUIs["footerRiggingText"], edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerRigging'])
+        cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerRigging'])
     
     
     def collapseAllFL(self, iconTB="triCollapseGuidesITB", layout=0, *args):
@@ -1745,18 +1750,18 @@ class Start(object):
                 imageIcon = self.triDownIcon
             self.moduleFLCollapseStatus = collapseValue
         else: #rebuilder processes
-            moduleList = self.rebuilderFLList
-            if self.rebuilderFLCollapseStatus:
+            moduleList = self.data.rebuilder_layouts
+            if self.data.rebuilders_collapse_status:
                 collapseValue = False
                 imageIcon = self.triDownIcon
-            self.rebuilderFLCollapseStatus = collapseValue
+            self.data.rebuilders_collapse_status = collapseValue
         if moduleList:
             for module in moduleList:
                 if layout == 0:
                     cmds.frameLayout(module.moduleFrameLayout, edit=True, collapse=collapseValue)
                 else:
-                    cmds.frameLayout(self.allUIs[module], edit=True, collapse=collapseValue)
-        cmds.iconTextButton(self.allUIs[iconTB], edit=True, image=imageIcon)
+                    cmds.frameLayout(module, edit=True, collapse=collapseValue)
+        cmds.iconTextButton(iconTB, edit=True, image=imageIcon)
 
 
     def checkImportedGuides(self, askUser=True, *args):
@@ -1814,7 +1819,7 @@ class Start(object):
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         for item in self.modulesToBeRiggedList:
             if not item.guideNet:
-                self.initExtraModule("dpUpdateGuides", self.toolsFolder)
+                self.initExtraModule("dpUpdateGuides", self.data.tools_folder)
                 break
 
 
@@ -1849,7 +1854,7 @@ class Start(object):
     
     def setValidatorPreset(self, *args):
         self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
-        checkInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList + self.checkFinishingInstanceList
+        checkInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances
         if checkInstanceList:
             for presetKey in self.validatorPresetDic[self.validatorPresetName]:
                 for validatorModule in checkInstanceList:
@@ -2222,7 +2227,7 @@ class Start(object):
         allTransformList = cmds.ls(selection=False, type="transform")
         #Get all the masterGrp nodes and ensure it isn't referenced
         for item in allTransformList:
-            if cmds.objExists(item+"."+self.masterAttr):
+            if cmds.objExists(item+"."+self.data.master_attr):
                 if not cmds.referenceQuery(item, isNodeReferenced=True):
                     masterGrpList.append(item)
         if masterGrpList:
@@ -2293,7 +2298,7 @@ class Start(object):
             self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
             self.customAttr.addAttr(0, [self.masterGrp]) #dpID
             # adding All_Grp attributes
-            cmds.addAttr(self.masterGrp, longName=self.masterAttr, attributeType="bool")
+            cmds.addAttr(self.masterGrp, longName=self.data.master_attr, attributeType="bool")
             cmds.addAttr(self.masterGrp, longName="dpAutoRigSystem", dataType="string")
             cmds.addAttr(self.masterGrp, longName="date", dataType="string")
             # system:
@@ -2309,7 +2314,7 @@ class Start(object):
             cmds.addAttr(self.masterGrp, longName="prefix", dataType="string")
             cmds.addAttr(self.masterGrp, longName="name", dataType="string")
             # setting All_Grp data
-            cmds.setAttr(self.masterGrp+"."+self.masterAttr, True)
+            cmds.setAttr(self.masterGrp+"."+self.data.master_attr, True)
             cmds.setAttr(self.masterGrp+".dpAutoRigSystem", self.gitHubURL, type="string")
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
@@ -2489,7 +2494,7 @@ class Start(object):
             for obj in objList:
                 # load dpReorderAttribute:
                 dpRAttr = dpReorderAttr.ReorderAttr(self, False)
-                if verbose and not self.rebuilding:
+                if verbose and not self.data.rebuilding:
                     self.utils.setProgress('Reordering: '+self.lang['c110_start'], 'Reordering Attributes', len(attrList), addOne=False, addNumber=False)
                 delta = 0
                 for i, desAttr in enumerate(attrList):
@@ -2504,7 +2509,7 @@ class Start(object):
                             dpRAttr.dpMoveAttr(1, [obj], [desAttr])
                     else:
                         delta = delta+1
-                if verbose and not self.rebuilding:
+                if verbose and not self.data.rebuilding:
                     self.utils.setProgress(endIt=True)
                 self.utils.closeUI(dpRAttr.winName)
     
@@ -2516,11 +2521,11 @@ class Start(object):
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
         # Starting progress window
         self.utils.setProgress(self.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
-        self.utils.closeUI(self.plusInfoWinName)
-        self.utils.closeUI(self.colorOverrideWinName)
+        self.utils.closeUI(self.data.plus_info_win_name)
+        self.utils.closeUI(self.data.color_override_win_name)
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
-        if self.rebuilding:
+        if self.data.rebuilding:
             self.populateCreatedGuideModules()
         else:
             self.refreshMainUI()
@@ -2547,7 +2552,7 @@ class Start(object):
                     if userChoose == btNo:
                         return
                     elif userChoose == btUpdateGuides:
-                        self.initExtraModule("dpUpdateGuides", self.toolsFolder)
+                        self.initExtraModule("dpUpdateGuides", self.data.tools_folder)
                         return
                     else:
                         break
@@ -3453,9 +3458,9 @@ class Start(object):
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
             #Try add hand follow (space switch attribute) on bipeds:
-            self.initExtraModule("dpLimbSpaceSwitch", self.toolsFolder)
+            self.initExtraModule("dpLimbSpaceSwitch", self.data.tools_folder)
             # add fingers hand pose:
-            self.initExtraModule("dpFingerHandPose", self.toolsFolder, hidden=True)
+            self.initExtraModule("dpFingerHandPose", self.data.tools_folder, hidden=True)
 
             # show dialogBox if detected a bug:
             if integrate == 1:
@@ -3470,7 +3475,7 @@ class Start(object):
         
         # reload the jointSkinList:
         self.populateJoints()
-        if not self.rebuilding:
+        if not self.data.rebuilding:
             self.refreshMainUI()
             # call log window:
             self.logger.logWin()

@@ -74,7 +74,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.cvEndJoint+".tz", 13)
         cmds.setAttr(self.cvUpLocGuide+".ty", 13)
         cmds.setAttr(self.cvUpLocGuide+".visibility", 0)
-        cmds.orientConstraint(self.dpUIinst.tempGrp, self.cvEndBackRotGrp, maintainOffset=False, name=self.cvEndBackRotGrp+"_OrC")
+        cmds.orientConstraint(self.dpUIinst.data.temp_grp, self.cvEndBackRotGrp, maintainOffset=False, name=self.cvEndBackRotGrp+"_OrC")
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
