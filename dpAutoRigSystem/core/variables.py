@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Data:
+    dp_auto_rig_filename: str = "dpAutoRig.py"
+    dp_auto_rig_path: str = ""
+
     language_default: str = "English"
     controller_default: str = "Default"
     validator_default: str = "AllCheckOuts"
@@ -30,6 +33,7 @@ class Data:
     plus_info_win_name: str = "dpPlusInfoWindow"
     color_override_win_name: str = "dpColorOverrideWindow"
     
+    icons_folder: str = "Icons"
     tools_folder: str = "Tools"
     language_folder: str = "Languages"
     standard_folder: str = "Modules/Standard"
@@ -92,11 +96,14 @@ class Data:
     degree_option: int = 0
     auto_check_update: int = 1
     agree_terms: int = 1
+    select_change_job_id: int = 0
 
     transform_attrs: list = field(default_factory=lambda: ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"])
     rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
     axis: list = field(default_factory=lambda: ["X", "Y", "Z"])
+    
     to_ids: list = field(default_factory=list)
+    
     control_instances: list = field(default_factory=list)
     checkin_instances: list = field(default_factory=list)
     checkout_instances: list = field(default_factory=list)

@@ -38,7 +38,7 @@ class BaseLayout(object):
         # create basic module UI:
         self.selectButton = cmds.button(label=" ", annotation=self.dpUIinst.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.dpUIinst.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
-        cmds.iconTextButton(image=self.dpUIinst.iconPlusInfo, height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
+        cmds.iconTextButton(image=self.dpUIinst.data.icon['plusInfo'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
         self.reCreateEditSelectedModuleLayout(self)
     
     
@@ -46,7 +46,7 @@ class BaseLayout(object):
         """ Clear the selected module layout, because the module was rigged, deleted or unselected maybe.
         """
         try:
-            cmds.deleteUI("selectedModuleColumn")
+            cmds.deleteUI("selected_module_layout")
         except:
             pass
     
@@ -107,12 +107,12 @@ class BaseLayout(object):
                 guideName = cmds.getAttr(self.moduleGrp+".customName")
                 if not guideName:
                     guideName = self.userGuideName
-                cmds.frameLayout(self.dpUIinst.allUIs['editSelectedModuleLayoutA'], edit=True, collapse=self.dpUIinst.collapseEditSelModFL, label=self.dpUIinst.lang['i011_editSelected']+" "+self.dpUIinst.lang['i143_module']+" :  "+self.dpUIinst.lang[self.title]+" - "+guideName)
+                cmds.frameLayout("edit_selected_module_fl", edit=True, collapse=self.dpUIinst.data.collapse_edit_sel_mod, label=self.dpUIinst.lang['i011_editSelected']+" "+self.dpUIinst.lang['i143_module']+" :  "+self.dpUIinst.lang[self.title]+" - "+guideName)
                 # edit button with "S" letter indicating it is selected:
                 cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
-                cmds.columnLayout("selectedModuleColumn", adjustableColumn=True, parent="selectedModuleLayout")
+                cmds.columnLayout("selected_module_layout", adjustableColumn=True, parent="edit_selected_module_fl")
                 # re-create segment layout:
-                self.segDelColumn = cmds.rowLayout('segDelColumn', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                self.segDelColumn = cmds.rowLayout('segDelColumn', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                 if self.nJointsAttrExists:
                     self.nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if self.nJointsAttr > 0:
@@ -129,7 +129,7 @@ class BaseLayout(object):
                 self.duplicateButton = cmds.button(label=self.dpUIinst.lang['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.dpUIinst.lang['i068_CtrlD'], parent=self.segDelColumn)
 
                 # reCreate mirror layout:
-                self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                 cmds.text(self.dpUIinst.lang['m010_mirror'], parent=self.doubleRigColumn)
                 self.mirrorMenu = cmds.optionMenu("mirrorMenu", label='', changeCommand=self.changeMirror, parent=self.doubleRigColumn)
                 mirrorMenuItemList = ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ']
@@ -176,7 +176,7 @@ class BaseLayout(object):
                 
                 # aim direction for eye look at:
                 if self.aimDirectionAttrExists:
-                    self.aimDirectionLayout = cmds.rowLayout('aimDirectionLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.aimDirectionLayout = cmds.rowLayout('aimDirectionLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(self.dpUIinst.lang['i082_aimDirection'], parent=self.aimDirectionLayout)
                     self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.aimDirectionLayout)
                     self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
@@ -188,7 +188,7 @@ class BaseLayout(object):
                 
                 # create a flip layout:
                 if self.flipAttrExists:
-                    self.flipLayout = cmds.rowLayout('flipLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.flipLayout = cmds.rowLayout('flipLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(" ", parent=self.flipLayout)
                     flipValue = cmds.getAttr(self.moduleGrp+".flip")
                     self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.flipLayout)
@@ -198,14 +198,14 @@ class BaseLayout(object):
                     
                 # create an indirectSkin layout:
                 if self.indirectSkinAttrExists:
-                    self.indirectSkinLayout = cmds.rowLayout('indirectSkinLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.indirectSkinLayout = cmds.rowLayout('indirectSkinLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(" ", parent=self.indirectSkinLayout)
                     indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
                     self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.indirectSkinLayout)
                     cmds.text(" ", parent=self.indirectSkinLayout)
                     holderValue = cmds.getAttr(self.moduleGrp+".holder")
                     self.holderCB = cmds.checkBox(label=self.dpUIinst.lang['c046_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
-                    self.sdkLocatorLayout = cmds.rowLayout('sdkLocatorLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.sdkLocatorLayout = cmds.rowLayout('sdkLocatorLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(" ", parent=self.sdkLocatorLayout)
                     cmds.text(" ", parent=self.sdkLocatorLayout)
                     cmds.text(" ", parent=self.sdkLocatorLayout)
@@ -215,7 +215,7 @@ class BaseLayout(object):
                     
                 # create eyelid layout:
                 if self.eyelidExists:
-                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="selectedModuleColumn")
+                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="selected_module_layout")
                     cmds.text(" ", parent=self.eyelidLayout)
                     self.eyelidCB = cmds.checkBox(label=self.dpUIinst.lang['i079_eyelid'], value=cmds.getAttr(self.moduleGrp+".eyelid"), changeCommand=self.changeEyelid, parent=self.eyelidLayout)
                     self.lidPivotCB = cmds.checkBox(label=self.dpUIinst.lang['i283_pivot'], value=cmds.getAttr(self.moduleGrp+".lidPivot"), changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
@@ -225,7 +225,7 @@ class BaseLayout(object):
                 
                 # create geometry layout:
                 if self.geoExists:
-                    self.geoColumn = cmds.rowLayout('geoColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
+                    self.geoColumn = cmds.rowLayout('geoColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selected_module_layout" )
                     cmds.button(label=self.dpUIinst.lang["m146_geo"]+" >", command=self.loadGeo, parent=self.geoColumn)
                     self.geoTF = cmds.textField('geoTF', text='', enable=True, changeCommand=self.changeGeo, parent=self.geoColumn)
                     currentGeo = cmds.getAttr(self.moduleGrp+".geo")
@@ -234,7 +234,7 @@ class BaseLayout(object):
                 
                 # create startFrame layout:
                 if self.startFrameExists:
-                    self.startFrameColumn = cmds.rowLayout('startFrameColumn', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.startFrameColumn = cmds.rowLayout('startFrameColumn', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(self.dpUIinst.lang["i169_startFrame"], parent=self.startFrameColumn)
                     self.startFrameIF = cmds.intField('startFrameIF', value=1, changeCommand=self.changeStartFrame, parent=self.startFrameColumn)
                     currentStartFrame = cmds.getAttr(self.moduleGrp+".startFrame")
@@ -246,7 +246,7 @@ class BaseLayout(object):
                     if self.startFrameExists:
                         self.wheelLayout = self.startFrameColumn
                     else:
-                        self.wheelLayout = cmds.rowLayout('wheelLayout', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                        self.wheelLayout = cmds.rowLayout('wheelLayout', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     steeringValue = cmds.getAttr(self.moduleGrp+".steering")
                     self.steeringCB = cmds.checkBox(label=self.dpUIinst.lang['m158_steering'], value=steeringValue, changeCommand=self.changeSteering, parent=self.wheelLayout)
                     showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
@@ -254,7 +254,7 @@ class BaseLayout(object):
                 
                 # create fatherB layout:
                 if self.fatherBExists:
-                    self.fatherBColumn = cmds.rowLayout('fatherBColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
+                    self.fatherBColumn = cmds.rowLayout('fatherBColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selected_module_layout" )
                     cmds.button(label=self.dpUIinst.lang["m160_fatherB"]+" >", command=self.loadFatherB, parent=self.fatherBColumn)
                     self.fatherBTF = cmds.textField('fatherBTF', text='', enable=True, changeCommand=self.changeFatherB, parent=self.fatherBColumn)
                     currentFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
@@ -263,7 +263,7 @@ class BaseLayout(object):
                 
                 # head items layout
                 if self.jawExists:
-                    self.headItemsLayout = cmds.rowLayout('headItemsLayout', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent="selectedModuleColumn")
+                    self.headItemsLayout = cmds.rowLayout('headItemsLayout', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent="selected_module_layout")
                     cmds.text(" ", parent=self.headItemsLayout)
                     self.jawCB = cmds.checkBox(label=self.dpUIinst.lang['c025_jaw'], value=cmds.getAttr(self.moduleGrp+".jaw"), changeCommand=self.changeJaw, parent=self.headItemsLayout)
                     self.chinCB = cmds.checkBox(label=self.dpUIinst.lang['c026_chin'], value=cmds.getAttr(self.moduleGrp+".chin"), changeCommand=self.changeChin, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
@@ -272,7 +272,7 @@ class BaseLayout(object):
                 
                 # create degree layout:
                 if self.degreeExists:
-                    self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
+                    self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selected_module_layout" )
                     cmds.text(self.dpUIinst.lang['i119_curveDegree'], parent=self.degreeColumn)
                     self.degreeMenu = cmds.optionMenu("degreeMenu", label='', changeCommand=self.changeDegree, parent=self.degreeColumn)
                     self.degreeMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
@@ -289,7 +289,7 @@ class BaseLayout(object):
                         
                 # create articulation joint layout:
                 if self.articulationExists:
-                    self.articLayout = cmds.rowLayout('articLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.articLayout = cmds.rowLayout('articLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(self.dpUIinst.lang['m173_articulation'], parent=self.articLayout)
                     articValue = cmds.getAttr(self.moduleGrp+".articulation")
                     self.articCB = cmds.checkBox(label="", value=articValue, changeCommand=self.changeArticulation, parent=self.articLayout)
@@ -302,7 +302,7 @@ class BaseLayout(object):
 
                 # create corrective layout:
                 if self.correctiveExists:
-                    self.correctiveLayout = cmds.rowLayout('correctiveLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.correctiveLayout = cmds.rowLayout('correctiveLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     self.correctiveTxt = cmds.text(self.dpUIinst.lang['c124_corrective'].capitalize(), parent=self.correctiveLayout)
                     correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
                     self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
@@ -313,7 +313,7 @@ class BaseLayout(object):
 
                 # create dynamic layout:
                 if self.dynamicExists:
-                    self.dynamicLayout = cmds.rowLayout('dynamicLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.dynamicLayout = cmds.rowLayout('dynamicLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     cmds.text(self.dpUIinst.lang['m097_dynamic'], parent=self.dynamicLayout)
                     dynamicValue = cmds.getAttr(self.moduleGrp+".dynamic")
                     self.dynamicCB = cmds.checkBox(label="", value=dynamicValue, changeCommand=self.changeDynamic, parent=self.dynamicLayout)
@@ -322,7 +322,7 @@ class BaseLayout(object):
                 if self.nJointsAttrExists:
                     if self.nMainCtrlAttrExists:
                         if self.nJointsAttr > 0:
-                            self.mainCtrlColumn = cmds.rowLayout('mainCtrlColumn', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="selectedModuleColumn" )
+                            self.mainCtrlColumn = cmds.rowLayout('mainCtrlColumn', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="selected_module_layout" )
                             hasMain = cmds.getAttr(self.moduleGrp+".mainControls")
                             nMainCtrlAttr = cmds.getAttr(self.moduleGrp+".nMain")
                             if self.nJointsAttr > 1:
@@ -335,7 +335,7 @@ class BaseLayout(object):
 
                 if self.deformerExists:
                     deformerEnableValue = cmds.getAttr(self.moduleGrp+".upperHead")
-                    self.deformerLayout = cmds.rowLayout('deformerLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.deformerLayout = cmds.rowLayout('deformerLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     self.deformerTxt = cmds.text(self.dpUIinst.lang['c097_deformer'].capitalize(), enable=deformerEnableValue, parent=self.deformerLayout)
                     self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.moduleGrp+".deformer"), changeCommand=self.changeDeformer, enable=deformerEnableValue, parent=self.deformerLayout)
                 
@@ -344,7 +344,7 @@ class BaseLayout(object):
                     facialEnableValue = True
                     if not cmds.getAttr(self.moduleGrp+".jaw") or not cmds.getAttr(self.moduleGrp+".chin") or not cmds.getAttr(self.moduleGrp+".lips") or not cmds.getAttr(self.moduleGrp+".upperHead"):
                         facialEnableValue=False
-                    self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selected_module_layout" )
                     self.facialTxt = cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), enable=facialEnableValue, parent=self.facialLayout)
                     facialValue = cmds.getAttr(self.moduleGrp+".facial")
                     self.facialCB = cmds.checkBox('facialCB', label="", value=facialValue, changeCommand=self.changeFacial, enable=facialEnableValue, parent=self.facialLayout)
@@ -352,7 +352,7 @@ class BaseLayout(object):
                     if not facialValue:
                         collapsed = True
                     # facial frame layout
-                    self.facialCtrlFrameLayout = cmds.frameLayout('facialCtrlFrameLayout', label=self.dpUIinst.lang['m139_facialCtrlsAttr'], collapsable=True, collapse=collapsed, enable=facialValue, parent="selectedModuleColumn")
+                    self.facialCtrlFrameLayout = cmds.frameLayout('facialCtrlFrameLayout', label=self.dpUIinst.lang['m139_facialCtrlsAttr'], collapsable=True, collapse=collapsed, enable=facialValue, parent="selected_module_layout")
                     facialCBLayout = cmds.rowColumnLayout('facialCBLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.facialCtrlFrameLayout)
                     # facial element checkboxes
                     self.facialBrowCB = cmds.checkBox('facialBrowCB', label=self.dpUIinst.lang["c060_brow"], value=cmds.getAttr(self.moduleGrp+".facialBrow"), changeCommand=partial(self.changeFacialElement, "facialBrowCB", "facialBrow"), parent=facialCBLayout)
@@ -381,7 +381,7 @@ class BaseLayout(object):
                     
                     
                 if self.deformedByExists:
-                    self.deformedByLayout = cmds.rowLayout('deformedByLayout', numberOfColumns=3, columnWidth3=(100, 170, 30), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
+                    self.deformedByLayout = cmds.rowLayout('deformedByLayout', numberOfColumns=3, columnWidth3=(100, 170, 30), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selected_module_layout" )
                     cmds.text(self.dpUIinst.lang['i313_deformedBy'], parent=self.deformedByLayout)
                     self.deformedByMenu = cmds.optionMenu("deformedByMenu", label='', changeCommand=self.changeDeformedBy, parent=self.deformedByLayout)
                     self.deformedByMenuItemList = ['0 - None', '1 - Head Deformer', '2 - Jaw Deformer', '3 - Head and Jaw Deformers']
@@ -541,20 +541,20 @@ class BaseLayout(object):
             cmds.delete(self.previewMirrorGrpName)
         
         # verify if there is not any guide module in the dpUIinst.guideMirrorGrp and then delete it:
-        self.utils.clearNodeGrp(self.dpUIinst.guideMirrorGrp, 'guideBaseMirror', unparent=False)
+        self.utils.clearNodeGrp(self.dpUIinst.data.guide_mirror_grp, 'guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
         guideChildrenList = self.utils.getGuideChildrenList(self.moduleGrp)
         
         self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
         if self.mirrorAxis != 'off':
-            if not cmds.objExists(self.dpUIinst.guideMirrorGrp):
-                self.dpUIinst.guideMirrorGrp = cmds.group(name=self.dpUIinst.guideMirrorGrp, empty=True)
-                cmds.addAttr(self.dpUIinst.guideMirrorGrp, longName="selectionChanges", defaultValue=0, attributeType="byte")
-                cmds.setAttr(self.dpUIinst.guideMirrorGrp+".template", 1)
-                cmds.setAttr(self.dpUIinst.guideMirrorGrp+".hiddenInOutliner", 1)
+            if not cmds.objExists(self.dpUIinst.data.guide_mirror_grp):
+                self.dpUIinst.data.guide_mirror_grp = cmds.group(name=self.dpUIinst.data.guide_mirror_grp, empty=True)
+                cmds.addAttr(self.dpUIinst.data.guide_mirror_grp, longName="selectionChanges", defaultValue=0, attributeType="byte")
+                cmds.setAttr(self.dpUIinst.data.guide_mirror_grp+".template", 1)
+                cmds.setAttr(self.dpUIinst.data.guide_mirror_grp+".hiddenInOutliner", 1)
                 for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v']:
-                    cmds.setAttr(self.dpUIinst.guideMirrorGrp+"."+attr, lock=True, keyable=False)
+                    cmds.setAttr(self.dpUIinst.data.guide_mirror_grp+"."+attr, lock=True, keyable=False)
                         
             if not cmds.objExists(self.previewMirrorGrpName):
                 if guideChildrenList:
@@ -654,7 +654,7 @@ class BaseLayout(object):
                 self.previewMirrorGrp = cmds.group(name=self.previewMirrorGrpName, empty=True)
                 cmds.parent( self.previewMirrorGuide, self.previewMirrorGrpName, absolute=True )
                 # parent the previewMirror group to the guideMirror group:
-                cmds.parent(self.previewMirrorGrp, self.dpUIinst.guideMirrorGrp, relative=True)
+                cmds.parent(self.previewMirrorGrp, self.dpUIinst.data.guide_mirror_grp, relative=True)
                 
                 # add attributes to be read as mirror guide when re-creating this module:
                 cmds.addAttr(self.previewMirrorGrp, longName='guideBaseMirror', attributeType='bool')

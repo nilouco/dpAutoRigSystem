@@ -228,7 +228,7 @@ class BaseStandard(object):
                     baseName = suffixNumberList[1]
                 dpAR_nameList = []
                 transformList = cmds.ls(selection=False, transforms=True)
-                guideBaseList = [guide for guide in transformList if guide.endswith(self.dpUIinst.guideBaseName)] or []
+                guideBaseList = [guide for guide in transformList if guide.endswith(self.dpUIinst.data.guide_base_name)] or []
                 guideBaseList.extend([staticGrp for staticGrp in transformList if "staticHook" in cmds.listAttr(staticGrp)] or [])
                 if guideBaseList:
                     for transform in guideBaseList:
@@ -475,8 +475,8 @@ class BaseStandard(object):
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
         """
-        self.dpUIinst.utils.closeUI(self.dpUIinst.plusInfoWinName)
-        self.dpUIinst.utils.closeUI(self.dpUIinst.colorOverrideWinName)
+        self.dpUIinst.utils.closeUI(self.dpUIinst.data.plus_info_win_name)
+        self.dpUIinst.utils.closeUI(self.dpUIinst.data.color_override_win_name)
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             self.toIDList = []
@@ -520,7 +520,7 @@ class BaseStandard(object):
                             if currentName == self.customName:
                                 self.customName = self.customName + "1"
                 self.userGuideName = self.customName
-            prefix = cmds.textField("prefixTextField", query=True, text=True)
+            prefix = cmds.textField("rig_prefix_tf", query=True, text=True)
             if prefix != "" and prefix != " " and prefix != "_" and prefix != None:
                 if prefix[len(prefix)-1] != "_":
                     prefix = prefix + "_"

@@ -66,8 +66,7 @@ class Pipeliner(object):
     def getJsonSettingsPath(self, *args):
         """ Returns the json path for the pipeline settings file.
         """
-        basePath = self.dpUIinst.dpARpath
-        basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]+"/Pipeline"
+        basePath = self.dpUIinst.data.dp_auto_rig_path+"/Pipeline"
         return os.path.join(basePath, self.settingsFile).replace("\\", "/")
 
 
@@ -896,16 +895,16 @@ class Pipeliner(object):
         """
         if self.checkAssetContext():
             try:
-                cmds.frameLayout(self.dpUIinst.allUIs["assetLayout"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
-                cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.pipeData['assetName'])
+                cmds.frameLayout("asset_fl", edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
+                cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.pipeData['assetName'])
                 if self.dpUIinst.verbose:
                     print(self.dpUIinst.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
             except:
                 pass
         else:
             try:
-                cmds.frameLayout(self.dpUIinst.allUIs["assetLayout"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.dpUIinst.lang['i305_none'])
-                cmds.textFieldGrp(self.dpUIinst.allUIs["assetText"], edit=True, text=self.dpUIinst.lang['i305_none'])
+                cmds.frameLayout("asset_fl", edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.dpUIinst.lang['i305_none'])
+                cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.dpUIinst.lang['i305_none'])
                 if self.dpUIinst.verbose:
                     print(self.dpUIinst.lang['r027_noAssetContext'])
             except:
@@ -933,9 +932,9 @@ class Pipeliner(object):
         if self.pipeData['assetName'] and self.pipeData['assetPath']:
             path = self.pipeData['assetPath']
         try:
-            cmds.textFieldGrp(self.dpUIinst.allUIs["mayaProjectText"], edit=True, text=self.pipeData['mayaProject'])
-            cmds.textFieldGrp(self.dpUIinst.allUIs["pipelineText"], edit=True, text=self.pipeData['projectPath'])
-            cmds.button(self.dpUIinst.allUIs['openAssetFolderBT'], edit=True, command=partial(self.dpUIinst.packager.openFolder, path))
+            cmds.textFieldGrp("asset_maya_project_tfg", edit=True, text=self.pipeData['mayaProject'])
+            cmds.textFieldGrp("asset_pipeline_tfg", edit=True, text=self.pipeData['projectPath'])
+            cmds.button("asset_open_folder_bt", edit=True, command=partial(self.dpUIinst.packager.openFolder, path))
         except:
             pass
 

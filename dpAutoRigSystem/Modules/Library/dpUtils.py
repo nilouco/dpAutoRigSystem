@@ -87,8 +87,6 @@ class Utils(object):
         """ Find and return the environ directory of this system.
         """
         envStr = os.environ[key]
-        
-        dpARPath = self.findPath("dpAutoRig.py")
 
         splitEnvList = []
         if os.name == "posix":
@@ -101,13 +99,13 @@ class Utils(object):
             splitEnvList = [x for x in splitEnvList if x != "" and x != ' ' and x != None]
             for env in splitEnvList:
                 env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
-                if env in dpARPath:
+                if env in self.dpUIinst.data.dp_auto_rig_path:
                     try:
-                        envPath = dpARPath.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
+                        envPath = self.dpUIinst.data.dp_auto_rig_path.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
                     except:
                         pass
                     if len(env) < 4:
-                        envPath = dpARPath.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
+                        envPath = self.dpUIinst.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
                         return envPath+"."+path
                     break
         # if we are here, we must return a default path:
@@ -125,16 +123,16 @@ class Utils(object):
         return envPath
 
 
-    def findPath(self, filename):
-        """ Find and return the absolute path of the fileName.
-        """
-        stringPath   = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename), filename))
-        correctPath  = stringPath.replace("\\", "/")
-        if os.name == "posix":
-            absolutePath = stringPath[0:stringPath.rfind("/")]
-        else:
-            absolutePath = correctPath[correctPath.find("/")-2:correctPath.rfind("/")]
-        return absolutePath
+    # def findPath(self, filename):
+    #     """ Find and return the absolute path of the fileName.
+    #     """
+    #     stringPath   = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename), filename))
+    #     correctPath  = stringPath.replace("\\", "/")
+    #     if os.name == "posix":
+    #         absolutePath = stringPath[0:stringPath.rfind("/")]
+    #     else:
+    #         absolutePath = correctPath[correctPath.find("/")-2:correctPath.rfind("/")]
+    #     return absolutePath
 
 
     def findAllFiles(self, path, dir, ext=".py"):
@@ -1536,8 +1534,8 @@ class Utils(object):
         """
         if itemList:
             for item in itemList:
-                if not self.dpUIinst.jointEndAttr in cmds.listAttr(item):
-                    cmds.addAttr(item, longName=self.dpUIinst.jointEndAttr, attributeType="bool", defaultValue=1)
+                if not self.dpUIinst.data.joint_end_attr in cmds.listAttr(item):
+                    cmds.addAttr(item, longName=self.dpUIinst.data.joint_end_attr, attributeType="bool", defaultValue=1)
         
 
     def createLocatorInItemPosition(self, item, *args):

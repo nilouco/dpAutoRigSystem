@@ -1,17 +1,37 @@
 import os
+import sys
 import json
 from maya import cmds
+
+
 
 class Configuration(object):
     def __init__(self, dpUIinst):
         self.ar = dpUIinst
+        
+        self.load_path()
+
         self.load_language()
+
+        self.load_icons()
 
         # TODO
             # get_language()
             # get_update()
             # get_terms_cond()
+            # get_icon()
 
+
+    def load_path(self):
+        path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace("\\", "/")
+        self.ar.data.dp_auto_rig_path = path[:path.rfind("/")] #remove '/core'
+
+        #correct_path = path[:path.rfind("/")] #remove '/core'
+        #if os.name == "posix":
+        #    self.ar.data.dp_auto_rig_path = stringPath[0:stringPath.rfind("/")]
+        #else:
+        #    self.ar.data.dp_auto_rig_path = correct_path[correct_path.find("/")-2:]
+    
 
     def load_language(self, name=None):
         founds, self.ar.data.lang_data = self.get_json_file_content(self.ar.data.language_folder)
@@ -61,6 +81,22 @@ class Configuration(object):
         return items, content
     
 
+
+    def load_icons(self):
+        
+        
+        # TODO: review the 3: after renamed all images without the "dp_" prefix
+        self.ar.data.icon = {i[3:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
+
+
+        print("self.ar.data.icon_path =",self.ar.data.icons_folder)
+        print("self.ar.data.icon =",self.ar.data.icon)
+        print("leg example: self.ar.data.icon['leg'] = ", self.ar.data.icon["leg"])
+
+    
+
+
+        
     def open_pipeliner(self, *args):
         print("WIP opening piliener UI", args)
         self.ar.pipeliner.mainUI(self.ar)

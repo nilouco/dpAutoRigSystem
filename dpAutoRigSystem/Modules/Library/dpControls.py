@@ -501,7 +501,6 @@ class ControlClass(object):
         """ Find the loaded control instance by name.
             Return the instance found.
         """
-        print("instanceName =", instanceName)
         if self.dpUIinst.data.control_instances:
             for instance in self.dpUIinst.data.control_instances:
                 if instance.guideModuleName == instanceName:
@@ -558,8 +557,6 @@ class ControlClass(object):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.getControlInstance(cvType)
-        print("cvType =", cvType)
-        print("curveInstance =", curveInstance)
         curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
             self.addGuideAttrs(curve, color, pin)
@@ -1281,8 +1278,8 @@ class ControlClass(object):
             Ask to mirror calibration of all controls if nothing is selected.
         """
         if not fromPrefix:
-            fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixTF"], query=True, text=True)
-            toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixTF"], query=True, text=True)
+            fromPrefix = cmds.textField("ctr_mirror_calibration_from_prefix_tf", query=True, text=True)
+            toPrefix = cmds.textField("ctr_mirror_calibration_to_prefix_tf", query=True, text=True)
         if fromPrefix and toPrefix:
             if not nodeName:
                 currentSelectionList = cmds.ls(selection=True, type="transform")
@@ -1672,9 +1669,9 @@ class ControlClass(object):
             Ask to mirror control shape of all controls if nothing is selected.
         """
         if not fromPrefix:
-            fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
-            toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixShapeTF"], query=True, text=True)
-            axis = cmds.optionMenu(self.dpUIinst.allUIs["axisShapeMenu"], query=True, value=True)
+            fromPrefix = cmds.textField("ctr_mirror_shape_from_prefix_tf", query=True, text=True)
+            toPrefix = cmds.textField("ctr_mirror_shape_to_prefix_tf", query=True, text=True)
+            axis = cmds.optionMenu("ctr_mirror_shape_axis_om", query=True, value=True)
         if fromPrefix and toPrefix:
             if not nodeName:
                 currentSelectionList = cmds.ls(selection=True, type="transform")

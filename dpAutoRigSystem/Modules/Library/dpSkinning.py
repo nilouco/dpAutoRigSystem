@@ -58,12 +58,12 @@ class Skinning(dpWeights.Weights):
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
         # log window
-        logWin = cmds.checkBox(self.dpUIinst.allUIs["displaySkinLogWin"], query=True, value=True)
+        logWin = cmds.checkBox("skin_log_win_cb", query=True, value=True)
 
         # get joints to be skinned:
-        uiJointSkinList = cmds.textScrollList(self.dpUIinst.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
+        uiJointSkinList = cmds.textScrollList("skin_joint_tsl", query=True, selectItem=True)
         if not uiJointSkinList:
-            uiJointSkinList = cmds.textScrollList(self.dpUIinst.allUIs["jntTextScrollLayout"], query=True, allItems=True)
+            uiJointSkinList = cmds.textScrollList("skin_joint_tsl", query=True, allItems=True)
         
         # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
         jointSkinList, jointNotExistingList = [], []
@@ -82,9 +82,9 @@ class Skinning(dpWeights.Weights):
                 jointSkinList = None
         
         # get geometries to be skinned:
-        geomSkinList = cmds.textScrollList(self.dpUIinst.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
+        geomSkinList = cmds.textScrollList("skin_geo_tcl", query=True, selectItem=True)
         if not geomSkinList:
-            geomSkinList = cmds.textScrollList(self.dpUIinst.allUIs["modelsTextScrollLayout"], query=True, allItems=True)
+            geomSkinList = cmds.textScrollList("skin_geo_tcl", query=True, allItems=True)
         
         # check if we have repeated listed geometries in case of the user choose to not display long names:
         if self.validateGeoList(geomSkinList, mode):
@@ -243,7 +243,7 @@ class Skinning(dpWeights.Weights):
     def getByUVsFromUI(self, *args):
         """ Read the radioCollection, verify its annotation and return True if found selected uvSpace.
         """
-        skinSurfAssociationCollection = cmds.radioCollection(self.dpUIinst.allUIs["skinSurfAssociationCollection"], query=True, select=True)
+        skinSurfAssociationCollection = cmds.radioCollection("skin_surface_association_rc", query=True, select=True)
         annot = cmds.radioButton(skinSurfAssociationCollection, query=True, annotation=True)
         if annot == "uvSpace":
             return True

@@ -97,8 +97,9 @@ class UI(object):
     def create_settings_menu(self):
         cmds.menu('settings_menu', label='Settings', parent='main_menu_bar')
         self.create_radio_menu("language", "settings_menu", self.ar.data.language_folder, self.ar.data.language_default, self.ar.data.language_option_var)
-        self.ar.validatorPresetList, self.ar.validatorPresetDic = self.create_radio_menu("controller_preset", "settings_menu", self.ar.data.curves_presets_folder, self.ar.data.controller_default, self.ar.data.controller_option_var)
-        self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_presets_folder, self.ar.data.validator_default, self.ar.data.validator_option_var)
+        self.ar.ctrlPresetList, self.ar.ctrlPresetDic = self.create_radio_menu("controller_preset", "settings_menu", self.ar.data.curves_presets_folder, self.ar.data.controller_default, self.ar.data.controller_option_var)
+        self.ar.validatorPresetList, self.ar.validatorPresetDic = self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_presets_folder, self.ar.data.validator_default, self.ar.data.validator_option_var)
+        self.ar.ctrlPreset = self.ar.ctrlPresetDic[self.ar.ctrlPresetList[0]]
         
 
 
@@ -165,7 +166,7 @@ class UI(object):
         #colTopRightA - columnLayout:
         cmds.rowColumnLayout('rig_header_rcl', numberOfColumns=2, adjustableColumn=1, columnWidth=(120, 50), parent='rigging_tab')
         cmds.text('modules_txt', label=self.ar.lang['i001_modules'], font="boldLabelFont", width=150, align='center', parent='rig_header_rcl')
-        cmds.iconTextButton("tri_collapse_guides_itb", image=self.ar.triDownIcon, annotation=self.ar.lang['i348_triangleIconAnn'], command=partial(self.ar.collapseAllFL, "tri_collapse_guides_itb", 0), width=17, height=17, style='iconOnly', align='right', parent='rig_header_rcl')
+        cmds.iconTextButton("tri_collapse_guides_itb", image=self.ar.data.icon['triDown'], annotation=self.ar.lang['i348_triangleIconAnn'], command=partial(self.ar.collapseAllFL, "tri_collapse_guides_itb", 0), width=17, height=17, style='iconOnly', align='right', parent='rig_header_rcl')
 #        cmds.setParent('rigging_tab')
         #colMiddleLeftA - scrollLayout - guidesLayout:
         cmds.scrollLayout("rig_guides_start_sl", width=160, parent='rigging_tab')
@@ -197,7 +198,7 @@ class UI(object):
         self.rig_options_layout = cmds.columnLayout('rig_options_layout', adjustableColumn=True, columnOffset=('left', 5), parent='rig_options_fl')
         cmds.rowColumnLayout('rig_prefix_rcl', numberOfColumns=2, columnWidth=[(1, 40), (2, 200)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent='rig_options_layout')
         cmds.textField('rig_prefix_tf', text="", parent= 'rig_prefix_rcl', changeCommand=self.ar.setPrefix)
-        cmds.text('prefix_txt', align='left', label=self.ar.lang['i003_prefix'], parent='rig_prefix_rcl')
+        cmds.text('rig_prefix_txt', align='left', label=self.ar.lang['i003_prefix'], parent='rig_prefix_rcl')
 #        cmds.setParent('rig_options_layout')
         cmds.checkBox('rig_display_joints_cb', label=self.ar.lang['i009_displayJointsCB'], align='left', value=1, parent='rig_options_layout')
         cmds.checkBox('rig_hide_guide_grp_cb', label=self.ar.lang['i183_hideGuideGrp'], align='left', value=1, changeCommand=self.ar.displayGuideGrp, parent='rig_options_layout')
@@ -285,7 +286,7 @@ class UI(object):
         cmds.checkBox('skin_log_win_cb', label=self.ar.lang['i286_displaySkinLog'], align='left', value=1, parent='skin_geo_cl')
         cmds.separator(style="none", height=2, parent='skin_geo_cl')
         cmds.textField('skin_geo_name_tf', width=30, changeCommand=self.ar.populateGeoms, parent='skin_geo_cl')
-        cmds.textScrollList('skin_geo_text_sl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.actualizeSkinFooter, parent='skin_geo_cl' )
+        cmds.textScrollList('skin_geo_tcl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.actualizeSkinFooter, parent='skin_geo_cl' )
         cmds.radioCollection('skin_geo_rc', edit=True, select=selGeoms)
 #        cmds.setParent('skin_create_fl')
         #footerB - columnLayout:
@@ -479,8 +480,8 @@ class UI(object):
         # project pipeline asset
         cmds.columnLayout('asset_main_cl', adjustableColumn=False, parent="rebuilder_tab")
         cmds.frameLayout('asset_fl', label=self.ar.lang['i303_asset'], collapsable=True, collapse=False, width=370, parent="asset_main_cl")
-        cmds.textFieldGrp("asset_maya_project_txt", label="Maya "+self.ar.lang['i301_project']+":", text=self.ar.pipeliner.pipeData['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
-        cmds.textFieldGrp("asset_pipeline_txt", label="Pipeline:", text=self.ar.pipeliner.pipeData['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
+        cmds.textFieldGrp("asset_maya_project_tfg", label="Maya "+self.ar.lang['i301_project']+":", text=self.ar.pipeliner.pipeData['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
+        cmds.textFieldGrp("asset_pipeline_tfg", label="Pipeline:", text=self.ar.pipeliner.pipeData['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
         cmds.textFieldGrp("asset_name_tfg", label=self.ar.lang['i303_asset']+":", text=self.ar.pipeliner.pipeData['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
         # asset buttons
         cmds.rowColumnLayout("asset_buttons_rcl", numberOfColumns=5, columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left"), (5, "left")], columnAttach=[(1, "left", 10), (2, "left", 10), (3, "left", 10), (4, "left", 10), (5, "left", 10)], parent="asset_fl")
@@ -493,7 +494,7 @@ class UI(object):
         # processes
         cmds.rowColumnLayout('processes_rcl', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, "left"), (2, "right")], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, "both", 10), (2, "right", 10)], parent="rebuilder_tab")
         cmds.text('processes_io_txt', label=self.ar.lang['i292_processes'].upper()+" IO", font="boldLabelFont", parent="processes_rcl")
-        cmds.iconTextButton("rebuilder_tri_collapse_itb", image=self.ar.triDownIcon, annotation=self.ar.lang['i348_triangleIconAnn'], command=partial(self.ar.collapseAllFL, "triCollapseRebuilderITB", 1), width=17, height=17, style='iconOnly', align='right', parent="processes_rcl")
+        cmds.iconTextButton("rebuilder_tri_collapse_itb", image=self.ar.data.icon['triDown'], annotation=self.ar.lang['i348_triangleIconAnn'], command=partial(self.ar.collapseAllFL, "rebuilder_tri_collapse_itb", 1), width=17, height=17, style='iconOnly', align='right', parent="processes_rcl")
         cmds.scrollLayout("rebuilder_main_sl", parent="rebuilder_tab")
         cmds.columnLayout("rebuilder_cl", adjustableColumn=True, rowSpacing=3, parent="rebuilder_main_sl")
         self.ar.startGuideModules(self.ar.data.rebuilder_folder, "start", "rebuilder_cl")
@@ -556,9 +557,6 @@ class UI(object):
         # TODO: by Configuration?
         #self.start_guides()
 
-        
-        # TODO: remove the allUIs dict:
-#        self.allUIs = {}
 
 
 
@@ -572,36 +570,8 @@ class UI(object):
 
         # -- Layout
         
-        # # create the main layout:
-        # self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')        
-        # # creating tabs - mainTabLayout:
-        # cmds.tabLayout('mainTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
-        # cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.main_layout, 'top', 0), (self.main_layout, 'left', 0), (self.main_layout, 'bottom', 0), (self.main_layout, 'right', 0)) )
-        
-        # -- Rigging tag
-        
-        # -- Skinning tab
-        
-        
-        # # -- Controllers tab
-
-        # # --Tools tab
-        
-   
-        
-        # # -- Validator tab
-        
-        
-        # # -- Rebuilder tab
-
-        
-        
-        # --
-        # call tabLayouts:
-        
         cmds.tabLayout('main_tab', edit=True, tabLabel=(('rigging_tab', 'Rigging'), ('skinning_tab', 'Skinning'), ('controllers_tab', self.ar.lang['i342_controllers']), ("tools_tab", self.ar.lang['i343_tools']), ("validator_tab", self.ar.lang['v000_validator']), ("rebuilder_tab", self.ar.lang['r000_rebuilder'])))
-#       cmds.tabLayout(self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), ('skinning_tab', 'Skinning'), ('controllers_tab', self.lang['i342_controllers']), ("tools_tab", self.lang['i343_tools']), ("validator_tab", self.lang['v000_validator']), ("rebuilder_tab", self.lang['r000_rebuilder'])))
-        #self.selList = cmds.ls(selection=True)
+
 
 
     def create_check_layout(self, name, folder, instances, layout, path=None):
@@ -661,9 +631,9 @@ class UI(object):
     #         for rebuildInstance in self.rebuilderInstanceList:
     #             rebuildInstance.updateActionButtons(color=False)
     #     try:
-    #         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
+    #         self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
     #     except:
-    #         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
+    #         self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
     #     if savedScene:
     #         cmds.select(clear=True)
     #         if self.selList:
@@ -686,7 +656,7 @@ class UI(object):
     #     cmds.scriptJob(event=('NewSceneOpened', self.refresh_main_ui), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
     #     cmds.scriptJob(event=('SceneSaved', partial(self.refresh_main_ui, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
     #     cmds.scriptJob(event=('workspaceChanged', self.ar.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-    #     self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+    #     self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
     #     self.ar.ctrls.startCorrectiveEditMode()
     #     self.jobSelectedGuide()
 

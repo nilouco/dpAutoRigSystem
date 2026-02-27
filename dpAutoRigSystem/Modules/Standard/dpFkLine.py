@@ -289,7 +289,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # end chain:
                     if n == self.nJoints-1:
                         # create end joint:
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.data.joint_end_attr, radius=0.5)
                         self.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # work with main fk controllers
