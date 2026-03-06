@@ -43,11 +43,11 @@ class ExitEditMode(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = self.dpUIinst.ctrls.getControlList()
+                toCheckList = self.ar.ctrls.getControlList()
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if "editMode" in cmds.listAttr(item):
                         if cmds.getAttr(item+".editMode") == 1:
@@ -58,7 +58,7 @@ class ExitEditMode(dpBaseAction.ActionStartClass):
                             else: #fix
                                 try:
                                     # delete the corrective script job
-                                    self.dpUIinst.ctrls.deleteOldJobs(item)
+                                    self.ar.ctrls.deleteOldJobs(item)
                                     # remove color override
                                     shapeList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
                                     if shapeList:
@@ -67,14 +67,14 @@ class ExitEditMode(dpBaseAction.ActionStartClass):
                                     # set edit mode off
                                     cmds.setAttr(item+".editMode", 0)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

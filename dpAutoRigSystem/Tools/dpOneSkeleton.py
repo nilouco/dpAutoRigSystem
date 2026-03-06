@@ -14,11 +14,11 @@ DP_ONESKELETON_VERSION = 1.02
 
 
 class OneSkeleton(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
+        self.ar = ar
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
         self.prefix = "Web_"
         self.rootName = "Root"
         self.suffix = "_Joint"
@@ -33,10 +33,10 @@ class OneSkeleton(object):
     def oneSkeletonPromptDialog(self, *args):
         """ Prompt dialog to get the name of the root joint to receive all the web joints as children.
         """
-        btContinue = self.dpUIinst.lang['i174_continue']
-        btCancel = self.dpUIinst.lang['i132_cancel']
+        btContinue = self.ar.data.lang['i174_continue']
+        btCancel = self.ar.data.lang['i132_cancel']
         result = cmds.promptDialog(title=CLASS_NAME, 
-                                   message=self.dpUIinst.lang["m006_name"], 
+                                   message=self.ar.data.lang["m006_name"], 
                                    text=self.prefix+self.rootName+self.suffix,
                                    button=[btContinue, btCancel], 
                                    defaultButton=btContinue, 
@@ -66,7 +66,7 @@ class OneSkeleton(object):
             self.ctrls.setControllerScaleCompensate(False)
             self.utils.setProgress(endIt=True)
         else:
-            mel.eval('warning \"'+self.dpUIinst.lang["v014_notFoundNodes"]+'\";')
+            mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
 
 
     def grouper(self, iterable, n, fillvalue=None, *args):
@@ -83,7 +83,7 @@ class OneSkeleton(object):
             Returns the new created joint list.
         """
         newJointList = []
-        self.utils.setProgress(self.dpUIinst.lang['m254_oneSkeleton'], self.dpUIinst.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
+        self.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
         for sourceNode in sourceList:
             self.utils.setProgress("Joint")
             cmds.select(clear=True)
@@ -135,7 +135,7 @@ class OneSkeleton(object):
                 pass
             cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
             # dpIDs
-            self.dpUIinst.customAttr.addAttr(0, [newJoint, pac, scc]) #dpID
+            self.ar.customAttr.addAttr(0, [newJoint, pac, scc]) #dpID
         return newJointList
 
 
@@ -157,10 +157,10 @@ class OneSkeleton(object):
         uniqueInfList = []
         skinClusterList = []
         if not cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True):
-            mel.eval('warning \"'+self.dpUIinst.lang['i041_meshConnEmpty']+'\";')
+            mel.eval('warning \"'+self.ar.data.lang['i041_meshConnEmpty']+'\";')
             return
         for transformNode in list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True))):
-            skinClusterList.extend(self.dpUIinst.skin.checkExistingDeformerNode(transformNode)[2] or [])
+            skinClusterList.extend(self.ar.skin.checkExistingDeformerNode(transformNode)[2] or [])
         if skinClusterList:
             for skinClusterNode in skinClusterList:
                 infList = cmds.skinCluster(skinClusterNode, query=True, influence=True)

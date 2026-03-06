@@ -50,7 +50,7 @@ class HideDataGrp(dpBaseAction.ActionStartClass):
                         dataGrp = "Data_Grp"
             if dataGrp:
                 self.utils.setProgress(max=1)
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
                 self.checkedObjList.append(dataGrp)
                 visibilityStatus = cmds.getAttr(dataGrp+".visibility")
                 if visibilityStatus:
@@ -61,17 +61,17 @@ class HideDataGrp(dpBaseAction.ActionStartClass):
                         try:
                             cmds.setAttr(dataGrp+".visibility", 0)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+dataGrp)
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+dataGrp)
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+dataGrp)
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+dataGrp)
                 else:
                     self.foundIssueList.append(False)
                     self.resultOkList.append(True)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

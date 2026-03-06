@@ -63,9 +63,8 @@ from .core import loading
 
 
 class Start(object):
-    def __init__(self, dev=False, intro=True):
-        self.dev = dev
-        self.verbose = self.dev #TODO: to dev or delete it?
+    def __init__(self, dev:bool=False, intro:bool=True):
+        self.dev: bool = dev
         self.dpARVersion = DPAR_VERSION_5
         self.load_opening(intro)
         self.reload_modules()
@@ -75,40 +74,15 @@ class Start(object):
         self.load_ui()
         self.opening.close_opening_ui()
         
-        
-        
-        # load system
-            # load library
-            # load tools
-            # loads ...
 
-
-
-
-    def load_variables(self):
-        self.data = variables.Data()
-
-
-    def load_settings(self):
-        self.config = settings.Configuration(self)
-        self.opt = settings.Option(self)
-
-
-    def load_components(self):
-        self.utils = dpUtils.Utils(self)
-        self.pipeliner = dpPipeliner.Pipeliner(self)
-        self.packager = dpPackager.Packager(self)
-        self.ctrls = dpControls.ControlClass(self)
-        self.publisher = dpPublisher.Publisher(self)
-        self.customAttr = dpCustomAttr.CustomAttr(self, False)
-        self.skin = dpSkinning.Skinning(self)
-        self.logger = dpLogger.Logger(self)
-
-
-    def load_ui(self):
-        self.main_ui = main.UI(self)
-
-
+    def load_opening(self, intro=True):
+        """ Just create a Loading window in order to show user that it's working to open the dpAutoRigSystem.
+        """
+        self.opening = loading.Opening()
+        if intro:
+            self.opening.create_opening_ui(self.dpARVersion)
+    
+    
     def reload_modules(self):
         """ Dev reloading modules.
         """ 
@@ -133,6 +107,41 @@ class Start(object):
             reload(variables)
             reload(loading)
             print("Reloaded imported modules")
+    
+    
+    def load_variables(self):
+        self.data = variables.Data()
+
+
+    def load_settings(self):
+        self.config = settings.Configuration(self)
+        self.opt = settings.Option(self)
+
+
+    def load_components(self):
+        self.utils = dpUtils.Utils(self)
+        self.pipeliner = dpPipeliner.Pipeliner(self)
+        self.packager = dpPackager.Packager(self)
+        self.ctrls = dpControls.ControlClass(self)
+        self.publisher = dpPublisher.Publisher(self)
+        self.customAttr = dpCustomAttr.CustomAttr(self, False)
+        self.skin = dpSkinning.Skinning(self)
+        self.logger = dpLogger.Logger(self)
+
+
+    def load_ui(self):
+        self.main_ui = main.UI(self)
+        self.ui_manager = main.Manager(self)
+
+
+    def ui(self):
+        self.main_ui.create_ui()
+
+
+
+
+
+
 
 
 
@@ -148,12 +157,9 @@ class Start(object):
     #     self.startScriptJobs()
     #     self.utils.closeUI("dpARLoadWin")
     #     cmds.select(startSelList)
-    #     print("dpAutoRigSystem "+self.lang['i346_loadedSuccess'])
+    #     print("dpAutoRigSystem "+self.data.lang['i346_loadedSuccess'])
 
 
-    def ui(self):
-        #self.main_ui = main.UI(self)
-        self.main_ui.create_ui()
         
 
     # def startScriptJobs(self, *args):
@@ -174,28 +180,8 @@ class Start(object):
     #     self.jobSelectedGuide()
 
 
-    # def deleteExistWindow(self, *args):
-    #     """ Check if there are the dpAutoRigWindow and a control element to delete the UI.
-    #     """
-    #     if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
-    #         cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
-    #         #cmds.deleteUI("dpAutoRigSystemWC", control=True)
-    #     winNameList = ["dpARLoadWin", "dpInfoWindow", "dpNewAssetWindow", "dpReplaceDPDataWindow", "dpSelectAssetWindow", "dpSaveVersionWindow", self.plusInfoWinName, self.colorOverrideWinName]
-    #     for winName in winNameList:
-    #         self.utils.closeUI(winName)
 
 
-    def clearDPARLoadingWindow(self, *args):
-        if cmds.window('dpARLoadWin', query=True, exists=True):
-            cmds.deleteUI('dpARLoadWin', window=True)
-
-
-    def load_opening(self, intro=True):
-        """ Just create a Loading window in order to show user that it's working to open the dpAutoRigSystem.
-        """
-        self.opening = loading.Opening()
-        if intro:
-            self.opening.create_opening_ui(self.dpARVersion)
     
 
     def dpARDownloadMaster(self, *args):
@@ -254,16 +240,6 @@ class Start(object):
                 return item
     
     
-    def changeOptionDegree(self, degree_value, *args):
-        """ Set optionVar to choosen menu item.
-        """
-        self.opt.set_option_var('dpAutoRigLastDegreeOption', degree_value)
-        self.data.degree_option = int(degree_value[0])
-        for modInst in self.moduleInstancesList:
-            if "degree" in cmds.listAttr(modInst.moduleGrp):
-                cmds.setAttr(modInst.moduleGrp+".degree", self.data.degree_option)
-    
-    
     
     
 
@@ -275,21 +251,6 @@ class Start(object):
     #     cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.dev)+"); ar.ui();", lowestPriority=True)
     
 
-    # def reloadDevModeUI(self, *args):
-    #     """ Reload the system code as development mode.
-    #     """
-    #     value = cmds.menuItem('devMode_MI', query=True, checkBox=True)
-    #     if value:
-    #         cmds.evalDeferred("from importlib import reload; reload(dpAutoRigSystem); ar = dpAutoRig.Start(True); ar.ui();", lowestPriority=True)
-    #     else:
-    #         cmds.evalDeferred("ar = dpAutoRig.Start(); ar.ui();", lowestPriority=True)
-
-
-    # def changeVerbose(self, *args):
-    #     """ Set the dev verbose variable.
-    #     """
-    #     self.verbose = cmds.menuItem('verbose_MI', query=True, checkBox=True)
-    #     print("Verbose =", self.verbose)
 
     
     def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
@@ -362,7 +323,7 @@ class Start(object):
         # delete module layout:
         if not selectedGuideNodeList:
             try:
-                cmds.frameLayout("edit_selected_module_fl", edit=True, label=self.lang['i011_editSelected']+" "+self.lang['i143_module'])
+                cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.data.lang['i011_editSelected']+" "+self.data.lang['i143_module'])
                 cmds.deleteUI("selectedModuleColumn")
             except:
                 pass
@@ -406,34 +367,14 @@ class Start(object):
         self.translatorInst.dpTranslatorMain()
         
 
-    # def createPreset(self, type="controls", presetDir="Modules/Curves/Presets", setOptionVar=True, *args):
-    #     """ Just call ctrls create preset and set it as userDefined preset.
-    #     """
-    #     if type == "controls":
-    #         newPresetString = self.ctrls.dpCreateControlsPreset()
-    #     elif type == "validator":
-    #         newPresetString = self.utils.dpCreateValidatorPreset()
-    #     if newPresetString:
-    #         # create json file:
-    #         resultDic = self.createJsonFile(newPresetString, presetDir, '_preset')
-    #         # set this new preset as userDefined preset:
-    #         self.presetName = resultDic['_preset']
-    #         if setOptionVar:
-    #             cmds.optionVar(remove="dpAutoRigLastPreset")
-    #             cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
-    #         # show preset creation result window:
-    #         self.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.lang['i134_rememberPublish']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
-    #         # close and reload dpAR UI in order to avoid Maya crash
-    #         self.reloadMainUI()
-    
     
     def setupDuplicatedGuide(self, selectedItem, *args):
         """ This method will create a new module instance for a duplicated guide found.
             Returns a guideBase for a new module instance.
         """
         # Duplicating a module guide
-        print(self.lang['i067_duplicating'])
-        self.utils.setProgress("dpAutoRigSystem", self.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
+        print(self.data.lang['i067_duplicating'])
+        self.utils.setProgress("dpAutoRigSystem", self.data.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
         # declaring variables
         nSegmentsAttr = "nJoints"
         customNameAttr = "customName"
@@ -457,7 +398,7 @@ class Start(object):
         thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
         moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
         moduleDir = moduleDir[moduleDir.find(".")+1:]
-        self.utils.setProgress(self.lang['i067_duplicating'])
+        self.utils.setProgress(self.data.lang['i067_duplicating'])
         # initializing a new module instance
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
@@ -482,12 +423,12 @@ class Start(object):
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
             if nJointsValue > 0:
                 newGuideInstance.changeJointNumber(nJointsValue)
-        self.utils.setProgress(self.lang['i067_duplicating'])
+        self.utils.setProgress(self.data.lang['i067_duplicating'])
         if customNameAttr in currentAttrList:
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
             if customNameValue != "" and customNameValue != None:
                 newGuideInstance.editGuideModuleName(customNameValue)
-        self.utils.setProgress(self.lang['i067_duplicating'])
+        self.utils.setProgress(self.data.lang['i067_duplicating'])
         if mirrorAxisAttr in currentAttrList:
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
             if mirroirAxisValue != "off":
@@ -540,7 +481,7 @@ class Start(object):
             cmds.parent(newGuideName, parentList[0])
 
         cmds.delete(selectedItem)
-        print(self.lang['r006_wellDone']+" "+newGuideName)
+        print(self.data.lang['r006_wellDone']+" "+newGuideName)
         self.utils.setProgress(endIt=True)
         return newGuideName
 
@@ -652,9 +593,9 @@ class Start(object):
             geomList.insert(0, "*")
             geomList.append(" ")
             geomList.append("-------")
-            geomList.append(self.lang['i074_attention'])
-            geomList.append(self.lang['i075_moreOne'])
-            geomList.append(self.lang['i076_sameName'])
+            geomList.append(self.data.lang['i074_attention'])
+            geomList.append(self.data.lang['i075_moreOne'])
+            geomList.append(self.data.lang['i076_sameName'])
             for sameName in sameNameList:
                 geomList.append(sameName)
         
@@ -711,9 +652,9 @@ class Start(object):
             
             # edit the footerB text:
             if nSelectedJoints != 0 and nSelectedGeoms != 0:
-                cmds.text('skin_footer_txt', edit=True, label=str(nSelectedJoints)+" "+self.lang['i025_joints']+" "+str(nSelectedGeoms)+" "+self.lang['i024_geometries'])
+                cmds.text('skin_footer_txt', edit=True, label=str(nSelectedJoints)+" "+self.data.lang['i025_joints']+" "+str(nSelectedGeoms)+" "+self.data.lang['i024_geometries'])
             else:
-                cmds.text('skin_footer_txt', edit=True, label=self.lang['i029_skinNothing'])
+                cmds.text('skin_footer_txt', edit=True, label=self.data.lang['i029_skinNothing'])
         except:
             pass
     
@@ -722,7 +663,7 @@ class Start(object):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        print("\n"+self.lang['i084_checkUpdate'])
+        print("\n"+self.data.lang['i084_checkUpdate'])
         
         # compare current version with GitHub master
         rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, self.data.raw_url)
@@ -744,19 +685,6 @@ class Start(object):
                 self.updateWin(rawResult, 'e008_failCheckUpdate')
     
     
-    def displayGuideGrp(self, value, *args):
-        """ Change display hidden guide groups in the Outliner:
-            dpAR_Temp_Grp
-            dpAR_GuideMirror_Grp
-        """
-        if cmds.objExists(self.data.temp_grp):
-            cmds.setAttr(self.data.temp_grp+".hiddenInOutliner", value)
-        if cmds.objExists(self.data.guide_mirror_grp):
-            cmds.setAttr(self.data.guide_mirror_grp+".hiddenInOutliner", value)
-        mel.eval('source AEdagNodeCommon;')
-        mel.eval('AEdagNodeCommonRefreshOutliners();')
-    
-    
     # Start working with Guide Modules:
     def startGuideModules(self, guideDir, action, layout, checkModuleList=None, path=None):
         """ Find and return the modules in the directory 'Modules'.
@@ -766,7 +694,7 @@ class Start(object):
             # find path where 'dpAutoRig.py' is been executed:
             path = self.data.dp_auto_rig_path
         if not self.data.loaded_path:
-            if self.verbose:
+            if self.data.verbose:
                 print("dpAutoRigPath: "+path)
             self.data.loaded_path = True
         # list all guide modules:
@@ -787,67 +715,12 @@ class Start(object):
             elif action == "exists":
                 return guideModuleList
             # avoid print again the same message:
-            if guideDir == self.data.standard_folder and not self.data.loaded_standard:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_standard = True
-            if guideDir == self.data.integrated_folder and not self.data.loaded_integrated:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_integrated = True
-            if guideDir == self.data.curves_simple_folder and not self.data.loaded_curve_shape:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_curve_shape = True
-            if guideDir == self.data.curves_combined_folder and not self.data.loaded_combined:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_combined = True
-            if guideDir == self.data.tools_folder and not self.data.loaded_tools:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_tools = True
-            if guideDir == self.data.checkin_folder and not self.data.loaded_checkin:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_checkin = True
-            if guideDir == self.data.checkout_folder and not self.data.loaded_checkout:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_checkout = True
-            if guideDir == self.data.rebuilder_folder and not self.data.loaded_rebuilder:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_rebuilder = True
-            if guideDir == self.data.start_folder and not self.data.loaded_start:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_start = True
-            if guideDir == self.data.source_folder and not self.data.loaded_source:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_source = True
-            if guideDir == self.data.setup_folder and not self.data.loaded_setup:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_setup = True
-            if guideDir == self.data.deforming_folder and not self.data.loaded_deforming:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_deforming = True
-            if guideDir == self.data.custom_folder and not self.data.loaded_custom:
-                if self.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-                self.data.loaded_custom = True
             if guideDir == "":
-                if not "Finishing" in layout and not self.data.loaded_addon:
-                    if self.verbose:
-                        print(path+" : "+str(guideModuleList))
-                    self.data.loaded_addon = True
-                elif not self.data.loaded_finishing:
-                    if self.verbose:
-                        print(path+" : "+str(guideModuleList))
-                    self.data.loaded_finishing = True
+                guideDir = path
+            if not guideDir in self.data.lib.keys():
+                self.data.lib[guideDir] = guideModuleList
+                if self.data.verbose:
+                    print(guideDir+" : "+str(guideModuleList))
         return guideModuleList
     
     
@@ -870,12 +743,12 @@ class Start(object):
             if self.dev:
                 reload(guide)
         except Exception as e:
-            errorString = self.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
+            errorString = self.data.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
             mel.eval('warning \"'+errorString+'\";')
             return
         # getting data from guide module:
-        title = self.lang[guide.TITLE]
-        description = self.lang[guide.DESCRIPTION]
+        title = self.data.lang[guide.TITLE]
+        description = self.data.lang[guide.DESCRIPTION]
         icon = guide.ICON
         if guideDir:
             # find path where 'dpAutoRig.py' is been executed to get the icon:
@@ -886,7 +759,7 @@ class Start(object):
             guide.WIKI = None
         
         # creating a basic layout for guide buttons:
-        if guideDir == self.data.curves_simple_folder.replace("/", ".") or guideDir == self.data.curves_combined_folder.replace("/", "."):
+        if guideDir == self.data.curve_simple_folder.replace("/", ".") or guideDir == self.data.curve_combined_folder.replace("/", "."):
             ctrlInstance = self.initExtraModule(guideModule, guideDir)
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, ctrlInstance, True), parent=layout)
             self.data.control_instances.append(ctrlInstance)
@@ -933,7 +806,7 @@ class Start(object):
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
                 rebuilderInstance.infoITB = cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
-                rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.lang['r058_deleteDataAnn'], parent=moduleLayout)
+                rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.data.lang['r058_deleteDataAnn'], parent=moduleLayout)
                 rebuilderInstance.updateActionButtons(color=False)
             else:
                 cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
@@ -968,7 +841,7 @@ class Start(object):
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text("rig_footer_txt", edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.lang['i005_footerRigging'])
+        cmds.text("rig_footer_txt", edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.data.lang['i005_footerRigging'])
         return guideInstance
     
     
@@ -1023,14 +896,16 @@ class Start(object):
         # WIP refactorying UI
         #
         #
-        try:
-            cmds.frameLayout('edit_selected_module_fl', edit=True, label=self.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
+#        try:
+        cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
+        if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
             cmds.deleteUI('rig_guides_inst_cl')
-            cmds.deleteUI('selected_module_layout')
-            cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
-            cmds.columnLayout('selected_module_layout', adjustableColumn=True, parent='edit_selected_module_fl')
-        except:
-            pass 
+        if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
+            cmds.deleteUI('rig_selected_module_cl')
+        cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
+        cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
+#        except:
+#            pass 
 
 
 
@@ -1080,54 +955,28 @@ class Start(object):
                     reload(mod)
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
-                dpUIinst = self
+                ar = self
                 if "rigType" in cmds.listAttr(module[2]):
                     curRigType = cmds.getAttr(module[2]+".rigType")
-                    moduleInst = moduleClass(dpUIinst, module[1], curRigType)
+                    moduleInst = moduleClass(ar, module[1], curRigType)
                 else:
                     if "Style" in cmds.listAttr(module[2]):
                         iStyle = cmds.getAttr(module[2]+".Style")
                         if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(dpUIinst, module[1], dpBaseStandard.RigType.biped)
+                            moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.biped)
                         else:
-                            moduleInst = moduleClass(dpUIinst, module[1], dpBaseStandard.RigType.quadruped)
+                            moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.quadruped)
                     else:
-                        moduleInst = moduleClass(dpUIinst, module[1], dpBaseStandard.RigType.default)
+                        moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.default)
                 self.moduleInstancesList.append(moduleInst)
                 # reload pinGuide scriptJob:
                 self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.lang['i005_footerRigging'])
+        cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.data.lang['i005_footerRigging'])
     
     
-    def collapseAllFL(self, iconTB="tri_collapse_guides_itb", layout=0, *args):
-        """ Edit the current module frame layout collapse and icon.
-            Layout number:
-            0 = guide module frame layouts
-            1 = rebuilder processes frame layouts
-        """
-        collapseValue = True
-        imageIcon = self.data.icon['triRight']
-        if layout == 0: #guide modules
-            moduleList = self.moduleInstancesList
-            if self.data.modules_collapse_status:
-                collapseValue = False
-                imageIcon = self.data.icon['triDown']
-            self.data.modules_collapse_status = collapseValue
-        else: #rebuilder processes
-            moduleList = self.data.rebuilder_layouts
-            if self.data.rebuilders_collapse_status:
-                collapseValue = False
-                imageIcon = self.data.icon['triDown']
-            self.data.rebuilders_collapse_status = collapseValue
-        if moduleList:
-            for module in moduleList:
-                if layout == 0:
-                    cmds.frameLayout(module.moduleFrameLayout, edit=True, collapse=collapseValue)
-                else:
-                    cmds.frameLayout(module, edit=True, collapse=collapseValue)
-        cmds.iconTextButton(iconTB, edit=True, image=imageIcon)
+    
 
 
     def checkImportedGuides(self, askUser=True, *args):
@@ -1146,9 +995,9 @@ class Start(object):
                         if name.find("_dpAR_") != -1:
                             if askUser:
                                 # open dialog to confirm merge namespaces:
-                                yesTxt = self.lang['i071_yes']
-                                noTxt = self.lang['i072_no']
-                                result = cmds.confirmDialog(title=self.lang['i205_guide'], message=self.lang['i206_removeNamespace'], 
+                                yesTxt = self.data.lang['i071_yes']
+                                noTxt = self.data.lang['i072_no']
+                                result = cmds.confirmDialog(title=self.data.lang['i205_guide'], message=self.data.lang['i206_removeNamespace'], 
                                                             button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
                                 if result == yesTxt:
                                     askUser = False
@@ -1174,7 +1023,7 @@ class Start(object):
                         if cmds.namespace(exists=name):
                             namespaceString = name.split(":")[0]
                             cmds.namespace(removeNamespace=namespaceString, mergeNamespaceWithRoot=True)
-                            print(f"{self.lang['m206_mergeNamespace']}: {namespaceString}")
+                            print(f"{self.data.lang['m206_mergeNamespace']}: {namespaceString}")
                             self.checkImportedGuides(False)
                             break
     
@@ -1188,44 +1037,6 @@ class Start(object):
                 self.initExtraModule("dpUpdateGuides", self.data.tools_folder)
                 break
 
-
-    def setPrefix(self, *args):
-        """ Get the text entered in the textField and change it to normal.
-        """
-        # get the entered text:
-        enteredText = cmds.textField("rig_prefix_tf", query=True, text=True)
-        # call utils to return the normalized text:
-        prefixName = self.utils.normalizeText(enteredText, prefixMax=10)
-        # edit the prefixTextField with the prefixName:
-        if len(prefixName) != 0:
-            cmds.textField("rig_prefix_tf", edit=True, text=prefixName+"_")
-
-
-    def getValidatorsAddOns(self, path="addOnsPath", *args):
-        """ Return a list of Validator's AddOns to load.
-        """
-        if os.path.exists(self.pipeliner.pipeData[path]):
-            return self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData[path])
-
-
-    def loadPipelineValidatorPresets(self, *args):
-        """ Load the Validator's presets from the pipeline path.
-        """
-        if os.path.exists(self.pipeliner.pipeData['presetsPath']):
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
-            if studioPreset:
-                self.validatorPresetList.insert(0, studioPreset[0])
-                self.validatorPresetDic.update(studioPresetDic)
-
-    
-    def setValidatorPreset(self, *args):
-        self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
-        checkInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances
-        if checkInstanceList:
-            for presetKey in self.validatorPresetDic[self.validatorPresetName]:
-                for validatorModule in checkInstanceList:
-                    if presetKey == validatorModule.guideModuleName:
-                        validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
 
 
     def changeActiveAllModules(self, instList, value, *args):
@@ -1244,8 +1055,8 @@ class Start(object):
         """
         if firstMode and actionType == "r000_rebuilder": #splitData
             if self.utils.getDuplicatedNames():
-                confirm = cmds.confirmDialog(title=self.lang['v024_duplicatedName'], icon="question", message=self.lang['i355_uniqueNameDependence'], button=[self.lang['i071_yes'], self.lang['i072_no']], defaultButton=self.lang['i072_no'], cancelButton=self.lang['i072_no'], dismissString=self.lang['i072_no'])
-                if confirm == self.lang['i072_no']:
+                confirm = cmds.confirmDialog(title=self.data.lang['v024_duplicatedName'], icon="question", message=self.data.lang['i355_uniqueNameDependence'], button=[self.data.lang['i071_yes'], self.data.lang['i072_no']], defaultButton=self.data.lang['i072_no'], cancelButton=self.data.lang['i072_no'], dismissString=self.data.lang['i072_no'])
+                if confirm == self.data.lang['i072_no']:
                     return
         self.resetAllButtonColors()
         actionResultData = {}
@@ -1257,7 +1068,7 @@ class Start(object):
             logText += "\nExported: "+publishLog["exportPath"]
             logText += "\nComments: "+publishLog["comments"]+"\n"
         if actionInstList:
-            self.utils.setProgress(self.lang[actionType]+': '+self.lang['c110_start'], self.lang[actionType], len(actionInstList))
+            self.utils.setProgress(self.data.lang[actionType]+': '+self.data.lang['c110_start'], self.data.lang[actionType], len(actionInstList))
             for a, actionInst in enumerate(actionInstList):
                 if actionInst.active:
                     self.utils.setProgress(actionInst.guideModuleName)
@@ -1277,16 +1088,16 @@ class Start(object):
                     logText += "\n"
             heightSize = len(dataList)
         else:
-            logText += "\n"+self.lang['i207_notMarked']
+            logText += "\n"+self.data.lang['i207_notMarked']
             heightSize = 2
         logText = self.pipeliner.getToday(True)+"\n\n"+logText+"\n"
         if verbose:
             self.logger.infoWin('i019_log', actionType, logText, "left", 250, (150+(heightSize)*13))
-            print("\n-------------\n"+self.lang[actionType]+"\n"+logText)
+            print("\n-------------\n"+self.data.lang[actionType]+"\n"+logText)
             if publishLog:
                 actionResultData["Publisher"] = publishLog
             if not self.utils.exportLogDicToJson(actionResultData, subFolder=self.dpData+"/"+self.dpLog):
-                print(self.lang['i201_saveScene'])
+                print(self.data.lang['i201_saveScene'])
         self.utils.setProgress(endIt=True)
         return actionResultData, False, 0
 
@@ -1295,8 +1106,8 @@ class Start(object):
         """ Simple window with links to donate in order to support this free and openSource code via PayPal.
         """
         # declaring variables:
-        self.donate_title       = 'dpAutoRig - v'+self.dpARVersion+' - '+self.lang['i167_donate']
-        self.donate_description = self.lang['i168_donateDesc']
+        self.donate_title       = 'dpAutoRig - v'+self.dpARVersion+' - '+self.data.lang['i167_donate']
+        self.donate_description = self.data.lang['i168_donateDesc']
         self.donate_winWidth    = 305
         self.donate_winHeight   = 300
         self.donate_align       = "center"
@@ -1309,8 +1120,8 @@ class Start(object):
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
         infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
-        brPaypalButton = cmds.button('brlPaypalButton', label=self.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(self.utils.visitWebSite, self.data.donate_url+"BRL"), parent=donateColumnLayout)
-        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(self.utils.visitWebSite, self.donateURL+"USD"), parent=donateColumnLayout)
+        brPaypalButton = cmds.button('brlPaypalButton', label=self.data.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(self.utils.visitWebSite, self.data.donate_url+"BRL"), parent=donateColumnLayout)
+        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.data.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(self.utils.visitWebSite, self.donateURL+"USD"), parent=donateColumnLayout)
         # call Donate Window:
         cmds.showWindow(dpDonateWin)
     
@@ -1328,32 +1139,32 @@ class Start(object):
         # creating Update Window:
         if cmds.window('dpUpdateWindow', query=True, exists=True):
             cmds.deleteUI('dpUpdateWindow', window=True)
-        dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.lang['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.data.lang['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
         if self.update_text:
-            updateDesc = cmds.text("\n"+self.lang[self.update_text], align="center", parent=updateLayout)
-            cmds.text("\n"+self.dpARVersion+self.lang['i090_currentVersion'], align="left", parent=updateLayout)
+            updateDesc = cmds.text("\n"+self.data.lang[self.update_text], align="center", parent=updateLayout)
+            cmds.text("\n"+self.dpARVersion+self.data.lang['i090_currentVersion'], align="left", parent=updateLayout)
         if self.update_remoteVersion:
             remoteVersion = self.update_remoteVersion.replace("\\n", "\n")
-            cmds.text(remoteVersion+self.lang['i091_onlineVersion'], align="left", parent=updateLayout)
+            cmds.text(remoteVersion+self.data.lang['i091_onlineVersion'], align="left", parent=updateLayout)
             cmds.separator(height=30)
             if self.update_remoteLog:
                 remoteLog = self.update_remoteLog.replace("\\n", "\n")
-                cmds.text(self.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
+                cmds.text(self.data.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
                 cmds.text(remoteLog, align="left", parent=updateLayout)
                 cmds.separator(height=30)
-            whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.data.whats_changed_url), parent=updateLayout)
-            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.data.github_url), parent=updateLayout)
-            downloadButton = cmds.button('downloadButton', label=self.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.data.master_url, "zip"), parent=updateLayout)
-            installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.data.master_url, self.update_remoteVersion), parent=updateLayout)
+            whatsChangedButton = cmds.button('whatsChangedButton', label=self.data.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.data.whats_changed_url), parent=updateLayout)
+            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.data.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.data.github_url), parent=updateLayout)
+            downloadButton = cmds.button('downloadButton', label=self.data.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.data.master_url, "zip"), parent=updateLayout)
+            installButton = cmds.button('installButton', label=self.data.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.data.master_url, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
         cmds.separator(height=30)
-        self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.lang['i092_autoCheckUpdate'], align="left", value=self.data.auto_check_update, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
+        self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.data.lang['i092_autoCheckUpdate'], align="left", value=self.data.auto_check_update, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
         cmds.separator(height=30)
         # call Update Window:
         cmds.showWindow(dpUpdateWin)
-        print(self.lang[self.update_text])
+        print(self.data.lang[self.update_text])
     
     
     def downloadUpdate(self, url, ext, *args):
@@ -1365,12 +1176,12 @@ class Start(object):
             self.utils.setProgress('Downloading...', 'Download Update', amount=50)
             try:
                 urllib.request.urlretrieve(url, downloadFolder[0])
-                self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+                self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
                     cmds.deleteUI('dpUpdateWindow', window=True)
             except:
-                self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
+                self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
             self.utils.setProgress(endIt=True)
     
     
@@ -1398,15 +1209,15 @@ class Start(object):
     def installUpdate(self, url, newVersion, *args):
         """ Install the last version from the given url address to download file
         """
-        btContinue = self.lang['i174_continue']
-        btCancel = self.lang['i132_cancel']
-        confirmAutoInstall = cmds.confirmDialog(title=self.lang['i098_installing'], message=self.lang['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
+        btContinue = self.data.lang['i174_continue']
+        btCancel = self.data.lang['i132_cancel']
+        confirmAutoInstall = cmds.confirmDialog(title=self.data.lang['i098_installing'], message=self.data.lang['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
         if confirmAutoInstall == btContinue:
-            print(self.lang['i098_installing'])
+            print(self.data.lang['i098_installing'])
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
             dpAR_DestFolder = self.data.dp_auto_rig_path
-            self.utils.setProgress('Installing: 0%', self.lang['i098_installing'])
+            self.utils.setProgress('Installing: 0%', self.data.lang['i098_installing'])
             
             try:
                 # get remote file from url:
@@ -1429,7 +1240,7 @@ class Start(object):
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
 
                 # store custom presets in order to avoid overwrite them when installing the update:
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.languagesFolder, dpAR_TempDir+"/"+self.languagesFolder)
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.data.languagesFolder, dpAR_TempDir+"/"+self.data.languagesFolder)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.curvesPresetsFolder, dpAR_TempDir+"/"+self.curvesPresetsFolder)
                 # keep dpPipelineInfo data
                 if os.path.exists(dpAR_DestFolder+"/Pipeline/dpPipelineSettings.json"):
@@ -1468,7 +1279,7 @@ class Start(object):
                 shutil.rmtree(folderToDelete)
 
                 # report finished update installation:
-                self.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.lang['i173_reloadScript']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+                self.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.data.lang['i173_reloadScript']+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
                     cmds.deleteUI('dpUpdateWindow', window=True)
@@ -1476,10 +1287,10 @@ class Start(object):
                 self.deleteExistWindow()
             except:
                 # report fail update installation:
-                self.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
+                self.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
             self.utils.setProgress(endIt=True)
         else:
-            print(self.lang['i038_canceled'])
+            print(self.data.lang['i038_canceled'])
     
     
     def setAutoCheckUpdatePref(self, currentValue, *args):
@@ -1553,7 +1364,7 @@ class Start(object):
             infoData['user'] = getpass.getuser()
             infoData['host'] = socket.gethostname()
             infoData['os'] = platform.system()
-            infoData['lang'] = self.langName
+            infoData['lang'] = self.data.langName
             infoData['Maya'] = cmds.about(version=True)
             infoData['dpAR'] = self.dpARVersion
             #print(infoData)
@@ -1570,13 +1381,13 @@ class Start(object):
         # creating Terms and Conditions Window:
         if cmds.window('dpTermsCondWindow', query=True, exists=True):
             cmds.deleteUI('dpTermsCondWindow', window=True)
-        dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         termsLayout = cmds.columnLayout('termsLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpTermsCondWin)
-        cmds.text("\n"+self.lang['i282_termsCondDesc'], align="center", parent=termsLayout)
+        cmds.text("\n"+self.data.lang['i282_termsCondDesc'], align="center", parent=termsLayout)
         # agreement:
         cmds.separator(height=30)
-        self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.lang['i280_iAgreeTermsCond'], align="left", value=self.data.agree_terms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
+        self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.data.lang['i280_iAgreeTermsCond'], align="left", value=self.data.agree_terms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
         cmds.separator(height=30)
         # call window:
         cmds.showWindow(dpTermsCondWin)
@@ -1638,7 +1449,7 @@ class Start(object):
         if not sAttrName in cmds.listAttr(self.masterGrp):
             cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
         if not cmds.objExists(sCtrlName):
-            if (sCtrlName != (self.prefix+"Option_Ctrl")):
+            if (sCtrlName != (self.data.prefix+"Option_Ctrl")):
                 nCtrl = self.ctrls.cvControl(sCtrlType, sCtrlName, r=fRadius, d=iDegree, dir="+X")
             else:
                 nCtrl = self.ctrls.cvCharacter(sCtrlType, sCtrlName, r=(fRadius*0.2))
@@ -1661,7 +1472,7 @@ class Start(object):
                 # rename existing All_Grp node without connections as All_Grp_Old
                 cmds.rename(sAllGrp, sAllGrp+"_Old")
             #Create Master Grp
-            self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
+            self.masterGrp = cmds.createNode("transform", name=self.data.prefix+sAllGrp)
             self.customAttr.addAttr(0, [self.masterGrp]) #dpID
             # adding All_Grp attributes
             cmds.addAttr(self.masterGrp, longName=self.data.master_attr, attributeType="bool")
@@ -1685,7 +1496,7 @@ class Start(object):
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
             cmds.setAttr(self.masterGrp+".system", self.dpARVersion, type="string")
-            cmds.setAttr(self.masterGrp+".language", self.lang["_language"], type="string")
+            cmds.setAttr(self.masterGrp+".language", self.data.lang["_preset"], type="string")
             #
             # TODO WIP (self.presetName)
             #
@@ -1695,7 +1506,7 @@ class Start(object):
             #
             cmds.setAttr(self.masterGrp+".preset", "WIP_PRESET_NAME_HERE", type="string")
             cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
-            cmds.setAttr(self.masterGrp+".prefix", self.prefix, type="string")
+            cmds.setAttr(self.masterGrp+".prefix", self.data.prefix, type="string")
             cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
@@ -1710,7 +1521,7 @@ class Start(object):
             cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
             cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
             # module counts:
-            for guideType in self.guideModuleList:
+            for guideType in self.data.lib[self.data.standard_folder]:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
             # set outliner color
             self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True) #white
@@ -1723,17 +1534,17 @@ class Start(object):
         cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
         # Get or create all the needed group
-        self.supportGrp     = self.getBaseGrp("supportGrp", self.prefix+"Support_Grp", ["modelsGrp", self.prefix+"Model_Grp"]) #just to make compatibility with old rigs
-        self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.prefix+"Ctrls_Grp")
-        self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.prefix+"Ctrls_Visibility_Grp")
-        self.dataGrp        = self.getBaseGrp("dataGrp", self.prefix+"Data_Grp")
-        self.renderGrp      = self.getBaseGrp("renderGrp", self.prefix+"Render_Grp")
-        self.proxyGrp       = self.getBaseGrp("proxyGrp", self.prefix+"Proxy_Grp")
-        self.fxGrp          = self.getBaseGrp("fxGrp", self.prefix+"FX_Grp")
-        self.staticGrp      = self.getBaseGrp("staticGrp", self.prefix+"Static_Grp")
-        self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
-        self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
-        self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
+        self.supportGrp     = self.getBaseGrp("supportGrp", self.data.prefix+"Support_Grp", ["modelsGrp", self.data.prefix+"Model_Grp"]) #just to make compatibility with old rigs
+        self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.data.prefix+"Ctrls_Grp")
+        self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.data.prefix+"Ctrls_Visibility_Grp")
+        self.dataGrp        = self.getBaseGrp("dataGrp", self.data.prefix+"Data_Grp")
+        self.renderGrp      = self.getBaseGrp("renderGrp", self.data.prefix+"Render_Grp")
+        self.proxyGrp       = self.getBaseGrp("proxyGrp", self.data.prefix+"Proxy_Grp")
+        self.fxGrp          = self.getBaseGrp("fxGrp", self.data.prefix+"FX_Grp")
+        self.staticGrp      = self.getBaseGrp("staticGrp", self.data.prefix+"Static_Grp")
+        self.scalableGrp    = self.getBaseGrp("scalableGrp", self.data.prefix+"Scalable_Grp")
+        self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.data.prefix+"BlendShapes_Grp")
+        self.wipGrp         = self.getBaseGrp("wipGrp", self.data.prefix+"WIP_Grp")
         # set outliner color
         self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True) #blue
         self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
@@ -1741,7 +1552,7 @@ class Start(object):
 
         # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
-            if self.masterGrp == self.prefix+sAllGrp:
+            if self.masterGrp == self.data.prefix+sAllGrp:
                 cmds.parent(self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
                 cmds.parent(self.supportGrp, self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
         cmds.select(clear=True)
@@ -1766,11 +1577,11 @@ class Start(object):
 
         # Controllers Setup
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
-        self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
-        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
+        self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.data.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
+        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.data.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         # Create root control
-        self.rootCtrl = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
-        self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
+        self.rootCtrl = self.getBaseCtrl("id_005_Root", "rootCtrl", self.data.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
+        self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.data.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
         needConnectPivotAttr = False
         if (self.ctrlCreated):
             needConnectPivotAttr = True
@@ -1780,13 +1591,13 @@ class Start(object):
             self.ctrls.createGroundDirectionShape(self.globalCtrl, 2, 15, 1)
             self.ctrls.createGroundDirectionShape(self.masterCtrl, 1, 11, 0)
             self.ctrls.createGroundDirectionShape(self.rootCtrl, 1, 8, 0)
-        self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
+        self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.data.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
             self.optionCtrlGrp = self.utils.zeroOut([self.optionCtrl], notTransformIO=False)[0]
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
-            self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
+            self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.data.prefix+'RigScale_MD')
             self.customAttr.addAttr(0, [self.rigScaleMD]) #dpID
             cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool", defaultValue=True)
             cmds.addAttr(self.optionCtrl, longName="dpRigScaleNode", attributeType="message")
@@ -1808,7 +1619,7 @@ class Start(object):
             cmds.parent(self.optionCtrlGrp, self.rootCtrl)
             cmds.parent(self.ctrlsVisGrp, self.rootCtrl)
         else:
-            self.rigScaleMD = self.prefix+'RigScale_MD'
+            self.rigScaleMD = self.data.prefix+'RigScale_MD'
 
         # parent Tag
         if "parentTag" in cmds.listAttr(self.globalCtrl):
@@ -1832,12 +1643,12 @@ class Start(object):
         cmds.select(clear=True)
 
         #Base joint
-        self.baseRootJnt = self.prefix+"BaseRoot_Jnt"
-        self.baseRootJntGrp = self.prefix+"BaseRoot_Joint_Grp"
+        self.baseRootJnt = self.data.prefix+"BaseRoot_Jnt"
+        self.baseRootJntGrp = self.data.prefix+"BaseRoot_Joint_Grp"
         if not cmds.objExists(self.baseRootJnt):
-            self.baseRootJnt = cmds.createNode("joint", name=self.prefix+"BaseRoot_Jnt")
+            self.baseRootJnt = cmds.createNode("joint", name=self.data.prefix+"BaseRoot_Jnt")
             if not cmds.objExists(self.baseRootJntGrp):
-                self.baseRootJntGrp = cmds.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
+                self.baseRootJntGrp = cmds.createNode("transform", name=self.data.prefix+"BaseRoot_Joint_Grp")
             cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
             cmds.parent(self.baseRootJntGrp, self.scalableGrp)
             cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
@@ -1868,7 +1679,7 @@ class Start(object):
                 # load dpReorderAttribute:
                 dpRAttr = dpReorderAttr.ReorderAttr(self, False)
                 if verbose and not self.data.rebuilding:
-                    self.utils.setProgress('Reordering: '+self.lang['c110_start'], 'Reordering Attributes', len(attrList), addOne=False, addNumber=False)
+                    self.utils.setProgress('Reordering: '+self.data.lang['c110_start'], 'Reordering Attributes', len(attrList), addOne=False, addNumber=False)
                 delta = 0
                 for i, desAttr in enumerate(attrList):
                     if verbose:
@@ -1891,9 +1702,9 @@ class Start(object):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the generating process.
         """
-        print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
+        print('\ndpAutoRigSystem Log: ' + self.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
-        self.utils.setProgress(self.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
+        self.utils.setProgress(self.data.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
         self.utils.closeUI(self.data.plus_info_win_name)
         self.utils.closeUI(self.data.color_override_win_name)
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
@@ -1918,10 +1729,10 @@ class Start(object):
             for guideModule in self.modulesToBeRiggedList:
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
                 if not guideVersion == self.dpARVersion:
-                    btYes = self.lang['i071_yes']
-                    btUpdateGuides = self.lang['m186_updateGuides']
-                    btNo = self.lang['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+self.dpARVersion, message=self.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    btYes = self.data.lang['i071_yes']
+                    btUpdateGuides = self.data.lang['m186_updateGuides']
+                    btNo = self.data.lang['i072_no']
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+self.dpARVersion, message=self.data.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
                     if userChoose == btNo:
                         return
                     elif userChoose == btUpdateGuides:
@@ -1941,28 +1752,11 @@ class Start(object):
             # store hierarchy from guides:
             self.hookDic = self.utils.hook()
             
-            # get prefix:
-            self.prefix = cmds.textField("rig_prefix_tf", query=True, text=True)
-            if self.prefix != "" and self.prefix != " " and self.prefix != "_" and self.prefix != None:
-                if self.prefix[len(self.prefix)-1] != "_":
-                    self.prefix = self.prefix + "_"
-
-            #Check if we need to colorize controller shapes
-            #Check integrate option
-            bColorize = False
-            bAddAttr = False
-            try:
-                bColorize = cmds.checkBox("rig_colorize_ctrl_cb", query=True, value=True)
-                integrate = cmds.checkBox("rig_integrate_cb", query=True, value=True)
-                bAddAttr = cmds.checkBox("rig_add_attr_cb", query=True, value=True)
-            except:
-                pass
-            
             # serialize all guides before build them
             for guideModule in self.modulesToBeRiggedList:
                 guideModule.serializeGuide()
 
-            if integrate == 1:
+            if self.data.integrate_module:
                 self.createBaseRigNode()
             # run RIG function for each guideModule:
             for guideModule in self.modulesToBeRiggedList:
@@ -1984,11 +1778,11 @@ class Start(object):
                     self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
             
             #Colorize all controller in yellow as a base
-            if bColorize:
+            if self.data.colorize_curve:
                 aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
                 aAllCtrls = cmds.ls("*_Ctrl")
-                lPattern = re.compile(self.lang['p002_left'] + '_.*._Ctrl')
-                rPattern = re.compile(self.lang['p003_right'] + '_.*._Ctrl')
+                lPattern = re.compile(self.data.lang['p002_left'] + '_.*._Ctrl')
+                rPattern = re.compile(self.data.lang['p003_right'] + '_.*._Ctrl')
                 for pCtrl in aAllCtrls:
                     shapeList = cmds.listRelatives(pCtrl, children=True, allDescendents=True, fullPath=True, type="shape")
                     if shapeList:
@@ -2002,9 +1796,9 @@ class Start(object):
                             else:
                                 self.ctrls.colorShape([pCtrl], "yellow")
             
-            if integrate == 1:
+            if self.data.integrate_module:
                 # Update progress window
-                self.utils.setProgress('Rigging: '+self.lang['i010_integrateCB'])
+                self.utils.setProgress('Rigging: '+self.data.lang['i010_integrateCB'])
                 
                 # get all parent info from rigged modules:
                 self.originedFromDic = self.utils.getOriginedFromDic()
@@ -2028,9 +1822,9 @@ class Start(object):
                     for s, sideName in enumerate(self.itemMirrorNameList):
                         
                         if self.itemGuideCustomName:
-                            self.itemGuideName = sideName + self.prefix + self.itemGuideCustomName
+                            self.itemGuideName = sideName + self.data.prefix + self.itemGuideCustomName
                         else:
-                            self.itemGuideName = sideName + self.prefix + self.itemGuideInstance
+                            self.itemGuideName = sideName + self.data.prefix + self.itemGuideInstance
                         
                         # get hook groups info:
                         self.staticHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"StaticHookGrp", destination=False, source=True)[0]
@@ -2056,9 +1850,9 @@ class Start(object):
                                 self.fatherMirrorNameList = self.fatherGuideMirrorNameList
                             for f, sideFatherName in enumerate(self.fatherMirrorNameList):
                                 if self.fatherCustomName:
-                                    self.fatherName = sideFatherName + self.prefix + self.fatherCustomName
+                                    self.fatherName = sideFatherName + self.data.prefix + self.fatherCustomName
                                 else:
-                                    self.fatherName = sideFatherName + self.prefix + self.fatherInstance
+                                    self.fatherName = sideFatherName + self.data.prefix + self.fatherInstance
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
                                 if self.fatherRiggedParentNode:
@@ -2093,7 +1887,7 @@ class Start(object):
                 
                 # prepare to show a dialog box if find a bug:
                 self.detectedBug = False
-                self.bugMessage = self.lang['b000_bugGeneral']
+                self.bugMessage = self.data.lang['b000_bugGeneral']
                 
                 # integrating modules together:
                 if self.integratedTaskDic:
@@ -2106,11 +1900,11 @@ class Start(object):
                         try:
                             correctiveGrpList = self.integratedTaskDic[moduleDic]['correctiveCtrlGrpList']
                             if correctiveGrpList:
-                                if not cmds.objExists(self.optionCtrl+"."+self.lang['c124_corrective']+"Ctrls"):
-                                    cmds.addAttr(self.optionCtrl, longName=self.lang['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                                    cmds.setAttr(self.optionCtrl+"."+self.lang['c124_corrective']+"Ctrls", channelBox=True)
+                                if not cmds.objExists(self.optionCtrl+"."+self.data.lang['c124_corrective']+"Ctrls"):
+                                    cmds.addAttr(self.optionCtrl, longName=self.data.lang['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                                    cmds.setAttr(self.optionCtrl+"."+self.data.lang['c124_corrective']+"Ctrls", channelBox=True)
                                 for correctiveGrp in correctiveGrpList:
-                                    cmds.connectAttr(self.optionCtrl+"."+self.lang['c124_corrective']+"Ctrls", correctiveGrp+".visibility", force=True)
+                                    cmds.connectAttr(self.optionCtrl+"."+self.data.lang['c124_corrective']+"Ctrls", correctiveGrp+".visibility", force=True)
                         except:
                             pass
 
@@ -2338,7 +2132,7 @@ class Start(object):
                                         self.toIDList.extend(cmds.parentConstraint(tipCtrl, rootCtrlRefList[s], maintainOffset=True, name=rootCtrlRefList[s]+"_PaC"))
 
                                     # verify if is quadruped
-                                    if limbStyle == self.lang['m037_quadruped'] or limbStyle == self.lang['m043_quadSpring']:
+                                    if limbStyle == self.data.lang['m037_quadruped'] or limbStyle == self.data.lang['m043_quadSpring']:
                                         if fatherGuideLoc != "JointLoc1":
                                             # get extra info from limb module data:
                                             quadFrontLeg = self.integratedTaskDic[moduleDic]['quadFrontLegList'][s]
@@ -2397,7 +2191,7 @@ class Start(object):
                                             cmds.setAttr(self.optionCtrl+'.'+shapeVisAttr, channelBox=True)
                                             cmds.connectAttr(self.optionCtrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
                                             cmds.setAttr(hipsA+'.'+shapeVisAttr, keyable=False)
-                                if bColorize:
+                                if self.data.colorize_curve:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
                         
@@ -2415,7 +2209,7 @@ class Start(object):
                                 # connect the masterCtrl to head group using a orientConstraint:
                                 worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
                                 self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
-                                if bColorize:
+                                if self.data.colorize_curve:
                                     if self.integratedTaskDic[moduleDic]['ctrlList']:
                                         self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
                                     if self.integratedTaskDic[moduleDic]['InnerCtrls']:
@@ -2425,11 +2219,11 @@ class Start(object):
                                     if self.integratedTaskDic[moduleDic]['rCtrls']:
                                         self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                             if self.facialCtrlGrpList:
-                                if not cmds.objExists(self.optionCtrl+"."+self.lang['c059_facial'].lower()):
-                                    cmds.addAttr(self.optionCtrl, longName=self.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                    cmds.setAttr(self.optionCtrl+"."+self.lang['c059_facial'].lower(), channelBox=True)
+                                if not cmds.objExists(self.optionCtrl+"."+self.data.lang['c059_facial'].lower()):
+                                    cmds.addAttr(self.optionCtrl, longName=self.data.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                    cmds.setAttr(self.optionCtrl+"."+self.data.lang['c059_facial'].lower(), channelBox=True)
                                 for facialCtrlGrp in self.facialCtrlGrpList:
-                                    cmds.connectAttr(self.optionCtrl+"."+self.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
+                                    cmds.connectAttr(self.optionCtrl+"."+self.data.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
                         
                         # integrate the Eye with the Head setup:
                         if moduleType == self.eyeName:
@@ -2447,9 +2241,9 @@ class Start(object):
                                 headParentConst = cmds.parentConstraint(self.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
                                 eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
                                 self.toIDList.extend([headParentConst, eyeRevNode])
-                                cmds.connectAttr(eyeCtrl+'.'+self.lang['c032_follow'], eyeRevNode+".inputX", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.data.lang['c032_follow'], eyeRevNode+".inputX", force=True)
                                 cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
-                                cmds.connectAttr(eyeCtrl+'.'+self.lang['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.data.lang['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
                                 cmds.parent(upLocGrp, upperCtrl, relative=False)
                                 cmds.setAttr(upLocGrp+".visibility", 0)
                                 # head drives eyeScaleGrp:
@@ -2464,7 +2258,7 @@ class Start(object):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
                                     self.toIDList.extend(cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC"))
                             # changing iris and pupil color override:
-                            if bColorize:
+                            if self.data.colorize_curve:
                                 self.itemMirrorNameList = [""]
                                 # get itemGuideName:
                                 self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
@@ -2508,9 +2302,9 @@ class Start(object):
                         # integrate the Single module with another Single as a father:
                         if moduleType == self.singleName:
                             # connect Option_Ctrl display attribute to the visibility:
-                            if not cmds.objExists(self.optionCtrl+"."+self.lang['m081_tweaks'].lower()):
-                                cmds.addAttr(self.optionCtrl, longName=self.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                cmds.setAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), channelBox=True)
+                            if not cmds.objExists(self.optionCtrl+"."+self.data.lang['m081_tweaks'].lower()):
+                                cmds.addAttr(self.optionCtrl, longName=self.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                cmds.setAttr(self.optionCtrl+"."+self.data.lang['m081_tweaks'].lower(), channelBox=True)
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2520,7 +2314,7 @@ class Start(object):
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ctrlGrp = self.integratedTaskDic[moduleDic]["ctrlGrpList"][s]
-                                cmds.connectAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
+                                cmds.connectAttr(self.optionCtrl+"."+self.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             if fatherModule == self.singleName:
@@ -2561,7 +2355,7 @@ class Start(object):
                                     except:
                                         steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][0]
                                     # connect modules to be integrated:
-                                    cmds.connectAttr(steeringCtrl+'.'+self.lang['c070_steering'], wheelCtrl+'.'+self.lang['i037_to']+self.lang['c070_steering'].capitalize(), force=True)
+                                    cmds.connectAttr(steeringCtrl+'.'+self.data.lang['c070_steering'], wheelCtrl+'.'+self.data.lang['i037_to']+self.data.lang['c070_steering'].capitalize(), force=True)
                                     # reparent wheel module:
                                     wheelHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
                                     cmds.parent(wheelHookCtrlGrp, self.ctrlsVisGrp)
@@ -2598,9 +2392,9 @@ class Start(object):
                                                     self.fatherBMirrorNameList = self.fatherBGuideMirrorNameList
                                                 for fB, fBSideName in enumerate(self.fatherBMirrorNameList):
                                                     if self.fatherBCustomName:
-                                                        fatherB = fBSideName + self.prefix + self.fatherBCustomName + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
+                                                        fatherB = fBSideName + self.data.prefix + self.fatherBCustomName + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     else:
-                                                        fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
+                                                        fatherB = fBSideName + self.data.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     fatherBRiggedNode = self.originedFromDic[fatherB]
                                                     if cmds.objExists(fatherBRiggedNode):
                                                         if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
@@ -2629,7 +2423,7 @@ class Start(object):
                         if moduleType == self.noseName:
                             self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
                             if self.itemGuideMirrorAxis == "off":
-                                if bColorize:
+                                if self.data.colorize_curve:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][0], "yellow")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][0], "red")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][0], "blue")
@@ -2679,7 +2473,7 @@ class Start(object):
                         self.customAttr.addAttr(0, self.toIDList, descendents=True)
 
                 # actualise the number of rigged guides by type
-                for guideType in self.guideModuleList:
+                for guideType in self.data.lib[self.data.standard_folder]:
                     typeCounter = 0
                     guideNetList = cmds.ls(selection=False, type="network")
                     for net in guideNetList:
@@ -2740,20 +2534,20 @@ class Start(object):
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
             # Add usefull attributes for the animators
-            if (bAddAttr):
+            if self.data.add_supplementary_attr:
                 # defining attribute name strings:
-                generalAttr = self.lang['c066_general']
-                vvAttr = self.lang['c031_volumeVariation']
-                spineAttr = self.lang['m011_spine'].lower()
-                limbAttr = self.lang['m019_limb'].lower()
-                armAttr = self.lang['m028_arm']
-                legAttr = self.lang['m030_leg']
-                frontAttr = self.lang['c056_front']
-                backAttr = self.lang['c057_back']
-                leftAttr = self.lang['p002_left'].lower()
-                rightAttr = self.lang['p003_right'].lower()
-                tweaksAttr = self.lang['m081_tweaks'].lower()
-                facialAttr = self.lang['c059_facial'].lower()
+                generalAttr = self.data.lang['c066_general']
+                vvAttr = self.data.lang['c031_volumeVariation']
+                spineAttr = self.data.lang['m011_spine'].lower()
+                limbAttr = self.data.lang['m019_limb'].lower()
+                armAttr = self.data.lang['m028_arm']
+                legAttr = self.data.lang['m030_leg']
+                frontAttr = self.data.lang['c056_front']
+                backAttr = self.data.lang['c057_back']
+                leftAttr = self.data.lang['p002_left'].lower()
+                rightAttr = self.data.lang['p003_right'].lower()
+                tweaksAttr = self.data.lang['m081_tweaks'].lower()
+                facialAttr = self.data.lang['c059_facial'].lower()
                 
                 if not cmds.objExists(self.optionCtrl+"."+generalAttr):
                     cmds.addAttr(self.optionCtrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
@@ -2836,11 +2630,11 @@ class Start(object):
             self.initExtraModule("dpFingerHandPose", self.data.tools_folder, hidden=True)
 
             # show dialogBox if detected a bug:
-            if integrate == 1:
+            if self.data.integrate_module:
                 if self.detectedBug:
                     print("\n\n")
                     print(self.bugMessage)
-                    cmds.confirmDialog(title=self.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
+                    cmds.confirmDialog(title=self.data.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
         # re-declaring guideMirror and previewMirror groups:
         if cmds.objExists(self.data.guide_mirror_grp):

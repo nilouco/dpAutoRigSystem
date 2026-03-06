@@ -24,50 +24,50 @@ def getUserDetail(opt1, opt2, cancel, userMessage):
     return result
 
 
-def Quadruped(dpUIinst):
+def Quadruped(ar):
     """ This function will create all guides needed to compose a quadruped.
     """
     # check modules integrity:
     guideDir = 'Modules.Standard'
     standardDir = 'Modules/Standard'
     checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
-    checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = ar.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
-        dpUIinst.collapseEditSelModFL = True
+        ar.collapseEditSelModFL = True
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']
-        bipedStyleName = dpUIinst.lang['m026_biped']
-        quadrupedStyleName = dpUIinst.lang['m155_quadrupedExtra']
+        doingName = ar.data.lang['m094_doing']
+        bipedStyleName = ar.data.lang['m026_biped']
+        quadrupedStyleName = ar.data.lang['m155_quadrupedExtra']
         # part names:
-        spineName = dpUIinst.lang['m011_spine']
-        headName = dpUIinst.lang['c024_head']
-        eyeName = dpUIinst.lang['c036_eye']
-        legName = dpUIinst.lang['m030_leg'].capitalize()
-        footName = dpUIinst.lang['c038_foot']
-        earName = dpUIinst.lang['m040_ear']
-        upperTeethName = dpUIinst.lang['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.lang['m075_upperTeeth']+dpUIinst.lang['c029_middle'].capitalize()
-        upperTeethSideName = dpUIinst.lang['m075_upperTeeth']+dpUIinst.lang['c016_revFoot_G'].capitalize()
-        lowerTeethName = dpUIinst.lang['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.lang['m076_lowerTeeth']+dpUIinst.lang['c029_middle'].capitalize()
-        lowerTeethSideName = dpUIinst.lang['m076_lowerTeeth']+dpUIinst.lang['c016_revFoot_G'].capitalize()
-        noseName = dpUIinst.lang['m078_nose']
-        tongueName = dpUIinst.lang['m077_tongue']
-        tailName = dpUIinst.lang['m039_tail']
-        toeName = dpUIinst.lang['c013_revFoot_D'].capitalize()
-        frontName = dpUIinst.lang['c056_front']
-        backName = dpUIinst.lang['c057_back']
-        simple   = dpUIinst.lang['i175_simple']
-        complete = dpUIinst.lang['i176_complete']
-        cancel   = dpUIinst.lang['i132_cancel']
-        userMessage = dpUIinst.lang['i177_chooseMessage']
-        breathName = dpUIinst.lang['c095_breath']
-        bellyName = dpUIinst.lang['c096_belly']
-        baseName = dpUIinst.lang['c106_base']
-        upperName = dpUIinst.lang['c044_upper']
-        lowerName = dpUIinst.lang['c045_lower']
-        quadrupedGuideName = dpUIinst.lang['m037_quadruped']+" "+dpUIinst.lang['i205_guide']
+        spineName = ar.data.lang['m011_spine']
+        headName = ar.data.lang['c024_head']
+        eyeName = ar.data.lang['c036_eye']
+        legName = ar.data.lang['m030_leg'].capitalize()
+        footName = ar.data.lang['c038_foot']
+        earName = ar.data.lang['m040_ear']
+        upperTeethName = ar.data.lang['m075_upperTeeth']
+        upperTeethMiddleName = ar.data.lang['m075_upperTeeth']+ar.data.lang['c029_middle'].capitalize()
+        upperTeethSideName = ar.data.lang['m075_upperTeeth']+ar.data.lang['c016_revFoot_G'].capitalize()
+        lowerTeethName = ar.data.lang['m076_lowerTeeth']
+        lowerTeethMiddleName = ar.data.lang['m076_lowerTeeth']+ar.data.lang['c029_middle'].capitalize()
+        lowerTeethSideName = ar.data.lang['m076_lowerTeeth']+ar.data.lang['c016_revFoot_G'].capitalize()
+        noseName = ar.data.lang['m078_nose']
+        tongueName = ar.data.lang['m077_tongue']
+        tailName = ar.data.lang['m039_tail']
+        toeName = ar.data.lang['c013_revFoot_D'].capitalize()
+        frontName = ar.data.lang['c056_front']
+        backName = ar.data.lang['c057_back']
+        simple   = ar.data.lang['i175_simple']
+        complete = ar.data.lang['i176_complete']
+        cancel   = ar.data.lang['i132_cancel']
+        userMessage = ar.data.lang['i177_chooseMessage']
+        breathName = ar.data.lang['c095_breath']
+        bellyName = ar.data.lang['c096_belly']
+        baseName = ar.data.lang['c106_base']
+        upperName = ar.data.lang['c044_upper']
+        lowerName = ar.data.lang['c045_lower']
+        quadrupedGuideName = ar.data.lang['m037_quadruped']+" "+ar.data.lang['i205_guide']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -79,12 +79,12 @@ def Quadruped(dpUIinst):
                 maxProcess = 22
                 
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, quadrupedGuideName, maxProcess, addOne=False, addNumber=False)
+            ar.utils.setProgress(doingName, quadrupedGuideName, maxProcess, addOne=False, addNumber=False)
 
             # woking with SPINE system:
-            dpUIinst.utils.setProgress(doingName+spineName)
+            ar.utils.setProgress(doingName+spineName)
             # create spine module instance:
-            spineInstance = dpUIinst.initGuide('dpSpine', guideDir, RigType.quadruped)
+            spineInstance = ar.initGuide('dpSpine', guideDir, RigType.quadruped)
             # editing spine base guide informations:
             spineInstance.editGuideModuleName(spineName)
             cmds.setAttr(spineInstance.moduleGrp+".translateY", 10)
@@ -99,9 +99,9 @@ def Quadruped(dpUIinst):
             cmds.refresh()
             
             # woking with HEAD system:
-            dpUIinst.utils.setProgress(doingName+headName)
+            ar.utils.setProgress(doingName+headName)
             # create head module instance:
-            headInstance = dpUIinst.initGuide('dpHead', guideDir, RigType.quadruped)
+            headInstance = ar.initGuide('dpHead', guideDir, RigType.quadruped)
             # editing head base guide informations:
             headInstance.editGuideModuleName(headName)
             cmds.setAttr(headInstance.moduleGrp+".translateY", 9.5)
@@ -131,9 +131,9 @@ def Quadruped(dpUIinst):
             cmds.refresh()
             
             # woking with Eye system:
-            dpUIinst.utils.setProgress(doingName+eyeName)
+            ar.utils.setProgress(doingName+eyeName)
             # create eyeLookAt module instance:
-            eyeInstance = dpUIinst.initGuide('dpEye', guideDir, RigType.quadruped)
+            eyeInstance = ar.initGuide('dpEye', guideDir, RigType.quadruped)
             # editing eyeLookAt base guide informations:
             eyeInstance.editGuideModuleName(eyeName)
             # setting X mirror:
@@ -150,9 +150,9 @@ def Quadruped(dpUIinst):
             cmds.refresh()
             
             # working with BACK LEG (B) system:
-            dpUIinst.utils.setProgress(doingName+legName)
+            ar.utils.setProgress(doingName+legName)
             # create back leg module instance:
-            backLegLimbInstance = dpUIinst.initGuide('dpLimb', guideDir, RigType.quadruped)
+            backLegLimbInstance = ar.initGuide('dpLimb', guideDir, RigType.quadruped)
             # change limb guide to back leg type:
             backLegLimbInstance.changeType(legName)
             # change limb guide to back leg style (quadruped):
@@ -187,9 +187,9 @@ def Quadruped(dpUIinst):
             backLegLimbInstance.changeMirror("X")
             cmds.refresh()
             
-            dpUIinst.utils.setProgress(doingName+footName)
+            ar.utils.setProgress(doingName+footName)
             # create BACK FOOT (B) module instance:
-            backFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
+            backFootInstance = ar.initGuide('dpFoot', guideDir, RigType.quadruped)
             backFootInstance.editGuideModuleName(footName+backName)
             cmds.setAttr(backFootInstance.annotation+".translateY", -3)
             cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
@@ -205,9 +205,9 @@ def Quadruped(dpUIinst):
             cmds.refresh()
             
             # working with FRONT LEG (A) system:
-            dpUIinst.utils.setProgress(doingName+legName)
+            ar.utils.setProgress(doingName+legName)
             # create front leg module instance:
-            frontLegLimbInstance = dpUIinst.initGuide('dpLimb', guideDir, RigType.quadruped)
+            frontLegLimbInstance = ar.initGuide('dpLimb', guideDir, RigType.quadruped)
             # change limb guide to front leg type:
             frontLegLimbInstance.changeType(legName)
             # change limb guide to front leg style (biped):
@@ -245,9 +245,9 @@ def Quadruped(dpUIinst):
             frontLegLimbInstance.changeMirror("X")
             cmds.refresh()
 
-            dpUIinst.utils.setProgress(doingName+footName)
+            ar.utils.setProgress(doingName+footName)
             # create FRONT FOOT (A) module instance:
-            frontFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
+            frontFootInstance = ar.initGuide('dpFoot', guideDir, RigType.quadruped)
             frontFootInstance.editGuideModuleName(footName+frontName)
             cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
             cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
@@ -263,9 +263,9 @@ def Quadruped(dpUIinst):
             cmds.refresh()
             
             # woking with TAIL system:
-            dpUIinst.utils.setProgress(doingName+tailName)
+            ar.utils.setProgress(doingName+tailName)
             # create FkLine module instance:
-            tailInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+            tailInstance = ar.initGuide('dpFkLine', guideDir, RigType.quadruped)
             # editing tail base guide informations:
             tailInstance.editGuideModuleName(tailName)
             cmds.setAttr(tailInstance.moduleGrp+".translateY", 9.8)
@@ -290,9 +290,9 @@ def Quadruped(dpUIinst):
             if userDetail == complete:
                 
                 # woking with TAIL system:
-                dpUIinst.utils.setProgress(doingName+tailName+baseName)
+                ar.utils.setProgress(doingName+tailName+baseName)
                 # create FkLine module instance:
-                tailBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                tailBaseInstance = ar.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing tail base guide informations:
                 tailBaseInstance.editGuideModuleName(tailName+baseName)
                 cmds.setAttr(tailBaseInstance.moduleGrp+".translateY", 10.0)
@@ -315,9 +315,9 @@ def Quadruped(dpUIinst):
                 eyeInstance.setCorrective(1)
                 
                 # woking with EAR system:
-                dpUIinst.utils.setProgress(doingName+earName)
+                ar.utils.setProgress(doingName+earName)
                 # create FkLine module instance:
-                earBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                earBaseInstance = ar.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear base guide informations:
                 earBaseInstance.editGuideModuleName(earName+baseName)
                 cmds.setAttr(earBaseInstance.moduleGrp+".translateX", 0.11)
@@ -332,9 +332,9 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earBaseInstance.cvEndJoint+".translateZ", 0.5)
                 cmds.setAttr(earBaseInstance.moduleGrp+".deformedBy", 1)
 
-                dpUIinst.utils.setProgress(doingName+earName)
+                ar.utils.setProgress(doingName+earName)
                 # create FkLine module instance:
-                earInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                earInstance = ar.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear base guide informations:
                 earInstance.editGuideModuleName(earName)
                 cmds.setAttr(earInstance.moduleGrp+".translateX", 0.8)
@@ -355,9 +355,9 @@ def Quadruped(dpUIinst):
                 # change the number of joints to the ear module:
                 earInstance.changeJointNumber(2)
 
-                dpUIinst.utils.setProgress(doingName+upperName+earName)
+                ar.utils.setProgress(doingName+upperName+earName)
                 # create FkLine module instance:
-                earUpperInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                earUpperInstance = ar.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear upper guide informations:
                 earUpperInstance.editGuideModuleName(upperName+earName)
                 cmds.setAttr(earUpperInstance.moduleGrp+".translateX", 1.401)
@@ -375,9 +375,9 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earUpperInstance.moduleGrp+".scaleZ", 0.4)
                 cmds.setAttr(earUpperInstance.moduleGrp+".deformedBy", 1)
                 
-                dpUIinst.utils.setProgress(doingName+lowerName+earName)
+                ar.utils.setProgress(doingName+lowerName+earName)
                 # create FkLine module instance:
-                earLowerInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                earLowerInstance = ar.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear upper guide informations:
                 earLowerInstance.editGuideModuleName(lowerName+earName)
                 cmds.setAttr(earLowerInstance.moduleGrp+".translateX", 1.796)
@@ -408,9 +408,9 @@ def Quadruped(dpUIinst):
                 cmds.refresh()
                 
                 # woking with Teeth system:
-                dpUIinst.utils.setProgress(doingName+upperTeethName)
+                ar.utils.setProgress(doingName+upperTeethName)
                 # create FkLine module instance:
-                upperTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                upperTeethInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing upperTeeth base guide informations:
                 upperTeethInstance.editGuideModuleName(upperTeethName)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".translateY", 12.5)
@@ -420,7 +420,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".deformedBy", 3)
                 # create FkLine module instance:
-                upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                upperTeethMiddleInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
                 upperTeethMiddleInstance.editGuideModuleName(upperTeethMiddleName)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 12.3)
@@ -433,7 +433,7 @@ def Quadruped(dpUIinst):
                 # parent upperTeethMiddle guide to upperTeeth guide:
                 cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
-                upperTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                upperTeethSideInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing upperTeethSide base guide informations:
                 upperTeethSideInstance.editGuideModuleName(upperTeethSideName)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
@@ -449,7 +449,7 @@ def Quadruped(dpUIinst):
                 # parent upperTeethSide guide to upperTeeth guide:
                 cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
-                lowerTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                lowerTeethInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing lowerTeeth base guide informations:
                 lowerTeethInstance.editGuideModuleName(lowerTeethName)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 11.7)
@@ -461,7 +461,7 @@ def Quadruped(dpUIinst):
                 # parent lowerTeeth guide to head guide:
                 cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 # create FkLine module instance:
-                lowerTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                lowerTeethMiddleInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethMiddle base guide informations:
                 lowerTeethMiddleInstance.editGuideModuleName(lowerTeethMiddleName)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 11.9)
@@ -474,7 +474,7 @@ def Quadruped(dpUIinst):
                 # parent lowerTeeth guide to lowerTeeth guide:
                 cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
-                lowerTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                lowerTeethSideInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethSide base guide informations:
                 lowerTeethSideInstance.editGuideModuleName(lowerTeethSideName)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
@@ -492,9 +492,9 @@ def Quadruped(dpUIinst):
                 cmds.refresh()
                 
                 # woking with Tongue system:
-                dpUIinst.utils.setProgress(doingName+tongueName)
+                ar.utils.setProgress(doingName+tongueName)
                 # create FkLine module instance:
-                tongueInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                tongueInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing tongue base guide informations:
                 tongueInstance.editGuideModuleName(tongueName)
                 cmds.setAttr(tongueInstance.moduleGrp+".translateY", 12)
@@ -514,9 +514,9 @@ def Quadruped(dpUIinst):
                 cmds.refresh()
                 
                 # woking with Nose system:
-                dpUIinst.utils.setProgress(doingName+noseName)
+                ar.utils.setProgress(doingName+noseName)
                 # create Nose module instance:
-                noseInstance = dpUIinst.initGuide('dpNose', guideDir)
+                noseInstance = ar.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
                 noseInstance.editGuideModuleName(noseName)
                 cmds.setAttr(noseInstance.moduleGrp+".translateY", 13)
@@ -536,9 +536,9 @@ def Quadruped(dpUIinst):
                 cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName+frontName)
+                ar.utils.setProgress(doingName+toeName+frontName)
                 # create toe1 module instance:
-                toe1FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe1FrontInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe1FrontInstance.editGuideModuleName(toeName+frontName+"_1")
                 # editing toe base guide informations:
@@ -559,9 +559,9 @@ def Quadruped(dpUIinst):
                 toe1FrontInstance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName+frontName)
+                ar.utils.setProgress(doingName+toeName+frontName)
                 # create toe2 module instance:
-                toe2FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe2FrontInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe2FrontInstance.editGuideModuleName(toeName+frontName+"_2")
                 # editing toe base guide informations:
@@ -582,9 +582,9 @@ def Quadruped(dpUIinst):
                 toe2FrontInstance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName+frontName)
+                ar.utils.setProgress(doingName+toeName+frontName)
                 # create toe3 module instance:
-                toe3FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe3FrontInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe3FrontInstance.editGuideModuleName(toeName+frontName+"_3")
                 # editing toe base guide informations:
@@ -605,9 +605,9 @@ def Quadruped(dpUIinst):
                 toe3FrontInstance.checkFatherMirror()
                 cmds.refresh()
 
-                dpUIinst.utils.setProgress(doingName+toeName+frontName)
+                ar.utils.setProgress(doingName+toeName+frontName)
                 # create toe4 module instance:
-                toe4FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe4FrontInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe4FrontInstance.editGuideModuleName(toeName+frontName+"_4")
                 # editing toe base guide informations:
@@ -628,9 +628,9 @@ def Quadruped(dpUIinst):
                 toe4FrontInstance.checkFatherMirror()
                 cmds.refresh()
 
-                dpUIinst.utils.setProgress(doingName+toeName+backName)
+                ar.utils.setProgress(doingName+toeName+backName)
                 # create toe1 module instance:
-                toe1BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe1BackInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe1BackInstance.editGuideModuleName(toeName+backName+"_1")
                 # editing toe base guide informations:
@@ -651,9 +651,9 @@ def Quadruped(dpUIinst):
                 toe1BackInstance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName+backName)
+                ar.utils.setProgress(doingName+toeName+backName)
                 # create toe2 module instance:
-                toe2BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe2BackInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe2BackInstance.editGuideModuleName(toeName+backName+"_2")
                 # editing toe base guide informations:
@@ -674,9 +674,9 @@ def Quadruped(dpUIinst):
                 toe2BackInstance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName+backName)
+                ar.utils.setProgress(doingName+toeName+backName)
                 # create toe3 module instance:
-                toe3BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe3BackInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe3BackInstance.editGuideModuleName(toeName+backName+"_3")
                 # editing toe base guide informations:
@@ -697,9 +697,9 @@ def Quadruped(dpUIinst):
                 toe3BackInstance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName+backName)
+                ar.utils.setProgress(doingName+toeName+backName)
                 # create toe4 module instance:
-                toe4BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe4BackInstance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe4BackInstance.editGuideModuleName(toeName+backName+"_4")
                 # editing toe base guide informations:
@@ -720,9 +720,9 @@ def Quadruped(dpUIinst):
                 toe4BackInstance.checkFatherMirror()
                 cmds.refresh()
 
-                dpUIinst.utils.setProgress(doingName+breathName)
+                ar.utils.setProgress(doingName+breathName)
                 # create breath module instance:
-                breathInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                breathInstance = ar.initGuide('dpSingle', guideDir)
                 # change name to breath:
                 breathInstance.editGuideModuleName(breathName)
                 # editing breath base guide informations:
@@ -734,9 +734,9 @@ def Quadruped(dpUIinst):
                 cmds.parent(breathInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
                 cmds.refresh()
 
-                dpUIinst.utils.setProgress(doingName+bellyName)
+                ar.utils.setProgress(doingName+bellyName)
                 # create belly module instance:
-                bellyInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                bellyInstance = ar.initGuide('dpSingle', guideDir)
                 # change name to belly:
                 bellyInstance.editGuideModuleName(bellyName)
                 # editing belly base guide informations:
@@ -748,12 +748,12 @@ def Quadruped(dpUIinst):
                 cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             
             # Close progress window
-            dpUIinst.utils.setProgress(endIt=True)
+            ar.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
-            dpUIinst.collapseEditSelModFL = False
+            ar.collapseEditSelModFL = False
             cmds.select(spineInstance.moduleGrp)
-            print(dpUIinst.lang['m090_createdQuadruped'])
+            print(ar.data.lang['m090_createdQuadruped'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

@@ -50,7 +50,7 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
                     if objList:
                         ctrlList = objList
                     else:
-                        ctrlList = self.dpUIinst.ctrls.getControlList()
+                        ctrlList = self.ar.ctrls.getControlList()
                     if ctrlList:
                         if self.firstMode: #export
                             self.exportDicToJsonFile(self.getCalibrationDataDic(ctrlList))
@@ -59,15 +59,15 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
                             if calibrationDic:
                                 self.importCalibrationData(calibrationDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
                         self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -86,8 +86,8 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
         dic = {}
         self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
         for ctrl in ctrlList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
-            calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
+            self.utils.setProgress(self.ar.data.lang[self.title])
+            calibrationList = self.ar.ctrls.getListFromStringAttr(ctrl)
             if calibrationList:
                 dic[ctrl] = {}
                 for attr in calibrationList:
@@ -102,7 +102,7 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
         # define lists to check result
         wellImportedList = []
         for item in calibrationDic.keys():
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             notFoundNodesList = []
             # check transformations
             if not cmds.objExists(item):
@@ -127,4 +127,4 @@ class CalibrationIO(dpBaseAction.ActionStartClass):
         if wellImportedList:
             self.wellDoneIO(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

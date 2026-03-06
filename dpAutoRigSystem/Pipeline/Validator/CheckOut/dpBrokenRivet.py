@@ -26,9 +26,9 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_BROKENRIVET_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpRivet)
-        self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
+        self.dpRivet = dpRivet.Rivet(self.ar, ui=False)
 
 
     def listFolliclesAtOrigin(self):
@@ -290,7 +290,7 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
             if closestVertexIndex == translatedClosestVertexIndex:
                 cmds.xform(tweakCtrl, piv=new_translation, ws=True)
             else:
-                mel.eval('warning \"'+self.dpUIinst.lang['e022_offsetClosetVertex']+'\";')
+                mel.eval('warning \"'+self.ar.data.lang['e022_offsetClosetVertex']+'\";')
 
 
     def randomizeNewPivot(self, rivetControllersList, attach_to_geo_list):
@@ -370,16 +370,16 @@ class BrokenRivet(dpBaseAction.ActionStartClass):
                     if len(folliclesOriginList) == 0:
                         self.resultOkList.append(True)
                         for fixed in rivetControllersList:
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+fixed)
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+fixed)
                     else:
                         self.resultOkList.append(False)
                         rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
                         for nonFixed in rivetControllersList:
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+nonFixed)
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+nonFixed)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -21,15 +21,15 @@ DP_UTILS_VERSION = 3.14
 
 
 class Utils(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         """ Initialize the module class loading variables.
         """
         # define variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.dpOrderList = "dpOrderList"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
         self.progress = False
-        self.dpID = self.dpUIinst.data.dp_id
+        self.dpID = self.ar.data.dp_id
         self.defineDics()
 
 
@@ -99,13 +99,13 @@ class Utils(object):
             splitEnvList = [x for x in splitEnvList if x != "" and x != ' ' and x != None]
             for env in splitEnvList:
                 env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
-                if env in self.dpUIinst.data.dp_auto_rig_path:
+                if env in self.ar.data.dp_auto_rig_path:
                     try:
-                        envPath = self.dpUIinst.data.dp_auto_rig_path.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
+                        envPath = self.ar.data.dp_auto_rig_path.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
                     except:
                         pass
                     if len(env) < 4:
-                        envPath = self.dpUIinst.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
+                        envPath = self.ar.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
                         return envPath+"."+path
                     break
         # if we are here, we must return a default path:
@@ -193,7 +193,7 @@ class Utils(object):
         guideFolder = self.findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules.Standard"
         for m in validModules:
             mod = __import__(guideFolder+"."+m, {}, {}, [m])
-            if self.dpUIinst.dev:
+            if self.ar.dev:
                 reload(mod)
             validModuleNames.append(mod.CLASS_NAME)
         return(validModules, validModuleNames)
@@ -273,14 +273,12 @@ class Utils(object):
             return [None, None, None]
 
 
-    def useDefaultRenderLayer(self):
-        """ Analisys if must use the Default Render Layer (masterLayer) checking the option in the UI.
-            Set to use it if need.
-        """
-        # analisys to use the defaultRenderLayer:
-        useDefaultRL = cmds.checkBox('rig_default_render_layer_cb', query=True, value=True)
-        if useDefaultRL:
-            cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
+    # def useDefaultRenderLayer(self):
+    #     """ Analisys if must use the Default Render Layer (masterLayer) checking the option in the UI.
+    #         Set to use it if need.
+    #     """
+    #     if self.ar.data.use_default_render_layer:
+    #         cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 
     def removeUserDefinedAttr(self, node, keepOriginedFrom=False):
@@ -331,7 +329,7 @@ class Utils(object):
                     cmds.delete(allChildrenList)
                 if offset:
                     offsetGrp = cmds.duplicate(zeroGrp, name=transform+'_Offset_Grp')[0]
-                    self.dpUIinst.customAttr.addAttr(0, [offsetGrp]) #dpID
+                    self.ar.customAttr.addAttr(0, [offsetGrp]) #dpID
                     cmds.parent(transform, offsetGrp, absolute=True)
                     cmds.parent(offsetGrp, zeroGrp, absolute=True)
                 else:
@@ -340,7 +338,7 @@ class Utils(object):
                     self.addCustomAttr([zeroGrp], self.ignoreTransformIOAttr)
                     if offset:
                         self.addCustomAttr([offsetGrp], self.ignoreTransformIOAttr)
-                self.dpUIinst.customAttr.addAttr(0, [zeroGrp]) #dpID
+                self.ar.customAttr.addAttr(0, [zeroGrp]) #dpID
                 zeroList.append(zeroGrp)
         return zeroList
 
@@ -507,7 +505,7 @@ class Utils(object):
             dist = cmds.getAttr(distBet+".distance")
             if keep:
                 self.addCustomAttr([nullA, nullB, nullC], self.ignoreTransformIOAttr)
-                self.dpUIinst.customAttr.addAttr(0, [distBet]) #dpID
+                self.ar.customAttr.addAttr(0, [distBet]) #dpID
                 return [dist, distBet, nullA, nullB, nullC, pointConst]
             else:
                 cmds.delete(distBet, nullA, nullB, nullC, pointConst)
@@ -664,7 +662,7 @@ class Utils(object):
                     cmds.parent(jnt, dup)
                     if not displayBone:
                         cmds.setAttr(dup+".drawStyle", 2) #none
-                    self.dpUIinst.customAttr.addAttr(0, [dup]) #dpID
+                    self.ar.customAttr.addAttr(0, [dup]) #dpID
                     resultList.append(dup)
         return resultList
 
@@ -778,7 +776,7 @@ class Utils(object):
                 if "DPAR_VERSION_5 = " in line:
                     gotRemoteFile = True
                     remoteVersion = line[18:-2] #these magic numbers filter only the version XX.YY.ZZ
-                    if remoteVersion == self.dpUIinst.dpARVersion:
+                    if remoteVersion == self.ar.dpARVersion:
                         # 0 - the current version is up to date
                         return [0, None, None]
                     else:
@@ -848,7 +846,7 @@ class Utils(object):
         else:
             twistBoneMD = cmds.createNode("multiplyDivide", name=twistBoneName+"_MD")
             cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotate"+axis, twistBoneMD+".input2"+axis, force=True)
-        self.dpUIinst.customAttr.addAttr(0, [twistBoneMM, twistBoneDM, twistBoneQtE, twistBoneMD]) #dpID
+        self.ar.customAttr.addAttr(0, [twistBoneMM, twistBoneDM, twistBoneQtE, twistBoneMD]) #dpID
         return twistBoneMD
         
 
@@ -928,7 +926,7 @@ class Utils(object):
         """ Return the All_Grp if it exists in the scene.
         """
         if not masterAttr:
-            masterAttr = self.dpUIinst.data.master_attr
+            masterAttr = self.ar.data.master_attr
         allTransformList = cmds.ls(selection=False, type="transform")
         if allTransformList:
             for transform in allTransformList:
@@ -945,12 +943,12 @@ class Utils(object):
         for m, masterGroupAttr in enumerate(masterGroupAttrList):
             if not masterGroupAttr in cmds.listAttr(nodeGrp):
                 if not oldAttrList[m]:
-                    cmds.setAttr(nodeGrp+"."+self.dpUIinst.masterAttr, 0)
+                    cmds.setAttr(nodeGrp+"."+self.ar.data.master_attr, 0)
                     return False
                 elif not oldAttrList[m] in cmds.listAttr(nodeGrp):
-                    cmds.setAttr(nodeGrp+"."+self.dpUIinst.masterAttr, 0)
+                    cmds.setAttr(nodeGrp+"."+self.ar.data.master_attr, 0)
                     return False
-        return cmds.getAttr(nodeGrp+"."+self.dpUIinst.masterAttr)
+        return cmds.getAttr(nodeGrp+"."+self.ar.data.master_attr)
     
 
     def getNodeByMessage(self, attrName, node=None, *args):
@@ -1105,7 +1103,7 @@ class Utils(object):
     def unlockAttr(self, nodeList):
         for node in nodeList:
             if cmds.objExists(node):
-                for attr in self.dpUIinst.transformAttrList:
+                for attr in self.ar.transformAttrList:
                     cmds.setAttr(node+"."+attr, lock=False)
 
 
@@ -1137,16 +1135,16 @@ class Utils(object):
         """ Creates a json file as a Validator Preset and returns it.
         """
         resultString = None
-        validatorsList = self.dpUIinst.data.checkin_instances + self.dpUIinst.data.checkout_instances + self.dpUIinst.data.checkaddon_instances
+        validatorsList = self.ar.data.checkin_instances + self.ar.data.checkout_instances + self.ar.data.checkaddon_instances
         if validatorsList:
             resultDialog = cmds.promptDialog(
-                                                title=self.dpUIinst.lang['i129_createPreset'],
-                                                message=self.dpUIinst.lang['i130_presetName'],
-                                                button=[self.dpUIinst.lang['i131_ok'], self.dpUIinst.lang['i132_cancel']],
-                                                defaultButton=self.dpUIinst.lang['i131_ok'],
-                                                cancelButton=self.dpUIinst.lang['i132_cancel'],
-                                                dismissString=self.dpUIinst.lang['i132_cancel'])
-            if resultDialog == self.dpUIinst.lang['i131_ok']:
+                                                title=self.ar.data.lang['i129_createPreset'],
+                                                message=self.ar.data.lang['i130_presetName'],
+                                                button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
+                                                defaultButton=self.ar.data.lang['i131_ok'],
+                                                cancelButton=self.ar.data.lang['i132_cancel'],
+                                                dismissString=self.ar.data.lang['i132_cancel'])
+            if resultDialog == self.ar.data.lang['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
                 author = getpass.getuser()
@@ -1241,7 +1239,7 @@ class Utils(object):
             cmds.setAttr(parentConst+".interpType", 2) #shortest
             if n == 0:
                 revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
-                self.dpUIinst.customAttr.addAttr(0, [revNode]) #dpID
+                self.ar.customAttr.addAttr(0, [revNode]) #dpID
                 cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
                 if storeName:
@@ -1404,7 +1402,7 @@ class Utils(object):
         if not itemList:
             itemList = cmds.ls(selection=False, type=nodeType)
         if itemList:
-            self.dpUIinst.customAttr.addAttr(0, itemList) #dpID
+            self.ar.customAttr.addAttr(0, itemList) #dpID
             for item in itemList:
                 if not item.endswith(suffix):
                     if cmds.attributeQuery("input", node=item, exists=True):
@@ -1442,7 +1440,7 @@ class Utils(object):
 
             Example:
                 self.utils.setProgress(messageName, titleName, 20, addOne=False)
-                self.dpUIinst.utils.setProgress(doingName+': '+backWheelName)
+                self.ar.utils.setProgress(doingName+': '+backWheelName)
 
             Returns the progress: 
                 True if the progressWindow is running
@@ -1534,8 +1532,8 @@ class Utils(object):
         """
         if itemList:
             for item in itemList:
-                if not self.dpUIinst.data.joint_end_attr in cmds.listAttr(item):
-                    cmds.addAttr(item, longName=self.dpUIinst.data.joint_end_attr, attributeType="bool", defaultValue=1)
+                if not self.ar.data.joint_end_attr in cmds.listAttr(item):
+                    cmds.addAttr(item, longName=self.ar.data.joint_end_attr, attributeType="bool", defaultValue=1)
         
 
     def createLocatorInItemPosition(self, item, *args):

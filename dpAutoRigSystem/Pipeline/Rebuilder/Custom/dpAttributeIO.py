@@ -22,7 +22,7 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_ATTRIBUTEIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseAction)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_attributeIO"
@@ -54,7 +54,7 @@ class AttributeIO(dpBaseAction.ActionStartClass):
                     if objList:
                         itemList = objList
                     else:
-                        itemList = self.dpUIinst.ctrls.getControlList()
+                        itemList = self.ar.ctrls.getControlList()
                         itemList.extend(self.getModelToExportList())
                     if itemList:
                         if self.firstMode: #export
@@ -64,15 +64,15 @@ class AttributeIO(dpBaseAction.ActionStartClass):
                             if attrDic:
                                 self.importAttributeData(attrDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
                         self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -100,7 +100,7 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         itemList = list(set(itemList))
         itemList.sort()
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             attrList = cmds.listAttr(item, userDefined=True)
             if attrList:
                 dic[item] = {"attributes" : {},
@@ -137,7 +137,7 @@ class AttributeIO(dpBaseAction.ActionStartClass):
         wellImportedList = []
         for item in attrDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
@@ -175,10 +175,10 @@ class AttributeIO(dpBaseAction.ActionStartClass):
                         wellImportedList.append(item)
                         # TODO: should we set the attribute value here?
                 # reorder attr
-                self.dpUIinst.reorderAttributes([item], attrDic[item]["order"], False)
+                self.ar.reorderAttributes([item], attrDic[item]["order"], False)
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
             self.wellDoneIO(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

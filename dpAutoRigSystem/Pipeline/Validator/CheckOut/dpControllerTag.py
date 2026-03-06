@@ -43,11 +43,11 @@ class ControllerTag(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = self.dpUIinst.ctrls.getControlList()
+                toCheckList = self.ar.ctrls.getControlList()
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     if not cmds.getAttr(item+".controlID") == "id_092_Correctives":
                         if self.firstMode:
                             # conditional to check here
@@ -55,7 +55,7 @@ class ControllerTag(dpBaseAction.ActionStartClass):
                                 self.checkedObjList.append(item+" + controllers")
                                 self.foundIssueList.append(True)
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v075_missingControllerTags'])
+                                self.messageList.append(self.ar.data.lang['v075_missingControllerTags'])
                                 break
                         else: #fix
                             try:
@@ -64,16 +64,16 @@ class ControllerTag(dpBaseAction.ActionStartClass):
                                 result = self.addParentControllerTag(item)
                                 self.resultOkList.append(True)
                                 if result:
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+result)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+result)
                                 else:
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

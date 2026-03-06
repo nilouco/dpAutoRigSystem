@@ -56,7 +56,7 @@ class KeyframeCleaner(dpBaseAction.ActionStartClass):
                     if animatedList:
                         self.utils.setProgress(max=len(animatedList), addOne=False, addNumber=False)
                         for item in animatedList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             if item in toCheckList:
                                 if cmds.objExists(item):
                                     crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
@@ -83,17 +83,17 @@ class KeyframeCleaner(dpBaseAction.ActionStartClass):
                                                             cmds.delete(crv)
                                                             if not reported:
                                                                 self.resultOkList.append(True)
-                                                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                                                 reported = True
                                                         except:
                                                             if not reported:
                                                                 self.resultOkList.append(False)
-                                                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                                                                 reported = True
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -13,9 +13,9 @@ DP_PRINTSELECTION_VERSION = 2.01
 
 
 class PrintSelection(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         # redeclaring variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         # call main function
         self.dpMain(self)
     
@@ -31,7 +31,7 @@ class PrintSelection(object):
             if self.resultDic:
                 self.dpPrintResults(self.resultDic)
         else:
-            mel.eval("warning \""+self.dpUIinst.lang['i042_notSelection']+"\";")
+            mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")
     
     
     def dpDefineDic(self, selList, *args):
@@ -62,4 +62,4 @@ class PrintSelection(object):
             print(resultDic['string'])
             print("-------")
         else:
-            mel.eval("warning \""+self.dpUIinst.lang['i042_notSelection']+"\";")
+            mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")

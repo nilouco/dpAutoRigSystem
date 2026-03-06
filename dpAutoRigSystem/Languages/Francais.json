@@ -1,11 +1,11 @@
 {
+    "_preset"        : "Francais",
     "_author"        : "Danilo Pinheiro",
     "_collaborators" : "Aline Lima\nAndre Ruegger\nCaio Cipo\nCaio Hidaka\nElvis Martins\nFilipe Mello\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLucas Alves\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPablo Emmanuel De Leo\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSaul Almeida\nSébastien Bourgoing\nThiago Silva\nThomas Mansencal",
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-04",
-    "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2026-02-04",
+    "_updated"       : "2026-03-05",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -172,7 +172,7 @@
     "i000_guides"               : "Créer des GUIDES",
     "i001_modules"              : "Modifier des MODULES",
     "i002_options"              : "Options",
-    "i003_prefix"               : "Préfixe pour tous les nodes.",
+    "i003_prefixAll"               : "Préfixe pour tous les nodes.",
     "i004_defaultRL"            : "Utiliser Default Render Layer (masterLayer).",
     "i005_footerRigging"        : "modules seront créés dans ce rig",
     "i006_aboutDesc"            : "\nSur dpAutoRigSystem:\n\nCe script est un programme en Python pour\nautomatiser le processus de rigging.\n\nC'était écrit afin de nous aider à développer\nplusieurs types de rigs par nous-mêmes.\nSon architecture est modulaire, multilingue et orienté à l'objet\nc'est-à-dire que vous pouvez créer n'importe quel type de rig en pièces\net les combiner comme vous voulez...\n\nSi vous avez des suggestions ou des commentaires, s'il vous plaît contactez-nous.\nJ'espère qu'il vous plaira   :)\n\nIl est GRATUIT !!!",
@@ -352,7 +352,7 @@
     "i180_indirectSkin"         : "Indirect Skinning",
     "i181_facialJoint"          : "Facial Joints",
     "i182_facialMessage"        : "Vous voulez utiliser ça pour?",
-    "i183_hideGuideGrp"         : "Cacher les groupes de guides dans l'Outliner.",
+    "i183_hideGuideGrp"         : "Montrer les groupes temporaires dans l'Outliner.",
     "i184_specular"             : "Specular",
     "i185_animation"            : "Animation",
     "i186_gaming"               : "Gaming",

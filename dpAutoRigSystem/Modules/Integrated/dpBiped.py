@@ -23,49 +23,49 @@ def getUserDetail(opt1, opt2, cancel, userMessage):
     return result
 
 
-def Biped(dpUIinst):
+def Biped(ar):
     """ This function will create all guides needed to compose a biped.
     """
     # check modules integrity:
     guideDir = 'Modules.Standard'
     standardDir = 'Modules/Standard'
     checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
-    checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = ar.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
-        dpUIinst.collapseEditSelModFL = True
+        ar.collapseEditSelModFL = True
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']
-        bipedStyleName = dpUIinst.lang['m026_biped']
+        doingName = ar.data.lang['m094_doing']
+        bipedStyleName = ar.data.lang['m026_biped']
         # part names:
-        spineName = dpUIinst.lang['m011_spine']
-        headName = dpUIinst.lang['c024_head']
-        eyeName = dpUIinst.lang['c036_eye']
-        legName = dpUIinst.lang['m030_leg'].capitalize()
-        footName = dpUIinst.lang['c038_foot']
-        armName = dpUIinst.lang['c037_arm'].capitalize()
-        fingerIndexName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m032_index']
-        fingerMiddleName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m033_middle']
-        fingerRingName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m034_ring']
-        fingerPinkyName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m035_pinky']
-        fingerThumbName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m036_thumb']
-        earName = dpUIinst.lang['m040_ear']
-        upperTeethName = dpUIinst.lang['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.lang['m075_upperTeeth']+dpUIinst.lang['c029_middle'].capitalize()
-        upperTeethSideName = dpUIinst.lang['m075_upperTeeth']+dpUIinst.lang['c016_revFoot_G'].capitalize()
-        lowerTeethName = dpUIinst.lang['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.lang['m076_lowerTeeth']+dpUIinst.lang['c029_middle'].capitalize()
-        lowerTeethSideName = dpUIinst.lang['m076_lowerTeeth']+dpUIinst.lang['c016_revFoot_G'].capitalize()
-        noseName = dpUIinst.lang['m078_nose']
-        tongueName = dpUIinst.lang['m077_tongue']
-        toeName = dpUIinst.lang['c013_revFoot_D'].capitalize()
-        breathName = dpUIinst.lang['c095_breath']
-        bellyName = dpUIinst.lang['c096_belly']
-        simple   = dpUIinst.lang['i175_simple']
-        complete = dpUIinst.lang['i176_complete']
-        cancel   = dpUIinst.lang['i132_cancel']
-        userMessage = dpUIinst.lang['i177_chooseMessage']
-        bipedGuideName = dpUIinst.lang['m026_biped']+" "+dpUIinst.lang['i205_guide']
+        spineName = ar.data.lang['m011_spine']
+        headName = ar.data.lang['c024_head']
+        eyeName = ar.data.lang['c036_eye']
+        legName = ar.data.lang['m030_leg'].capitalize()
+        footName = ar.data.lang['c038_foot']
+        armName = ar.data.lang['c037_arm'].capitalize()
+        fingerIndexName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m032_index']
+        fingerMiddleName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m033_middle']
+        fingerRingName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m034_ring']
+        fingerPinkyName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m035_pinky']
+        fingerThumbName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m036_thumb']
+        earName = ar.data.lang['m040_ear']
+        upperTeethName = ar.data.lang['m075_upperTeeth']
+        upperTeethMiddleName = ar.data.lang['m075_upperTeeth']+ar.data.lang['c029_middle'].capitalize()
+        upperTeethSideName = ar.data.lang['m075_upperTeeth']+ar.data.lang['c016_revFoot_G'].capitalize()
+        lowerTeethName = ar.data.lang['m076_lowerTeeth']
+        lowerTeethMiddleName = ar.data.lang['m076_lowerTeeth']+ar.data.lang['c029_middle'].capitalize()
+        lowerTeethSideName = ar.data.lang['m076_lowerTeeth']+ar.data.lang['c016_revFoot_G'].capitalize()
+        noseName = ar.data.lang['m078_nose']
+        tongueName = ar.data.lang['m077_tongue']
+        toeName = ar.data.lang['c013_revFoot_D'].capitalize()
+        breathName = ar.data.lang['c095_breath']
+        bellyName = ar.data.lang['c096_belly']
+        simple   = ar.data.lang['i175_simple']
+        complete = ar.data.lang['i176_complete']
+        cancel   = ar.data.lang['i132_cancel']
+        userMessage = ar.data.lang['i177_chooseMessage']
+        bipedGuideName = ar.data.lang['m026_biped']+" "+ar.data.lang['i205_guide']
         
         
         # getting Simple or Complete module guides to create:
@@ -78,12 +78,12 @@ def Biped(dpUIinst):
                 maxProcess = 18
         
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, bipedGuideName, maxProcess, addOne=False, addNumber=False)
+            ar.utils.setProgress(doingName, bipedGuideName, maxProcess, addOne=False, addNumber=False)
 
             # working with SPINE system:
-            dpUIinst.utils.setProgress(doingName+spineName)
+            ar.utils.setProgress(doingName+spineName)
             # create spine module instance:
-            spineInstance = dpUIinst.initGuide('dpSpine', guideDir)
+            spineInstance = ar.initGuide('dpSpine', guideDir)
             # editing spine base guide informations:
             spineInstance.editGuideModuleName(spineName)
             spineInstance.changeStyle(bipedStyleName)
@@ -93,9 +93,9 @@ def Biped(dpUIinst):
             cmds.refresh()
             
             # working with HEAD system:
-            dpUIinst.utils.setProgress(doingName+headName)
+            ar.utils.setProgress(doingName+headName)
             # create head module instance:
-            headInstance = dpUIinst.initGuide('dpHead', guideDir)
+            headInstance = ar.initGuide('dpHead', guideDir)
             # editing head base guide informations:
             headInstance.editGuideModuleName(headName)
             headInstance.changeJointNumber(2)
@@ -106,9 +106,9 @@ def Biped(dpUIinst):
             cmds.refresh()
             
             # working with Eye system:
-            dpUIinst.utils.setProgress(doingName+eyeName)
+            ar.utils.setProgress(doingName+eyeName)
             # create eye module instance:
-            eyeInstance = dpUIinst.initGuide('dpEye', guideDir)
+            eyeInstance = ar.initGuide('dpEye', guideDir)
             # editing eyeLookAt base guide informations:
             eyeInstance.editGuideModuleName(eyeName)
             # setting X mirror:
@@ -125,9 +125,9 @@ def Biped(dpUIinst):
             cmds.refresh()
             
             # working with LEG system:
-            dpUIinst.utils.setProgress(doingName+legName)
+            ar.utils.setProgress(doingName+legName)
             # create leg module instance:
-            legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
+            legLimbInstance = ar.initGuide('dpLimb', guideDir)
             # change name to leg:
             legLimbInstance.editGuideModuleName(legName)
             # setting X mirror:
@@ -151,9 +151,9 @@ def Biped(dpUIinst):
             cmds.refresh()
             
             # working with FOOT system:
-            dpUIinst.utils.setProgress(doingName+footName)
+            ar.utils.setProgress(doingName+footName)
             # create foot module instance:
-            footInstance = dpUIinst.initGuide('dpFoot', guideDir)
+            footInstance = ar.initGuide('dpFoot', guideDir)
             footInstance.editGuideModuleName(footName)
             cmds.setAttr(footInstance.annotation+".translateY", -3)
             cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
@@ -164,9 +164,9 @@ def Biped(dpUIinst):
             cmds.refresh()
             
             # working with ARM system:
-            dpUIinst.utils.setProgress(doingName+armName)
+            ar.utils.setProgress(doingName+armName)
             # creating module instances:
-            armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
+            armLimbInstance = ar.initGuide('dpLimb', guideDir)
             # change name to arm:
             armLimbInstance.editGuideModuleName(armName)
             # setting X mirror:
@@ -187,17 +187,17 @@ def Biped(dpUIinst):
             cmds.refresh()
             
             # working with FINGERS system:
-            dpUIinst.utils.setProgress(doingName+dpUIinst.lang['m007_finger'])
+            ar.utils.setProgress(doingName+ar.data.lang['m007_finger'])
             # create finger instances:
-            thumbFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
+            thumbFingerInstance = ar.initGuide('dpFinger', guideDir)
             thumbFingerInstance.editGuideModuleName(fingerThumbName)
-            indexFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
+            indexFingerInstance = ar.initGuide('dpFinger', guideDir)
             indexFingerInstance.editGuideModuleName(fingerIndexName)
-            middleFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
+            middleFingerInstance = ar.initGuide('dpFinger', guideDir)
             middleFingerInstance.editGuideModuleName(fingerMiddleName)
-            ringFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
+            ringFingerInstance = ar.initGuide('dpFinger', guideDir)
             ringFingerInstance.editGuideModuleName(fingerRingName)
-            pinkyFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
+            pinkyFingerInstance = ar.initGuide('dpFinger', guideDir)
             pinkyFingerInstance.editGuideModuleName(fingerPinkyName)
             # edit finger guides:
             fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
@@ -234,9 +234,9 @@ def Biped(dpUIinst):
                     instance.setCorrective(1)
 
                 # working with EAR system:
-                dpUIinst.utils.setProgress(doingName+earName)
+                ar.utils.setProgress(doingName+earName)
                 # create FkLine module instance:
-                earInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                earInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing ear base guide informations:
                 earInstance.editGuideModuleName(earName)
                 cmds.setAttr(earInstance.moduleGrp+".translateX", 1)
@@ -255,9 +255,9 @@ def Biped(dpUIinst):
                 cmds.refresh()
 
                 # working with Teeth system:
-                dpUIinst.utils.setProgress(doingName+upperTeethName)
+                ar.utils.setProgress(doingName+upperTeethName)
                 # create FkLine module instance:
-                upperTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                upperTeethInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing upperTeeth base guide informations:
                 upperTeethInstance.editGuideModuleName(upperTeethName)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".translateY", 20.3)
@@ -269,7 +269,7 @@ def Biped(dpUIinst):
                 # parent upperTeeth guide to head guide:
                 cmds.parent(upperTeethInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
                 # create FkLine module instance:
-                upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                upperTeethMiddleInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
                 upperTeethMiddleInstance.editGuideModuleName(upperTeethMiddleName)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 20.1)
@@ -282,7 +282,7 @@ def Biped(dpUIinst):
                 # parent upperTeethMiddle guide to upperTeeth guide:
                 cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
-                upperTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                upperTeethSideInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing upperTeethSide base guide informations:
                 upperTeethSideInstance.editGuideModuleName(upperTeethSideName)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
@@ -298,7 +298,7 @@ def Biped(dpUIinst):
                 # parent upperTeethSide guide to upperTeeth guide:
                 cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
-                lowerTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                lowerTeethInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing lowerTeeth base guide informations:
                 lowerTeethInstance.editGuideModuleName(lowerTeethName)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 19.5)
@@ -310,7 +310,7 @@ def Biped(dpUIinst):
                 # parent lowerTeeth guide to head guide:
                 cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 # create FkLine module instance:
-                lowerTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                lowerTeethMiddleInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethMiddle base guide informations:
                 lowerTeethMiddleInstance.editGuideModuleName(lowerTeethMiddleName)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 19.7)
@@ -323,7 +323,7 @@ def Biped(dpUIinst):
                 # parent lowerTeeth guide to lowerTeeth guide:
                 cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
-                lowerTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                lowerTeethSideInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing lowerTeethSide base guide informations:
                 lowerTeethSideInstance.editGuideModuleName(lowerTeethSideName)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
@@ -341,9 +341,9 @@ def Biped(dpUIinst):
                 cmds.refresh()
                 
                 # working with Nose systems:
-                dpUIinst.utils.setProgress(doingName+noseName)
+                ar.utils.setProgress(doingName+noseName)
                 # create FkLine module instance:
-                noseInstance = dpUIinst.initGuide('dpNose', guideDir)
+                noseInstance = ar.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
                 noseInstance.editGuideModuleName(noseName)
                 cmds.setAttr(noseInstance.moduleGrp+".translateY", 21.2)
@@ -355,9 +355,9 @@ def Biped(dpUIinst):
                 cmds.refresh()
                 
                 # working with Tongue system:
-                dpUIinst.utils.setProgress(doingName+tongueName)
+                ar.utils.setProgress(doingName+tongueName)
                 # create FkLine module instance:
-                tongueInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                tongueInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing tongue base guide informations:
                 tongueInstance.editGuideModuleName(tongueName)
                 cmds.setAttr(tongueInstance.moduleGrp+".translateY", 19.85)
@@ -377,9 +377,9 @@ def Biped(dpUIinst):
                 cmds.refresh()
                 
                 # working with Toes system:
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe1 module instance:
-                toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe1Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe1Instance.editGuideModuleName(toeName+"_1")
                 # editing toe base guide informations:
@@ -400,9 +400,9 @@ def Biped(dpUIinst):
                 toe1Instance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe2 module instance:
-                toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe2Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe2Instance.editGuideModuleName(toeName+"_2")
                 # editing toe base guide informations:
@@ -423,9 +423,9 @@ def Biped(dpUIinst):
                 toe2Instance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe3 module instance:
-                toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe3Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe3Instance.editGuideModuleName(toeName+"_3")
                 # editing toe base guide informations:
@@ -446,9 +446,9 @@ def Biped(dpUIinst):
                 toe3Instance.checkFatherMirror()
                 cmds.refresh()
 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe4 module instance:
-                toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe4Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe4Instance.editGuideModuleName(toeName+"_4")
                 # editing toe base guide informations:
@@ -469,9 +469,9 @@ def Biped(dpUIinst):
                 toe4Instance.checkFatherMirror()
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe5 module instance:
-                toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe5Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe5Instance.editGuideModuleName(toeName+"_5")
                 # editing toe base guide informations:
@@ -493,9 +493,9 @@ def Biped(dpUIinst):
                 cmds.refresh()
                 
                 # working with Breath system:
-                dpUIinst.utils.setProgress(doingName+breathName)
+                ar.utils.setProgress(doingName+breathName)
                 # create FkLine module instance:
-                breathInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                breathInstance = ar.initGuide('dpSingle', guideDir)
                 # editing breath base guide informations:
                 breathInstance.editGuideModuleName(breathName)
                 cmds.setAttr(breathInstance.moduleGrp+".shapeSize", 0.3)
@@ -510,9 +510,9 @@ def Biped(dpUIinst):
                 cmds.refresh()
 
                 # working with Belly system:
-                dpUIinst.utils.setProgress(doingName+bellyName)
+                ar.utils.setProgress(doingName+bellyName)
                 # create FkLine module instance:
-                bellyInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                bellyInstance = ar.initGuide('dpSingle', guideDir)
                 # editing belly base guide informations:
                 bellyInstance.editGuideModuleName(bellyName)
                 cmds.setAttr(bellyInstance.moduleGrp+".shapeSize", 0.3)
@@ -526,12 +526,12 @@ def Biped(dpUIinst):
                 cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             
             # Close progress window
-            dpUIinst.utils.setProgress(endIt=True)
+            ar.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
-            dpUIinst.collapseEditSelModFL = False
+            ar.collapseEditSelModFL = False
             cmds.select(spineInstance.moduleGrp)
-            print(dpUIinst.lang['m089_createdBiped'])
+            print(ar.data.lang['m089_createdBiped'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

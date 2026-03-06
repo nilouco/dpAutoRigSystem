@@ -47,7 +47,7 @@ class SoftenEdges(dpBaseAction.ActionStartClass):
             if allMeshList:
                 self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
                 for mesh in allMeshList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
                         cmds.select(mesh)
                         # set selection only non-smoothed edges
@@ -67,16 +67,16 @@ class SoftenEdges(dpBaseAction.ActionStartClass):
                                     try:
                                         cmds.polySoftEdge(mesh, angle=180, constructionHistory=False)
                                         self.resultOkList.append(True)
-                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
+                                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+mesh)
                                     except:
                                         self.resultOkList.append(False)
-                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+                                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+mesh)
                         cmds.select(clear=True)
         
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

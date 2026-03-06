@@ -62,7 +62,7 @@ class TFaceCleaner(dpBaseAction.ActionStartClass):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in toCheckList
                         for obj in toCheckList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 # get edges
                                 edgeIter = OpenMaya.MItMeshEdge(shapeNode)
@@ -93,16 +93,16 @@ class TFaceCleaner(dpBaseAction.ActionStartClass):
                                 mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"2\",\"0\" };')
                                 cmds.select(clear=True)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     if self.firstMode:
                         cmds.select(tFaceList)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

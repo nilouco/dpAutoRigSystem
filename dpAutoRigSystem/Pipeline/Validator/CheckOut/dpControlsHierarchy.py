@@ -30,7 +30,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
             shapeList = cmds.listRelatives(transform, shapes=True)
         except Exception as e:
             print(e)
-            self.messageList.append(f"{self.dpUIinst.lang['v070_duplicateName']} {transform}")
+            self.messageList.append(f"{self.ar.data.lang['v070_duplicateName']} {transform}")
             return False
         if shapeList:
             for shape in shapeList:
@@ -100,11 +100,11 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
     def logInfo(self, informationDictionary):
         for ctrl in informationDictionary:
             if informationDictionary[ctrl][0] == None:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.lang['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} {self.ar.data.lang['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
             elif informationDictionary[ctrl][1] == None:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.lang['v066_wasRemoved']}")
+                self.messageList.append(f"{ctrl} {self.ar.data.lang['v066_wasRemoved']}")
             else:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.lang['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} {self.ar.data.lang['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
 
 
     def compareHierarchy(self, originalHierarchy, newHierarchy):
@@ -113,7 +113,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
             self.logInfo(infoDic)
             return False
         else:
-            self.messageList.append(self.dpUIinst.lang['v068_matchingHierarchies'])
+            self.messageList.append(self.ar.data.lang['v068_matchingHierarchies'])
             return True
 
 
@@ -146,7 +146,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
                 self.checkedObjList.append(str(rootNode))
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
-                self.messageList.append(self.dpUIinst.lang['v062_globalMissing'])
+                self.messageList.append(self.ar.data.lang['v062_globalMissing'])
 
             if rootNode:
                 isHierarchySame = True
@@ -159,7 +159,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
                         self.checkedObjList.append(str(lastHierarchyDic))
                     else:
                         self.checkedObjList.append("Controls Hierarchy")
-                        self.messageList.append(self.dpUIinst.lang['v063_firstHierarchy'])
+                        self.messageList.append(self.ar.data.lang['v063_firstHierarchy'])
 
                     if self.firstMode: #verify
                         if isHierarchySame:
@@ -178,16 +178,16 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
                             self.checkedObjList.append("Scene")
                             self.foundIssueList.append(True)
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+" "+self.dpUIinst.lang['v064_hierarchy'])
-                            self.messageList.append(self.dpUIinst.lang['i201_saveScene'])
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+" "+self.ar.data.lang['v064_hierarchy'])
+                            self.messageList.append(self.ar.data.lang['i201_saveScene'])
                     self.maybeDone = False
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
                 self.maybeDone = True
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

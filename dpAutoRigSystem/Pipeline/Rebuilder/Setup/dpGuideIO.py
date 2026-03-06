@@ -29,9 +29,9 @@ class GuideIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_guideIO"
         self.startName = "dpGuide"
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpHeadDeformer)
-        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.dpUIinst, ui=False)
+        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.ar, ui=False)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -62,10 +62,10 @@ class GuideIO(dpBaseAction.ActionStartClass):
                             netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                             netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
                         if netList:
-                            self.dpUIinst.ctrls.unPinGuide(force=True)
+                            self.ar.ctrls.unPinGuide(force=True)
                             self.exportDicToJsonFile(self.getGuideDataDic(netList))
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
                             cmds.select(clear=True)
                     else: #import
                         # apply viewport xray
@@ -80,24 +80,24 @@ class GuideIO(dpBaseAction.ActionStartClass):
                                 self.setupGuideBaseParenting(guideDic)
                             except Exception as e:
                                 if not wellImported: #guide initialization issue
-                                    self.notWorkedWellIO(self.dpUIinst.lang['m195_couldNotBeSet']+": "+str(e))
+                                    self.notWorkedWellIO(self.ar.data.lang['m195_couldNotBeSet']+": "+str(e))
                                 else: #parenting issue
-                                    self.notWorkedWellIO(self.dpUIinst.lang['m197_notPossibleParent']+": "+str(e))
+                                    self.notWorkedWellIO(self.ar.data.lang['m197_notPossibleParent']+": "+str(e))
                                 wellImported = False
                             if wellImported:
                                 self.wellDoneIO(self.latestDataFile)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                         cmds.select(clear=True)
                         # remove viewport xray
                         for mp in modelPanelList:
                             cmds.modelEditor(mp, edit=True, xray=False)
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -115,13 +115,13 @@ class GuideIO(dpBaseAction.ActionStartClass):
         toExportDataDic = {}
         self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
         for net in netList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             # mount a dic with all data 
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
                     moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
-                    for moduleInstance in self.dpUIinst.moduleInstancesList:
+                    for moduleInstance in self.ar.moduleInstancesList:
                         if str(moduleInstance) == moduleInstanceInfoString:
                             moduleInstance.serializeGuide(False) #serialize it without build it
                 toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
@@ -220,7 +220,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         for item in list(self.netDic["GuideData"]):
             if self.netDic["GuideData"][item]:
                 for attr in list(self.netDic["GuideData"][item]):
-                    if attr in self.dpUIinst.transformAttrList:
+                    if attr in self.ar.transformAttrList:
                         if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
                             if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
                                 cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])
@@ -262,9 +262,9 @@ class GuideIO(dpBaseAction.ActionStartClass):
                     try:
                         #self.netDic = json.loads(guideDic[net])
                         self.netDic = guideDic[net]
-                        self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+guideDic[net]['ModuleType'])
+                        self.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
                         # create a module instance:
-                        self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                        self.instance = self.ar.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
                         self.setupInstanceChanges()
                         self.setupGuideTransformations()
                     except Exception as e:

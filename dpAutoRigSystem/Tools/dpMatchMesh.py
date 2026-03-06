@@ -14,10 +14,10 @@ DP_MATCHMESH_VERSION = 3.02
 
 
 class MatchMesh(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         # redeclaring variables
-        self.dpUIinst = dpUIinst
-        self.utils = self.dpUIinst.utils
+        self.ar = ar
+        self.utils = self.ar.utils
         # call main function
         self.dpMatchMesh(self)
     
@@ -31,7 +31,7 @@ class MatchMesh(object):
         selList = cmds.ls(selection=True)
         
         if(len(selList) <= 1):
-            cmds.warning(self.dpUIinst.lang['i040_notMatchSel'])
+            cmds.warning(self.ar.data.lang['i040_notMatchSel'])
         else:
             # declaring current variables
             fromFather = None
@@ -72,7 +72,7 @@ class MatchMesh(object):
             
             if gotMeshes:
                 # storing transformation data
-                for attr in self.dpUIinst.transformAttrList[:-1]:
+                for attr in self.ar.transformAttrList[:-1]:
                     fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
                     toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
 
@@ -103,7 +103,7 @@ class MatchMesh(object):
                     # put fromTransform in the same location then toTransform
                     if fromFather != None:
                         cmds.parent(fromTransform, world=True)
-                    for attr in self.dpUIinst.transformAttrList[:-1]:
+                    for attr in self.ar.transformAttrList[:-1]:
                         cmds.setAttr(fromTransform+"."+attr, lock=False)
                         cmds.setAttr(toTransform+"."+attr, lock=False)
                         if "scale" in attr:
@@ -120,7 +120,7 @@ class MatchMesh(object):
                     toMeshFn.getPoints(toVerticeList)
                     
                     # progress window
-                    self.utils.setProgress(self.dpUIinst.lang['i035_transfData']+': '+self.dpUIinst.lang['c110_start'], 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
+                    self.utils.setProgress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected
@@ -129,7 +129,7 @@ class MatchMesh(object):
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        self.utils.setProgress(self.dpUIinst.lang['i035_transfData'])
+                        self.utils.setProgress(self.ar.data.lang['i035_transfData'])
                         
                         # transfer data
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
@@ -139,18 +139,18 @@ class MatchMesh(object):
                     if fromFather != None:
                         cmds.parent(fromTransform, fromFather)
                     # restore transformation data
-                    for attr in self.dpUIinst.transformAttrList[:-1]:
+                    for attr in self.ar.transformAttrList[:-1]:
                         cmds.setAttr(fromTransform+"."+attr, fromTransformDic[attr])
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
 
                     if not cancelled:
                         cmds.select(selList)
-                        self.dpUIinst.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
-                        print(self.dpUIinst.lang['i035_transfData'], self.dpUIinst.lang['i036_from'].upper(), ":", fromMesh, ",", self.dpUIinst.lang['i037_to'].upper(), ":", toMesh)
+                        self.ar.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
+                        print(self.ar.data.lang['i035_transfData'], self.ar.data.lang['i036_from'].upper(), ":", fromMesh, ",", self.ar.data.lang['i037_to'].upper(), ":", toMesh)
                     else:
-                        print(self.dpUIinst.lang['i038_canceled'])
+                        print(self.ar.data.lang['i038_canceled'])
                 else:
-                    mel.eval("warning \""+self.dpUIinst.lang['i039_notMatchDif']+"\";")
+                    mel.eval("warning \""+self.ar.data.lang['i039_notMatchDif']+"\";")
                 cmds.select(selList)
             else:
-                mel.eval("warning \""+self.dpUIinst.lang['i040_notMatchSel']+"\";")
+                mel.eval("warning \""+self.ar.data.lang['i040_notMatchSel']+"\";")

@@ -60,17 +60,17 @@ class OneVertex(dpBaseAction.ActionStartClass):
                                     self.resultOkList.append(False)
                                 else: #fix
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                            self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(oneVertexList)+")\n---")
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                            self.messageList.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(oneVertexList)+")\n---")
                             cmds.select(oneVertexList)
                     else:
                         self.notFoundNodes()
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+                    self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
+                self.notWorkedWellIO(self.ar.data.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
+            self.notWorkedWellIO(self.ar.data.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 

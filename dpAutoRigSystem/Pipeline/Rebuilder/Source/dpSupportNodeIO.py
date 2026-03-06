@@ -55,20 +55,20 @@ class SupportNodeIO(dpBaseAction.ActionStartClass):
                             else:
                                 itemList = self.getNodeToExportList()
                             if itemList:
-                                self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
+                                self.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
                                 self.exportAlembicFile(itemList, attr=False, curve=True)
                             else:
                                 self.maybeDoneIO("Geometries")
                         else: #import
                             self.importLatestAlembicFile(self.getExportedList())
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                        self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['e018_notLoadedPlugin']+"AbcExport")
+                    self.notWorkedWellIO(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

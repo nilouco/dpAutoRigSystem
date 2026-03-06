@@ -1,11 +1,11 @@
 {
+    "_preset"        : "English",
     "_author"        : "Danilo Pinheiro",
     "_collaborators" : "Aline Lima\nAndre Ruegger\nCaio Cipo\nCaio Hidaka\nElvis Martins\nFilipe Mello\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLucas Alves\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPablo Emmanuel De Leo\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSaul Almeida\nSébastien Bourgoing\nThiago Silva\nThomas Mansencal",
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2010-10-03",
-    "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2026-02-04",
+    "_updated"       : "2026-03-05",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -172,7 +172,7 @@
     "i000_guides"               : "Create GUIDES",
     "i001_modules"              : "Edit MODULES",
     "i002_options"              : "Options",
-    "i003_prefix"               : "Prefix for all nodes.",
+    "i003_prefixAll"               : "Prefix for all nodes.",
     "i004_defaultRL"            : "Use Default Render Layer (masterLayer).",
     "i005_footerRigging"        : "modules will be created in this rig",
     "i006_aboutDesc"            : "\nAbout dpAutoRigSystem:\n\nThis script is a Python program to\nautomate the rigging process.\n\nIt was written to help us develop\nvarious types of rigs on our own.\nIts arquitecture is modular, multilingual, and object oriented,\nwhich means you can create any type of rigging parts\nand combine them however you want...\n\nIf you have any suggestions or comments, please contact us.\nI hope you enjoy it   :)\n\nIt is FREE !!!",
@@ -352,7 +352,7 @@
     "i180_indirectSkin"         : "Indirect Skinning",
     "i181_facialJoint"          : "Facial Joints",
     "i182_facialMessage"        : "Do you want to use it for?",
-    "i183_hideGuideGrp"         : "Hide guide groups in Outliner.",
+    "i183_hideGuideGrp"         : "Display temporary groups in the Outliner.",
     "i184_specular"             : "Specular",
     "i185_animation"            : "Animation",
     "i186_gaming"               : "Gaming",

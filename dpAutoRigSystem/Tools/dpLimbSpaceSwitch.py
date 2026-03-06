@@ -12,32 +12,32 @@ DP_LIMBSPACESWITCH_VERSION = 2.06
 
 
 class LimbSpaceSwitch(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         # redeclaring variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         
         # find nodes
-        allGrp = self.dpUIinst.utils.getAllGrp()
+        allGrp = self.ar.utils.getAllGrp()
         if allGrp:
-            self.rootCtrl = self.dpUIinst.utils.getNodeByMessage("ctrlsVisibilityGrp", allGrp)
-            self.globalCtrl = self.dpUIinst.utils.getNodeByMessage("globalCtrl", allGrp)
+            self.rootCtrl = self.ar.utils.getNodeByMessage("ctrlsVisibilityGrp", allGrp)
+            self.globalCtrl = self.ar.utils.getNodeByMessage("globalCtrl", allGrp)
             self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
             self.toIDList = []
 
             self.globalName = "Global"
             self.rootName = "Root"
 
-            self.spineName = self.dpUIinst.lang['m011_spine']
-            self.hipsName = self.dpUIinst.lang['c027_hips']
-            self.headName = self.dpUIinst.lang['c024_head']
-            self.chestName = self.dpUIinst.lang['c028_chest']
+            self.spineName = self.ar.data.lang['m011_spine']
+            self.hipsName = self.ar.data.lang['c027_hips']
+            self.headName = self.ar.data.lang['c024_head']
+            self.chestName = self.ar.data.lang['c028_chest']
             
             self.spineHipsACtrl = self.spineName+"_"+self.hipsName+"A_Ctrl"
             self.spineHipsBCtrl = self.spineName+"_"+self.hipsName+"B_Ctrl"
             self.spineChestACtrl = self.spineName+"_"+self.chestName+"A_Ctrl"
             self.spineChestBCtrl = self.spineName+"_"+self.chestName+"B_Ctrl"
             self.headSubCtrl = self.headName+"_"+self.headName+"_Sub_Ctrl"
-            self.followAttr = self.dpUIinst.lang['c032_follow']
+            self.followAttr = self.ar.data.lang['c032_follow']
 
             # call main function
             self.dpMain(self)
@@ -79,12 +79,12 @@ class LimbSpaceSwitch(object):
         """ Set attributes and call setDrivenKey method.
         """
         oldDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
-        sideList = [self.dpUIinst.lang['p002_left'], self.dpUIinst.lang['p003_right']]
+        sideList = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
         limbList = [
-                    self.dpUIinst.lang['c037_arm']+"_"+self.dpUIinst.lang['c004_arm_extrem'],
-                    self.dpUIinst.lang['c006_leg_main']+"_"+self.dpUIinst.lang['c009_leg_extrem'],
-                    self.dpUIinst.lang['c006_leg_main']+self.dpUIinst.lang['c056_front']+"_"+self.dpUIinst.lang['c009_leg_extrem'],
-                    self.dpUIinst.lang['c006_leg_main']+self.dpUIinst.lang['c057_back']+"_"+self.dpUIinst.lang['c009_leg_extrem']
+                    self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem'],
+                    self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c009_leg_extrem'],
+                    self.ar.data.lang['c006_leg_main']+self.ar.data.lang['c056_front']+"_"+self.ar.data.lang['c009_leg_extrem'],
+                    self.ar.data.lang['c006_leg_main']+self.ar.data.lang['c057_back']+"_"+self.ar.data.lang['c009_leg_extrem']
                     ]
         for side in sideList:
             for x, limbNode in enumerate(limbList):
@@ -152,4 +152,4 @@ class LimbSpaceSwitch(object):
         if oldDrivenKeyList:
             newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
         self.toIDList.extend(newDrivenKeyList)
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID

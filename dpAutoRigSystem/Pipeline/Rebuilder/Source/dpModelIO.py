@@ -53,7 +53,7 @@ class ModelIO(dpBaseAction.ActionStartClass):
                             if objList:
                                 meshList = objList
                             else:
-                                meshList = self.utils.filterTransformList(self.getModelToExportList(), verbose=self.verbose, title=self.dpUIinst.lang[self.title])
+                                meshList = self.utils.filterTransformList(self.getModelToExportList(), verbose=self.verbose, title=self.ar.data.lang[self.title])
                             if meshList:
                                 self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
                                 constraintDataDic = self.removeConstraints(meshList)
@@ -65,13 +65,13 @@ class ModelIO(dpBaseAction.ActionStartClass):
                         else: #import
                             self.importLatestAlembicFile(self.getExportedList())
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                        self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['e018_notLoadedPlugin']+"AbcExport")
+                    self.notWorkedWellIO(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

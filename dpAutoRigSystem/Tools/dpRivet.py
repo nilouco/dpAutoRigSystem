@@ -37,11 +37,11 @@ DP_RIVET_VERSION = 2.10
 
 
 class Rivet(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # declaring variables
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
+        self.ar = ar
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None
@@ -67,64 +67,64 @@ class Rivet(object):
         self.utils.closeUI('dpRivetWindow')
         rivet_winWidth  = 305
         rivet_winHeight = 470
-        dpRivetWin = cmds.window('dpRivetWindow', title=self.dpUIinst.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpRivetWin = cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         rivetTabsLayout = cmds.tabLayout('rivetTabsLayout', innerMarginWidth=5, innerMarginHeight=5, parent="dpRivetWindow")
         rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10), parent=rivetTabsLayout)
-        cmds.text(label=self.dpUIinst.lang["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.ar.data.lang["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=rivetLayout)
-        cmds.button(label=self.dpUIinst.lang["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
+        cmds.button(label=self.ar.data.lang["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
         self.geoToAttachTF = cmds.textField('geoToAttachTF', width=180, text="", changeCommand=partial(self.dpLoadGeoToAttach, None, True), parent=doubleLayout)
         uvSetLayout = cmds.rowColumnLayout('uvSetLayout', numberOfColumns=2, columnWidth=[(1, 110), (2, 210)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 1), (2, 'left', 10)], parent=rivetLayout)
         cmds.text(label="UV Set:", font='obliqueLabelFont', parent=uvSetLayout)
         self.uvSetTF = cmds.textField('uvSetTF', width=180, text="", editable=False, parent=uvSetLayout)
         cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.dpUIinst.lang["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.ar.data.lang["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         itemsLayout = cmds.columnLayout('itemsLayout', columnOffset=('left', 10), width=310, parent=rivetLayout)
         self.itemScrollList = cmds.textScrollList('itemScrollList', width=290, height=100, allowMultiSelection=True, parent=itemsLayout)
         cmds.separator(style='none', height=5, parent=itemsLayout)
         middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=itemsLayout)
-        cmds.button(label=self.dpUIinst.lang["i045_add"], annotation=self.dpUIinst.lang["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
-        cmds.button(label=self.dpUIinst.lang["i046_remove"], annotation=self.dpUIinst.lang["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
+        cmds.button(label=self.ar.data.lang["i045_add"], annotation=self.ar.data.lang["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
+        cmds.button(label=self.ar.data.lang["i046_remove"], annotation=self.ar.data.lang["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
         cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.dpUIinst.lang["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.ar.data.lang["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
         fatherLayout = cmds.columnLayout('fatherLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.attachTCB = cmds.checkBox('attachTCB', label=self.dpUIinst.lang["m148_attach"]+" Translate", value=True, parent=fatherLayout)
-        self.attachRCB = cmds.checkBox('attachRCB', label=self.dpUIinst.lang["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
-        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.dpUIinst.lang["m149_createGroupConst"], value=True, parent=fatherLayout)
+        self.attachTCB = cmds.checkBox('attachTCB', label=self.ar.data.lang["m148_attach"]+" Translate", value=True, parent=fatherLayout)
+        self.attachRCB = cmds.checkBox('attachRCB', label=self.ar.data.lang["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
+        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.ar.data.lang["m149_createGroupConst"], value=True, parent=fatherLayout)
         invertLayout = cmds.columnLayout('invertLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.dpUIinst.lang["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
+        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.ar.data.lang["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
         translateLayout = cmds.rowColumnLayout('translateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=translateLayout)
-        self.invertTCB = cmds.checkBox('invertTCB', label=self.dpUIinst.lang["m151_invert"]+" Translate", value=True, parent=translateLayout)
+        self.invertTCB = cmds.checkBox('invertTCB', label=self.ar.data.lang["m151_invert"]+" Translate", value=True, parent=translateLayout)
         rotateLayout = cmds.rowColumnLayout('rotateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=rotateLayout)
-        self.invertRCB = cmds.checkBox('invertRCB', label=self.dpUIinst.lang["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
+        self.invertRCB = cmds.checkBox('invertRCB', label=self.ar.data.lang["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
         faceToRivetLayout = cmds.columnLayout('faceToRivetLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.dpChangeDeformer, parent=faceToRivetLayout)
+        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.ar.data.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.dpChangeDeformer, parent=faceToRivetLayout)
         deformerLayout = cmds.columnLayout('deformerLayout', columnOffset=("left", 20), parent=faceToRivetLayout)
         self.deformerCollection = cmds.radioCollection('deformerCollection', parent=deformerLayout)
-        self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
-        self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m172_wrapDeformer"], annotation=self.wrapDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
+        self.morphDeformerRB = cmds.radioButton(label=self.ar.data.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
+        self.wrapDeformerRB = cmds.radioButton(label=self.ar.data.lang["m172_wrapDeformer"], annotation=self.wrapDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
         cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
         if not self.mayaVersionRequired:
             cmds.radioCollection(self.deformerCollection, edit=True, select=self.wrapDeformerRB)
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
-        cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
+        cmds.button(label=self.ar.data.lang["i158_create"]+" "+self.ar.data.lang["m083_rivet"], annotation=self.ar.data.lang["i158_create"]+" "+self.ar.data.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
         # tab layout - remove tab
         removeLayout = cmds.columnLayout("removeLayout", columnOffset=("left", 10), parent=rivetTabsLayout)
         cmds.separator(style='none', height=10, parent=removeLayout)
         removeButtonsRL = cmds.rowLayout(numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent=removeLayout)
-        cmds.button(label=self.dpUIinst.lang["i314_selectAll"], width=153, command=self.selectAll, parent=removeButtonsRL)
-        cmds.button(label=self.dpUIinst.lang["m181_refresh"], width=153, command=self.refreshRivetList, parent=removeButtonsRL)
+        cmds.button(label=self.ar.data.lang["i314_selectAll"], width=153, command=self.selectAll, parent=removeButtonsRL)
+        cmds.button(label=self.ar.data.lang["m181_refresh"], width=153, command=self.refreshRivetList, parent=removeButtonsRL)
         cmds.separator(style='none', height=5, parent=removeLayout)
         self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
         cmds.separator(style='none', height=5, parent=removeLayout)
         self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=410, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
         cmds.separator(style='none', height=5, parent=removeLayout)
-        cmds.button(label=f"{self.dpUIinst.lang['i046_remove']} {self.dpUIinst.lang['m083_rivet']}", width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
-        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.dpUIinst.lang["i158_create"]), (removeLayout, self.dpUIinst.lang["i046_remove"])))
+        cmds.button(label=f"{self.ar.data.lang['i046_remove']} {self.ar.data.lang['m083_rivet']}", width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
+        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.ar.data.lang["i158_create"]), (removeLayout, self.ar.data.lang["i046_remove"])))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
 
@@ -165,12 +165,12 @@ class Rivet(object):
         """
         self.disablePac(indexList)
         for i, index in enumerate(indexList):
-            self.utils.setProgress(self.dpUIinst.lang['i315_removing'])
+            self.utils.setProgress(self.ar.data.lang['i315_removing'])
             netNode = self.rivetNetNodeList[index]
             if netNode:
                 self.removeRivetFromNetNode(netNode)
             else:
-                mel.eval('print \"dpAR: '+self.dpUIinst.lang['m204_unableRemRivet']+itemList[i]+'\\n\";')
+                mel.eval('print \"dpAR: '+self.ar.data.lang['m204_unableRemRivet']+itemList[i]+'\\n\";')
         self.refreshRivetList()
         cmds.select(clear=True)
     
@@ -190,12 +190,12 @@ class Rivet(object):
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(trueIndexList), addOne=False, addNumber=False)
+            self.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(trueIndexList), addOne=False, addNumber=False)
             self.removeRivetFromList(trueIndexList, selectionList)
             self.checkRivetGrp()
             self.utils.setProgress(endIt=True)
         else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m169_noItemSelect']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['m169_noItemSelect']+'\\n\";')
         cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
 
     
@@ -242,9 +242,9 @@ class Rivet(object):
             skinClusterList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='skinCluster')
             blendShapeList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='blendShape')
             if len(skinClusterList) == 0 and len(blendShapeList) == 0:
-                removeAttachedGeo = cmds.confirmDialog(title=self.dpUIinst.lang['i319_removeGeometry'], icon="question", message=f"{self.dpUIinst.lang['i320_rivetHeldGeo']} {attachedGeometry} {self.dpUIinst.lang['i321_noConnectionGeo']}", button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
+                removeAttachedGeo = cmds.confirmDialog(title=self.ar.data.lang['i319_removeGeometry'], icon="question", message=f"{self.ar.data.lang['i320_rivetHeldGeo']} {attachedGeometry} {self.ar.data.lang['i321_noConnectionGeo']}", button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
 
-                if removeAttachedGeo == self.dpUIinst.lang['i071_yes']:
+                if removeAttachedGeo == self.ar.data.lang['i071_yes']:
                     currentParent = cmds.listRelatives(attachedGeometry, parent=True)
                     if currentParent:
                         cmds.lockNode(currentParent[0])
@@ -253,7 +253,7 @@ class Rivet(object):
                     else:
                         cmds.delete(attachedGeometry)
         cmds.delete(rivetNetNode)
-        mel.eval('print \"dpAR: '+self.dpUIinst.lang['m144_removedRivet']+" "+rivetControl+'\\n\";')
+        mel.eval('print \"dpAR: '+self.ar.data.lang['m144_removedRivet']+" "+rivetControl+'\\n\";')
     
 
     def itemsWithRivetList(self):
@@ -369,19 +369,19 @@ class Rivet(object):
             needToRemove = toCreateSet & hasRivetSet
         if needToRemove:
             if len(needToRemove) > 0:
-                removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i316_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
-                if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
+                removeExistingRivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
+                if removeExistingRivet == self.ar.data.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
+                    self.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
                     self.utils.setProgress(endIt=True)
-                elif removeExistingRivet == self.dpUIinst.lang['i072_no']:
+                elif removeExistingRivet == self.ar.data.lang['i072_no']:
                     pass
                 else:
                     return
 
         # call run function to create Rivet setup using UI values
-        self.utils.setProgress(self.dpUIinst.lang['i318_working'], self.dpUIinst.lang['i317_creatingRivet'], len(itemList), addOne=False, addNumber=False)
+        self.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(itemList), addOne=False, addNumber=False)
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.utils.setProgress(endIt=True)
         self.utils.closeUI('dpRivetWindow')
@@ -545,7 +545,7 @@ class Rivet(object):
             createdRivetGrp = True
             self.rivetGrp = cmds.group(name=rivetGrpName, empty=True)
             self.toIDList.append(self.rivetGrp)
-            for attr in self.dpUIinst.transformAttrList[:-1]:
+            for attr in self.ar.transformAttrList[:-1]:
                 cmds.setAttr(self.rivetGrp+"."+attr, lock=True, keyable=False, channelBox=False)
             cmds.addAttr(self.rivetGrp, longName="dpRivetGrp", attributeType='bool')
             cmds.setAttr(self.rivetGrp+".dpRivetGrp", 1)
@@ -617,7 +617,7 @@ class Rivet(object):
                         cancelProcess = True
                         break
                     # animated:
-                    for attr in self.dpUIinst.transformAttrList[:-1]:
+                    for attr in self.ar.transformAttrList[:-1]:
                         if cmds.listConnections(rivet+"."+attr, source=True, destination=False):
                             cancelProcess = True
                             break
@@ -673,7 +673,7 @@ class Rivet(object):
                 
             # working with follicles and attaches
             for r, rivet in enumerate(self.rivetList):
-                self.utils.setProgress(self.dpUIinst.lang['i317_creatingRivet'])
+                self.utils.setProgress(self.ar.data.lang['i317_creatingRivet'])
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)
@@ -782,7 +782,7 @@ class Rivet(object):
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
         self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
         cmds.select(clear=True)
         return self.netList
     
@@ -839,10 +839,10 @@ class Rivet(object):
                 if cmds.listRelatives(toRivetGeo, allParents=True):
                     cmds.parent(toRivetGeo, world=True)
                 # Unlock attributes and apply initialShading
-                self.dpUIinst.ctrls.setLockHide([toRivetGeo], self.dpUIinst.transformAttrList, False, True, True)
+                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.transformAttrList, False, True, True)
                 cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
                 cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
-                self.dpUIinst.ctrls.setLockHide([toRivetGeo], self.dpUIinst.transformAttrList[:-1], True, False, True)
+                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.transformAttrList[:-1], True, False, True)
                 # Renaming
                 cmds.rename(toRivetGeo, faceToRivetGeoName)
                 # Turning on nodes
@@ -1012,7 +1012,7 @@ class Rivet(object):
         wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
         baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
         baseShape = cmds.rename(baseShape, toRivetName+"_Base")
-        self.dpUIinst.ctrls.setLockHide([baseShape], self.dpUIinst.transformAttrList[:-1], True, False, True)
+        self.ar.ctrls.setLockHide([baseShape], self.ar.transformAttrList[:-1], True, False, True)
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         self.toIDList.extend([wrapGeo, wrapNode, baseShape])

@@ -74,15 +74,15 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                             if bsDic:
                                 self.importBlendShapes(bsDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                        self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['e018_notLoadedPlugin']+"AbcExport")
+                    self.notWorkedWellIO(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -100,7 +100,7 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
         bsDic = {}
         self.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
         for bsNode in bsList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+bsNode)
+            self.utils.setProgress(self.ar.data.lang[self.title]+": "+bsNode)
             bsDic[bsNode] = {}
             bsDic[bsNode]["targets"] = {}
             # get blendShape node info
@@ -198,7 +198,7 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                         abcToImport = self.originalPath+"/"+self.originalName+"_"+bsNode+".abc"
                         mel.eval("AbcImport -mode import \""+abcToImport+"\";")
                     except:
-                        self.notWorkedWellIO(self.dpUIinst.lang["r032_notImportedData"]+": "+self.originalName+"_"+bsNode+".abc")
+                        self.notWorkedWellIO(self.ar.data.lang["r032_notImportedData"]+": "+self.originalName+"_"+bsNode+".abc")
                         wellImported = False
             if not cmds.objExists(bsNode):
                 # create an empty blendShape node
@@ -213,7 +213,7 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
                     #mel.eval('catchQuiet(`blendShape -edit -ip "'+self.targetPath+'/'+self.targetName+'_'+bsNode+'.'+self.extention+'" '+bsNode+'`);')
                     print("--------------------------------\nEnding Autodesk not suppressed messages, sorry!\n--------------------------------\n")
                 except Exception as e:
-                    self.notWorkedWellIO(self.dpUIinst.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
+                    self.notWorkedWellIO(self.ar.data.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
                     wellImported = False
             for i in list(bsDic[bsNode]["indexTargetDic"].keys()):
                 target = bsDic[bsNode]["indexTargetDic"][i]

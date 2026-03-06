@@ -26,8 +26,8 @@ DP_PACKAGER_VERSION = 2.01
 
 class Packager(object):
 
-    def __init__(self, dpUIinst) -> None:
-        self.utils = dpUtils.Utils(dpUIinst)
+    def __init__(self, ar) -> None:
+        self.utils = dpUtils.Utils(ar)
         self.callback = None
     
     
@@ -300,7 +300,7 @@ class Packager(object):
             if not self.callback:
                 #import dpPublishCallback
                 dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
-                #if self.dpUIinst.dev:
+                #if self.ar.dev:
                 reload(dpCallback)
                 self.callback = dpCallback.Callback()
             return self.callback.main(data)

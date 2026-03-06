@@ -53,9 +53,9 @@ class SkinningIO(dpBaseAction.ActionStartClass):
                         if objList:
                             itemList = objList
                         else:
-                            itemList = self.dpUIinst.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                            itemList = self.ar.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.ar.skin.ignoreSkinningAttr)
                         if itemList:
-                            self.exportDicToJsonFile(self.dpUIinst.skin.getSkinWeightData(itemList))
+                            self.exportDicToJsonFile(self.ar.skin.getSkinWeightData(itemList))
                         else:
                             self.maybeDoneIO("Render_Grp")
                     else: #import
@@ -63,13 +63,13 @@ class SkinningIO(dpBaseAction.ActionStartClass):
                         if skinWeightDic:
                             self.importSkinning(skinWeightDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -117,7 +117,7 @@ class SkinningIO(dpBaseAction.ActionStartClass):
             if cmds.objExists(item):
                 if refNodeList: #disable at the momment
                     for refNodeName in refNodeList:
-                        if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(item):
+                        if refNodeName[refNodeName.rfind(":")+1:] == self.ar.skin.getIOFileName(item):
                             if cmds.polyCompare(item, refNodeName, vertices=True) > 0 or cmds.polyCompare(item, refNodeName, edges=True) > 0: #check if shape changes
                                 changedShapeMeshList.append(item)
                                 wellImported = False
@@ -135,16 +135,16 @@ class SkinningIO(dpBaseAction.ActionStartClass):
         if toImportList:
             try:
                 # import skin weights
-                self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.latestDataFile, False)
+                self.ar.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.latestDataFile, False)
                 self.wellDoneIO(self.latestDataFile)
             except Exception as e:
                 self.notWorkedWellIO(self.latestDataFile+": "+str(e))
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
         if not wellImported:
             if changedShapeMeshList:
-                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+                self.notWorkedWellIO(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
             elif changedTopoMeshList:
-                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
+                self.notWorkedWellIO(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
             elif notFoundMeshList:
-                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

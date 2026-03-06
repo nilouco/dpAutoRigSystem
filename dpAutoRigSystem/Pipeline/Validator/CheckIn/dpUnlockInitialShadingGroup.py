@@ -47,7 +47,7 @@ class UnlockInitialShadingGroup(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         if item == "initialShadingGroup":
                             # conditional to check here
@@ -62,14 +62,14 @@ class UnlockInitialShadingGroup(dpBaseAction.ActionStartClass):
                                             cmds.lockNode(item, lock=False, lockUnpublished=False)
                                             cmds.setAttr(item+".nodeState", lock=False)
                                             self.resultOkList.append(True)
-                                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                         except:
                                             self.resultOkList.append(False)
-                                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

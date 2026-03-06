@@ -59,15 +59,15 @@ class RenameIO(dpBaseAction.ActionStartClass):
                             if nodeIDDic:
                                 self.importNodeIDData(nodeIDDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
                         self.notWorkedWellIO("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -86,7 +86,7 @@ class RenameIO(dpBaseAction.ActionStartClass):
         dic = {}
         self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 dic[item] = cmds.getAttr(item+"."+self.dpID)
         return dic
@@ -102,7 +102,7 @@ class RenameIO(dpBaseAction.ActionStartClass):
         notFoundNodesList = []
         maybeList = []
         for item in nodeIDDic.keys():
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             # check item
             if not cmds.objExists(item):
                 oldIDList = self.utils.getDecomposedIDList(nodeIDDic[item])
@@ -117,8 +117,8 @@ class RenameIO(dpBaseAction.ActionStartClass):
         if wellImportedList:
             self.wellDoneIO(self.latestDataFile)
         elif notFoundNodesList:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif maybeList:
-            self.maybeDoneIO(self.dpUIinst.lang['r066_shapeToReplace']+" "+', '.join(maybeList))
+            self.maybeDoneIO(self.ar.data.lang['r066_shapeToReplace']+" "+', '.join(maybeList))
         else:
-            self.maybeDoneIO(self.dpUIinst.lang['r032_notImportedData'])
+            self.maybeDoneIO(self.ar.data.lang['r032_notImportedData'])

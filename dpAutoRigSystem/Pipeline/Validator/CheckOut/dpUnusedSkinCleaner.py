@@ -47,7 +47,7 @@ class UnusedSkinCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional 1 to check here if there's an influenced node, otherwise delete the unused skinCluster
                     meshList = cmds.skinCluster(item, query=True, geometry=True)
                     if meshList:
@@ -69,10 +69,10 @@ class UnusedSkinCleaner(dpBaseAction.ActionStartClass):
                                     if toRemoveJointList:
                                         cmds.skinCluster(item, edit=True, removeInfluence=toRemoveJointList, toSelectedBones=True)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(len(toRemoveJointList))+" joints")
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(len(toRemoveJointList))+" joints")
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     else:
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
@@ -83,14 +83,14 @@ class UnusedSkinCleaner(dpBaseAction.ActionStartClass):
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = deleted")
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+" = deleted")
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

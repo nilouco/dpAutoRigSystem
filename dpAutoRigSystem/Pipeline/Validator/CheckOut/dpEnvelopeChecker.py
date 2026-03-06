@@ -71,7 +71,7 @@ class EnvelopeChecker(dpBaseAction.ActionStartClass):
 
                 if not self.firstMode:
                     for idx, issue in enumerate(self.checkedObjList):
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         if issue:
                             try:
                                 cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
@@ -83,7 +83,7 @@ class EnvelopeChecker(dpBaseAction.ActionStartClass):
 
             self.resultOkList.append(not True in self.foundIssueList)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

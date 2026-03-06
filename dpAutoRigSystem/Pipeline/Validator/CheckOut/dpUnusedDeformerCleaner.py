@@ -55,7 +55,7 @@ class UnusedDeformerCleaner(dpBaseAction.ActionStartClass):
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 if deformerList:
                     for defNode in deformerList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         hasTags = False
                         indicesList = cmds.getAttr(defNode+".input", multiIndices=True)
                         if indicesList:
@@ -74,7 +74,7 @@ class UnusedDeformerCleaner(dpBaseAction.ActionStartClass):
                                     unusedList.append(defNode)
                 if intermedList:
                     for intermedObj in intermedList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         outputList = cmds.listConnections(intermedObj, source=False, destination=True, plugs=True)
                         if not outputList:
                             unusedList.append(intermedObj)
@@ -90,14 +90,14 @@ class UnusedDeformerCleaner(dpBaseAction.ActionStartClass):
                             cmds.lockNode(unusedList, lock=False)
                             cmds.delete(unusedList)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": nodes = "+str(len(unusedList)))
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": nodes = "+str(len(unusedList)))
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": nodes = "+str(len(unusedList)))
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": nodes = "+str(len(unusedList)))
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

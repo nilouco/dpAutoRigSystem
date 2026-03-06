@@ -56,7 +56,7 @@ class PassthroughAttributes(dpBaseAction.ActionStartClass):
                     self.utils.setProgress(max=len(toCheckList)*2, addOne=False, addNumber=False)
                 toOptimizeList = []
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     # check optimization
                     for plug, connections in self.getConnectionDic(item).items():
                         sources = connections["sourceList"]
@@ -74,9 +74,9 @@ class PassthroughAttributes(dpBaseAction.ActionStartClass):
                         self.checkedObjList.append("\n".join(toOptimizeList))
                         self.resultOkList.append(False)
                     else: #fix
-                        self.checkedObjList.append(self.dpUIinst.lang[self.title])
+                        self.checkedObjList.append(self.ar.data.lang[self.title])
                         for item in toCheckList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             try:
                                 optimizedList = []
                                 for i in range(self.iterNumber):
@@ -102,14 +102,14 @@ class PassthroughAttributes(dpBaseAction.ActionStartClass):
                                         break
                                 if optimizedList:
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+f"\n{self.dpUIinst.lang['v004_fixed']}: ".join(optimizedList))
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+f"\n{self.ar.data.lang['v004_fixed']}: ".join(optimizedList))
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

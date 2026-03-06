@@ -16,12 +16,12 @@ DP_HEADDEFORMER_VERSION = 4.05
 
 
 class HeadDeformer(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # defining variables:
         self.headDeformerName = CLASS_NAME
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
+        self.ar = ar
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
         self.ui = ui
         self.headCtrl = None
         self.wellDone = True
@@ -33,11 +33,11 @@ class HeadDeformer(object):
     def dpHeadDeformerPromptDialog(self, *args):
         """ dpDeformer prompt dialog to get the name of the deformer
         """
-        btContinue = self.dpUIinst.lang['i174_continue']
-        btCancel = self.dpUIinst.lang['i132_cancel']
+        btContinue = self.ar.data.lang['i174_continue']
+        btCancel = self.ar.data.lang['i132_cancel']
         result = cmds.promptDialog(title="dpHeadDeformer", 
-                                   message=self.dpUIinst.lang["m006_name"], 
-                                   text=self.dpUIinst.lang["c024_head"], 
+                                   message=self.ar.data.lang["m006_name"], 
+                                   text=self.ar.data.lang["c024_head"], 
                                    button=[btContinue, btCancel], 
                                    defaultButton=btContinue, 
                                    cancelButton=btCancel, 
@@ -77,17 +77,17 @@ class HeadDeformer(object):
         self.headCtrl = ctrl
         deformerName = self.addDeformerInName(dialogName, True)
         clusterName = self.addDeformerInName(dialogName, False)
-        mainCtrlName = deformerName+"_"+self.dpUIinst.lang["c058_main"]
-        centerSymmetryName = clusterName+self.dpUIinst.lang["c098_center"]+self.dpUIinst.lang["c101_symmetry"]
-        topSymmetryName = clusterName+self.dpUIinst.lang["c099_top"]+self.dpUIinst.lang["c101_symmetry"]
-        intensityName = clusterName+self.dpUIinst.lang["c049_intensity"]
-        expandName = clusterName+self.dpUIinst.lang["c104_expand"]
-        bottomCtrlName = clusterName+self.dpUIinst.lang["c100_bottom"]
-        middleCtrlName = clusterName+self.dpUIinst.lang["m033_middle"]
-        topCtrlName = clusterName+self.dpUIinst.lang["c099_top"]
-        calibrateName = self.dpUIinst.lang["c111_calibrate"].lower()
+        mainCtrlName = deformerName+"_"+self.ar.data.lang["c058_main"]
+        centerSymmetryName = clusterName+self.ar.data.lang["c098_center"]+self.ar.data.lang["c101_symmetry"]
+        topSymmetryName = clusterName+self.ar.data.lang["c099_top"]+self.ar.data.lang["c101_symmetry"]
+        intensityName = clusterName+self.ar.data.lang["c049_intensity"]
+        expandName = clusterName+self.ar.data.lang["c104_expand"]
+        bottomCtrlName = clusterName+self.ar.data.lang["c100_bottom"]
+        middleCtrlName = clusterName+self.ar.data.lang["m033_middle"]
+        topCtrlName = clusterName+self.ar.data.lang["c099_top"]
+        calibrateName = self.ar.data.lang["c111_calibrate"].lower()
         axisList = ["X", "Y", "Z"]
-        posList = [self.dpUIinst.lang["c100_bottom"], self.dpUIinst.lang["m033_middle"], self.dpUIinst.lang["c099_top"]]
+        posList = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
         validName = self.utils.validateName(deformerName+"_FFD", "FFD")
@@ -109,7 +109,7 @@ class HeadDeformer(object):
             for hdNode in hdList:
                 if not cmds.objExists(hdNode):
                     cmds.polyCube(name=hdNode, constructionHistory=False)
-                    print(self.dpUIinst.lang["i304_new"], "=", hdNode)
+                    print(self.ar.data.lang["i304_new"], "=", hdNode)
             cmds.select(hdList)
             # lattice deformer
             latticeDefList = cmds.lattice(name=deformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
@@ -185,8 +185,8 @@ class HeadDeformer(object):
             cmds.addAttr(arrowCtrl, longName=calibrateName+"Y", attributeType='float', defaultValue=300/bBoxSize, keyable=False)
             cmds.addAttr(arrowCtrl, longName=calibrateName+"Z", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
             cmds.addAttr(arrowCtrl, longName=calibrateName+"Reduce", attributeType='float', defaultValue=100, keyable=False)
-            cmds.addAttr(arrowCtrl, longName=self.dpUIinst.lang["c021_showControls"], attributeType='long', min=0, max=1, defaultValue=0)
-            cmds.setAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], edit=True, keyable=False, channelBox=True)
+            cmds.addAttr(arrowCtrl, longName=self.ar.data.lang["c021_showControls"], attributeType='long', min=0, max=1, defaultValue=0)
+            cmds.setAttr(arrowCtrl+"."+self.ar.data.lang["c021_showControls"], edit=True, keyable=False, channelBox=True)
             
             # multiply divide in order to intensify influences
             calibrateMD = cmds.createNode("multiplyDivide", name=deformerName+"_Calibrate_MD")
@@ -234,7 +234,7 @@ class HeadDeformer(object):
                 if unitConvNode:
                     if cmds.objectType(unitConvNode) == "unitConversion":
                         cmds.setAttr(unitConvNode+".conversionFactor", 1)
-            cmds.connectAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], mainCtrlShape+".visibility")
+            cmds.connectAttr(arrowCtrl+"."+self.ar.data.lang["c021_showControls"], mainCtrlShape+".visibility")
             self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             
             # create symmetry setup
@@ -262,7 +262,7 @@ class HeadDeformer(object):
             subCtrlGrpList = []
             for pos, latticeSubPoints in zip(posList, latticeSubPointsList):
                 # create and connect cluster
-                namePos = bottomCtrlName.replace(self.dpUIinst.lang["c100_bottom"], pos)
+                namePos = bottomCtrlName.replace(self.ar.data.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
                 self.toIDList.extend(subClusterList)
                 cmds.parent(self.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
@@ -273,7 +273,7 @@ class HeadDeformer(object):
                 subCtrlGrpList.append(ctrlSubZeroList)
                 cmds.matchTransform(ctrlSubZeroList, subClusterList[1], pos=True)
                 # connect atributes
-                cmds.connectAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], ctrlSubZeroList+".visibility")
+                cmds.connectAttr(arrowCtrl+"."+self.ar.data.lang["c021_showControls"], ctrlSubZeroList+".visibility")
                 for axis in axisList:
                     cmds.connectAttr(subCtrl+".translate"+axis, subClusterList[1]+".translate"+axis, force=True)
                     cmds.connectAttr(subCtrl+".rotate"+axis, subClusterList[1]+".rotate"+axis, force=True)
@@ -310,7 +310,7 @@ class HeadDeformer(object):
             childrenControlsList = []
             headSubCtrl = self.ctrls.getControlNodeById("id_093_HeadSub")
             jawCtrl = self.ctrls.getControlNodeById("id_024_HeadJaw")
-            jawConditionList = [self.dpUIinst.lang["m075_upperTeeth"], self.dpUIinst.lang["m076_lowerTeeth"], self.dpUIinst.lang["m077_tongue"], self.dpUIinst.lang["c039_lip"]+"_"+self.dpUIinst.lang["c058_main"]]
+            jawConditionList = [self.ar.data.lang["m075_upperTeeth"], self.ar.data.lang["m076_lowerTeeth"], self.ar.data.lang["m077_tongue"], self.ar.data.lang["c039_lip"]+"_"+self.ar.data.lang["c058_main"]]
             ctrlIDNotIncludeList = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if headSubCtrl:
                 headSubCtrlChildrenList = cmds.listRelatives(headSubCtrl, allDescendents=True)
@@ -339,7 +339,7 @@ class HeadDeformer(object):
             if deformedByList:
                 for item in deformedByList:
                     if cmds.objExists(item+".controlID"):
-                        if not self.dpUIinst.lang["c025_jaw"] in arrowCtrl:
+                        if not self.ar.data.lang["c025_jaw"] in arrowCtrl:
                             if cmds.objExists(item+"."+DPHEADDEFINFLUENCE) and cmds.getAttr(item+"."+DPHEADDEFINFLUENCE):
                                 shape = cmds.listRelatives(item, shapes=True)
                                 if shape:
@@ -354,7 +354,7 @@ class HeadDeformer(object):
             if not self.headCtrl:
                 if headSubCtrl:
                     if len(headSubCtrl) > 1:
-                        mel.eval("warning" + "\"" + self.dpUIinst.lang["i075_moreOne"] + " Head control.\"" + ";")
+                        mel.eval("warning" + "\"" + self.ar.data.lang["i075_moreOne"] + " Head control.\"" + ";")
                     else:
                         self.headCtrl = headSubCtrl[0]
             if self.headCtrl:
@@ -365,7 +365,7 @@ class HeadDeformer(object):
                 cmds.xform(dataGrp, translation=(headCtrlPosList[0], headCtrlPosList[1], headCtrlPosList[2]), worldSpace=True)
                 cmds.parent(mainCtrlGrp, self.headCtrl)
             else:
-                mel.eval("warning" + "\"" + self.dpUIinst.lang["e020_notFoundHeadCtrl"] + "\"" + ";")
+                mel.eval("warning" + "\"" + self.ar.data.lang["e020_notFoundHeadCtrl"] + "\"" + ";")
                 self.wellDone = False
             
             cmds.parent(squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1], offsetGrp)
@@ -373,7 +373,7 @@ class HeadDeformer(object):
             
             # try to integrate to Scalable_Grp
             for item in cmds.ls(selection=False, type="transform"):
-                if cmds.objExists(item+"."+self.dpUIinst.masterAttr) and cmds.getAttr(item+"."+self.dpUIinst.masterAttr) == 1:
+                if cmds.objExists(item+"."+self.ar.masterAttr) and cmds.getAttr(item+"."+self.ar.masterAttr) == 1:
                     scalableGrp = cmds.listConnections(item+".scalableGrp")[0]
                     cmds.parent(dataGrp, scalableGrp)
                     break
@@ -385,7 +385,7 @@ class HeadDeformer(object):
             self.ctrls.colorShape([arrowCtrl, mainCtrl, centerSymmetryCtrl, topSymmetryCtrl, subCtrlList[0], subCtrlList[1], subCtrlList[2]], "cyan")
 
             # if there's Jaw in the deformerName it will configure rotate and delete symetries and subControls setup
-            if self.dpUIinst.lang["c025_jaw"] in mainCtrl:
+            if self.ar.data.lang["c025_jaw"] in mainCtrl:
                 cmds.setAttr(mainCtrlGrp+".rotateX", 145)
                 cmds.delete(clusterGrp, subCtrlGrpList, symmetryCtrlZeroList)
 
@@ -424,14 +424,14 @@ class HeadDeformer(object):
             self.toIDList.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
             for deformerList in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:
                 self.toIDList.extend(deformerList)
-            self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+            self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:
-                print(self.dpUIinst.lang["i179_addedHeadDef"])
+                print(self.ar.data.lang["i179_addedHeadDef"])
             return self.net
         else:
-            mel.eval("warning" + "\"" + self.dpUIinst.lang["i034_notSelHeadDef"] + "\"" + ";")
+            mel.eval("warning" + "\"" + self.ar.data.lang["i034_notSelHeadDef"] + "\"" + ";")
 
 
     def getNetData(self, deformerName, hdList, *args):

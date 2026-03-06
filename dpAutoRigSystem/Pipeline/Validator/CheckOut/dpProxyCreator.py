@@ -84,14 +84,14 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
                                 try:
                                     for sourceTransform in toProxyList:
                                         sourceShortName = self.utils.getShortName(sourceTransform)
-                                        self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+sourceShortName)
+                                        self.utils.setProgress(self.ar.data.lang[self.title]+": "+sourceShortName)
                                         self.createProxy(sourceTransform, sourceShortName, proxyGrp)
                                     self.proxyIntegration(proxyGrp)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+proxyGrp)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+proxyGrp)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+proxyGrp)
                         else:
                             self.foundIssueList.append(False)
                             self.resultOkList.append(True)
@@ -102,7 +102,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
             else:
                 self.notFoundNodes(proxyGrp)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
         
@@ -168,7 +168,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
                         if nodeFaceList:
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
                             cmds.delete(faceDupList)
-                        self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
+                        self.ar.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
                         cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
                         cmds.parent(dup, jnt)
                         cmds.scriptEditorInfo(suppressWarnings=True)
@@ -178,7 +178,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
                         cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
                         cmds.parent(dup, grp)
                         self.utils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
-                        self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                        self.ar.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
                         if drawOverrideList:
                             # remove from display layer
@@ -222,7 +222,7 @@ class ProxyCreator(dpBaseAction.ActionStartClass):
             self.connectProxyVis(optionCtrl, "Tweaks") #fixed camelCase for earlier rig versions v4.03.32
             self.connectProxyVis(optionCtrl, suffixName="Facial_Ctrls_Grp")
             self.connectProxyVis(optionCtrl, suffixName="Deformer_Ctrl_Grp")
-        self.dpUIinst.ctrls.colorShape([grp], [1, 0.5, 0.5], outliner=True) #red
+        self.ar.ctrls.colorShape([grp], [1, 0.5, 0.5], outliner=True) #red
 
 
     def connectProxyVis(self, ctrl, attr=None, suffixName=None, *args):

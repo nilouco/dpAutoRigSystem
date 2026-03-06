@@ -52,7 +52,7 @@ class ScalableDeformerChecker(dpBaseAction.ActionStartClass):
                     rigScaleOutput = [optionCtrl+"."+self.rigScaleOutputAttr]
                     itemAttrToFixList = []
                     for node in toCheckList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         nodeType = cmds.objectType(node)
                         # check skinCluster nodes and connections
                         if nodeType == "skinCluster":
@@ -84,17 +84,17 @@ class ScalableDeformerChecker(dpBaseAction.ActionStartClass):
                                         # connect the rigScaleOutput to the deformer scale attributes
                                         cmds.connectAttr(rigScaleOutput[0], itemAttr, force=True)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+itemAttr)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+itemAttr)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+itemAttr)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+itemAttr)
                                 cmds.select(clear=True)
                 else:
                     self.notFoundNodes("Option_Ctrl")
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

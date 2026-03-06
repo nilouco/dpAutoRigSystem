@@ -75,13 +75,13 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.jointEndAttr, radius=0.5)
                 self.utils.addJointEndAttr([self.endJoint])
                 # joint labelling:
                 self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_1")
                 # create a control:
-                self.steeringCtrl = self.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.dpUIinst.lang['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc1")
-                self.mainCtrl = self.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.steeringCtrl)
+                self.steeringCtrl = self.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc1")
+                self.mainCtrl = self.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.steeringCtrl)
                 self.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
                 self.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
                 self.steeringCtrlList.append(self.steeringCtrl)
@@ -105,11 +105,11 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(self.steeringCtrl+".scaleCompensate", channelBox=True)
                 cmds.connectAttr(self.steeringCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 # integrating setup:
-                cmds.addAttr(self.steeringCtrl, longName=self.dpUIinst.lang['c071_limit'], defaultValue=500, attributeType="float", keyable=False)
-                cmds.addAttr(self.steeringCtrl, longName=self.dpUIinst.lang['c049_intensity'], min=0, defaultValue=0.8, attributeType="float", keyable=False)
-                cmds.addAttr(self.steeringCtrl, longName=self.dpUIinst.lang['c070_steering'], attributeType="float", keyable=False)
-                cmds.setAttr(self.steeringCtrl+"."+self.dpUIinst.lang['c071_limit'], 500, channelBox=True)
-                cmds.setAttr(self.steeringCtrl+"."+self.dpUIinst.lang['c049_intensity'], 0.8, channelBox=True)
+                cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c071_limit'], defaultValue=500, attributeType="float", keyable=False)
+                cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c049_intensity'], min=0, defaultValue=0.8, attributeType="float", keyable=False)
+                cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c070_steering'], attributeType="float", keyable=False)
+                cmds.setAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], 500, channelBox=True)
+                cmds.setAttr(self.steeringCtrl+"."+self.ar.data.lang['c049_intensity'], 0.8, channelBox=True)
                 self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Unit_MD")
                 self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rotate_MD")
                 self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_MD")
@@ -117,18 +117,18 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(self.steeringInvertMD+".input2X", 0.1)
                 cmds.setAttr(self.steeringUnitMD+".input2X", -1)
                 cmds.transformLimits(self.steeringCtrl, enableRotationZ=(1, 1))
-                cmds.connectAttr(self.steeringCtrl+"."+self.dpUIinst.lang['c071_limit'], self.steeringUnitMD+".input1X", force=True)
+                cmds.connectAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], self.steeringUnitMD+".input1X", force=True)
                 cmds.connectAttr(self.steeringUnitMD+".outputX", self.steeringCtrl+".minRotLimit.minRotZLimit", force=True)
-                cmds.connectAttr(self.steeringCtrl+"."+self.dpUIinst.lang['c071_limit'], self.steeringCtrl+".maxRotLimit.maxRotZLimit", force=True)
+                cmds.connectAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], self.steeringCtrl+".maxRotLimit.maxRotZLimit", force=True)
                 cmds.connectAttr(self.steeringCtrl+".rotateZ", self.steeringInvertMD+".input1X", force=True)
                 cmds.connectAttr(self.steeringInvertMD+".outputX", self.steeringMD+".input1X", force=True)
-                cmds.connectAttr(self.steeringCtrl+"."+self.dpUIinst.lang['c049_intensity'], self.steeringMD+".input2X", force=True)
-                cmds.connectAttr(self.steeringMD+".outputX", self.steeringCtrl+"."+self.dpUIinst.lang['c070_steering'], force=True)
+                cmds.connectAttr(self.steeringCtrl+"."+self.ar.data.lang['c049_intensity'], self.steeringMD+".input2X", force=True)
+                cmds.connectAttr(self.steeringMD+".outputX", self.steeringCtrl+"."+self.ar.data.lang['c070_steering'], force=True)
                 
                 # calibration attributes:
                 steeringCalibrationList = [
-                                            self.dpUIinst.lang['c071_limit'],
-                                            self.dpUIinst.lang['c049_intensity']
+                                            self.ar.data.lang['c071_limit'],
+                                            self.ar.data.lang['c049_intensity']
                                             ]
                 self.ctrls.setStringAttrFromList(self.steeringCtrl, steeringCalibrationList)
 
@@ -143,7 +143,7 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.hookSetup(side, [zeroOutCtrlGrpList[1]], [side+self.userGuideName+"_1_Jnt"])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -151,7 +151,7 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def integratingInfo(self, *args):

@@ -2,16 +2,20 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Data:
-    dp_auto_rig_filename: str = "dpAutoRig.py"
+    prefix: str = ""
+    degree: str = ""
+
     dp_auto_rig_path: str = ""
+    dp_auto_rig_filename: str = "dpAutoRig.py"
 
     language_default: str = "English"
-    controller_default: str = "Default"
     validator_default: str = "AllCheckOuts"
+    curve_default: str = "Default"
+    degree_default: str = "Preset_0"
     
     language_option_var: str = "dpAutoRigLastLanguage"
-    controller_option_var: str = "dpAutoRigLastControllerPreset"
     validator_option_var: str = "dpAutoRigLastValidatorPreset"
+    curve_option_var: str = "dpAutoRigLastCurvePreset"
     degree_option_var: str = "dpAutoRigLastDegreeOption"
     
     base_name: str = "dpAR_"
@@ -38,13 +42,13 @@ class Data:
     language_folder: str = "Languages"
     standard_folder: str = "Modules/Standard"
     integrated_folder: str = "Modules/Integrated"
-    curves_simple_folder: str = "Modules/Curves/Simple"
-    curves_combined_folder: str = "Modules/Curves/Combined"
-    curves_presets_folder: str = "Modules/Curves/Presets"
+    curve_simple_folder: str = "Modules/Curves/Simple"
+    curve_combined_folder: str = "Modules/Curves/Combined"
+    curve_preset_folder: str = "Modules/Curves/Presets"
     validator_folder: str = "Pipeline/Validator"
     checkin_folder: str = "Pipeline/Validator/CheckIn"
     checkout_folder: str = "Pipeline/Validator/CheckOut"
-    validator_presets_folder: str = "Pipeline/Validator/Presets"
+    validator_preset_folder: str = "Pipeline/Validator/Presets"
     rebuilder_folder: str = "Pipeline/Rebuilder"
     start_folder: str = "Pipeline/Rebuilder/Start"
     source_folder: str = "Pipeline/Rebuilder/Source"
@@ -72,26 +76,18 @@ class Data:
     dp_log: str = "dpLog"
     dp_id: str = "dpID"
 
+    verbose: bool = False
     loaded_path: bool = False
-    loaded_standard: bool = False
-    loaded_integrated: bool = False
-    loaded_curve_shape: bool = False
-    loaded_combined: bool = False
-    loaded_tools: bool = False
-    loaded_checkin: bool = False
-    loaded_checkout: bool = False
-    loaded_addon: bool = False
-    loaded_finishing: bool = False
-    loaded_rebuilder: bool = False
-    loaded_start: bool = False
-    loaded_source: bool = False
-    loaded_setup: bool = False
-    loaded_deforming: bool = False
-    loaded_custom: bool = False
     rebuilding: bool = False
     modules_collapse_status: bool = False
-    rebuilders_collapse_status: bool = False
+    rebuilders_collapse_status: bool = True
     collapse_edit_sel_mod: bool = False
+    display_joint: bool = True
+    display_temp_grp: bool = False
+    integrate_module: bool = True
+    use_default_render_layer: bool = True
+    colorize_curve: bool = True
+    add_supplementary_attr: bool = True
 
     degree_option: int = 0
     auto_check_update: int = 1
@@ -101,6 +97,7 @@ class Data:
     transform_attrs: list = field(default_factory=lambda: ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"])
     rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
     axis: list = field(default_factory=lambda: ["X", "Y", "Z"])
+    degrees: list = field(default_factory=lambda: ['Preset_0', 'Linear_1', 'Cubic_3'])
     
     to_ids: list = field(default_factory=list)
     
@@ -110,3 +107,11 @@ class Data:
     checkaddon_instances: list = field(default_factory=list)
     checkfinishing_instances: list = field(default_factory=list)
     rebuilder_instances: list = field(default_factory=list)
+
+    lib: dict = field(default_factory=dict)
+    lang: dict = field(default_factory=dict)
+    lang_preset_data: dict = field(default_factory=dict)
+    curve_preset: dict = field(default_factory=dict)
+    curve_preset_data: dict = field(default_factory=dict)
+    validator_preset: dict = field(default_factory=dict)
+    validator_preset_data: dict = field(default_factory=dict)

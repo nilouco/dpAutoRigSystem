@@ -14,8 +14,8 @@ DP_JOINTDISPLAY_VERSION = 1.01
 
 
 class JointDisplay(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
-        self.dpUIinst = dpUIinst
+    def __init__(self, ar, ui=True, *args, **kwargs):
+        self.ar = ar
         self.ui = ui
         # joints lists 
         self.allJointsList = []
@@ -38,11 +38,11 @@ class JointDisplay(object):
         """ Create a window in order to load the joints in the scene.
         """
         # call close UI function
-        self.dpUIinst.utils.closeUI('dpJointDisplayWindow')
+        self.ar.utils.closeUI('dpJointDisplayWindow')
         # starting UI
         jointDisplay_winWidth  = 660
         jointDisplay_winHeight = 410
-        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.dpUIinst.lang["m233_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.ar.data.lang["m233_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating Main layout:
         jointDisplayMainLayout = cmds.columnLayout('jointDisplayMainLayout', columnOffset=('both', 5), adjustableColumn=True)
@@ -51,8 +51,8 @@ class JointDisplay(object):
         headerLayout = cmds.rowColumnLayout("headerLayout", adjustableColumn=1, numberOfColumns=2, columnWidth=[(1, 140), (2, 320)], columnAlign=[(1, 'left'), (2, 'right')], columnAttach=[(1, 'left', 10), (2, 'right', 10)], parent=jointDisplayMainLayout)
 
         # filter
-        self.jointFilter = cmds.textFieldGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", textChangedCommand=self.refreshLists, adjustableColumn=2, parent=headerLayout)
-        self.radiusFSG = cmds.floatSliderGrp("radiusFSG", label=self.dpUIinst.lang['c067_radius'].capitalize(), field=True, minValue=0, value=1, sliderStep=0.1, changeCommand=self.changeRadius, adjustableColumn=3, parent=headerLayout)
+        self.jointFilter = cmds.textFieldGrp("jointFilter", label=self.ar.data.lang['i268_filterByName'], text="", textChangedCommand=self.refreshLists, adjustableColumn=2, parent=headerLayout)
+        self.radiusFSG = cmds.floatSliderGrp("radiusFSG", label=self.ar.data.lang['c067_radius'].capitalize(), field=True, minValue=0, value=1, sliderStep=0.1, changeCommand=self.changeRadius, adjustableColumn=3, parent=headerLayout)
         cmds.separator(style='none', height=5, parent=jointDisplayMainLayout)
 
         # bone display panels
@@ -79,13 +79,13 @@ class JointDisplay(object):
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True, numberOfColumns=3, columnWidth=[(1, 160), (2, 100), (3, 160)], columnOffset=[(1, "both", 5), (2, "both", 80), (3, "both", 5)], adjustableColumn=2, parent=jointDisplayMainLayout)
         
         # defining move buttons
-        cmds.button("moveRightBT", label=self.dpUIinst.lang['c034_move']+' >>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
-        self.changeAllToMenu = cmds.optionMenu('chabgeAllTo',label=self.dpUIinst.lang['i359_changeTo']+' :', width = 200, parent=buttonLayout, changeCommand= self.changeAllToButton)
+        cmds.button("moveRightBT", label=self.ar.data.lang['c034_move']+' >>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
+        self.changeAllToMenu = cmds.optionMenu('chabgeAllTo',label=self.ar.data.lang['i359_changeTo']+' :', width = 200, parent=buttonLayout, changeCommand= self.changeAllToButton)
         cmds.menuItem( label='Bone', parent=self.changeAllToMenu)
         cmds.menuItem( label='Multi-Child as box', parent=self.changeAllToMenu )
         cmds.menuItem( label='None', parent=self.changeAllToMenu )
         cmds.menuItem( label='Joint', parent=self.changeAllToMenu )
-        cmds.button("moveLeftBT", label='<< '+self.dpUIinst.lang['c034_move'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft, parent=buttonLayout)
+        cmds.button("moveLeftBT", label='<< '+self.ar.data.lang['c034_move'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft, parent=buttonLayout)
 
         # call dpJointDisplayUI Window:
         cmds.showWindow(dpJointDisplayWin)
@@ -106,7 +106,7 @@ class JointDisplay(object):
         self.allJointsList = cmds.ls(selection=False, type='joint')
         writtenValue = cmds.textFieldGrp(self.jointFilter, query=True, text=True)
         if not writtenValue == "" and not writtenValue == " ":
-            self.allJointsList = self.dpUIinst.utils.filterName(writtenValue, cmds.ls(selection=False, type='joint'), " ")
+            self.allJointsList = self.ar.utils.filterName(writtenValue, cmds.ls(selection=False, type='joint'), " ")
 
 
     def populateLabelList(self, *args):

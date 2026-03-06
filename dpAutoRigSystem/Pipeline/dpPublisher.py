@@ -8,19 +8,19 @@ DP_PUBLISHER_VERSION = 1.12
 
 
 class Publisher(object):
-    def __init__(self, dpUIinst, ui=True, verbose=True):
+    def __init__(self, ar, ui=True, verbose=True):
         """ Initialize the module class loading variables.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.ui = ui
         self.verbose = verbose
-        self.publisherName = self.dpUIinst.lang['m046_publisher']
+        self.publisherName = self.ar.data.lang['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
-        self.utils = dpUIinst.utils
-        self.pipeliner = dpUIinst.pipeliner
-        self.packager = dpUIinst.packager
+        self.utils = ar.utils
+        self.pipeliner = ar.pipeliner
+        self.packager = ar.packager
 
 
     def getFileTypeByExtension(self, fileName, *args):
@@ -40,7 +40,7 @@ class Publisher(object):
         self.utils.closeUI('dpPublisherWindow')
         savedScene = self.utils.checkSavedScene()
         if not savedScene:
-            savedScene = self.dpUIinst.pipeliner.userSaveThisScene(True)
+            savedScene = self.ar.pipeliner.userSaveThisScene(True)
             return
         if savedScene:
             # window
@@ -52,20 +52,20 @@ class Publisher(object):
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
             cmds.separator(style="none", height=20, parent=publisherLayout)
             # fields
-            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.dpUIinst.lang['i220_filePath'], text='', buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.userLoadFilePath, adjustableColumn=2, changeCommand=self.editPublishPath, parent=publisherLayout)
-            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.dpUIinst.lang['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-            self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.dpUIinst.lang['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.dpUIinst.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
+            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.ar.data.lang['i220_filePath'], text='', buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.userLoadFilePath, adjustableColumn=2, changeCommand=self.editPublishPath, parent=publisherLayout)
+            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.ar.data.lang['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
+            self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.ar.data.lang['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
+            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.ar.data.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             # buttons
             publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
-            cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
-            cmds.button('diagnoseBT', label=self.dpUIinst.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
-            cmds.button('publishBT', label=self.dpUIinst.lang['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
-            cmds.button('publishBatchBT', label=self.dpUIinst.lang['i358_batch'], command=partial(self.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
+            cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
+            cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
-            self.pipeliner.mainUI(self.dpUIinst)
+            self.pipeliner.mainUI(self.ar)
             self.utils.closeUI('dpPipelinerWindow')
             self.setPublishFilePath()
 
@@ -95,7 +95,7 @@ class Publisher(object):
     def userLoadFilePath(self, *args):
         """ Ask user to load a file path.
         """
-        dialogResult = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.dpUIinst.lang['i187_load'])
+        dialogResult = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.ar.data.lang['i187_load'])
         if dialogResult:
             self.setPublishFilePath(dialogResult[0])
 
@@ -113,14 +113,14 @@ class Publisher(object):
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = self.dpUIinst.data.checkaddon_instances.copy()
-        toCheckValidatorList.extend(self.dpUIinst.data.checkin_instances)
-        toCheckValidatorList.extend(self.dpUIinst.data.checkout_instances)
-        toCheckValidatorList.extend(self.dpUIinst.checkFinishingInstanceList)
+        toCheckValidatorList = self.ar.data.checkaddon_instances.copy()
+        toCheckValidatorList.extend(self.ar.data.checkin_instances)
+        toCheckValidatorList.extend(self.ar.data.checkout_instances)
+        toCheckValidatorList.extend(self.ar.checkFinishingInstanceList)
         if toCheckValidatorList:
-            validationResultDataList = self.dpUIinst.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
+            validationResultDataList = self.ar.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
-                stoppedMessage = self.dpUIinst.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
+                stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
                 return stoppedMessage
         return False
         
@@ -133,8 +133,8 @@ class Publisher(object):
             mel.eval('warning \"'+validatorsResult+'\";')
             self.utils.setProgress(endIt=True)
         else:
-            validatorsResult = self.dpUIinst.lang['v007_allOk']
-        self.dpUIinst.logger.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
+            validatorsResult = self.ar.data.lang['v007_allOk']
+        self.ar.logger.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
 
 
     def runPublishing(self, fromUI, verifyValidator=True, comments=False, *args):
@@ -154,7 +154,7 @@ class Publisher(object):
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            self.utils.setProgress(self.dpUIinst.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
+            self.utils.setProgress(self.ar.data.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
 
             # check if there'a a file name to publish this scene
             publishFileName = self.pipeliner.getPipeFileName(self.pipeliner.pipeData['publishPath'])
@@ -188,42 +188,42 @@ class Publisher(object):
                     self.abortPublishing(validatorsResult)
                     return False
                 else:
-                    self.utils.setProgress(self.dpUIinst.lang['i336_storingData']+"...", addNumber=False)
+                    self.utils.setProgress(self.ar.data.lang['i336_storingData']+"...", addNumber=False)
                     
                     self.pipeliner.pipeData.update(publishLog)
 
                     # try to store data into All_Grp if it exists
                     self.pipeliner.pipeData['modelVersion'] = None
-                    if not self.dpUIinst.checkIfNeedCreateAllGrp():
+                    if not self.ar.checkIfNeedCreateAllGrp():
                         # published from file
-                        if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
-                            cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
-                        cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        if not cmds.objExists(self.ar.masterGrp+".publishedFromFile"):
+                            cmds.addAttr(self.ar.masterGrp, longName="publishedFromFile", dataType="string")
+                        cmds.setAttr(self.ar.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
                         # asset name
-                        if not cmds.objExists(self.dpUIinst.masterGrp+".assetName"):
-                            cmds.addAttr(self.dpUIinst.masterGrp, longName="assetName", dataType="string")
-                        cmds.setAttr(self.dpUIinst.masterGrp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
+                        if not cmds.objExists(self.ar.masterGrp+".assetName"):
+                            cmds.addAttr(self.ar.masterGrp, longName="assetName", dataType="string")
+                        cmds.setAttr(self.ar.masterGrp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
                         # comments
-                        if not cmds.objExists(self.dpUIinst.masterGrp+".comment"):
-                            cmds.addAttr(self.dpUIinst.masterGrp, longName="comment", dataType="string")
-                        cmds.setAttr(self.dpUIinst.masterGrp+".comment", commentValue, type="string")
+                        if not cmds.objExists(self.ar.masterGrp+".comment"):
+                            cmds.addAttr(self.ar.masterGrp, longName="comment", dataType="string")
+                        cmds.setAttr(self.ar.masterGrp+".comment", commentValue, type="string")
                         # model version
                         shortName = cmds.file(query=True, sceneName=True, shortName=True)
                         if self.pipeliner.pipeData['s_model'] in shortName:
                             modelVersion = shortName[shortName.find(self.pipeliner.pipeData['s_model'])+len(self.pipeliner.pipeData['s_model']):]
                             modelVersion = int(modelVersion[:modelVersion.find("_")])
-                            if not cmds.objExists(self.dpUIinst.masterGrp+".modelVersion"):
-                                cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
-                            cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
+                            if not cmds.objExists(self.ar.masterGrp+".modelVersion"):
+                                cmds.addAttr(self.ar.masterGrp, longName="modelVersion", attributeType="long")
+                            cmds.setAttr(self.ar.masterGrp+".modelVersion", modelVersion)
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
-                        if cmds.objExists(self.dpUIinst.masterGrp+".system"):
-                            builtVersion = cmds.getAttr(self.dpUIinst.masterGrp+".system")
+                        if cmds.objExists(self.ar.masterGrp+".system"):
+                            builtVersion = cmds.getAttr(self.ar.masterGrp+".system")
                             if "dpAutoRig_" in builtVersion: #suport old rigged files
                                 builtVersion = builtVersion.split("dpAutoRig_")[1]
                     else:
-                        builtVersion = self.dpUIinst.dpARVersion
+                        builtVersion = self.ar.dpARVersion
 
-                    self.utils.setProgress(self.dpUIinst.lang['i227_getImage']+"...", addNumber=False)
+                    self.utils.setProgress(self.ar.data.lang['i227_getImage']+"...", addNumber=False)
 
                     # publishing file
                     # create folders to publish file if needed
@@ -231,7 +231,7 @@ class Publisher(object):
                         try:
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
-                            self.abortPublishing(self.dpUIinst.lang['v022_noFilePath'])
+                            self.abortPublishing(self.ar.data.lang['v022_noFilePath'])
                             return False
                     
                     # mount folders
@@ -242,9 +242,9 @@ class Publisher(object):
                             if self.pipeliner.pipeData['b_imager']:
                                 self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.getToday())
                                 self.utils.setProgress(endIt=True)
-                                self.utils.setProgress(self.dpUIinst.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
+                                self.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
                     else:
-                        self.utils.setProgress(self.dpUIinst.lang['i225_savingFile']+"...", addNumber=False)
+                        self.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", addNumber=False)
                     
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
@@ -254,31 +254,31 @@ class Publisher(object):
                     if self.pipeliner.pipeData['b_deliver']:
                         if self.pipeliner.pipeData['toClientPath']:
                             # toClient
-                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Zipping", addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Zipping", addNumber=False)
                             zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.getToday())
                             # dropbox
-                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Clouding", addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Clouding", addNumber=False)
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
                             # open folder
-                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Folder openning", addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Folder openning", addNumber=False)
                             self.packager.openFolder(self.pipeliner.pipeData['toClientPath'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
-                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpHist", addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpHist", addNumber=False)
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
                         # organize old published files
                         if self.pipeliner.assetNameList:
-                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpOld", addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpOld", addNumber=False)
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
-                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpLog", addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpLog", addNumber=False)
                             messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
-                                print(self.dpUIinst.lang[result])
+                                print(self.ar.data.lang[result])
 
                     # publishing callback
                     if self.pipeliner.pipeData['s_callback']:
@@ -296,9 +296,9 @@ class Publisher(object):
                         self.askUserChooseFile(publishFileName)
 
             else:
-                mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')
+                mel.eval('warning \"'+self.ar.data.lang['v021_noFileName']+'\";')
         else:
-            mel.eval('warning \"'+self.dpUIinst.lang['v022_noFilePath']+'\";')
+            mel.eval('warning \"'+self.ar.data.lang['v022_noFilePath']+'\";')
 
 
     def abortPublishing(self, raison=None, *args):
@@ -314,7 +314,7 @@ class Publisher(object):
         cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
         # report the error in a log window
         if raison:
-            self.dpUIinst.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
+            self.ar.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
             mel.eval('warning \"'+raison+'\";')
 
 
@@ -325,7 +325,7 @@ class Publisher(object):
         """
         optWip = "1 - "+self.pipeliner.pipeData['shortName']
         optPub = "2 - "+publishFileName
-        result = cmds.confirmDialog(title=self.publisherName, message=self.dpUIinst.lang['v098_askUserChooseFile'], button=[optWip, optPub], defaultButton=optPub, cancelButton=optPub, dismissString=optPub)
+        result = cmds.confirmDialog(title=self.publisherName, message=self.ar.data.lang['v098_askUserChooseFile'], button=[optWip, optPub], defaultButton=optPub, cancelButton=optPub, dismissString=optPub)
         if result == optWip:
             cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
 
@@ -344,20 +344,20 @@ class Publisher(object):
         succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
         if publishedFile:
             cmds.separator(style="none", height=20, parent=succesLayout)
-            cmds.text(label=self.dpUIinst.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
+            cmds.text(label=self.ar.data.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
             cmds.text(label=publishedFile, parent=succesLayout)
         if errorList:
             cmds.separator(style="in", height=20, parent=succesLayout)
-            cmds.text(label=self.dpUIinst.lang['i141_error']+":", font='boldLabelFont', parent=succesLayout)
-            cmds.text(label=self.dpUIinst.lang['i074_attention'], parent=succesLayout)
+            cmds.text(label=self.ar.data.lang['i141_error']+":", font='boldLabelFont', parent=succesLayout)
+            cmds.text(label=self.ar.data.lang['i074_attention'], parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
             for errorFile in errorList:
                 cmds.button(label=errorFile, command=partial(self.pipeliner.loadAsset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
         else:
             cmds.separator(style="none", height=20, parent=succesLayout)
-            cmds.text(label=self.dpUIinst.lang['i018_thanks'], parent=succesLayout)
+            cmds.text(label=self.ar.data.lang['i018_thanks'], parent=succesLayout)
 
 
     def loadPublishingBatch(self, path, assetList=None, comments=None, *args):
@@ -368,15 +368,15 @@ class Publisher(object):
             if not comments:
                 comments = cmds.textFieldGrp(self.pipeliner.commentBatchTFG, query=True, text=True)
                 if not comments:
-                    comments = self.dpUIinst.lang['m046_publisher']+" v"+str(DP_PUBLISHER_VERSION)
-            if not comments.endswith(self.dpUIinst.lang['i358_batch']):
-                comments = self.dpUIinst.lang['i358_batch']+" - "+comments
+                    comments = self.ar.data.lang['m046_publisher']+" v"+str(DP_PUBLISHER_VERSION)
+            if not comments.endswith(self.ar.data.lang['i358_batch']):
+                comments = self.ar.data.lang['i358_batch']+" - "+comments
             if not assetList:
                 assetList = [a[a.rfind("|")+1:-2] for a in self.pipeliner.selectedBatchList if cmds.checkBox(a, query=True, value=True)]
             if assetList:
-                print(self.dpUIinst.lang['i335_starting']+" "+self.dpUIinst.lang['i358_batch']+" "+self.dpUIinst.lang['m046_publisher']+"...")
-                print(self.dpUIinst.lang['i219_comments']+":", comments)
-                print(self.dpUIinst.lang['i303_asset']+"s:", assetList)
+                print(self.ar.data.lang['i335_starting']+" "+self.ar.data.lang['i358_batch']+" "+self.ar.data.lang['m046_publisher']+"...")
+                print(self.ar.data.lang['i219_comments']+":", comments)
+                print(self.ar.data.lang['i303_asset']+"s:", assetList)
                 for asset in assetList:
                     self.pipeliner.loadAsset(path, asset)
                     publishResult = self.runPublishing(fromUI=False, comments=comments)

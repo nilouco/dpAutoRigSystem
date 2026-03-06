@@ -41,7 +41,7 @@ class CycleChecker(dpBaseAction.ActionStartClass):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             self.utils.setProgress(max=1, addOne=False, addNumber=False)
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             cycles = None
             if objList:
                 cycles = cmds.cycleCheck(objList, list=True)
@@ -56,12 +56,12 @@ class CycleChecker(dpBaseAction.ActionStartClass):
                     self.resultOkList.append(False)
                 else: #fix = can't do it automatically, sorry
                     self.resultOkList.append(False)
-                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+", ".join(cycles))
+                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(cycles))
             else:
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -14,9 +14,9 @@ DP_TARGETMIRROR_VERSION = 2.07
 
 
 class TargetMirror(object):
-    def __init__(self, dpUIinst, *args, **kwargs):
-        self.dpUIinst = dpUIinst
-        self.utils = self.dpUIinst.utils
+    def __init__(self, ar, *args, **kwargs):
+        self.ar = ar
+        self.utils = self.ar.utils
         # call main function
         self.dpTargetMirrorUI(self)
     
@@ -29,23 +29,23 @@ class TargetMirror(object):
             cmds.deleteUI('dpTargetMirrorWindow', window=True)
         targetMirror_winWidth  = 305
         targetMirror_winHeight = 250
-        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.dpUIinst.lang["m055_tgtMirror"]+" "+str(DP_TARGETMIRROR_VERSION), widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.ar.data.lang["m055_tgtMirror"]+" "+str(DP_TARGETMIRROR_VERSION), widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         targetMirrorLayout = cmds.columnLayout('targetMirrorLayout')
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 120), (2, 190)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=targetMirrorLayout)
-        cmds.button(label=self.dpUIinst.lang["i043_origModel"]+" >", annotation=self.dpUIinst.lang["i044_origDesc"], backgroundColor=(1.0, 1.0, 0.7), width=120, command=self.dpLoadOriginalModel, parent=doubleLayout)
+        cmds.button(label=self.ar.data.lang["i043_origModel"]+" >", annotation=self.ar.data.lang["i044_origDesc"], backgroundColor=(1.0, 1.0, 0.7), width=120, command=self.dpLoadOriginalModel, parent=doubleLayout)
         self.originalModelTextField = cmds.textField('originalModelTextField', width=160, text="", parent=doubleLayout)
         listMirrorLayout = cmds.columnLayout('listMirrorLayout', columnOffset=('left', 10), width=310, parent=targetMirrorLayout)
-        cmds.text(label=self.dpUIinst.lang["i047_targetList"], height=30, parent=listMirrorLayout)
+        cmds.text(label=self.ar.data.lang["i047_targetList"], height=30, parent=listMirrorLayout)
         self.targetScrollList = cmds.textScrollList('targetScrollList', width=290, height=100, allowMultiSelection=True, parent=listMirrorLayout)
         cmds.separator(style='none', parent=listMirrorLayout)
         middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=listMirrorLayout)
-        cmds.button(label=self.dpUIinst.lang["i045_add"], annotation=self.dpUIinst.lang["i048_addDesc"], width=140, command=self.dpAddSelect, parent=middleLayout)
-        cmds.button(label=self.dpUIinst.lang["i046_remove"], annotation=self.dpUIinst.lang["i051_removeDesc"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
+        cmds.button(label=self.ar.data.lang["i045_add"], annotation=self.ar.data.lang["i048_addDesc"], width=140, command=self.dpAddSelect, parent=middleLayout)
+        cmds.button(label=self.ar.data.lang["i046_remove"], annotation=self.ar.data.lang["i051_removeDesc"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
         cmds.separator(style='none', height=15, parent=middleLayout)
         renameLayout = cmds.rowColumnLayout('renameLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0)], parent=listMirrorLayout)
-        self.autoRenameCB = cmds.checkBox('autoRenameCB', label=self.dpUIinst.lang["i056_autoRename"], value=1, onCommand=partial(self.dpChangeRename, 1), offCommand=partial(self.dpChangeRename, 0), parent=renameLayout)
+        self.autoRenameCB = cmds.checkBox('autoRenameCB', label=self.ar.data.lang["i056_autoRename"], value=1, onCommand=partial(self.dpChangeRename, 1), offCommand=partial(self.dpChangeRename, 0), parent=renameLayout)
         self.fromTxt = cmds.text('fromTxt', label="from", parent=renameLayout)
         self.toTxt = cmds.text('toTxt', label="to", parent=renameLayout)
         cmds.separator(style='none', height=15, parent=renameLayout)
@@ -59,10 +59,10 @@ class TargetMirror(object):
         rbZ = cmds.radioButton("rbZ", label="Z = XY", annotation="Z", align="left", collection="mirrorAxisRC", parent=tripleLayout)
         cmds.radioCollection('mirrorAxisRC', edit=True, select="rbX")
         cmds.separator(style='none', height=15, parent=listMirrorLayout)
-        self.mirrorPosCB = cmds.checkBox('mirrorPosCB', label=self.dpUIinst.lang["i057_mirrorPosition"], value=1, parent=listMirrorLayout)
-        self.cleanUndoCB = cmds.checkBox('cleanUndoCB', label=self.dpUIinst.lang["i049_clearUndo"], annotation=self.dpUIinst.lang["i050_clearUndoDesc"], align="left", value=1, parent=listMirrorLayout)
-        self.checkHistoryCB = cmds.checkBox('checkHistoryCB', label=self.dpUIinst.lang["i162_checkHistory"], annotation=self.dpUIinst.lang["i161_historyMessage"], align="left", value=0, parent=listMirrorLayout)
-        cmds.button(label=self.dpUIinst.lang["i054_targetRun"], annotation=self.dpUIinst.lang["i053_targetRunDesc"], width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpRunMirror, parent=listMirrorLayout)
+        self.mirrorPosCB = cmds.checkBox('mirrorPosCB', label=self.ar.data.lang["i057_mirrorPosition"], value=1, parent=listMirrorLayout)
+        self.cleanUndoCB = cmds.checkBox('cleanUndoCB', label=self.ar.data.lang["i049_clearUndo"], annotation=self.ar.data.lang["i050_clearUndoDesc"], align="left", value=1, parent=listMirrorLayout)
+        self.checkHistoryCB = cmds.checkBox('checkHistoryCB', label=self.ar.data.lang["i162_checkHistory"], annotation=self.ar.data.lang["i161_historyMessage"], align="left", value=0, parent=listMirrorLayout)
+        cmds.button(label=self.ar.data.lang["i054_targetRun"], annotation=self.ar.data.lang["i053_targetRunDesc"], width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpRunMirror, parent=listMirrorLayout)
 
         # call targetMirrorUI Window:
         cmds.showWindow(dpTargetMirrorWin)
@@ -111,9 +111,9 @@ class TargetMirror(object):
                     # add selected items in the empyt target scroll list
                     cmds.textScrollList(self.targetScrollList, edit=True, append=selMeshList)
             else:
-                mel.eval("warning \""+self.dpUIinst.lang["i055_tgtSelect"]+"\";")
+                mel.eval("warning \""+self.ar.data.lang["i055_tgtSelect"]+"\";")
         else:
-            mel.eval("warning \""+self.dpUIinst.lang["i055_tgtSelect"]+"\";")
+            mel.eval("warning \""+self.ar.data.lang["i055_tgtSelect"]+"\";")
     
     
     def dpRemoveSelect(self, *args):
@@ -146,7 +146,7 @@ class TargetMirror(object):
                             if cmds.checkBox(self.checkHistoryCB, query=True, value=True):
                                 historyList = cmds.listHistory(childList[0])
                                 if len(historyList) > 1:
-                                    dialogReturn = cmds.confirmDialog(title=self.dpUIinst.lang["i159_historyFound"], message=self.dpUIinst.lang["i160_historyDesc"]+"\n\n"+item+"\n\n"+self.dpUIinst.lang["i161_historyMessage"], button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+                                    dialogReturn = cmds.confirmDialog(title=self.ar.data.lang["i159_historyFound"], message=self.ar.data.lang["i160_historyDesc"]+"\n\n"+item+"\n\n"+self.ar.data.lang["i161_historyMessage"], button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
                                     if dialogReturn == "Yes":
                                         isGeometry = True
                                 else:
@@ -154,15 +154,15 @@ class TargetMirror(object):
                             else:
                                 isGeometry = True
                         else:
-                            mel.eval("warning \""+item+" "+self.dpUIinst.lang["i058_notGeo"]+"\";")
+                            mel.eval("warning \""+item+" "+self.ar.data.lang["i058_notGeo"]+"\";")
                     except:
-                        mel.eval("warning \""+self.dpUIinst.lang["i163_sameName"]+" "+item+"\";")
+                        mel.eval("warning \""+self.ar.data.lang["i163_sameName"]+" "+item+"\";")
                 else:
-                    mel.eval("warning \""+self.dpUIinst.lang["i059_selTransform"]+" "+item+" "+self.dpUIinst.lang["i060_shapePlease"]+"\";")
+                    mel.eval("warning \""+self.ar.data.lang["i059_selTransform"]+" "+item+" "+self.ar.data.lang["i060_shapePlease"]+"\";")
             else:
-                mel.eval("warning \""+item+" "+self.dpUIinst.lang["i061_notExists"]+"\";")
+                mel.eval("warning \""+item+" "+self.ar.data.lang["i061_notExists"]+"\";")
         else:
-            mel.eval("warning \""+self.dpUIinst.lang["i062_notFound"]+" "+item+"\";")
+            mel.eval("warning \""+self.ar.data.lang["i062_notFound"]+" "+item+"\";")
         return isGeometry
     
     
@@ -177,7 +177,7 @@ class TargetMirror(object):
             # get target list:
             targetList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
             if targetList:
-                self.utils.setProgress('Target: '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
+                self.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
                 cancelled = False
                 self.toIDList = []
                 # get mirror information from UI
@@ -234,5 +234,5 @@ class TargetMirror(object):
                             if clearUndo:
                                 mel.eval("flushUndo;")
                 self.utils.setProgress(endIt=True)
-                self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
             cmds.select(clear=True)

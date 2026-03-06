@@ -50,7 +50,7 @@ class NonManifoldCleaner(dpBaseAction.ActionStartClass):
                     if geoToCleanList:
                         self.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
                         for geo in geoToCleanList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):
                                 self.checkedObjList.append(geo)
                                 self.foundIssueList.append(True)
@@ -62,20 +62,20 @@ class NonManifoldCleaner(dpBaseAction.ActionStartClass):
                                         # Cleanup non manifolds
                                         mel.eval('polyCleanupArgList 4 { "0","1","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
                                         self.resultOkList.append(True)
-                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+geo)
+                                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+geo)
                                         mel.eval('changeSelectMode -object;')
                                         cmds.select(clear=True)
                                     except:
                                         self.resultOkList.append(False)
-                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+geo)
+                                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+geo)
                     else:
                         self.notFoundNodes()
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+                    self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
+                self.notWorkedWellIO(self.ar.data.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
+            self.notWorkedWellIO(self.ar.data.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 

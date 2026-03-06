@@ -29,22 +29,22 @@ class Smile(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.dpUIinst.startGuideModules(self.curvesSimpleFolder, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.startGuideModules(self.curvesSimpleFolder, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
         # load module instance
-        circleInstance = self.dpUIinst.initExtraModule('dpCircle', self.curvesSimpleFolder.replace("/", "."))
-        mouthInstance = self.dpUIinst.initExtraModule('dpCurvedCircleUp', self.curvesSimpleFolder.replace("/", "."))
+        circleInstance = self.ar.initExtraModule('dpCircle', self.curvesSimpleFolder.replace("/", "."))
+        mouthInstance = self.ar.initExtraModule('dpCurvedCircleUp', self.curvesSimpleFolder.replace("/", "."))
         # creating curve shapes:
         curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)

@@ -52,7 +52,7 @@ class DataSetCleaner(dpBaseAction.ActionStartClass):
                 if toCheckList:
                     self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                     for item in toCheckList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         plugList = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
                         if plugList:
                             for plug in plugList:
@@ -71,14 +71,14 @@ class DataSetCleaner(dpBaseAction.ActionStartClass):
                                             cmds.disconnectAttr(item+".instObjGroups[0]", plug)
                                             if not itemDone:
                                                 self.resultOkList.append(True)
-                                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                         except:
                                             self.resultOkList.append(False)
-                                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -23,7 +23,7 @@ class VaccineCleaner(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_VACCINECLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseAction)
     
 
@@ -51,7 +51,7 @@ class VaccineCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     scriptdata = cmds.scriptNode(item, beforeScript=True, query=True)
                     #if "fuck_All_U" in scriptdata:
@@ -69,18 +69,18 @@ class VaccineCleaner(dpBaseAction.ActionStartClass):
                                     if os.path.exists(path+vaccine):
                                         os.remove(path+vaccine)
                                 if os.path.exists(path+"userSetup.py"):
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
                                 else:
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 cmds.select(clear=True)
                                 self.resultOkList.append(True)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

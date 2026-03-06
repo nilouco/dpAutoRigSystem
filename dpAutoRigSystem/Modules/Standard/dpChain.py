@@ -23,7 +23,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseStandard)
             reload(dpBaseLayout)
         self.worldRefList = []
@@ -183,9 +183,9 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # look at aim constraint:
         aimConst = cmds.aimConstraint(ikToAimCtrl, fakeLoc, ikCtrlZero, worldUpType="object", worldUpObject=upLoc, aimVector=(0, 0, zDir), upVector=(0, 1, 0), maintainOffset=True, name=ikCtrlZero+"_AiC")[0]
         if autoOrient:
-            cmds.connectAttr(ikCtrl+"."+self.dpUIinst.lang['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
+            cmds.connectAttr(ikCtrl+"."+self.ar.data.lang['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
             aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
-            cmds.connectAttr(ikCtrl+"."+self.dpUIinst.lang['c033_autoOrient'], aimRev+".inputX", force=True)
+            cmds.connectAttr(ikCtrl+"."+self.ar.data.lang['c033_autoOrient'], aimRev+".inputX", force=True)
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
             self.toIDList.append(aimRev)
 
@@ -197,8 +197,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         renamedList = []
         for item in reversed(jntList):
             if cmds.objectType(item) == "joint":
-                if self.dpUIinst.jointEndAttr in cmds.listAttr(item):
-                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_"+self.dpUIinst.jointEndAttr, toName+"_"+self.dpUIinst.jointEndAttr))
+                if self.ar.jointEndAttr in cmds.listAttr(item):
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_"+self.ar.jointEndAttr, toName+"_"+self.ar.jointEndAttr))
                     renamedList.append(newName)
                     continue
                 elif "_Jax" in item:
@@ -237,7 +237,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dynJntList.insert(0, firstDynJnt)
         self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
         self.utils.addJointEndAttr([self.skinJointList[-1]])
-        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_"+self.dpUIinst.jointEndAttr)
+        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_"+self.ar.jointEndAttr)
         self.utils.removeUserDefinedAttr(self.skinJointList[:-1])
         newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
         cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
@@ -325,7 +325,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # creating joint chains:
                 self.chainDic = {}
                 self.jSuffixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt']
-                self.jEndSuffixList = ['_'+self.dpUIinst.jointEndAttr, '_Ik_'+self.dpUIinst.jointEndAttr, '_Fk_'+self.dpUIinst.jointEndAttr]
+                self.jEndSuffixList = ['_'+self.ar.jointEndAttr, '_Ik_'+self.ar.jointEndAttr, '_Fk_'+self.ar.jointEndAttr]
                 for t, suffix in enumerate(self.jSuffixList):
                     self.wipList = []
                     cmds.select(clear=True)
@@ -387,9 +387,9 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if n == (self.nJoints-1):
                     self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd", parentTag=self.fkCtrlList[-1])
                     cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName=self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName=self.dpUIinst.lang['c118_active']+self.dpUIinst.lang['c031_volumeVariation'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.ar.data.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.ar.data.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.ar.data.lang['c118_active']+self.ar.data.lang['c031_volumeVariation'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
                     cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
                     if s == 1:
@@ -490,8 +490,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.fixMirrorFlipping(ikCtrlMainZero, s, -1)
 
                         # loading Maya matrix node
-                        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+                        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+                        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                         if loadedQuatNode and loadedMatrixPlugin:
                             # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
                             ikMainLoc = cmds.spaceLocator(name=side+self.userGuideName+"_Ik_Main_Loc")[0]
@@ -520,10 +520,10 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.fixMirrorFlipping(ikCtrlZero, s, 1)
 
                     if c == 4: #last
-                        cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                        cmds.addAttr(ikCtrl, longName=self.ar.data.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
-                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd", parentTag=self.ikCtrlList[-1])
+                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.ar.data.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd", parentTag=self.ikCtrlList[-1])
                         self.ctrls.colorShape([self.ikCtrlLast], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
                         ikCtrlLastZero = self.utils.zeroOut([self.ikCtrlLast])[0]
@@ -545,10 +545,10 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         else:
                             self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v", "ro"])
                     else: #first
-                        cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                        cmds.addAttr(ikCtrl, longName=self.ar.data.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # first ik control:
-                        self.ikCtrlFirst = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_Base", parentTag=self.ikCtrlMain)
+                        self.ikCtrlFirst = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.ar.data.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_Base", parentTag=self.ikCtrlMain)
                         self.ctrls.colorShape([self.ikCtrlFirst], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlFirst, maintainOffset=False))
                         ikCtrlFirstZero = self.utils.zeroOut([self.ikCtrlFirst])[0]
@@ -632,9 +632,9 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 vvScaleCompensateMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_VV_ScaleCompensate_MD")
                 vvClp = cmds.createNode('clamp', name=side+self.userGuideName+"_VV_Clp")
                 cmds.setAttr(vvClp+".maxR", 1000)
-                cmds.connectAttr(self.toParentExtremCtrl+'.'+self.dpUIinst.lang['c031_volumeVariation'], vvBC+'.blender', force=True)
-                cmds.connectAttr(self.toParentExtremCtrl+"."+self.dpUIinst.lang['c118_active']+self.dpUIinst.lang['c031_volumeVariation'], vvCond+'.firstTerm', force=True)
-                cmds.connectAttr(self.toParentExtremCtrl+".min"+self.dpUIinst.lang['c031_volumeVariation'], vvClp+'.min.minR', force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+'.'+self.ar.data.lang['c031_volumeVariation'], vvBC+'.blender', force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+"."+self.ar.data.lang['c118_active']+self.ar.data.lang['c031_volumeVariation'], vvCond+'.firstTerm', force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+".min"+self.ar.data.lang['c031_volumeVariation'], vvClp+'.min.minR', force=True)
                 cmds.connectAttr(vvBC+'.outputR', vvClp+'.input.inputR', force=True)
                 cmds.connectAttr(vvClp+'.output.outputR', vvCond+'.colorIfTrueR', force=True)
                 cmds.connectAttr(vvScaleCompensateMD+".outputX", vvBC+'.color1R', force=True)
@@ -698,7 +698,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
                 self.toIDList.extend([curveInfoNode, ikNormalizeMD, globalStretchBC, stretchableBC, stretchBC, ikStretchRevNode, vvBC, vvCond, vvMD, vvScaleCompensateMD, vvClp, fkLastScaleCompensateMD, ikLastScaleCompensateMD, lastScaleBC])
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -706,7 +706,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
     
 
     def fixMirrorFlipping(self, item, s, value=-1, axis=None, *args):

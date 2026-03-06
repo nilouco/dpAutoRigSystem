@@ -23,41 +23,41 @@ def getUserDetail(opt1, opt2, cancel, userMessage):
     return result
 
 
-def Bike(dpUIinst):
+def Bike(ar):
     """ This function will create all guides needed to compose a bike.
     """
     # check modules integrity:
     guideDir = 'Modules.Standard'
     standardDir = 'Modules/Standard'
     checkModuleList = ['dpFkLine', 'dpWheel', 'dpSteering', 'dpSuspension']
-    checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = ar.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
-        dpUIinst.collapseEditSelModFL = True
+        ar.collapseEditSelModFL = True
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']
+        doingName = ar.data.lang['m094_doing']
         # part names:
-        chassisName = dpUIinst.lang['c091_chassis']
-        forkName = dpUIinst.lang['m229_fork']
-        handlebarName = dpUIinst.lang['m228_handlebar']
-        hornName = dpUIinst.lang['c081_horn']
-        frontWheelName = dpUIinst.lang['c056_front']+dpUIinst.lang['m156_wheel']
-        backWheelName = dpUIinst.lang['c057_back']+dpUIinst.lang['m156_wheel']
-        frontSuspensionName = dpUIinst.lang['c056_front']+dpUIinst.lang['m153_suspension']
-        backSuspensionName = dpUIinst.lang['c057_back']+dpUIinst.lang['m153_suspension']
-        seatName = dpUIinst.lang['c088_seat']
-        mirrorName = dpUIinst.lang['m010_mirror']
-        pedalName = dpUIinst.lang['c089_pedal']
-        leftPedalName = dpUIinst.lang['p002_left']+"_"+dpUIinst.lang['c089_pedal']
-        rightPedalName = dpUIinst.lang['p003_right']+"_"+dpUIinst.lang['c089_pedal']
-        leverName = dpUIinst.lang['c090_lever']
-        frontBasketName = dpUIinst.lang['c056_front']+dpUIinst.lang['c094_basket']
-        backBasketName = dpUIinst.lang['c057_back']+dpUIinst.lang['c094_basket']
-        simple   = dpUIinst.lang['i175_simple']
-        complete = dpUIinst.lang['i176_complete']
-        cancel   = dpUIinst.lang['i132_cancel']
-        userMessage = dpUIinst.lang['i177_chooseMessage']
-        bikeGuideName = dpUIinst.lang['m165_bike']+" "+dpUIinst.lang['i205_guide']
+        chassisName = ar.data.lang['c091_chassis']
+        forkName = ar.data.lang['m229_fork']
+        handlebarName = ar.data.lang['m228_handlebar']
+        hornName = ar.data.lang['c081_horn']
+        frontWheelName = ar.data.lang['c056_front']+ar.data.lang['m156_wheel']
+        backWheelName = ar.data.lang['c057_back']+ar.data.lang['m156_wheel']
+        frontSuspensionName = ar.data.lang['c056_front']+ar.data.lang['m153_suspension']
+        backSuspensionName = ar.data.lang['c057_back']+ar.data.lang['m153_suspension']
+        seatName = ar.data.lang['c088_seat']
+        mirrorName = ar.data.lang['m010_mirror']
+        pedalName = ar.data.lang['c089_pedal']
+        leftPedalName = ar.data.lang['p002_left']+"_"+ar.data.lang['c089_pedal']
+        rightPedalName = ar.data.lang['p003_right']+"_"+ar.data.lang['c089_pedal']
+        leverName = ar.data.lang['c090_lever']
+        frontBasketName = ar.data.lang['c056_front']+ar.data.lang['c094_basket']
+        backBasketName = ar.data.lang['c057_back']+ar.data.lang['c094_basket']
+        simple   = ar.data.lang['i175_simple']
+        complete = ar.data.lang['i176_complete']
+        cancel   = ar.data.lang['i132_cancel']
+        userMessage = ar.data.lang['i177_chooseMessage']
+        bikeGuideName = ar.data.lang['m165_bike']+" "+ar.data.lang['i205_guide']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -69,12 +69,12 @@ def Bike(dpUIinst):
                 maxProcess = 16
             
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, bikeGuideName, maxProcess, addOne=False, addNumber=False)
-            dpUIinst.utils.setProgress(doingName+chassisName)
+            ar.utils.setProgress(doingName, bikeGuideName, maxProcess, addOne=False, addNumber=False)
+            ar.utils.setProgress(doingName+chassisName)
             
             # woking with CHASSIS system:
             # create fkLine module instance:
-            chassisInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            chassisInstance = ar.initGuide('dpFkLine', guideDir)
             # editing chassis base guide informations:
             chassisInstance.editGuideModuleName(chassisName)
             cmds.setAttr(chassisInstance.moduleGrp+".translateY", 9)
@@ -82,9 +82,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # woking with HANDLEBAR system:
-            dpUIinst.utils.setProgress(doingName+handlebarName)
+            ar.utils.setProgress(doingName+handlebarName)
             # create fork instance:
-            handlebarInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            handlebarInstance = ar.initGuide('dpFkLine', guideDir)
             # editing fork base guide informations:
             handlebarInstance.editGuideModuleName(handlebarName)
             cmds.setAttr(handlebarInstance.moduleGrp+".translateY", 13.4)
@@ -96,9 +96,9 @@ def Bike(dpUIinst):
             cmds.refresh()
 
             # woking with FORK system:
-            dpUIinst.utils.setProgress(doingName+forkName)
+            ar.utils.setProgress(doingName+forkName)
             # create fkLine module instance:
-            forkInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            forkInstance = ar.initGuide('dpFkLine', guideDir)
             # editing fkLine base guide informations:
             forkInstance.editGuideModuleName(forkName)
             cmds.setAttr(forkInstance.moduleGrp+".translateY", 10.7)
@@ -110,9 +110,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with PEDAL self.wheelName system:
-            dpUIinst.utils.setProgress(doingName+pedalName)
+            ar.utils.setProgress(doingName+pedalName)
             # create pedal wheel module instance:
-            pedalInstance = dpUIinst.initGuide('dpWheel', guideDir)
+            pedalInstance = ar.initGuide('dpWheel', guideDir)
             pedalInstance.editGuideModuleName(pedalName)        
             # editing pedal wheel base guide informations:
             cmds.setAttr(pedalInstance.moduleGrp+".translateY", 4.5)
@@ -125,9 +125,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with LEFT PEDAL system:
-            dpUIinst.utils.setProgress(doingName+leftPedalName)
+            ar.utils.setProgress(doingName+leftPedalName)
             # create pedal fkLine module instance:
-            leftPedalInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            leftPedalInstance = ar.initGuide('dpFkLine', guideDir)
             leftPedalInstance.editGuideModuleName(leftPedalName)        
             # editing left pedal base guide informations:
             cmds.setAttr(leftPedalInstance.moduleGrp+".translateX", 1.3)
@@ -139,9 +139,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with RIGHT PEDAL system:
-            dpUIinst.utils.setProgress(doingName+rightPedalName)
+            ar.utils.setProgress(doingName+rightPedalName)
             # create pedal fkLine module instance:
-            rightPedalInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            rightPedalInstance = ar.initGuide('dpFkLine', guideDir)
             rightPedalInstance.editGuideModuleName(rightPedalName)        
             # editing right pedal base guide informations:
             cmds.setAttr(rightPedalInstance.moduleGrp+".translateX", -1.3)
@@ -153,9 +153,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with FRONT self.wheelName system:
-            dpUIinst.utils.setProgress(doingName+frontWheelName)
+            ar.utils.setProgress(doingName+frontWheelName)
             # create wheel module instance:
-            frontWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
+            frontWheelInstance = ar.initGuide('dpWheel', guideDir)
             frontWheelInstance.editGuideModuleName(frontWheelName)        
             # editing frontWheel base guide informations:
             cmds.setAttr(frontWheelInstance.moduleGrp+".translateY", 4.7)
@@ -171,9 +171,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with BACK self.wheelName system:
-            dpUIinst.utils.setProgress(doingName+backWheelName)
+            ar.utils.setProgress(doingName+backWheelName)
             # create wheel module instance:
-            backWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
+            backWheelInstance = ar.initGuide('dpWheel', guideDir)
             backWheelInstance.editGuideModuleName(backWheelName)        
             # editing frontWheel base guide informations:
             cmds.setAttr(backWheelInstance.moduleGrp+".translateY", 4.7)
@@ -189,9 +189,9 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # woking with SEAT system:
-            dpUIinst.utils.setProgress(doingName+seatName)
+            ar.utils.setProgress(doingName+seatName)
             # create fkLine module instance:
-            frontSeatInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            frontSeatInstance = ar.initGuide('dpFkLine', guideDir)
             frontSeatInstance.editGuideModuleName(seatName)
             # editing seat base guide informations:
             cmds.setAttr(frontSeatInstance.moduleGrp+".translateY", 10)
@@ -211,9 +211,9 @@ def Bike(dpUIinst):
             if userDetail == complete:
             
                 # woking with HORN system:
-                dpUIinst.utils.setProgress(doingName+hornName)
+                ar.utils.setProgress(doingName+hornName)
                 # create fkLine module instance:
-                hornInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                hornInstance = ar.initGuide('dpFkLine', guideDir)
                 # editing eyeLookAt base guide informations:
                 hornInstance.editGuideModuleName(hornName)
                 cmds.setAttr(hornInstance.moduleGrp+".translateX", -1.64)
@@ -226,8 +226,8 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # create FRONT self.suspensionName module instance:
-                dpUIinst.utils.setProgress(doingName+frontSuspensionName)
-                frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
+                ar.utils.setProgress(doingName+frontSuspensionName)
+                frontSuspensionInstance = ar.initGuide('dpSuspension', guideDir)
                 frontSuspensionInstance.editGuideModuleName(frontSuspensionName)
                 # editing frontSuspension base guide informations:
                 cmds.setAttr(frontSuspensionInstance.moduleGrp+".translateY", 7)
@@ -241,8 +241,8 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # create BACK self.suspensionName module instance:
-                dpUIinst.utils.setProgress(doingName+backSuspensionName)
-                backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
+                ar.utils.setProgress(doingName+backSuspensionName)
+                backSuspensionInstance = ar.initGuide('dpSuspension', guideDir)
                 backSuspensionInstance.editGuideModuleName(backSuspensionName)
                 # editing back suspension base guide informations:
                 cmds.setAttr(backSuspensionInstance.moduleGrp+".translateY", 7)
@@ -256,9 +256,9 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # woking with MIRROR system:
-                dpUIinst.utils.setProgress(doingName+mirrorName)
+                ar.utils.setProgress(doingName+mirrorName)
                 # create fkLine module instance:
-                mirrorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                mirrorInstance = ar.initGuide('dpFkLine', guideDir)
                 mirrorInstance.editGuideModuleName(mirrorName)
                 # editing mirror base guide informations:
                 cmds.setAttr(mirrorInstance.moduleGrp+".translateX", 3.4)
@@ -279,9 +279,9 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # working with LEVER system:
-                dpUIinst.utils.setProgress(doingName+leverName)
+                ar.utils.setProgress(doingName+leverName)
                 # create fkLine module instance:
-                leverInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                leverInstance = ar.initGuide('dpFkLine', guideDir)
                 leverInstance.editGuideModuleName(leverName)
                 # setting X mirror:
                 leverInstance.changeMirror("X")
@@ -297,9 +297,9 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # woking with FRONT BASKET system:
-                dpUIinst.utils.setProgress(doingName+frontBasketName)
+                ar.utils.setProgress(doingName+frontBasketName)
                 # create fkLine module instance:
-                frontBasketInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                frontBasketInstance = ar.initGuide('dpFkLine', guideDir)
                 frontBasketInstance.editGuideModuleName(frontBasketName)
                 # editing front basket base guide informations:
                 cmds.setAttr(frontBasketInstance.moduleGrp+".translateY", 10)
@@ -312,9 +312,9 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # woking with BACK BASKET system:
-                dpUIinst.utils.setProgress(doingName+backBasketName)
+                ar.utils.setProgress(doingName+backBasketName)
                 # create fkLine module instance:
-                backBasketInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                backBasketInstance = ar.initGuide('dpFkLine', guideDir)
                 backBasketInstance.editGuideModuleName(backBasketName)
                 # editing back basket base guide informations:
                 cmds.setAttr(backBasketInstance.moduleGrp+".translateY", 10)
@@ -327,12 +327,12 @@ def Bike(dpUIinst):
                 cmds.parent(backBasketInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
             
             # Close progress window
-            dpUIinst.utils.setProgress(endIt=True)
+            ar.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
-            dpUIinst.collapseEditSelModFL = False
+            ar.collapseEditSelModFL = False
             cmds.select(chassisInstance.moduleGrp)
-            print(dpUIinst.lang['m168_createdBike'])
+            print(ar.data.lang['m168_createdBike'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

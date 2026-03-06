@@ -74,7 +74,7 @@ class NamespaceCleaner(dpBaseAction.ActionStartClass):
             if namespaceToCleanList:
                 self.utils.setProgress(max=len(namespaceMainList), addOne=False, addNumber=False)
                 for namespace in namespaceToCleanList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     self.checkedObjList.append(namespace)
                     self.foundIssueList.append(True)
                 if self.firstMode:
@@ -83,19 +83,19 @@ class NamespaceCleaner(dpBaseAction.ActionStartClass):
                     try:
                         if namespaceWithGuidesList:
                             # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
-                            self.dpUIinst.checkImportedGuides(False)
+                            self.ar.checkImportedGuides(False)
                         elif namespaceWithoutGuidesList:
                             # call function inside validator to remove namespaces when it's not a guide.
                             self.removeNamespace()
                         self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+namespace)
+                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+namespace)
                     except:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+namespace)
+                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+namespace)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

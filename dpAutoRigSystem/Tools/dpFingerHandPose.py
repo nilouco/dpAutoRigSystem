@@ -12,30 +12,30 @@ DP_FINGERHANDPOSE_VERSION = 1.01
 
 
 class FingerHandPose(object):
-    def __init__(self, dpUIinst, ui=True, *args):
+    def __init__(self, ar, ui=True, *args):
         # redeclaring variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
         oldDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
         self.toIDList = []
-        sideList = ["", self.dpUIinst.lang['p002_left']+"_", self.dpUIinst.lang['p003_right']+"_"]
-        armName = dpUIinst.lang['c037_arm']
-        wristName = dpUIinst.lang['c004_arm_extrem']
-        fingerIndexName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m032_index']
-        fingerMiddleName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m033_middle']
-        fingerRingName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m034_ring']
-        fingerPinkyName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m035_pinky']
+        sideList = ["", self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
+        armName = ar.data.lang['c037_arm']
+        wristName = ar.data.lang['c004_arm_extrem']
+        fingerIndexName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m032_index']
+        fingerMiddleName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m033_middle']
+        fingerRingName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m034_ring']
+        fingerPinkyName = ar.data.lang['m007_finger']+"_"+ar.data.lang['m035_pinky']
         fingerList = [fingerIndexName, fingerMiddleName, fingerRingName, fingerPinkyName]
-        curlName = dpUIinst.lang['c128_curl']
-        sideName = dpUIinst.lang['c121_side'].lower()
-        scratchName = dpUIinst.lang['c129_scratch']
-        spreadName = dpUIinst.lang['c130_spread']
-        relaxName = dpUIinst.lang['c131_relax']
+        curlName = ar.data.lang['c128_curl']
+        sideName = ar.data.lang['c121_side'].lower()
+        scratchName = ar.data.lang['c129_scratch']
+        spreadName = ar.data.lang['c130_spread']
+        relaxName = ar.data.lang['c131_relax']
         handAttrList = [curlName, sideName, scratchName, spreadName, relaxName]
         handCtrlList = []
         
         # find nodes
-        allGrp = self.dpUIinst.utils.getAllGrp()
+        allGrp = self.ar.utils.getAllGrp()
         if allGrp:
             if cmds.getAttr(allGrp+".dpFingerCount"): #it has fingers
                 for side in sideList:
@@ -100,7 +100,7 @@ class FingerHandPose(object):
             if oldDrivenKeyList:
                 newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
             self.toIDList.extend(newDrivenKeyList)
-            self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+            self.ar.customAttr.addAttr(0, self.toIDList) #dpID
             if ui: #verbose
                 cmds.select(handCtrlList)
-                self.dpUIinst.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)
+                self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)

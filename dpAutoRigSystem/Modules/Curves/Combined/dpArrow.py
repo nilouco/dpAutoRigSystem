@@ -21,7 +21,7 @@ class Arrow(dpBaseCurve.BaseCurve):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseCurve)
         # dependence module list:
         self.checkModuleList = ['dpArrowFlat']
@@ -32,21 +32,21 @@ class Arrow(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.dpUIinst.startGuideModules(self.curvesSimpleFolder, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.startGuideModules(self.curvesSimpleFolder, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
         # load module instance
-        arrowFlatInstance = self.dpUIinst.initExtraModule('dpArrowFlat', self.curvesSimpleFolder.replace("/", "."))
+        arrowFlatInstance = self.ar.initExtraModule('dpArrowFlat', self.curvesSimpleFolder.replace("/", "."))
         # creating curve shapes:
         curve1 = arrowFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = arrowFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

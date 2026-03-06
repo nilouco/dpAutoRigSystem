@@ -23,28 +23,28 @@ def getUserDetail(opt1, opt2, cancel, userMessage):
     return result
 
 
-def Leg(dpUIinst):
+def Leg(ar):
     """ This function will create all guides needed to compose a leg.
     """
     # check modules integrity:
     guideDir = 'Modules.Standard'
     standardDir = 'Modules/Standard'
     checkModuleList = ['dpLimb', 'dpFoot', 'dpFkLine']
-    checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = ar.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
-        dpUIinst.collapseEditSelModFL = True
+        ar.collapseEditSelModFL = True
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']
+        doingName = ar.data.lang['m094_doing']
         # part names:
-        legName = dpUIinst.lang['m030_leg'].capitalize()
-        footName = dpUIinst.lang['c038_foot']
-        toeName = dpUIinst.lang['c013_revFoot_D'].capitalize()
-        simple   = dpUIinst.lang['i175_simple']
-        complete = dpUIinst.lang['i176_complete']
-        cancel   = dpUIinst.lang['i132_cancel']
-        userMessage = dpUIinst.lang['i177_chooseMessage']
-        legGuideName = dpUIinst.lang['m030_leg']+" "+dpUIinst.lang['i205_guide']
+        legName = ar.data.lang['m030_leg'].capitalize()
+        footName = ar.data.lang['c038_foot']
+        toeName = ar.data.lang['c013_revFoot_D'].capitalize()
+        simple   = ar.data.lang['i175_simple']
+        complete = ar.data.lang['i176_complete']
+        cancel   = ar.data.lang['i132_cancel']
+        userMessage = ar.data.lang['i177_chooseMessage']
+        legGuideName = ar.data.lang['m030_leg']+" "+ar.data.lang['i205_guide']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -56,11 +56,11 @@ def Leg(dpUIinst):
                 maxProcess = 7
                 
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False, addNumber=False)
+            ar.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False, addNumber=False)
 
-            dpUIinst.utils.setProgress(doingName+legName)
+            ar.utils.setProgress(doingName+legName)
             # create leg module instance:
-            legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
+            legLimbInstance = ar.initGuide('dpLimb', guideDir)
             # change limb guide to leg type:
             legLimbInstance.changeType(legName)
             # change name to leg:
@@ -72,14 +72,14 @@ def Leg(dpUIinst):
             cmds.setAttr(legBaseGuide+".translateY", 10)
             cmds.setAttr(legBaseGuide+".rotateX", 0)
             cmds.setAttr(legLimbInstance.radiusCtrl+".translateX", 1.5)
-            legLimbInstance.changeStyle(dpUIinst.lang['m026_biped'])
+            legLimbInstance.changeStyle(ar.data.lang['m026_biped'])
             # edit location of leg ankle guide:
             cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
             cmds.refresh()
             
-            dpUIinst.utils.setProgress(doingName+footName)
+            ar.utils.setProgress(doingName+footName)
             # create foot module instance:
-            footInstance = dpUIinst.initGuide('dpFoot', guideDir)
+            footInstance = ar.initGuide('dpFoot', guideDir)
             footInstance.editGuideModuleName(footName)
             cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
             cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
@@ -92,9 +92,9 @@ def Leg(dpUIinst):
             #
             if userDetail == complete:
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe1 module instance:
-                toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe1Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe1Instance.editGuideModuleName(toeName+"_1")
                 # editing toe base guide informations:
@@ -114,9 +114,9 @@ def Leg(dpUIinst):
                 cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe2 module instance:
-                toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe2Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe2Instance.editGuideModuleName(toeName+"_2")
                 # editing toe base guide informations:
@@ -136,9 +136,9 @@ def Leg(dpUIinst):
                 cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe3 module instance:
-                toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe3Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe3Instance.editGuideModuleName(toeName+"_3")
                 # editing toe base guide informations:
@@ -158,9 +158,9 @@ def Leg(dpUIinst):
                 cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe4 module instance:
-                toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe4Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe4Instance.editGuideModuleName(toeName+"_4")
                 # editing toe base guide informations:
@@ -180,9 +180,9 @@ def Leg(dpUIinst):
                 cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+toeName)
+                ar.utils.setProgress(doingName+toeName)
                 # create toe5 module instance:
-                toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)
+                toe5Instance = ar.initGuide('dpFkLine', guideDir)
                 # change name to toe:
                 toe5Instance.editGuideModuleName(toeName+"_5")
                 # editing toe base guide informations:
@@ -202,12 +202,12 @@ def Leg(dpUIinst):
                 cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
             
             # Close progress window
-            dpUIinst.utils.setProgress(endIt=True)
+            ar.utils.setProgress(endIt=True)
 
             # select the legGuide_Base:
-            dpUIinst.collapseEditSelModFL = False
+            ar.collapseEditSelModFL = False
             cmds.select(legBaseGuide)
-            print(dpUIinst.lang['m092_createdLeg'])
+            print(ar.data.lang['m092_createdLeg'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

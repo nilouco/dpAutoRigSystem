@@ -50,14 +50,14 @@ class ControlShapeIO(dpBaseAction.ActionStartClass):
                     if objList:
                         ctrlList = objList
                     else:
-                        ctrlList = self.dpUIinst.ctrls.getControlList()
+                        ctrlList = self.ar.ctrls.getControlList()
                     if ctrlList:
                         self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
                         if self.firstMode: #export
                             try:
                                 self.pipeliner.makeDirIfNotExists(self.ioPath)
                                 ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".ma"
-                                self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
+                                self.ar.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
                                 self.wellDoneIO(ctrlFileName)
                             except Exception as e:
                                 self.notWorkedWellIO(', '.join(ctrlList)+": "+str(e))
@@ -67,20 +67,20 @@ class ControlShapeIO(dpBaseAction.ActionStartClass):
                                 try:
                                     exportedList.sort()
                                     ctrlsToImport = self.ioPath+"/"+exportedList[-1]
-                                    self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport, ui=False, verbose=True)
+                                    self.ar.ctrls.importShape(ctrlList, ctrlsToImport, ui=False, verbose=True)
                                     self.wellDoneIO(exportedList[-1])
                                 except Exception as e:
                                     self.notWorkedWellIO(exportedList[-1]+": "+str(e))
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
                         self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

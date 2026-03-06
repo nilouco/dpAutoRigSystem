@@ -50,7 +50,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
                     if objList:
                         ctrlList = objList
                     else:
-                        ctrlList = self.dpUIinst.ctrls.getControlList()
+                        ctrlList = self.ar.ctrls.getControlList()
                     if ctrlList:
                         if self.firstMode: #export
                             toExportDataDic = self.getConnectionDataDic(ctrlList)
@@ -61,15 +61,15 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
                             if connectDic:
                                 self.importConnectionData(connectDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
                         self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -88,9 +88,9 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         dic = {}
         self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                attrList = self.dpUIinst.transformAttrList.copy()
+                attrList = self.ar.transformAttrList.copy()
                 userDefList = cmds.listAttr(item, userDefined=True)
                 if userDefList:
                     attrList.extend(userDefList)
@@ -162,7 +162,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         dic = {}
         self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
                     for attrDic, multi in zip([self.utils.typeAttrDic, self.utils.typeOutAttrDic, self.utils.typeMultiAttrDic, self.utils.typeOutMultiAttrDic], [False, False, True, True]):
@@ -194,7 +194,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         wellImportedList = []
         for item in connectDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 # check connections
                 for attr in connectDic[item].keys():
@@ -229,7 +229,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
                                                 if isLocked:
                                                     cmds.setAttr(ioInfo[plug][0], lock=True)
                                     else: #there is a not connected unitConversion node
-                                        self.notWorkedWellIO(self.dpUIinst.lang['r047_notConnectedUC']+": "+uc)
+                                        self.notWorkedWellIO(self.ar.data.lang['r047_notConnectedUC']+": "+uc)
                                 elif cmds.objExists(ioInfo[:ioInfo.find(".")]):
                                     if i == 0: #in
                                         if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
@@ -252,6 +252,6 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
             else:
                 notFoundNodesList.append(item)
         if notFoundNodesList:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:
             self.wellDoneIO(self.latestDataFile)

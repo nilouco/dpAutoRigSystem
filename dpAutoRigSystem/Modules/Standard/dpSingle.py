@@ -124,18 +124,18 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.curveDegree = 1
                 # work with curve shape and rotation cases:
                 indirectSkinRot = (0, 0, 0)
-                if self.dpUIinst.lang['c058_main'] in self.userGuideName:
+                if self.ar.data.lang['c058_main'] in self.userGuideName:
                     ctrlTypeID = "id_054_SingleMain"
                     if len(self.sideList) > 1:
-                        if self.dpUIinst.lang['c041_eyebrow'] in self.userGuideName:
+                        if self.ar.data.lang['c041_eyebrow'] in self.userGuideName:
                             indirectSkinRot = (0, 0, -90)
                         else:
                             indirectSkinRot = (0, 0, 90)
                 else:
                     ctrlTypeID = "id_029_SingleIndSkin"
-                    if self.dpUIinst.lang['c045_lower'] in self.userGuideName:
+                    if self.ar.data.lang['c045_lower'] in self.userGuideName:
                         indirectSkinRot=(0, 0, 180)
-                    elif self.dpUIinst.lang['c043_corner'] in self.userGuideName:
+                    elif self.ar.data.lang['c043_corner'] in self.userGuideName:
                         if "00" in self.userGuideName:
                             indirectSkinRot=(0, 0, 90)
                         else:
@@ -167,7 +167,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
-                    for attr in self.dpUIinst.transformAttrList[:-1]:
+                    for attr in self.ar.transformAttrList[:-1]:
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr, force=True)
                     # fix mirror issue: Maya 2026 release bug
                     if s == 1:
@@ -179,17 +179,17 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.connectAttr(invMD+'.output'+sAxis, self.jnt+'.translate'+sAxis, force=True)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
-                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.lang['c046_holder']+"_Grp")
+                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
                         self.utils.removeUserDefinedAttr(self.singleCtrl, True)
                         #cmds.addAttr(self.singleCtrl, longName="dpHolder", attributeType="bool", defaultValue=1)
-                        #self.dpUIinst.customAttr.addAttr("custom", [self.singleCtrl], "dpHolder")
+                        #self.ar.customAttr.addAttr("custom", [self.singleCtrl], "dpHolder")
                         self.utils.addCustomAttr([self.singleCtrl], "dpHolder")
                         self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.dpUIinst.lang['c046_holder']+"_Jis"))
+                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.getHasSDKLocator():
-                            if not self.dpUIinst.lang['c058_main'] in self.userGuideName:
+                            if not self.ar.data.lang['c058_main'] in self.userGuideName:
                                 # this one will be used to receive inputs from sdk locator:
                                 sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
                                 sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
@@ -216,7 +216,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
                                 cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
                                 cmds.setAttr(sdkLoc+".visibility", lock=True)
-                                for attr in self.dpUIinst.transformAttrList[:-1]:
+                                for attr in self.ar.transformAttrList[:-1]:
                                     cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
                                 cmds.setAttr(sdkLocGrp+".rotateX", 0)
                                 cmds.setAttr(sdkLocGrp+".rotateY", 0)
@@ -230,7 +230,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 # create end joint:
                 cmds.select(self.jnt)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.jointEndAttr, radius=0.5)
                 self.utils.addJointEndAttr([self.endJoint])
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
@@ -243,7 +243,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.aCtrlGrpList.append(self.toCtrlHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -251,7 +251,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def integratingInfo(self, *args):

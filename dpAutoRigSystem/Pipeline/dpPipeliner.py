@@ -14,12 +14,12 @@ DP_PIPELINER_VERSION = 1.19
 
 
 class Pipeliner(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
+        self.ar = ar
+        self.utils = ar.utils
         self.settingsFile = "dpPipelineSettings.json"
         self.defaultInfoFile = "dpPipelineInfo.json"
         self.infoFile = self.defaultInfoFile
@@ -36,7 +36,7 @@ class Pipeliner(object):
     def refreshAssetData(self, *args):
         """ Load the asset data from saved file in the pipeline.
         """
-        if not self.dpUIinst.data.rebuilding:
+        if not self.ar.data.rebuilding:
             self.pipeData = self.getPipelineData()
             self.getPipeFileName()
             self.refreshProjectUI()
@@ -66,7 +66,7 @@ class Pipeliner(object):
     def getJsonSettingsPath(self, *args):
         """ Returns the json path for the pipeline settings file.
         """
-        basePath = self.dpUIinst.data.dp_auto_rig_path+"/Pipeline"
+        basePath = self.ar.data.dp_auto_rig_path+"/Pipeline"
         return os.path.join(basePath, self.settingsFile).replace("\\", "/")
 
 
@@ -178,31 +178,31 @@ class Pipeliner(object):
         "s_presets"          : "dpPresets",
         "s_addOns"           : "dpAddOns",
         "s_finishing"        : "dpFinishing",
-        "s_hist"             : self.dpUIinst.data.dp_data+"/dpHist",
-        "s_modelIO"          : self.dpUIinst.data.dp_data+"/dpModel",
-        "s_supportNodeIO"    : self.dpUIinst.data.dp_data+"/dpSupportNode",
-        "s_blendShapeIO"     : self.dpUIinst.data.dp_data+"/dpBlendShape",
-        "s_shaderIO"         : self.dpUIinst.data.dp_data+"/dpShader",
-        "s_guideIO"          : self.dpUIinst.data.dp_data+"/dpGuide",
-        "s_rivetIO"          : self.dpUIinst.data.dp_data+"/dpRivet",
-        "s_parentingIO"      : self.dpUIinst.data.dp_data+"/dpParenting",
-        "s_skinningIO"       : self.dpUIinst.data.dp_data+"/dpSkinning",
-        "s_deformationIO"    : self.dpUIinst.data.dp_data+"/dpDeformation",
-        "s_componentTagIO"   : self.dpUIinst.data.dp_data+"/dpComponentTag",
-        "s_inputOrderIO"     : self.dpUIinst.data.dp_data+"/dpInputOrder",
-        "s_renameIO"         : self.dpUIinst.data.dp_data+"/dpRename",
-        "s_transformationIO" : self.dpUIinst.data.dp_data+"/dpTransformation",
-        "s_controlShapeIO"   : self.dpUIinst.data.dp_data+"/dpControlShape",
-        "s_attributeIO"      : self.dpUIinst.data.dp_data+"/dpAttribute",
-        "s_constraintIO"     : self.dpUIinst.data.dp_data+"/dpConstraint",
-        "s_utilityIO"        : self.dpUIinst.data.dp_data+"/dpUtility",
-        "s_drivenKeyIO"      : self.dpUIinst.data.dp_data+"/dpDrivenKey",
-        "s_offsetMatrixIO"   : self.dpUIinst.data.dp_data+"/dpOffsetMatrix",
-        "s_connectionIO"     : self.dpUIinst.data.dp_data+"/dpConnection",
-        "s_calibrationIO"    : self.dpUIinst.data.dp_data+"/dpCalibration",
-        "s_visibilityIO"     : self.dpUIinst.data.dp_data+"/dpVisibility",
-        "s_channelIO"        : self.dpUIinst.data.dp_data+"/dpChannel",
-        "s_hierarchyIO"      : self.dpUIinst.data.dp_data+"/dpHierarchy",
+        "s_hist"             : self.ar.data.dp_data+"/dpHist",
+        "s_modelIO"          : self.ar.data.dp_data+"/dpModel",
+        "s_supportNodeIO"    : self.ar.data.dp_data+"/dpSupportNode",
+        "s_blendShapeIO"     : self.ar.data.dp_data+"/dpBlendShape",
+        "s_shaderIO"         : self.ar.data.dp_data+"/dpShader",
+        "s_guideIO"          : self.ar.data.dp_data+"/dpGuide",
+        "s_rivetIO"          : self.ar.data.dp_data+"/dpRivet",
+        "s_parentingIO"      : self.ar.data.dp_data+"/dpParenting",
+        "s_skinningIO"       : self.ar.data.dp_data+"/dpSkinning",
+        "s_deformationIO"    : self.ar.data.dp_data+"/dpDeformation",
+        "s_componentTagIO"   : self.ar.data.dp_data+"/dpComponentTag",
+        "s_inputOrderIO"     : self.ar.data.dp_data+"/dpInputOrder",
+        "s_renameIO"         : self.ar.data.dp_data+"/dpRename",
+        "s_transformationIO" : self.ar.data.dp_data+"/dpTransformation",
+        "s_controlShapeIO"   : self.ar.data.dp_data+"/dpControlShape",
+        "s_attributeIO"      : self.ar.data.dp_data+"/dpAttribute",
+        "s_constraintIO"     : self.ar.data.dp_data+"/dpConstraint",
+        "s_utilityIO"        : self.ar.data.dp_data+"/dpUtility",
+        "s_drivenKeyIO"      : self.ar.data.dp_data+"/dpDrivenKey",
+        "s_offsetMatrixIO"   : self.ar.data.dp_data+"/dpOffsetMatrix",
+        "s_connectionIO"     : self.ar.data.dp_data+"/dpConnection",
+        "s_calibrationIO"    : self.ar.data.dp_data+"/dpCalibration",
+        "s_visibilityIO"     : self.ar.data.dp_data+"/dpVisibility",
+        "s_channelIO"        : self.ar.data.dp_data+"/dpChannel",
+        "s_hierarchyIO"      : self.ar.data.dp_data+"/dpHierarchy",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
         "s_webhook"          : "",
@@ -414,14 +414,14 @@ class Pipeliner(object):
             self.setPipelineInfoFile()
 
 
-    def mainUI(self, dpUIinst=None, loadedFileInfo=False, *args):
+    def mainUI(self, ar=None, loadedFileInfo=False, *args):
         """ Open an UI to load, set and save the pipeline info.
         """
         self.utils.closeUI('dpPipelinerWindow')
         self.getPipelineData(loadedFileInfo)
         # window
-        if dpUIinst:
-            self.dpUIinst = dpUIinst
+        if ar:
+            self.ar = ar
             pipeliner_winWidth  = 380
             pipeliner_winHeight = 480
             cmds.window('dpPipelinerWindow', title="Pipeliner "+str(DP_PIPELINER_VERSION), widthHeight=(pipeliner_winWidth, pipeliner_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -431,9 +431,9 @@ class Pipeliner(object):
             # pipeline info
             pipelineInfoLayout = cmds.columnLayout('pipelineInfoLayout', adjustableColumn=True, columnOffset=("left", 10), parent=self.pipelinerLayout)
             cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
-            cmds.text('pipelineInfo', label="Pipeline "+self.dpUIinst.lang['i013_info'], height=30, font='boldLabelFont', parent=pipelineInfoLayout)
+            cmds.text('pipelineInfo', label="Pipeline "+self.ar.data.lang['i013_info'], height=30, font='boldLabelFont', parent=pipelineInfoLayout)
             pathData = self.getPathData()
-            self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.dpUIinst.lang['i220_filePath'], text=pathData, buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadPipeInfo, changeCommand=partial(self.loadPipeInfo, True), adjustableColumn=2, parent=pipelineInfoLayout)
+            self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.ar.data.lang['i220_filePath'], text=pathData, buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.loadPipeInfo, changeCommand=partial(self.loadPipeInfo, True), adjustableColumn=2, parent=pipelineInfoLayout)
             cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
             # pipeline data
             cmds.text('pipelineData', height=30, label="Pipeline Data", font='boldLabelFont', parent=pipelineInfoLayout)
@@ -455,13 +455,13 @@ class Pipeliner(object):
             for key in list(self.pipeInfo):
                 if "_" in key:
                     if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
                     elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], numberOfFields=1, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], numberOfFields=1, parent=self.pipelineDataLayout)
                     elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
                     elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.dpUIinst.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
             # try to force loading empty data info
             try:
                 if self.pipeData['sceneName']:
@@ -479,9 +479,9 @@ class Pipeliner(object):
             self.pipelineFooterLayout = cmds.columnLayout('pipelineFooterLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
             cmds.separator(style='in', height=20, parent=self.pipelineFooterLayout)
             self.pipelineFooterButtonsLayout = cmds.paneLayout("pipelineFooterButtonsLayout", configuration="vertical3", separatorThickness=2.0, parent=self.pipelineFooterLayout)
-            cmds.button('resetPipeInfoBT', label=self.dpUIinst.lang['i271_reset'], command=self.resetPipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.button('newPipeInfoBT', label=self.dpUIinst.lang['i304_new'], command=self.newPipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.button('savePipeInfoBT', label=self.dpUIinst.lang['i222_save'], command=self.savePipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
+            cmds.button('resetPipeInfoBT', label=self.ar.data.lang['i271_reset'], command=self.resetPipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
+            cmds.button('newPipeInfoBT', label=self.ar.data.lang['i304_new'], command=self.newPipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
+            cmds.button('savePipeInfoBT', label=self.ar.data.lang['i222_save'], command=self.savePipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
             cmds.separator(style='none', height=5, parent=self.pipelineFooterLayout)
         else:
             pathData = self.getPathData()
@@ -491,7 +491,7 @@ class Pipeliner(object):
     def getPathData(self, *args):
         """ Returns the concatenated path and info file name.
         """
-        pathData = self.dpUIinst.lang['i062_notFound']
+        pathData = self.ar.data.lang['i062_notFound']
         if self.pipeInfo and self.pipeData['path']:
             pathData = self.pipeData['path']+"/"+self.infoFile
         return pathData
@@ -510,7 +510,7 @@ class Pipeliner(object):
             self.pipeData['publishPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+projectFolder+self.pipeData['f_publish']
             return self.pipeData['publishPath']
         else:
-            print(self.dpUIinst.lang['i350_notFoundPipeInfoFile'])
+            print(self.ar.data.lang['i350_notFoundPipeInfoFile'])
 
 
     def loadPipeInfo(self, loaded=None, *args):
@@ -602,7 +602,7 @@ class Pipeliner(object):
         self.pipeInfo = self.declareDefaultPipelineInfo()
         self.pipeData = self.pipeInfo
         self.loadUIData()
-        self.setPipelineSettingsPath(self.dpUIinst.lang['i357_putInfoFilePathHere'], self.defaultInfoFile)
+        self.setPipelineSettingsPath(self.ar.data.lang['i357_putInfoFilePathHere'], self.defaultInfoFile)
 
 
     def newPipeInfo(self, filePathName=None, *args):
@@ -850,7 +850,7 @@ class Pipeliner(object):
         """
         if self.checkAssetContext():
             # declaring variables:
-            saveVersion_title     = 'dpAutoRig - '+self.dpUIinst.lang['i222_save']+" "+self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m205_version'].lower()
+            saveVersion_title     = 'dpAutoRig - '+self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower()
             saveVersion_winWidth  = 380
             saveVersion_winHeight = 220
             saveVersion_align     = "left"
@@ -861,19 +861,19 @@ class Pipeliner(object):
             saveVersionColumnLayout = cmds.columnLayout('saveVersionColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpSaveVersionWin)
             cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
             cmds.textFieldGrp('currentPathTFG', label="Path", text=self.pipeData['wipPath'], columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
-            cmds.textFieldGrp('currentFileNameTFG', label=self.dpUIinst.lang['i276_current'], text=self.getCurrentFileName(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
-            self.saveModelVersionTFG = cmds.textFieldGrp('saveModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text=str(int(self.getModelVersion())), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
-            self.saveRigVersionTFG = cmds.textFieldGrp('saveRigVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text=str(int(self.getRigWIPVersion())+1), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
+            cmds.textFieldGrp('currentFileNameTFG', label=self.ar.data.lang['i276_current'], text=self.getCurrentFileName(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
+            self.saveModelVersionTFG = cmds.textFieldGrp('saveModelVersionTFG', label="Model "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.getModelVersion())), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
+            self.saveRigVersionTFG = cmds.textFieldGrp('saveRigVersionTFG', label="WIP "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.getRigWIPVersion())+1), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
             cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
             cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=saveVersion_align, parent=saveVersionColumnLayout)
             previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=saveVersionColumnLayout)
             self.saveVersionPreviewTxt = cmds.text('saveVersionPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-            cmds.button('runSaveVersionBT', label=self.dpUIinst.lang['i222_save'], align=saveVersion_align, command=self.runSaveVersion, parent=saveVersionColumnLayout)
+            cmds.button('runSaveVersionBT', label=self.ar.data.lang['i222_save'], align=saveVersion_align, command=self.runSaveVersion, parent=saveVersionColumnLayout)
             # call save asset version Window:
             cmds.showWindow(dpSaveVersionWin)
             self.getSaveVersionPreviewTextByUI()
         else:
-            cmds.confirmDialog(title=self.dpUIinst.lang['i222_save']+" "+self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m205_version'].lower(), message=self.dpUIinst.lang['r069_noAssetToSaveVersion'], button="Ok")
+            cmds.confirmDialog(title=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower(), message=self.ar.data.lang['r069_noAssetToSaveVersion'], button="Ok")
 
 
     def runSaveVersion(self, *args):
@@ -886,7 +886,7 @@ class Pipeliner(object):
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=thisType, force=True)
             self.utils.closeUI("dpSaveVersionWindow")
-            self.dpUIinst.rebuilding = False
+            self.ar.rebuilding = False
             self.refreshAssetData()
 
 
@@ -895,18 +895,18 @@ class Pipeliner(object):
         """
         if self.checkAssetContext():
             try:
-                cmds.frameLayout("asset_fl", edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
+                cmds.frameLayout("asset_fl", edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.pipeData['assetName'])
                 cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.pipeData['assetName'])
-                if self.dpUIinst.verbose:
-                    print(self.dpUIinst.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
+                if self.ar.data.verbose:
+                    print(self.ar.data.lang['r067_currentAssetContext']+" "+self.pipeData['assetName'])
             except:
                 pass
         else:
             try:
-                cmds.frameLayout("asset_fl", edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.dpUIinst.lang['i305_none'])
-                cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.dpUIinst.lang['i305_none'])
-                if self.dpUIinst.verbose:
-                    print(self.dpUIinst.lang['r027_noAssetContext'])
+                cmds.frameLayout("asset_fl", edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.ar.data.lang['i305_none'])
+                cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.ar.data.lang['i305_none'])
+                if self.ar.data.verbose:
+                    print(self.ar.data.lang['r027_noAssetContext'])
             except:
                 pass
 
@@ -934,7 +934,7 @@ class Pipeliner(object):
         try:
             cmds.textFieldGrp("asset_maya_project_tfg", edit=True, text=self.pipeData['mayaProject'])
             cmds.textFieldGrp("asset_pipeline_tfg", edit=True, text=self.pipeData['projectPath'])
-            cmds.button("asset_open_folder_bt", edit=True, command=partial(self.dpUIinst.packager.openFolder, path))
+            cmds.button("asset_open_folder_bt", edit=True, command=partial(self.ar.packager.openFolder, path))
         except:
             pass
 
@@ -960,7 +960,7 @@ class Pipeliner(object):
                 path = self.pipeData['wipPath']
             else:
                 # There's no path to load assets
-                cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i350_notFoundPipeInfoFile'], button="Ok")
+                cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i350_notFoundPipeInfoFile'], button="Ok")
         if path and os.path.exists(path):
             if not file:
                 assetList = next(os.walk(path))[1]
@@ -976,7 +976,7 @@ class Pipeliner(object):
                     return
                 else:
                     # Inform that it isn't possible to continue without wip assets to load
-                    cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i351_notFoundWIPAssets'], button="Ok")
+                    cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i351_notFoundWIPAssets'], button="Ok")
             if file:
                 assetFolder = path+"/"+file
                 if mode == 0: #load
@@ -988,7 +988,7 @@ class Pipeliner(object):
                         if not savedScene:
                             savedScene = self.userSaveThisScene(False)
                         if savedScene:
-                            self.dpUIinst.rebuilding = False
+                            self.ar.rebuilding = False
                             cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
                             cmds.workspace(directory=assetFolder)
                             self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
@@ -1001,10 +1001,10 @@ class Pipeliner(object):
                         self.dpDataToReplaceUI(file)
                     else:
                         # There's no data do replace from the selected asset
-                        cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['r007_notExportedData']+": "+file, button="Ok")
+                        cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['r007_notExportedData']+": "+file, button="Ok")
         else:
             # There's no wip path to load assets
-            cmds.confirmDialog(title=self.dpUIinst.lang['i187_load']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i352_notFoundWIPPath'], button="Ok")
+            cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i352_notFoundWIPPath'], button="Ok")
 
 
     def selectAssetFromListUI(self, assetList, path, mode, *args):
@@ -1013,7 +1013,7 @@ class Pipeliner(object):
             Works well for load and replace data.
         """
         # declaring variables:
-        selectAsset_title = 'dpAutoRig - '+self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i303_asset']
+        selectAsset_title = 'dpAutoRig - '+self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']
         select_winWidth = 240
         select_winHeight = 285
         select_align = "center"
@@ -1022,9 +1022,9 @@ class Pipeliner(object):
         # creating layout:
         selectColumnLayout = cmds.columnLayout('selectColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetWin)
         cmds.separator(style='none', height=10, parent=selectColumnLayout)
-        cmds.text(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i303_asset']+":", align="left", parent=selectColumnLayout)
+        cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+":", align="left", parent=selectColumnLayout)
         self.selectAssetTSL = cmds.textScrollList('selectAssetTSL', allowMultiSelection=False, append=assetList, parent=selectColumnLayout)
-        self.runSelectAssetBT = cmds.button('runSelectAssetBT', label=self.dpUIinst.lang['m004_select'], align=select_align, command=partial(self.selectAssetFromUI, path, mode), parent=selectColumnLayout)
+        self.runSelectAssetBT = cmds.button('runSelectAssetBT', label=self.ar.data.lang['m004_select'], align=select_align, command=partial(self.selectAssetFromUI, path, mode), parent=selectColumnLayout)
         # call Window:
         cmds.showWindow(dpSelectAssetWin)
 
@@ -1042,7 +1042,7 @@ class Pipeliner(object):
         """ Let user select the assets to publish in batch.
         """
         # declaring variables:
-        selectAssetCB_title = 'dpAutoRig - '+self.dpUIinst.lang['m046_publisher']+" "+self.dpUIinst.lang['i358_batch']
+        selectAssetCB_title = 'dpAutoRig - '+self.ar.data.lang['m046_publisher']+" "+self.ar.data.lang['i358_batch']
         selectCB_winWidth = 240
         selectCB_winHeight = 285
         selectCB_align = "center"
@@ -1051,9 +1051,9 @@ class Pipeliner(object):
         # creating layout:
         selectBatchLayout = cmds.columnLayout('selectBatchLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetCBWin)
         cmds.separator(style='none', height=10, parent=selectBatchLayout)
-        cmds.text(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i303_asset']+"s:", align="left", parent=selectBatchLayout)
+        cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+"s:", align="left", parent=selectBatchLayout)
         if len(assetList) > 1:
-            cmds.checkBox(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], value=False, changeCommand=self.selectAllAssetCB, parent=selectBatchLayout)
+            cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=False, changeCommand=self.selectAllAssetCB, parent=selectBatchLayout)
         cmds.separator(style='in', height=10, parent=selectBatchLayout)
         selectCBAssetSL = cmds.scrollLayout('selectCBAssetSL', parent=selectBatchLayout)
         selectCBColumnLayout = cmds.columnLayout('selectCBColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=selectCBAssetSL)
@@ -1062,8 +1062,8 @@ class Pipeliner(object):
         for asset in assetList:
             self.selectedBatchList.append(cmds.checkBox(asset+"CB", label=asset, parent=selectCBColumnLayout))
         cmds.separator(style='in', height=10, parent=selectBatchLayout)
-        self.commentBatchTFG = cmds.textFieldGrp('commentBatchTFG', label=self.dpUIinst.lang['i219_comments'], text='', adjustableColumn=2, editable=True, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth=[(1, 55), (2, 50)], parent=selectBatchLayout)
-        self.runSelectCBAssetBT = cmds.button('runSelectCBAssetBT', label=self.dpUIinst.lang['i216_publish'], align=selectCB_align, command=partial(self.dpUIinst.publisher.loadPublishingBatch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=selectBatchLayout)
+        self.commentBatchTFG = cmds.textFieldGrp('commentBatchTFG', label=self.ar.data.lang['i219_comments'], text='', adjustableColumn=2, editable=True, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth=[(1, 55), (2, 50)], parent=selectBatchLayout)
+        self.runSelectCBAssetBT = cmds.button('runSelectCBAssetBT', label=self.ar.data.lang['i216_publish'], align=selectCB_align, command=partial(self.ar.publisher.loadPublishingBatch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=selectBatchLayout)
         cmds.separator(style='none', height=5, parent=selectBatchLayout)
         # call Window:
         cmds.showWindow(dpSelectAssetCBWin)
@@ -1128,7 +1128,7 @@ class Pipeliner(object):
         """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.
         """
         # declaring variables:
-        self.newAsset_title     = 'dpAutoRig - '+self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset']
+        self.newAsset_title     = 'dpAutoRig - '+self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset']
         self.newAsset_winWidth  = 380
         self.newAsset_winHeight = 220
         self.newAsset_align     = "left"
@@ -1138,18 +1138,18 @@ class Pipeliner(object):
         # creating text layout:
         newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpNewAssetWin)
         cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
-        self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, adjustableColumn=2, parent=newAssetColumnLayout)
-        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, adjustableColumn=2, parent=newAssetColumnLayout)
+        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.ar.data.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.ar.data.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         try:
-            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text=self.pipeData['projectPath'], columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.ar.data.lang['i301_project']+" path", text=self.pipeData['projectPath'], columnWidth3=(80, 150, 30), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         except:
-            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text="", columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.ar.data.lang['i301_project']+" path", text="", columnWidth3=(80, 150, 30), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
         cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
         previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=newAssetColumnLayout)
         self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-        cmds.button('runCreateNewAssetBT', label=self.dpUIinst.lang['i158_create'], align=self.newAsset_align, command=self.createNewAsset, parent=newAssetColumnLayout)
+        cmds.button('runCreateNewAssetBT', label=self.ar.data.lang['i158_create'], align=self.newAsset_align, command=self.createNewAsset, parent=newAssetColumnLayout)
         # call New Asset Window:
         cmds.showWindow(dpNewAssetWin)
         self.getNewAssetPreviewTextByUI()
@@ -1167,12 +1167,12 @@ class Pipeliner(object):
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
                 self.utils.closeUI("dpNewAssetWindow")
-                self.dpUIinst.rebuilding = False
+                self.ar.rebuilding = False
                 self.refreshAssetData()
             else:
-                cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i349_alreadyExistsAsset'], button="Ok")
+                cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i349_alreadyExistsAsset'], button="Ok")
         else:
-            cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i307_fillFieldCorrectly'], button="Ok")
+            cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i307_fillFieldCorrectly'], button="Ok")
 
 
     def getDPDataExistListToReplace(self, path, *args):
@@ -1213,7 +1213,7 @@ class Pipeliner(object):
         """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
         """
         # declaring variables:
-        self.replaceDPData_title     = 'dpAutoRig - '+self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.data.dp_data+" - "+self.dpUIinst.lang['i303_asset']
+        self.replaceDPData_title     = 'dpAutoRig - '+self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data+" - "+self.ar.data.lang['i303_asset']
         self.replaceDPData_winWidth  = 220
         self.replaceDPData_winHeight = 330+(len(self.existDataList)*16)
         self.replaceDPData_align     = "left"
@@ -1223,16 +1223,16 @@ class Pipeliner(object):
         # creating layout:
         replaceDataColumnLayout = cmds.columnLayout('replaceDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
         cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        cmds.text("rebuilderReplaceDataText", label=self.dpUIinst.lang['i308_toReplaceDPData'], parent=replaceDataColumnLayout)
+        cmds.text("rebuilderReplaceDataText", label=self.ar.data.lang['i308_toReplaceDPData'], parent=replaceDataColumnLayout)
         cmds.text("rebuilderReplaceDataAssetText", label="\n"+self.pipeData['assetName'], font="boldLabelFont", parent=replaceDataColumnLayout)
         cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
         for item in self.existDataList:
             cmds.checkBox(item+"CB", label=item, value=True)
         cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
         if len(self.existDataList) > 1:
-            cmds.checkBox(label=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], value=True, changeCommand=self.selectAllDataCB, parent=replaceDataColumnLayout)
+            cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=True, changeCommand=self.selectAllDataCB, parent=replaceDataColumnLayout)
             cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        cmds.button('runReplaceDataBT', label=self.dpUIinst.lang['m219_replace'].upper()+"\n"+fromAssetName+" -> "+self.pipeData['assetName'], align=self.replaceDPData_align, command=self.replaceDataByUI, parent=replaceDataColumnLayout)
+        cmds.button('runReplaceDataBT', label=self.ar.data.lang['m219_replace'].upper()+"\n"+fromAssetName+" -> "+self.pipeData['assetName'], align=self.replaceDPData_align, command=self.replaceDataByUI, parent=replaceDataColumnLayout)
         # call New Asset Window:
         cmds.showWindow(dpReplaceDPDataWindow)
         
@@ -1291,7 +1291,7 @@ class Pipeliner(object):
                     destItem = destPath+"/"+prefix+self.pipeData['assetName']+self.pipeData['s_model']+"0".zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+"0".zfill(self.pipeData['i_padding'])+ext
                     shutil.copy2(sourcePath+"/"+sourceItem, destItem)
             # Concatenate done message
-            sucessMessageText = self.dpUIinst.lang['r068_replacedDataSuccess']+"\n\n"+self.dpUIinst.lang['i036_from']+": "+path+"\n"+self.dpUIinst.lang['i037_to']+": "+self.pipeData['assetName']+"\n\n"+" \n".join(toReplaceList)
+            sucessMessageText = self.ar.data.lang['r068_replacedDataSuccess']+"\n\n"+self.ar.data.lang['i036_from']+": "+path+"\n"+self.ar.data.lang['i037_to']+": "+self.pipeData['assetName']+"\n\n"+" \n".join(toReplaceList)
             cmds.confirmDialog(title="dpAutoRigSystem", message=sucessMessageText, button="Ok")
 
 
@@ -1301,14 +1301,14 @@ class Pipeliner(object):
             If not mustSaveIt, the user can choose continue without saving, them it'll return True.
         """
         shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        saveName = self.dpUIinst.lang['i222_save']
-        saveAsName = self.dpUIinst.lang['i223_saveAs']
-        cancelName = self.dpUIinst.lang['i132_cancel']
-        continueName = self.dpUIinst.lang['i174_continue']
+        saveName = self.ar.data.lang['i222_save']
+        saveAsName = self.ar.data.lang['i223_saveAs']
+        cancelName = self.ar.data.lang['i132_cancel']
+        continueName = self.ar.data.lang['i174_continue']
         if mustSaveIt:
-            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
         else:
-            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName, continueName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName, continueName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
         if confirmResult == cancelName:
             return False
         if confirmResult == continueName:
@@ -1318,7 +1318,7 @@ class Pipeliner(object):
                 newNameList = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
                 if newNameList:
                     newName = newNameList[0]
-                    ext = self.dpUIinst.publisher.getFileTypeByExtension(newName)
+                    ext = self.ar.publisher.getFileTypeByExtension(newName)
                     cmds.file(rename=newName)
                     return cmds.file(save=True, type=ext)
                 else:

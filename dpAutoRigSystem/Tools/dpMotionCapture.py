@@ -16,18 +16,18 @@ DP_MOTIONCAPTURE_VERSION = 1.03
 
 
 class MotionCapture(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
-        self.lang = self.dpUIinst.lang
+        self.ar = ar
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
+        self.lang = self.ar.data.lang
         self.ui = ui
         self.autoRotateAttrList = [self.lang['c047_autoRotate'], self.lang['c032_follow']]
         self.hikCharacterAttr = "Character"
         self.hikNode = self.hikGetLatestNode()
         self.hikDic = None
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpIkFkSnap)
         # call main function:
         if self.ui:
@@ -521,7 +521,7 @@ class MotionCapture(object):
                 ikExtremSubCtrl = cmds.listConnections(net+".ikExtremSubCtrl")[0]
                 ikJointList = cmds.listConnections(net+".ikJointList")
                 # make an ikFkSnap instance without create another network node.
-                ikFkSnapInst = dpIkFkSnap.IkFkSnapClass(self.dpUIinst, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'], creation=False)
+                ikFkSnapInst = dpIkFkSnap.IkFkSnapClass(self.ar, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], creation=False)
                 # snap from Fk to Ik (that means move ik to fk position)                
                 ikFkSnapInst.snapFkToIk()
                 del ikFkSnapInst
@@ -566,7 +566,7 @@ class MotionCapture(object):
             for ctrl in ctrlList:
                 self.lockAutoRotateAttr(ctrl, True)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.dpUIinst.axisList:
+                for axis in self.ar.axisList:
                     cmds.mute(zeroGrp+".rotate"+axis, force=True)
         print(self.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
@@ -599,7 +599,7 @@ class MotionCapture(object):
             hipList = self.getOrderedByTimeID(hipList)
             cmds.xform(clavList[0], rotation=(90, 0, 90), worldSpace=True) #left clavicle
             cmds.xform(hipList[0], rotation=(90, 0, 0), worldSpace=True) #left hips
-            for axis in self.dpUIinst.axisList:
+            for axis in self.ar.axisList:
                 cmds.setAttr(clavList[1]+".rotate"+axis, cmds.getAttr(clavList[0]+".rotate"+axis)) #right clavicle
                 cmds.setAttr(hipList[1]+".rotate"+axis, cmds.getAttr(hipList[0]+".rotate"+axis)) #right hips
         # arm/leg
@@ -678,7 +678,7 @@ class MotionCapture(object):
         mel.eval("HIKCharacterControlsTool;")
         mel.eval("hikCreateDefinition;")
         self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
-        self.dpID = self.dpUIinst.customAttr.addAttr(0, [self.hikNode])[0] #dpID
+        self.dpID = self.ar.customAttr.addAttr(0, [self.hikNode])[0] #dpID
         print(self.lang['m251_createdCharDefinition']+" "+self.hikNode)
         return self.hikNode
     
@@ -704,7 +704,7 @@ class MotionCapture(object):
                                 cmds.connectAttr(self.hikDic[hikKey]["joint"+r]+".message", self.hikNode+"."+hikKey, force=True)
                                 if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"+r]):
                                     cmds.addAttr(self.hikDic[hikKey]["joint"+r], longName=self.hikCharacterAttr, attributeType="message")
-                                for attr in self.dpUIinst.transformAttrList:
+                                for attr in self.ar.transformAttrList:
                                     cmds.setAttr(self.hikDic[hikKey]["joint"+r]+"."+attr, lock=False)
                                 break
                         else:
@@ -784,7 +784,7 @@ class MotionCapture(object):
             for ctrl in ctrlList:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.dpUIinst.axisList:
+                for axis in self.ar.axisList:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
             print(self.lang['i046_remove']+" "+self.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
@@ -792,8 +792,8 @@ class MotionCapture(object):
     def resetDefaultPose(self, *args):
         """ Back rig to default pose calling the ResetPose validator.
         """
-        if self.dpUIinst.data.checkout_instances:
-            for checkOutInst in self.dpUIinst.data.checkout_instances:
+        if self.ar.data.checkout_instances:
+            for checkOutInst in self.ar.data.checkout_instances:
                 if "ResetPose" in str(checkOutInst):
                     checkOutInst.verbose = False
                     checkOutInst.runAction(False) #fix
@@ -913,7 +913,7 @@ for hik in cmds.ls(type="HIKCharacterNode"):
         HumanIKCleaner(hik, "'''+self.hikNode+'_Cleaner_SN'+'''", '''+str(self.getAutoRotateCtrlList())+''', '''+str(self.autoRotateAttrList)+''')
 '''
         sn = cmds.scriptNode(name=self.hikNode+'_Cleaner_SN', sourceType='python', scriptType=2, beforeScript=hikCleanerCode)
-        self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
+        self.ar.customAttr.addAttr(0, [sn]) #dpID
         cmds.scriptNode(sn, executeBefore=True)
 
 

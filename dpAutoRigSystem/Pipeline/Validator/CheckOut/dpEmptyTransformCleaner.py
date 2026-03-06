@@ -51,7 +51,7 @@ class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
                 # conditional to check here
                 if emptyTransformList:
                     for item in emptyTransformList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         self.checkedObjList.append(self.utils.getShortName(item, False))
                         self.foundIssueList.append(True)
                         if self.firstMode:
@@ -61,14 +61,14 @@ class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
@@ -83,7 +83,7 @@ class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
-        filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
+        filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.ar.data.lang[self.title])
         filteredList = self.reorderList(filteredList)
         emptyTransforms = []
         for transform in filteredList:

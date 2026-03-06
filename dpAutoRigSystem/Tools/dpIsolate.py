@@ -12,11 +12,11 @@ DP_ISOLATE_VERSION = 1.04
 
 
 class Isolate(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         # redeclaring variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.rootName = "Root"
-        self.isolateName = self.dpUIinst.lang['m095_isolate'].lower()
+        self.isolateName = self.ar.data.lang['m095_isolate'].lower()
         
         # base item to isolate
         self.rootCtrl = self.rootName+"_Ctrl"
@@ -62,7 +62,7 @@ class Isolate(object):
         if len(nodeList) == 3:
             for nodeName in nodeList:
                 if not cmds.objExists(nodeName):
-                    print(self.dpUIinst.lang['e004_objNotExist'], nodeName)
+                    print(self.ar.data.lang['e004_objNotExist'], nodeName)
                     return
         # call scripted function
         self.dpIsolate(self.isolateName, nodeList)
@@ -80,7 +80,7 @@ class Isolate(object):
         cmds.addAttr(nodeList[2], longName=attrName, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
         # create reverse node
         reverseNode = cmds.createNode('reverse', name=nodeList[2]+"_"+attrName.capitalize()+"_Rev")
-        self.dpUIinst.customAttr.addAttr(0, [pConst, reverseNode]) #dpID
+        self.ar.customAttr.addAttr(0, [pConst, reverseNode]) #dpID
         # do isolate connections
         cmds.connectAttr(nodeList[2]+"."+attrName, pConst+"."+nodeList[0]+"W0", force=True)
         cmds.connectAttr(nodeList[2]+"."+attrName, reverseNode+".inputX", force=True)

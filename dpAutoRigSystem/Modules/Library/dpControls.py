@@ -17,17 +17,17 @@ DP_CONTROLS_VERSION = 3.07
 
 
 class ControlClass(object):
-    def __init__(self, dpUIinst, moduleGrp=None, *args, **kwargs):
+    def __init__(self, ar, moduleGrp=None, *args, **kwargs):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
+        self.ar = ar
+        self.utils = ar.utils
         self.moduleGrp = moduleGrp
         self.loadVariables()
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpResetPose)
-        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
+        self.resetPose = dpResetPose.ResetPose(self.ar, ui=False, verbose=False)
 
 
     def loadVariables(self, *args):
@@ -37,7 +37,7 @@ class ControlClass(object):
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
-        self.doingName = self.dpUIinst.lang['m094_doing']
+        self.doingName = self.ar.data.lang['m094_doing']
         self.declareColors()
 
 
@@ -45,7 +45,7 @@ class ControlClass(object):
         """ Create the dpAR temp group if it doesn't exists.
         """
         if not tempGrp:
-            tempGrp = self.dpUIinst.data.temp_grp
+            tempGrp = self.ar.data.temp_grp
         if not cmds.objExists(tempGrp):
             cmds.group(name=tempGrp, empty=True)
             cmds.setAttr(tempGrp+".visibility", 0)
@@ -295,11 +295,11 @@ class ControlClass(object):
         """
         currentRBGColor = self.getCurrentRGBColor(self.moduleGrp)
         currentRBGOutlinerColor = self.getCurrentRGBColor(self.moduleGrp, True)
-        self.dpUIinst.utils.closeUI(self.dpUIinst.colorOverrideWinName)
+        self.ar.utils.closeUI(self.ar.colorOverrideWinName)
         # creating colorOverride Window:
         colorOverride_winWidth  = 170
         colorOverride_winHeight = 115
-        dpColorOverrideWin = cmds.window(self.dpUIinst.colorOverrideWinName, title=self.dpUIinst.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpColorOverrideWin = cmds.window(self.ar.colorOverrideWinName, title=self.ar.data.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         colorTabLayout = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=dpColorOverrideWin)
         # Index layout:
@@ -311,12 +311,12 @@ class ControlClass(object):
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorRGBLayout)
         self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [self.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
-        cmds.button("removeOverrideColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
+        cmds.button("removeOverrideColorBT", label=self.ar.data.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
         # Outliner layout:
         colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
         self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [self.moduleGrp], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
-        cmds.button("removeOutlinerColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
+        cmds.button("removeOutlinerColorBT", label=self.ar.data.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
         # renaming tabLayouts:
         cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))
         # call colorIndex Window:
@@ -427,7 +427,7 @@ class ControlClass(object):
         cmds.setAttr(ribbonNurbsPlane+".visibility", 0)
         self.setNotRenderable([ribbonNurbsPlaneShape])
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        self.utils.addCustomAttr([ribbonNurbsPlane], self.dpUIinst.skin.ignoreSkinningAttr)
+        self.utils.addCustomAttr([ribbonNurbsPlane], self.ar.skin.ignoreSkinningAttr)
         # create groups to be used as a root of the ribbon system:
         ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_Rbn_RibbonJoint_Grp")
         # create joints:
@@ -435,7 +435,7 @@ class ControlClass(object):
         for j in range(totalJoints+1):
             # create pointOnSurfaceInfo:
             infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+str(j+1)+"_POSI")
-            self.dpUIinst.customAttr.addAttr(0, [infoNode]) #dpID
+            self.ar.customAttr.addAttr(0, [infoNode]) #dpID
             # setting parameters worldSpace, U and V:
             cmds.connectAttr(ribbonNurbsPlaneShape+".worldSpace[0]", infoNode+".inputSurface")
             cmds.setAttr(infoNode+".parameterV", ((1/float(totalJoints))*j) )
@@ -485,7 +485,7 @@ class ControlClass(object):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['type']
+        ctrlModule = self.ar.data.curve_preset[ctrlType]['type']
         return ctrlModule
 
 
@@ -493,7 +493,7 @@ class ControlClass(object):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['degree']
+        ctrlModule = self.ar.data.curve_preset[ctrlType]['degree']
         return ctrlModule
 
 
@@ -501,8 +501,8 @@ class ControlClass(object):
         """ Find the loaded control instance by name.
             Return the instance found.
         """
-        if self.dpUIinst.data.control_instances:
-            for instance in self.dpUIinst.data.control_instances:
+        if self.ar.data.control_instances:
+            for instance in self.ar.data.control_instances:
                 if instance.guideModuleName == instanceName:
                     return instance
 
@@ -636,7 +636,7 @@ class ControlClass(object):
             cmds.setAttr(optCtrlTxt+".template", 1)
             cmds.setAttr(optCtrlTxt+".tx", -0.61*r)
             cmds.setAttr(optCtrlTxt+".ty", 1.1*r)
-            self.dpUIinst.customAttr.addAttr(0, [optCtrlTxt]) #dpID
+            self.ar.customAttr.addAttr(0, [optCtrlTxt]) #dpID
         except:
             # it will pass if we don't able to find the font to create the text
             pass
@@ -737,7 +737,7 @@ class ControlClass(object):
             if selList:
                 sourceItem = selList[0]
             else:
-                print(self.dpUIinst.lang["e015_selectToCopyAttr"])
+                print(self.ar.data.lang["e015_selectToCopyAttr"])
         if cmds.objExists(sourceItem):
             if not attrList:
                 # getting channelBox selected attributes:
@@ -754,7 +754,7 @@ class ControlClass(object):
                         value = cmds.getAttr(sourceItem+'.'+attr)
                         self.attrValueDic[attr] = value
                 if verbose:
-                    print(self.dpUIinst.lang["i125_copiedAttr"])
+                    print(self.ar.data.lang["i125_copiedAttr"])
         return self.attrValueDic
 
 
@@ -776,9 +776,9 @@ class ControlClass(object):
                         except:
                             pass
                             if verbose:
-                                print(self.dpUIinst.lang["e016_notPastedAttr"], attr)
+                                print(self.ar.data.lang["e016_notPastedAttr"], attr)
             if verbose:
-                print(self.dpUIinst.lang["i126_pastedAttr"])
+                print(self.ar.data.lang["i126_pastedAttr"])
 
 
     def copyAndPasteAttr(self, verbose=False, *args):
@@ -887,7 +887,7 @@ class ControlClass(object):
                         # update cvControls attributes:
                         self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
-                    self.dpUIinst.customAttr.addAttr(0, destinationList, shapes=True) #dpID
+                    self.ar.customAttr.addAttr(0, destinationList, shapes=True) #dpID
 
 
     def transferPlug(self, fromPlug, toPlug, value=True, connections=True, *args):
@@ -899,7 +899,7 @@ class ControlClass(object):
             inputList = cmds.listConnections(fromPlug, source=True, destination=False, plugs=True)
             if inputList:
                 if len(inputList) > 1:
-                    raise RuntimeError(self.dpUIinst.lang['e023_unableTransferPlug'])
+                    raise RuntimeError(self.ar.data.lang['e023_unableTransferPlug'])
                 cmds.connectAttr(inputList[0], toPlug, force=True)
             destinationList = cmds.listConnections(fromPlug, source=False, destination=True, plugs=True) or []
             for dest in destinationList:
@@ -970,18 +970,19 @@ class ControlClass(object):
         resultQuestion = cmds.confirmDialog(
                                         title=titleText,
                                         message=messageText, 
-                                        button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], 
-                                        defaultButton=self.dpUIinst.lang['i071_yes'], 
-                                        cancelButton=self.dpUIinst.lang['i072_no'], 
-                                        dismissString=self.dpUIinst.lang['i072_no'])
-        if resultQuestion == self.dpUIinst.lang['i071_yes']:
+                                        button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], 
+                                        defaultButton=self.ar.data.lang['i071_yes'], 
+                                        cancelButton=self.ar.data.lang['i072_no'], 
+                                        dismissString=self.ar.data.lang['i072_no'])
+        if resultQuestion == self.ar.data.lang['i071_yes']:
             return True
         return False
 
 
-    def dpCreateControlsPreset(self, *args):
+    def create_curve_preset(self, *args):
         """ Creates a json file as a Control Preset and returns it.
         """
+        print("calling here 0000")
         resultString = None
         ctrlList, ctrlIDList = [], []
         allTransformList = cmds.ls(selection=False, type='transform')
@@ -991,18 +992,18 @@ class ControlClass(object):
                     ctrlList.append(item)
         if ctrlList:
             resultDialog = cmds.promptDialog(
-                                            title=self.dpUIinst.lang['i129_createPreset'],
-                                            message=self.dpUIinst.lang['i130_presetName'],
-                                            button=[self.dpUIinst.lang['i131_ok'], self.dpUIinst.lang['i132_cancel']],
-                                            defaultButton=self.dpUIinst.lang['i131_ok'],
-                                            cancelButton=self.dpUIinst.lang['i132_cancel'],
-                                            dismissString=self.dpUIinst.lang['i132_cancel'])
-            if resultDialog == self.dpUIinst.lang['i131_ok']:
+                                            title=self.ar.data.lang['i129_createPreset'],
+                                            message=self.ar.data.lang['i130_presetName'],
+                                            button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
+                                            defaultButton=self.ar.data.lang['i131_ok'],
+                                            cancelButton=self.ar.data.lang['i132_cancel'],
+                                            dismissString=self.ar.data.lang['i132_cancel'])
+            if resultDialog == self.ar.data.lang['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
                 confirmSameName = True
-                if resultName in self.presetDic:
-                    confirmSameName = self.confirmAskUser(self.dpUIinst.lang['i129_createPreset'], self.dpUIinst.lang['i135_existingName'])
+                if resultName in self.ar.data.curve_preset_data:
+                    confirmSameName = self.confirmAskUser(self.ar.data.lang['i129_createPreset'], self.ar.data.lang['i135_existingName'])
                 if confirmSameName:
                     author = getpass.getuser()
                     date = str(datetime.datetime.now().date())
@@ -1022,10 +1023,10 @@ class ControlClass(object):
                                 ctrl_Degree = cmds.getAttr(ctrlNode+".degree")
                                 resultString += ',"'+ctrl_ID+'":{"type":"'+ctrl_Type+'","degree":'+str(ctrl_Degree)+'}'
                     # check if we got all controlIDs:
-                    for j, pID in enumerate(self.dpUIinst.ctrlPreset):
+                    for j, pID in enumerate(self.ar.data.curve_preset):
                         if not pID in ctrlIDList:
                             # get missing controlIDs from current preset:
-                            resultString += ',"'+pID+'":{"type":"'+self.dpUIinst.ctrlPreset[pID]["type"]+'","degree":'+str(self.dpUIinst.ctrlPreset[pID]["degree"])+'}'
+                            resultString += ',"'+pID+'":{"type":"'+self.ar.data.curve_preset[pID]["type"]+'","degree":'+str(self.ar.data.curve_preset[pID]["degree"])+'}'
                     resultString += "}"
         return resultString
 
@@ -1068,7 +1069,7 @@ class ControlClass(object):
                 if tempList:
                     bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
                     bbList[1] *= 0.75 #less importance to height
-                    bbAverage = self.dpUIinst.utils.averageValue(bbList)
+                    bbAverage = self.ar.utils.averageValue(bbList)
                     resultValue = magicNumber*bbAverage*origRadius
                     if resultValue:
                         return resultValue
@@ -1104,7 +1105,7 @@ class ControlClass(object):
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
         cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
         # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
-        cmds.parent(clusterHandle, self.dpUIinst.data.temp_grp)
+        cmds.parent(clusterHandle, self.ar.data.temp_grp)
 
 
     def addGuideAttrs(self, ctrlName, color="blue", pin=True, *args):
@@ -1168,22 +1169,22 @@ class ControlClass(object):
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
             pcName = ctrlName+"_PinGuide_PaC"
             if pinValue:
-                if cmds.objExists(self.dpUIinst.data.temp_grp):
+                if cmds.objExists(self.ar.data.temp_grp):
                     if not cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True):
                         self.storeLockedList(ctrlName)
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
-                        for attr in self.dpUIinst.transformAttrList:
+                        for attr in self.ar.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=False)
-                        pc = cmds.parentConstraint(self.dpUIinst.data.temp_grp, ctrlName, maintainOffset=True, name=pcName)[0]
+                        pc = cmds.parentConstraint(self.ar.data.temp_grp, ctrlName, maintainOffset=True, name=pcName)[0]
                         cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
-                        for attr in self.dpUIinst.transformAttrList:
+                        for attr in self.ar.transformAttrList:
                             cmds.setAttr(ctrlName+"."+attr, lock=True)
             else:
                 pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
                 if pcNodeList:
                     cmds.delete(pcNodeList[0])
-                    for attr in self.dpUIinst.transformAttrList:
+                    for attr in self.ar.transformAttrList:
                         cmds.setAttr(ctrlName+"."+attr, lock=False)
                     self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)
@@ -1247,10 +1248,10 @@ class ControlClass(object):
         importCalibrationNamespace = "dpImportCalibration"
         sourceRefNodeList = []
         # get user file to import calibration from
-        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.lang['i196_import']+" "+self.dpUIinst.lang['i193_calibration'])
+        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.ar.data.lang['i196_import']+" "+self.ar.data.lang['i193_calibration'])
         if not importCalibrationPath:
             return
-        self.utils.setProgress(self.dpUIinst.lang['i214_refFile'], importCalibrationNamespace, addOne=False)
+        self.utils.setProgress(self.ar.data.lang['i214_refFile'], importCalibrationNamespace, addOne=False)
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
@@ -1259,7 +1260,7 @@ class ControlClass(object):
         if refNodeList:
             for item in refNodeList:
                 self.utils.setProgress(max=len(refNodeList), addOne=False, addNumber=False)
-                self.utils.setProgress(self.dpUIinst.lang['i215_setAttr'], addOne=True)
+                self.utils.setProgress(self.ar.data.lang['i215_setAttr'], addOne=True)
                 if "calibrationList" in cmds.listAttr(item):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
@@ -1289,7 +1290,7 @@ class ControlClass(object):
                             self.mirrorCalibration(selectedNode, fromPrefix, toPrefix)
                 else:
                     # ask to run for all nodes:
-                    if self.confirmAskUser(self.dpUIinst.lang['m010_mirror']+" "+self.dpUIinst.lang['i193_calibration'], self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['i197_mirrorAll']):
+                    if self.confirmAskUser(self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['i193_calibration'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i197_mirrorAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         if allNodeList:
                             for node in allNodeList:
@@ -1304,7 +1305,7 @@ class ControlClass(object):
                             attrList = list(set(attrList) - set(notMirrorAttrList))
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
-            print(self.dpUIinst.lang['i198_mirrorPrefix'])
+            print(self.ar.data.lang['i198_mirrorPrefix'])
 
 
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
@@ -1323,9 +1324,9 @@ class ControlClass(object):
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
-                print(self.dpUIinst.lang['i195_transferedCalib'], sourceItem, destinationList, attrList)
+                print(self.ar.data.lang['i195_transferedCalib'], sourceItem, destinationList, attrList)
         else:
-            print(self.dpUIinst.lang['i042_notSelection'])
+            print(self.ar.data.lang['i042_notSelection'])
 
 
     def setStringAttrFromList(self, nodeName, attrList, attrName="calibrationList", *args):
@@ -1381,14 +1382,14 @@ class ControlClass(object):
             if path and "dpData" in path:
                 currentPath = path.split("dpData")[0]
             else:
-                mel.eval('warning \"'+self.dpUIinst.lang['i201_saveScene']+'\";')
+                mel.eval('warning \"'+self.ar.data.lang['i201_saveScene']+'\";')
                 return
         if not nodeList:
             nodeList = self.getControlList()
         if nodeList:
             if not path:
                 if IO:
-                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
+                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.ar.dpData+"/"+dir
                     if not os.path.exists(dpFolder):
                         os.makedirs(dpFolder)
                     path = dpFolder+"/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
@@ -1398,7 +1399,7 @@ class ControlClass(object):
                         path = pathList[0] 
             if path:
                 if ui:
-                    self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i164_export'], len(nodeList), addOne=False, addNumber=False)
+                    self.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodeList), addOne=False, addNumber=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1447,7 +1448,7 @@ class ControlClass(object):
                     print('Exported shapes to: {0}'.format(path))
                 cmds.undoInfo(closeChunk=True)
         else:
-            mel.eval('warning \"'+self.dpUIinst.lang['i202_noControls']+'\";')
+            mel.eval('warning \"'+self.ar.data.lang['i202_noControls']+'\";')
         if ui:
             # Close progress window
             self.utils.setProgress(endIt=True)
@@ -1468,13 +1469,13 @@ class ControlClass(object):
                     if path and "dpData" in path:
                         currentPath = path.split("dpData")[0]
                     else:
-                        print(self.dpUIinst.lang['i201_saveScene'])
+                        print(self.ar.data.lang['i201_saveScene'])
                         return
-                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
+                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.ar.dpData+"/"+dir
                 dpControlShapeFile = "/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
                 path = dpFolder+dpControlShapeFile
                 if not os.path.exists(path):
-                    print (self.dpUIinst.lang['i202_noControls'])
+                    print (self.ar.data.lang['i202_noControls'])
                     return
             elif not path:
                 pathList = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
@@ -1482,7 +1483,7 @@ class ControlClass(object):
                     path = pathList[0]
             if path:
                 if not os.path.exists(path):
-                    print(self.dpUIinst.lang['e004_objNotExist']+path)
+                    print(self.ar.data.lang['e004_objNotExist']+path)
                 else:
                     # create a file reference:
                     cmds.file(path, reference=True, namespace=importShapeNamespace)
@@ -1490,7 +1491,7 @@ class ControlClass(object):
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
                         if ui:
-                            self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i196_import'], len(refNodeList), addOne=False, addNumber=False)
+                            self.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(refNodeList), addOne=False, addNumber=False)
                         for sourceRefNode in refNodeList:
                             if ui or verbose:
                                 self.utils.setProgress(self.doingName+': Shape')
@@ -1502,7 +1503,7 @@ class ControlClass(object):
                     cmds.file(path, removeReference=True)
                     print("Imported shapes: {0}".format(path))
         else:
-            print(self.dpUIinst.lang['i202_noControls'])
+            print(self.ar.data.lang['i202_noControls'])
         if ui:
             # Close progress window
             self.utils.setProgress(endIt=True)
@@ -1562,7 +1563,7 @@ class ControlClass(object):
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
-        self.dpUIinst.customAttr.addAttr(0, toIDList) #dpID
+        self.ar.customAttr.addAttr(0, toIDList) #dpID
         self.setStringAttrFromList(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
 
@@ -1681,14 +1682,14 @@ class ControlClass(object):
                             self.mirrorShape(selectedNode, fromPrefix, toPrefix, axis)
                 else:
                     # ask to run for all nodes:
-                    if self.confirmAskUser(self.dpUIinst.lang['m010_mirror']+" "+self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['i265_mirrorShapeAll']):
+                    if self.confirmAskUser(self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['m067_shape'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i265_mirrorShapeAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
-                            self.utils.setProgress(self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['m010_mirror'], len(allNodeList), addOne=False, addNumber=False)
+                            self.utils.setProgress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(allNodeList), addOne=False, addNumber=False)
                             for node in allNodeList:
                                 if node in allControlList:
-                                    self.utils.setProgress(self.dpUIinst.lang['m067_shape']+": "+node)
+                                    self.utils.setProgress(self.ar.data.lang['m067_shape']+": "+node)
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
                         self.utils.setProgress(endIt=True)
@@ -1706,7 +1707,7 @@ class ControlClass(object):
                         self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinationList=[destinationNode], keepColor=True, force=True)
                         cmds.delete(mirrorShapeGrp)
         else:
-            print(self.dpUIinst.lang['i198_mirrorPrefix'])
+            print(self.ar.data.lang['i198_mirrorPrefix'])
 
 
     def setupDefaultValues(self, resetMode=True, ctrlList=None, *args):
@@ -1718,7 +1719,7 @@ class ControlClass(object):
             nodeToRunList = self.getSelectedControls()
             if not nodeToRunList:
                 # ask to run for all nodes:
-                if self.confirmAskUser(self.dpUIinst.lang['i270_defaultValues'], self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['i273_runAllNodes']):
+                if self.confirmAskUser(self.ar.data.lang['i270_defaultValues'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i273_runAllNodes']):
                     nodeToRunList = self.getControlList()
         else:
             nodeToRunList = self.getControlList()
@@ -1749,20 +1750,20 @@ class ControlClass(object):
         # window
         defaultValueOption_winWidth  = 430
         defaultValueOption_winHeight = 300
-        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.lang['i270_defaultValues']+" "+self.dpUIinst.lang['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.defaultValueWindowName, title=self.ar.data.lang['i270_defaultValues']+" "+self.ar.data.lang['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         dvMainLayout = cmds.columnLayout('dvMainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueWindowName)
         cmds.separator(style='none', height=5, parent=dvMainLayout)
         dvHeaderLayout = cmds.rowColumnLayout('dvHeaderLayout', numberOfColumns=3, columnWidth=[(1, 150), (2, 10), (3, 180)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], adjustableColumn=2, parent=dvMainLayout)
-        cmds.button("editSelectedCtrlBT", label=self.dpUIinst.lang['i011_editSelected'], command=self.populateSelectedControls, parent=dvHeaderLayout)
+        cmds.button("editSelectedCtrlBT", label=self.ar.data.lang['i011_editSelected'], command=self.populateSelectedControls, parent=dvHeaderLayout)
         cmds.separator(style='none', height=30, parent=dvHeaderLayout)
-        cmds.button("selectAllBT", label=self.dpUIinst.lang['i291_selectAllControls'], command=partial(self.selectAllControls, True), parent=dvHeaderLayout)
+        cmds.button("selectAllBT", label=self.ar.data.lang['i291_selectAllControls'], command=partial(self.selectAllControls, True), parent=dvHeaderLayout)
         FirstCL = cmds.columnLayout('FirstSL',  adjustableColumn=True, columnOffset=("both", 10), parent=dvMainLayout)
         firstRL = cmds.rowLayout("firstRL", numberOfColumns=4, columnWidth4=(150, 100, 50, 50), height=32, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=FirstCL)
-        cmds.text("controllerTxt", label=self.dpUIinst.lang['i111_controller'], font='boldLabelFont', align="center", parent=firstRL)
-        cmds.text("attributeTxt", label=self.dpUIinst.lang['i275_attribute'], font='boldLabelFont', parent=firstRL)
-        cmds.text("defaultTxt", label=self.dpUIinst.lang['m042_default'], font='boldLabelFont', parent=firstRL)
-        cmds.text("currentTxt", label=self.dpUIinst.lang['i276_current'], font='boldLabelFont', parent=firstRL)
+        cmds.text("controllerTxt", label=self.ar.data.lang['i111_controller'], font='boldLabelFont', align="center", parent=firstRL)
+        cmds.text("attributeTxt", label=self.ar.data.lang['i275_attribute'], font='boldLabelFont', parent=firstRL)
+        cmds.text("defaultTxt", label=self.ar.data.lang['m042_default'], font='boldLabelFont', parent=firstRL)
+        cmds.text("currentTxt", label=self.ar.data.lang['i276_current'], font='boldLabelFont', parent=firstRL)
         cmds.separator(style='in', height=10, parent=dvMainLayout)
         self.defaultValueLayout = cmds.scrollLayout('defaultValueMainLayout', width=350, height=200, parent=dvMainLayout)
         self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)

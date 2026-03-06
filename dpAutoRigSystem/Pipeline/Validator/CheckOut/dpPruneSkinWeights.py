@@ -49,10 +49,10 @@ class PruneSkinWeights(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for skinClusterNode in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     meshList = cmds.skinCluster(skinClusterNode, query=True, geometry=True)
                     if meshList:
-                        weightsList = self.dpUIinst.skin.getSkinWeights(meshList[0], skinClusterNode)
+                        weightsList = self.ar.skin.getSkinWeights(meshList[0], skinClusterNode)
                         toPruneList = []
                         # check low weights
                         for v, weightDic in enumerate(weightsList):
@@ -75,15 +75,15 @@ class PruneSkinWeights(dpBaseAction.ActionStartClass):
                                     cmds.select(meshList[0])
                                     mel.eval('doPruneSkinClusterWeightsArgList 2 { "'+str(self.pruneMinValue)+'", "1" };')
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+skinClusterNode+" = "+str(len(toPruneList))+" vertices")
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+skinClusterNode+" = "+str(len(toPruneList))+" vertices")
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+skinClusterNode)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+skinClusterNode)
                                 cmds.select(clear=True)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

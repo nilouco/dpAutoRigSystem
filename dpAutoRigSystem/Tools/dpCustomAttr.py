@@ -19,12 +19,12 @@ DP_CUSTOMATTR_VERSION = 1.11
 
 
 class CustomAttr(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         self.title = TITLE
         # redeclaring variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.ui = ui
-        self.utils = self.dpUIinst.utils
+        self.utils = self.ar.utils
         self.mainWindowName = "dpCustomAttributesWindow"
         self.addWindowName = "dpAddCustomAttributesWindow"
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
@@ -60,14 +60,14 @@ class CustomAttr(object):
         # window
         customAttributes_winWidth  = 380
         customAttributes_winHeight = 350
-        cmds.window(self.mainWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(customAttributes_winWidth, customAttributes_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.mainWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(customAttributes_winWidth, customAttributes_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         customAttributesLayout = cmds.columnLayout('customAttributesLayout', adjustableColumn=True, columnOffset=("both", 10))
         mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=customAttributesLayout)
-        cmds.text("headerTxt", label=self.dpUIinst.lang['i267_customAttrHeader']+' "'+ATTR_START+'"', align="left", height=30, font='boldLabelFont', parent=mainLayout)
+        cmds.text("headerTxt", label=self.ar.data.lang['i267_customAttrHeader']+' "'+ATTR_START+'"', align="left", height=30, font='boldLabelFont', parent=mainLayout)
         # filter
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=mainLayout)
-        self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand=self.selectNodes, changeCommand=self.filterByName, adjustableColumn=2, parent=filterLayout)
+        self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.ar.data.lang['i268_filterByName'], text="", buttonLabel=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], buttonCommand=self.selectNodes, changeCommand=self.filterByName, adjustableColumn=2, parent=filterLayout)
         cmds.separator(style='none', height=5, parent=filterLayout)
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
@@ -75,22 +75,22 @@ class CustomAttr(object):
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
         buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 120), (4, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5), (4, "both", 5)], parent=mainLayout)
-        cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
-        cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
-        cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.updateID, parent=buttonLayout)
-        cmds.button("revealIDButton", label=self.dpUIinst.lang['i340_reveal']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=partial(self.revealID, None, True), parent=buttonLayout)
+        cmds.button("addButton", label=self.ar.data.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
+        cmds.button("removeButton", label=self.ar.data.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
+        cmds.button("updateIDButton", label=self.ar.data.lang['i089_update']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.updateID, parent=buttonLayout)
+        cmds.button("revealIDButton", label=self.ar.data.lang['i340_reveal']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=partial(self.revealID, None, True), parent=buttonLayout)
         cmds.separator(style='none', height=15, parent=mainLayout)
         # settings - frameLayout:
-        settingsFL = cmds.frameLayout('settingsFL', label=self.dpUIinst.lang['i215_setAttr'], collapsable=True, collapse=True, parent=mainLayout)
+        settingsFL = cmds.frameLayout('settingsFL', label=self.ar.data.lang['i215_setAttr'], collapsable=True, collapse=True, parent=mainLayout)
         settingsCL = cmds.columnLayout('settingsCL', adjustableColumn=True, columnOffset=('left', 5), parent=settingsFL)
         # type
-        cmds.text('typeTxt', align='left', label=self.dpUIinst.lang['i138_type'], height=30, font='boldLabelFont', parent=settingsCL)
-        self.typeAllCB = cmds.checkBox('typeAllCB', label=self.dpUIinst.lang['i339_any'].capitalize(), align='left', value=0, changeCommand=partial(self.updateType, "any"), parent=settingsCL)
+        cmds.text('typeTxt', align='left', label=self.ar.data.lang['i138_type'], height=30, font='boldLabelFont', parent=settingsCL)
+        self.typeAllCB = cmds.checkBox('typeAllCB', label=self.ar.data.lang['i339_any'].capitalize(), align='left', value=0, changeCommand=partial(self.updateType, "any"), parent=settingsCL)
         self.typeTransformCB = cmds.checkBox('transform', label="transform", align='left', value=1, changeCommand=partial(self.updateType, "transform"), parent=settingsCL)
         self.typeNetworkCB = cmds.checkBox('network', label="network", align='left', value=1, changeCommand=partial(self.updateType, "network"), parent=settingsCL)
         cmds.separator(style='in', height=15, parent=settingsCL)
         # display
-        cmds.text('displayTxt', align='left', label=self.dpUIinst.lang['m217_suffix']+" "+self.dpUIinst.lang['c126_display'], height=30, font='boldLabelFont', parent=settingsCL)
+        cmds.text('displayTxt', align='left', label=self.ar.data.lang['m217_suffix']+" "+self.ar.data.lang['c126_display'], height=30, font='boldLabelFont', parent=settingsCL)
         diplayRCL = cmds.rowColumnLayout('displayRCL', numberOfColumns=6, columnWidth=[(1, 70), (2, 70), (3, 70), (4, 70), (5, 70), (6, 70)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10), (5, 'left', 10), (6, 'left', 10)], parent=settingsCL)
         self.displayGrpCB = cmds.checkBox('displayGrpCB', label="Grp", annotation="Group", align='left', value=1, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayCtrlCB = cmds.checkBox('displayCtrlCB', label="Ctrl", annotation="Controller", align='left', value=1, changeCommand=self.updateNameDisplay, parent=diplayRCL)
@@ -143,8 +143,8 @@ class CustomAttr(object):
         """
         if typeName == "any":
             if value:
-                confirm = cmds.confirmDialog(title=self.dpUIinst.lang[self.title], icon="question", message=self.dpUIinst.lang['m098_confirmSelectAny'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i072_no'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
-                if confirm == self.dpUIinst.lang['i071_yes']:
+                confirm = cmds.confirmDialog(title=self.ar.data.lang[self.title], icon="question", message=self.ar.data.lang['m098_confirmSelectAny'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+                if confirm == self.ar.data.lang['i071_yes']:
                     self.typeList = []
                     for cbItem in self.typeCBList:
                         cmds.checkBox(cbItem, edit=True, value=1, enable=0)
@@ -206,16 +206,16 @@ class CustomAttr(object):
         self.utils.closeUI(self.addWindowName)
         add_winWidth  = 220
         add_winHeight = 260
-        cmds.window(self.addWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.addWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         addAttrLayout = cmds.columnLayout('addAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
-        cmds.text("headerAddTxt", label=self.dpUIinst.lang['i045_add']+" "+self.dpUIinst.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=addAttrLayout)
+        cmds.text("headerAddTxt", label=self.ar.data.lang['i045_add']+" "+self.ar.data.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=addAttrLayout)
         cmds.separator(style='none', height=10, parent=addAttrLayout)
         for a, attr in enumerate(ATTR_LIST):
             cmds.button("addButton"+str(a), label=attr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.addAttr, a), parent=addAttrLayout)
             cmds.separator(style='none', height=5, parent=addAttrLayout)
         cmds.separator(style='in', height=10, parent=addAttrLayout)
-        cmds.text("customAddTxt", label=self.dpUIinst.lang['m212_customAttr']+":", align="left", height=30, parent=addAttrLayout)
-        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustomAttrTFG", label="", text="", buttonLabel=self.dpUIinst.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom"), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
+        cmds.text("customAddTxt", label=self.ar.data.lang['m212_customAttr']+":", align="left", height=30, parent=addAttrLayout)
+        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustomAttrTFG", label="", text="", buttonLabel=self.ar.data.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom"), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
         cmds.showWindow(self.addWindowName)
 
 
@@ -290,9 +290,9 @@ class CustomAttr(object):
         self.utils.closeUI(self.removeWindowName)
         remove_winWidth  = 200
         remove_winHeight = 250
-        cmds.window(self.removeWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.removeWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         removeAttrLayout = cmds.columnLayout('removeAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
-        cmds.text("headerRemoveTxt", label=self.dpUIinst.lang['i046_remove']+" "+self.dpUIinst.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=removeAttrLayout)
+        cmds.text("headerRemoveTxt", label=self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=removeAttrLayout)
         cmds.separator(style='none', height=10, parent=removeAttrLayout)
         toRemoveAttrList = self.getCustomAttrList()
         if toRemoveAttrList:
@@ -302,7 +302,7 @@ class CustomAttr(object):
                 cmds.button("removeButton"+rAttr, label=rAttr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.removeAttr, rAttr), parent=removeAttrLayout)
                 cmds.separator(style='none', height=5, parent=removeAttrLayout)
         else:
-            cmds.text("noCustomAttrTxt", label=self.dpUIinst.lang['i062_notFound']+" "+self.dpUIinst.lang['m212_customAttr'])
+            cmds.text("noCustomAttrTxt", label=self.ar.data.lang['i062_notFound']+" "+self.ar.data.lang['m212_customAttr'])
         cmds.showWindow(self.removeWindowName)
 
 
@@ -362,7 +362,7 @@ class CustomAttr(object):
             itemList = [node for node in cmds.ls(selection=True) for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignoreList]
         if itemList:
             for item in itemList:
-                decomposedIDList = self.dpUIinst.utils.decomposeID(item)
+                decomposedIDList = self.ar.utils.decomposeID(item)
                 idDic[item] = {#"node" : item,
                                 ATTR_DPID : cmds.getAttr(item+"."+ATTR_DPID),
                                 "name" : decomposedIDList[1],
@@ -381,12 +381,12 @@ class CustomAttr(object):
             self.utils.closeUI(self.idWindowName)
             id_winWidth  = 780
             id_winHeight = 350
-            cmds.window(self.idWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(id_winWidth, id_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window(self.idWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(id_winWidth, id_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             self.idAttrLayout = cmds.columnLayout('self.idAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
-            cmds.text("headerIdTxt", label=ATTR_DPID+" "+self.dpUIinst.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=self.idAttrLayout)
+            cmds.text("headerIdTxt", label=ATTR_DPID+" "+self.ar.data.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=self.idAttrLayout)
             cmds.separator(style='none', height=10, parent=self.idAttrLayout)
             refreshLayout = cmds.rowLayout("refreshLayout", numberOfColumns=2, width=400, columnWidth2=(200, 200), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=self.idAttrLayout)
-            cmds.button(self.dpUIinst.lang['m181_refresh'], width=80, command=self.populateIDUI, backgroundColor=(0.5, 0.5, 0.5), parent=refreshLayout)
+            cmds.button(self.ar.data.lang['m181_refresh'], width=80, command=self.populateIDUI, backgroundColor=(0.5, 0.5, 0.5), parent=refreshLayout)
             cmds.separator(style='in', height=30, parent=self.idAttrLayout)
             self.idScrollLayout = cmds.scrollLayout("self.idScrollLayout", width=300, parent=self.idAttrLayout)
             self.populateIDUI(idDic)
@@ -407,17 +407,17 @@ class CustomAttr(object):
                 cmds.rowColumnLayout(numberOfColumns=3, adjustableColumn=3, columnWidth=[(1, 200), (2, 80), (3, 500)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10), (3, 'both', 10)], parent=self.idScrollLayout)
                 # button
                 if node == idDic[node]["name"]:
-                    cmds.button(label=node, command=partial(self.dpUIinst.ctrls.selectControl, node, False))
+                    cmds.button(label=node, command=partial(self.ar.ctrls.selectControl, node, False))
                 else: #supposed renamed node
-                    cmds.button(label=node, command=partial(self.dpUIinst.ctrls.selectControl, node, False), backgroundColor=(0.8, 0.5, 0.5))
+                    cmds.button(label=node, command=partial(self.ar.ctrls.selectControl, node, False), backgroundColor=(0.8, 0.5, 0.5))
                 # data
                 cmds.text(label=ATTR_DPID)
                 cmds.text(label=idDic[node][ATTR_DPID])
                 cmds.text(label="")
-                cmds.text(label=self.dpUIinst.lang['m006_name'])
+                cmds.text(label=self.ar.data.lang['m006_name'])
                 cmds.text(idDic[node]["name"])
                 cmds.text(label="")
-                cmds.text(label=self.dpUIinst.lang['i341_date'])
+                cmds.text(label=self.ar.data.lang['i341_date'])
                 cmds.text(label=idDic[node]["date"])
                 cmds.separator(style='none', height=5, parent=self.idScrollLayout)
             cmds.separator(style='none', height=10, parent=self.idScrollLayout)

@@ -61,7 +61,7 @@ class RemainingVertexCleaner(dpBaseAction.ActionStartClass):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in toCheckList
                         for obj in toCheckList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 vertexIter = OpenMaya.MItMeshVertex(shapeNode)
                                 iterEdges  = OpenMaya.MItMeshEdge(shapeNode)
@@ -102,18 +102,18 @@ class RemainingVertexCleaner(dpBaseAction.ActionStartClass):
                             try:
                                 cmds.delete(item)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     if self.firstMode:
                         self.messageList.append("Remaining vertex: "+str(remainingVertexList))
-                        self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(remainingVertexList)+")\n---")
+                        self.messageList.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(remainingVertexList)+")\n---")
                         cmds.select(remainingVertexList)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

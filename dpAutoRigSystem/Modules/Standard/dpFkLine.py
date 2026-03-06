@@ -214,7 +214,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
         # Create the reOrien button in the flip layout:
-        self.reOrientBT = cmds.button(label=self.dpUIinst.lang["m022_reOrient"], annotation=self.dpUIinst.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent=self.flipLayout)
+        self.reOrientBT = cmds.button(label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent=self.flipLayout)
 
 
     def rigModule(self, *args):
@@ -289,7 +289,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # end chain:
                     if n == self.nJoints-1:
                         # create end joint:
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.data.joint_end_attr, radius=0.5)
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
                         self.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # work with main fk controllers
@@ -299,7 +299,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.hookSetup(side, [self.ctrlZeroGrp], [self.skinJointList[0]])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -307,5 +307,5 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
     

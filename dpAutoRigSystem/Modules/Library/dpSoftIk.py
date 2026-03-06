@@ -32,10 +32,10 @@ DP_SOFTIK_VERSION = 2.04
 
 
 class SoftIkClass(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.ctrls = dpUIinst.ctrls
+        self.ar = ar
+        self.ctrls = ar.ctrls
 
 
     def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, axis="Z", *args):
@@ -47,7 +47,7 @@ class SoftIkClass(object):
         softIkCalibValue = 0.02*cmds.getAttr(distBetween+".distance")
         # add the dSoft and softIk attributes on the controller:
         cmds.addAttr(ctrlName, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
-        cmds.addAttr(ctrlName, longName="softIk_"+self.dpUIinst.lang['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
+        cmds.addAttr(ctrlName, longName="softIk_"+self.ar.data.lang['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
         cmds.addAttr(ctrlName, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
         
         # set up node network for softIk:
@@ -87,13 +87,13 @@ class SoftIkClass(object):
         cmds.setAttr(softIkRigScaleClp+".maxR", 1000000)
 
         # make connections:
-        cmds.connectAttr(ctrlName+".softIk_"+self.dpUIinst.lang['c111_calibrate'], self.calibrateMD+".input1X", force=True)
+        cmds.connectAttr(ctrlName+".softIk_"+self.ar.data.lang['c111_calibrate'], self.calibrateMD+".input1X", force=True)
         cmds.connectAttr(self.calibrateMD+".outputX", softRmV+".outputMax", force=True)
         cmds.connectAttr(ctrlName+".softIk", softRmV+".inputValue", force=True)
         cmds.connectAttr(softRmV+".outValue", ctrlName+".softDistance", force=True)
         cmds.connectAttr(ctrlName+".startChainLength", lengthStartMD+".input1X", force=True)
         cmds.connectAttr(lengthStartMD+".outputX", daMD+".input1D[0]", force=True)
-        cmds.connectAttr(ctrlName+"."+self.dpUIinst.lang["c113_length"], lengthStartMD+".input2X", force=True)
+        cmds.connectAttr(ctrlName+"."+self.ar.data.lang["c113_length"], lengthStartMD+".input2X", force=True)
         cmds.connectAttr(ctrlName+".softDistance", daMD+".input1D[1]", force=True)
         cmds.connectAttr(distBetween+".distance", xMinusDaPMA+".input1D[0]", force=True)
         cmds.connectAttr(daMD+".output1D", xMinusDaPMA+".input1D[1]", force=True)
@@ -135,7 +135,7 @@ class SoftIkClass(object):
             cmds.connectAttr(distDiffPMA+".output1D", stretchBC+".color2G", force=True)
             cmds.connectAttr(softRatioMD+".outputX", stretchBC+".color1R", force=True)
             cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
-            cmds.connectAttr(ctrlName+"."+self.dpUIinst.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
+            cmds.connectAttr(ctrlName+"."+self.ar.data.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
             cmds.connectAttr(stretchBC+".outputG", softIkRigScaleClp+".inputR", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
@@ -144,5 +144,5 @@ class SoftIkClass(object):
                     cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1
         
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
         return self.calibrateMD

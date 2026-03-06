@@ -47,16 +47,16 @@ class JointEndCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # list joint ends
-                jEndList = [j for j in toCheckList if self.dpUIinst.jointEndAttr in cmds.listAttr(j)] #by attribute
-                jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.dpUIinst.jointEndAttr)]) #by suffix
+                jEndList = [j for j in toCheckList if self.ar.jointEndAttr in cmds.listAttr(j)] #by attribute
+                jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.jointEndAttr)]) #by suffix
                 if jEndList:
                     # check connection with skinCluster to avoid delete it and crash the setup
-                    jEndList = list(set(jEndList)-set(self.dpUIinst.skin.getSkinnedJointList())) #remove duplicated and skinned joints
+                    jEndList = list(set(jEndList)-set(self.ar.skin.getSkinnedJointList())) #remove duplicated and skinned joints
                     jEndList = [j for j in jEndList if not cmds.listRelatives(j, children=True)] #remove if there are children
                     if jEndList:
                         jEndList.sort()
                         for item in jEndList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             self.checkedObjList.append(item)
                             self.foundIssueList.append(True)
                             if self.firstMode:
@@ -66,10 +66,10 @@ class JointEndCleaner(dpBaseAction.ActionStartClass):
                                     cmds.lockNode(item, lock=False)
                                     cmds.delete(item)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     else:
                         self.notFoundNodes()
                 else:
@@ -77,7 +77,7 @@ class JointEndCleaner(dpBaseAction.ActionStartClass):
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

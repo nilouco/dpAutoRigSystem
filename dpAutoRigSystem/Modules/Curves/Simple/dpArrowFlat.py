@@ -19,7 +19,7 @@ class ArrowFlat(dpBaseCurve.BaseCurve):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseCurve)
     
     

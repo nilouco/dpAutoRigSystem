@@ -43,12 +43,12 @@ class SideCalibration(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = self.dpUIinst.ctrls.getControlList()
+                toCheckList = self.ar.ctrls.getControlList()
             if toCheckList:
                 pairDic = {}
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".calibrationList"):
                         if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
@@ -59,9 +59,9 @@ class SideCalibration(dpBaseAction.ActionStartClass):
                                     foundOtherSide = True
                                     break
                             if foundOtherSide:
-                                calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(item)
+                                calibrationList = self.ar.ctrls.getListFromStringAttr(item)
                                 if calibrationList:
-                                    notMirrorAttrList = self.dpUIinst.ctrls.getListFromStringAttr(item, "notMirrorList")
+                                    notMirrorAttrList = self.ar.ctrls.getListFromStringAttr(item, "notMirrorList")
                                     if notMirrorAttrList:
                                         calibrationList = list(set(calibrationList) - set(notMirrorAttrList))
                                     for attr in calibrationList:
@@ -84,22 +84,22 @@ class SideCalibration(dpBaseAction.ActionStartClass):
                                                             cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                         else:
                                                             # check for left, top or front side to use it as priority node:
-                                                            if item[0] == self.dpUIinst.lang['p002_left'] or item[0] == self.dpUIinst.lang['p004_top'] or item[0] == self.dpUIinst.lang['p006_front']:
+                                                            if item[0] == self.ar.data.lang['p002_left'] or item[0] == self.ar.data.lang['p004_top'] or item[0] == self.ar.data.lang['p006_front']:
                                                                 cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                             else:
                                                                 cmds.setAttr(item+"."+attr, pairCurrentValue)
                                                         self.resultOkList.append(True)
-                                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
+                                                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
                                                     except:
                                                         self.resultOkList.append(False)
-                                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
+                                                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
                                         else:
                                             self.resultOkList.append(True)
-                                            self.messageList.append(item+"."+attr+" "+self.dpUIinst.lang['i061_notExists'])
+                                            self.messageList.append(item+"."+attr+" "+self.ar.data.lang['i061_notExists'])
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

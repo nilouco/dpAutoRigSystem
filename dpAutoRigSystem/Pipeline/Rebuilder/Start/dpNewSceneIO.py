@@ -22,12 +22,12 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_NEWSCENEIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseAction)
         self.startName = "dpNewScene"
         self.firstBTEnable = False
-        self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']
-        self.secondBTCustomLabel = self.dpUIinst.lang['i306_run']
+        self.firstBTCustomLabel = self.ar.data.lang['i305_none']
+        self.secondBTCustomLabel = self.ar.data.lang['i306_run']
         self.setActionType("r000_rebuilder")
 
 
@@ -49,9 +49,9 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
         # --- rebuilder code --- beginning
         if self.pipeliner.checkAssetContext():
             if self.firstMode: #export
-                self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
+                self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
-                self.dpUIinst.rebuilding = True
+                self.ar.rebuilding = True
                 try:
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
@@ -59,7 +59,7 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
                 except Exception as e:
                     self.notWorkedWellIO(str(e))
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         # --- rebuilder code --- end
         # ---
 

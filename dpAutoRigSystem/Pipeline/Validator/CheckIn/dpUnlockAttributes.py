@@ -49,7 +49,7 @@ class UnlockAttributes(dpBaseAction.ActionStartClass):
                         lockedAttrDic = {}
                         self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
                         for item in nodeList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             lockedAttrList = cmds.listAttr(item, locked=True)
                             if lockedAttrList:
                                 lockedAttrDic[item] = lockedAttrList
@@ -66,18 +66,18 @@ class UnlockAttributes(dpBaseAction.ActionStartClass):
                                         for attr in lockedAttrDic[item]:
                                             cmds.setAttr(item+"."+attr, lock=False)
                                         self.resultOkList.append(True)
-                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(lockedAttrDic[item]))
+                                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(lockedAttrDic[item]))
                                     except:
                                         self.resultOkList.append(False)
-                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" = "+attr)
+                                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+" = "+attr)
                     else:
                         self.notFoundNodes()
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+                    self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
+                self.notWorkedWellIO(self.ar.data.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
+            self.notWorkedWellIO(self.ar.data.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 

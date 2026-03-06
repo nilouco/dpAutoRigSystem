@@ -61,13 +61,13 @@ class ConstraintIO(dpBaseAction.ActionStartClass):
                         if constDic:
                             self.importConstraintData(constDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

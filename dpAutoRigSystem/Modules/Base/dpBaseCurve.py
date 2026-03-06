@@ -6,11 +6,11 @@ DP_BASECURVE_VERSION = 2.04
 
 
 class BaseCurve(object):
-    def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -25,9 +25,9 @@ class BaseCurve(object):
         self.cvKnotList = None
         self.cvPeriodic = None
         self.suffix = "Ctrl"
-        self.curvesSimpleFolder = dpUIinst.data.curves_simple_folder
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
+        self.curvesSimpleFolder = ar.data.curve_simple_folder
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
     
     
     def getControlUIValues(self, cvName='', *args):
@@ -63,7 +63,7 @@ class BaseCurve(object):
             cmds.addAttr(cvNode, longName="dpGuide", attributeType='bool')
             cmds.setAttr(cvNode+".dpGuide", 1)
         cmds.addAttr(cvNode, longName="version", dataType='string')
-        cmds.setAttr(cvNode+".version", self.dpUIinst.dpARVersion, type="string")
+        cmds.setAttr(cvNode+".version", self.ar.dpARVersion, type="string")
         if self.cvID:
             cmds.addAttr(cvNode, longName="controlID", dataType='string')
             cmds.setAttr(cvNode+".controlID", self.cvID, type="string")
@@ -97,7 +97,7 @@ class BaseCurve(object):
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
         self.ctrls.renameShape([cvCurve])
         self.ctrls.displayRotateOrderAttr([cvCurve])
-        self.dpUIinst.customAttr.addAttr(0, [cvCurve]) #dpID
+        self.ar.customAttr.addAttr(0, [cvCurve]) #dpID
         return cvCurve
     
     
@@ -153,7 +153,7 @@ class BaseCurve(object):
                     self.ctrls.transferShape(True, True, self.cvCurve, destinationList, True)
             else:
                 cmds.delete(self.cvCurve)
-                mel.eval("warning \""+self.dpUIinst.lang['e011_notSelShape']+"\";")
+                mel.eval("warning \""+self.ar.data.lang['e011_notSelShape']+"\";")
     
     
     def cvCreate(self, useUI, cvID, cvName='Control_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, combine=False, *args):

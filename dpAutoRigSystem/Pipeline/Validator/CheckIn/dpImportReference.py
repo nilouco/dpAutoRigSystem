@@ -46,7 +46,7 @@ class ImportReference(dpBaseAction.ActionStartClass):
         if referenceList:
             self.utils.setProgress(max=len(referenceList), addOne=False, addNumber=False)
             for reference in referenceList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
                 self.checkedObjList.append(reference)
                 self.foundIssueList.append(True)
             if self.firstMode:
@@ -78,12 +78,12 @@ class ImportReference(dpBaseAction.ActionStartClass):
                         try:
                             cmds.file(ref, importReference=True)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+ref)
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+ref)
                             self.importReference()
                             break
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+ref)
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+ref)
                     else:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+ref)
+                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+ref)

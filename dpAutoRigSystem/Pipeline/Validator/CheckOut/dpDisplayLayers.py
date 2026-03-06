@@ -45,7 +45,7 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
             else:
                 # List all controls
                 ctrlsGeometryList = None
-                self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
+                self.allCtrlsList = self.ar.ctrls.getControlList()
                 if self.allCtrlsList:
                     allGeoList = self.getGeometryTranform()
                     ctrlsGeometryList = self.allCtrlsList
@@ -84,20 +84,20 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
                                     self.verifyFixMode(toFixList)
                             else:
                                 # Empty layer
-                                self.verifyFixMode([self.dpUIinst.lang['v056_emptyLayers']])
+                                self.verifyFixMode([self.ar.data.lang['v056_emptyLayers']])
                         else:
                             # Layer configuration
-                            self.verifyFixMode([self.dpUIinst.lang['v057_layerConfiguration']])
+                            self.verifyFixMode([self.ar.data.lang['v057_layerConfiguration']])
                     else:
                         # No display layer
-                        self.verifyFixMode([self.dpUIinst.lang['v054_displayLayers']])
+                        self.verifyFixMode([self.ar.data.lang['v054_displayLayers']])
                 else:
                     # Extra Lyr to delete
                     self.verifyFixMode(self.extraLayerToDelete)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
@@ -182,7 +182,7 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
         if itemList:
             self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
             for i, item in enumerate(itemList):
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
                 if self.firstMode:
                     self.resultOkList.append(False)
                     self.checkedObjList.append(item)
@@ -194,7 +194,7 @@ class DisplayLayers(dpBaseAction.ActionStartClass):
                         if i == len(itemList) - 1:
                             self.createDisplayLayers()    
                         self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                     except:#fix
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)

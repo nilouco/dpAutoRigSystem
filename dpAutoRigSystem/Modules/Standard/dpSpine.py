@@ -48,10 +48,10 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
         # style layout:
-        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selected_module_layout")
-        cmds.text(label=self.dpUIinst.lang['m041_style'], visible=True, parent=self.styleLayout)
+        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
+        cmds.text(label=self.ar.data.lang['m041_style'], visible=True, parent=self.styleLayout)
         self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
-        styleMenuItemList = [self.dpUIinst.lang['m042_default'], self.dpUIinst.lang['m026_biped']]
+        styleMenuItemList = [self.ar.data.lang['m042_default'], self.ar.data.lang['m026_biped']]
         for item in styleMenuItemList:
             cmds.menuItem(label=item, parent=self.styleMenu)
         # read from guide attribute the current value to style:
@@ -64,10 +64,10 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             We will optimise: control world orientation
         """
         # for Default style:
-        if style == self.dpUIinst.lang['m042_default'] or style == 0:
+        if style == self.ar.data.lang['m042_default'] or style == 0:
             cmds.setAttr(self.moduleGrp+".style", 0)
         # for Biped style:
-        if style == self.dpUIinst.lang['m026_biped'] or style == 1:
+        if style == self.ar.data.lang['m026_biped'] or style == 1:
             cmds.setAttr(self.moduleGrp+".style", 1)
 
 
@@ -75,7 +75,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.dpUIinst.lang['m042_default']+':'+self.dpUIinst.lang['m026_biped'])
+        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped'])
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5, d=1, guide=True)
         self.cvEndJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -170,13 +170,13 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         if cmds.objExists(self.moduleGrp):
             self.currentStyle = cmds.getAttr(self.moduleGrp+".style")
             # naming main controls:
-            hipsName  = self.dpUIinst.lang['c100_bottom']
-            chestName = self.dpUIinst.lang['c099_top']
-            baseName = self.dpUIinst.lang['c106_base']
-            endName = self.dpUIinst.lang['c120_tip']
+            hipsName  = self.ar.data.lang['c100_bottom']
+            chestName = self.ar.data.lang['c099_top']
+            baseName = self.ar.data.lang['c106_base']
+            endName = self.ar.data.lang['c120_tip']
             if self.currentStyle == 1: #Biped
-                hipsName  = self.dpUIinst.lang['c027_hips']
-                chestName = self.dpUIinst.lang['c028_chest']
+                hipsName  = self.ar.data.lang['c027_hips']
+                chestName = self.ar.data.lang['c028_chest']
             # run for all sides
             for s, side in enumerate(self.sideList):
                 attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
@@ -204,14 +204,14 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_Base")
                 self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+chestName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Active_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Fk_ikFkBlend', attributeType="float", min=0, max=1, defaultValue=1, keyable=True)
                 self.aHipsAList.append(self.hipsACtrl)
-                self.aVolVariationAttrList.append(attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'])
-                self.aActVolVariationAttrList.append(attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'])
-                self.aMScaleVolVariationAttrList.append(attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'])
+                self.aVolVariationAttrList.append(attrNameLower+'_'+self.ar.data.lang['c031_volumeVariation'])
+                self.aActVolVariationAttrList.append(attrNameLower+'Active_'+self.ar.data.lang['c031_volumeVariation'])
+                self.aMScaleVolVariationAttrList.append(attrNameLower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'])
                 self.aIkFkBlendAttrList.append(attrNameLower+'Fk_ikFkBlend')
                 
                 # base and end controls:
@@ -229,12 +229,12 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(tempTipCluster+".translateY", 0.2*self.ctrlRadius)
                 cmds.delete([self.baseCtrl, self.tipCtrl], constructionHistory=True)
                 # shape visibility
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+endName+self.dpUIinst.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+baseName+self.dpUIinst.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+endName+self.dpUIinst.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+baseName+self.dpUIinst.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
-                self.shapeVisAttrList.append(attrNameLower+endName+self.dpUIinst.lang['c126_display'])
-                self.shapeVisAttrList.append(attrNameLower+baseName+self.dpUIinst.lang['c126_display'])
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+endName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+baseName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+endName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+baseName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                self.shapeVisAttrList.append(attrNameLower+endName+self.ar.data.lang['c126_display'])
+                self.shapeVisAttrList.append(attrNameLower+baseName+self.ar.data.lang['c126_display'])
 
                 # Setup axis order
                 if self.rigType == dpBaseStandard.RigType.quadruped:
@@ -303,14 +303,14 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # create base and end joints:
                 cmds.select(clear=True)
-                baseJnt = cmds.joint(name=side+self.userGuideName+"_00_"+self.dpUIinst.lang['c106_base']+"_Jnt", scaleCompensate=False)
+                baseJnt = cmds.joint(name=side+self.userGuideName+"_00_"+self.ar.data.lang['c106_base']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(baseJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(clear=True)
-                tipJnt = cmds.joint(name=side+self.userGuideName+"_"+str(self.nJoints+1).zfill(2)+"_"+self.dpUIinst.lang['c120_tip']+"_Jnt", scaleCompensate=False)
+                tipJnt = cmds.joint(name=side+self.userGuideName+"_"+str(self.nJoints+1).zfill(2)+"_"+self.ar.data.lang['c120_tip']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(tipJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(baseJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c106_base'])
-                self.utils.setJointLabel(tipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c120_tip'])
+                self.utils.setJointLabel(baseJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c106_base'])
+                self.utils.setJointLabel(tipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c120_tip'])
                 # Base and end controllers:
                 cmds.parentConstraint(self.baseCtrl, baseJnt, maintainOffset=False, name=baseJnt+"_PaC")
                 cmds.scaleConstraint(self.baseCtrl, baseJnt, maintainOffset=True, name=baseJnt+"_ScC")
@@ -378,7 +378,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
                         cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
                         cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
-                        sizeCtrlList.append(side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(r)+"_Ctrl")
+                        sizeCtrlList.append(side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(r)+"_Ctrl")
                 sizeCtrlList.append(self.chestBCtrl)
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_Rbn_ArcLenShape")
@@ -399,13 +399,13 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(rbnMD+'.operation', 2)
                 # create a blendColor, a condition and a multiplyDivide in order to get the correct result value of volumeVariation:
                 rbnBlendColors = cmds.createNode('blendColors', name=side+self.userGuideName+"_Rbn_BC")
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'], rbnBlendColors+'.blender')
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_'+self.ar.data.lang['c031_volumeVariation'], rbnBlendColors+'.blender')
                 rbnCond = cmds.createNode('condition', name=side+self.userGuideName+'_Rbn_Cond')
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'], rbnCond+'.firstTerm')
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Active_'+self.ar.data.lang['c031_volumeVariation'], rbnCond+'.firstTerm')
                 cmds.connectAttr(rbnBlendColors+'.outputR', rbnCond+'.colorIfTrueR')
                 cmds.connectAttr(rbnMD+'.outputX', rbnBlendColors+'.color1R')
                 rbnVVMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rbn_VV_MD")
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], rbnVVMD+'.input2X')
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'], rbnVVMD+'.input2X')
                 cmds.connectAttr(rbnVVMD+'.outputX', rbnCond+'.colorIfFalseR')
                 cmds.setAttr(rbnVVMD+'.operation', 2)
                 cmds.setAttr(rbnBlendColors+'.color2R', 1)
@@ -413,15 +413,15 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # middle ribbon setup:
                 for n in range(1, self.nJoints - 1):
                     if self.currentStyle == 0: #default
-                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
-                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
+                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
+                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 4)
                         cmds.setAttr(self.middleFkCtrl+".rotateOrder", 4)
                         cmds.rotate(0, 0, 90, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
                     else: #biped
-                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
-                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
+                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
+                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 3)
                         cmds.setAttr(self.middleFkCtrl+".rotateOrder", 3)
                     self.aInnerCtrls[s].append(self.middleCtrl)
@@ -458,7 +458,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(self.parentConst+"."+self.chestBCtrl+"W1", nParentValue)
                     cmds.parent(middleCluster, spineClustersGrp, relative=True)
                     # add originedFrom attribute to this middle ctrl:
-                    middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_OrigFrom_Grp")
+                    middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_OrigFrom_Grp")
                     self.utils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
                     cmds.parentConstraint(self.aRbnJointList[n], middleOrigGrp, maintainOffset=False, name=middleOrigGrp+"_PaC")
                     cmds.parent(middleOrigGrp, self.hipsACtrl)
@@ -466,24 +466,24 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(rbnCond+'.outColorR', self.aRbnJointList[n]+'.scaleX')
                     cmds.connectAttr(rbnCond+'.outColorR', self.aRbnJointList[n]+'.scaleZ')
                     # create intensity attribute to drive joint with more force in horizontal:
-                    cmds.addAttr(self.middleCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
-                    cmds.addAttr(self.middleFkCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+                    cmds.addAttr(self.middleCtrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+                    cmds.addAttr(self.middleFkCtrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
                     jointFather = cmds.listRelatives(self.aRbnJointList[n], allParents=True)[0]
-                    intRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_Rev")
-                    middleIntBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_BC")
+                    intRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_Rev")
+                    middleIntBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_BC")
                     self.toIDList.extend([intRevNode, middleIntBC])
-                    middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_PaC")[0]
-                    cmds.connectAttr(self.middleFkCtrl+"."+self.dpUIinst.lang['c049_intensity'], middleIntBC+".color1R", force=True)
-                    cmds.connectAttr(self.middleCtrl+"."+self.dpUIinst.lang['c049_intensity'], middleIntBC+".color2R", force=True)
+                    middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_PaC")[0]
+                    cmds.connectAttr(self.middleFkCtrl+"."+self.ar.data.lang['c049_intensity'], middleIntBC+".color1R", force=True)
+                    cmds.connectAttr(self.middleCtrl+"."+self.ar.data.lang['c049_intensity'], middleIntBC+".color2R", force=True)
                     cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', middleIntBC+".blender", force=True)
                     cmds.connectAttr(middleIntBC+".outputR", middleIntPC+"."+self.middleCtrl+"W0", force=True)
-                    cmds.connectAttr(self.middleCtrl+"."+self.dpUIinst.lang['c049_intensity'], intRevNode+".inputX", force=True)
+                    cmds.connectAttr(self.middleCtrl+"."+self.ar.data.lang['c049_intensity'], intRevNode+".inputX", force=True)
                     cmds.connectAttr(intRevNode+".outputX", middleIntPC+"."+jointFather+"W1", force=True)
                     # fk middle control hierarchy:
                     if n == 1: #first middle
                         cmds.parent(self.middleFkCtrlZero, self.hipsFkCtrl)
                     else:
-                        cmds.parent(self.middleFkCtrlZero, side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n-1)+"_Fk_Ctrl")
+                        cmds.parent(self.middleFkCtrlZero, side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n-1)+"_Fk_Ctrl")
                     # build fk setup:
                     self.middleCtrlGrpPC = cmds.parentConstraint(self.middleCtrlZero, self.middleFkCtrl, self.middleCtrlGrp, maintainOffset=True, name=self.middleCtrlGrp+"_IkFkBlend_PaC")[0]
                     if n == 1:
@@ -527,7 +527,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([middleOrigGrp], self.utils.ignoreTransformIOAttr)
                 self.toIDList.extend([middleScaleYMD, arcLen, rbnMD, rbnBlendColors, rbnCond, rbnVVMD])
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -535,7 +535,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
 
 
     def addParentTagInfo(self, *args):

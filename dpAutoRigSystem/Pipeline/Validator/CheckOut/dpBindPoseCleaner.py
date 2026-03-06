@@ -49,7 +49,7 @@ class BindPoseCleaner(dpBaseAction.ActionStartClass):
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # conditional to check here
                 if len(toCheckList) > 1:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     self.checkedObjList.append(", ".join(toCheckList))
                     self.foundIssueList.append(True)
                     if self.firstMode:
@@ -59,18 +59,18 @@ class BindPoseCleaner(dpBaseAction.ActionStartClass):
                             for item in toCheckList:
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
-                            jntList = self.dpUIinst.skin.getSkinnedJointList()
+                            jntList = self.ar.skin.getSkinnedJointList()
                             if jntList:
                                 cmds.dagPose(jntList, save=True, bindPose=True, name=self.bindPoseName)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+self.bindPoseName)
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+self.bindPoseName)
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+", ".join(toCheckList))
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(toCheckList))
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

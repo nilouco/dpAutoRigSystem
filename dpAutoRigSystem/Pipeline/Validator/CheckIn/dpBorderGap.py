@@ -23,7 +23,7 @@ class BorderGap(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_BORDERGAP_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpBaseAction)
 
 
@@ -64,7 +64,7 @@ class BorderGap(dpBaseAction.ActionStartClass):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in toCheckList
                         for obj in toCheckList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 iterPolys = OpenMaya.MItMeshEdge(shapeNode)
                                 # Iterate through polys on current mesh
@@ -90,14 +90,14 @@ class BorderGap(dpBaseAction.ActionStartClass):
                             self.resultOkList.append(False)
                         else: #fix
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                    self.messageList.append(self.dpUIinst.lang['v122_borderGap']+": "+str(gapList))
-                    self.messageList.append("---\n"+self.dpUIinst.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(gapList)+")\n---")
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                    self.messageList.append(self.ar.data.lang['v122_borderGap']+": "+str(gapList))
+                    self.messageList.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(gapList)+")\n---")
                     cmds.select(gapList)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

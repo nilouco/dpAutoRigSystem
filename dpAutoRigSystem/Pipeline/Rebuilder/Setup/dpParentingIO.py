@@ -60,7 +60,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                             parentDic.update(self.getModelDataDic())
                             self.exportDicToJsonFile(parentDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
                         parentDic = self.importLatestJsonFile(self.getExportedList())
                         if parentDic:
@@ -69,15 +69,15 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                                     self.importParentingData(parentDic) #double run to first put broken nodes in place
                                 self.importParentingData(parentDic)
                             except Exception as e:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
+                                self.notWorkedWellIO(self.ar.data.lang['r032_notImportedData']+": "+str(e))
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -94,7 +94,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
         """
         if not transformList:
             transformList = cmds.ls(selection=False, long=True, type="transform")
-        filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
+        filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.ar.data.lang[self.title])
         filteredList = self.reorderList(filteredList)
         return {"Parent" : filteredList}
 
@@ -117,7 +117,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
             self.utils.setProgress(max=len(parentDic["BrokenID"]), addOne=False, addNumber=False)
             for nodeType in parentDic["BrokenID"].keys():
                 if nodeType == "transform":
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     for item in parentDic["BrokenID"][nodeType].keys():
                         if not cmds.objExists(item):
                             if not self.checkIsFromModeling(parentDic, nodeType, item):
@@ -141,7 +141,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
             modelChangedList = []
             # check parenting shaders
             for item in parentDic["Parent"]:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
                 if not cmds.objExists(item):
                     parentIssueList.append(item)
                     shortItem = item[item.rfind("|")+1:]
@@ -166,11 +166,11 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                                         cmds.parent(shortItem, shortFatherNode)
                                         wellImportedList.append(shortItem)
                                     else:
-                                        self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
+                                        self.notWorkedWellIO(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortFatherNode)
                             else: #root here
                                 modelChangedList.append(item)
                         else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortItem)
+                            self.notWorkedWellIO(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortItem)
                     else:
                         if not self.checkIsFromModeling(parentDic, "transform", item):
                             modelChangedList.append(item)
@@ -182,7 +182,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
                 elif wellImportedList:
                     self.wellDoneIO(self.latestDataFile)
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+                    self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
             else:
                 self.wellDoneIO(self.latestDataFile)
         else:

@@ -8,12 +8,12 @@ DP_SKINNING_VERSION = 1.10
 
 
 class Skinning(dpWeights.Weights):
-    def __init__(self, dpUIinst, *args, **kwargs):
+    def __init__(self, ar, *args, **kwargs):
         """ Initialize the class.
         """
-        if dpUIinst.dev:
+        if ar.dev:
             reload(dpWeights)
-        dpWeights.Weights.__init__(self, dpUIinst, *args, **kwargs)
+        dpWeights.Weights.__init__(self, ar, *args, **kwargs)
         # defining variables:
         self.skinInfoAttrList = ['skinningMethod', 'maintainMaxInfluences', 'maxInfluences']
         self.jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']
@@ -27,10 +27,10 @@ class Skinning(dpWeights.Weights):
         if geoList:
             for i, item in enumerate(geoList):
                 if item in geoList[:i]:
-                    self.dpUIinst.logger.infoWin('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
+                    self.ar.logger.infoWin('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
                     return False
                 elif not cmds.objExists(item):
-                    self.dpUIinst.logger.infoWin('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
+                    self.ar.logger.infoWin('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
                     return False
                 elif not mode:
                     try:
@@ -38,7 +38,7 @@ class Skinning(dpWeights.Weights):
                         if inputDeformerList:
                             for deformerNode in inputDeformerList:
                                 if cmds.objectType(deformerNode) == "skinCluster":
-                                    self.dpUIinst.logger.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
+                                    self.ar.logger.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
                                     return False
                     except:
                         pass
@@ -74,9 +74,9 @@ class Skinning(dpWeights.Weights):
                 else:
                     jointNotExistingList.append(item)
         if jointNotExistingList:
-            notExistingJointMessage = self.dpUIinst.lang['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.dpUIinst.lang['i070_continueSkin']
-            btYes = self.dpUIinst.lang['i071_yes']
-            btNo = self.dpUIinst.lang['i072_no']
+            notExistingJointMessage = self.ar.data.lang['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.ar.data.lang['i070_continueSkin']
+            btYes = self.ar.data.lang['i071_yes']
+            btNo = self.ar.data.lang['i072_no']
             confirmSkinning = cmds.confirmDialog(title='Confirm Skinning', message=notExistingJointMessage, button=[btYes,btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
             if confirmSkinning == btNo:
                 jointSkinList = None
@@ -111,24 +111,24 @@ class Skinning(dpWeights.Weights):
                         newSkinClusterNode = cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)[0]
                         cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
                         self.setSkinRelativeMode(newSkinClusterNode)
-                print(self.dpUIinst.lang['i077_skinned']+', '.join(geomSkinList))
+                print(self.ar.data.lang['i077_skinned']+', '.join(geomSkinList))
                 if logWin:
                     if notSkinnedList:
-                        self.dpUIinst.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList)+'\n\n'+self.dpUIinst.lang['i322_didntChangeInf']+'\n'.join(notSkinnedList), 'center', 205, 270)
+                        self.ar.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList)+'\n\n'+self.ar.data.lang['i322_didntChangeInf']+'\n'.join(notSkinnedList), 'center', 205, 270)
                     else:
-                        self.dpUIinst.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                        self.ar.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
                 cmds.select(geomSkinList)
         else:
-            print(self.dpUIinst.lang['i029_skinNothing'])
+            print(self.ar.data.lang['i029_skinNothing'])
             if logWin:
-                self.dpUIinst.logger.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
+                self.ar.logger.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
 
     
     def serializeCopySkin(self, sourceList, destinationList, oneSource=True, byUVs=False, *args):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
-        self.utils.setProgress('Skinning: ', self.dpUIinst.lang['i287_copy']+" Skinning", len(destinationList), addOne=False, addNumber=False)
+        self.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinationList), addOne=False, addNumber=False)
         for sourceItem in sourceList:
             self.utils.setProgress("Skinning: ")
             if oneSource:
@@ -198,7 +198,7 @@ class Skinning(dpWeights.Weights):
                     cmds.reorderDeformers(destDefList[1][defOrderIdx-1], newSkinClusterNode, destinationItem)
                 i += 1
         # log result
-        mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
+        mel.eval("print \""+self.ar.data.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
 
 
     def copySkinFromOneSource(self, objList=None, ui=False, byUVs=False, *args):
@@ -220,11 +220,11 @@ class Skinning(dpWeights.Weights):
                     # call copySkin function
                     self.serializeCopySkin([sourceItem], destinationList, True, byUVs)
                 else:
-                    mel.eval("warning \""+self.dpUIinst.lang['e007_notSkinFound']+"\";")
+                    mel.eval("warning \""+self.ar.data.lang['e007_notSkinFound']+"\";")
             else:
-                mel.eval("warning \""+self.dpUIinst.lang['e006_firstSkinnedGeo']+"\";")
+                mel.eval("warning \""+self.ar.data.lang['e006_firstSkinnedGeo']+"\";")
         else:
-            mel.eval("warning \""+self.dpUIinst.lang['e005_selectOneObj']+"\";")
+            mel.eval("warning \""+self.ar.data.lang['e005_selectOneObj']+"\";")
 
 
     def copySkinSameName(self, objList=None, ui=False, byUVs=False, *args):
@@ -318,7 +318,7 @@ class Skinning(dpWeights.Weights):
     def getSkinWeightData(self, itemList, *args):
         """ Return the the skinCluster weights data of the given item list.
         """
-        self.utils.setProgress(self.ioStartName+': '+self.dpUIinst.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
+        self.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
         skinWeightsDic = {}
         for item in itemList:
             self.utils.setProgress('SkinningIO: '+item)
@@ -386,8 +386,8 @@ class Skinning(dpWeights.Weights):
     def importSkinWeightsFromFile(self, itemList, path, filename, verbose=True, *args):
         """ Import the skinCluster weights of the given item in the given path and filename.
         """
-        self.utils.setProgress(self.ioStartName+": "+self.dpUIinst.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
-        skinWeightDic = self.dpUIinst.pipeliner.getJsonContent(path+"/"+filename)
+        self.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
+        skinWeightDic = self.ar.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
             for item in itemList:
                 self.utils.setProgress("SkinningIO: "+item)
@@ -418,19 +418,19 @@ class Skinning(dpWeights.Weights):
         """
         itemList = cmds.ls(selection=True, type="transform")
         if not itemList:
-            cmds.confirmDialog(title="SkinCluster Weights IO", message=self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['m225_selectAnything'], button=[self.dpUIinst.lang['i038_canceled']])
+            cmds.confirmDialog(title="SkinCluster Weights IO", message=self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['m225_selectAnything'], button=[self.ar.data.lang['i038_canceled']])
             return
-        action = self.dpUIinst.lang['i196_import']
+        action = self.ar.data.lang['i196_import']
         if export:
-            action = self.dpUIinst.lang['i164_export']
-        path = cmds.fileDialog2(fileMode=3, caption=action+" "+self.dpUIinst.lang['i298_folder'], okCaption=action)
+            action = self.ar.data.lang['i164_export']
+        path = cmds.fileDialog2(fileMode=3, caption=action+" "+self.ar.data.lang['i298_folder'], okCaption=action)
         if itemList and path:
             for item in itemList:
                 filename = path[0]+"/"+self.ioStartName+"_"+self.getIOFileName(item)+".json"
                 if cmds.listRelatives(item, children=True, allDescendents=True, shapes=True):
                     if export:
                         skinClusterDic = self.getSkinWeightData([item])
-                        self.dpUIinst.pipeliner.saveJsonFile(skinClusterDic, filename)
+                        self.ar.pipeliner.saveJsonFile(skinClusterDic, filename)
                     else:
                         self.importSkinWeightsFromFile([item], path[0], self.ioStartName+"_"+self.getIOFileName(item)+".json")
         self.utils.setProgress(endIt=True)

@@ -6,12 +6,12 @@ DP_WEIGTHS_VERSION = 1.00
 
 
 class Weights(object):
-    def __init__(self, dpUIinst, *args, **kwargs):
+    def __init__(self, ar, *args, **kwargs):
         """ Initialize the class.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
+        self.ar = ar
+        self.utils = ar.utils
         self.typeAttrDic = {
                             "cluster"         : [None, "envelope", "relative", "angleInterpolation"],
                             "deltaMush"       : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],
@@ -127,7 +127,7 @@ class Weights(object):
                             if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
                                 childNode = childNode[childNode.rfind("|")+1:] #unique name
                             else:
-                                print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
+                                print(self.ar.data.lang['i299_notUniqueName'], childNode)
                             for desiredType in deformerTypeList:
                                 if self.checkExistingDeformerNode(childNode, deformerType=desiredType)[0]:
                                     if not childNode in deformedItemList:

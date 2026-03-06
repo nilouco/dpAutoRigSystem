@@ -82,7 +82,7 @@ class RemapValueToSetRange(dpBaseAction.ActionStartClass):
                     self.utils.setProgress(max=len(remapValueToChangeList), addOne=False, addNumber=False)
                     wellDone = True
                     for remapValueNode in remapValueToChangeList:
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.checkedObjList.append(remapValueNode)
@@ -92,7 +92,7 @@ class RemapValueToSetRange(dpBaseAction.ActionStartClass):
                                 setRangeNode = cmds.createNode("setRange", name=remapValueNode.replace("_RmV", "_SR"))
                                 # Transfer values or connections
                                 for remapAttr, setRangeAttr in self.mappingDic.items():
-                                    self.dpUIinst.ctrls.transferPlug(f"{remapValueNode}.{remapAttr}", f"{setRangeNode}.{setRangeAttr}")
+                                    self.ar.ctrls.transferPlug(f"{remapValueNode}.{remapAttr}", f"{setRangeNode}.{setRangeAttr}")
                                 #clear Interpolation_PMA node
                                 indexList = cmds.getAttr(f"{remapValueNode}.value", multiIndices=True)
                                 for index in indexList:
@@ -108,16 +108,16 @@ class RemapValueToSetRange(dpBaseAction.ActionStartClass):
                                 wellDone = False
                                 break
                     if self.firstMode:
-                        self.messageList.append(self.dpUIinst.lang['v006_foundIssue']+": "+str(len(remapValueToChangeList))+" remapValue nodes")
+                        self.messageList.append(self.ar.data.lang['v006_foundIssue']+": "+str(len(remapValueToChangeList))+" remapValue nodes")
                     else:
                         if wellDone:
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+str(len(remapValueToChangeList))+" remapValue nodes")
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+str(len(remapValueToChangeList))+" remapValue nodes")
                         else:
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+remapValueNode)
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+remapValueNode)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

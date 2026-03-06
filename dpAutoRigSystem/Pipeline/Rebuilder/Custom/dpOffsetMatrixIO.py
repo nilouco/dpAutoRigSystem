@@ -61,15 +61,15 @@ class OffsetMatrixIO(dpBaseAction.ActionStartClass):
                             if toImportDic:
                                 self.importOffsetMatrixData(toImportDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                        self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -88,7 +88,7 @@ class OffsetMatrixIO(dpBaseAction.ActionStartClass):
         dic = {}
         self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 inPlugList = cmds.listConnections(item+"."+self.offsetMatrixAttr, source=True, destination=False, plugs=True)
                 if inPlugList:
@@ -106,7 +106,7 @@ class OffsetMatrixIO(dpBaseAction.ActionStartClass):
         wellImportedList = []
         for item in connectDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 omAttr = item+"."+self.offsetMatrixAttr
                 if not cmds.listConnections(omAttr, plugs=True, source=True, destination=False):
@@ -120,6 +120,6 @@ class OffsetMatrixIO(dpBaseAction.ActionStartClass):
             else:
                 notFoundNodesList.append(item+"."+self.offsetMatrixAttr)
         if notFoundNodesList:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:
             self.wellDoneIO(self.latestDataFile)

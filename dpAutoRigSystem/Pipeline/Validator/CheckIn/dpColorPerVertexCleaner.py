@@ -47,7 +47,7 @@ class ColorPerVertexCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     self.checkedObjList.append(item)
                     self.foundIssueList.append(True)
                     if self.firstMode:
@@ -64,14 +64,14 @@ class ColorPerVertexCleaner(dpBaseAction.ActionStartClass):
                                 meshList = ["None"]
                             cmds.select(clear=True)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" - Mesh: "+", ".join(meshList))
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+" - Mesh: "+", ".join(meshList))
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" - Mesh: "+", ".join(meshList))
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Mesh: "+", ".join(meshList))
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

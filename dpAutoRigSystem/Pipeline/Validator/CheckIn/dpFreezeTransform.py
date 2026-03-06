@@ -57,7 +57,7 @@ class FreezeTransform(dpBaseAction.ActionStartClass):
                         camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
                         allValidObjs = list(filter(lambda obj: obj not in camerasList, allObjectList))
                         for idx, obj in enumerate(allValidObjs):
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
+                            self.utils.setProgress(self.ar.data.lang[self.title])
                             if cmds.objExists(obj):
                                 # run for translates and rotates
                                 frozenTR = self.checkFrozenObject(obj, zeroAttrList, 0)
@@ -70,7 +70,7 @@ class FreezeTransform(dpBaseAction.ActionStartClass):
                                 else:
                                     self.foundIssueList.append(True)
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v018_foundTransform']+obj)
+                                    self.messageList.append(self.ar.data.lang['v018_foundTransform']+obj)
                                     toFixList.append((obj, idx))
                         if not self.firstMode and len(toFixList) > 0: #one item to fix
                             for obj in toFixList:
@@ -80,19 +80,19 @@ class FreezeTransform(dpBaseAction.ActionStartClass):
                                         if self.checkFrozenObject(obj[0], zeroAttrList, 0) and self.checkFrozenObject(obj[0], oneAttrList, 1):
                                             self.foundIssueList[obj[1]] = False
                                             self.resultOkList[obj[1]] = True
-                                            self.messageList.append(self.dpUIinst.lang['v019_frozenTransform']+obj[0])
+                                            self.messageList.append(self.ar.data.lang['v019_frozenTransform']+obj[0])
                                         else:
                                             raise Exception('Freeze Tranform Failed')
                                     except:
-                                        self.messageList.append(self.dpUIinst.lang['v017_freezeError'] + obj+'.')
+                                        self.messageList.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
                                 else:
-                                    self.messageList.append(self.dpUIinst.lang['v017_freezeError'] + obj+'.')
+                                    self.messageList.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+                    self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['v100_cantExistsGuides'])
+                self.notWorkedWellIO(self.ar.data.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v099_cantExistsAllGrp'])
+            self.notWorkedWellIO(self.ar.data.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 

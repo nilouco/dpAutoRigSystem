@@ -20,11 +20,11 @@ DP_RIBBONCLASS_VERSION = 2.11
 
 
 class RibbonClass(object):
-    def __init__(self, dpUIinst, *args):
+    def __init__(self, ar, *args):
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
+        self.ar = ar
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
         
         
     def addRibbonToLimb(self, limbInstance, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, oriBLoc=None, *args):
@@ -34,15 +34,15 @@ class RibbonClass(object):
         self.limbInstance = limbInstance
         self.ctrlRadius = limbInstance.ctrlRadius
         self.curveDegree = limbInstance.curveDegree
-        self.limbManualVVAttr = self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation']
-        self.limbVVAttr       = self.dpUIinst.lang['m019_limb'].lower()+"_"+self.dpUIinst.lang['c031_volumeVariation']
-        self.limbMinVVAttr    = self.dpUIinst.lang['m019_limb'].lower()+"Min_"+self.dpUIinst.lang['c031_volumeVariation']
-        self.limbLengthAttr   = self.dpUIinst.lang['c113_length']
+        self.limbManualVVAttr = self.ar.data.lang['m019_limb'].lower()+"Manual_"+self.ar.data.lang['c031_volumeVariation']
+        self.limbVVAttr       = self.ar.data.lang['m019_limb'].lower()+"_"+self.ar.data.lang['c031_volumeVariation']
+        self.limbMinVVAttr    = self.ar.data.lang['m019_limb'].lower()+"Min_"+self.ar.data.lang['c031_volumeVariation']
+        self.limbLengthAttr   = self.ar.data.lang['c113_length']
         self.toIDList = []
 
-        cornerName = self.dpUIinst.lang['c007_leg_corner']
+        cornerName = self.ar.data.lang['c007_leg_corner']
         if arm:
-            cornerName = self.dpUIinst.lang['c002_arm_corner']
+            cornerName = self.ar.data.lang['c002_arm_corner']
         articNumber = 1
         if addArtic:
             articNumber = 2
@@ -252,7 +252,7 @@ class RibbonClass(object):
         for i in range(len(limbJoints)):
             oldName = limbJoints[i][:-4]
             limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+articNumber)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
-            if not self.dpUIinst.lang['c043_corner'] in oldName:
+            if not self.ar.data.lang['c043_corner'] in oldName:
                 childList = cmds.listRelatives(limbJoints[i], allDescendents=True)
                 if childList:
                     for childNode in childList:
@@ -298,8 +298,8 @@ class RibbonClass(object):
                 cmds.setAttr(pac+"."+iniJxt+"W1", 0.3)
 
         # corner autoRotate setup
-        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             cornerAutoRotateMD = cmds.createNode("multiplyDivide", name=prefix+myName+"_"+cornerName+"_AutoRotate_MD")
             cornerAutoRotateMM = cmds.createNode("multMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_MM")
@@ -367,7 +367,7 @@ class RibbonClass(object):
                 cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downBLimb['twistAutoRotMD']+".input2X", force=True)
 
         self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
 
         # result lists to return them:
         extraCtrlList = upLimb['extraCtrlList']
@@ -404,7 +404,7 @@ class RibbonClass(object):
         """
         grp = None
         curve = self.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.moduleGrp)
-        self.dpUIinst.ctrls.setLockHide([curve], ['v'])
+        self.ar.ctrls.setLockHide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=myName+'_Grp')
             self.utils.addCustomAttr([grp], self.utils.ignoreTransformIOAttr)
@@ -435,7 +435,7 @@ class RibbonClass(object):
         else:
             cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-        self.dpUIinst.ctrls.setLockHide([curve], ['v'])
+        self.ar.ctrls.setLockHide([curve], ['v'])
         return [grp, curve, zero0, zero1]
     
     
@@ -465,7 +465,7 @@ class RibbonClass(object):
             ribbon = cmds.nurbsPlane(ax=axis, w=1, lr=numJoints, d=3, u=1, v=numJoints, ch=0, name=name+'_Plane')[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, su=1, du=1, dv=3, tol=0.01, fr=0, dir=0) 
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        self.utils.addCustomAttr([ribbon], self.dpUIinst.skin.ignoreSkinningAttr)
+        self.utils.addCustomAttr([ribbon], self.ar.skin.ignoreSkinningAttr)
         #call the function to create follicles and joint in the nurbsPlane
         results = self.createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
         rb_Jnt = results[0]
@@ -520,8 +520,8 @@ class RibbonClass(object):
         drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bottom_Jxt')
         drv_Jnt[1] = cmds.rename(drv_Jnt[1], name+'_Drv_Mid_Jxt')
         drv_Jnt[2] = cmds.rename(drv_Jnt[2], name+'_Drv_Top_Jxt')
-        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_'+self.dpUIinst.jointEndAttr)
-        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_'+self.dpUIinst.jointEndAttr)
+        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_'+self.ar.jointEndAttr)
+        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_'+self.ar.jointEndAttr)
         
         #place joints correctly accordaly with the user options choose
         if (horizontal and axis==(1, 0, 0)) or (horizontal and axis==(0, 0, 1)):
@@ -933,8 +933,8 @@ class RibbonClass(object):
             retDict['twistBoneMD'] = twistBoneMD
         
         # autoRotate:
-        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             upTwistBoneMD = self.utils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
             bottomTwistBoneMD = self.utils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")

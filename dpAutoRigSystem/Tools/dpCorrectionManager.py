@@ -20,16 +20,16 @@ DP_CORRECTIONMANAGER_VERSION = 2.14
 
 
 class CorrectionManager(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # redeclaring variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.ui = ui
-        self.utils = dpUIinst.utils
-        if self.dpUIinst.dev:
+        self.utils = ar.utils
+        if self.ar.dev:
             reload(dpRivet)
             reload(dpControls)
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
-        self.correctionManagerName = self.dpUIinst.lang['m068_correctionManager']
+        self.ctrls = dpControls.ControlClass(self.ar)
+        self.correctionManagerName = self.ar.data.lang['m068_correctionManager']
         self.angleName = ANGLE
         self.distanceName = DISTANCE
         self.netSuffix = "Net"
@@ -68,29 +68,29 @@ class CorrectionManager(object):
         cmds.showWindow('dpCorrectionManagerWindow')
         # create UI layout and elements:
         correctionManagerLayout = cmds.columnLayout('correctionManagerLayout', adjustableColumn=True, columnOffset=("both", 10))
-        cmds.text("infoTxt", label=self.dpUIinst.lang['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent=correctionManagerLayout)
+        cmds.text("infoTxt", label=self.ar.data.lang['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent=correctionManagerLayout)
         correctionManagerLayoutA = cmds.rowColumnLayout('correctionManagerLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=correctionManagerLayout)
-        self.createBT = cmds.button('createBT', label=self.dpUIinst.lang['i158_create'], command=partial(self.createCorrectionManager, fromUI=True), backgroundColor=(0.7, 1.0, 0.7), parent=correctionManagerLayoutA)
+        self.createBT = cmds.button('createBT', label=self.ar.data.lang['i158_create'], command=partial(self.createCorrectionManager, fromUI=True), backgroundColor=(0.7, 1.0, 0.7), parent=correctionManagerLayoutA)
         self.createTF = cmds.textField('createTF', editable=True, parent=correctionManagerLayoutA)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         refreshLayout = cmds.rowColumnLayout('refreshLayoutA', numberOfColumns=4, columnWidth=[(1, 50), (2, 150), (2, 100), (3, 80)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'both', 10), (2, 'left', 0), (3, 'left', 10), (4, 'left', 90)], parent=correctionManagerLayout)
-        cmds.text(self.dpUIinst.lang['i138_type'], parent=refreshLayout)
+        cmds.text(self.ar.data.lang['i138_type'], parent=refreshLayout)
         radioLayout = cmds.columnLayout("radioLayout", parent=refreshLayout)
         self.correctTypeCollection = cmds.radioCollection("correctTypeCollection", parent=radioLayout)
-        typeAngle = cmds.radioButton(label=self.dpUIinst.lang['c102_angle'].capitalize(), annotation=self.angleName, collection=self.correctTypeCollection)
-        cmds.radioButton(label=self.dpUIinst.lang['m182_distance'], annotation=self.distanceName, collection=self.correctTypeCollection)
+        typeAngle = cmds.radioButton(label=self.ar.data.lang['c102_angle'].capitalize(), annotation=self.angleName, collection=self.correctTypeCollection)
+        cmds.radioButton(label=self.ar.data.lang['m182_distance'], annotation=self.distanceName, collection=self.correctTypeCollection)
         cmds.radioCollection(self.correctTypeCollection, edit=True, select=typeAngle)
         self.rivetCB = cmds.checkBox('rivetCB', label="Rivet", parent=refreshLayout)
-        cmds.refreshBT = cmds.button('refreshBT', label=self.dpUIinst.lang['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
+        cmds.refreshBT = cmds.button('refreshBT', label=self.ar.data.lang['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
         # existing:
-        cmds.text("existingTxt", label=self.dpUIinst.lang['m071_existing'], align="left", height=25, font='boldLabelFont', parent=correctionManagerLayout)
+        cmds.text("existingTxt", label=self.ar.data.lang['m071_existing'], align="left", height=25, font='boldLabelFont', parent=correctionManagerLayout)
         self.filterNameTF = cmds.textField('filterNameTF', width=30, changeCommand=self.populateNetUI, parent=correctionManagerLayout)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         self.existingNetTSL = cmds.textScrollList('existingNetTSL', width=20, allowMultiSelection=False, selectCommand=self.actualizeEditLayout, parent=correctionManagerLayout)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         # edit selected net layout:
-        self.editSelectedNetLayout = cmds.frameLayout('editSelectedNetLayout', label=self.dpUIinst.lang['i011_editSelected'], collapsable=True, collapse=False, parent=correctionManagerLayout)
+        self.editSelectedNetLayout = cmds.frameLayout('editSelectedNetLayout', label=self.ar.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent=correctionManagerLayout)
 
 
     def renameLinkedNodes(self, oldName, name, *args):
@@ -107,12 +107,12 @@ class CorrectionManager(object):
                 if connectedNodeList:
                     childrenList = cmds.listRelatives(connectedNodeList[0], children=True, allDescendents=True)
                     cmds.rename(connectedNodeList[0], connectedNodeList[0].replace(oldName, name))
-                    self.dpUIinst.customAttr.updateID([connectedNodeList[0].replace(oldName, name)])
+                    self.ar.customAttr.updateID([connectedNodeList[0].replace(oldName, name)])
                     if childrenList:
                         for children in childrenList:
                             try:
                                 cmds.rename(children, children.replace(oldName, name))
-                                self.dpUIinst.customAttr.updateID([children.replace(oldName, name)])
+                                self.ar.customAttr.updateID([children.replace(oldName, name)])
                             except:
                                 pass
 
@@ -151,7 +151,7 @@ class CorrectionManager(object):
             if self.ui:
                 self.populateNetUI()
                 #self.actualizeEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
-                cmds.textFieldGrp(self.nameTFG, label=self.dpUIinst.lang['m006_name'], edit=True, text=name)
+                cmds.textFieldGrp(self.nameTFG, label=self.ar.data.lang['m006_name'], edit=True, text=name)
         return name
 
 
@@ -246,17 +246,17 @@ class CorrectionManager(object):
                 self.selectedLayout = cmds.columnLayout('selectedLayout', adjustableColumn=True, parent=self.editSelectedNetLayout)
                 self.nameLayout = cmds.rowLayout('nameLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
                 currentName = cmds.getAttr(self.net+".name")
-                self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.dpUIinst.lang['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
-                self.delete_BT = cmds.button('delete_BT', label=self.dpUIinst.lang['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
+                self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.ar.data.lang['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
+                self.delete_BT = cmds.button('delete_BT', label=self.ar.data.lang['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
                 # type:
                 self.typeLayout = cmds.rowLayout('typeLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
                 currentType = cmds.getAttr(self.net+".type")
-                self.typeTFG = cmds.textFieldGrp("typeTFG", label=self.dpUIinst.lang['i138_type'], text=currentType, editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.typeLayout)
+                self.typeTFG = cmds.textFieldGrp("typeTFG", label=self.ar.data.lang['i138_type'], text=currentType, editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.typeLayout)
                 # axis:
                 self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(85, 80, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'right', 2), (2, 'right', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
                 if cmds.getAttr(self.net+".type") == self.distanceName:
-                    self.decomposeCB = cmds.checkBox("decomposeCB", label=self.dpUIinst.lang['m185_decompose'], value=cmds.getAttr(self.net+".decompose"), changeCommand=self.changeDecompose, parent=self.axisLayout)
-                self.axisMenu = cmds.optionMenu("axisMenu", label=self.dpUIinst.lang['i052_axis'], changeCommand=self.changeAxis, parent=self.axisLayout)
+                    self.decomposeCB = cmds.checkBox("decomposeCB", label=self.ar.data.lang['m185_decompose'], value=cmds.getAttr(self.net+".decompose"), changeCommand=self.changeDecompose, parent=self.axisLayout)
+                self.axisMenu = cmds.optionMenu("axisMenu", label=self.ar.data.lang['i052_axis'], changeCommand=self.changeAxis, parent=self.axisLayout)
                 self.axisMenuItemList = ['X', 'Y', 'Z']
                 for axis in self.axisMenuItemList:
                     cmds.menuItem(label=axis, parent=self.axisMenu)
@@ -264,7 +264,7 @@ class CorrectionManager(object):
                 cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
                 if cmds.getAttr(self.net+".type") == self.angleName:
                     # axis order:
-                    cmds.text("axisOrderTxt", label=self.dpUIinst.lang['i052_axis']+" "+self.dpUIinst.lang['m045_order'], parent=self.axisLayout)
+                    cmds.text("axisOrderTxt", label=self.ar.data.lang['i052_axis']+" "+self.ar.data.lang['m045_order'], parent=self.axisLayout)
                     self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisLayout)
                     self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
                     for axisOrder in self.axisOrderMenuItemList:
@@ -274,7 +274,7 @@ class CorrectionManager(object):
                 else: #Distance
                     self.distanceLayout = cmds.columnLayout('distanceLayout', adjustableColumn=True, height=30, parent=self.selectedLayout)
                     currentDistance = self.getDistance()
-                    self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.dpUIinst.lang['m182_distance'], text=str(round(currentDistance, 4)), buttonLabel=self.dpUIinst.lang['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 60), (3, 80)], parent=self.distanceLayout)
+                    self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.ar.data.lang['m182_distance'], text=str(round(currentDistance, 4)), buttonLabel=self.ar.data.lang['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 60), (3, 80)], parent=self.distanceLayout)
                     if not cmds.getAttr(self.net+".decompose"):
                         cmds.optionMenu(self.axisMenu, edit=True, enable=False)
                 # input and output values:
@@ -284,7 +284,7 @@ class CorrectionManager(object):
                 currentOutputEnd = cmds.getAttr(self.net+".outputEnd")
                 # interpolation:
                 self.interpolationLayout = cmds.columnLayout('interpolationLayout', adjustableColumn=False, columnAlign="left", parent=self.selectedLayout)
-                self.interpMenu = cmds.optionMenu("interpMenu", label=self.dpUIinst.lang['m210_interpolation'], changeCommand=self.changeInterpolation, parent=self.interpolationLayout)
+                self.interpMenu = cmds.optionMenu("interpMenu", label=self.ar.data.lang['m210_interpolation'], changeCommand=self.changeInterpolation, parent=self.interpolationLayout)
                 self.interpMenuItemList = ['Linear', 'Smooth', 'Spline']
                 for interp in self.interpMenuItemList:
                     cmds.menuItem(label=interp, parent=self.interpMenu)
@@ -293,11 +293,11 @@ class CorrectionManager(object):
                 # range:
                 rangeLayout = cmds.columnLayout('rangeLayout', adjustableColumn=True, columnAlign="right", parent=self.selectedLayout)
                 rangeLabelLayout = cmds.rowLayout('rangeLabelLayout', numberOfColumns=3, adjustableColumn=1, columnWidth=[(1, 10), (2, 58), (3, 80)], columnAttach=[(1, "right", 0), (2, "right", 20), (3, "right", 30)], parent=rangeLayout)
-                cmds.text("rangeTxt", label=self.dpUIinst.lang['m072_range'], align="right", parent=rangeLabelLayout)
-                cmds.text("startTxt", label=self.dpUIinst.lang['c110_start'], align="right", parent=rangeLabelLayout)
-                cmds.text("endTxt", label=self.dpUIinst.lang['m184_end'], align="right", parent=rangeLabelLayout)
-                cmds.floatFieldGrp("inputFFG", label=self.dpUIinst.lang['m137_input'], numberOfFields=2, value1=currentInputStart, value2=currentInputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeInputValues, parent=rangeLayout)
-                cmds.floatFieldGrp("outputFFG", label=self.dpUIinst.lang['m138_output'], numberOfFields=2, value1=currentOutputStart, value2=currentOutputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeOutputValues, parent=rangeLayout)
+                cmds.text("rangeTxt", label=self.ar.data.lang['m072_range'], align="right", parent=rangeLabelLayout)
+                cmds.text("startTxt", label=self.ar.data.lang['c110_start'], align="right", parent=rangeLabelLayout)
+                cmds.text("endTxt", label=self.ar.data.lang['m184_end'], align="right", parent=rangeLabelLayout)
+                cmds.floatFieldGrp("inputFFG", label=self.ar.data.lang['m137_input'], numberOfFields=2, value1=currentInputStart, value2=currentInputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeInputValues, parent=rangeLayout)
+                cmds.floatFieldGrp("outputFFG", label=self.ar.data.lang['m138_output'], numberOfFields=2, value1=currentOutputStart, value2=currentOutputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeOutputValues, parent=rangeLayout)
 
     
     def actualizeEditLayout(self, *args):
@@ -367,7 +367,7 @@ class CorrectionManager(object):
             cmds.parent(grp, self.utils.getNodeByMessage("correctionDataGrp", self.net))
             return loc
         else:
-            mel.eval('warning \"'+toAttach+' '+self.dpUIinst.lang['i061_notExists']+'\";')
+            mel.eval('warning \"'+toAttach+' '+self.ar.data.lang['i061_notExists']+'\";')
 
 
     def createCorrectionManager(self, nodeList=None, name=None, correctType=None, toRivet=False, fromUI=False, *args):
@@ -375,8 +375,8 @@ class CorrectionManager(object):
             Returns the created network node.
         """
         # loading Maya matrix node
-        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             if not nodeList:
                 nodeList = cmds.ls(selection=True, flatten=True)
@@ -416,7 +416,7 @@ class CorrectionManager(object):
                     if fromUI:
                         toRivet = cmds.checkBox(self.rivetCB, query=True, value=True)
                     if toRivet:
-                        self.dpRivetInst = dpRivet.Rivet(self.dpUIinst, False)
+                        self.dpRivetInst = dpRivet.Rivet(self.ar, False)
 
                     # create the container of the system data using a network node
                     self.net = cmds.createNode("network", name=name)
@@ -606,15 +606,15 @@ class CorrectionManager(object):
                         cmds.connectAttr(distanceAxisXCnd+".message", self.net+".distanceAxisXCnd", force=True)
                         cmds.connectAttr(distanceAxisYZCnd+".message", self.net+".distanceAxisYZCnd", force=True)
                     
-                    self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
-                    self.dpUIinst.customAttr.addAttr(0, [self.correctionManagerDataGrp], descendents=True) #dpID
+                    self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+                    self.ar.customAttr.addAttr(0, [self.correctionManagerDataGrp], descendents=True) #dpID
                     # update UI                    
                     if self.ui:
                         self.populateNetUI()
                         self.actualizeEditLayout()
                     cmds.undoInfo(closeChunk=True)
                 else:
-                    mel.eval('warning \"'+self.dpUIinst.lang['m065_selOrigAction']+'\";')
+                    mel.eval('warning \"'+self.ar.data.lang['m065_selOrigAction']+'\";')
             else:
-                mel.eval('warning \"'+self.dpUIinst.lang['m066_selectTwo']+'\";')
+                mel.eval('warning \"'+self.ar.data.lang['m066_selectTwo']+'\";')
         return self.net

@@ -100,7 +100,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.userGuideName+"_"+letter+"_1_Jnt", scaleCompensate=False)
-                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.dpUIinst.jointEndAttr, scaleCompensate=False, radius=0.5)
+                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.ar.jointEndAttr, scaleCompensate=False, radius=0.5)
                     self.utils.addJointEndAttr([endJoint])
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
@@ -109,7 +109,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.jointList.append(jnt)
                     
                     # create a control:
-                    mainCtrl = self.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.dpUIinst.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter)
+                    mainCtrl = self.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter)
                     ctrl = self.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter, parentTag=mainCtrl)
                     upLocCtrl = self.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter, parentTag=ctrl)
                     self.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
@@ -146,7 +146,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                     
                     # working with aim setup:
-                    cmds.addAttr(ctrl, longName=self.dpUIinst.lang['c118_active'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                    cmds.addAttr(ctrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                     aimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+letter+"_Aim_Loc")[0]
                     upLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+letter+"_Up_Loc")[0]
                     locGrp = cmds.group(aimLoc, upLoc, name=side+self.userGuideName+"_"+letter+"_Loc_Grp")
@@ -161,10 +161,10 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # aim constraints:
                 # B to A:
                 aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True, name=self.ctrlZeroList[0]+"_AiC")[0]
-                cmds.connectAttr(self.ctrlList[0]+"."+self.dpUIinst.lang['c118_active'], aAimConst+"."+self.aimLocList[1]+"W0", force=True)
+                cmds.connectAttr(self.ctrlList[0]+"."+self.ar.data.lang['c118_active'], aAimConst+"."+self.aimLocList[1]+"W0", force=True)
                 # A to B:
                 bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[1]+"_AiC")[0]
-                cmds.connectAttr(self.ctrlList[1]+"."+self.dpUIinst.lang['c118_active'], bAimConst+"."+self.aimLocList[0]+"W0", force=True)
+                cmds.connectAttr(self.ctrlList[1]+"."+self.ar.data.lang['c118_active'], bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
                 # integrating data:
                 self.loadedFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
@@ -178,7 +178,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ctrlHookGrpList.append(self.toCtrlHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()

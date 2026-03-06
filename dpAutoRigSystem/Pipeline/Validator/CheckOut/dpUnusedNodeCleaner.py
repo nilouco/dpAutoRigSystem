@@ -54,7 +54,7 @@ class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
                     # conditional to check here
                     if not len(allMatList) == len(usedMatList):
                         self.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
                         self.checkedObjList.append(str(", ".join(issueMatList)))
                         self.foundIssueList.append(True)
@@ -64,16 +64,16 @@ class UnusedNodeCleaner(dpBaseAction.ActionStartClass):
                             try:
                                 fixResult = mel.eval("MLdeleteUnused;")
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+str(fixResult)+" nodes = "+str(len(issueMatList))+" materials")
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+str(fixResult)+" nodes = "+str(len(issueMatList))+" materials")
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": materials")
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": materials")
                 else:
                     self.notFoundNodes()
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

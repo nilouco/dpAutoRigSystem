@@ -15,8 +15,8 @@ DP_SOFTHARDEDGES_VERSION = 1.00
 
 
 class ConvertNormals(object):
-    def __init__(self, dpUIinst):
-        self.utils = dpUIinst.utils
+    def __init__(self, ar):
+        self.utils = ar.utils
         self.version = DP_SOFTHARDEDGES_VERSION
 
 

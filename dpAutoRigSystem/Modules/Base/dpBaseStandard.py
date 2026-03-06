@@ -14,11 +14,11 @@ DP_BASESTANDARD_VERSION = 2.13
 
 
 class BaseStandard(object):
-    def __init__(self, dpUIinst, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, number=None, *args):
+    def __init__(self, ar, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, number=None, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -40,14 +40,14 @@ class BaseStandard(object):
         self.sideList = [""]
         self.axisList = ["X", "Y", "Z"]
         # utils
-        self.utils = dpUIinst.utils
-        if self.dpUIinst.dev:
+        self.utils = ar.utils
+        if self.ar.dev:
             reload(dpControls)
             reload(dpCorrectionManager)
         # calling dpControls:
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.moduleGrp)
+        self.ctrls = dpControls.ControlClass(self.ar, self.moduleGrp)
         # starting correctionManager:
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar, False)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -69,7 +69,7 @@ class BaseStandard(object):
         layoutName = cmds.getAttr(self.moduleGrp+".customName")
         if not layoutName:
             layoutName = self.userGuideName
-        self.moduleLayoutName = self.dpUIinst.lang[self.title]+" - "+layoutName
+        self.moduleLayoutName = self.ar.data.lang[self.title]+" - "+layoutName
         self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
         self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
         # here we have just the column layouts to be populated by modules.
@@ -79,7 +79,7 @@ class BaseStandard(object):
         """ Create the elements to Guide module in the scene, like controls, etc...
         """
         # GUIDE:
-        self.utils.useDefaultRenderLayer()
+        self.ar.opt.check_use_default_render_layer()
         # create guide base (moduleGrp):
         guideBaseList = self.ctrls.cvBaseGuide(self.moduleGrp, r=2)
         self.moduleGrp = guideBaseList[0]
@@ -96,12 +96,12 @@ class BaseStandard(object):
         cmds.setAttr(self.moduleGrp+".moduleType", self.guideModuleName, type='string')
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
-        cmds.setAttr(self.moduleGrp+".mirrorName", self.dpUIinst.lang['p002_left']+' --> '+self.dpUIinst.lang['p003_right'], type='string')
+        cmds.setAttr(self.moduleGrp+".mirrorName", self.ar.data.lang['p002_left']+' --> '+self.ar.data.lang['p003_right'], type='string')
         cmds.setAttr(self.moduleGrp+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
-        cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.dpUIinst.guide, type='string')
+        cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.ar.guide, type='string')
         cmds.setAttr(self.moduleGrp+".rigType", self.rigType, type='string')
-        cmds.setAttr(self.moduleGrp+".dpARVersion", self.dpUIinst.dpARVersion, type='string')
+        cmds.setAttr(self.moduleGrp+".dpARVersion", self.ar.dpARVersion, type='string')
         
         baseFloatAttrList = ['shapeSize', 'worldSize']
         for baseFloatAttr in baseFloatAttrList:
@@ -111,14 +111,14 @@ class BaseStandard(object):
         baseIntegerAttrList = ['degree']
         for baseIntAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntAttr, attributeType='short')
-        cmds.setAttr(self.moduleGrp+".degree", self.dpUIinst.data.degree_option)
+        cmds.setAttr(self.moduleGrp+".degree", self.ar.data.degree_option)
         
         baseIntegerAttrList = ['guideColorIndex']
         for baseIntegerAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntegerAttr, attributeType='long')
         for c, guideColorAttr in enumerate(['guideColorR', 'guideColorG', 'guideColorB']):
             cmds.addAttr(self.moduleGrp, longName=guideColorAttr, attributeType='float')
-            cmds.setAttr(self.moduleGrp+"."+guideColorAttr, self.dpUIinst.ctrls.colorList[0][c])
+            cmds.setAttr(self.moduleGrp+"."+guideColorAttr, self.ar.ctrls.colorList[0][c])
 
         # create annotation to this module:
         self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
@@ -128,7 +128,7 @@ class BaseStandard(object):
         cmds.setAttr(self.annotation+'.text', self.moduleGrp[self.moduleGrp.find("__")+2:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
         # setup worldSize
-        self.dpUIinst.ctrls.getDPARTempGrp()
+        self.ar.ctrls.getDPARTempGrp()
         self.createWorldSize()
         # prepare guide to serialization
         self.createGuideNetwork()
@@ -152,7 +152,7 @@ class BaseStandard(object):
                 else:
                     try:
                         self.deleteModule()
-                        mel.eval('warning \"'+ self.dpUIinst.lang['e000_guideNotFound'] +' - '+ self.moduleGrp +'\";')
+                        mel.eval('warning \"'+ self.ar.data.lang['e000_guideNotFound'] +' - '+ self.moduleGrp +'\";')
                     except:
                         pass
                     return False
@@ -183,12 +183,12 @@ class BaseStandard(object):
             self.clearSelectedModuleLayout()
             # edit the footer A text:
             self.currentText = cmds.text("footerRiggingText", query=True, label=True)
-            cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.dpUIinst.lang['i005_footerRigging'])
+            cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])
         except:
             pass
         # clear module from instance list (clean dpUI list):
-        delIndex = self.dpUIinst.moduleInstancesList.index(self)
-        self.dpUIinst.moduleInstancesList.pop(delIndex)
+        delIndex = self.ar.moduleInstancesList.index(self)
+        self.ar.moduleInstancesList.pop(delIndex)
     
 
     def duplicateModule(self, *args):
@@ -228,7 +228,7 @@ class BaseStandard(object):
                     baseName = suffixNumberList[1]
                 dpAR_nameList = []
                 transformList = cmds.ls(selection=False, transforms=True)
-                guideBaseList = [guide for guide in transformList if guide.endswith(self.dpUIinst.data.guide_base_name)] or []
+                guideBaseList = [guide for guide in transformList if guide.endswith(self.ar.data.guide_base_name)] or []
                 guideBaseList.extend([staticGrp for staticGrp in transformList if "staticHook" in cmds.listAttr(staticGrp)] or [])
                 if guideBaseList:
                     for transform in guideBaseList:
@@ -252,7 +252,7 @@ class BaseStandard(object):
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField(self.userName, edit=True, text=self.customName)
-                    cmds.frameLayout(self.moduleFrameLayout, edit=True, label=self.dpUIinst.lang[self.title]+" - "+self.customName)
+                    cmds.frameLayout(self.moduleFrameLayout, edit=True, label=self.ar.data.lang[self.title]+" - "+self.customName)
                 except:
                     pass
                 cmds.setAttr(self.moduleGrp+".customName", self.customName, type='string')
@@ -272,11 +272,11 @@ class BaseStandard(object):
                         3 = inputValue,
                     ]
         """
-        if not cmds.objExists(ctrl+"."+self.dpUIinst.lang['c124_corrective']):
-            cmds.addAttr(ctrl, longName=self.dpUIinst.lang['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        if not cmds.objExists(ctrl+"."+self.ar.data.lang['c124_corrective']):
+            cmds.addAttr(ctrl, longName=self.ar.data.lang['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # corrective network node
         correctiveNet = self.correctionManager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
-        cmds.connectAttr(ctrl+"."+self.dpUIinst.lang['c124_corrective'], correctiveNet+".corrective", force=True)
+        cmds.connectAttr(ctrl+"."+self.ar.data.lang['c124_corrective'], correctiveNet+".corrective", force=True)
         cmds.setAttr(correctiveNet+".axis", axis)
         cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
         if isLeg:
@@ -301,7 +301,7 @@ class BaseStandard(object):
         if jcrList:
             l = 0
             sDefault = s
-            mirrorPrefixList = [self.dpUIinst.lang['p002_left'], self.dpUIinst.lang['p003_right']]
+            mirrorPrefixList = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
             for i, jcr in enumerate(jcrList):
                 if not i == 0: #exclude jar in the index 0
                     # logic to mirror calibration setup for left and right sides of a centered module like neck/head
@@ -343,7 +343,7 @@ class BaseStandard(object):
     def changeMainCtrlsNumber(self, enteredNCtrls, *args):
         """ Edit the number of main controllers in the guide.
         """
-        self.utils.useDefaultRenderLayer()
+        self.ar.opt.check_use_default_render_layer()
         # get the number of main controllers entered by user:
         if enteredNCtrls == 0:
             try:
@@ -399,7 +399,7 @@ class BaseStandard(object):
                     mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.guideName+"_Base", parentTag=self.getParentToTag(mainCtrlList))
                     mainCtrlList.append(mainCtrl)
                     self.ctrls.colorShape([mainCtrl], "cyan")
-                    cmds.addAttr(mainCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                    cmds.addAttr(mainCtrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     # position
                     cmds.parent(mainCtrl, currentCtrlZero)
                     cmds.makeIdentity(mainCtrl, apply=False, translate=True, rotate=True, scale=True)
@@ -409,7 +409,7 @@ class BaseStandard(object):
                     self.toIDList.append(rIntensityMD)
                     for axis in self.axisList:
                         cmds.connectAttr(mainCtrl+".rotate"+axis, rIntensityMD+".input1"+axis, force=True)
-                        cmds.connectAttr(mainCtrl+"."+self.dpUIinst.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
+                        cmds.connectAttr(mainCtrl+"."+self.ar.data.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
                 else:
                     # offseting sub controllers
                     offsetGrp = cmds.group(name=currentCtrl+"_Offset_Grp", empty=True)
@@ -475,8 +475,8 @@ class BaseStandard(object):
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
         """
-        self.dpUIinst.utils.closeUI(self.dpUIinst.data.plus_info_win_name)
-        self.dpUIinst.utils.closeUI(self.dpUIinst.data.color_override_win_name)
+        self.ar.utils.closeUI(self.ar.data.plus_info_win_name)
+        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             self.toIDList = []
@@ -491,7 +491,7 @@ class BaseStandard(object):
             self.ctrls.unPinGuide([self.moduleGrp], force=True)
             
             # RIG:
-            self.utils.useDefaultRenderLayer()
+            self.ar.opt.check_use_default_render_layer()
             
             # get the radius value to controls:
             if cmds.objExists(self.radiusCtrl):
@@ -520,11 +520,9 @@ class BaseStandard(object):
                             if currentName == self.customName:
                                 self.customName = self.customName + "1"
                 self.userGuideName = self.customName
-            prefix = cmds.textField("rig_prefix_tf", query=True, text=True)
-            if prefix != "" and prefix != " " and prefix != "_" and prefix != None:
-                if prefix[len(prefix)-1] != "_":
-                    prefix = prefix + "_"
-                self.userGuideName = prefix + self.userGuideName
+
+            if self.ar.data.prefix:
+                self.userGuideName = self.ar.data.prefix + self.userGuideName
             cmds.select(clear=True)
             self.getMirrorSideList()
     
@@ -541,7 +539,7 @@ class BaseStandard(object):
             cmds.parent(staticList, self.toStaticHookGrp)
         if scalableList:
             cmds.parent(scalableList, self.toScalableHookGrp)
-        self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
+        self.ar.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
         # add hook attributes to be read when rigging integrated modules:
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
         self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
@@ -577,7 +575,7 @@ class BaseStandard(object):
         else:
             guideNumber = self.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
-        self.dpID = self.dpUIinst.customAttr.addAttr(0, [self.guideNet])[0] #dpID
+        self.dpID = self.ar.customAttr.addAttr(0, [self.guideNet])[0] #dpID
         for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
@@ -745,7 +743,7 @@ class BaseStandard(object):
         cmds.connectAttr(self.wsRef+".worldMatrix[0]", self.moduleGrp+".offsetParentMatrix", force=True)
         cmds.setAttr(self.wsRef+".visibility", False)
         cmds.setAttr(self.wsRef+".template", 1)
-        cmds.parent(self.wsRef, self.dpUIinst.data.temp_grp)
+        cmds.parent(self.wsRef, self.ar.data.temp_grp)
 
 
     def getParentToTag(self, itemList, returnItem=None, *args):

@@ -17,13 +17,13 @@ DP_ACTIONSTARTCLASS_VERSION = 2.09
 
 
 class ActionStartClass(object):
-    def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.pipeliner = dpUIinst.pipeliner
+        self.ar = ar
+        self.utils = ar.utils
+        self.pipeliner = ar.pipeliner
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -45,8 +45,8 @@ class ActionStartClass(object):
         self.secondBTCustomLabel = None
         self.ioDir = None
         self.maybeDone = False
-        self.infoText = self.dpUIinst.lang['i305_none']
-        self.dpID = self.dpUIinst.data.dp_id
+        self.infoText = self.ar.data.lang['i305_none']
+        self.dpID = self.ar.data.dp_id
         self.constraintTypeList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
         # returned lists
         self.checkedObjList = []
@@ -63,11 +63,11 @@ class ActionStartClass(object):
         """
         self.actionType = value
         if self.actionType == "v000_validator":
-            self.firstBTLabel = self.dpUIinst.lang['i210_verify']
-            self.secondBTLabel = self.dpUIinst.lang['c052_fix']
+            self.firstBTLabel = self.ar.data.lang['i210_verify']
+            self.secondBTLabel = self.ar.data.lang['c052_fix']
         else: #r000_rebuilder
-            self.firstBTLabel = self.dpUIinst.lang['i164_export']
-            self.secondBTLabel = self.dpUIinst.lang['i196_import']
+            self.firstBTLabel = self.ar.data.lang['i164_export']
+            self.secondBTLabel = self.ar.data.lang['i196_import']
         if self.firstBTCustomLabel:
             self.firstBTLabel = self.firstBTCustomLabel
         if self.secondBTCustomLabel:
@@ -101,7 +101,7 @@ class ActionStartClass(object):
         cmds.refresh()
         if self.verbose:
             titleText = self.getTitle()
-            self.utils.setProgress(titleText+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
+            self.utils.setProgress(titleText+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
 
 
     def resetButtonColors(self, *args):
@@ -165,20 +165,20 @@ class ActionStartClass(object):
     def updateInfoDataButton(self, *args):
         """ Just get the latest exported data and edit the info button text.
         """
-        self.infoText = "\n\n"+self.dpUIinst.lang['r060_latestExportedData']+"\n"
+        self.infoText = "\n\n"+self.ar.data.lang['r060_latestExportedData']+"\n"
         buttonLabel = self.getLatestExportedData()
-        buttonCommand = self.dpUIinst.packager.openFolder
+        buttonCommand = self.ar.packager.openFolder
         buttonArgument = self.ioPath
         if cmds.iconTextButton(self.infoITB, query=True, exists=True):
             #functools.partial(<bound method Logger.infoWin of <dpAutoRigSystem.Pipeline.dpLogger.Logger object at 0x00000259E390BD10>>, 'r003_modelIO', 'r004_modelIODesc', None, 'center', 305, 250, wiki='10-‐-Rebuilder#-model')
             thisWiki = str(cmds.iconTextButton(self.infoITB, query=True, command=True)).split("wiki='")[1][:-2]
-            cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.dpUIinst.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument], wiki=thisWiki))
+            cmds.iconTextButton(self.infoITB, edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument], wiki=thisWiki))
 
 
     def getLatestExportedData(self, *args):
         """ Returns the latest exported data or "None".
         """
-        latestData = self.dpUIinst.lang['i305_none']
+        latestData = self.ar.data.lang['i305_none']
         exportedList = self.getExportedList()
         if exportedList:
             exportedList.sort()
@@ -201,8 +201,8 @@ class ActionStartClass(object):
             Returns its value or the current title text only.
         """
         titleText = self.title
-        if self.title in self.dpUIinst.lang.keys():
-            titleText = self.dpUIinst.lang[self.title]
+        if self.title in self.ar.data.lang.keys():
+            titleText = self.ar.data.lang[self.title]
         return titleText
 
 
@@ -210,10 +210,10 @@ class ActionStartClass(object):
         """ Prepare the log output text and data dictionary for this checked validator/rebuilder.
         """
         # texts
-        nameText = self.dpUIinst.lang['m006_name']
-        modeText = self.dpUIinst.lang['v003_mode']
-        foundIssueText = self.dpUIinst.lang['v006_foundIssue']
-        everythingOkText = self.dpUIinst.lang['v007_allOk']
+        nameText = self.ar.data.lang['m006_name']
+        modeText = self.ar.data.lang['v003_mode']
+        foundIssueText = self.ar.data.lang['v006_foundIssue']
+        everythingOkText = self.ar.data.lang['v007_allOk']
         titleText = self.getTitle()
         # header
         logText = nameText+": "+titleText+"\n"
@@ -239,10 +239,10 @@ class ActionStartClass(object):
                 logText += "\n"+msg
         logText += "\n"
         # dataLog
-        self.dataLogDic["log"] = self.dpUIinst.lang[self.actionType]
+        self.dataLogDic["log"] = self.ar.data.lang[self.actionType]
         self.dataLogDic["user"] = getpass.getuser()
         self.dataLogDic["time"] = self.pipeliner.getToday(True)
-        self.dataLogDic["dpARVersion"] = self.dpUIinst.dpARVersion
+        self.dataLogDic["dpARVersion"] = self.ar.dpARVersion
         self.dataLogDic["module"] = self.guideModuleName
         self.dataLogDic["version"] = self.version
         self.dataLogDic["name"] = self.title
@@ -254,10 +254,10 @@ class ActionStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n\n"+logText)
-            if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
-                print(self.dpUIinst.lang['i201_saveScene'])
+            self.ar.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n\n"+logText, "left", 250, 250)
+            print("\n-------------\n"+self.ar.data.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n\n"+logText)
+            if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.ar.dpData+"/"+self.ar.dpLog):
+                print(self.ar.data.lang['i201_saveScene'])
 
     
     def notFoundNodes(self, item=None, *args):
@@ -266,7 +266,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
-        self.messageList.append(self.dpUIinst.lang['v014_notFoundNodes'])
+        self.messageList.append(self.ar.data.lang['v014_notFoundNodes'])
 
 
     def notWorkedWellIO(self, item="", *args):
@@ -275,7 +275,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(True)
         self.resultOkList.append(False)
-        self.messageList.append(self.dpUIinst.lang['r005_notWorkedWell'])
+        self.messageList.append(self.ar.data.lang['r005_notWorkedWell'])
 
 
     def wellDoneIO(self, item="", text="r006_wellDone", *args):
@@ -284,7 +284,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
-        self.messageList.append(self.dpUIinst.lang[text]+": "+item)
+        self.messageList.append(self.ar.data.lang[text]+": "+item)
 
 
     def maybeDoneIO(self, item="", *args):
@@ -294,7 +294,7 @@ class ActionStartClass(object):
         self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
-        self.messageList.append(self.dpUIinst.lang['r063_maybeDoneIO']+": "+item)
+        self.messageList.append(self.ar.data.lang['r063_maybeDoneIO']+": "+item)
 
 
     def getIOPath(self, ioDir, *args):
@@ -371,7 +371,7 @@ class ActionStartClass(object):
                     try:
                         inputDeformerList = cmds.findDeformers(child)
                     except:
-                        self.messageList.append(self.dpUIinst.lang['i075_moreOne']+": "+child)
+                        self.messageList.append(self.ar.data.lang['i075_moreOne']+": "+child)
                         inputDeformerList = False
                     if inputDeformerList:
                         for defNode in inputDeformerList:
@@ -407,9 +407,9 @@ class ActionStartClass(object):
         if not toCheckList:
             toCheckList = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
         if toCheckList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
+            self.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
             self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            filteredList = self.utils.filterTransformList(toCheckList, verbose=self.verbose, title=self.dpUIinst.lang[self.title]+" "+self.dpUIinst.lang['i329_broken'])
+            filteredList = self.utils.filterTransformList(toCheckList, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
             if filteredList:
                 for item in filteredList:
                     shortName = item[item.rfind("|")+1:]
@@ -442,7 +442,7 @@ class ActionStartClass(object):
             except Exception as e:
                 self.notWorkedWellIO(jsonName+": "+str(e))
         else:
-            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
 
 
     def exportAlembicFile(self, itemList, path=None, startName=None, fileName=None, attr=True, curve=False, *args):
@@ -466,7 +466,7 @@ class ActionStartClass(object):
                 if curve:
                     itemList.extend(cmds.listRelatives(itemList, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
                 for mesh in itemList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     userDefAttrList = cmds.listAttr(mesh, userDefined=True)
                     if userDefAttrList:
                         for userDefAttr in userDefAttrList:
@@ -485,7 +485,7 @@ class ActionStartClass(object):
         """
         self.latestDataFile = None
         if exportedList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
+            self.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
             try:
                 # import alembic
                 exportedList.sort()
@@ -497,7 +497,7 @@ class ActionStartClass(object):
             except Exception as e:
                 self.notWorkedWellIO(self.latestDataFile+": "+str(e))
         else:
-            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
 
 
     def importLatestJsonFile(self, exportedList, path=None, *args):
@@ -511,7 +511,7 @@ class ActionStartClass(object):
             self.latestDataFile = exportedList[-1]
             return self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
         else:
-            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
 
 
     def updateDeleteDataButton(self, *args):
@@ -528,11 +528,11 @@ class ActionStartClass(object):
         """ Confirm if the user really want to delete the rebuilding exported data, then delete its folder.
         """
         # to confirm before delete data
-        confirm = cmds.confirmDialog(title=self.dpUIinst.lang[self.title], icon="question", message=self.dpUIinst.lang['r059_deleteData'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i072_no'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
-        if confirm == self.dpUIinst.lang['i071_yes']:
+        confirm = cmds.confirmDialog(title=self.ar.data.lang[self.title], icon="question", message=self.ar.data.lang['r059_deleteData'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+        if confirm == self.ar.data.lang['i071_yes']:
             oldFirstBTLabel = self.firstBTLabel
             self.firstMode = True
-            self.firstBTLabel = self.dpUIinst.lang['i344_deleted']
+            self.firstBTLabel = self.ar.data.lang['i344_deleted']
             try:
                 shutil.rmtree(self.ioPath, ignore_errors=False)
                 self.updateDeleteDataButton()
@@ -574,10 +574,10 @@ class ActionStartClass(object):
             unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
             if unparentedMeshList:
                 for item in unparentedMeshList:
-                    if not cmds.objExists(item+"."+self.dpUIinst.masterAttr):
+                    if not cmds.objExists(item+"."+self.ar.masterAttr):
                         fatherNode = item[:item[1:].find("|")+1]
                         if fatherNode:
-                            if not cmds.objExists(fatherNode+"."+self.dpUIinst.masterAttr):
+                            if not cmds.objExists(fatherNode+"."+self.ar.masterAttr):
                                 if not fatherNode in tempList:
                                     tempList.append(fatherNode)
         if tempList:
@@ -628,7 +628,7 @@ class ActionStartClass(object):
         #            }
         self.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
         for const in constraintList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.dpID, node=const, exists=True):
                 # getting attributes if they exists
                 dic[const] = {"attributes" : {},
@@ -676,7 +676,7 @@ class ActionStartClass(object):
         wellImportedList = []
         for item in constDic.keys():
             existingNodesList = []
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             # create constraint node if it needs
             if not cmds.objExists(item):
                 constType = constDic[item]["type"]
@@ -732,7 +732,7 @@ class ActionStartClass(object):
                 else:
                     cmds.createNode(constType, name=item) #broken node
                     if verbose:
-                        self.notWorkedWellIO(self.dpUIinst.lang['i329_broken']+" node - "+item)
+                        self.notWorkedWellIO(self.ar.data.lang['i329_broken']+" node - "+item)
             else:
                 existingNodesList.append(item)
         if verbose:
@@ -740,9 +740,9 @@ class ActionStartClass(object):
                 self.wellDoneIO(self.latestDataFile)
             else:
                 if existingNodesList:
-                    self.wellDoneIO(self.dpUIinst.lang['r032_notImportedData'])
+                    self.wellDoneIO(self.ar.data.lang['r032_notImportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
+                    self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
 
 
     def removeConstraints(self, itemList, *args):

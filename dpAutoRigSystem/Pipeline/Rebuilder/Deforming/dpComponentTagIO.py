@@ -26,9 +26,9 @@ class ComponentTagIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_componentTagIO"
         self.startName = "dpComponentTag"
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpWeights)
-        self.defWeights = dpWeights.Weights(self.dpUIinst)
+        self.defWeights = dpWeights.Weights(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -72,21 +72,21 @@ class ComponentTagIO(dpBaseAction.ActionStartClass):
                                                 }
                                 self.exportDicToJsonFile(self.tagDataDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" componentTag")
+                                self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" componentTag")
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh, lattice")
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" mesh, lattice")
                     else: #import
                         tagDataDic = self.importLatestJsonFile(self.getExportedList())
                         if tagDataDic:
                             self.importTag(tagDataDic, nodeList)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 

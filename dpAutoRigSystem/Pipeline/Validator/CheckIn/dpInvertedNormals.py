@@ -59,7 +59,7 @@ class InvertedNormals(dpBaseAction.ActionStartClass):
                     parentNode = fnShapeNode.parent(0)
                     fnParentNode = OpenMaya.MFnDagNode(parentNode)
                     objName = fnParentNode.name()
-                    self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shapeName)
+                    self.utils.setProgress(self.ar.data.lang[self.title]+": "+shapeName)
                     # verify if objName or shapeName is in objMeshList
                     for obj in objMeshList:
                         if objName in obj or shapeName in obj:
@@ -115,14 +115,14 @@ class InvertedNormals(dpBaseAction.ActionStartClass):
                             #cmds.setAttr(mesh+".doubleSided", 0)
                             #cmds.setAttr(mesh+".opposite", 0)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+mesh)
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+mesh)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

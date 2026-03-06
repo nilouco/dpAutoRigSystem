@@ -23,34 +23,34 @@ def getUserDetail(opt1, opt2, cancel, default, userMessage):
     return result
 
 
-def Tweaks(dpUIinst):
+def Tweaks(ar):
     """ This function will create all guides needed to compose a good facial tweaks controls with integrated Single modules using indirect skinning.
     """
     # check modules integrity:
     guideDir = 'Modules.Standard'
     standardDir = 'Modules/Standard'
     checkModuleList = ['dpSingle']
-    checkResultList = dpUIinst.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = ar.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
-        dpUIinst.collapseEditSelModFL = True
+        ar.collapseEditSelModFL = True
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']
+        doingName = ar.data.lang['m094_doing']
         # part names:
-        mainName = dpUIinst.lang['c058_main']
-        tweaksName = dpUIinst.lang['m081_tweaks']
-        middleName = dpUIinst.lang['c029_middle']
-        eyebrowName = dpUIinst.lang['c041_eyebrow']
-        eyelidName = dpUIinst.lang['c042_eyelid']
-        eyeSocketName = dpUIinst.lang['c127_eyeSocket']
-        cornerName = dpUIinst.lang['c043_corner']
-        upperName = dpUIinst.lang['c044_upper']
-        lowerName = dpUIinst.lang['c045_lower']
-        lipName = dpUIinst.lang['c039_lip']
-        holderName = dpUIinst.lang['c046_holder']
-        squintName = dpUIinst.lang['c054_squint']
-        cheekName = dpUIinst.lang['c055_cheek']
-        tweaksGuideName = dpUIinst.lang['m081_tweaks']+" "+dpUIinst.lang['i205_guide']
+        mainName = ar.data.lang['c058_main']
+        tweaksName = ar.data.lang['m081_tweaks']
+        middleName = ar.data.lang['c029_middle']
+        eyebrowName = ar.data.lang['c041_eyebrow']
+        eyelidName = ar.data.lang['c042_eyelid']
+        eyeSocketName = ar.data.lang['c127_eyeSocket']
+        cornerName = ar.data.lang['c043_corner']
+        upperName = ar.data.lang['c044_upper']
+        lowerName = ar.data.lang['c045_lower']
+        lipName = ar.data.lang['c039_lip']
+        holderName = ar.data.lang['c046_holder']
+        squintName = ar.data.lang['c054_squint']
+        cheekName = ar.data.lang['c055_cheek']
+        tweaksGuideName = ar.data.lang['m081_tweaks']+" "+ar.data.lang['i205_guide']
         
         holderMainName = tweaksName+"_"+holderName+"_"+mainName
         # eyebrows names:
@@ -96,15 +96,15 @@ def Tweaks(dpUIinst):
         lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
         
         # kind guides:
-        simple   = dpUIinst.lang['i175_simple']
-        complete = dpUIinst.lang['i176_complete']
-        cancel   = dpUIinst.lang['i132_cancel']
-        userMessage = dpUIinst.lang['i177_chooseMessage']
+        simple   = ar.data.lang['i175_simple']
+        complete = ar.data.lang['i176_complete']
+        cancel   = ar.data.lang['i132_cancel']
+        userMessage = ar.data.lang['i177_chooseMessage']
         
         # use indirect skinning or joints:
-        indSkin     = dpUIinst.lang['i180_indirectSkin']+"\n"+dpUIinst.lang['i185_animation']
-        faceJoint   = dpUIinst.lang['i181_facialJoint']+"\n"+dpUIinst.lang['i186_gaming']
-        faceMessage = dpUIinst.lang['i182_facialMessage']
+        indSkin     = ar.data.lang['i180_indirectSkin']+"\n"+ar.data.lang['i185_animation']
+        faceJoint   = ar.data.lang['i181_facialJoint']+"\n"+ar.data.lang['i186_gaming']
+        faceMessage = ar.data.lang['i182_facialMessage']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, complete, userMessage)
@@ -124,60 +124,60 @@ def Tweaks(dpUIinst):
                     indSkinValue = 0
             
                 # Starting progress window
-                dpUIinst.utils.setProgress(doingName, tweaksGuideName, maxProcess, addOne=False, addNumber=False)
+                ar.utils.setProgress(doingName, tweaksGuideName, maxProcess, addOne=False, addNumber=False)
                 
-                dpUIinst.utils.setProgress(doingName+eyebrowMainName)
+                ar.utils.setProgress(doingName+eyebrowMainName)
                 # creating Single instances:
-                holderMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                holderMainInstance = ar.initGuide('dpSingle', guideDir)
                 holderMainInstance.editGuideModuleName(holderMainName)
                 
-                eyebrowMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                eyebrowMainInstance = ar.initGuide('dpSingle', guideDir)
                 eyebrowMainInstance.editGuideModuleName(eyebrowMainName)
                 eyebrowMainInstance.changeMirror("X")
                 cmds.setAttr(eyebrowMainInstance.moduleGrp+".deformedBy", 1)
                 
-                eyebrowInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                eyebrowInstance1 = ar.initGuide('dpSingle', guideDir)
                 eyebrowInstance1.editGuideModuleName(eyebrowName1)
                 eyebrowInstance1.changeMirror("X")
                 
-                eyebrowInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                eyebrowInstance2 = ar.initGuide('dpSingle', guideDir)
                 eyebrowInstance2.editGuideModuleName(eyebrowName2)
                 eyebrowInstance2.changeMirror("X")
                 
-                eyebrowInstance3 = dpUIinst.initGuide('dpSingle', guideDir)
+                eyebrowInstance3 = ar.initGuide('dpSingle', guideDir)
                 eyebrowInstance3.editGuideModuleName(eyebrowName3)
                 eyebrowInstance3.changeMirror("X")
                 cmds.refresh()
                 
-                dpUIinst.utils.setProgress(doingName+lipMainName)
+                ar.utils.setProgress(doingName+lipMainName)
 
-                lipMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                lipMainInstance = ar.initGuide('dpSingle', guideDir)
                 lipMainInstance.editGuideModuleName(lipMainName)
                 cmds.setAttr(lipMainInstance.moduleGrp+".deformedBy", 3)
                 
-                upperLipMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                upperLipMiddleInstance = ar.initGuide('dpSingle', guideDir)
                 upperLipMiddleInstance.editGuideModuleName(upperLipMiddleName)
                 
-                upperLipInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                upperLipInstance1 = ar.initGuide('dpSingle', guideDir)
                 upperLipInstance1.editGuideModuleName(checkText=upperLipName1)
                 upperLipInstance1.changeMirror("X")
                 
-                upperLipInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                upperLipInstance2 = ar.initGuide('dpSingle', guideDir)
                 upperLipInstance2.editGuideModuleName(upperLipName2)
                 upperLipInstance2.changeMirror("X")
                 
-                lowerLipMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                lowerLipMiddleInstance = ar.initGuide('dpSingle', guideDir)
                 lowerLipMiddleInstance.editGuideModuleName(lowerLipMiddleName)
                 
-                lowerLipInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                lowerLipInstance1 = ar.initGuide('dpSingle', guideDir)
                 lowerLipInstance1.editGuideModuleName(lowerLipName1)
                 lowerLipInstance1.changeMirror("X")
                 
-                lowerLipInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                lowerLipInstance2 = ar.initGuide('dpSingle', guideDir)
                 lowerLipInstance2.editGuideModuleName(lowerLipName2)
                 lowerLipInstance2.changeMirror("X")
                 
-                lipCornerInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                lipCornerInstance = ar.initGuide('dpSingle', guideDir)
                 lipCornerInstance.editGuideModuleName(lipCornerName)
                 lipCornerInstance.changeMirror("X")
                 cmds.refresh()
@@ -187,107 +187,107 @@ def Tweaks(dpUIinst):
                 #
                 if userDetail == complete:
                     
-                    dpUIinst.utils.setProgress(doingName+eyelidMainName)
+                    ar.utils.setProgress(doingName+eyelidMainName)
 
-                    eyebrowMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                    eyebrowMiddleInstance = ar.initGuide('dpSingle', guideDir)
                     eyebrowMiddleInstance.editGuideModuleName(eyebrowMiddleName)
 
-                    eyebrowInstance4 = dpUIinst.initGuide('dpSingle', guideDir)
+                    eyebrowInstance4 = ar.initGuide('dpSingle', guideDir)
                     eyebrowInstance4.editGuideModuleName(eyebrowName4)
                     eyebrowInstance4.changeMirror("X")
 
                     if userIndirectSkin == indSkin:
-                        eyelidMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                        eyelidMainInstance = ar.initGuide('dpSingle', guideDir)
                         eyelidMainInstance.editGuideModuleName(eyelidMainName)
                         eyelidMainInstance.changeMirror("X")
                         cmds.setAttr(eyelidMainInstance.moduleGrp+".deformedBy", 1)
                         
-                        upperEyelidInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyelidInstance0 = ar.initGuide('dpSingle', guideDir)
                         upperEyelidInstance0.editGuideModuleName(upperEyelidName0)
                         upperEyelidInstance0.changeMirror("X")
                         
-                        upperEyelidInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyelidInstance1 = ar.initGuide('dpSingle', guideDir)
                         upperEyelidInstance1.editGuideModuleName(upperEyelidName1)
                         upperEyelidInstance1.changeMirror("X")
                         
-                        upperEyelidInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyelidInstance2 = ar.initGuide('dpSingle', guideDir)
                         upperEyelidInstance2.editGuideModuleName(upperEyelidName2)
                         upperEyelidInstance2.changeMirror("X")
                         
-                        lowerEyelidInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyelidInstance0 = ar.initGuide('dpSingle', guideDir)
                         lowerEyelidInstance0.editGuideModuleName(lowerEyelidName0)
                         lowerEyelidInstance0.changeMirror("X")
                         
-                        lowerEyelidInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyelidInstance1 = ar.initGuide('dpSingle', guideDir)
                         lowerEyelidInstance1.editGuideModuleName(lowerEyelidName1)
                         lowerEyelidInstance1.changeMirror("X")
                         
-                        lowerEyelidInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyelidInstance2 = ar.initGuide('dpSingle', guideDir)
                         lowerEyelidInstance2.editGuideModuleName(lowerEyelidName2)
                         lowerEyelidInstance2.changeMirror("X")
                         
-                        eyelidCornerInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        eyelidCornerInstance0 = ar.initGuide('dpSingle', guideDir)
                         eyelidCornerInstance0.editGuideModuleName(eyelidCornerName0)
                         eyelidCornerInstance0.changeMirror("X")
                         
-                        eyelidCornerInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        eyelidCornerInstance1 = ar.initGuide('dpSingle', guideDir)
                         eyelidCornerInstance1.editGuideModuleName(eyelidCornerName1)
                         eyelidCornerInstance1.changeMirror("X")
 
-                        upperEyeSocketInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyeSocketInstance0 = ar.initGuide('dpSingle', guideDir)
                         upperEyeSocketInstance0.editGuideModuleName(upperEyeSocketName0)
                         upperEyeSocketInstance0.changeMirror("X")
                         
-                        upperEyeSocketInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyeSocketInstance1 = ar.initGuide('dpSingle', guideDir)
                         upperEyeSocketInstance1.editGuideModuleName(upperEyeSocketName1)
                         upperEyeSocketInstance1.changeMirror("X")
                         
-                        upperEyeSocketInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                        upperEyeSocketInstance2 = ar.initGuide('dpSingle', guideDir)
                         upperEyeSocketInstance2.editGuideModuleName(upperEyeSocketName2)
                         upperEyeSocketInstance2.changeMirror("X")
                         
-                        lowerEyeSocketInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyeSocketInstance0 = ar.initGuide('dpSingle', guideDir)
                         lowerEyeSocketInstance0.editGuideModuleName(lowerEyeSocketName0)
                         lowerEyeSocketInstance0.changeMirror("X")
                         
-                        lowerEyeSocketInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyeSocketInstance1 = ar.initGuide('dpSingle', guideDir)
                         lowerEyeSocketInstance1.editGuideModuleName(lowerEyeSocketName1)
                         lowerEyeSocketInstance1.changeMirror("X")
                         
-                        lowerEyeSocketInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                        lowerEyeSocketInstance2 = ar.initGuide('dpSingle', guideDir)
                         lowerEyeSocketInstance2.editGuideModuleName(lowerEyeSocketName2)
                         lowerEyeSocketInstance2.changeMirror("X")
 
                     cmds.refresh()                    
-                    dpUIinst.utils.setProgress(doingName+eyeSocketName)
+                    ar.utils.setProgress(doingName+eyeSocketName)
 
 
 
                     cmds.refresh()                    
-                    dpUIinst.utils.setProgress(doingName+squintMainName)
+                    ar.utils.setProgress(doingName+squintMainName)
                     
-                    squintMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+                    squintMainInstance = ar.initGuide('dpSingle', guideDir)
                     squintMainInstance.editGuideModuleName(squintMainName)
                     squintMainInstance.changeMirror("X")
                     cmds.setAttr(squintMainInstance.moduleGrp+".deformedBy", 1)
                     
-                    squintInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                    squintInstance1 = ar.initGuide('dpSingle', guideDir)
                     squintInstance1.editGuideModuleName(checkText=squintName1)
                     squintInstance1.changeMirror("X")
                     
-                    squintInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                    squintInstance2 = ar.initGuide('dpSingle', guideDir)
                     squintInstance2.editGuideModuleName(squintName2)
                     squintInstance2.changeMirror("X")
                     
-                    squintInstance3 = dpUIinst.initGuide('dpSingle', guideDir)
+                    squintInstance3 = ar.initGuide('dpSingle', guideDir)
                     squintInstance3.editGuideModuleName(squintName3)
                     squintInstance3.changeMirror("X")
 
-                    cheekInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+                    cheekInstance1 = ar.initGuide('dpSingle', guideDir)
                     cheekInstance1.editGuideModuleName(cheekName1)
                     cheekInstance1.changeMirror("X")
 
-                    cheekInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+                    cheekInstance2 = ar.initGuide('dpSingle', guideDir)
                     cheekInstance2.editGuideModuleName(cheekName2)
                     cheekInstance2.changeMirror("X")
                 
@@ -327,7 +327,7 @@ def Tweaks(dpUIinst):
                 cmds.setAttr(holderMainInstance.radiusCtrl+".translateX", 2)
                 cmds.setAttr(holderMainInstance.moduleGrp+".holder", 0.7)
                 
-                dpUIinst.utils.setProgress(doingName+" hierarchy")
+                ar.utils.setProgress(doingName+" hierarchy")
                 cmds.refresh()
                 
                 # working on hierarchy
@@ -485,11 +485,11 @@ def Tweaks(dpUIinst):
                         cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateZ", 0.5)
                 
                 # Close progress window
-                dpUIinst.utils.setProgress(endIt=True)
+                ar.utils.setProgress(endIt=True)
 
-                dpUIinst.collapseEditSelModFL = False
+                ar.collapseEditSelModFL = False
                 cmds.select(holderMainInstance.moduleGrp)
-                print(dpUIinst.lang['m093_createdTweaks'])
+                print(ar.data.lang['m093_createdTweaks'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

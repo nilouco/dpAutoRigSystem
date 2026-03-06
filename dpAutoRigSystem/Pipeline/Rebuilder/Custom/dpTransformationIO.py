@@ -55,19 +55,19 @@ class TransformationIO(dpBaseAction.ActionStartClass):
                         if transformList:
                             self.exportDicToJsonFile(self.getTransformDataDic(transformList))
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
                         transformDic = self.importLatestJsonFile(self.getExportedList())
                         if transformDic:
                             self.importTransformation(transformDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -85,9 +85,9 @@ class TransformationIO(dpBaseAction.ActionStartClass):
         self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         # define dictionary to export
         transformDic = {}
-        itemList = self.utils.filterTransformList(itemList, filterLattice=False, filterBaseName=False, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
+        itemList = self.utils.filterTransformList(itemList, filterLattice=False, filterBaseName=False, verbose=self.verbose, title=self.ar.data.lang[self.title])
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             useThisTransform = True
             if cmds.objExists(item+".dpNotTransformIO"):
                 if cmds.getAttr(item+".dpNotTransformIO") == 1:
@@ -166,7 +166,7 @@ class TransformationIO(dpBaseAction.ActionStartClass):
         # define lists to check result
         wellImportedList = []
         for item in transformDic.keys():
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             notFoundNodesList = []
             # check transform
             #if not cmds.objExists(item):
@@ -215,10 +215,10 @@ class TransformationIO(dpBaseAction.ActionStartClass):
                         except Exception as e:
                             self.notWorkedWellIO(item+" - "+str(e))
                 if not ran:
-                    self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                    self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
             self.wellDoneIO(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

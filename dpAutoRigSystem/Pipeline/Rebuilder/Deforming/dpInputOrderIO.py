@@ -51,23 +51,23 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                         if objList:
                             deformedList = objList
                         else:
-                            deformedList = self.dpUIinst.skin.getDeformedItemList(deformerTypeList=self.dpUIinst.skin.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                            deformedList = self.ar.skin.getDeformedItemList(deformerTypeList=self.ar.skin.getAllDeformerTypeList(), ignoreAttr=self.ar.skin.ignoreSkinningAttr)
                         if deformedList:
                             self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" - meshes")
                     else: #import
                         orderDic = self.importLatestJsonFile(self.getExportedList())
                         if orderDic:
                             self.importInputOrder(orderDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -85,8 +85,8 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
         orderDic = {}
         self.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
         for item in deformedList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
-            orderDic[item] = self.dpUIinst.skin.getOrderList(item)
+            self.utils.setProgress(self.ar.data.lang[self.title])
+            orderDic[item] = self.ar.skin.getOrderList(item)
         return orderDic
     
 
@@ -97,7 +97,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
         wellImported = True
         toImportList, notFoundMeshList, = [], []
         for item in orderDic.keys():
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 toImportList.append(item)
             else:
@@ -111,7 +111,7 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
                     deformerList = orderDic[item]
                     if deformerList:
                         if len(deformerList) > 1:
-                            self.dpUIinst.skin.setOrderList(item, deformerList)
+                            self.ar.skin.setOrderList(item, deformerList)
                 except Exception as e:
                     wellImported = False
                     print(e)
@@ -120,4 +120,4 @@ class InputOrderIO(dpBaseAction.ActionStartClass):
             if wellImported:
                 self.wellDoneIO(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

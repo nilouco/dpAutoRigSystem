@@ -14,8 +14,8 @@ DP_REORDERATTR_VERSION = 1.04
 
 
 class ReorderAttr(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
-        self.dpUIinst = dpUIinst
+    def __init__(self, ar, ui=True, *args, **kwargs):
+        self.ar = ar
         self.winName = "dpReorderAttrWindow"
         self.nextAttrTypeList = ["message", "typed"]
         # call main function
@@ -27,17 +27,17 @@ class ReorderAttr(object):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpReorderAttrUI Window:
-        self.dpUIinst.utils.closeUI(self.winName)
+        self.ar.utils.closeUI(self.winName)
         reorderAttr_winWidth  = 175
         reorderAttr_winHeight = 75
-        dpReorderAttrWin = cmds.window(self.winName, title=self.dpUIinst.lang["m087_reorderAttr"]+" "+str(DP_REORDERATTR_VERSION), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpReorderAttrWin = cmds.window(self.winName, title=self.ar.data.lang["m087_reorderAttr"]+" "+str(DP_REORDERATTR_VERSION), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         reorderAttrLayout = cmds.columnLayout('reorderAttrLayout', columnOffset=("left", 30))
         cmds.separator(style='none', height=7, parent=reorderAttrLayout)
-        cmds.button(label=self.dpUIinst.lang["i154_up"], annotation=self.dpUIinst.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True, True), parent=reorderAttrLayout)
+        cmds.button(label=self.ar.data.lang["i154_up"], annotation=self.ar.data.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True, True), parent=reorderAttrLayout)
         cmds.separator(style='in', height=10, width=110, parent=reorderAttrLayout)
-        cmds.button(label=self.dpUIinst.lang["i156_down"], annotation=self.dpUIinst.lang["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True, True), parent=reorderAttrLayout)
+        cmds.button(label=self.ar.data.lang["i156_down"], annotation=self.ar.data.lang["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True, True), parent=reorderAttrLayout)
         
         # call dpReorderAttrUI Window:
         cmds.showWindow(dpReorderAttrWin)
@@ -61,7 +61,7 @@ class ReorderAttr(object):
                     if userDefAttrList:
                         if not attrList[0] in userDefAttrList:
                             if verbose:
-                                mel.eval("warning \""+self.dpUIinst.lang["m235_selectedStaticAttr"]+"\";")
+                                mel.eval("warning \""+self.ar.data.lang["m235_selectedStaticAttr"]+"\";")
                         else:
                             cmds.scriptEditorInfo(suppressInfo=True)
                             # unlock all user defined attibutes before start the changing position:
@@ -115,13 +115,13 @@ class ReorderAttr(object):
                                     cmds.setAttr(obj+"."+lockAttr, lock=True)
                     else:
                         if verbose:
-                            mel.eval("warning \""+self.dpUIinst.lang["m236_canReorderUserDefAttr"]+"\";")
+                            mel.eval("warning \""+self.ar.data.lang["m236_canReorderUserDefAttr"]+"\";")
             else:
                 if verbose:
-                    mel.eval("warning \""+self.dpUIinst.lang["m237_selectChannelBoxAttr"]+"\";")
+                    mel.eval("warning \""+self.ar.data.lang["m237_selectChannelBoxAttr"]+"\";")
         else:
             if verbose:
-                mel.eval("warning \""+self.dpUIinst.lang["m238_selectTransform"]+"\";")
+                mel.eval("warning \""+self.ar.data.lang["m238_selectTransform"]+"\";")
         # back ScritpEditor to show info:
         cmds.scriptEditorInfo(suppressInfo=True)
  

@@ -27,9 +27,9 @@ class DeformationIO(dpBaseAction.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_deformationIO"
         self.startName = "dpDeformation"
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpWeights)
-        self.defWeights = dpWeights.Weights(self.dpUIinst)
+        self.defWeights = dpWeights.Weights(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -70,21 +70,21 @@ class DeformationIO(dpBaseAction.ActionStartClass):
                             if hasDef:
                                 self.exportDicToJsonFile(self.getDeformerDataDic(inputDeformerList))
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" deformers")
+                                self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" deformers")
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" mesh")
                     else: #import
                         deformerDic = self.importLatestJsonFile(self.getExportedList())
                         if deformerDic:
                             self.importDeformationData(deformerDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -105,7 +105,7 @@ class DeformationIO(dpBaseAction.ActionStartClass):
         deformerDic = {}
         # run for all deformer types to get info
         for deformerType in self.defWeights.typeAttrDic.keys():
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             deformerList = cmds.ls(selection=False, type=deformerType)
             if deformerList:
                 for deformerNode in deformerList:
@@ -269,7 +269,7 @@ class DeformationIO(dpBaseAction.ActionStartClass):
         if toImportList:
             self.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
             for deformerNode in toImportList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
                 try:
                     wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
                 except Exception as e:
@@ -285,9 +285,9 @@ class DeformationIO(dpBaseAction.ActionStartClass):
             if wellImported:
                 self.wellDoneIO(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(deformerDic.keys())))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(deformerDic.keys())))
         if not wellImported:
             if changedShapeMeshList:
-                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+                self.notWorkedWellIO(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
             elif notFoundMeshList:
-                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

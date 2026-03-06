@@ -19,13 +19,13 @@ DP_FACIALCONNECTION_VERSION = 2.00
 
 
 class FacialConnection(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
-        self.ctrls = dpUIinst.ctrls
+        self.ar = ar
+        self.utils = ar.utils
+        self.ctrls = ar.ctrls
         self.ui = ui
-        self.headFacialCtrlsGrp = self.dpUIinst.lang["c024_head"]+"_"+self.dpUIinst.lang["c059_facial"]+"_Ctrls_Grp"
+        self.headFacialCtrlsGrp = self.ar.data.lang["c024_head"]+"_"+self.ar.data.lang["c059_facial"]+"_Ctrls_Grp"
         self.jntTargetList = []
         self.RmVNumber = 0
         self.bsReceptSuffix = "Recept_BS"
@@ -42,17 +42,17 @@ class FacialConnection(object):
 
     def dpInitTweaksVariables(self, *args):
         # part names:
-        mainName = self.dpUIinst.lang['c058_main']
-        tweaksName = self.dpUIinst.lang['m081_tweaks']
-        middleName = self.dpUIinst.lang['c029_middle']
-        eyebrowName = self.dpUIinst.lang['c041_eyebrow']
-        cornerName = self.dpUIinst.lang['c043_corner']
-        upperName = self.dpUIinst.lang['c044_upper']
-        lowerName = self.dpUIinst.lang['c045_lower']
-        lipName = self.dpUIinst.lang['c039_lip']
-        squintName = self.dpUIinst.lang['c054_squint']
-        cheekName = self.dpUIinst.lang['c055_cheek']
-        self.calibrateName = self.dpUIinst.lang["c111_calibrate"].lower()
+        mainName = self.ar.data.lang['c058_main']
+        tweaksName = self.ar.data.lang['m081_tweaks']
+        middleName = self.ar.data.lang['c029_middle']
+        eyebrowName = self.ar.data.lang['c041_eyebrow']
+        cornerName = self.ar.data.lang['c043_corner']
+        upperName = self.ar.data.lang['c044_upper']
+        lowerName = self.ar.data.lang['c045_lower']
+        lipName = self.ar.data.lang['c039_lip']
+        squintName = self.ar.data.lang['c054_squint']
+        cheekName = self.ar.data.lang['c055_cheek']
+        self.calibrateName = self.ar.data.lang["c111_calibrate"].lower()
         # eyebrows names:
         self.eyebrowMiddleName = tweaksName+"_"+middleName+"_"+eyebrowName
         self.eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
@@ -95,7 +95,7 @@ class FacialConnection(object):
         # load json file:
         path = os.path.dirname(__file__)
         jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
-        presetContent = self.dpUIinst.pipeliner.getJsonContent(jsonPath+FACIALPRESET+".json")
+        presetContent = self.ar.pipeliner.getJsonContent(jsonPath+FACIALPRESET+".json")
         if presetContent:
             # rebuild dictionary using object variables:
             for storedAttr in list(presetContent):
@@ -118,21 +118,21 @@ class FacialConnection(object):
         self.utils.closeUI('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 230
         facialCtrl_winHeight = 330
-        dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.dpUIinst.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
         cmds.separator(height=5, style="in", horizontal=True, parent=facialCtrlLayout)
-        cmds.button(label=self.dpUIinst.lang['m140_createTargets'], annotation=self.dpUIinst.lang["m141_createTargetsDesc"], width=220, command=self.dpCreateTargetsFromUI, align="center", parent=facialCtrlLayout)
-        self.createBsNodeCB = cmds.checkBox(label=self.dpUIinst.lang['m258_createBSNode'], annotation=self.dpUIinst.lang["m259_createBSNodeDesc"], value=1, parent=facialCtrlLayout)
-        self.combinationTgtCB = cmds.checkBox(label=self.dpUIinst.lang['m260_combinationTargets'], annotation=self.dpUIinst.lang["m261_combinationTargetsDesc"], value=1, parent=facialCtrlLayout)
-        self.tweakTgtOnlyCB = cmds.checkBox(label=self.dpUIinst.lang['m262_tweakTargetOnly'], annotation=self.dpUIinst.lang["m263_tweakTargetOnlyDesc"], value=0, changeCommand=self.dpDisableCombination, parent=facialCtrlLayout)
+        cmds.button(label=self.ar.data.lang['m140_createTargets'], annotation=self.ar.data.lang["m141_createTargetsDesc"], width=220, command=self.dpCreateTargetsFromUI, align="center", parent=facialCtrlLayout)
+        self.createBsNodeCB = cmds.checkBox(label=self.ar.data.lang['m258_createBSNode'], annotation=self.ar.data.lang["m259_createBSNodeDesc"], value=1, parent=facialCtrlLayout)
+        self.combinationTgtCB = cmds.checkBox(label=self.ar.data.lang['m260_combinationTargets'], annotation=self.ar.data.lang["m261_combinationTargetsDesc"], value=1, parent=facialCtrlLayout)
+        self.tweakTgtOnlyCB = cmds.checkBox(label=self.ar.data.lang['m262_tweakTargetOnly'], annotation=self.ar.data.lang["m263_tweakTargetOnlyDesc"], value=0, changeCommand=self.dpDisableCombination, parent=facialCtrlLayout)
         cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
-        cmds.text(label=self.dpUIinst.lang['m264_rebuildTargetsText'], parent=facialCtrlLayout)
-        cmds.button(label=self.dpUIinst.lang['m265_rebuildTargets'], annotation=self.dpUIinst.lang["m266_rebuildTargetsDesc"], width=220, command=self.dpRebuildTargets, parent=facialCtrlLayout)
+        cmds.text(label=self.ar.data.lang['m264_rebuildTargetsText'], parent=facialCtrlLayout)
+        cmds.button(label=self.ar.data.lang['m265_rebuildTargets'], annotation=self.ar.data.lang["m266_rebuildTargetsDesc"], width=220, command=self.dpRebuildTargets, parent=facialCtrlLayout)
         cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
-        cmds.text(label=self.dpUIinst.lang['m142_connectFacialAttr'], parent=facialCtrlLayout)
-        cmds.button(label=self.dpUIinst.lang['m170_blendShapes']+" - "+self.dpUIinst.lang['i185_animation'], annotation="Create selected facial controls.", width=220, command=self.dpConnectToBlendShape, parent=facialCtrlLayout)
-        cmds.button(label=self.dpUIinst.lang['i181_facialJoint']+" - "+self.dpUIinst.lang['i186_gaming'], annotation="Create default facial controls package.", width=220, command=self.dpConnectToJoints, parent=facialCtrlLayout)
+        cmds.text(label=self.ar.data.lang['m142_connectFacialAttr'], parent=facialCtrlLayout)
+        cmds.button(label=self.ar.data.lang['m170_blendShapes']+" - "+self.ar.data.lang['i185_animation'], annotation="Create selected facial controls.", width=220, command=self.dpConnectToBlendShape, parent=facialCtrlLayout)
+        cmds.button(label=self.ar.data.lang['i181_facialJoint']+" - "+self.ar.data.lang['i186_gaming'], annotation="Create default facial controls package.", width=220, command=self.dpConnectToJoints, parent=facialCtrlLayout)
         # call facialControlUI Window:
         cmds.showWindow(dpFacialControlWin)
     
@@ -174,11 +174,11 @@ class FacialConnection(object):
             for geoBase in fromMeshList:
                 prefix = baseName
                 if self.ui:
-                    btContinue = self.dpUIinst.lang['i174_continue']
-                    btCancel = self.dpUIinst.lang['i132_cancel']
+                    btContinue = self.ar.data.lang['i174_continue']
+                    btCancel = self.ar.data.lang['i132_cancel']
                     result = cmds.promptDialog(
-                                                title=self.dpUIinst.lang['m006_name'],
-                                                message=self.dpUIinst.lang['i144_prefix']+":",
+                                                title=self.ar.data.lang['m006_name'],
+                                                message=self.ar.data.lang['i144_prefix']+":",
                                                 button=[btContinue, btCancel],
                                                 defaultButton=btContinue,
                                                 cancelButton=btCancel,
@@ -233,9 +233,9 @@ class FacialConnection(object):
                 if createBsNode:
                     self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=combinationTargets)
             if self.ui and resultList:
-                self.dpUIinst.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
+                self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
-            mel.eval("warning \""+self.dpUIinst.lang["i042_notSelection"]+"\";")
+            mel.eval("warning \""+self.ar.data.lang["i042_notSelection"]+"\";")
         self.utils.closeUI('dpFacialConnectionWindow')
     
 
@@ -244,7 +244,7 @@ class FacialConnection(object):
         """
         dup = cmds.duplicate(fromMesh)[0]
         newTgt = cmds.rename(dup, prefix+tgt+suffix)
-        self.dpUIinst.customAttr.addAttr(0, [newTgt], descendents=True) #dpID
+        self.ar.customAttr.addAttr(0, [newTgt], descendents=True) #dpID
         cmds.select(newTgt)
         cmds.hyperShade(newTgt, assign="initialShadingGroup")
         connectedPlug = cmds.listConnections(newTgt+".drawOverride", destination=False, source=True, plugs=True)
@@ -305,7 +305,7 @@ class FacialConnection(object):
                                 # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
                                 if connectIt:
                                     cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
-                                    print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
+                                    print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
                                     resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
             for bsNode in list(bsDic.keys()):
                 # check and connect combination targets if any
@@ -315,7 +315,7 @@ class FacialConnection(object):
                     for result in combResultList:
                         resultList.append(result)
         if self.ui and resultList:
-            self.dpUIinst.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
+            self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.utils.closeUI('dpFacialConnectionWindow')
     
 
@@ -376,11 +376,11 @@ class FacialConnection(object):
                                                             oMax = nodeDic[toNode][toAttr][1]
                                                             self.dpCreateRemapNode(facialCtrl, facialAttr, jntTarget, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
                                                             self.RmVNumber = self.RmVNumber+1
-                                                        print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
+                                                        print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
                                                         resultList.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
-                    self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+                    self.ar.customAttr.addAttr(0, self.toIDList) #dpID
                     if self.ui and resultList:
-                        self.dpUIinst.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
+                        self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.utils.closeUI('dpFacialConnectionWindow')
 
     
@@ -388,8 +388,8 @@ class FacialConnection(object):
         """ Load the respective items to build the joint target list (offset group node) and returns it.
         """
         self.offsetSuffix = "_Ctrl_Offset_Grp"
-        leftPrefix = self.dpUIinst.lang["p002_left"]+"_"
-        rightPrefix = self.dpUIinst.lang["p003_right"]+"_"
+        leftPrefix = self.ar.data.lang["p002_left"]+"_"
+        rightPrefix = self.ar.data.lang["p003_right"]+"_"
         for item in itemList:
             centerName = item+self.offsetSuffix
             leftName   = leftPrefix+item+self.offsetSuffix
@@ -583,7 +583,7 @@ class FacialConnection(object):
                     # add combination only if the target is not locked
                     if not cmds.getAttr(bsNode+"."+combTgt, lock=True):
                         cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
-                        print(self.dpUIinst.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
+                        print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
                         resultList.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
         return resultList
 
@@ -630,7 +630,7 @@ class FacialConnection(object):
                     if targetList:
                         # progress window
                         progressAmount = 0
-                        self.utils.setProgress('Rebuilding Target: '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang["m265_rebuildTargets"], len(targetList), addOne=False, addNumber=False)
+                        self.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targetList), addOne=False, addNumber=False)
                         cancelled = False
                         nbTarget = len(targetList)
                         reconnectList = []

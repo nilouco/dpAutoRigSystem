@@ -12,14 +12,14 @@ DP_UPDATEGUIDES_VERSION = 1.10
 
 
 class UpdateGuides(object):
-    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+    def __init__(self, ar, ui=True, *args, **kwargs):
         # defining variables
-        self.dpUIinst = dpUIinst
+        self.ar = ar
         self.ui = ui
-        self.utils = dpUIinst.utils
+        self.utils = ar.utils
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
-        self.currentDpArVersion = dpUIinst.dpARVersion
+        self.currentDpArVersion = ar.dpARVersion
         # Receive the guides list from hook function
         self.guidesDictionary = self.utils.hook()
         # List that will hold all new guides instances
@@ -33,7 +33,7 @@ class UpdateGuides(object):
             # Get all info nedeed and store in updateData dictionary
             self.getGuidesToUpdateData()
         else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_guideNotFound']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
         if self.ui:
             # Open the UI
             self.updateGuidesUI()
@@ -49,21 +49,21 @@ class UpdateGuides(object):
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
         updateSummaryCL = cmds.columnLayout('updateSummaryCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
-        cmds.text(label=str(len(self.updateData))+' '+self.dpUIinst.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
+        cmds.text(label=str(len(self.updateData))+' '+self.ar.data.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
         if newData:
-            cmds.text(label=self.dpUIinst.lang['m190_newAttrFound'], align='center', parent=updateSummaryCL)
+            cmds.text(label=self.ar.data.lang['m190_newAttrFound'], align='center', parent=updateSummaryCL)
             updateSummarySL = cmds.scrollLayout('updateSummarySL', width=330, height=400, parent=updateSummaryCL)
             updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummarySL)
-            cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
-            cmds.text(label=self.dpUIinst.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
+            cmds.text(label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
+            cmds.text(label=self.ar.data.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
             for guide in newData:
                 for newAttr in newData[guide]:
                     cmds.text(label=guide, align='left', parent=updateSummaryRC)
                     cmds.text(label=newAttr, align='center', parent=updateSummaryRC)
         cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.text(label=self.dpUIinst.lang['m192_askOldGuides'], align='center', parent=updateSummaryCL)
+        cmds.text(label=self.ar.data.lang['m192_askOldGuides'], align='center', parent=updateSummaryCL)
         cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.button(label=self.dpUIinst.lang['m193_deleteOldGuides'], command=self.doDelete, backgroundColor=(1.0, 0.6, 0.4), parent=updateSummaryCL)
+        cmds.button(label=self.ar.data.lang['m193_deleteOldGuides'], command=self.doDelete, backgroundColor=(1.0, 0.6, 0.4), parent=updateSummaryCL)
         cmds.separator(style='none', height=10, parent=updateSummaryCL)
         cmds.showWindow('updateSummary')
 
@@ -75,21 +75,21 @@ class UpdateGuides(object):
         self.utils.closeUI('updateSummary')
         cmds.window('updateGuidesWindow', title="Guides Info")
         updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
-        cmds.text(label='DPAR '+self.dpUIinst.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
+        cmds.text(label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
         if len(self.updateData) > 0:
             updateGuidesSL = cmds.scrollLayout('updateGuidesSL', width=330, height=400, parent=updateGuidesCL)
             updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesSL)
-            cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
-            cmds.text(label=self.dpUIinst.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-            cmds.text(label=self.dpUIinst.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+            cmds.text(label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
+            cmds.text(label=self.ar.data.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+            cmds.text(label=self.ar.data.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
             for guide in self.updateData:
                 cmds.text(label=guide, align='left', parent=updateGuidesBaseRCL)
                 cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent=updateGuidesBaseRCL)
                 cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent=updateGuidesBaseRCL)
             cmds.separator(style='none', height=10, parent=updateGuidesBaseRCL)
-            cmds.button(label=self.dpUIinst.lang['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
+            cmds.button(label=self.ar.data.lang['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
         else:
-            cmds.text(label=self.dpUIinst.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
+            cmds.text(label=self.ar.data.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
         cmds.separator(style='none', height=10, parent=updateGuidesCL)
         cmds.window('updateGuidesWindow', edit=True, height=1)
         cmds.select(clear=True)
@@ -140,43 +140,43 @@ class UpdateGuides(object):
 
     def translateLimbStyleValue(self, enumValue):
         if enumValue == 1:
-            return self.dpUIinst.lang['m026_biped']
+            return self.ar.data.lang['m026_biped']
         elif enumValue == 2:
-            return self.dpUIinst.lang['m037_quadruped']
+            return self.ar.data.lang['m037_quadruped']
         elif enumValue == 3:
-            return self.dpUIinst.lang['m043_quadSpring']
+            return self.ar.data.lang['m043_quadSpring']
         elif enumValue == 4:
-            return self.dpUIinst.lang['m155_quadrupedExtra']
+            return self.ar.data.lang['m155_quadrupedExtra']
         else:
-            return self.dpUIinst.lang['m042_default']
+            return self.ar.data.lang['m042_default']
 
 
     def translateSpineStyleValue(self, enumValue):
         if enumValue == 1:
-            return self.dpUIinst.lang['m026_biped']
+            return self.ar.data.lang['m026_biped']
         else:
-            return self.dpUIinst.lang['m042_default']
+            return self.ar.data.lang['m042_default']
     
 
     def translateLimbTypeValue(self, enumValue):
         if enumValue == 1:
-            return self.dpUIinst.lang['m030_leg']
+            return self.ar.data.lang['m030_leg']
         else:
-            return self.dpUIinst.lang['m028_arm']
+            return self.ar.data.lang['m028_arm']
 
 
     def setAttrValue(self, dpGuide, attr, value):
         try:
             cmds.setAttr(dpGuide+'.'+attr, value)
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
 
 
     def setAttrStrValue(self, dpGuide, attr, value):
         try:
             cmds.setAttr(dpGuide+'.'+attr, value, type='string')
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
     
 
     def setEyelidGuideAttribute(self, dpGuide, value):
@@ -327,8 +327,8 @@ class UpdateGuides(object):
     def getGuidesToUpdateData(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
         """
-        self.dpUIinst.populateCreatedGuideModules()
-        instancedModulesStrList = list(map(str, self.dpUIinst.modulesToBeRiggedList))
+        self.ar.populateCreatedGuideModules()
+        instancedModulesStrList = list(map(str, self.ar.modulesToBeRiggedList))
 
         for baseGuide in self.guidesDictionary:
             guideVersion = cmds.getAttr(baseGuide+'.dpARVersion', silent=True)
@@ -339,7 +339,7 @@ class UpdateGuides(object):
                 guideAttrList = self.listKeyUserAttr(baseGuide)
                 # Create de attributes dictionary for each baseGuide
                 self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
-                self.updateData[baseGuide]['instance'] = self.dpUIinst.modulesToBeRiggedList[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
+                self.updateData[baseGuide]['instance'] = self.ar.modulesToBeRiggedList[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
                 self.updateData[baseGuide]['children'] = {}
                 self.updateData[baseGuide]['parent'] = self.getGuideParent(baseGuide)
                 childrenList = self.listChildren(baseGuide)
@@ -356,7 +356,7 @@ class UpdateGuides(object):
         for guide in self.updateData:
             guideType = self.updateData[guide]['guideModuleName']
             # create the new guide
-            currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules.Standard")
+            currentNewGuide = self.ar.initGuide("dp"+guideType, "Modules.Standard")
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
             currentNewGuide.editGuideModuleName(guideName)
@@ -393,7 +393,7 @@ class UpdateGuides(object):
                 try:
                     cmds.parent(self.updateData[guide]['newGuide'], newParentFinal)
                 except:
-                    mel.eval('print \"dpAR: '+self.dpUIinst.lang['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
+                    mel.eval('print \"dpAR: '+self.ar.data.lang['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
             if self.ui:
                 cmds.refresh()
 
@@ -407,7 +407,7 @@ class UpdateGuides(object):
                     try:
                         cmds.parent(retainGuide, newParentFinal)
                     except:
-                        mel.eval('print \"dpAR: '+self.dpUIinst.lang['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
+                        mel.eval('print \"dpAR: '+self.ar.data.lang['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
     
 
     def sendTransformsToListEnd(self, elementList):
@@ -493,13 +493,13 @@ class UpdateGuides(object):
         try:
             cmds.delete(*self.updateData.keys())
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_guideNotFound']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
              if self.updateData[guide]['instance'].guideNamespace in allNamespaceList:
                     cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guideNamespace, ':'), force=True)
                     cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guideNamespace, force=True)
-        self.dpUIinst.reloadMainUI()
+        self.ar.ui_manager.reload_ui()
 
 
     def patchFootRfF(self, *args):
@@ -536,25 +536,25 @@ class UpdateGuides(object):
         """
         self.utils.closeUI('updateGuidesWindow')
         # Starts progress bar feedback
-        self.utils.setProgress(self.dpUIinst.lang['m198_renameOldGuides'], self.dpUIinst.lang['m186_updateGuides'], 7, addOne=False)
+        self.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, addOne=False)
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
-        self.utils.setProgress(self.dpUIinst.lang['m199_creatingNewGuides'])
+        self.utils.setProgress(self.ar.data.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.createNewGuides()
-        self.utils.setProgress(self.dpUIinst.lang['m200_setAttrs'])
+        self.utils.setProgress(self.ar.data.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
         self.setNewGuideAttr('attributes')
-        self.utils.setProgress(self.dpUIinst.lang['m201_parentGuides'])
+        self.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parentNewGuides()
-        self.utils.setProgress(self.dpUIinst.lang['m202_setTranforms'])
+        self.utils.setProgress(self.ar.data.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
         self.setNewGuideAttr('transformAttributes')
-        self.utils.setProgress(self.dpUIinst.lang['m203_setChildGuides'])
+        self.utils.setProgress(self.ar.data.lang['m203_setChildGuides'])
         # Set all children attributes
         self.setChildrenGuides()
-        self.utils.setProgress(self.dpUIinst.lang['m201_parentGuides'])
+        self.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parentRetainGuides()
         self.patchFootRfF()

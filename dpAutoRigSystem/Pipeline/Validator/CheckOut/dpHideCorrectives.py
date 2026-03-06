@@ -48,7 +48,7 @@ class HideCorrectives(dpBaseAction.ActionStartClass):
                     toCheckList = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
                 if toCheckList:
                     self.utils.setProgress(max=1)
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     item = optionCtrl+".correctiveCtrls"
                     # conditional to check here
                     checkChannelBox = cmds.getAttr(item, channelBox=True)
@@ -62,16 +62,16 @@ class HideCorrectives(dpBaseAction.ActionStartClass):
                                 cmds.setAttr(item, 0)
                                 cmds.setAttr(item, lock=True, channelBox=False)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     else:
                         self.notFoundNodes()
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -24,9 +24,9 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_UNLOCKNORMALS_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(zeSoftHardEdges)
-        self.softHardEdges = zeSoftHardEdges.ConvertNormals(self.dpUIinst)
+        self.softHardEdges = zeSoftHardEdges.ConvertNormals(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -53,7 +53,7 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
             if allMeshList:
                 self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
                 for mesh in allMeshList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
                         lockedList = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
                         # check if there's any locked normal
@@ -67,14 +67,14 @@ class UnlockNormals(dpBaseAction.ActionStartClass):
                                     #cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True) #it doesn't keep the soft and hard edges when importing mesh
                                     self.softHardEdges.setSoftHard(mesh)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+mesh)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+mesh)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -62,13 +62,13 @@ class DrivenKeyIO(dpBaseAction.ActionStartClass):
                         if drivenKeyDic:
                             self.importDrivenKeyData(drivenKeyDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -90,7 +90,7 @@ class DrivenKeyIO(dpBaseAction.ActionStartClass):
         keyTimeAttrList = ["keyTime", "keyValue"]
         self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
         for item in nodeList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
                 # getting attributes if they exists
                 dic[item] = { "attributes"     : {},
@@ -152,7 +152,7 @@ class DrivenKeyIO(dpBaseAction.ActionStartClass):
         wellImportedList = []
         for item in drivenKeyDic.keys():
             existingNodesList = []
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             # create set driven key node if it needs
             if not cmds.objExists(item):
                 drivenKeyType = drivenKeyDic[item]["type"]
@@ -200,6 +200,6 @@ class DrivenKeyIO(dpBaseAction.ActionStartClass):
             self.wellDoneIO(self.latestDataFile)
         else:
             if existingNodesList:
-                self.wellDoneIO(self.dpUIinst.lang['r032_notImportedData'])
+                self.wellDoneIO(self.ar.data.lang['r032_notImportedData'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
+                self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))

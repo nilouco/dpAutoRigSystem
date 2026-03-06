@@ -275,13 +275,13 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # grouping:
                     if n > 0:
                         if n == 1:
-                            if not cmds.objExists(self.fingerCtrl+'.'+self.dpUIinst.lang['c021_showControls']):
-                                cmds.addAttr(self.fingerCtrl, longName=self.dpUIinst.lang['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
+                            if not cmds.objExists(self.fingerCtrl+'.'+self.ar.data.lang['c021_showControls']):
+                                cmds.addAttr(self.fingerCtrl, longName=self.ar.data.lang['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                                 self.ctrlShape0 = cmds.listRelatives(side+self.userGuideName+"_00_Ctrl", children=True, type='nurbsCurve')[0]
-                                cmds.connectAttr(self.fingerCtrl+"."+self.dpUIinst.lang['c021_showControls'], self.ctrlShape0+".visibility", force=True)
-                                cmds.setAttr(self.fingerCtrl+'.'+self.dpUIinst.lang['c021_showControls'], keyable=False, channelBox=True)
+                                cmds.connectAttr(self.fingerCtrl+"."+self.ar.data.lang['c021_showControls'], self.ctrlShape0+".visibility", force=True)
+                                cmds.setAttr(self.fingerCtrl+'.'+self.ar.data.lang['c021_showControls'], keyable=False, channelBox=True)
                             for j in range(1, self.nJoints+1):
-                                cmds.addAttr(self.fingerCtrl, longName=self.dpUIinst.lang['c022_phalange']+str(j), attributeType='float', keyable=True)
+                                cmds.addAttr(self.fingerCtrl, longName=self.ar.data.lang['c022_phalange']+str(j), attributeType='float', keyable=True)
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side+self.userGuideName+"_%02d_Jnt"%(n-1)
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
@@ -313,7 +313,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     
                     if n == self.nJoints:
                         # create end joint:
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.jointEndAttr, radius=0.5)
                         self.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 
@@ -327,10 +327,10 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 for n in range(1, self.nJoints+1):
                     self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
                     self.sdkGrp = side+self.userGuideName+"_%02d_SDK_Grp"%(n)
-                    cmds.connectAttr(self.fingerCtrl+"."+self.dpUIinst.lang['c022_phalange']+str(n), self.sdkGrp+".rotateY", force=True)
+                    cmds.connectAttr(self.fingerCtrl+"."+self.ar.data.lang['c022_phalange']+str(n), self.sdkGrp+".rotateY", force=True)
                     if n > 1:
                         self.ctrlShape = cmds.listRelatives(side+self.userGuideName+"_%02d_Ctrl"%(n), children=True, type='nurbsCurve')[0]
-                        cmds.connectAttr(self.fingerCtrl+"."+self.dpUIinst.lang['c021_showControls'], self.ctrlShape+".visibility", force=True)
+                        cmds.connectAttr(self.fingerCtrl+"."+self.ar.data.lang['c021_showControls'], self.ctrlShape+".visibility", force=True)
 
                 # ik and Fk setup
                 if self.nJoints == 2:
@@ -361,8 +361,8 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.joint(jointNode, edit=True, setPreferredAngles=True)
                         cmds.setAttr(jointNode+".rotateY", currentRY)
                         cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_Jnt", "_Ik_Jxt"))
-                    elif "_"+self.dpUIinst.jointEndAttr in jointNode[jointNode.rfind("|"):]:
-                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.dpUIinst.jointEndAttr, "_Ik_"+self.dpUIinst.jointEndAttr))
+                    elif "_"+self.ar.jointEndAttr in jointNode[jointNode.rfind("|"):]:
+                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.ar.jointEndAttr, "_Ik_"+self.ar.jointEndAttr))
                 ikBaseJoint = cmds.rename(dupIk, dupIk.replace("_Jnt1", "_Ik_Jxt"))
                 ikJointList = cmds.listRelatives(ikBaseJoint, children=True, allDescendents=True)
                 ikJointList.append(ikBaseJoint)
@@ -379,15 +379,15 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 for jointNode in jointFkList:
                     if "_Jnt" in jointNode[jointNode.rfind("|"):]:
                         cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_Jnt", "_Fk_Jxt"))
-                    elif "_"+self.dpUIinst.jointEndAttr in jointNode[jointNode.rfind("|"):]:
-                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.dpUIinst.jointEndAttr, "_Fk_"+self.dpUIinst.jointEndAttr))
+                    elif "_"+self.ar.jointEndAttr in jointNode[jointNode.rfind("|"):]:
+                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.ar.jointEndAttr, "_Fk_"+self.ar.jointEndAttr))
                 fkBaseJoint = cmds.rename(dupFk, dupFk.replace("_Jnt2", "_Fk_Jxt"))
                 fkJointList = cmds.listRelatives(fkBaseJoint, children=True, allDescendents=True)
                 fkJointList.append(fkBaseJoint)
 
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
-                    if not "_"+self.dpUIinst.jointEndAttr in fkJoint:
+                    if not "_"+self.ar.jointEndAttr in fkJoint:
                         self.utils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
                         self.scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
@@ -403,7 +403,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     else:
                         ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_01_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IKH")
                     cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
-                    endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.dpUIinst.jointEndAttr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
+                    endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.ar.jointEndAttr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
                     cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
                     self.ikCtrl = self.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.ctrlList[1])
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
@@ -451,7 +451,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
-                    if not "_"+self.dpUIinst.jointEndAttr in ikJoint:
+                    if not "_"+self.ar.jointEndAttr in ikJoint:
                         self.utils.clearDpArAttr([ikJoint])
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
@@ -502,7 +502,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.scalableGrpList.append(self.toScalableHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -510,7 +510,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
 
 
     def integratingInfo(self, *args):

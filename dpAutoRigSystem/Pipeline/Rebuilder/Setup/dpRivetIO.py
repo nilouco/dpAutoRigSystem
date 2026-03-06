@@ -24,9 +24,9 @@ class RivetIO(dpBaseAction.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_RIVETIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
-        if self.dpUIinst.dev:
+        if self.ar.dev:
             reload(dpRivet)
-        self.dpRivet = dpRivet.Rivet(self.dpUIinst, ui=False)
+        self.dpRivet = dpRivet.Rivet(self.ar, ui=False)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_rivetIO"
         self.startName = "dpRivet"
@@ -61,21 +61,21 @@ class RivetIO(dpBaseAction.ActionStartClass):
                         if netList:
                             self.exportDicToJsonFile(self.getRivetDataDic(netList))
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['v014_notFoundNodes'])
+                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
                             cmds.select(clear=True)
                     else: #import
                         rivetDic = self.importLatestJsonFile(self.getExportedList())
                         if rivetDic:
                             self.importRivet(rivetDic)
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                         cmds.select(clear=True)
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -96,7 +96,7 @@ class RivetIO(dpBaseAction.ActionStartClass):
         i = 0
         for n, net in enumerate(netList):
             if self.verbose:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
             # mount a dic
             if cmds.objExists(net+".rivetData"):
                 data = json.loads(cmds.getAttr(net+".rivetData"))
@@ -120,13 +120,13 @@ class RivetIO(dpBaseAction.ActionStartClass):
         for net in rivetDic.keys():
             try:
                 netDic = rivetDic[net]
-                self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+netDic['geoToAttach'])
+                self.utils.setProgress(self.ar.data.lang[self.title]+': '+netDic['geoToAttach'])
                 # recreate rivet:
                 self.dpRivet.deformerToUse = netDic['deformerToUse']
                 rivetList = self.dpRivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['itemList'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
                 if not rivetList:
                     wellImported = False
-                    self.notWorkedWellIO(net+": "+self.dpUIinst.lang['r032_notImportedData'])
+                    self.notWorkedWellIO(net+": "+self.ar.data.lang['r032_notImportedData'])
             except Exception as e:
                 wellImported = False
                 self.notWorkedWellIO(net+": "+str(e))

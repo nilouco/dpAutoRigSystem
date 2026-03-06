@@ -61,11 +61,11 @@ class ResetPose(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList = self.dpUIinst.ctrls.getControlList()
+                toCheckList = self.ar.ctrls.getControlList()
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".dpControl"):
                         self.checkedObjList.append(item)
@@ -110,14 +110,14 @@ class ResetPose(dpBaseAction.ActionStartClass):
                                     elif attrType == 2: #float
                                         cmds.setAttr(item+"."+attr, float(format(attrData[attr][0],".3f")))
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

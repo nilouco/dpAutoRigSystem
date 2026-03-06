@@ -15,11 +15,11 @@ DP_COPYPASTEATTR_VERSION = 2.04
 
 
 class CopyPasteAttr(object):
-    def __init__(self, dpUIinst, *args, **kwargs):
+    def __init__(self, ar, *args, **kwargs):
         # defining variables
-        self.dpUIinst = dpUIinst
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
-        if self.dpUIinst.dev:
+        self.ar = ar
+        self.ctrls = dpControls.ControlClass(self.ar)
+        if self.ar.dev:
             reload(dpControls)
         # call main function
         self.copyPasteAttrUI()
@@ -40,8 +40,8 @@ class CopyPasteAttr(object):
         dpCopyPasteAttrWin = cmds.window('dpCopyPasteAttrWin', title='CopyPasteAttr - v'+str(DP_COPYPASTEATTR_VERSION), width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
         # UI elements:
         mainLayout  = cmds.columnLayout('mainLayout', width=150, height=75, adjustableColumn=True, parent=dpCopyPasteAttrWin)
-        cmds.button('copyButton', label=self.dpUIinst.lang['i122_copyAttr'], command=partial(self.ctrls.copyAttr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent=mainLayout)
-        cmds.button('pasteButton', label=self.dpUIinst.lang['i123_pasteAttr'], command=partial(self.ctrls.pasteAttr, verbose=True), backgroundColor=(1.0, 1.0, 0.7), parent=mainLayout)
-        cmds.button('copyAndPasteButton', label=self.dpUIinst.lang['i124_copyPasteAttr'], command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
+        cmds.button('copyButton', label=self.ar.data.lang['i122_copyAttr'], command=partial(self.ctrls.copyAttr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent=mainLayout)
+        cmds.button('pasteButton', label=self.ar.data.lang['i123_pasteAttr'], command=partial(self.ctrls.pasteAttr, verbose=True), backgroundColor=(1.0, 1.0, 0.7), parent=mainLayout)
+        cmds.button('copyAndPasteButton', label=self.ar.data.lang['i124_copyPasteAttr'], command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
         # calling UI:
         cmds.showWindow(dpCopyPasteAttrWin)

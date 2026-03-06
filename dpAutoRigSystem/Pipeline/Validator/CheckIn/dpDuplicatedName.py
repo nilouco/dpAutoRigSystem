@@ -56,7 +56,7 @@ class DuplicatedName(dpBaseAction.ActionStartClass):
                 duplicates = {k:v for k,v in names.items() if len(v) > 1}
                 if duplicates:
                     for name, paths in duplicates.items():
-                        self.utils.setProgress(self.dpUIinst.lang[self.title])
+                        self.utils.setProgress(self.ar.data.lang[self.title])
                         # found issue here
                         self.checkedObjList.append(name)
                         self.foundIssueList.append(True)
@@ -72,14 +72,14 @@ class DuplicatedName(dpBaseAction.ActionStartClass):
                                             if not cmds.objExists(name+"_"+str(i)):
                                                 self.renameNodeAndChildren(path, i)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+name)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+name)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+name)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+name)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

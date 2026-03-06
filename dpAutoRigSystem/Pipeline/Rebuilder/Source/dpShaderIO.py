@@ -79,15 +79,15 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                             try:
                                 self.importShader(shaderDic)
                             except Exception as e:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
+                                self.notWorkedWellIO(self.ar.data.lang['r032_notImportedData']+": "+str(e))
                         else:
-                            self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -105,7 +105,7 @@ class ShaderIO(dpBaseAction.ActionStartClass):
         shaderDic = {}
         self.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
         for shader in shaderList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shader)
+            self.utils.setProgress(self.ar.data.lang[self.title]+": "+shader)
             fileNode = None
             texture = None
             color = None
@@ -209,6 +209,6 @@ class ShaderIO(dpBaseAction.ActionStartClass):
                     notFoundMeshList.append(mesh)
         cmds.select(clear=True)
         if notFoundMeshList:
-            self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
+            self.notWorkedWellIO(self.ar.data.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
         else:
             self.wellDoneIO(self.latestDataFile)

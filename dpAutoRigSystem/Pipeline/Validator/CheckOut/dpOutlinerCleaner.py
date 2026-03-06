@@ -40,7 +40,7 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            hiddenList = [self.dpUIinst.data.temp_grp, self.dpUIinst.guideMirrorGrp]
+            hiddenList = [self.ar.data.temp_grp, self.ar.guideMirrorGrp]
             
             
             #TODO = get node by attribute (dpTemp)
@@ -51,7 +51,7 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
             if objList:
                 self.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
                 for item in hiddenList:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    self.utils.setProgress(self.ar.data.lang[self.title])
                     if item in objList:
                         self.checkedObjList.append(item)
                         if cmds.objExists(item):
@@ -62,17 +62,17 @@ class OutlinerCleaner(dpBaseAction.ActionStartClass):
                                 try:    
                                     cmds.delete(item)
                                     self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 except:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
                         else:
                             self.foundIssueList.append(False)
                             self.resultOkList.append(True)
             else:
                 self.notFoundNodes()
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

@@ -22,8 +22,8 @@ class CheckinIO(dpBaseAction.ActionStartClass):
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.startName = "dpCheckin"
         self.firstBTEnable = False
-        self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']
-        self.secondBTCustomLabel = self.dpUIinst.lang['i306_run']
+        self.firstBTCustomLabel = self.ar.data.lang['i305_none']
+        self.secondBTCustomLabel = self.ar.data.lang['i306_run']
         self.setActionType("r000_rebuilder")
     
 
@@ -45,17 +45,17 @@ class CheckinIO(dpBaseAction.ActionStartClass):
         # --- rebuilder code --- beginning
         if self.pipeliner.checkAssetContext():
             if self.firstMode: #export
-                self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
+                self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
                 try:
                     # clean up geometries
                     validatorToRunList = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.runActionsInSilence(validatorToRunList, self.dpUIinst.data.checkin_instances, False, objList) #fix
+                    self.runActionsInSilence(validatorToRunList, self.ar.data.checkin_instances, False, objList) #fix
                     self.wellDoneIO(", ".join(validatorToRunList))
                 except Exception as e:
                     self.notWorkedWellIO(str(e))
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+            self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         # --- rebuilder code --- end
         # ---
 

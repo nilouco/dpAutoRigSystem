@@ -60,15 +60,15 @@ class VisibilityIO(dpBaseAction.ActionStartClass):
                             if visDic:
                                 self.importVisibilityData(visDic)
                             else:
-                                self.maybeDoneIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
                     else:
                         self.maybeDoneIO("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
+                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
@@ -87,7 +87,7 @@ class VisibilityIO(dpBaseAction.ActionStartClass):
         dic = {}
         self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if "visibility" in cmds.listAttr(item):
                     if not cmds.listConnections(item+".visibility", source=True, destination=False):
@@ -103,7 +103,7 @@ class VisibilityIO(dpBaseAction.ActionStartClass):
         wellImportedList = []
         for item in visDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            self.utils.setProgress(self.ar.data.lang[self.title])
             # check attribute
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
@@ -121,4 +121,4 @@ class VisibilityIO(dpBaseAction.ActionStartClass):
         if wellImportedList:
             self.wellDoneIO(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

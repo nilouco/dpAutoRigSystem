@@ -50,7 +50,7 @@ class WIPCleaner(dpBaseAction.ActionStartClass):
                         wipGrp = "WIP_Grp"
             if wipGrp:
                 self.utils.setProgress(max=len(wipGrp), addOne=False, addNumber=False)
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                self.utils.setProgress(self.ar.data.lang[self.title])
                 self.checkedObjList.append(wipGrp)
                 wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
                 if wipChildrenList:
@@ -61,10 +61,10 @@ class WIPCleaner(dpBaseAction.ActionStartClass):
                         try:
                             cmds.delete(wipChildrenList)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+wipGrp)
+                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+wipGrp)
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+wipGrp)
+                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+wipGrp)
                 else:
                     self.foundIssueList.append(False)
                     self.resultOkList.append(True)
@@ -72,9 +72,9 @@ class WIPCleaner(dpBaseAction.ActionStartClass):
                 self.checkedObjList.append("")
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
-                self.messageList.append(self.dpUIinst.lang['v011_notWIP'])
+                self.messageList.append(self.ar.data.lang['v011_notWIP'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r072_noReferenceAllowed'])
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

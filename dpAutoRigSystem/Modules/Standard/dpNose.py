@@ -292,25 +292,25 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.cvEndJoint    = side+self.userGuideName+"_Guide_JointEnd"
                 
                 # generating naming:
-                leftSideName  = self.dpUIinst.lang['p002_left']
-                rightSideName = self.dpUIinst.lang['p003_right']
+                leftSideName  = self.ar.data.lang['p002_left']
+                rightSideName = self.ar.data.lang['p003_right']
                 if self.addFlip:
-                    leftSideName = self.dpUIinst.lang['c123_outer']
-                    rightSideName = self.dpUIinst.lang['c122_inner']
-                middleJntName    = side+self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle']+"_Jnt"
-                tipJntName       = side+self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip']+"_Jnt"
-                bottomJntName    = side+self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom']+"_Jnt"
-                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+leftSideName+"_"+self.dpUIinst.lang['c121_side']+"_Jnt"
-                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+rightSideName+"_"+self.dpUIinst.lang['c121_side']+"_Jnt"
-                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+leftSideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Jnt"
-                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+rightSideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Jnt"
-                middleCtrlName   = side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+"_Ctrl"
-                tipCtrlName      = side+self.userGuideName+"_"+self.dpUIinst.lang['c120_tip']+"_Ctrl"
-                bottomCtrlName   = side+self.userGuideName+"_"+self.dpUIinst.lang['c100_bottom']+"_Ctrl"
-                lSideCtrlName    = leftSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['c121_side']+"_Ctrl"
-                rSideCtrlName    = rightSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['c121_side']+"_Ctrl"
-                lNostrilCtrlName = leftSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Ctrl"
-                rNostrilCtrlName = rightSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Ctrl"
+                    leftSideName = self.ar.data.lang['c123_outer']
+                    rightSideName = self.ar.data.lang['c122_inner']
+                middleJntName    = side+self.userGuideName+"_%02d_"%(n+1)+self.ar.data.lang['c029_middle']+"_Jnt"
+                tipJntName       = side+self.userGuideName+"_%02d_"%(n+2)+self.ar.data.lang['c120_tip']+"_Jnt"
+                bottomJntName    = side+self.userGuideName+"_%02d_"%(n+2)+self.ar.data.lang['c100_bottom']+"_Jnt"
+                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+leftSideName+"_"+self.ar.data.lang['c121_side']+"_Jnt"
+                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+rightSideName+"_"+self.ar.data.lang['c121_side']+"_Jnt"
+                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+leftSideName+"_"+self.ar.data.lang['m079_nostril']+"_Jnt"
+                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+rightSideName+"_"+self.ar.data.lang['m079_nostril']+"_Jnt"
+                middleCtrlName   = side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+"_Ctrl"
+                tipCtrlName      = side+self.userGuideName+"_"+self.ar.data.lang['c120_tip']+"_Ctrl"
+                bottomCtrlName   = side+self.userGuideName+"_"+self.ar.data.lang['c100_bottom']+"_Ctrl"
+                lSideCtrlName    = leftSideName+"_"+side+self.userGuideName+"_"+self.ar.data.lang['c121_side']+"_Ctrl"
+                rSideCtrlName    = rightSideName+"_"+side+self.userGuideName+"_"+self.ar.data.lang['c121_side']+"_Ctrl"
+                lNostrilCtrlName = leftSideName+"_"+side+self.userGuideName+"_"+self.ar.data.lang['m079_nostril']+"_Ctrl"
+                rNostrilCtrlName = rightSideName+"_"+side+self.userGuideName+"_"+self.ar.data.lang['m079_nostril']+"_Ctrl"
                 
                 # creating joints:
                 self.middleJnt = cmds.joint(name=middleJntName, scaleCompensate=False)
@@ -332,14 +332,14 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     if cmds.objExists(dpARJoint):
                         cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(self.middleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle'])
-                self.utils.setJointLabel(self.tipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip'])
-                self.utils.setJointLabel(self.bottomJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom'])
-                self.utils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
-                self.utils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
+                self.utils.setJointLabel(self.middleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.ar.data.lang['c029_middle'])
+                self.utils.setJointLabel(self.tipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.ar.data.lang['c120_tip'])
+                self.utils.setJointLabel(self.bottomJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.ar.data.lang['c100_bottom'])
+                self.utils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.ar.data.lang['c121_side'])
+                self.utils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.ar.data.lang['c121_side'])
                 if self.addNostril:
-                    self.utils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
-                    self.utils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
+                    self.utils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
+                    self.utils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
                 
                 # creating controls:
                 self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvMiddleLoc", parentTag=self.centerList[-1])
@@ -436,7 +436,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # create end joint:
                 cmds.select(self.tipJnt)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.jointEndAttr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.jointEndAttr, radius=0.5)
                 self.utils.addJointEndAttr([self.endJoint])
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
 
@@ -450,7 +450,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ctrlHookGrpList.append(self.toCtrlHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
