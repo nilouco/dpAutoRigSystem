@@ -19,6 +19,7 @@ class ControlsHierarchy(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_CONTROLSHIERARCHY_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.ioDir = "s_hierarchyIO"

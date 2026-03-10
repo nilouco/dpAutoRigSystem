@@ -6,7 +6,7 @@ DP_BASELAYOUT_VERSION = 2.09
 
 
 class BaseLayout(object):
-    def __init__(self, ar, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, ar, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI):
         """ Initialize the layout class.
         """
         # defining variables:
@@ -15,6 +15,7 @@ class BaseLayout(object):
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
+        self.wiki = WIKI
         self.userGuideName = userGuideName
         self.utils = ar.utils
     
@@ -22,24 +23,25 @@ class BaseLayout(object):
     def basicModuleLayout(self, *args):
         """ Create a Basic Module dpBaseLayout.
         """
-        # declaring facial variables
-        self.browTgtList = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
-        self.eyelidTgtList = [None, None, "EyelidsClose", "EyelidsOpen"]
-        self.mouthTgtList = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
-        self.lipsTgtList = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
-        self.sneerTgtList = ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"]
-        self.grimaceTgtList = ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"]
-        self.faceTgtList = ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
-        self.bsType = "bsType"
-        self.jointsType = "jointsType"
-        self.facialUserType = self.bsType
-        # BASIC MODULE LAYOUT:
-        self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
-        # create basic module UI:
-        self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
-        self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
-        cmds.iconTextButton(image=self.ar.data.icon['plusInfo'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
-        self.reCreateEditSelectedModuleLayout(self)
+        if self.ar.data.ui_state:
+            # declaring facial variables
+            self.browTgtList = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
+            self.eyelidTgtList = [None, None, "EyelidsClose", "EyelidsOpen"]
+            self.mouthTgtList = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
+            self.lipsTgtList = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
+            self.sneerTgtList = ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"]
+            self.grimaceTgtList = ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"]
+            self.faceTgtList = ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
+            self.bsType = "bsType"
+            self.jointsType = "jointsType"
+            self.facialUserType = self.bsType
+            # BASIC MODULE LAYOUT:
+            self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
+            # create basic module UI:
+            self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
+            self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
+            cmds.iconTextButton(image=self.ar.data.icon['plusInfo'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
+            self.reCreateEditSelectedModuleLayout(self)
     
     
     def clearSelectedModuleLayout(self, *args):
@@ -570,7 +572,7 @@ class BaseLayout(object):
                         # set values to guide base:
                         cmds.setAttr(guideChild+".mirrorAxis", self.mirrorAxis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
-                        for moduleInstance in self.ar.moduleInstancesList:
+                        for moduleInstance in self.ar.data.standard_instances:
                             if cmds.objExists(moduleInstance.moduleGrp):
                                 if cmds.getAttr(moduleInstance.moduleGrp+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
                                     moduleInstance.createPreviewMirror()

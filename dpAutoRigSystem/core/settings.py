@@ -20,6 +20,8 @@ class Configuration(object):
 
         self.load_icons()
 
+        #self.set_values()
+
         
 
         # TODO
@@ -147,6 +149,8 @@ class Configuration(object):
     def load_icons(self):
         # TODO: review the 3: after renamed all images without the "dp_" prefix
         self.ar.data.icon = {i[3:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
+        
+        #print(self.ar.data.icon)
 
         
         
@@ -183,6 +187,10 @@ class Configuration(object):
         """
         if os.path.exists(self.ar.pipeliner.pipeData[path]):
             return self.ar.startGuideModules("", "exists", None, path=self.ar.pipeliner.pipeData[path])
+        
+
+    # def set_values(self):
+    #     self.ar.customAttr.ui = False
 
 
 class Option(object):
@@ -197,7 +205,7 @@ class Option(object):
     def change_degree(self, value, *args):
         self.set_option_var(self.ar.data.degree_option_var, value)
         self.ar.data.degree_option = int(value[-1])
-        for module_instance in self.ar.moduleInstancesList:
+        for module_instance in self.ar.data.standard_instances:
             if "degree" in cmds.listAttr(module_instance.moduleGrp):
                 cmds.setAttr(module_instance.moduleGrp+".degree", self.ar.data.degree_option)
 

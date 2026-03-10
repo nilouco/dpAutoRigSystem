@@ -4,6 +4,7 @@ from maya import mel
 from functools import partial
 from . import dpRivet
 from ..Modules.Library import dpControls
+from ..Modules.Base import dpBaseLibrary
 from importlib import reload
 
 # global variables to this module:    
@@ -19,16 +20,22 @@ DISTANCE = "Distance"
 DP_CORRECTIONMANAGER_VERSION = 2.14
 
 
-class CorrectionManager(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # redeclaring variables
-        self.ar = ar
-        self.ui = ui
-        self.utils = ar.utils
+class CorrectionManager(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
+            reload(dpBaseLibrary)
             reload(dpRivet)
             reload(dpControls)
-        self.ctrls = dpControls.ControlClass(self.ar)
+
+#        self.ar.ctrls = dpControls.ControlClass(self.ar)
+
         self.correctionManagerName = self.ar.data.lang['m068_correctionManager']
         self.angleName = ANGLE
         self.distanceName = DISTANCE
@@ -36,9 +43,13 @@ class CorrectionManager(object):
         self.correctionManagerDataGrp = "CorrectionManager_Data_Grp"
         self.netList = []
         self.net = None
+
+    
+    def build_tool(self):
         # call main UI function
         if self.ui:
-            self.closeUI()
+#            self.closeUI()
+            self.ar.utils.closeUI("dpCorrectionManagerWindow")
             self.mainUI()
             self.refreshUI()
             
@@ -50,11 +61,11 @@ class CorrectionManager(object):
         self.actualizeEditLayout()
 
         
-    def closeUI(self, *args):
-        """ Delete existing CorrectionManager window if it exists.
-        """
-        if cmds.window('dpCorrectionManagerWindow', query=True, exists=True):
-            cmds.deleteUI('dpCorrectionManagerWindow', window=True)
+    # def closeUI(self, *args):
+    #     """ Delete existing CorrectionManager window if it exists.
+    #     """
+    #     if cmds.window('dpCorrectionManagerWindow', query=True, exists=True):
+    #         cmds.deleteUI('dpCorrectionManagerWindow', window=True)
 
 
     def mainUI(self, *args):
@@ -144,7 +155,7 @@ class CorrectionManager(object):
             if self.ui:
                 name = cmds.textFieldGrp(self.nameTFG, query=True, text=True)
         if name:
-            name = self.utils.resolveName(name, self.netSuffix)[0]
+            name = self.ar.utils.resolveName(name, self.netSuffix)[0]
             self.renameLinkedNodes(oldName, name)
             cmds.setAttr(self.net+".name", name, type="string")
             self.net = cmds.rename(self.net, self.net.replace(oldName, name))
@@ -215,14 +226,14 @@ class CorrectionManager(object):
             for netAttr in netAttrList:
                 if "Rivet" in netAttr:
                     try:
-                        cmds.delete(self.utils.getNodeByMessage(netAttr, self.net))
+                        cmds.delete(self.ar.utils.getNodeByMessage(netAttr, self.net))
                     except:
                         pass
         if cmds.objExists("Rivet_Grp"):
             if not cmds.listRelatives("Rivet_Grp", allDescendents=True, children=True):
                 cmds.delete("Rivet_Grp")
         try:
-            cmds.delete(self.utils.getNodeByMessage("correctionDataGrp", self.net))
+            cmds.delete(self.ar.utils.getNodeByMessage("correctionDataGrp", self.net))
         except:
             pass
         cmds.delete(self.net)
@@ -324,11 +335,11 @@ class CorrectionManager(object):
             if filterName:
                 self.net = None
                 self.clearEditLayout()
-                currentNetList = self.utils.filterName(filterName, currentNetList, " ")
+                currentNetList = self.ar.utils.filterName(filterName, currentNetList, " ")
             for item in currentNetList:
-                if cmds.objExists(item+".dpNetwork"):
+                if "dpNetwork" in cmds.listAttr(item):
                     if cmds.getAttr(item+".dpNetwork") == 1:
-                        if cmds.objExists(item+".dpCorrectionManager"):
+                        if "dpCorrectionManager" in cmds.listAttr(item):
                             if cmds.getAttr(item+".dpCorrectionManager") == 1:
                                 #TODO validate correctionManager node integrity here
                                 self.netList.append(item)
@@ -356,7 +367,7 @@ class CorrectionManager(object):
             loc = cmds.spaceLocator(name=name+"_Loc")[0]
             cmds.addAttr(loc, longName="inputNode", attributeType="message")
             cmds.connectAttr(toAttach+".message", loc+".inputNode", force=True)
-            grp = self.utils.zeroOut([loc])[0]
+            grp = self.ar.utils.zeroOut([loc])[0]
             if toRivet:
                 rivetNode = self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, False, useOffset=False)[-1]
                 cmds.addAttr(self.net, longName=toAttach+"_Rivet", attributeType="message")
@@ -364,7 +375,7 @@ class CorrectionManager(object):
             else:
                 cmds.parentConstraint(toAttach, grp, maintainOffset=False, name=grp+"_PaC")
                 cmds.scaleConstraint(toAttach, grp, maintainOffset=True, name=grp+"_ScC")
-            cmds.parent(grp, self.utils.getNodeByMessage("correctionDataGrp", self.net))
+            cmds.parent(grp, self.ar.utils.getNodeByMessage("correctionDataGrp", self.net))
             return loc
         else:
             mel.eval('warning \"'+toAttach+' '+self.ar.data.lang['i061_notExists']+'\";')
@@ -375,8 +386,8 @@ class CorrectionManager(object):
             Returns the created network node.
         """
         # loading Maya matrix node
-        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             if not nodeList:
                 nodeList = cmds.ls(selection=True, flatten=True)
@@ -392,8 +403,8 @@ class CorrectionManager(object):
                         self.correctionManagerDataGrp = cmds.group(empty=True, name=self.correctionManagerDataGrp)
                         cmds.addAttr(self.correctionManagerDataGrp, longName="dpCorrectionManagerDataGrp", attributeType="bool")
                         cmds.setAttr(self.correctionManagerDataGrp+".dpCorrectionManagerDataGrp", 1)
-                        self.ctrls.setLockHide([self.correctionManagerDataGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                        scalableGrp = self.utils.getNodeByMessage("scalableGrp")
+                        self.ar.ctrls.setLockHide([self.correctionManagerDataGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                        scalableGrp = self.ar.utils.getNodeByMessage("scalableGrp")
                         if scalableGrp:
                             cmds.parent(self.correctionManagerDataGrp, scalableGrp)
                         cmds.setAttr(self.correctionManagerDataGrp+".visibility", 0)
@@ -403,7 +414,7 @@ class CorrectionManager(object):
                         name = cmds.textField(self.createTF, query=True, text=True)
                         if not name:
                             name = "Correction"
-                    correctionName, name = self.utils.resolveName(name, self.netSuffix)
+                    correctionName, name = self.ar.utils.resolveName(name, self.netSuffix)
                     
                     # type
                     if not correctType:
@@ -416,7 +427,8 @@ class CorrectionManager(object):
                     if fromUI:
                         toRivet = cmds.checkBox(self.rivetCB, query=True, value=True)
                     if toRivet:
-                        self.dpRivetInst = dpRivet.Rivet(self.ar, False)
+                        self.dpRivetInst = dpRivet.Rivet(self.ar)
+                        self.dpRivetInst.ui = False
 
                     # create the container of the system data using a network node
                     self.net = cmds.createNode("network", name=name)
@@ -440,7 +452,7 @@ class CorrectionManager(object):
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
-                    optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+                    optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
                     if optionCtrl:
                         cmds.connectAttr(optionCtrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
                     cmds.addAttr(self.net, longName="corrective", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
@@ -470,7 +482,7 @@ class CorrectionManager(object):
                     
                     # if rotate extration option:
                     if correctType == self.angleName:                        
-                        # write a new self.utils function to generate these matrix nodes here:
+                        # write a new self.ar.utils function to generate these matrix nodes here:
                         extractAngleMM = cmds.createNode("multMatrix", name=correctionName+"_ExtractAngle_MM")
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
                         extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")

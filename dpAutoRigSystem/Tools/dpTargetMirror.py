@@ -2,6 +2,8 @@
 from maya import cmds
 from maya import mel
 from functools import partial
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "TargetMirror"
@@ -13,10 +15,20 @@ WIKI = "06-‐-Tools#-target-mirror"
 DP_TARGETMIRROR_VERSION = 2.07
 
 
-class TargetMirror(object):
-    def __init__(self, ar, *args, **kwargs):
-        self.ar = ar
-        self.utils = self.ar.utils
+class TargetMirror(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
+        
+    
+    def build_tool(self, *args):
         # call main function
         self.dpTargetMirrorUI(self)
     
@@ -177,7 +189,7 @@ class TargetMirror(object):
             # get target list:
             targetList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
             if targetList:
-                self.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
                 cancelled = False
                 self.toIDList = []
                 # get mirror information from UI
@@ -191,7 +203,7 @@ class TargetMirror(object):
                     if cmds.progressWindow(query=True, isCancelled=True):
                         cancelled = True
                         break
-                    self.utils.setProgress("Target: "+item)
+                    self.ar.utils.setProgress("Target: "+item)
                     if not item == origNode:
                         # start copying
                         if self.dpCheckGeometry(item):
@@ -233,6 +245,6 @@ class TargetMirror(object):
                             # clear undo
                             if clearUndo:
                                 mel.eval("flushUndo;")
-                self.utils.setProgress(endIt=True)
+                self.ar.utils.setProgress(endIt=True)
                 self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
             cmds.select(clear=True)

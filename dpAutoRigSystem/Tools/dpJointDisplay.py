@@ -2,6 +2,8 @@
 from maya import cmds
 from maya import mel
 from functools import partial
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "JointDisplay"
@@ -13,10 +15,17 @@ WIKI = "06-‐-Tools#-joint-display"
 DP_JOINTDISPLAY_VERSION = 1.01
 
 
-class JointDisplay(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        self.ar = ar
-        self.ui = ui
+class JointDisplay(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         # joints lists 
         self.allJointsList = []
         self.boneLabelList = []
@@ -27,6 +36,9 @@ class JointDisplay(object):
         self.selectedBoard = 0
         self.allBoardList = ['boneFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn', 'jointFieldcolumn']
         self.destinationBoardIndex = 0
+        
+
+    def build_tool(self, *args):
         # call main function
         if self.ui:
             self.dpJointDisplayUI()

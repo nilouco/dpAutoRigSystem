@@ -7,6 +7,7 @@ class Data:
 
     dp_auto_rig_path: str = ""
     dp_auto_rig_filename: str = "dpAutoRig.py"
+    workspace_control_name: str = "dpAutoRigSystemWC"
 
     language_default: str = "English"
     validator_default: str = "AllCheckOuts"
@@ -18,6 +19,10 @@ class Data:
     curve_option_var: str = "dpAutoRigLastCurvePreset"
     degree_option_var: str = "dpAutoRigLastDegreeOption"
     
+    rig_type_biped: str = "biped"
+    rig_type_quadruped: str = "quadruped"
+    rig_type_default: str = "unknown" #support old guide system TODO: check using...
+
     base_name: str = "dpAR_"
     eye_name: str = "Eye"
     head_name: str = "Head"
@@ -76,6 +81,7 @@ class Data:
     dp_log: str = "dpLog"
     dp_id: str = "dpID"
 
+    ui_state: bool = False
     verbose: bool = False
     loaded_path: bool = False
     rebuilding: bool = False
@@ -101,7 +107,12 @@ class Data:
     
     to_ids: list = field(default_factory=list)
     
-    control_instances: list = field(default_factory=list)
+    created_guides: list = field(default_factory=list)
+    standard_instances: list = field(default_factory=list)
+    template_instances: list = field(default_factory=list)
+    curve_simple_instances: list = field(default_factory=list)
+    curve_combined_instances: list = field(default_factory=list)
+    tools_instances: list = field(default_factory=list)
     checkin_instances: list = field(default_factory=list)
     checkout_instances: list = field(default_factory=list)
     checkaddon_instances: list = field(default_factory=list)

@@ -5,16 +5,12 @@ from ..Library import dpControls
 from ...Tools import dpCorrectionManager
 from importlib import reload
 
-class RigType(object):
-    biped = "biped"
-    quadruped = "quadruped"
-    default = "unknown" #Support old guide system
 
 DP_BASESTANDARD_VERSION = 2.13
 
 
 class BaseStandard(object):
-    def __init__(self, ar, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, number=None, *args):
+    def __init__(self, ar, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, number=None, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -25,6 +21,7 @@ class BaseStandard(object):
         self.icon = ICON
         self.userGuideName = userGuideName
         self.rigType = rigType
+        self.wiki = WIKI
         # defining namespace:
         self.guideNamespace = self.guideModuleName+"__"+self.userGuideName
         # defining guideNamespace:
@@ -47,14 +44,19 @@ class BaseStandard(object):
         # calling dpControls:
         self.ctrls = dpControls.ControlClass(self.ar, self.moduleGrp)
         # starting correctionManager:
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar, False)
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar)
+        self.correctionManager.ui = False
+        
+
+    def build_raw_guide(self, *args):
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
             # create GUIDE for this module:
             self.createGuide()
-        # create the Module layout in the mainUI - modulesLayoutA:        
-        self.createModuleLayout()
+        if self.ar.data.ui_state:
+            # create the Module layout in the mainUI - modulesLayoutA:        
+            self.createModuleLayout()
         # update module instance info:
         self.updateModuleInstanceInfo()
         self.guideNet = self.utils.getNodeByMessage("net", self.moduleGrp)
@@ -70,8 +72,9 @@ class BaseStandard(object):
         if not layoutName:
             layoutName = self.userGuideName
         self.moduleLayoutName = self.ar.data.lang[self.title]+" - "+layoutName
-        self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
-        self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
+        if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
+            self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
+            self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
         # here we have just the column layouts to be populated by modules.
     
     
@@ -187,8 +190,8 @@ class BaseStandard(object):
         except:
             pass
         # clear module from instance list (clean dpUI list):
-        delIndex = self.ar.moduleInstancesList.index(self)
-        self.ar.moduleInstancesList.pop(delIndex)
+        delIndex = self.ar.data.standard_instances.index(self)
+        self.ar.data.standard_instances.pop(delIndex)
     
 
     def duplicateModule(self, *args):

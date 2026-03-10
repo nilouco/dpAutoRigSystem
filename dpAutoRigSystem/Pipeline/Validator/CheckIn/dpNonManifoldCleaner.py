@@ -20,6 +20,7 @@ class NonManifoldCleaner(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_NONMANIFOLDCLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     

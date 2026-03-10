@@ -26,6 +26,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         self.cValue = 70
     

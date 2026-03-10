@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -15,14 +17,21 @@ DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 DP_HEADDEFORMER_VERSION = 4.05
 
 
-class HeadDeformer(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # defining variables:
+class HeadDeformer(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.headDeformerName = CLASS_NAME
-        self.ar = ar
-        self.utils = ar.utils
-        self.ctrls = ar.ctrls
-        self.ui = ui
+        
+
+    def build_tool(self, *args):
         self.headCtrl = None
         self.wellDone = True
         # call main function
@@ -90,7 +99,7 @@ class HeadDeformer(object):
         posList = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
-        validName = self.utils.validateName(deformerName+"_FFD", "FFD")
+        validName = self.ar.utils.validateName(deformerName+"_FFD", "FFD")
         numbering = validName.replace(deformerName, "")[:-4]
         if numbering:
             deformerName = deformerName+numbering
@@ -170,10 +179,10 @@ class HeadDeformer(object):
                     cmds.setAttr(defHandle+".scale"+axis, 1)
             
             # arrow control curve
-            arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", deformerName+"_Ctrl", 0.25*bBoxSize, d=0)
+            arrowCtrl = self.ar.ctrls.cvControl("id_053_HeadDeformer", deformerName+"_Ctrl", 0.25*bBoxSize, d=0)
 
             # main control curve and shape
-            mainCtrl = self.ctrls.cvControl("id_097_HeadDeformerMain", mainCtrlName+"_Ctrl", 0.57*bBoxSize, d=0, parentTag=arrowCtrl)
+            mainCtrl = self.ar.ctrls.cvControl("id_097_HeadDeformerMain", mainCtrlName+"_Ctrl", 0.57*bBoxSize, d=0, parentTag=arrowCtrl)
             mainCtrlShape = cmds.listRelatives(mainCtrl, shapes=True)[0]
             
             # add control intensity and calibrate attributes
@@ -235,20 +244,20 @@ class HeadDeformer(object):
                     if cmds.objectType(unitConvNode) == "unitConversion":
                         cmds.setAttr(unitConvNode+".conversionFactor", 1)
             cmds.connectAttr(arrowCtrl+"."+self.ar.data.lang["c021_showControls"], mainCtrlShape+".visibility")
-            self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+            self.ar.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             
             # create symmetry setup
             centerClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:3][0:5]", relative=True, name=centerSymmetryName+"_Cls") #[Cluster, Handle]
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
-            clustersZeroList = self.utils.zeroOut([centerClusterList[1], topClusterList[1]])
+            clustersZeroList = self.ar.utils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.matchTransform(clustersZeroList[1], centerClusterList[1])
             clusterGrp = cmds.group(clustersZeroList, name=deformerName+"_Cluster_Grp")
             # arrange lattice deform points percent
             cmds.percent(topClusterList[0], [latticeDefList[1]+".pt[0:5][2][0]", latticeDefList[1]+".pt[0:5][2][1]", latticeDefList[1]+".pt[0:5][2][2]", latticeDefList[1]+".pt[0:5][2][3]", latticeDefList[1]+".pt[0:5][2][4]", latticeDefList[1]+".pt[0:5][2][5]"], value=0.5)
             # symmetry controls
-            centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90), parentTag=arrowCtrl)
-            topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0), parentTag=arrowCtrl)
-            symmetryCtrlZeroList = self.utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
+            centerSymmetryCtrl = self.ar.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90), parentTag=arrowCtrl)
+            topSymmetryCtrl = self.ar.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0), parentTag=arrowCtrl)
+            symmetryCtrlZeroList = self.ar.utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
             for axis in axisList:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
                 cmds.connectAttr(centerSymmetryCtrl+".rotate"+axis, centerClusterList[1]+".rotate"+axis, force=True)
@@ -265,11 +274,11 @@ class HeadDeformer(object):
                 namePos = bottomCtrlName.replace(self.ar.data.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
                 self.toIDList.extend(subClusterList)
-                cmds.parent(self.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
+                cmds.parent(self.ar.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
-                subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0), parentTag=arrowCtrl)
+                subCtrl = self.ar.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0), parentTag=arrowCtrl)
                 subCtrlList.append(subCtrl)
-                ctrlSubZeroList = self.utils.zeroOut([subCtrl])[0]
+                ctrlSubZeroList = self.ar.utils.zeroOut([subCtrl])[0]
                 subCtrlGrpList.append(ctrlSubZeroList)
                 cmds.matchTransform(ctrlSubZeroList, subClusterList[1], pos=True)
                 # connect atributes
@@ -281,7 +290,7 @@ class HeadDeformer(object):
 
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
-            self.utils.zeroOut([arrowCtrl], False, False)
+            self.ar.utils.zeroOut([arrowCtrl], False, False)
             offsetGrp = cmds.group(name=deformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=deformerName+"_Data_Grp", empty=True)
             cmds.matchTransform(arrowCtrlGrp, latticeDefList[2], position=True, rotation=True)
@@ -308,8 +317,8 @@ class HeadDeformer(object):
 
             # workaround to add the deformer attribute on the remaining maincontrols from head and jaw control         
             childrenControlsList = []
-            headSubCtrl = self.ctrls.getControlNodeById("id_093_HeadSub")
-            jawCtrl = self.ctrls.getControlNodeById("id_024_HeadJaw")
+            headSubCtrl = self.ar.ctrls.getControlNodeById("id_093_HeadSub")
+            jawCtrl = self.ar.ctrls.getControlNodeById("id_024_HeadJaw")
             jawConditionList = [self.ar.data.lang["m075_upperTeeth"], self.ar.data.lang["m076_lowerTeeth"], self.ar.data.lang["m077_tongue"], self.ar.data.lang["c039_lip"]+"_"+self.ar.data.lang["c058_main"]]
             ctrlIDNotIncludeList = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if headSubCtrl:
@@ -327,11 +336,11 @@ class HeadDeformer(object):
                     if cmds.objExists(item+".controlID"):
                         if not cmds.objExists(item+"."+DPHEADDEFINFLUENCE):
                             if cmds.getAttr(item+".controlID") not in ctrlIDNotIncludeList:
-                                self.ctrls.addDefInfluenceAttrs(item, defInfluenceType=1)
+                                self.ar.ctrls.addDefInfluenceAttrs(item, defInfluenceType=1)
                                 if not cmds.objExists(item+"."+DPJAWDEFINFLUENCE):
                                     for condition in jawConditionList:
                                         if condition in item:
-                                            self.ctrls.addDefInfluenceAttrs(item, defInfluenceType=2)
+                                            self.ar.ctrls.addDefInfluenceAttrs(item, defInfluenceType=2)
 
             # apply influence deformer only in child shape controls which have the attribute or given nodes
             if not deformedByList:
@@ -382,7 +391,7 @@ class HeadDeformer(object):
             cmds.scale(1.25, 1.25, 1.25, offsetGrp)
             
             # colorize
-            self.ctrls.colorShape([arrowCtrl, mainCtrl, centerSymmetryCtrl, topSymmetryCtrl, subCtrlList[0], subCtrlList[1], subCtrlList[2]], "cyan")
+            self.ar.ctrls.colorShape([arrowCtrl, mainCtrl, centerSymmetryCtrl, topSymmetryCtrl, subCtrlList[0], subCtrlList[1], subCtrlList[2]], "cyan")
 
             # if there's Jaw in the deformerName it will configure rotate and delete symetries and subControls setup
             if self.ar.data.lang["c025_jaw"] in mainCtrl:
@@ -414,12 +423,12 @@ class HeadDeformer(object):
                                     calibrateName+"Z",
                                     calibrateName+"Reduce"
                                 ]
-            self.ctrls.setStringAttrFromList(arrowCtrl, hdCalibrationList)
+            self.ar.ctrls.setStringAttrFromList(arrowCtrl, hdCalibrationList)
             
             # rename unitConversion nodes
-            self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
+            self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
             # add ignoreTranformIO attribute
-            self.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, arrowCtrlGrp], self.utils.ignoreTransformIOAttr)
+            self.ar.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, arrowCtrlGrp], self.ar.utils.ignoreTransformIOAttr)
             # add dpID attributes
             self.toIDList.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
             for deformerList in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:

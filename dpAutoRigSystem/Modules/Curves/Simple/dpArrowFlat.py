@@ -18,6 +18,7 @@ class ArrowFlat(dpBaseCurve.BaseCurve):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = None
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseCurve)
@@ -27,8 +28,8 @@ class ArrowFlat(dpBaseCurve.BaseCurve):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
-        result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide)
-        return result
+        return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide)
+        
     
     
     def getLinearPoints(self, *args):

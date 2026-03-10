@@ -20,6 +20,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         # returned data from the dictionary
         self.mainJisList = []

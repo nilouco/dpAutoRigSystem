@@ -1,7 +1,9 @@
 # importing libraries:
+import os
 from maya import cmds
 from maya import mel
-import os
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -18,13 +20,17 @@ FACIALPRESET = "FacialJoints"
 DP_FACIALCONNECTION_VERSION = 2.00
 
 
-class FacialConnection(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # defining variables:
-        self.ar = ar
-        self.utils = ar.utils
-        self.ctrls = ar.ctrls
-        self.ui = ui
+class FacialConnection(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.headFacialCtrlsGrp = self.ar.data.lang["c024_head"]+"_"+self.ar.data.lang["c059_facial"]+"_Ctrls_Grp"
         self.jntTargetList = []
         self.RmVNumber = 0
@@ -35,6 +41,9 @@ class FacialConnection(object):
                                  "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
                                  "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
         self.combinationTargetList = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
+        
+
+    def build_tool(self):
         # call main function:
         if self.ui:
             self.dpFacialConnectionUI(self)
@@ -115,7 +124,7 @@ class FacialConnection(object):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating targetMirrorUI Window:
-        self.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.closeUI('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 230
         facialCtrl_winHeight = 330
         dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -236,7 +245,7 @@ class FacialConnection(object):
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.ar.data.lang["i042_notSelection"]+"\";")
-        self.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.closeUI('dpFacialConnectionWindow')
     
 
     def dpDuplicateRenameAndInitShaderTgt(self, fromMesh, prefix, tgt, suffix, *args):
@@ -258,11 +267,11 @@ class FacialConnection(object):
         """
         resultDic = {}
         if not ctrlList:
-            ctrlList = self.ctrls.getControlList()
+            ctrlList = self.ar.ctrls.getControlList()
         if ctrlList:
             for ctrl in ctrlList:
                 if cmds.objExists(ctrl+".facialList"):
-                    resultDic[ctrl] = self.ctrls.getListFromStringAttr(ctrl, "facialList")
+                    resultDic[ctrl] = self.ar.ctrls.getListFromStringAttr(ctrl, "facialList")
         return resultDic
     
 
@@ -316,7 +325,7 @@ class FacialConnection(object):
                         resultList.append(result)
         if self.ui and resultList:
             self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
-        self.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.closeUI('dpFacialConnectionWindow')
     
 
     def dpConnectToJoints(self, ctrlList=None, *args):
@@ -381,7 +390,7 @@ class FacialConnection(object):
                     self.ar.customAttr.addAttr(0, self.toIDList) #dpID
                     if self.ui and resultList:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
-        self.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.closeUI('dpFacialConnectionWindow')
 
     
     def dpGetJointNodeList(self, itemList, *args):
@@ -419,7 +428,7 @@ class FacialConnection(object):
     def dpCreateRemapNode(self, fromNode, fromAttr, jntTarget, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
         """ Creates the nodes to remap values and connect it to final output (jntTarget) item.
         """
-        fromNodeName = self.utils.extractSuffix(fromNode)
+        fromNodeName = self.ar.utils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
         self.toIDList.append(remap)
         outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
@@ -621,7 +630,7 @@ class FacialConnection(object):
         """
         selectionList = cmds.ls(selection=True, type="transform")
         if selectionList and len(selectionList) == 2:
-            if self.utils.dpCheckGeometry(selectionList[0]) and self.utils.dpCheckGeometry(selectionList[1]):
+            if self.ar.utils.dpCheckGeometry(selectionList[0]) and self.ar.utils.dpCheckGeometry(selectionList[1]):
                 oldMesh = selectionList[0]
                 newMesh = selectionList[1]
                 bsNode = cmds.ls(cmds.listHistory(oldMesh), type="blendShape")
@@ -630,7 +639,7 @@ class FacialConnection(object):
                     if targetList:
                         # progress window
                         progressAmount = 0
-                        self.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targetList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targetList), addOne=False, addNumber=False)
                         cancelled = False
                         nbTarget = len(targetList)
                         reconnectList = []

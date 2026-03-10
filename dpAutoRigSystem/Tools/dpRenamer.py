@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "Renamer"
@@ -12,10 +14,17 @@ WIKI = "06-‐-Tools#-renamer"
 DP_RENAMER_VERSION = 1.02
 
 
-class Renamer():
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # defining variables
-        self.ar = ar
+class Renamer(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.selOption = 1 #Selected
         self.originalList, self.previewList = [], []
         self.addSequence = None
@@ -29,7 +38,9 @@ class Renamer():
         self.replaceName = None
         self.padding = 2
         self.start = 0
-        self.ui = ui
+        
+
+    def build_tool(self, *args):
         # call main function
         if self.ui:
             self.renamerUI()

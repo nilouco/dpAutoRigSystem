@@ -1,5 +1,7 @@
 # importing libraries:
 from maya import cmds
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "Isolate"
@@ -11,15 +13,24 @@ WIKI = "06-‐-Tools#-isolate"
 DP_ISOLATE_VERSION = 1.04
 
 
-class Isolate(object):
-    def __init__(self, ar, *args):
-        # redeclaring variables
-        self.ar = ar
+class Isolate(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.rootName = "Root"
         self.isolateName = self.ar.data.lang['m095_isolate'].lower()
-        
         # base item to isolate
         self.rootCtrl = self.rootName+"_Ctrl"
+        
+
+    def build_tool(self, *args):
         # get selected item to create isolate setup on it
         self.selItem = self.dpGetSelItem()
         if self.selItem:

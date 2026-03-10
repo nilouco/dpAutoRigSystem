@@ -24,6 +24,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_GUIDEIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
@@ -31,7 +32,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
         self.startName = "dpGuide"
         if self.ar.dev:
             reload(dpHeadDeformer)
-        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.ar, ui=False)
+        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.ar)
+        self.dpHeadDeformer.ui = False
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -121,7 +123,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
                     moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
-                    for moduleInstance in self.ar.moduleInstancesList:
+                    for moduleInstance in self.ar.data.standard_instances:
                         if str(moduleInstance) == moduleInstanceInfoString:
                             moduleInstance.serializeGuide(False) #serialize it without build it
                 toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))

@@ -19,6 +19,7 @@ class UnknownNodesCleaner(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_UNKNOWNNODESCLEANER_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
     

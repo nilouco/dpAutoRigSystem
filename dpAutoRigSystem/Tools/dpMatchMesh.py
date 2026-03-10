@@ -2,6 +2,8 @@
 from maya import cmds
 from maya import mel
 from maya import OpenMaya
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "MatchMesh"
@@ -13,16 +15,25 @@ WIKI = "06-‐-Tools#-match-mesh"
 DP_MATCHMESH_VERSION = 3.02
 
 
-class MatchMesh(object):
-    def __init__(self, ar, *args):
-        # redeclaring variables
-        self.ar = ar
-        self.utils = self.ar.utils
+class MatchMesh(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
+
+
+    def build_tool(self, *args):
         # call main function
         self.dpMatchMesh(self)
     
 
-    def dpMatchMesh(self, *args):
+    def dpMatchMesh(self):
         """ Get selection and transfere vertices information.
         """
         # declaring variables
@@ -120,7 +131,7 @@ class MatchMesh(object):
                     toMeshFn.getPoints(toVerticeList)
                     
                     # progress window
-                    self.utils.setProgress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
+                    self.ar.utils.setProgress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected
@@ -129,12 +140,12 @@ class MatchMesh(object):
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        self.utils.setProgress(self.ar.data.lang['i035_transfData'])
+                        self.ar.utils.setProgress(self.ar.data.lang['i035_transfData'])
                         
                         # transfer data
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
                     
-                    self.utils.setProgress(endIt=True)
+                    self.ar.utils.setProgress(endIt=True)
 
                     if fromFather != None:
                         cmds.parent(fromTransform, fromFather)

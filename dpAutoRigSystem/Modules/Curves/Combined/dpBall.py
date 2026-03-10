@@ -19,6 +19,7 @@ class Ball(dpBaseCurve.BaseCurve):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = None
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
         # dependence module list:
         self.checkModuleList = ['dpCircle']
@@ -29,11 +30,11 @@ class Ball(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.ar.startGuideModules(self.curvesSimpleFolder, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
-            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
-            return result
+            return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
+            
         else:
             # error checking modules in the folder:
             mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
@@ -43,12 +44,11 @@ class Ball(dpBaseCurve.BaseCurve):
         """ Combine controls in order to return it.
         """
         # load module instance
-        circleInstance = self.ar.initExtraModule('dpCircle', self.curvesSimpleFolder.replace("/", "."))
+        circleInstance = self.ar.initExtraModule('dpCircle', self.ar.data.curve_simple_folder.replace("/", "."))
         # creating curve shapes:
         curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve3 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve2+".rotateY", -90)
         cmds.setAttr(curve3+".rotateX", 90)
-        mainCurve = self.combineCurves([curve1, curve2, curve3])
-        return mainCurve
+        return self.combineCurves([curve1, curve2, curve3])

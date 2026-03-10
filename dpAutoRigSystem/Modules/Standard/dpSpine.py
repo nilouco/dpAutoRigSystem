@@ -20,6 +20,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         # declare variable
         self.integratedActionsDic = {}
@@ -237,7 +238,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.shapeVisAttrList.append(attrNameLower+baseName+self.ar.data.lang['c126_display'])
 
                 # Setup axis order
-                if self.rigType == dpBaseStandard.RigType.quadruped:
+                if self.rigType == self.ar.data.rig_type_quadruped:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.hipsBCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.chestACtrl + ".rotateOrder", 1)
@@ -435,7 +436,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.delete(cmds.parentConstraint(middleLocGuide, self.middleFkCtrl, maintainOffset=False))
                     if self.currentStyle == 1: #biped
                         cmds.rotate(0, 0, 0, self.middleCtrl, self.middleFkCtrl)
-                    if self.rigType == dpBaseStandard.RigType.quadruped:
+                    if self.rigType == self.ar.data.rig_type_quadruped:
                         cmds.rotate(90, 0, 0, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
                     self.middleCtrlGrp = self.utils.zeroOut([self.middleCtrl])[0]

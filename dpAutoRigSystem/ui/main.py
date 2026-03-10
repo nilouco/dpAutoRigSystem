@@ -2,6 +2,7 @@
 import os
 from maya import cmds
 from functools import partial
+from importlib import reload
 
 
 class UI(object):
@@ -12,15 +13,15 @@ class UI(object):
     def create_ui(self):
         """ Start the main UI, menus and layouts for dpAutoRigSystem through workspaceControl.
         """
-        if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
-            cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
+        if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
+            cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
         labelText = "dpAutoRigSystem"
         labelText += " - "+self.ar.dpARVersion
         if self.ar.dev:
             labelText += " ~ dev"
         uiCallScript = "import dpAutoRigSystem; from dpAutoRigSystem import dpAutoRig; ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.main_ui.show_ui();"
         cmds.workspaceControl(
-                                "dpAutoRigSystemWC", 
+                                self.ar.data.workspace_control_name, 
                                 retain=False,
                                 floating=False,
                                 minimumWidth=400,
@@ -39,14 +40,23 @@ class UI(object):
         """ Call mainUI method and the following instructions to check optionVars, refresh UI elements, start the scriptJobs and close loading window.
         """
         startSelList = cmds.ls(selection=True)
+
         self.main_ui()
+        self.ar.ui_manager.set_ui_state(True)
+
+        # TODO change start_library to populate_library because it already has started by Start class
+        self.ar.lib.fill_library()
+        #Fill(self.ar)
+        #self.ar.ui_manager.refresh_ui()
+
 
         self.ar.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
         self.ar.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
         
-        Fill(self.ar)
+        #self.ar.refreshMainUI()
 
-        self.ar.refreshMainUI()
+
+
 #        self.ar.startScriptJobs()
 #        self.ar.utils.closeUI("dpar_load_win")
 #        cmds.select(startSelList)
@@ -72,7 +82,7 @@ class UI(object):
 
 
     def create_menu(self):
-        cmds.menuBarLayout("main_menu_bar", parent="dpAutoRigSystemWC")
+        cmds.menuBarLayout("main_menu_bar", parent=self.ar.data.workspace_control_name)
         self.create_settings_menu()
         self.create_the_create_menu()
         self.create_window_menu()
@@ -87,11 +97,10 @@ class UI(object):
         self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"], self.ar.data.curve_preset_data, self.ar.data.curve_option_var, refresh=True)
         self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {d:0 for d in self.ar.data.degrees}, self.ar.data.degree_option_var, degree=True)
         
-        #                       (, name, parent_menu, current, data, option_var=None):
         #
         #
         # WIP
-        #
+        # TODO: save options by optionVars:
         #
         #
         cmds.menuItem("options_mi", label=self.ar.data.lang['i002_options'], subMenu=True, parent="settings_menu")
@@ -106,30 +115,6 @@ class UI(object):
 
         cmds.menuItem("opt_prefix_mi", label=f"{self.ar.data.lang['i272_set']} {self.ar.data.lang['i144_prefix']}", command=self.ar.opt.set_prefix, parent="settings_menu")
         
-        #cmds.optionMenuGrp('opt_degree_om', label=self.ar.data.lang['i128_optionDegree'], parent="settings_menu")
-
-
-
-#         cmds.rowColumnLayout('rig_prefix_rcl', numberOfColumns=2, columnWidth=[(1, 40), (2, 200)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent='rig_options_layout')
-#         cmds.textField('rig_prefix_tf', text="", parent= 'rig_prefix_rcl', changeCommand=self.ar.setPrefix)
-#         cmds.text('rig_prefix_txt', align='left', label=self.ar.data.lang['i003_prefixAll'], parent='rig_prefix_rcl')
-#         cmds.checkBox('rig_display_joint_cb', label=self.ar.data.lang['i009_displayJointsCB'], align='left', value=1, parent='rig_options_layout')
-#         cmds.checkBox('rig_hide_guide_grp_cb', label=self.ar.data.lang['i183_hideGuideGrp'], align='left', value=1, changeCommand=self.ar.displayGuideGrp, parent='rig_options_layout')
-#         cmds.checkBox('rig_integrate_cb', label=self.ar.data.lang['i010_integrateCB'], align='left', value=1, parent='rig_options_layout')
-#         cmds.checkBox('rig_default_render_layer_cb', label=self.ar.data.lang['i004_defaultRL'], align='left', value=1, parent='rig_options_layout')
-#         cmds.checkBox('rig_colorize_ctrl_cb', label=self.ar.data.lang['i065_colorizeCtrl'], align='left', value=1, parent='rig_options_layout')
-#         cmds.checkBox('rig_add_attr_cb', label=self.ar.data.lang['i066_addAttr'], align='left', value=1, parent='rig_options_layout')
-
-#         cmds.rowColumnLayout('rig_degree_rcl', numberOfColumns=2, columnWidth=[(1, 100), (2, 250)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent='rig_options_layout')
-        
-# # option Degree:
-#         self.create_option_menu('rig_degree', 'rig_degree_rcl', ['0 - Preset', '1 - Linear', '3 - Cubic'], self.ar.data.degree_option_var)
-#         cmds.text('option_degree_txt', label=self.ar.data.lang['i128_optionDegree'], parent='rig_degree_rcl')
-
-
-
-
-
 
 
 
@@ -397,10 +382,10 @@ class UI(object):
         cmds.optionMenuGrp('ctr_direction_omg', edit=True, value='+Y')
         # curve shapes
         cmds.frameLayout('ctr_shapes_fl', label=self.ar.data.lang['i100_curveShapes'], collapsable=True, collapse=True, parent='ctr_create_fl')
-        cmds.gridLayout('ctr_simple_module_gl', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent='ctr_shapes_fl')
+        cmds.gridLayout('ctr_simple_module_gl', numberOfColumns=8, cellWidthHeight=(40, 50), backgroundColor=(0.3, 0.3, 0.3), parent='ctr_shapes_fl')
         # -> ctr_simple_module_gl here we'll populate the control module layout with the items from Controllers folder:
         cmds.frameLayout('ctr_combined_shapes_fl', label=self.ar.data.lang['i118_combinedShapes'], collapsable=True, collapse=True, parent='ctr_create_fl')
-        cmds.gridLayout('ctr_combined_module_gl', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent='ctr_combined_shapes_fl')
+        cmds.gridLayout('ctr_combined_module_gl', numberOfColumns=8, cellWidthHeight=(40, 50), backgroundColor=(0.3, 0.3, 0.3), parent='ctr_combined_shapes_fl')
         # -> ctr_combined_module_gl here we'll populate the control module layout with the items from Controllers folder:
         # edit seleted controller
         cmds.frameLayout('ctr_edit_selected_fl', label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
@@ -542,8 +527,7 @@ class UI(object):
         cmds.separator(height=30, parent=name+"_fl")
 
 
-    
-    
+            
 
     
 
@@ -558,7 +542,7 @@ class UI(object):
     #     if savedScene:
     #         self.selList = cmds.ls(selection=True)
     #         self.rebuilding = False
-    #     self.ar.populateCreatedGuideModules()
+    #     self.ar.fill_created_guides()
     #     self.ar.checkImportedGuides()
     #     self.ar.checkGuideNets()
     #     self.ar.populateJoints()
@@ -609,9 +593,10 @@ class UI(object):
 
 class Fill(object):
     def __init__(self, ar):
-        print("init fill")
         self.ar = ar
 
+
+    def start_library(self):
         self.start_modules()
         self.load_pipeline_validator()
         self.set_validator_preset()
@@ -619,28 +604,6 @@ class Fill(object):
 
 
 
-    def load_pipeline_validator(self):
-        """ Load the Validator's presets from the pipeline path.
-        """
-        if self.ar.pipeliner.pipeData['presetsPath']:
-            if os.path.exists(self.ar.pipeliner.pipeData['presetsPath']):
-                studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipeData['presetsPath']+"/", True)
-                if studio_preset:
-                    self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
-                    self.ar.data.validator_preset_data.update(studio_preset_data)
-                    cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", label=self.ar.data.validator_preset["_preset"], radioButton=False, collection="validator_preset_rbc", parent="validator_preset_menu")
-                    cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", edit=True, radioButton=True, collection="validator_preset_rbc")
-
-    
-    def set_validator_preset(self):
-        check_instances = self.ar.data.checkin_instances + self.ar.data.checkout_instances + self.ar.data.checkaddon_instances + self.ar.data.checkfinishing_instances
-        if check_instances:
-            for validator_name in self.ar.data.validator_preset:
-                for validator_instance in check_instances:
-                    if validator_name == validator_instance.guideModuleName:
-                        validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.guideModuleName])
-    
-    
     def start_modules(self):
         # rigging
         self.ar.startGuideModules(self.ar.data.standard_folder, "start", "rig_guides_standard_cl")
@@ -668,12 +631,100 @@ class Fill(object):
         self.ar.startGuideModules(self.ar.data.custom_folder, "start", "rebuilder_custom_fl")
 
 
+    def load_pipeline_validator(self):
+        """ Load the Validator's presets from the pipeline path.
+        """
+        if self.ar.pipeliner.pipeData['presetsPath']:
+            if os.path.exists(self.ar.pipeliner.pipeData['presetsPath']):
+                studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipeData['presetsPath']+"/", True)
+                if studio_preset:
+                    self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
+                    self.ar.data.validator_preset_data.update(studio_preset_data)
+                    cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", label=self.ar.data.validator_preset["_preset"], radioButton=False, collection="validator_preset_rbc", parent="validator_preset_menu")
+                    cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", edit=True, radioButton=True, collection="validator_preset_rbc")
+
+    
+    def set_validator_preset(self):
+        check_instances = self.ar.data.checkin_instances + self.ar.data.checkout_instances + self.ar.data.checkaddon_instances + self.ar.data.checkfinishing_instances
+        if check_instances:
+            for validator_name in self.ar.data.validator_preset:
+                for validator_instance in check_instances:
+                    if validator_name == validator_instance.guideModuleName:
+                        validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.guideModuleName])
+    
+    
+    def fill_library(self):
+
+        # # rigging
+        for item in self.ar.data.standard_instances:
+            self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_cl")
+        for item in self.ar.data.template_instances:
+            self.populate_library(item, self.ar.data.integrated_folder, "rig_guides_integrated_cl")
+        # # controllers
+        for item in self.ar.data.curve_simple_instances:
+            self.populate_library(item, self.ar.data.curve_simple_folder, "ctr_simple_module_gl")
+        for item in self.ar.data.curve_combined_instances:
+            self.populate_library(item, self.ar.data.curve_combined_folder, "ctr_combined_module_gl")
+        # tools
+        for item in self.ar.data.tools_instances:
+            self.populate_library(item, self.ar.data.tools_folder, "tools_module_cl")
+        
+        
+
+            print("item =", item)
+
+        # # validators
+        # self.ar.startGuideModules(self.ar.data.checkin_folder, "populate", "i208_checkin_module_cl")
+        # self.ar.startGuideModules(self.ar.data.checkout_folder, "populate", "i209_checkout_module_cl")
+        # if self.ar.pipeliner.pipeData['addOnsPath'] and self.ar.config.get_validator_addons():
+        #     self.ar.startGuideModules("", "populate", "i212_addOns_module_cl", path=self.ar.pipeliner.pipeData['addOnsPath'])
+        #     cmds.frameLayout('i212_addOns_fl', edit=True, visible=True)
+        # if self.ar.pipeliner.pipeData['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
+        #     self.ar.startGuideModules("", "populate", "i354_finishing_module_cl", path=self.ar.pipeliner.pipeData['finishingPath'])
+        #     cmds.frameLayout('i354_finishing_fl', edit=True, visible=True)
+        # # rebuilders
+        # self.ar.startGuideModules(self.ar.data.rebuilder_folder, "populate", "rebuilder_cl")
+        # self.ar.startGuideModules(self.ar.data.start_folder, "populate", "rebuilder_start_fl")
+        # self.ar.startGuideModules(self.ar.data.source_folder, "populate", "rebuilder_source_fl")
+        # self.ar.startGuideModules(self.ar.data.setup_folder, "populate", "rebuilder_setup_fl")
+        # self.ar.startGuideModules(self.ar.data.deforming_folder, "populate", "rebuilder_deforming_fl")
+        # self.ar.startGuideModules(self.ar.data.custom_folder, "populate", "rebuilder_custom_fl")
+
+
+
+    def populate_library(self, item, folder, layout, columns=5):
+        if cmds.layout(layout, query=True, exists=True):
+            if folder == self.ar.data.curve_simple_folder or folder == self.ar.data.curve_combined_folder:
+                cmds.iconTextButton(image=self.ar.data.icon[item.guideModuleName[0].lower()+item.guideModuleName[1:]], label=item.guideModuleName, annotation=item.guideModuleName, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
+                return
+            moduleLayout = cmds.rowLayout(numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
+            cmds.image(image=self.ar.data.icon[item.guideModuleName[0].lower()+item.guideModuleName[1:]], width=32, parent=moduleLayout)
+            if folder == self.ar.data.standard_folder:
+                cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_raw_guide, parent=moduleLayout)
+            elif folder == self.ar.data.integrated_folder:
+                cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=moduleLayout)
+            elif folder == self.ar.data.tools_folder:
+                cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=moduleLayout)
+                #cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
+
+            cmds.iconTextButton(image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=moduleLayout)
+
+
+
+
+
+
+
+
+
+
+
 
 class Manager(object):
     def __init__(self, ar):
         print("init manager")
         self.ar = ar
-    
+
 
     def reload_ui(self, opt_var=None, item=None, *args):
         """ This method will set the given optionVar and reload the dpAutoRigSystem UI.
@@ -695,7 +746,10 @@ class Manager(object):
             cmds.evalDeferred("ar = dpAutoRig.Start(); ar.ui();", lowestPriority=True)
 
 
-    def refresh_ui(self):
+    def refresh_ui(self, savedScene=False, resetButtons=True, clearSel=False):
+        """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
+            Useful to rebuilding process when creating a new scene
+        """
         print("refreshing UI === wip from validator preset changed menu.......")
         #
         # WIP
@@ -706,14 +760,128 @@ class Manager(object):
         #
         #
         #
+
+#            def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
+
+        if savedScene:
+            self.selList = cmds.ls(selection=True)
+            self.ar.data.rebuilding = False
+        #clear layouts
+        self.clear_guide_layout()
+        self.fill_created_guides()
+
+#        self.checkImportedGuides()
+#        self.checkGuideNets()
+#        self.populateJoints()
+#        self.populateGeoms()
+#        if not self.ar.data.rebuilding:
+#            if resetButtons:
+#                self.resetAllButtonColors()
+#            self.pipeliner.refreshAssetData()
+#            for rebuildInstance in self.rebuilderInstanceList:
+#                rebuildInstance.updateActionButtons(color=False)
+#        try:
+#            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
+#        except:
+#            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
+#        if savedScene:
+#            cmds.select(clear=True)
+#            if self.selList:
+#                cmds.select(self.selList)
+#        if clearSel:
+#            cmds.select(clear=True)
+#        self.ar.data.rebuilding = False
+
+
+    def clear_guide_layout(self):
+        if self.ar.data.ui_state:
+            print("hehhrehe 5050505")
+           # if cmds.frameLayout('rig_edit_selected_module_fl', query=True, exists=True):
+            cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.ar.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
+            if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
+                cmds.deleteUI('rig_guides_inst_cl')
+            if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
+                cmds.deleteUI('rig_selected_module_cl')
+            cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
+            cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
+
+
+    def fill_created_guides(self, *args):
+        """ Read all guide modules loaded in the scene and re-create the elements in the moduleLayout.
+        """
+        # create a new list in order to store all created guide modules in the scene and its userSpecNames:
+        self.ar.data.created_guides = []
+        self.ar.data.standard_instances = []
+        # list all namespaces:
+        cmds.namespace(setNamespace=":")
+        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
+        # find path where 'dpAutoRig.py' is been executed:
+        path = self.ar.data.dp_auto_rig_path
+        guideDir = self.ar.data.standard_folder
+        # find all module names:
+        moduleNameInfo = self.ar.utils.findAllModuleNames(path, guideDir)
+        validModules = moduleNameInfo[0]
+        validModuleNames = moduleNameInfo[1]
         
+        # check if there is "__" (double undersore) in the namespaces:
+        for n in namespaceList:
+            divString = n.partition("__")
+            if divString[1] != "":
+                module = divString[0]
+                userSpecName = divString[2]
+                if module in validModuleNames:
+                    index = validModuleNames.index(module)
+                    # check if there is this module guide base in the scene:
+                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
+                    if cmds.objExists(curGuideName):
+                        self.ar.data.created_guides.append([validModules[index], userSpecName, curGuideName])
+                    else:
+                        cmds.namespace(moveNamespace=(n, ':'), force=True)
+                        cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
+#        self.clearGuideLayout()
+        # if exists any guide module in the scene, recreate its instance as objectClass:
+        if self.ar.data.created_guides:
+            sortedAllGuidesList = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
+            # load again the modules:
+            guideFolder = self.ar.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder.replace("/", ".")
+            # this list will be used to rig all modules pressing the RIG button:
+            for module in sortedAllGuidesList:
+                mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
+                if self.ar.dev:
+                    reload(mod)
+                # identify the guide modules and add to the moduleInstancesList:
+                moduleClass = getattr(mod, mod.CLASS_NAME)
+                if "rigType" in cmds.listAttr(module[2]):
+                    curRigType = cmds.getAttr(module[2]+".rigType")
+                    moduleInst = moduleClass(self.ar, module[1], curRigType)
+                else:
+                    if "Style" in cmds.listAttr(module[2]):
+                        iStyle = cmds.getAttr(module[2]+".Style")
+                        if (iStyle == 0 or iStyle == 1):
+                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
+                        else:
+                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
+                    else:
+                        moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
+                self.ar.data.standard_instances.append(moduleInst)
+                
+                # reload pinGuide scriptJob:
+                self.ar.ctrls.startPinGuide(module[2])
+        
+        # edit the footer A text:
+        if self.ar.data.ui_state:
+            self.modulesToBeRiggedList = self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)
+            cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.ar.data.lang['i005_footerRigging'])
+        print("end of fill_created_guides =", self.ar.data.created_guides)
+        print("end of fill_created_guides, standard_instances =", self.ar.data.standard_instances)
+
 
 
     def delete_exist_window(self, *args):
         """ Check if there are the dpAutoRigWindow and a control element to delete the UI.
         """
-        if cmds.workspaceControl("dpAutoRigSystemWC", query=True, exists=True):
-            cmds.workspaceControl("dpAutoRigSystemWC", edit=True, close=True)
+        if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
+            cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
             #cmds.deleteUI("dpAutoRigSystemWC", control=True)
         win_names = [
                         "dpARLoadWin", 
@@ -727,9 +895,11 @@ class Manager(object):
                        ]
         for win_name in win_names:
             self.ar.utils.closeUI(win_name)
+        self.set_ui_state(False)
 
     
-    
+    def set_ui_state(self, value):
+        self.ar.data.ui_state = value
 
 
     def collapse_all_fl(self, iconTB="rig_tri_collapse_guides_itb", layout=0, *args):
@@ -741,7 +911,7 @@ class Manager(object):
         collapse_value = True
         icon = self.ar.data.icon['triRight']
         if layout == 0: #guide modules
-            modules = self.ar.moduleInstancesList
+            modules = self.ar.data.standard_instances
             if self.ar.data.modules_collapse_status:
                 collapse_value = False
                 icon = self.ar.data.icon['triDown']

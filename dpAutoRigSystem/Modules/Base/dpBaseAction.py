@@ -17,7 +17,7 @@ DP_ACTIONSTARTCLASS_VERSION = 2.09
 
 
 class ActionStartClass(object):
-    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, ui=True, verbose=True):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -28,6 +28,7 @@ class ActionStartClass(object):
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
+        self.wiki = WIKI
         self.ui = ui
         self.verbose = verbose
         self.active = True
@@ -48,6 +49,7 @@ class ActionStartClass(object):
         self.infoText = self.ar.data.lang['i305_none']
         self.dpID = self.ar.data.dp_id
         self.constraintTypeList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
+        self.customName = ""
         # returned lists
         self.checkedObjList = []
         self.foundIssueList = []
@@ -79,10 +81,13 @@ class ActionStartClass(object):
             If there's an UI it will work to update the checkBox and buttons.
         """
         self.active = value
-        if self.ui:
-            cmds.checkBox(self.actionCB, edit=True, value=value)
-            cmds.button(self.firstBT, edit=True, enable=value)
-            cmds.button(self.secondBT, edit=True, enable=value)
+        if self.ar.data.ui_state:
+            if self.actionCB and cmds.checkBox(self.actionCB, query=True, exists=True):
+                cmds.checkBox(self.actionCB, edit=True, value=value)
+            if self.firstBT and cmds.button(self.firstBT, query=True, exists=True):
+                cmds.button(self.firstBT, edit=True, enable=value)
+            if self.secondBT and cmds.button(self.secondBT, query=True, exists=True):
+                cmds.button(self.secondBT, edit=True, enable=value)
 
 
     def cleanUpToStart(self, *args):

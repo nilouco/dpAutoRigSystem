@@ -2,6 +2,8 @@
 from maya import cmds
 from maya import mel
 from itertools import zip_longest
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "OneSkeleton"
@@ -13,16 +15,23 @@ WIKI = "06-‐-Tools#-one-skeleton"
 DP_ONESKELETON_VERSION = 1.02
 
 
-class OneSkeleton(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # defining variables:
-        self.ar = ar
-        self.utils = ar.utils
-        self.ctrls = ar.ctrls
+class OneSkeleton(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.prefix = "Web_"
         self.rootName = "Root"
         self.suffix = "_Joint"
-        self.ui = ui
+        
+        
+    def build_tool(self, *args):
         # call main UI function
         if self.ui:
             name = self.oneSkeletonPromptDialog()
@@ -63,8 +72,8 @@ class OneSkeleton(object):
                 newJointList.sort()
                 cmds.parent(newJointList, root)
                 cmds.select(root)
-            self.ctrls.setControllerScaleCompensate(False)
-            self.utils.setProgress(endIt=True)
+            self.ar.ctrls.setControllerScaleCompensate(False)
+            self.ar.utils.setProgress(endIt=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
 
@@ -83,9 +92,9 @@ class OneSkeleton(object):
             Returns the new created joint list.
         """
         newJointList = []
-        self.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
         for sourceNode in sourceList:
-            self.utils.setProgress("Joint")
+            self.ar.utils.setProgress("Joint")
             cmds.select(clear=True)
             newJoint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             newJointList.append(newJoint)
@@ -142,8 +151,8 @@ class OneSkeleton(object):
     def getMeshList(self, *args):
         """ Returns the Render_Grp meshes or all meshes in the scene.
         """
-        if self.utils.getAllGrp():
-            renderGrp = self.utils.getNodeByMessage("renderGrp")
+        if self.ar.utils.getAllGrp():
+            renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
             if renderGrp:
                 meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
                 if meshList:
@@ -177,4 +186,4 @@ class OneSkeleton(object):
         cmds.select(clear=True)
         cmds.joint(name=root, scaleCompensate=False)
         cmds.setAttr(root+".visibility", 0)
-        self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)
+        self.ar.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)

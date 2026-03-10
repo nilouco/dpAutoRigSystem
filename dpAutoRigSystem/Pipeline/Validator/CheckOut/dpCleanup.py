@@ -19,6 +19,7 @@ class Cleanup(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_CLEANUP_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.cleanupAttr = "dpDeleteIt"

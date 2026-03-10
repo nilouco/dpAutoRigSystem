@@ -1,5 +1,7 @@
 # importing libraries:
 from maya import cmds
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
@@ -11,8 +13,20 @@ WIKI = "06-‐-Tools#-update-rig-info"
 DP_UPDATERIGINFO_VERSION = 2.01
 
 
-class UpdateRigInfo(object):
+class UpdateRigInfo(dpBaseLibrary.BaseLibrary):
     def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
+        
+
+    def build_tool(self, *args):
         # call main function
         self.dpMain(self)
     

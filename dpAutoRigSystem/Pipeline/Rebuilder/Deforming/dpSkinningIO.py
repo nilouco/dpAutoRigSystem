@@ -20,6 +20,7 @@ class SkinningIO(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_SKINNINGIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")

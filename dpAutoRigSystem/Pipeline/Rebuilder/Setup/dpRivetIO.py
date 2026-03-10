@@ -22,11 +22,13 @@ class RivetIO(dpBaseAction.ActionStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.version = DP_RIVETIO_VERSION
         dpBaseAction.ActionStartClass.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpRivet)
-        self.dpRivet = dpRivet.Rivet(self.ar, ui=False)
+        self.dpRivet = dpRivet.Rivet(self.ar)
+        self.dpRivet.ui = False
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_rivetIO"
         self.startName = "dpRivet"

@@ -6,7 +6,7 @@ DP_BASECURVE_VERSION = 2.04
 
 
 class BaseCurve(object):
-    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -15,6 +15,7 @@ class BaseCurve(object):
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
+        self.wiki = WIKI
         self.cvName = None
         self.cvAction = None
         self.cvDegree = None
@@ -25,7 +26,6 @@ class BaseCurve(object):
         self.cvKnotList = None
         self.cvPeriodic = None
         self.suffix = "Ctrl"
-        self.curvesSimpleFolder = ar.data.curve_simple_folder
         self.utils = ar.utils
         self.ctrls = ar.ctrls
     
@@ -110,12 +110,13 @@ class BaseCurve(object):
             cmds.makeIdentity(item, translate=True, rotate=True, scale=True, apply=True)
             self.ctrls.transferShape(True, False, item, [mainCurve])
         cmds.setAttr(mainCurve+".className", self.guideModuleName, type="string")
-        return mainCurve
+
         
     
     def setControlDirection(self, cvNode, cvDirection, *args):
         """ Rotate the node given to have the correct direction orientation.
         """
+        print("cvNode =", cvNode)
         if cvDirection == "-X":
             cmds.setAttr(cvNode+".rotateX", 90)
             cmds.setAttr(cvNode+".rotateY", -90)

@@ -28,13 +28,16 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.facialAttrList = ["facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         self.loadVariables()
         if self.ar.dev:
             self.reloadModules()
-        self.dpFacialConnect = dpFacialConnection.FacialConnection(self.ar, ui=False)
-        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.ar, ui=False)
+        self.dpFacialConnect = dpFacialConnection.FacialConnection(self.ar)
+        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.ar)
+        self.dpFacialConnect.ui = False
+        self.dpHeadDeformer.ui = False
 
 
     def reloadModules(self, *args):
@@ -795,7 +798,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.delete([self.chinCtrl, self.chewCtrl], constructionHistory=True)
                 
                 #Setup Axis Order
-                if self.rigType == dpBaseStandard.RigType.quadruped:
+                if self.rigType == self.ar.data.rig_type_quadruped:
                     for n in range(0, self.nJoints):
                         cmds.setAttr(self.neckCtrlList[n]+".rotateOrder", 1)
                     cmds.setAttr(self.headCtrl+".rotateOrder", 1)
@@ -992,7 +995,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.ar.data.lang['c047_autoRotate'], neckARMD+".input2Y", force=True)
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.ar.data.lang['c047_autoRotate'], neckARMD+".input2Z", force=True)
                     cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
-                    if self.rigType == dpBaseStandard.RigType.quadruped:
+                    if self.rigType == self.ar.data.rig_type_quadruped:
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
                         quadrupedRotYZFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YZ_Fix_MD")
                         self.toIDList.append(quadrupedRotYZFixMD)

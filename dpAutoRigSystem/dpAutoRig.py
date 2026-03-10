@@ -68,9 +68,11 @@ class Start(object):
         self.dpARVersion = DPAR_VERSION_5
         self.load_opening(intro)
         self.reload_modules()
+        #self.load_system() // loads inside of it?
         self.load_variables()
         self.load_settings()
         self.load_components()
+        self.load_library()
         self.load_ui()
         self.opening.close_opening_ui()
         
@@ -124,21 +126,32 @@ class Start(object):
         self.packager = dpPackager.Packager(self)
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
-        self.customAttr = dpCustomAttr.CustomAttr(self, False)
+        self.customAttr = dpCustomAttr.CustomAttr(self)
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
 
 
+    def load_library(self):
+        self.lib = main.Fill(self)
+        self.lib.start_library()
+        print("finished started library herhe")
+
+
     def load_ui(self):
-        self.main_ui = main.UI(self)
         self.ui_manager = main.Manager(self)
+        self.main_ui = main.UI(self)
+
+        print("after load_ui , standard_instances =", self.data.standard_instances)
 
 
     def ui(self):
         self.main_ui.create_ui()
+        
+        #WIP: calling again TODO call filling UI instead
+        #self.lib.start_library()
+        #self.ui_manager.refresh_ui()
 
-
-
+        print("after create_ui , standard_instances =", self.data.standard_instances)
 
 
 
@@ -170,6 +183,7 @@ class Start(object):
     #         - SelectionChanged
     #         - WorkspaceChanged = not documented
     #     """
+#            cmds.scriptJob(uiDeleted=('dpAutoRigSystemWC', partial(self.ui_manager.set_ui_state, False)))
     #     cmds.scriptJob(event=('SceneOpened', partial(self.refreshMainUI, clearSel=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
     #     #cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
     #     cmds.scriptJob(event=('NewSceneOpened', self.refreshMainUI), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
@@ -253,35 +267,35 @@ class Start(object):
 
 
     
-    def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
-        """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
-            Useful to rebuilding process when creating a new scene
-        """
-        if savedScene:
-            self.selList = cmds.ls(selection=True)
-            self.data.rebuilding = False
-        self.populateCreatedGuideModules()
-        self.checkImportedGuides()
-        self.checkGuideNets()
-#        self.populateJoints()
-#        self.populateGeoms()
-#        if not self.data.rebuilding:
-#            if resetButtons:
-#                self.resetAllButtonColors()
-#            self.pipeliner.refreshAssetData()
-#            for rebuildInstance in self.rebuilderInstanceList:
-#                rebuildInstance.updateActionButtons(color=False)
-#        try:
-#            self.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
-#        except:
-#            self.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
-#        if savedScene:
-#            cmds.select(clear=True)
-#            if self.selList:
-#                cmds.select(self.selList)
-#        if clearSel:
-#            cmds.select(clear=True)
-#        self.data.rebuilding = False
+#     def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
+#         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
+#             Useful to rebuilding process when creating a new scene
+#         """
+#         if savedScene:
+#             self.selList = cmds.ls(selection=True)
+#             self.data.rebuilding = False
+#         self.populateCreatedGuideModules()
+#         self.checkImportedGuides()
+#         self.checkGuideNets()
+# #        self.populateJoints()
+# #        self.populateGeoms()
+# #        if not self.data.rebuilding:
+# #            if resetButtons:
+# #                self.resetAllButtonColors()
+# #            self.pipeliner.refreshAssetData()
+# #            for rebuildInstance in self.rebuilderInstanceList:
+# #                rebuildInstance.updateActionButtons(color=False)
+# #        try:
+# #            self.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
+# #        except:
+# #            self.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
+# #        if savedScene:
+# #            cmds.select(clear=True)
+# #            if self.selList:
+# #                cmds.select(self.selList)
+# #        if clearSel:
+# #            cmds.select(clear=True)
+# #        self.data.rebuilding = False
 
 
     def jobSelectedGuide(self):
@@ -308,7 +322,7 @@ class Start(object):
                 self.refreshMainUI()
                 cmds.select(updatedGuideNodeList)
         # update UI
-        for m, moduleInstance in enumerate(self.moduleInstancesList):
+        for m, moduleInstance in enumerate(self.data.standard_instances):
             if cmds.objExists(moduleInstance.moduleGrp):
                 if moduleInstance.selectButton:
                     currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
@@ -690,6 +704,7 @@ class Start(object):
         """ Find and return the modules in the directory 'Modules'.
             Returns a list with the found modules.
         """
+#        print("starting modules", guideDir, layout)
         if not path:
             # find path where 'dpAutoRig.py' is been executed:
             path = self.data.dp_auto_rig_path
@@ -701,9 +716,8 @@ class Start(object):
         guideModuleList = self.utils.findAllModules(path, guideDir)
         if guideModuleList:
             if action == "start":
-                # create guide buttons:
                 for guideModule in guideModuleList:
-                    self.createGuideButton(guideModule, guideDir, layout, path)
+                    self.startModule_TEMP_Name(guideModule, guideDir, layout, path)
             elif action == "check":
                 notFoundModuleList = []
                 # verify the list if exists all elements in the folder:
@@ -714,6 +728,10 @@ class Start(object):
                 return notFoundModuleList
             elif action == "exists":
                 return guideModuleList
+            # elif action == "populate":
+            #     # create guide buttons:
+            #     for guideModule in guideModuleList:
+            #         self.createGuideButton(guideModule, guideDir, layout, path)
             # avoid print again the same message:
             if guideDir == "":
                 guideDir = path
@@ -723,8 +741,13 @@ class Start(object):
                     print(guideDir+" : "+str(guideModuleList))
         return guideModuleList
     
-    
-    def createGuideButton(self, guideModule, guideDir, layout, path=None):
+
+
+    #
+    # WIP
+    #
+    #
+    def startModule_TEMP_Name(self, guideModule, guideDir, layout, path=None):
         """ Create a guideButton for guideModule in the respective colMiddleLeftA guidesLayout.
         """
         # especific import command for guides storing theses guides modules in a variable:
@@ -746,47 +769,41 @@ class Start(object):
             errorString = self.data.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
             mel.eval('warning \"'+errorString+'\";')
             return
-        # getting data from guide module:
-        title = self.data.lang[guide.TITLE]
-        description = self.data.lang[guide.DESCRIPTION]
-        icon = guide.ICON
-        if guideDir:
-            # find path where 'dpAutoRig.py' is been executed to get the icon:
-            path = self.data.dp_auto_rig_path
-        iconDir = path+icon
-        guideName = guide.CLASS_NAME
-        if not "WIKI" in dir(guide):
-            guide.WIKI = None
         
-        # creating a basic layout for guide buttons:
-        if guideDir == self.data.curve_simple_folder.replace("/", ".") or guideDir == self.data.curve_combined_folder.replace("/", "."):
-            ctrlInstance = self.initExtraModule(guideModule, guideDir)
-            cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControllerModule, ctrlInstance, True), parent=layout)
-            self.data.control_instances.append(ctrlInstance)
+        # # getting data from guide module:
+        # title = self.data.lang[guide.TITLE]
+        # description = self.data.lang[guide.DESCRIPTION]
+        # icon = guide.ICON
+        # if guideDir:
+        #     # find path where 'dpAutoRig.py' is been executed to get the icon:
+        #     path = self.data.dp_auto_rig_path
+        # iconDir = path+icon
+        # guideName = guide.CLASS_NAME
+        # if not "WIKI" in dir(guide):
+        #     guide.WIKI = None
+        
+#        print("hehrhe middle starting guides..... 1", guideName)
+        # first pass to separate code from ui:
+        #
+        # 1 - code
+        #
+        #
+        if guideDir == self.data.integrated_folder.replace("/", "."):
+            #self.data.template_instances.append(self.execIntegratedGuide(guideModule, guideDir))
+            self.data.template_instances.append(self.initExtraModule(guideModule, guideDir))
+        elif guideDir == self.data.curve_simple_folder.replace("/", "."):
+            self.data.curve_simple_instances.append(self.initExtraModule(guideModule, guideDir))
+        elif guideDir == self.data.curve_combined_folder.replace("/", "."):
+            self.data.curve_combined_instances.append(self.initExtraModule(guideModule, guideDir))
+        elif guideDir == self.data.tools_folder.replace("/", "."):
+            self.data.tools_instances.append(self.initExtraModule(guideModule, guideDir))
+
         else:
             isRebuilder = False
             if guideDir == self.data.rebuilder_folder.replace("/", ".") or guideDir == self.data.start_folder.replace("/", ".") or guideDir == self.data.source_folder.replace("/", ".") or guideDir == self.data.setup_folder.replace("/", ".") or guideDir == self.data.deforming_folder.replace("/", ".") or guideDir == self.data.custom_folder.replace("/", "."):
                 isRebuilder = True
-                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=layout)
-            else:
-                moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
-            cmds.image(image=iconDir, width=32, parent=moduleLayout)
-            if guideDir == self.data.standard_folder.replace("/", "."):
-                '''
-                We need to passe the rigType parameters because the cmds.button command will send a False parameter that
-                will be stock in the rigType if we don't pass the parameter
-                https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
-                '''
-                cmds.button(title+'_bt', label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, dpBaseStandard.RigType.biped), parent=moduleLayout)
-            elif guideDir == self.data.integrated_folder.replace("/", "."):
-                cmds.button(label=title, height=32, command=partial(self.execIntegratedGuide, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == self.data.tools_folder:
-                cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
+            if guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
-                validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
-                validatorInstance.firstBT = cmds.button(label=validatorInstance.firstBTLabel, width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
-                validatorInstance.secondBT = cmds.button(label=validatorInstance.secondBTLabel.capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
                 if guideDir == self.data.checkin_folder.replace("/", "."):
                     self.data.checkin_instances.append(validatorInstance)
                 elif guideDir == self.data.checkout_folder.replace("/", "."):
@@ -796,25 +813,220 @@ class Start(object):
                         self.data.checkfinishing_instances.append(validatorInstance)
                     else:
                         self.data.checkaddon_instances.append(validatorInstance)
-                    if validatorInstance.customName:
-                        cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
-                        #validatorInstance.title = validatorInstance.customName
             if isRebuilder:
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
                 self.data.rebuilder_instances.append(rebuilderInstance)
-                rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
-                rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
-                rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
-                rebuilderInstance.infoITB = cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
-                rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.data.lang['r058_deleteDataAnn'], parent=moduleLayout)
-                rebuilderInstance.updateActionButtons(color=False)
+
+#        print("hehrhe middle starting guides..... 2", guideName)
+
+
+        if guideDir == self.data.standard_folder.replace("/", "."):
+            self.data.standard_instances.append(self.initGuide(guideModule, guideDir, self.data.rig_type_biped))
+#            self.data.standard_instances.append(guide_instance)
+#            print("iniiitteted guide =", guideModule)
+            #initedGuide.build_raw_guide()
+        
+    
+
+    def createGuideButton(self, guideModule, guideDir, layout, path=None):
+        """ Create a guideButton for guideModule in the respective colMiddleLeftA guidesLayout.
+        """
+#         # especific import command for guides storing theses guides modules in a variable:
+#         #guide = __import__("dpAutoRigSystem."+guideDir+"."+guideModule, {}, {}, [guideModule])
+#         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+
+#         print("guideModule, guideDir, layout, path=None ===", guideModule, guideDir, layout, path)
+
+#         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
+#         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
+#         try:
+#             if guideDir:
+#                 guideDir = guideDir.replace("/", ".")
+#                 guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+#             else:
+#                 sys.path.append(path)
+#                 guide = __import__(guideModule, {}, {}, [guideModule])
+#             if self.dev:
+#                 reload(guide)
+#         except Exception as e:
+#             errorString = self.data.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
+#             mel.eval('warning \"'+errorString+'\";')
+#             return
+        
+#         # getting data from guide module:
+#         title = self.data.lang[guide.TITLE]
+#         description = self.data.lang[guide.DESCRIPTION]
+#         icon = guide.ICON
+#         if guideDir:
+#             # find path where 'dpAutoRig.py' is been executed to get the icon:
+#             path = self.data.dp_auto_rig_path
+#         iconDir = path+icon
+#         guideName = guide.CLASS_NAME
+#         if not "WIKI" in dir(guide):
+#             guide.WIKI = None
+        
+# #        print("hehrhe middle starting guides..... 1", guideName)
+#         # first pass to separate code from ui:
+#         #
+#         # 1 - code
+#         #
+#         #
+#         if guideDir == self.data.curve_simple_folder.replace("/", ".") or guideDir == self.data.curve_combined_folder.replace("/", "."):
+#             ctrlInstance = self.initExtraModule(guideModule, guideDir)
+#             self.data.control_instances.append(ctrlInstance)
+#         else:
+#             isRebuilder = False
+#             if guideDir == self.data.rebuilder_folder.replace("/", ".") or guideDir == self.data.start_folder.replace("/", ".") or guideDir == self.data.source_folder.replace("/", ".") or guideDir == self.data.setup_folder.replace("/", ".") or guideDir == self.data.deforming_folder.replace("/", ".") or guideDir == self.data.custom_folder.replace("/", "."):
+#                 isRebuilder = True
+#             if guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
+#                 validatorInstance = self.initExtraModule(guideModule, guideDir)
+#                 if guideDir == self.data.checkin_folder.replace("/", "."):
+#                     self.data.checkin_instances.append(validatorInstance)
+#                 elif guideDir == self.data.checkout_folder.replace("/", "."):
+#                     self.data.checkout_instances.append(validatorInstance)
+#                 else: #addOns
+#                     if "Finishing" in layout: #workaround to define this module as finishing addOn to run after all.
+#                         self.data.checkfinishing_instances.append(validatorInstance)
+#                     else:
+#                         self.data.checkaddon_instances.append(validatorInstance)
+#             if isRebuilder:
+#                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
+#                 self.data.rebuilder_instances.append(rebuilderInstance)
+
+# #        print("hehrhe middle starting guides..... 2", guideName)
+
+
+#         if guideDir == self.data.standard_folder.replace("/", "."):
+#             initedGuide = self.initGuide(guideModule, guideDir, self.data.rig_type_biped)
+            
+# #            print("iniiitteted guide =", guideModule)
+#             #initedGuide.build_raw_guide()
+        
+#     # second pass to separate code from ui:
+#     #
+#     # 2 - ui
+#     #
+#     #
+# #    def createGuideButton2(self, guideModule, guideDir, layout, path=None):
+        
+
+        #print("layout =", layout)
+#        if self.data.ui_state and 
+        if cmds.layout(layout, query=True, exists=True):
+            if guideDir == self.data.curve_simple_folder or guideDir == self.data.curve_combined_folder:
+                for ctrl_instance in self.data.control_instances:
+                    if ctrl_instance.guideModuleName == guideModule[2:]: #hack removing 'dp' prefix
+                        cmds.iconTextButton(image=self.data.icon[ctrl_instance.guideModuleName[0].lower()+ctrl_instance.guideModuleName[1:]] ,label=ctrl_instance.guideModuleName, annotation=ctrl_instance.guideModuleName, height=32, width=32, command=partial(self.installControllerModule, ctrl_instance, True), parent=layout)
+                        return
+
+            isRebuilder = False
+            if guideDir == self.data.rebuilder_folder or guideDir == self.data.start_folder or guideDir == self.data.source_folder or guideDir == self.data.setup_folder or guideDir == self.data.deforming_folder or guideDir == self.data.custom_folder:
+                isRebuilder = True
+                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=layout)
             else:
-                cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
-        cmds.setParent('..')
+                moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
+            
+            if guideDir == self.data.standard_folder:
+                for guide_instance in self.data.standard_instances:
+                    if guide_instance.guideModuleName == guideModule[2:]: #hack removing 'dp' prefix
+                        
+                        cmds.image(image=self.data.icon[guide_instance.guideModuleName[0].lower()+guide_instance.guideModuleName[1:]], width=32, parent=moduleLayout)
+                        cmds.button(guide_instance.title+'_bt', label="dp"+guide_instance.title, height=32, command=partial(self.initGuide, guideModule, guideDir, self.data.rig_type_biped), parent=moduleLayout)
+
+#             elif guideDir == self.data.integrated_folder:
+#                 cmds.button(label=title, height=32, command=partial(self.execIntegratedGuide, guideModule, guideDir), parent=moduleLayout)
+#             elif guideDir == self.data.tools_folder:
+#                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
+#             elif guideDir == self.data.checkin_folder or guideDir == self.data.checkout_folder or guideDir == "": #addOns
+# #                validatorInstance = self.initExtraModule(guideModule, guideDir)
+#                 validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
+#                 validatorInstance.firstBT = cmds.button(label=validatorInstance.firstBTLabel, width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
+#                 validatorInstance.secondBT = cmds.button(label=validatorInstance.secondBTLabel.capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
+# #                if guideDir == self.data.checkin_folder.replace("/", "."):
+# #                    self.data.checkin_instances.append(validatorInstance)
+# #                elif guideDir == self.data.checkout_folder.replace("/", "."):
+# #                    self.data.checkout_instances.append(validatorInstance)
+# #                else: #addOns
+# #                    if "Finishing" in layout: #workaround to define this module as finishing addOn to run after all.
+# #                        self.data.checkfinishing_instances.append(validatorInstance)
+# #                    else:
+# #                        self.data.checkaddon_instances.append(validatorInstance)
+#                 if validatorInstance.customName:
+#                     cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
+#                     #validatorInstance.title = validatorInstance.customName
+#             if isRebuilder:
+# #               rebuilderInstance = self.initExtraModule(guideModule, guideDir)
+# #               self.data.rebuilder_instances.append(rebuilderInstance)
+#                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
+#                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
+#                 rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
+#                 rebuilderInstance.infoITB = cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
+#                 rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.data.lang['r058_deleteDataAnn'], parent=moduleLayout)
+#                 rebuilderInstance.updateActionButtons(color=False)
+#             else:
+#                 cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide_instance.title, guide_instance.description, None, 'center', 305, 250, wiki=guide_instance.wiki), parent=moduleLayout)
+#                 return
+# #            print("hehrhe middle starting guides..... 3", guideName, layout)
+#             # creating a basic layout for guide buttons:
+            #if guideDir == self.data.curve_simple_folder.replace("/", ".") or guideDir == self.data.curve_combined_folder.replace("/", "."):
+    #            ctrlInstance = self.initExtraModule(guideModule, guideDir)
+    #            self.data.control_instances.append(ctrlInstance)
+        
+            #else:
+#                     print("bye")
+#                 isRebuilder = False
+#                 if guideDir == self.data.rebuilder_folder.replace("/", ".") or guideDir == self.data.start_folder.replace("/", ".") or guideDir == self.data.source_folder.replace("/", ".") or guideDir == self.data.setup_folder.replace("/", ".") or guideDir == self.data.deforming_folder.replace("/", ".") or guideDir == self.data.custom_folder.replace("/", "."):
+#                     isRebuilder = True
+#                     moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2), (6, 'left', 2)], parent=layout)
+#                 else:
+#                     moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
+#                 cmds.image(image=iconDir, width=32, parent=moduleLayout)
+#                 if guideDir == self.data.standard_folder.replace("/", "."):
+#                     '''
+#                     We need to passe the rigType parameters because the cmds.button command will send a False parameter that
+#                     will be stock in the rigType if we don't pass the parameter
+#                     https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
+#                     '''
+#                     #cmds.button(title+'_bt', label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, self.data.rig_type_biped), parent=moduleLayout)
+#                     cmds.button(title+'_bt', label=title, height=32, command=initedGuide.build_raw_guide, parent=moduleLayout)
+#                 elif guideDir == self.data.integrated_folder.replace("/", "."):
+#                     cmds.button(label=title, height=32, command=partial(self.execIntegratedGuide, guideModule, guideDir), parent=moduleLayout)
+#                 elif guideDir == self.data.tools_folder:
+#                     cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
+#                 elif guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
+#     #                validatorInstance = self.initExtraModule(guideModule, guideDir)
+#                     validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
+#                     validatorInstance.firstBT = cmds.button(label=validatorInstance.firstBTLabel, width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
+#                     validatorInstance.secondBT = cmds.button(label=validatorInstance.secondBTLabel.capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
+#     #                if guideDir == self.data.checkin_folder.replace("/", "."):
+#     #                    self.data.checkin_instances.append(validatorInstance)
+#     #                elif guideDir == self.data.checkout_folder.replace("/", "."):
+#     #                    self.data.checkout_instances.append(validatorInstance)
+#     #                else: #addOns
+#     #                    if "Finishing" in layout: #workaround to define this module as finishing addOn to run after all.
+#     #                        self.data.checkfinishing_instances.append(validatorInstance)
+#     #                    else:
+#     #                        self.data.checkaddon_instances.append(validatorInstance)
+#                     if validatorInstance.customName:
+#                         cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
+#                         #validatorInstance.title = validatorInstance.customName
+#                 if isRebuilder:
+#     #               rebuilderInstance = self.initExtraModule(guideModule, guideDir)
+#     #               self.data.rebuilder_instances.append(rebuilderInstance)
+#                     rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
+#                     rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
+#                     rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
+#                     rebuilderInstance.infoITB = cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250, wiki=guide.WIKI), parent=moduleLayout)
+#                     rebuilderInstance.deleteDataITB = cmds.iconTextButton(image=self.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=rebuilderInstance.deleteData, enable=rebuilderInstance.deleteDataBTEnable, annotation=self.data.lang['r058_deleteDataAnn'], parent=moduleLayout)
+#                     rebuilderInstance.updateActionButtons(color=False)
+#                 else:
+#                    cmds.iconTextButton(image=self.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.logger.infoWin, guide_instance.title, guide_instance.description, None, 'center', 305, 250, wiki=guide_instance.wiki), parent=moduleLayout)
+#     #        cmds.setParent('..')
+# #            print("OOO end loaded buttons...")
     
     
     #@dpUtils.profiler
-    def initGuide(self, guideModule, guideDir, rigType=dpBaseStandard.RigType.biped, number=None, *args):
+    def initGuide(self, guideModule, guideDir, rigType="biped", number=None, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
@@ -837,11 +1049,13 @@ class Start(object):
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
         guideInstance = guideClass(self, userSpecName, rigType, number=number)
-        self.moduleInstancesList.append(guideInstance)
+        
+#        self.data.standard_instances.append(guideInstance)
         # edit the footer A text:
-        self.allGuidesList.append([guideModule, userSpecName])
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text("rig_footer_txt", edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.data.lang['i005_footerRigging'])
+        self.data.created_guides.append([guideModule, userSpecName])
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
+        if self.data.ui_state:
+            cmds.text("rig_footer_txt", edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.data.lang['i005_footerRigging'])
         return guideInstance
     
     
@@ -876,104 +1090,107 @@ class Start(object):
     def execIntegratedGuide(self, guideModule, guideDir, *args):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
+        print("hehreheheheheheheh 1111")
         # import this scripted module:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         if self.dev:
             reload(guide)
+        print("getattr(guide, guide.CLASS_NAME) =", getattr(guide, guide.CLASS_NAME))
+        return guide
         # get the CLASS_NAME from guideModule:
-        startScriptFunction = getattr(guide, guide.CLASS_NAME)
+#        startScriptFunction = getattr(guide, guide.CLASS_NAME)
         # execute this scriptedGuideModule:
-        startScriptFunction(self)
+#        startScriptFunction(self)
     
     
-    def clearGuideLayout(self, *args):
-        """ Clear current guide layout before reload modules.
-        """
-        #
-        # TODO
-        #
-        # WIP refactorying UI
-        #
-        #
-#        try:
-        cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
-        if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
-            cmds.deleteUI('rig_guides_inst_cl')
-        if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
-            cmds.deleteUI('rig_selected_module_cl')
-        cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
-        cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
-#        except:
-#            pass 
+#     def clearGuideLayout(self, *args):
+#         """ Clear current guide layout before reload modules.
+#         """
+#         #
+#         # TODO
+#         #
+#         # WIP refactorying UI
+#         #
+#         #
+# #        try:
+#         cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
+#         if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
+#             cmds.deleteUI('rig_guides_inst_cl')
+#         if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
+#             cmds.deleteUI('rig_selected_module_cl')
+#         cmds.columnLayout('rig_guides_inst_cl', adjustableColumn=True, width=200, parent='rig_guides_inst_sl')
+#         cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
+# #        except:
+# #            pass 
 
 
 
-    def populateCreatedGuideModules(self, *args):
-        """ Read all guide modules loaded in the scene and re-create the elements in the moduleLayout.
-        """
-        # create a new list in order to store all created guide modules in the scene and its userSpecNames:
-        self.allGuidesList = []
-        self.moduleInstancesList = []
-        # list all namespaces:
-        cmds.namespace(setNamespace=":")
-        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
-        # find path where 'dpAutoRig.py' is been executed:
-        path = self.data.dp_auto_rig_path
-        guideDir = self.data.standard_folder
-        # find all module names:
-        moduleNameInfo = self.utils.findAllModuleNames(path, guideDir)
-        validModules = moduleNameInfo[0]
-        validModuleNames = moduleNameInfo[1]
+    # def populateCreatedGuideModules(self, *args):
+    #     """ Read all guide modules loaded in the scene and re-create the elements in the moduleLayout.
+    #     """
+    #     # create a new list in order to store all created guide modules in the scene and its userSpecNames:
+    #     self.data.created_guides = []
+    #     self.data.standard_instances = []
+    #     # list all namespaces:
+    #     cmds.namespace(setNamespace=":")
+    #     namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
+    #     # find path where 'dpAutoRig.py' is been executed:
+    #     path = self.data.dp_auto_rig_path
+    #     guideDir = self.data.standard_folder
+    #     # find all module names:
+    #     moduleNameInfo = self.utils.findAllModuleNames(path, guideDir)
+    #     validModules = moduleNameInfo[0]
+    #     validModuleNames = moduleNameInfo[1]
         
-        # check if there is "__" (double undersore) in the namespaces:
-        for n in namespaceList:
-            divString = n.partition("__")
-            if divString[1] != "":
-                module = divString[0]
-                userSpecName = divString[2]
-                if module in validModuleNames:
-                    index = validModuleNames.index(module)
-                    # check if there is this module guide base in the scene:
-                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.data.guide_base_name
-                    if cmds.objExists(curGuideName):
-                        self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
-                    else:
-                        cmds.namespace(moveNamespace=(n, ':'), force=True)
-                        cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
+    #     # check if there is "__" (double undersore) in the namespaces:
+    #     for n in namespaceList:
+    #         divString = n.partition("__")
+    #         if divString[1] != "":
+    #             module = divString[0]
+    #             userSpecName = divString[2]
+    #             if module in validModuleNames:
+    #                 index = validModuleNames.index(module)
+    #                 # check if there is this module guide base in the scene:
+    #                 curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.data.guide_base_name
+    #                 if cmds.objExists(curGuideName):
+    #                     self.data.created_guides.append([validModules[index], userSpecName, curGuideName])
+    #                 else:
+    #                     cmds.namespace(moveNamespace=(n, ':'), force=True)
+    #                     cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
 
-        self.clearGuideLayout()
-        # if exists any guide module in the scene, recreate its instance as objectClass:
-        if self.allGuidesList:
-            sortedAllGuidesList = sorted(self.allGuidesList, key=lambda userSpecName: userSpecName[1])
-            # load again the modules:
-            guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.data.standard_folder.replace("/", ".")
-            # this list will be used to rig all modules pressing the RIG button:
-            for module in sortedAllGuidesList:
-                mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
-                if self.dev:
-                    reload(mod)
-                # identify the guide modules and add to the moduleInstancesList:
-                moduleClass = getattr(mod, mod.CLASS_NAME)
-                ar = self
-                if "rigType" in cmds.listAttr(module[2]):
-                    curRigType = cmds.getAttr(module[2]+".rigType")
-                    moduleInst = moduleClass(ar, module[1], curRigType)
-                else:
-                    if "Style" in cmds.listAttr(module[2]):
-                        iStyle = cmds.getAttr(module[2]+".Style")
-                        if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.biped)
-                        else:
-                            moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.quadruped)
-                    else:
-                        moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.default)
-                self.moduleInstancesList.append(moduleInst)
-                # reload pinGuide scriptJob:
-                self.ctrls.startPinGuide(module[2])
-        # edit the footer A text:
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
-        cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.data.lang['i005_footerRigging'])
+    #     self.clearGuideLayout()
+    #     # if exists any guide module in the scene, recreate its instance as objectClass:
+    #     if self.data.created_guides:
+    #         sortedAllGuidesList = sorted(self.data.created_guides, key=lambda userSpecName: userSpecName[1])
+    #         # load again the modules:
+    #         guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.data.standard_folder.replace("/", ".")
+    #         # this list will be used to rig all modules pressing the RIG button:
+    #         for module in sortedAllGuidesList:
+    #             mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
+    #             if self.dev:
+    #                 reload(mod)
+    #             # identify the guide modules and add to the moduleInstancesList:
+    #             moduleClass = getattr(mod, mod.CLASS_NAME)
+    #             ar = self
+    #             if "rigType" in cmds.listAttr(module[2]):
+    #                 curRigType = cmds.getAttr(module[2]+".rigType")
+    #                 moduleInst = moduleClass(ar, module[1], curRigType)
+    #             else:
+    #                 if "Style" in cmds.listAttr(module[2]):
+    #                     iStyle = cmds.getAttr(module[2]+".Style")
+    #                     if (iStyle == 0 or iStyle == 1):
+    #                         moduleInst = moduleClass(ar, module[1], self.data.rig_type_biped)
+    #                     else:
+    #                         moduleInst = moduleClass(ar, module[1], self.ar.data.rig_type_quadruped)
+    #                 else:
+    #                     moduleInst = moduleClass(ar, module[1], dpBaseStandard.RigType.default)
+    #             self.data.standard_instances.append(moduleInst)
+    #             # reload pinGuide scriptJob:
+    #             self.ctrls.startPinGuide(module[2])
+    #     # edit the footer A text:
+    #     self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
+    #     cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.data.lang['i005_footerRigging'])
     
     
     
@@ -984,7 +1201,7 @@ class Start(object):
             Use a recursive method to remove imported of imported guides.
         """
         importedNamespaceList = []
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
         currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
@@ -1031,7 +1248,7 @@ class Start(object):
     def checkGuideNets(self, *args):
         """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
         """
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
         for item in self.modulesToBeRiggedList:
             if not item.guideNet:
                 self.initExtraModule("dpUpdateGuides", self.data.tools_folder)
@@ -1715,7 +1932,7 @@ class Start(object):
             self.refreshMainUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
         self.riggedModuleDic = {}
         
         # declare a list to store all integrating information:

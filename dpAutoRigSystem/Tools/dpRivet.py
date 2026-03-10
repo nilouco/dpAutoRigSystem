@@ -18,16 +18,19 @@
 
 
 # importing libraries:
+import json
 from maya import cmds
 from maya import mel
 from functools import partial
-import json
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
 TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
 ICON = "/Icons/dp_rivet.png"
+WIKI = "06-‐-Tools#-rivet"
 
 RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
@@ -36,12 +39,17 @@ WRAP = "Wrap"
 DP_RIVET_VERSION = 2.10
 
 
-class Rivet(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # declaring variables
-        self.ar = ar
-        self.utils = ar.utils
-        self.ctrls = ar.ctrls
+class Rivet(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None
@@ -51,10 +59,12 @@ class Rivet(object):
         self.wrapDeformer = WRAP
         self.mayaMinimalVersion = 2022.3
         self.mayaVersionRequired = self.checkMayaVersion()
-        self.ui = ui
         self.netList = []
+        
+
+    def build_tool(self, *args):
         # call main function
-        if ui:
+        if self.ui:
             self.dpRivetUI()
             # try to fill UI items from selection
             self.dpFillUI()
@@ -64,7 +74,7 @@ class Rivet(object):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpRivetUI Window:
-        self.utils.closeUI('dpRivetWindow')
+        self.ar.utils.closeUI('dpRivetWindow')
         rivet_winWidth  = 305
         rivet_winHeight = 470
         dpRivetWin = cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -165,7 +175,7 @@ class Rivet(object):
         """
         self.disablePac(indexList)
         for i, index in enumerate(indexList):
-            self.utils.setProgress(self.ar.data.lang['i315_removing'])
+            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'])
             netNode = self.rivetNetNodeList[index]
             if netNode:
                 self.removeRivetFromNetNode(netNode)
@@ -190,10 +200,10 @@ class Rivet(object):
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            self.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(trueIndexList), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(trueIndexList), addOne=False, addNumber=False)
             self.removeRivetFromList(trueIndexList, selectionList)
             self.checkRivetGrp()
-            self.utils.setProgress(endIt=True)
+            self.ar.utils.setProgress(endIt=True)
         else:
             mel.eval('print \"dpAR: '+self.ar.data.lang['m169_noItemSelect']+'\\n\";')
         cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
@@ -259,7 +269,7 @@ class Rivet(object):
     def itemsWithRivetList(self):
         """ From all rivet network nodes, rise a controllers list to fill ui.
         """
-        rivetNetList = self.utils.getNetworkNodeByAttr("dpRivetNet")
+        rivetNetList = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
         if rivetNetList:
             controllerList = []
             self.rivetNetNodeList = []
@@ -372,19 +382,19 @@ class Rivet(object):
                 removeExistingRivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
                 if removeExistingRivet == self.ar.data.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    self.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
-                    self.utils.setProgress(endIt=True)
+                    self.ar.utils.setProgress(endIt=True)
                 elif removeExistingRivet == self.ar.data.lang['i072_no']:
                     pass
                 else:
                     return
 
         # call run function to create Rivet setup using UI values
-        self.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(itemList), addOne=False, addNumber=False)
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
-        self.utils.setProgress(endIt=True)
-        self.utils.closeUI('dpRivetWindow')
+        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.closeUI('dpRivetWindow')
     
     
     def dpSelectUVSetWin(self, uvSetList, *args):
@@ -416,7 +426,7 @@ class Rivet(object):
         else:
             selectedList = cmds.ls(selection=True)
         if selectedList:
-            if self.utils.dpCheckGeometry(selectedList[0]):
+            if self.ar.utils.dpCheckGeometry(selectedList[0]):
                 self.geoToAttach = selectedList[0]
                 cmds.textField(self.geoToAttachTF, edit=True, text=self.geoToAttach)
                 self.dpLoadUVSet(self.geoToAttach)
@@ -535,8 +545,8 @@ class Rivet(object):
         self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
 
         # integrate to dpAutoRigSystem:
-        self.masterCtrl = self.utils.getNodeByMessage("masterCtrl")
-        self.scalableGrp = self.utils.getNodeByMessage("scalableGrp")
+        self.masterCtrl = self.ar.utils.getNodeByMessage("masterCtrl")
+        self.scalableGrp = self.ar.utils.getNodeByMessage("scalableGrp")
         
         # create Rivet_Grp in order to organize hierarchy:
         createdRivetGrp = False
@@ -559,9 +569,9 @@ class Rivet(object):
             else:
                 geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4)
             self.deformFaceToRivet(geoToAttach, self.originedGeo)
-            supportGrp = self.utils.getNodeByMessage("supportGrp")
+            supportGrp = self.ar.utils.getNodeByMessage("supportGrp")
             if supportGrp:
-                self.ctrls.colorShape([supportGrp], [0.51, 1, 0.667], outliner=True) #green
+                self.ar.ctrls.colorShape([supportGrp], [0.51, 1, 0.667], outliner=True) #green
 
         # get shape to attach:
         if cmds.objExists(geoToAttach):
@@ -636,7 +646,7 @@ class Rivet(object):
             # then we need to duplicate, unlock attributes and freezeTransformation:
             dupGeo = cmds.duplicate(geoToAttach, name=geoToAttach+"_dpRivet_TEMP_Geo")[0]
             # unlock attr:
-            self.utils.unlockAttr([dupGeo])
+            self.ar.utils.unlockAttr([dupGeo])
             # parent to world:
             if cmds.listRelatives(dupGeo, allParents=True):
                 cmds.parent(dupGeo, world=True)
@@ -673,7 +683,7 @@ class Rivet(object):
                 
             # working with follicles and attaches
             for r, rivet in enumerate(self.rivetList):
-                self.utils.setProgress(self.ar.data.lang['i317_creatingRivet'])
+                self.ar.utils.setProgress(self.ar.data.lang['i317_creatingRivet'])
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)
@@ -781,7 +791,7 @@ class Rivet(object):
         else:
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
-        self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
+        self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
         self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
         cmds.select(clear=True)
         return self.netList
@@ -834,7 +844,7 @@ class Rivet(object):
                     cmds.setAttr(blendShapeNode+".envelope", 0)
                 # Duplicate geometry after turn off skinCluster and blendShape. 
                 toRivetGeo = cmds.duplicate(geo)[0]
-                self.utils.removeUserDefinedAttr(toRivetGeo)
+                self.ar.utils.removeUserDefinedAttr(toRivetGeo)
                 # Unparenting
                 if cmds.listRelatives(toRivetGeo, allParents=True):
                     cmds.parent(toRivetGeo, world=True)
@@ -857,7 +867,7 @@ class Rivet(object):
         """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
             Returns the suggested name.
         """
-        toRivetName = self.utils.extractSuffix(geo)
+        toRivetName = self.ar.utils.extractSuffix(geo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         i = 0
@@ -984,7 +994,7 @@ class Rivet(object):
         #Renaming
         hist = cmds.listHistory(morphGeo)
         morphList = cmds.ls(hist, type="morph")[0]
-        toRivetName = self.utils.extractSuffix(morphGeo)
+        toRivetName = self.ar.utils.extractSuffix(morphGeo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
@@ -992,7 +1002,7 @@ class Rivet(object):
         componentMatchNode = cmds.rename(componentMatchNode, toRivetName+"_CpM")
         self.toIDList.extend([morphGeo, morphNode, componentMatchNode])
         # Parent in supportGrp
-        self.parentToTransform([morphGeo], self.utils.getNodeByMessage("supportGrp"))
+        self.parentToTransform([morphGeo], self.ar.utils.getNodeByMessage("supportGrp"))
         return morphGeo, morphNode
 
 
@@ -1006,7 +1016,7 @@ class Rivet(object):
         hist = cmds.listHistory(wrapGeo)
         wrapList = cmds.ls(hist, type="wrap")[0]
         # Renaming
-        toRivetName = self.utils.extractSuffix(wrapGeo)
+        toRivetName = self.ar.utils.extractSuffix(wrapGeo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
@@ -1017,7 +1027,7 @@ class Rivet(object):
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         self.toIDList.extend([wrapGeo, wrapNode, baseShape])
         # Parent in supportGrp
-        self.parentToTransform([wrapGeo, baseShape], self.utils.getNodeByMessage("supportGrp"))
+        self.parentToTransform([wrapGeo, baseShape], self.ar.utils.getNodeByMessage("supportGrp"))
         return wrapGeo, wrapNode
 
 

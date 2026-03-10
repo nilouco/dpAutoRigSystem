@@ -2,6 +2,8 @@
 from maya import cmds
 from maya import mel
 from functools import partial
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "ReorderAttr"
@@ -13,13 +15,24 @@ WIKI = "06-‐-Tools#-reorder-attributes"
 DP_REORDERATTR_VERSION = 1.04
 
 
-class ReorderAttr(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        self.ar = ar
+class ReorderAttr(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         self.winName = "dpReorderAttrWindow"
         self.nextAttrTypeList = ["message", "typed"]
+        
+
+    def build_tool(self, *args):
         # call main function
-        if ui:
+        if self.ui:
             self.dpReorderAttrUI(self)
     
     

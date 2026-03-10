@@ -1,5 +1,7 @@
 # importing libraries:
 from maya import cmds
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "LimbSpaceSwitch"
@@ -11,11 +13,20 @@ WIKI = "06-‐-Tools#-limb-space-switch"
 DP_LIMBSPACESWITCH_VERSION = 2.06
 
 
-class LimbSpaceSwitch(object):
-    def __init__(self, ar, *args):
-        # redeclaring variables
-        self.ar = ar
+class LimbSpaceSwitch(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         
+        
+    def build_tool(self, *args):
         # find nodes
         allGrp = self.ar.utils.getAllGrp()
         if allGrp:

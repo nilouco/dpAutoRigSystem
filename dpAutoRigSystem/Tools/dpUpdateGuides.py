@@ -1,5 +1,7 @@
 from maya import cmds
 from maya import mel
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "UpdateGuides"
@@ -11,23 +13,30 @@ WIKI = "06-‐-Tools#-update-guides"
 DP_UPDATEGUIDES_VERSION = 1.10
 
 
-class UpdateGuides(object):
-    def __init__(self, ar, ui=True, *args, **kwargs):
-        # defining variables
-        self.ar = ar
-        self.ui = ui
-        self.utils = ar.utils
+class UpdateGuides(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
-        self.currentDpArVersion = ar.dpARVersion
+        self.currentDpArVersion = self.ar.dpARVersion
         # Receive the guides list from hook function
-        self.guidesDictionary = self.utils.hook()
+        self.guidesDictionary = self.ar.utils.hook()
         # List that will hold all new guides instances
         self.newGuidesInstanceList = []
         # Dictionary where the keys are the guides that will be used and don't need update
         # and values are its current parent, this is used to search for possible new parent
         self.guidesToReParentDict = {}
-        self.TRANSFORM_LIST = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
+
+
+    def build_tool(self, *args):
         # If there are guides on the dictionary go on.
         if len(self.guidesDictionary) > 0:
             # Get all info nedeed and store in updateData dictionary
@@ -45,7 +54,7 @@ class UpdateGuides(object):
     def summaryUI(self):
         """ Update Guides Summary UI for log info.
         """
-        self.utils.closeUI('updateSummary')
+        self.ar.utils.closeUI('updateSummary')
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
         updateSummaryCL = cmds.columnLayout('updateSummaryCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
@@ -71,8 +80,8 @@ class UpdateGuides(object):
     def updateGuidesUI(self):
         """ Main Update Guides UI.
         """
-        self.utils.closeUI('updateGuidesWindow')
-        self.utils.closeUI('updateSummary')
+        self.ar.utils.closeUI('updateGuidesWindow')
+        self.ar.utils.closeUI('updateSummary')
         cmds.window('updateGuidesWindow', title="Guides Info")
         updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
         cmds.text(label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
@@ -316,7 +325,7 @@ class UpdateGuides(object):
         transformDic = {}
         for attribute in attrList:
             attributeValue = self.getAttrValue(guide, attribute)
-            if attribute in self.TRANSFORM_LIST:
+            if attribute in self.ar.data.transform_attrs[:-1]: #without visibility
                 attributeValueLocked = self.getAttrValue(guide, attribute, True)
                 transformDic[attribute] = (attributeValue, attributeValueLocked)
             else:
@@ -484,7 +493,7 @@ class UpdateGuides(object):
     
 
     def doDelete(self, *args):
-        self.utils.closeUI('updateSummary')
+        self.ar.utils.closeUI('updateSummary')
         for guide in self.updateData:
             try:
                 cmds.parent(guide, world=True)
@@ -534,33 +543,33 @@ class UpdateGuides(object):
     def doUpdate(self, *args):
         """ Main method to update the guides in the scene.
         """
-        self.utils.closeUI('updateGuidesWindow')
+        self.ar.utils.closeUI('updateGuidesWindow')
         # Starts progress bar feedback
-        self.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, addOne=False)
+        self.ar.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, addOne=False)
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
-        self.utils.setProgress(self.ar.data.lang['m199_creatingNewGuides'])
+        self.ar.utils.setProgress(self.ar.data.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.createNewGuides()
-        self.utils.setProgress(self.ar.data.lang['m200_setAttrs'])
+        self.ar.utils.setProgress(self.ar.data.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
         self.setNewGuideAttr('attributes')
-        self.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
+        self.ar.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parentNewGuides()
-        self.utils.setProgress(self.ar.data.lang['m202_setTranforms'])
+        self.ar.utils.setProgress(self.ar.data.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
         self.setNewGuideAttr('transformAttributes')
-        self.utils.setProgress(self.ar.data.lang['m203_setChildGuides'])
+        self.ar.utils.setProgress(self.ar.data.lang['m203_setChildGuides'])
         # Set all children attributes
         self.setChildrenGuides()
-        self.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
+        self.ar.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parentRetainGuides()
         self.patchFootRfF()
         cmds.select(clear=True)
         # Ends progress bar feedback
-        self.utils.setProgress(endIt=True)
+        self.ar.utils.setProgress(endIt=True)
         if self.ui:
             # Calls for summary window
             self.summaryUI()

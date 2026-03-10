@@ -27,6 +27,7 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
         self.armName = "Arm"
         self.legName = "Leg"
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
@@ -34,8 +35,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         if self.ar.dev:
             self.reloadModules()
         self.softIk = dpSoftIk.SoftIkClass(self.ar)
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar, False)
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar)
         self.ribbon = jcRibbon.RibbonClass(self.ar, self)
+        self.correctionManager.ui = False
         
         
     def reloadModules(self, *args):
