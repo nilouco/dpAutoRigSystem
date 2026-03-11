@@ -118,6 +118,11 @@ class Data:
     checkaddon_instances: list = field(default_factory=list)
     checkfinishing_instances: list = field(default_factory=list)
     rebuilder_instances: list = field(default_factory=list)
+    start_instances: list = field(default_factory=list)
+    source_instances: list = field(default_factory=list)
+    setup_instances: list = field(default_factory=list)
+    deforming_instances: list = field(default_factory=list)
+    custom_instances: list = field(default_factory=list)
 
     lib: dict = field(default_factory=dict)
     lang: dict = field(default_factory=dict)

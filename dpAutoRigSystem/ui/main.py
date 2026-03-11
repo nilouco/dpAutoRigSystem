@@ -594,6 +594,14 @@ class UI(object):
 class Fill(object):
     def __init__(self, ar):
         self.ar = ar
+        self.validator_folders = [self.ar.data.checkin_folder, self.ar.data.checkout_folder]
+        self.rebuilder_folders = [ self.ar.data.rebuilder_folder,
+                                   self.ar.data.start_folder,
+                                   self.ar.data.source_folder,
+                                   self.ar.data.setup_folder,
+                                   self.ar.data.deforming_folder,
+                                   self.ar.data.custom_folder
+                                   ]
 
 
     def start_library(self):
@@ -618,12 +626,10 @@ class Fill(object):
         self.ar.startGuideModules(self.ar.data.checkout_folder, "start", "i209_checkout_module_cl")
         if self.ar.pipeliner.pipeData['addOnsPath'] and self.ar.config.get_validator_addons():
             self.ar.startGuideModules("", "start", "i212_addOns_module_cl", path=self.ar.pipeliner.pipeData['addOnsPath'])
-            cmds.frameLayout('i212_addOns_fl', edit=True, visible=True)
         if self.ar.pipeliner.pipeData['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
             self.ar.startGuideModules("", "start", "i354_finishing_module_cl", path=self.ar.pipeliner.pipeData['finishingPath'])
-            cmds.frameLayout('i354_finishing_fl', edit=True, visible=True)
         # rebuilders
-        self.ar.startGuideModules(self.ar.data.rebuilder_folder, "start", "rebuilder_cl")
+#        #self.ar.startGuideModules(self.ar.data.rebuilder_folder, "start", "rebuilder_cl")
         self.ar.startGuideModules(self.ar.data.start_folder, "start", "rebuilder_start_fl")
         self.ar.startGuideModules(self.ar.data.source_folder, "start", "rebuilder_source_fl")
         self.ar.startGuideModules(self.ar.data.setup_folder, "start", "rebuilder_setup_fl")
@@ -654,7 +660,6 @@ class Fill(object):
     
     
     def fill_library(self):
-
         # # rigging
         for item in self.ar.data.standard_instances:
             self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_cl")
@@ -668,51 +673,58 @@ class Fill(object):
         # tools
         for item in self.ar.data.tools_instances:
             self.populate_library(item, self.ar.data.tools_folder, "tools_module_cl")
+        # validators
+        for item in self.ar.data.checkin_instances:
+            self.populate_library(item, self.ar.data.checkin_folder, "i208_checkin_module_cl")
+        for item in self.ar.data.checkout_instances:
+            self.populate_library(item, self.ar.data.checkout_folder, "i209_checkout_module_cl")
+        for item in self.ar.data.checkaddon_instances:
+            cmds.frameLayout('i212_addOns_fl', edit=True, visible=True)
+            self.populate_library(item, "", "i212_addOns_module_cl")
+        for item in self.ar.data.checkfinishing_instances:
+            cmds.frameLayout('i354_finishing_fl', edit=True, visible=True)
+            self.populate_library(item, "", "i354_finishing_module_cl")
+        # rebuilders
+        for item in self.ar.data.start_instances:
+            self.populate_library(item, self.ar.data.start_folder, "rebuilder_start_fl", 6)
+        for item in self.ar.data.source_instances:
+            self.populate_library(item, self.ar.data.source_folder, "rebuilder_source_fl", 6)
+        for item in self.ar.data.setup_instances:
+            self.populate_library(item, self.ar.data.setup_folder, "rebuilder_setup_fl", 6)
+        for item in self.ar.data.deforming_instances:
+            self.populate_library(item, self.ar.data.deforming_folder, "rebuilder_deforming_fl", 6)
+        for item in self.ar.data.custom_instances:
+            self.populate_library(item, self.ar.data.custom_folder, "rebuilder_custom_fl", 6)
+
         
-        
-
-            print("item =", item)
-
-        # # validators
-        # self.ar.startGuideModules(self.ar.data.checkin_folder, "populate", "i208_checkin_module_cl")
-        # self.ar.startGuideModules(self.ar.data.checkout_folder, "populate", "i209_checkout_module_cl")
-        # if self.ar.pipeliner.pipeData['addOnsPath'] and self.ar.config.get_validator_addons():
-        #     self.ar.startGuideModules("", "populate", "i212_addOns_module_cl", path=self.ar.pipeliner.pipeData['addOnsPath'])
-        #     cmds.frameLayout('i212_addOns_fl', edit=True, visible=True)
-        # if self.ar.pipeliner.pipeData['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
-        #     self.ar.startGuideModules("", "populate", "i354_finishing_module_cl", path=self.ar.pipeliner.pipeData['finishingPath'])
-        #     cmds.frameLayout('i354_finishing_fl', edit=True, visible=True)
-        # # rebuilders
-        # self.ar.startGuideModules(self.ar.data.rebuilder_folder, "populate", "rebuilder_cl")
-        # self.ar.startGuideModules(self.ar.data.start_folder, "populate", "rebuilder_start_fl")
-        # self.ar.startGuideModules(self.ar.data.source_folder, "populate", "rebuilder_source_fl")
-        # self.ar.startGuideModules(self.ar.data.setup_folder, "populate", "rebuilder_setup_fl")
-        # self.ar.startGuideModules(self.ar.data.deforming_folder, "populate", "rebuilder_deforming_fl")
-        # self.ar.startGuideModules(self.ar.data.custom_folder, "populate", "rebuilder_custom_fl")
-
 
 
     def populate_library(self, item, folder, layout, columns=5):
         if cmds.layout(layout, query=True, exists=True):
+            icon_name = self.ar.ui_manager.get_icon_name(item)
             if folder == self.ar.data.curve_simple_folder or folder == self.ar.data.curve_combined_folder:
-                cmds.iconTextButton(image=self.ar.data.icon[item.guideModuleName[0].lower()+item.guideModuleName[1:]], label=item.guideModuleName, annotation=item.guideModuleName, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
+                cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.guideModuleName, annotation=item.guideModuleName, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
                 return
             moduleLayout = cmds.rowLayout(numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
-            cmds.image(image=self.ar.data.icon[item.guideModuleName[0].lower()+item.guideModuleName[1:]], width=32, parent=moduleLayout)
+            cmds.image(item.title+"_img", image=self.ar.data.icon[icon_name], width=32, parent=moduleLayout)
             if folder == self.ar.data.standard_folder:
                 cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_raw_guide, parent=moduleLayout)
             elif folder == self.ar.data.integrated_folder:
                 cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=moduleLayout)
             elif folder == self.ar.data.tools_folder:
                 cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=moduleLayout)
-                #cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-
-            cmds.iconTextButton(image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=moduleLayout)
-
-
-
-
-
+            else:
+                item.actionCB = cmds.checkBox(label=self.ar.data.lang[item.title], value=True, changeCommand=item.changeActive, parent=moduleLayout)
+                item.firstBT = cmds.button(label=item.firstBTLabel, width=45, command=partial(item.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.firstBTEnable, parent=moduleLayout)
+                item.secondBT = cmds.button(label=item.secondBTLabel.capitalize(), width=45, command=partial(item.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.secondBTEnable, parent=moduleLayout)
+                if folder == "" or folder in self.validator_folders:
+                    if item.customName:
+                        cmds.checkBox(item.actionCB, edit=True, label=item.customName)
+                        item.title = item.customName
+                if folder in self.rebuilder_folders:
+                    item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=moduleLayout)
+                    item.updateActionButtons(color=False)
+            cmds.iconTextButton(item.title+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=moduleLayout)
 
 
 
@@ -795,8 +807,6 @@ class Manager(object):
 
     def clear_guide_layout(self):
         if self.ar.data.ui_state:
-            print("hehhrehe 5050505")
-           # if cmds.frameLayout('rig_edit_selected_module_fl', query=True, exists=True):
             cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.ar.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
             if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
                 cmds.deleteUI('rig_guides_inst_cl')
@@ -872,8 +882,9 @@ class Manager(object):
         if self.ar.data.ui_state:
             self.modulesToBeRiggedList = self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)
             cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.ar.data.lang['i005_footerRigging'])
-        print("end of fill_created_guides =", self.ar.data.created_guides)
+        
         print("end of fill_created_guides, standard_instances =", self.ar.data.standard_instances)
+        print("end of fill_created_guides =", self.ar.data.created_guides)
 
 
 
@@ -929,3 +940,12 @@ class Manager(object):
                 else:
                     cmds.frameLayout(item, edit=True, collapse=collapse_value)
         cmds.iconTextButton(iconTB, edit=True, image=icon)
+
+
+    def get_icon_name(self, item, alternative="addOn"):
+        icon_name = "AR"
+        if hasattr(item, "guideModuleName"):
+            icon_name = item.guideModuleName[0].lower()+item.guideModuleName[1:]
+        if not icon_name in self.ar.data.icon.keys():
+            icon_name = alternative
+        return icon_name

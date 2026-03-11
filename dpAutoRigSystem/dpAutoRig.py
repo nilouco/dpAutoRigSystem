@@ -788,8 +788,9 @@ class Start(object):
         # 1 - code
         #
         #
-        if guideDir == self.data.integrated_folder.replace("/", "."):
-            #self.data.template_instances.append(self.execIntegratedGuide(guideModule, guideDir))
+        if guideDir == self.data.standard_folder.replace("/", "."):
+            self.data.standard_instances.append(self.initGuide(guideModule, guideDir, self.data.rig_type_biped))
+        elif guideDir == self.data.integrated_folder.replace("/", "."):
             self.data.template_instances.append(self.initExtraModule(guideModule, guideDir))
         elif guideDir == self.data.curve_simple_folder.replace("/", "."):
             self.data.curve_simple_instances.append(self.initExtraModule(guideModule, guideDir))
@@ -797,31 +798,35 @@ class Start(object):
             self.data.curve_combined_instances.append(self.initExtraModule(guideModule, guideDir))
         elif guideDir == self.data.tools_folder.replace("/", "."):
             self.data.tools_instances.append(self.initExtraModule(guideModule, guideDir))
+        elif guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
+            validator_instance = self.initExtraModule(guideModule, guideDir)
+            if guideDir == self.data.checkin_folder.replace("/", "."):
+                self.data.checkin_instances.append(validator_instance)
+            elif guideDir == self.data.checkout_folder.replace("/", "."):
+                self.data.checkout_instances.append(validator_instance)
+            else: #addOns
+                if "finishing" in layout: #workaround to define this module as finishing addOn to run after all.
+                    self.data.checkfinishing_instances.append(validator_instance)
+                else:
+                    self.data.checkaddon_instances.append(validator_instance)
+        elif guideDir == self.data.rebuilder_folder.replace("/", ".") or guideDir == self.data.start_folder.replace("/", ".") or guideDir == self.data.source_folder.replace("/", ".") or guideDir == self.data.setup_folder.replace("/", ".") or guideDir == self.data.deforming_folder.replace("/", ".") or guideDir == self.data.custom_folder.replace("/", "."):
+            rebuilder_instance = self.initExtraModule(guideModule, guideDir)
+            self.data.rebuilder_instances.append(rebuilder_instance)
+            if guideDir == self.data.start_folder.replace("/", "."):
+                self.data.start_instances.append(rebuilder_instance)
+            elif guideDir == self.data.source_folder.replace("/", "."):
+                self.data.source_instances.append(rebuilder_instance)
+            elif guideDir == self.data.setup_folder.replace("/", "."):
+                self.data.setup_instances.append(rebuilder_instance)
+            elif guideDir == self.data.deforming_folder.replace("/", "."):
+                self.data.deforming_instances.append(rebuilder_instance)
+            elif guideDir == self.data.custom_folder.replace("/", "."):
+                self.data.custom_instances.append(rebuilder_instance)
 
-        else:
-            isRebuilder = False
-            if guideDir == self.data.rebuilder_folder.replace("/", ".") or guideDir == self.data.start_folder.replace("/", ".") or guideDir == self.data.source_folder.replace("/", ".") or guideDir == self.data.setup_folder.replace("/", ".") or guideDir == self.data.deforming_folder.replace("/", ".") or guideDir == self.data.custom_folder.replace("/", "."):
-                isRebuilder = True
-            if guideDir == self.data.checkin_folder.replace("/", ".") or guideDir == self.data.checkout_folder.replace("/", ".") or guideDir == "": #addOns
-                validatorInstance = self.initExtraModule(guideModule, guideDir)
-                if guideDir == self.data.checkin_folder.replace("/", "."):
-                    self.data.checkin_instances.append(validatorInstance)
-                elif guideDir == self.data.checkout_folder.replace("/", "."):
-                    self.data.checkout_instances.append(validatorInstance)
-                else: #addOns
-                    if "Finishing" in layout: #workaround to define this module as finishing addOn to run after all.
-                        self.data.checkfinishing_instances.append(validatorInstance)
-                    else:
-                        self.data.checkaddon_instances.append(validatorInstance)
-            if isRebuilder:
-                rebuilderInstance = self.initExtraModule(guideModule, guideDir)
-                self.data.rebuilder_instances.append(rebuilderInstance)
 
 #        print("hehrhe middle starting guides..... 2", guideName)
 
 
-        if guideDir == self.data.standard_folder.replace("/", "."):
-            self.data.standard_instances.append(self.initGuide(guideModule, guideDir, self.data.rig_type_biped))
 #            self.data.standard_instances.append(guide_instance)
 #            print("iniiitteted guide =", guideModule)
             #initedGuide.build_raw_guide()
