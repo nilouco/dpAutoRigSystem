@@ -11,7 +11,7 @@ class BaseCurve(object):
         """
         # defining variables:
         self.ar = ar
-        self.guideModuleName = CLASS_NAME
+        self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
@@ -69,7 +69,7 @@ class BaseCurve(object):
             cmds.setAttr(cvNode+".controlID", self.cvID, type="string")
         if className:
             cmds.addAttr(cvNode, longName="className", dataType='string')
-            cmds.setAttr(cvNode+".className", self.guideModuleName, type="string")
+            cmds.setAttr(cvNode+".className", self.name, type="string")
         if size:
             cmds.addAttr(cvNode, longName="size", attributeType='float')
             cmds.setAttr(cvNode+".size", self.cvSize)
@@ -101,22 +101,21 @@ class BaseCurve(object):
         return cvCurve
     
     
-    def combineCurves(self, curveList, *args):
+    def combineCurves(self, curves, *args):
         """ Combine all guiven curve to just one main curve and return it.
         """
-        mainCurve = curveList[0]
-        cmds.makeIdentity(mainCurve, translate=True, rotate=True, scale=True, apply=True)
-        for item in curveList[1:]:
+        cmds.makeIdentity(curves[0], translate=True, rotate=True, scale=True, apply=True)
+        for item in curves[1:]:
             cmds.makeIdentity(item, translate=True, rotate=True, scale=True, apply=True)
-            self.ctrls.transferShape(True, False, item, [mainCurve])
-        cmds.setAttr(mainCurve+".className", self.guideModuleName, type="string")
+            self.ctrls.transferShape(True, False, item, [curves[0]])
+        cmds.setAttr(curves[0]+".className", self.name, type="string")
+        return curves[0]
 
         
     
     def setControlDirection(self, cvNode, cvDirection, *args):
         """ Rotate the node given to have the correct direction orientation.
         """
-        print("cvNode =", cvNode)
         if cvDirection == "-X":
             cmds.setAttr(cvNode+".rotateX", 90)
             cmds.setAttr(cvNode+".rotateY", -90)

@@ -96,6 +96,7 @@ class Configuration(object):
         # declare the resulted list:
         items = []
         content = {}
+        folder = folder.replace(".", "/")
         path = folder
         if not absolute:
             # find path where 'dpAutoRig.py' is been executed:
@@ -186,8 +187,37 @@ class Configuration(object):
         """ Return a list of Validator's AddOns or Finishing to load.
         """
         if os.path.exists(self.ar.pipeliner.pipeData[path]):
-            return self.ar.startGuideModules("", "exists", None, path=self.ar.pipeliner.pipeData[path])
+            return self.ar.startGuideModules("", "exists", path=self.ar.pipeliner.pipeData[path])
         
+
+    def get_instance_info(self, name, folders, info="instances"):
+
+        #print("WIP here.... get_instance_by_name =", name)
+        # Temporary renaming before refacotry files renaming is done:
+        if name.startswith("dp"):
+            name = name[2:] #removes initial dp string
+        #
+        # TODO: implement folder search here
+        #
+        #
+        #print("folder =", folder)
+        for folder in folders:
+            if folder in self.ar.data.lib.keys():
+                # print("YES =", self.ar.data.lib[folder])
+                # if name in self.ar.data.lib[folder]["modules"]:
+                #     print("MERCI =")
+                for i, item in enumerate(self.ar.data.lib[folder]["instances"]):
+    #                print("item, name, item.name =", item, name, item.name)
+                    if name == item.name:
+    #                    print("info =", info, item.name)
+                        return self.ar.data.lib[folder][info][i]
+
+        # for item in self.ar.data.lib:
+        #     print("item =", item)
+
+
+
+
 
     # def set_values(self):
     #     self.ar.customAttr.ui = False

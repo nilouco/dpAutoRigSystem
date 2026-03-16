@@ -38,11 +38,11 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.moduleGrp+".articulation", 1)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
 
-        self.cvJointLoc1 = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.cvJointLoc1 = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
-        self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc2", r=0.25, d=1, guide=True)
+        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc2", r=0.25, d=1, guide=True)
         cmds.parent(self.cvJointLoc, self.cvJointLoc1, relative=True)
         cmds.setAttr(self.cvJointLoc+".translateZ", 1)
         cmds.setAttr(self.cvJointLoc+".translateX", -0.01)
@@ -50,20 +50,20 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.jGuide = cmds.joint(name=self.guideName+"_JGuide2", radius=0.001)
         cmds.setAttr(self.jGuide+".template", 1)
         cmds.parent(self.jGuide, self.jGuide1)
-        self.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
 
-        self.cvEndJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.2, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.2, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
         cmds.parent(self.cvJointLoc1, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        self.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # include nodes into net
         self.addNodeToGuideNet([self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointLoc2", "JointEnd"])
 
@@ -71,7 +71,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.changeJointNumber(3)
 
         # create a base cvLoc to start the finger joints:
-        self.cvBaseJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc0", r=0.2, d=1, guide=True)
+        self.cvBaseJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc0", r=0.2, d=1, guide=True)
         cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
         cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
         cmds.parent(self.cvBaseJoint, self.moduleGrp)
@@ -85,7 +85,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        self.utils.useDefaultRenderLayer()
+        self.ar.opt.check_use_default_render_layer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -108,7 +108,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if self.enteredNJoints > self.currentNJoints:
                     for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                         # create another N cvJointLoc:
-                        self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.2, d=1, guide=True)
+                        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.2, d=1, guide=True)
                         # set its nJoint value as n:
                         cmds.setAttr(self.cvJointLoc+".nJoint", n)
                         # parent it to the lastGuide:
@@ -119,7 +119,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.jGuide = cmds.joint(name=self.guideName+"_JGuide"+str(n), radius=0.001)
                         cmds.setAttr(self.jGuide+".template", 1)
                         cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1))
-                        self.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+                        self.ar.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
                         self.addNodeToGuideNet([self.cvJointLoc], ["JointLoc"+str(n)])
                 elif self.enteredNJoints < self.currentNJoints:
                     # re-define cvEndJoint:
@@ -194,7 +194,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     # create a control:
                     if n == 1:
-                        self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90), guideSource=self.guideName+"_JointLoc"+str(n), parentTag=self.ctrlList[0])
+                        self.fingerCtrl = self.ar.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90), guideSource=self.guideName+"_JointLoc"+str(n), parentTag=self.ctrlList[0])
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
@@ -231,7 +231,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.skinJointList[0]+".segmentScaleCompensate", force=True)
                     else:
-                        self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n), parentTag=self.getParentToTag(self.ctrlList))
+                        self.fingerCtrl = self.ar.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n), parentTag=self.getParentToTag(self.ctrlList))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         if n == self.nJoints:
                             self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
@@ -406,7 +406,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
                     endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.ar.jointEndAttr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
                     cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
-                    self.ikCtrl = self.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.ctrlList[1])
+                    self.ikCtrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.ctrlList[1])
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
@@ -421,7 +421,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.parentConstraint(self.ikCtrl, endIkHandleList[0], name=side+self.userGuideName+"_EndIkHandle_PaC", maintainOffset=True)
                     ikHandleGrp = cmds.group(ikHandleList[0], endIkHandleList[0], name=side+self.userGuideName+"_IKH_Grp")
                     cmds.setAttr(ikHandleGrp+".visibility", 0)
-                    self.ctrls.setLockHide([self.ikCtrl], ['sx', 'sy', 'sz', 'v'])
+                    self.ar.ctrls.setLockHide([self.ikCtrl], ['sx', 'sy', 'sz', 'v'])
 
                     if self.nJoints == 2:
                         cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_PaC")

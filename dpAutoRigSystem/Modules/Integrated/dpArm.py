@@ -34,7 +34,7 @@ class Arm(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFinger']
-        checkResultList = self.ar.startGuideModules(standardDir, "check", None, checkModuleList=checkModuleList)
+        checkResultList = self.ar.startGuideModules(standardDir, "check", checkModuleList=checkModuleList)
         
         if len(checkResultList) == 0:
             self.ar.collapseEditSelModFL = True

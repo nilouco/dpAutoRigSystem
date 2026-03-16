@@ -11,7 +11,7 @@ class BaseLayout(object):
         """
         # defining variables:
         self.ar = ar
-        self.guideModuleName = CLASS_NAME
+        self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON

@@ -17,13 +17,12 @@ DP_CONTROLS_VERSION = 3.07
 
 
 class ControlClass(object):
-    def __init__(self, ar, moduleGrp=None, *args, **kwargs):
+    def __init__(self, ar, *args, **kwargs):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
         self.ar = ar
         self.utils = ar.utils
-        self.moduleGrp = moduleGrp
         self.loadVariables()
         if self.ar.dev:
             reload(dpResetPose)
@@ -50,7 +49,7 @@ class ControlClass(object):
             cmds.group(name=tempGrp, empty=True)
             cmds.setAttr(tempGrp+".visibility", 0)
             cmds.setAttr(tempGrp+".template", 1)
-            cmds.setAttr(tempGrp+".hiddenInOutliner", 1)
+            cmds.setAttr(tempGrp+".hiddenInOutliner", 1) #TODO: get this value from further optionVar
             self.setLockHide([tempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
         return tempGrp
 
@@ -289,12 +288,12 @@ class ControlClass(object):
                 self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
 
 
-    def colorizeUI(self, instance=None, *args, **kwargs):
+    def colorizeUI(self, instance, *args, **kwargs):
         """ Show a little window to choose the color of the button and the override the guide.
             From the old dpColorOverride extra tool. Thanks!
         """
-        currentRBGColor = self.getCurrentRGBColor(self.moduleGrp)
-        currentRBGOutlinerColor = self.getCurrentRGBColor(self.moduleGrp, True)
+        currentRBGColor = self.getCurrentRGBColor(instance.moduleGrp)
+        currentRBGOutlinerColor = self.getCurrentRGBColor(instance.moduleGrp, True)
         self.ar.utils.closeUI(self.ar.colorOverrideWinName)
         # creating colorOverride Window:
         colorOverride_winWidth  = 170
@@ -306,16 +305,16 @@ class ControlClass(object):
         colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20), parent=colorTabLayout)
         # creating buttons
         for colorIndex, colorValues in enumerate(self.colorList):
-            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [self.moduleGrp], colorIndex, instance=instance), parent=colorIndexLayout)
+            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [instance.moduleGrp], colorIndex, instance=instance), parent=colorIndexLayout)
         # RGB layout:
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorRGBLayout)
-        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [self.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
+        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [instance.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
         cmds.button("removeOverrideColorBT", label=self.ar.data.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
         # Outliner layout:
         colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
-        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [self.moduleGrp], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
+        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [instance.moduleGrp], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
         cmds.button("removeOutlinerColorBT", label=self.ar.data.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
         # renaming tabLayouts:
         cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))
@@ -501,10 +500,20 @@ class ControlClass(object):
         """ Find the loaded control instance by name.
             Return the instance found.
         """
-        if self.ar.data.control_instances:
-            for instance in self.ar.data.control_instances:
-                if instance.guideModuleName == instanceName:
-                    return instance
+
+        # if self.ar.data.control_instances:
+        #     for instance in self.ar.data.control_instances:
+        #         if instance.name == instanceName:
+        #             return instance
+
+        # WIP
+        # TODO: change to call directly the settings
+        #
+        #print("instanceName 000 =", instanceName)
+        return self.ar.config.get_instance_info(instanceName, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
+
+
+
 
 
     def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, parentTag=None, *args):
@@ -1101,9 +1110,10 @@ class ControlClass(object):
     def connectShapeSize(self, clusterHandle, *args):
         """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
         """
-        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleX", force=True)
-        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
-        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
+        moduleGrp = clusterHandle[:clusterHandle.rfind("Guide_")+6]+"Base" #hack to get moduleGrp name by string TODO: change to find by instance
+        cmds.connectAttr(moduleGrp+".shapeSize", clusterHandle+".scaleX", force=True)
+        cmds.connectAttr(moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
+        cmds.connectAttr(moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
         # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
         cmds.parent(clusterHandle, self.ar.data.temp_grp)
 

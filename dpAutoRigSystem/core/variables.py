@@ -45,21 +45,23 @@ class Data:
     icons_folder: str = "Icons"
     tools_folder: str = "Tools"
     language_folder: str = "Languages"
-    standard_folder: str = "Modules/Standard"
-    integrated_folder: str = "Modules/Integrated"
-    curve_simple_folder: str = "Modules/Curves/Simple"
-    curve_combined_folder: str = "Modules/Curves/Combined"
-    curve_preset_folder: str = "Modules/Curves/Presets"
-    validator_folder: str = "Pipeline/Validator"
-    checkin_folder: str = "Pipeline/Validator/CheckIn"
-    checkout_folder: str = "Pipeline/Validator/CheckOut"
-    validator_preset_folder: str = "Pipeline/Validator/Presets"
-    rebuilder_folder: str = "Pipeline/Rebuilder"
-    start_folder: str = "Pipeline/Rebuilder/Start"
-    source_folder: str = "Pipeline/Rebuilder/Source"
-    setup_folder: str = "Pipeline/Rebuilder/Setup"
-    deforming_folder: str = "Pipeline/Rebuilder/Deforming"
-    custom_folder: str = "Pipeline/Rebuilder/Custom"
+    standard_folder: str = "Modules.Standard"
+    integrated_folder: str = "Modules.Integrated"
+    curve_simple_folder: str = "Modules.Curves.Simple"
+    curve_combined_folder: str = "Modules.Curves.Combined"
+    curve_preset_folder: str = "Modules.Curves.Presets"
+    validator_folder: str = "Pipeline.Validator"
+    checkin_folder: str = "Pipeline.Validator.CheckIn"
+    checkout_folder: str = "Pipeline.Validator.CheckOut"
+    validator_preset_folder: str = "Pipeline.Validator.Presets"
+    rebuilder_folder: str = "Pipeline.Rebuilder"
+    start_folder: str = "Pipeline.Rebuilder.Start"
+    source_folder: str = "Pipeline.Rebuilder.Source"
+    setup_folder: str = "Pipeline.Rebuilder.Setup"
+    deforming_folder: str = "Pipeline.Rebuilder.Deforming"
+    custom_folder: str = "Pipeline.Rebuilder.Custom"
+    checkaddon_folder: str = ""
+    checkfinishing_folder: str = ""
     
     guide_base_attr: str = "guideBase"
     master_attr: str = "masterGrp"
@@ -108,6 +110,8 @@ class Data:
     to_ids: list = field(default_factory=list)
     
     created_guides: list = field(default_factory=list)
+    lib_modules: list = field(default_factory=list)
+    lib_instances: list = field(default_factory=list)
     standard_instances: list = field(default_factory=list)
     template_instances: list = field(default_factory=list)
     curve_simple_instances: list = field(default_factory=list)

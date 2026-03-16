@@ -30,7 +30,7 @@ class DiamondFlat(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -43,9 +43,7 @@ class DiamondFlat(dpBaseCurve.BaseCurve):
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
-        # load module instance
-        squareInstance = self.ar.initExtraModule('dpSquare', self.ar.data.curve_simple_folder.replace("/", "."))
-        # creating curve shapes:
-        curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        square = self.ar.config.get_instance_info("dpSquare", [self.ar.data.curve_simple_folder])
+        curve1 = square.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve1+".rotateZ", 45)
         return self.combineCurves([curve1])

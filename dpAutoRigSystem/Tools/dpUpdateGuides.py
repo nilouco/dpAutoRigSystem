@@ -242,7 +242,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
                 currentInstance.changeJointNumber(value)
             elif attr == 'style':
                 currentInstance = self.getNewGuideInstance(dpGuide)
-                if currentInstance.guideModuleName == 'Limb':
+                if currentInstance.name == 'Limb':
                     expectedValue = self.translateLimbStyleValue(value)
                 else:
                     expectedValue = self.translateSpineStyleValue(value)
@@ -344,7 +344,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
             if guideVersion != self.currentDpArVersion:
                 # Create the database holder where the key is the baseGuide
                 self.updateData[baseGuide] = {}
-                self.updateData[baseGuide]["guideModuleName"] = self.guidesDictionary[baseGuide]["guideModuleName"]
+                self.updateData[baseGuide]["name"] = self.guidesDictionary[baseGuide]["name"]
                 guideAttrList = self.listKeyUserAttr(baseGuide)
                 # Create de attributes dictionary for each baseGuide
                 self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
@@ -363,7 +363,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
 
     def createNewGuides(self):
         for guide in self.updateData:
-            guideType = self.updateData[guide]['guideModuleName']
+            guideType = self.updateData[guide]['name']
             # create the new guide
             currentNewGuide = self.ar.initGuide("dp"+guideType, "Modules.Standard")
             # rename as it's predecessor

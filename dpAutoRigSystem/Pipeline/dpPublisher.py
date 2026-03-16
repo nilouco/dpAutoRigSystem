@@ -120,7 +120,7 @@ class Publisher(object):
         if toCheckValidatorList:
             validationResultDataList = self.ar.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
-                stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
+                stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].name                    
                 return stoppedMessage
         return False
         

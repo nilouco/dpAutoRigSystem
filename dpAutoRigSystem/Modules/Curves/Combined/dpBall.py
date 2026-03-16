@@ -30,7 +30,7 @@ class Ball(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -43,12 +43,10 @@ class Ball(dpBaseCurve.BaseCurve):
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
-        # load module instance
-        circleInstance = self.ar.initExtraModule('dpCircle', self.ar.data.curve_simple_folder.replace("/", "."))
-        # creating curve shapes:
-        curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        curve3 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        circle = self.ar.config.get_instance_info("dpCircle", [self.ar.data.curve_simple_folder])
+        curve1 = circle.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve2 = circle.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve3 = circle.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve2+".rotateY", -90)
         cmds.setAttr(curve3+".rotateX", 90)
         return self.combineCurves([curve1, curve2, curve3])

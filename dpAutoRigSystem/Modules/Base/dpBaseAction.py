@@ -24,7 +24,7 @@ class ActionStartClass(object):
         self.ar = ar
         self.utils = ar.utils
         self.pipeliner = ar.pipeliner
-        self.guideModuleName = CLASS_NAME
+        self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
@@ -248,7 +248,7 @@ class ActionStartClass(object):
         self.dataLogDic["user"] = getpass.getuser()
         self.dataLogDic["time"] = self.pipeliner.getToday(True)
         self.dataLogDic["dpARVersion"] = self.ar.dpARVersion
-        self.dataLogDic["module"] = self.guideModuleName
+        self.dataLogDic["module"] = self.name
         self.dataLogDic["version"] = self.version
         self.dataLogDic["name"] = self.title
         self.dataLogDic["mode"] = actionText

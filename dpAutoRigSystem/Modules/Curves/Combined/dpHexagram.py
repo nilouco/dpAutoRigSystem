@@ -30,7 +30,7 @@ class Hexagram(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", None, checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -43,10 +43,8 @@ class Hexagram(dpBaseCurve.BaseCurve):
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
-        # load module instance
-        triangleInstance = self.ar.initExtraModule('dpTriangle', self.ar.data.curve_simple_folder.replace("/", "."))
-        # creating curve shapes:
-        curve1 = triangleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        curve2 = triangleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        triangle = self.ar.config.get_instance_info("dpTriangle", [self.ar.data.curve_simple_folder])
+        curve1 = triangle.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve2 = triangle.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve2+".rotateZ", 180)
         return self.combineCurves([curve1, curve2])

@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Library import dpControls
 from ...Tools import dpCorrectionManager
 from importlib import reload
 
@@ -10,20 +9,48 @@ DP_BASESTANDARD_VERSION = 2.13
 
 
 class BaseStandard(object):
-    def __init__(self, ar, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, number=None, *args):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
         self.ar = ar
-        self.guideModuleName = CLASS_NAME
+        self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
-        self.userGuideName = userGuideName
-        self.rigType = rigType
         self.wiki = WIKI
+        
+        self.get_namespace_for_it()
+        # WIP TODO: redefine them here?
+        #
+        
+
+
+        # utils
+        self.utils = ar.utils
+        if self.ar.dev:
+            reload(dpCorrectionManager)
+        # setting dpControls:
+#        self.ar.ctrls.moduleGrp
+        # starting correctionManager:
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar)
+        self.correctionManager.ui = False
+        
+        self.raw = True
+        self.serialized = False
+        self.sideList = [""]
+        self.axisList = ["X", "Y", "Z"]
+        
+
+    def get_namespace_for_it(self, userGuideName=None):
+        self.userGuideName = userGuideName
+        if not self.userGuideName:
+            self.userGuideName = self.ar.data.base_name+str(self.ar.utils.findLastNumber())
+        self.rigType = "biped"
+        print("ORIGINAL = userGUideName --===", self.userGuideName)
+        
         # defining namespace:
-        self.guideNamespace = self.guideModuleName+"__"+self.userGuideName
+        self.guideNamespace = self.name+"__"+self.userGuideName
         # defining guideNamespace:
         cmds.namespace(setNamespace=":")
         self.namespaceExists = cmds.namespace(exists=self.guideNamespace)
@@ -31,29 +58,32 @@ class BaseStandard(object):
         self.moduleGrp = self.guideName+"_Base"
         self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
         self.annotation = self.moduleGrp+"_Ant"
-        self.number = number
-        self.raw = True
-        self.serialized = False
-        self.sideList = [""]
-        self.axisList = ["X", "Y", "Z"]
-        # utils
-        self.utils = ar.utils
-        if self.ar.dev:
-            reload(dpControls)
-            reload(dpCorrectionManager)
-        # calling dpControls:
-        self.ctrls = dpControls.ControlClass(self.ar, self.moduleGrp)
-        # starting correctionManager:
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar)
-        self.correctionManager.ui = False
-        
 
-    def build_raw_guide(self, *args):
+
+    def build_raw_guide(self, userGuideName=None, *args):
+        #
+        #
+        #self.number = number
+        #
+        # WIP TODO: get new userGuideName by findLastNumber in utils
+        #
+        print("self.userGuideName before =", self.userGuideName)
+        self.get_namespace_for_it(userGuideName)
+        print("self.userGuideName after =", self.userGuideName)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
             # create GUIDE for this module:
             self.createGuide()
+        
+        self.load_raw_guide()
+    
+
+    def load_raw_guide(self, userGuideName=None):
+
+        print("loading here // userGuideName ==", userGuideName)
+        if userGuideName:
+            self.userGuideName = userGuideName
         if self.ar.data.ui_state:
             # create the Module layout in the mainUI - modulesLayoutA:        
             self.createModuleLayout()
@@ -62,13 +92,17 @@ class BaseStandard(object):
         self.guideNet = self.utils.getNodeByMessage("net", self.moduleGrp)
         if self.guideNet:
             self.raw = cmds.getAttr(self.guideNet+".rawGuide")
-    
+
+
     
     def createModuleLayout(self, *args):
         """ Create the Module Layout, so it will exists in the right as a new options to editModules.
         """
         # MODULE LAYOUT:
-        layoutName = cmds.getAttr(self.moduleGrp+".customName")
+        print("self.moduleGrp = ", self.moduleGrp)
+        layoutName = ""
+        if "customName" in cmds.listAttr(self.moduleGrp):
+            layoutName = cmds.getAttr(self.moduleGrp+".customName")
         if not layoutName:
             layoutName = self.userGuideName
         self.moduleLayoutName = self.ar.data.lang[self.title]+" - "+layoutName
@@ -84,7 +118,7 @@ class BaseStandard(object):
         # GUIDE:
         self.ar.opt.check_use_default_render_layer()
         # create guide base (moduleGrp):
-        guideBaseList = self.ctrls.cvBaseGuide(self.moduleGrp, r=2)
+        guideBaseList = self.ar.ctrls.cvBaseGuide(self.moduleGrp, r=2)
         self.moduleGrp = guideBaseList[0]
         self.radiusCtrl = guideBaseList[1]
         # add attributes to be read when rigging module:
@@ -96,13 +130,19 @@ class BaseStandard(object):
         baseStringAttrList  = ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
-        cmds.setAttr(self.moduleGrp+".moduleType", self.guideModuleName, type='string')
+        cmds.setAttr(self.moduleGrp+".moduleType", self.name, type='string')
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
         cmds.setAttr(self.moduleGrp+".mirrorName", self.ar.data.lang['p002_left']+' --> '+self.ar.data.lang['p003_right'], type='string')
         cmds.setAttr(self.moduleGrp+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
-        cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.ar.guide, type='string')
+
+        # print("self =", self)
+        # print("self.name =", self.name)
+        # print("guide)info =", self.ar.config.get_instance_info(self.name, self.ar.data.standard_folder, "imported"))
+        # info = self.ar.data.lib
+
+        cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.ar.config.get_instance_info(self.name, [self.ar.data.standard_folder], "imported"), type='string')
         cmds.setAttr(self.moduleGrp+".rigType", self.rigType, type='string')
         cmds.setAttr(self.moduleGrp+".dpARVersion", self.ar.dpARVersion, type='string')
         
@@ -327,7 +367,7 @@ class BaseStandard(object):
                         s = sDefault
                     # add joint label, create controller, zeroOut
                     self.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, labelName+"_"+str(m))
-                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
+                    jcrCtrl, jcrGrp = self.ar.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
                     for calibrateAttr in calibratePresetList[i].keys():
@@ -399,9 +439,9 @@ class BaseStandard(object):
                 currentCtrlZero = cmds.listRelatives(currentCtrl, parent=True)[0]
                 if n == startAt:
                     # create a main controller
-                    mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.guideName+"_Base", parentTag=self.getParentToTag(mainCtrlList))
+                    mainCtrl = self.ar.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.guideName+"_Base", parentTag=self.getParentToTag(mainCtrlList))
                     mainCtrlList.append(mainCtrl)
-                    self.ctrls.colorShape([mainCtrl], "cyan")
+                    self.ar.ctrls.colorShape([mainCtrl], "cyan")
                     cmds.addAttr(mainCtrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     # position
                     cmds.parent(mainCtrl, currentCtrlZero)
@@ -422,7 +462,7 @@ class BaseStandard(object):
                     for axis in self.axisList:
                         cmds.connectAttr(rIntensityMD+".output"+axis, offsetGrp+".rotate"+axis, force=True)
                 # display sub controllers shapes
-                self.ctrls.setSubControlDisplay(mainCtrl, currentCtrl, 0)
+                self.ar.ctrls.setSubControlDisplay(mainCtrl, currentCtrl, 0)
     
 
     def getMirrorSideList(self, *args):
@@ -472,7 +512,7 @@ class BaseStandard(object):
             # joint labelling:
             self.jointLabelAdd = 0
         # store the number of this guide by module type
-        self.dpAR_count = self.utils.findModuleLastNumber(self.guideModuleName, "moduleType", True)
+        self.dpAR_count = self.utils.findModuleLastNumber(self.name, "moduleType", True)
 
 
     def rigModule(self, *args):
@@ -491,7 +531,7 @@ class BaseStandard(object):
                 pass
 
             # unPinGuides before Rig them:
-            self.ctrls.unPinGuide([self.moduleGrp], force=True)
+            self.ar.ctrls.unPinGuide([self.moduleGrp], force=True)
             
             # RIG:
             self.ar.opt.check_use_default_render_layer()
@@ -570,11 +610,11 @@ class BaseStandard(object):
         self.integratedActionsDic = {}
     
 
-    def createGuideNetwork(self, *args):
+    def createGuideNetwork(self, number=None, *args):
         """ Create a network for the current guide and store on it the nodes used in this module by message.
         """
-        if self.number:
-            guideNumber = self.number
+        if number:
+            guideNumber = number
         else:
             guideNumber = self.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
@@ -588,7 +628,7 @@ class BaseStandard(object):
         cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
         cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
         cmds.addAttr(self.guideNet, longName="linkedNode", attributeType="message")
-        cmds.setAttr(self.guideNet+".moduleType", self.guideModuleName, type="string")
+        cmds.setAttr(self.guideNet+".moduleType", self.name, type="string")
         cmds.setAttr(self.guideNet+".guideName", self.userGuideName, type="string")
         cmds.setAttr(self.guideNet+".guideNumber", guideNumber, type="string")
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
@@ -689,7 +729,7 @@ class BaseStandard(object):
     def serializeGuide(self, buildIt=True, *args):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
-        self.ctrls.unPinGuide(force=True)
+        self.ar.ctrls.unPinGuide(force=True)
         if not self.serialized:
             afterDataDic, guideDic = {}, {}
             beforeList = self.getBeforeList()
@@ -698,7 +738,7 @@ class BaseStandard(object):
                     self.raw = False
                     cmds.setAttr(self.guideNet+".rawGuide", 0)
                 afterDataDic["GuideNumber"] = cmds.getAttr(self.guideNet+".guideNumber")
-                afterDataDic["ModuleType"] = self.guideModuleName
+                afterDataDic["ModuleType"] = self.name
                 afterDataDic["RawGuide"] = self.raw
                 afterDataDic["BeforeData"] = beforeList
                 for beforeAttr in beforeList:

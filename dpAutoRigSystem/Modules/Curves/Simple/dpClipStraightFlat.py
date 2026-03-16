@@ -29,7 +29,7 @@ class ClipStraightFlat(dpBaseCurve.BaseCurve):
         
     
     
-    def getLinearPoints(self, *args):
+    def getLinearPoints(self):
         """ Get a list of linear points for this kind of control curve.
             Set class object variables cvPointList, cvKnotList and cvPeriodic.
         """
@@ -40,7 +40,7 @@ class ClipStraightFlat(dpBaseCurve.BaseCurve):
         self.cvPeriodic = False #open
     
     
-    def getCubicPoints(self, *args):
+    def getCubicPoints(self):
         """ Get a list of cubic points for this kind of control curve.
             Set class object variables cvPointList, cvKnotList and cvPeriodic.
         """

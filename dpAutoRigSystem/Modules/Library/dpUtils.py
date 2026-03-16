@@ -139,7 +139,7 @@ class Utils(object):
         """ Find all files in the directory with the extension.
             Return a list of all module names (without '.py' extension).
         """
-        fileDir = path + "/" + dir
+        fileDir = path + "/" + dir.replace(".", "/")
         allFilesList = os.listdir(fileDir)
         # select only files with extension:
         pyFilesList = []
@@ -155,6 +155,7 @@ class Utils(object):
             Return a list of all module names (without '.py' extension).
         """
         baseClassList = ["dpBaseStandard", "dpBaseLayout", "dpBaseCurve", "dpBaseAction", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
+        dir = dir.replace(".", "/")
         allPyFilesList = self.findAllFiles(path, dir, ".py")
         moduleList = []
         for file in allPyFilesList:
@@ -396,7 +397,7 @@ class Utils(object):
     def hook(self):
         """ Mount a dictionary with guide modules hierarchies.
             Return a dictionary with the father and children lists inside of each guide like:
-            {guide{'guideModuleNamespace':"...", 'guideModuleName':"...", 'guideCustomName':"...", 'guideMirrorAxis':"...", 'guideMirrorName':"...", 'fatherGuide':"...", 'fatherNode':"...", 'fatherModule':"...", 'fatherCustomName':"...", 'fatherMirrorAxis':"...", 'fatherMirrorName':"...", 'fatherGuideLoc':"...", 'childrenList':[...]}}
+            {guide{'guideModuleNamespace':"...", 'name':"...", 'guideCustomName':"...", 'guideMirrorAxis':"...", 'guideMirrorName':"...", 'fatherGuide':"...", 'fatherNode':"...", 'fatherModule':"...", 'fatherCustomName':"...", 'fatherMirrorAxis':"...", 'fatherMirrorName':"...", 'fatherGuideLoc':"...", 'childrenList':[...]}}
         """
         hookDic = {}
         allList = cmds.ls(type='transform')
@@ -404,7 +405,7 @@ class Utils(object):
             if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1:
                 # module info:
                 guideModuleNamespace = item[:item.find(":")]
-                guideModuleName      = item[:item.find("__")]
+                name      = item[:item.find("__")]
                 guideInstance        = item[item.rfind("__")+2:item.find(":")]
                 guideCustomName      = cmds.getAttr(item+".customName")
                 guideMirrorAxis      = cmds.getAttr(item+".mirrorAxis")
@@ -467,13 +468,13 @@ class Utils(object):
                 
                 # mounting dictionary:
                 if guideParentList and guideChildrenList:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "guideModuleName":guideModuleName, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":guideChildrenList}
+                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":guideChildrenList}
                 elif guideParentList:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "guideModuleName":guideModuleName, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":[]}
+                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":[]}
                 elif guideChildrenList:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "guideModuleName":guideModuleName, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":guideChildrenList}
+                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":guideChildrenList}
                 else:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "guideModuleName":guideModuleName, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":[]}
+                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":[]}
         return hookDic
 
 
@@ -1152,7 +1153,7 @@ class Utils(object):
                 resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
                 # add validators and its current active values
                 for validator in validatorsList:
-                    resultString += ',"'+validator.guideModuleName+'" : '+str(validator.active).lower()
+                    resultString += ',"'+validator.name+'" : '+str(validator.active).lower()
                 resultString += "}"
         return resultString
 
