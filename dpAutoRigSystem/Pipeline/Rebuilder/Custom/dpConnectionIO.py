@@ -91,7 +91,7 @@ class ConnectionIO(dpBaseAction.ActionStartClass):
         for item in itemList:
             self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                attrList = self.ar.transformAttrList.copy()
+                attrList = self.ar.data.transform_attrs.copy()
                 userDefList = cmds.listAttr(item, userDefined=True)
                 if userDefList:
                     attrList.extend(userDefList)

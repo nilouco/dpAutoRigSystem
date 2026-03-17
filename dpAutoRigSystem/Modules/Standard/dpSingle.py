@@ -168,7 +168,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
-                    for attr in self.ar.transformAttrList[:-1]:
+                    for attr in self.ar.data.transform_attrs[:-1]:
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr, force=True)
                     # fix mirror issue: Maya 2026 release bug
                     if s == 1:
@@ -217,7 +217,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
                                 cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
                                 cmds.setAttr(sdkLoc+".visibility", lock=True)
-                                for attr in self.ar.transformAttrList[:-1]:
+                                for attr in self.ar.data.transform_attrs[:-1]:
                                     cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
                                 cmds.setAttr(sdkLocGrp+".rotateX", 0)
                                 cmds.setAttr(sdkLocGrp+".rotateY", 0)

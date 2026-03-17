@@ -83,7 +83,7 @@ class MatchMesh(dpBaseLibrary.BaseLibrary):
             
             if gotMeshes:
                 # storing transformation data
-                for attr in self.ar.transformAttrList[:-1]:
+                for attr in self.ar.data.transform_attrs[:-1]:
                     fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
                     toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
 
@@ -114,7 +114,7 @@ class MatchMesh(dpBaseLibrary.BaseLibrary):
                     # put fromTransform in the same location then toTransform
                     if fromFather != None:
                         cmds.parent(fromTransform, world=True)
-                    for attr in self.ar.transformAttrList[:-1]:
+                    for attr in self.ar.data.transform_attrs[:-1]:
                         cmds.setAttr(fromTransform+"."+attr, lock=False)
                         cmds.setAttr(toTransform+"."+attr, lock=False)
                         if "scale" in attr:
@@ -150,7 +150,7 @@ class MatchMesh(dpBaseLibrary.BaseLibrary):
                     if fromFather != None:
                         cmds.parent(fromTransform, fromFather)
                     # restore transformation data
-                    for attr in self.ar.transformAttrList[:-1]:
+                    for attr in self.ar.data.transform_attrs[:-1]:
                         cmds.setAttr(fromTransform+"."+attr, fromTransformDic[attr])
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
 

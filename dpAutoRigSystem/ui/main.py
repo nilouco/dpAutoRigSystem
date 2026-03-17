@@ -690,8 +690,7 @@ class Fill(object):
             if folder == self.ar.data.curve_simple_folder or folder == self.ar.data.curve_combined_folder:
                 cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.name, annotation=item.name, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
                 return
-#            module_layout = cmds.rowLayout(item.title+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
-            module_layout = cmds.rowLayout(numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
+            module_layout = cmds.rowLayout(item.title+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
             cmds.image(item.title+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
             if folder == self.ar.data.standard_folder:
                 cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_raw_guide, parent=module_layout)
@@ -718,7 +717,7 @@ class Fill(object):
 
 class Manager(object):
     def __init__(self, ar):
-        print("init manager")
+#        print("init manager")
         self.ar = ar
 
 
@@ -791,9 +790,6 @@ class Manager(object):
 
     def clear_guide_layout(self):
         if self.ar.data.ui_state:
-
-            print("cleared layout here....")
-            
             cmds.frameLayout('rig_edit_selected_module_fl', edit=True, label=self.ar.data.lang['i011_editSelected'], collapsable=True, collapse=False, parent='rigging_tab')
             if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
                 cmds.deleteUI('rig_guides_inst_cl')
@@ -806,10 +802,6 @@ class Manager(object):
     def fill_created_guides(self, *args):
         """ Read all guide modules loaded in the scene and re-create the elements in the module_layout.
         """
-        
-        print("entered here 000000 -----------------------------------", self.ar.data.created_guides)
-        print("lib =", self.ar.data.lib)
-
         # create a new list in order to store all created guide modules in the scene and its userSpecNames:
         self.ar.data.created_guides = []
         self.ar.data.standard_instances = []
@@ -840,31 +832,18 @@ class Manager(object):
                         cmds.namespace(moveNamespace=(n, ':'), force=True)
                         cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
 
-#        self.clearGuideLayout()
-        print("self.ar.data.created_guides ====", self.ar.data.created_guides)
-
         # if exists any guide module in the scene, recreate its instance as objectClass:
         if self.ar.data.created_guides:
             sortedAllGuidesList = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
             guideFolder = self.ar.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder.replace("/", ".")
-            
-            print("guideFolder =", guideFolder)
-            
             # this list will be used to rig all modules pressing the RIG button:
             for module in sortedAllGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
-                
-                print("mod =", mod)
-                #print("mod.name", mod.name)
-                
                 if self.ar.dev:
                     reload(mod)
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
-                
-                print("moduleClass =", moduleClass)
-                
                 if "rigType" in cmds.listAttr(module[2]):
                     curRigType = cmds.getAttr(module[2]+".rigType")
                     moduleInst = moduleClass(self.ar)#, module[1], curRigType)
@@ -877,39 +856,22 @@ class Manager(object):
                             moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
                     else:
                         moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
-                
-                print("moduleInst =", moduleInst)
-                
                 self.ar.data.standard_instances.append(moduleInst)
-                print("moduleInst.userGuideName before =", moduleInst.userGuideName)
-                #moduleInst.userGuideName = module[1]
                 moduleInst.get_namespace_for_it(module[1])
-                print("moduleInst.userGuideName after =", moduleInst.userGuideName)
-
-                #print("self.ar.data.standard_instances = ", self.ar.data.standard_instances)
                 if self.ar.data.ui_state:
                     moduleInst.load_raw_guide(moduleInst.userGuideName)
 
-
                 # reload pinGuide scriptJob:
                 self.ar.ctrls.startPinGuide(module[2])
-        
-        # edit the footer A text:
-        if self.ar.data.ui_state:
-            self.modulesToBeRiggedList = self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)
-            print("modulesToBeRiggedList XXXX = ", self.modulesToBeRiggedList)
-            # for guide in self.ar.data.standard_instances:
-            #     #print("guide =", cmds.getAttr(guide.moduleGrp+".moduleNamespace"))
-                
-            #     #guide.load_raw_guide(cmds.getAttr(guide.moduleGrp+".moduleNamespace"))
+        self.update_footer_ui()
 
-            #     guideNet = self.ar.utils.getNodeByMessage("net", guide.moduleGrp)
-            #     if guideNet:
-            #         if cmds.getAttr(self.guideNet+".rawGuide"):
-            #             userGuideName = cmds.getAttr(self.guideNet+".guideNumber")
-            #             print("guide.userGuideName zzzzzzz =", userGuideName)
-            #             #guide.load_raw_guide(guide)
-            cmds.text('rig_footer_txt', edit=True, label=str(len(self.modulesToBeRiggedList))+" "+self.ar.data.lang['i005_footerRigging'])
+
+
+    def update_footer_ui(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
+        if not quantity:
+            quantity = len(self.ar.data.created_guides)
+        if self.ar.data.ui_state:
+            cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
 
 
 

@@ -47,7 +47,7 @@ class BaseStandard(object):
         if not self.userGuideName:
             self.userGuideName = self.ar.data.base_name+str(self.ar.utils.findLastNumber())
         self.rigType = "biped"
-        print("ORIGINAL = userGUideName --===", self.userGuideName)
+#        print("ORIGINAL = userGUideName --===", self.userGuideName)
         
         # defining namespace:
         self.guideNamespace = self.name+"__"+self.userGuideName
@@ -67,9 +67,9 @@ class BaseStandard(object):
         #
         # WIP TODO: get new userGuideName by findLastNumber in utils
         #
-        print("self.userGuideName before =", self.userGuideName)
+#        print("self.userGuideName before =", self.userGuideName)
         self.get_namespace_for_it(userGuideName)
-        print("self.userGuideName after =", self.userGuideName)
+#        print("self.userGuideName after =", self.userGuideName)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -81,7 +81,7 @@ class BaseStandard(object):
 
     def load_raw_guide(self, userGuideName=None):
 
-        print("loading here // userGuideName ==", userGuideName)
+#        print("loading here // userGuideName ==", userGuideName)
         if userGuideName:
             self.userGuideName = userGuideName
         if self.ar.data.ui_state:
@@ -99,7 +99,7 @@ class BaseStandard(object):
         """ Create the Module Layout, so it will exists in the right as a new options to editModules.
         """
         # MODULE LAYOUT:
-        print("self.moduleGrp = ", self.moduleGrp)
+#        print("self.moduleGrp = ", self.moduleGrp)
         layoutName = ""
         if "customName" in cmds.listAttr(self.moduleGrp):
             layoutName = cmds.getAttr(self.moduleGrp+".customName")
@@ -175,6 +175,10 @@ class BaseStandard(object):
         self.createWorldSize()
         # prepare guide to serialization
         self.createGuideNetwork()
+        self.ar.data.created_guides.append([self.name, self.userGuideName, self.moduleGrp])
+#        print("self.ar.data.created_guides =", self.ar.data.created_guides)
+#        print("valid =", self.name, self.userGuideName, self.moduleGrp)
+        self.ar.ui_manager.update_footer_ui()
     
     
     def updateModuleInstanceInfo(self, *args):
@@ -205,33 +209,60 @@ class BaseStandard(object):
         """ Delete the Guide, ModuleLayout and Namespace.
         """
         # delete mirror preview:
-        try:
-            cmds.delete(self.moduleGrp[:self.moduleGrp.find(":")]+"_MirrorGrp")
-        except:
-            pass
-        if cmds.objExists(self.moduleGrp+"_WorldSize_Ref"):
-            cmds.delete(self.moduleGrp+"_WorldSize_Ref")
+        #try:
+        #    cmds.delete(self.moduleGrp[:self.moduleGrp.find(":")]+"_MirrorGrp")
+        #except:
+        #    pass
+        for item in [self.moduleGrp[:self.moduleGrp.find(":")]+"_MirrorGrp",
+                     self.moduleGrp+"_WorldSize_Ref"]:
+            if cmds.objExists(item):
+                cmds.delete(item)
+        
         # delete the guide module:
         self.utils.clearNodeGrp(self.moduleGrp, 'guideBase', unparent=True)
         # clear default 'dpAR_GuideMirror_Grp':
         self.utils.clearNodeGrp()
+        
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
             cmds.namespace(moveNamespace=(self.guideNamespace, ':'), force=True)
             cmds.namespace(removeNamespace=self.guideNamespace, force=True)
-        try:
+        
+        if self.ar.data.ui_state:
             # delete the moduleFrameLayout from window UI:
-            cmds.deleteUI(self.moduleFrameLayout)
-            self.clearSelectedModuleLayout()
+            #if cmds.frameLayout(self.moduleFrameLayout, query=True, exists=True):
+            #    cmds.deleteUI(self.moduleFrameLayout)
+            #self.clearSelectedModuleLayout()
+            
+            print("created_guides before =", self.ar.data.created_guides)
+            self.ar.ui_manager.clear_guide_layout()
+            self.ar.ui_manager.fill_created_guides()
+            #print("self.userGuideName =", self.name, self.userGuideName, self.moduleGrp)
+
             # edit the footer A text:
-            self.currentText = cmds.text("footerRiggingText", query=True, label=True)
-            cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])
-        except:
-            pass
+            self.ar.ui_manager.update_footer_ui()
+            # self.currentText = cmds.text("footerRiggingText", query=True, label=True)
+            # cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])
+        
         # clear module from instance list (clean dpUI list):
-        delIndex = self.ar.data.standard_instances.index(self)
-        self.ar.data.standard_instances.pop(delIndex)
+#        delIndex = self.ar.data.standard_instances.index(self)
+#        self.ar.data.standard_instances.pop(delIndex)
+        #if [self.name, self.userGuideName, self.moduleGrp] in self.ar.data.created_guides:
+        #delIndex = self.ar.data.created_guides.index([self.name, self.userGuideName, self.moduleGrp])
+        #if delIndex:
+        #    self.ar.data.created_guides.pop(delIndex)
+        #else:
+        #    print("NNNNNNOOOOO, ", delIndex)
+        #    print("YES removing it...")
+        #    self.ar.data.created_guides.remove([self.name, self.userGuideName, self.moduleGrp])
+        #    print("Good removed it...")
+        #
+        #
+        # TODO: call refresh UI here?
+        #
+        #
+        print("created_guides after  =", self.ar.data.created_guides)
     
 
     def duplicateModule(self, *args):
@@ -275,12 +306,12 @@ class BaseStandard(object):
                 guideBaseList.extend([staticGrp for staticGrp in transformList if "staticHook" in cmds.listAttr(staticGrp)] or [])
                 if guideBaseList:
                     for transform in guideBaseList:
-                        transformAttrList = cmds.listAttr(transform)
-                        if "dpAR_name" in transformAttrList:
+                        attributes = cmds.listAttr(transform)
+                        if "dpAR_name" in attributes:
                             currentName = cmds.getAttr(transform+".dpAR_name")
                             if baseName == self.utils.getSuffixNumberList(currentName)[1]:
                                 dpAR_nameList.append(currentName)
-                        if "customName" in transformAttrList:
+                        if "customName" in attributes:
                             currentName = cmds.getAttr(transform+".customName")
                             if currentName:
                                 if baseName == self.utils.getSuffixNumberList(currentName)[1]:

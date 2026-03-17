@@ -1184,17 +1184,17 @@ class ControlClass(object):
                         self.storeLockedList(ctrlName)
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
-                        for attr in self.ar.transformAttrList:
+                        for attr in self.ar.data.transform_attrs:
                             cmds.setAttr(ctrlName+"."+attr, lock=False)
                         pc = cmds.parentConstraint(self.ar.data.temp_grp, ctrlName, maintainOffset=True, name=pcName)[0]
                         cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
-                        for attr in self.ar.transformAttrList:
+                        for attr in self.ar.data.transform_attrs:
                             cmds.setAttr(ctrlName+"."+attr, lock=True)
             else:
                 pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
                 if pcNodeList:
                     cmds.delete(pcNodeList[0])
-                    for attr in self.ar.transformAttrList:
+                    for attr in self.ar.data.transform_attrs:
                         cmds.setAttr(ctrlName+"."+attr, lock=False)
                     self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)

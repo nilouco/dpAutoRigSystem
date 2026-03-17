@@ -222,7 +222,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         for item in list(self.netDic["GuideData"]):
             if self.netDic["GuideData"][item]:
                 for attr in list(self.netDic["GuideData"][item]):
-                    if attr in self.ar.transformAttrList:
+                    if attr in self.ar.data.transform_attrs:
                         if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
                             if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
                                 cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])

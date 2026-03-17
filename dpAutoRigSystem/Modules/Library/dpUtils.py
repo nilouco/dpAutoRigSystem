@@ -1104,7 +1104,7 @@ class Utils(object):
     def unlockAttr(self, nodeList):
         for node in nodeList:
             if cmds.objExists(node):
-                for attr in self.ar.transformAttrList:
+                for attr in self.ar.data.transform_attrs:
                     cmds.setAttr(node+"."+attr, lock=False)
 
 

@@ -711,7 +711,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                 cmds.connectAttr(self.hikDic[hikKey]["joint"+r]+".message", self.hikNode+"."+hikKey, force=True)
                                 if not self.hikCharacterAttr in cmds.listAttr(self.hikDic[hikKey]["joint"+r]):
                                     cmds.addAttr(self.hikDic[hikKey]["joint"+r], longName=self.hikCharacterAttr, attributeType="message")
-                                for attr in self.ar.transformAttrList:
+                                for attr in self.ar.data.transform_attrs:
                                     cmds.setAttr(self.hikDic[hikKey]["joint"+r]+"."+attr, lock=False)
                                 break
                         else:

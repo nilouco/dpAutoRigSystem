@@ -90,7 +90,7 @@ class ChannelIO(dpBaseAction.ActionStartClass):
             self.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 dic[item] = {}
-                for attr in self.ar.transformAttrList:
+                for attr in self.ar.data.transform_attrs:
                     dic[item][attr] = {
                                         "locked" : cmds.getAttr(item+"."+attr, lock=True),
                                         "keyable" : cmds.getAttr(item+"."+attr, keyable=True),
@@ -113,7 +113,7 @@ class ChannelIO(dpBaseAction.ActionStartClass):
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
-                for attr in self.ar.transformAttrList:
+                for attr in self.ar.data.transform_attrs:
                     try:
                         cmds.setAttr(item+"."+attr, keyable=attrDic[item][attr]['keyable'])
                         if not attrDic[item][attr]['keyable']:

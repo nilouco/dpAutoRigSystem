@@ -555,7 +555,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
             createdRivetGrp = True
             self.rivetGrp = cmds.group(name=rivetGrpName, empty=True)
             self.toIDList.append(self.rivetGrp)
-            for attr in self.ar.transformAttrList[:-1]:
+            for attr in self.ar.data.transform_attrs[:-1]:
                 cmds.setAttr(self.rivetGrp+"."+attr, lock=True, keyable=False, channelBox=False)
             cmds.addAttr(self.rivetGrp, longName="dpRivetGrp", attributeType='bool')
             cmds.setAttr(self.rivetGrp+".dpRivetGrp", 1)
@@ -627,7 +627,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
                         cancelProcess = True
                         break
                     # animated:
-                    for attr in self.ar.transformAttrList[:-1]:
+                    for attr in self.ar.data.transform_attrs[:-1]:
                         if cmds.listConnections(rivet+"."+attr, source=True, destination=False):
                             cancelProcess = True
                             break
@@ -849,10 +849,10 @@ class Rivet(dpBaseLibrary.BaseLibrary):
                 if cmds.listRelatives(toRivetGeo, allParents=True):
                     cmds.parent(toRivetGeo, world=True)
                 # Unlock attributes and apply initialShading
-                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.transformAttrList, False, True, True)
+                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.data.transform_attrs, False, True, True)
                 cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
                 cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
-                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.transformAttrList[:-1], True, False, True)
+                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.data.transform_attrs[:-1], True, False, True)
                 # Renaming
                 cmds.rename(toRivetGeo, faceToRivetGeoName)
                 # Turning on nodes
@@ -1022,7 +1022,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
         wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
         baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
         baseShape = cmds.rename(baseShape, toRivetName+"_Base")
-        self.ar.ctrls.setLockHide([baseShape], self.ar.transformAttrList[:-1], True, False, True)
+        self.ar.ctrls.setLockHide([baseShape], self.ar.data.transform_attrs[:-1], True, False, True)
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         self.toIDList.extend([wrapGeo, wrapNode, baseShape])
