@@ -1,8 +1,5 @@
 #import libraries
-import os
-import sys
 from maya import cmds
-from maya import mel
 from functools import partial
 from importlib import reload
 
@@ -20,136 +17,8 @@ class UIFiller(object):
                                    self.ar.data.deforming_folder,
                                    self.ar.data.custom_folder]
 
-
-    def start_library(self):
-        self.start_modules()
-        self.load_pipeline_validator()
-        self.set_validator_preset()
-
-
-    def start_modules(self):
-        # rigging
-        self.start_modules_by_folder(self.ar.data.standard_folder)
-        self.start_modules_by_folder(self.ar.data.integrated_folder)
-        # controllers
-        self.start_modules_by_folder(self.ar.data.curve_simple_folder)
-        self.start_modules_by_folder(self.ar.data.curve_combined_folder)
-        # tools
-        self.start_modules_by_folder(self.ar.data.tools_folder)
-        # validators
-        self.start_modules_by_folder(self.ar.data.checkin_folder)
-        self.start_modules_by_folder(self.ar.data.checkout_folder)
-        if self.ar.pipeliner.pipeData['addOnsPath'] and self.ar.config.get_validator_addons():
-            self.start_modules_by_folder("", path=self.ar.pipeliner.pipeData['addOnsPath'])
-            self.ar.data.checkaddon_folder = self.ar.pipeliner.pipeData['addOnsPath']
-        if self.ar.pipeliner.pipeData['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
-            self.start_modules_by_folder("", path=self.ar.pipeliner.pipeData['finishingPath'])
-            self.ar.data.checkfinishing_folder = self.ar.pipeliner.pipeData['finishingPath']
-        # rebuilders
-        self.start_modules_by_folder(self.ar.data.start_folder)
-        self.start_modules_by_folder(self.ar.data.source_folder)
-        self.start_modules_by_folder(self.ar.data.setup_folder)
-        self.start_modules_by_folder(self.ar.data.deforming_folder)
-        self.start_modules_by_folder(self.ar.data.custom_folder)
-
-
-    def start_modules_by_folder(self, folder, path=None):
-        libs, imported_modules = [], []
-        if not path:
-            path = self.ar.data.dp_auto_rig_path
-        if not self.ar.data.loaded_path:
-            if self.ar.data.verbose:
-                print(f"dpAutoRigPath: {path}")
-            self.ar.data.loaded_path = True
-        
-        # find all guide modules:
-        modules = self.ar.utils.findAllModules(path, folder)
-        if modules:
-            for module in modules:
-                lib_instance, imported_module = self.initialize_library(module, folder, path)
-                self.ar.data.lib_instances.append(lib_instance)
-                libs.append(lib_instance)
-                imported_modules.append(imported_module)
-        
-            # avoid print again the same message:
-            if folder == "":
-                folder = path
-            if not folder in self.ar.data.lib.keys():
-                self.ar.data.lib[folder] = { 
-                                            "modules" : modules,
-                                            "instances": libs,
-                                            "imported" : imported_modules
-                                            }
-                if self.ar.data.verbose:
-                    print(folder+" : "+str(modules))
-        return modules
     
-
-
-    def initialize_library(self, module, folder, path=None):
-        """ Returns the started instance and the imported module objects.
-        """
-        imported_module = self.import_library(module, folder, path)
-        if imported_module:
-            return [self.create_instance(imported_module), imported_module]
-
-
-
-    def import_library(self, module, folder, path=None):
-        imported_module = None
-        basePath = self.ar.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
-        try:
-            if folder:
-                folder = folder.replace("/", ".")
-                imported_module = __import__(f"{basePath}.{folder}.{module}", {}, {}, [module])
-            elif path:
-                sys.path.append(path)
-                imported_module = __import__(module, {}, {}, [module])
-            if self.ar.dev:
-                reload(imported_module)
-        except Exception as e:
-            errorString = self.ar.data.lang['e017_loadingExtension']+" "+module+" : "+str(e.args)
-            mel.eval('warning \"'+errorString+'\";')
-            return
-        return imported_module
-
-
-
-    def create_instance(self, imported_module):
-        """ Returns the initialized module instance.
-        """
-        return getattr(imported_module, imported_module.CLASS_NAME)(self.ar)
-    
-
-
-
-    def load_pipeline_validator(self):
-        """ Load the Validator's presets from the pipeline path.
-        """
-        if self.ar.pipeliner.pipeData['presetsPath']:
-            if os.path.exists(self.ar.pipeliner.pipeData['presetsPath']):
-                studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipeData['presetsPath']+"/", True)
-                if studio_preset:
-                    self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
-                    self.ar.data.validator_preset_data.update(studio_preset_data)
-                    cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", label=self.ar.data.validator_preset["_preset"], radioButton=False, collection="validator_preset_rbc", parent="validator_preset_menu")
-                    cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", edit=True, radioButton=True, collection="validator_preset_rbc")
-
-    
-    def set_validator_preset(self):
-        check_instances = self.ar.data.lib[self.ar.data.checkin_folder]["instances"] + self.ar.data.lib[self.ar.data.checkout_folder]["instances"]
-        if self.ar.data.checkaddon_folder in self.ar.data.lib.keys():
-            check_instances = check_instances + self.ar.data.lib[self.ar.data.checkaddon_folder]["instances"]
-        if self.ar.data.checkfinishing_folder in self.ar.data.lib.keys():
-            check_instances = check_instances + self.ar.data.lib[self.ar.data.checkfinishing_folder]["instances"]
-        if check_instances:
-            for validator_name in self.ar.data.validator_preset:
-                for validator_instance in check_instances:
-                    if validator_name == validator_instance.name:
-                        validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
-    
-    
-    def fill_library(self):
+    def fill_libraries(self):
         # rigging
         for item in self.ar.data.lib[self.ar.data.standard_folder]["instances"]:
             self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_cl")
@@ -195,14 +64,14 @@ class UIFiller(object):
             if folder == self.ar.data.curve_simple_folder or folder == self.ar.data.curve_combined_folder:
                 cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.name, annotation=item.name, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
                 return
-            module_layout = cmds.rowLayout(item.title+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
-            cmds.image(item.title+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
+            module_layout = cmds.rowLayout(item.name+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
+            cmds.image(item.name+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
             if folder == self.ar.data.standard_folder:
-                cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_raw_guide, parent=module_layout)
+                cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_raw_guide, parent=module_layout)
             elif folder == self.ar.data.integrated_folder:
-                cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
+                cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
             elif folder == self.ar.data.tools_folder:
-                cmds.button(item.title+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=module_layout)
+                cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=module_layout)
             else:
                 item.actionCB = cmds.checkBox(label=self.ar.data.lang[item.title], value=item.active, changeCommand=item.changeActive, parent=module_layout)
                 item.firstBT = cmds.button(label=item.firstBTLabel, width=45, command=partial(item.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.firstBTEnable, parent=module_layout)
@@ -214,5 +83,72 @@ class UIFiller(object):
                 if folder in self.rebuilder_folders:
                     item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
                     item.updateActionButtons(color=False)
-            cmds.iconTextButton(item.title+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
+            cmds.iconTextButton(item.name+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
 
+
+    def load_pipeline_validator_preset(self):
+        cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", label=self.ar.data.validator_preset["_preset"], radioButton=False, collection="validator_preset_rbc", parent="validator_preset_menu")
+        cmds.menuItem(f"{self.ar.data.validator_preset['_preset']}_mi", edit=True, radioButton=True, collection="validator_preset_rbc")
+
+
+    def fill_created_guides(self):
+        """ Read all guide modules loaded in the scene and re-create the elements in the module_layout.
+        """
+        # create a new list in order to store all created guide modules in the scene and its userSpecNames:
+        self.ar.data.created_guides = []
+        self.ar.data.standard_instances = []
+        # list all namespaces:
+        cmds.namespace(setNamespace=":")
+        namespaces = cmds.namespaceInfo(listOnlyNamespaces=True)
+        # find all module names:
+        module_name = self.ar.utils.findAllModuleNames(self.ar.data.dp_auto_rig_path, self.ar.data.standard_folder)
+        valid_modules = module_name[0]
+        valid_module_ames = module_name[1]
+        
+        # check if there is "__" (double undersore) in the namespaces:
+        for n in namespaces:
+            n_partitions = n.partition("__")
+            if n_partitions[1] != "":
+                module = n_partitions[0]
+                userSpecName = n_partitions[2]
+                if module in valid_module_ames:
+                    index = valid_module_ames.index(module)
+                    # check if there is this module guide base in the scene:
+                    curGuideName = valid_module_ames[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
+                    if cmds.objExists(curGuideName):
+                        self.ar.data.created_guides.append([valid_modules[index], userSpecName, curGuideName])
+                    else:
+                        cmds.namespace(moveNamespace=(n, ':'), force=True)
+                        cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
+
+        # if exists any guide module in the scene, recreate its instance as objectClass:
+        if self.ar.data.created_guides:
+            sorted_guides = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
+            # load again the modules:
+            module_path = f"{self.ar.utils.findEnv('PYTHONPATH', 'dpAutoRigSystem')}.{self.ar.data.standard_folder.replace('/', '.')}"
+            # this list will be used to rig all modules pressing the RIG button:
+            for module in sorted_guides:
+                imported_module = __import__(module_path+"."+module[0], {}, {}, [module[0]])
+                if self.ar.dev:
+                    reload(imported_module)
+                # identify the guide modules and add to the moduleInstancesList:
+                moduleClass = getattr(imported_module, imported_module.CLASS_NAME)
+                if "rigType" in cmds.listAttr(module[2]):
+                    curRigType = cmds.getAttr(module[2]+".rigType")
+                    moduleInst = moduleClass(self.ar)#, module[1], curRigType)
+                else:
+                    if "Style" in cmds.listAttr(module[2]):
+                        iStyle = cmds.getAttr(module[2]+".Style")
+                        if (iStyle == 0 or iStyle == 1):
+                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
+                        else:
+                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
+                    else:
+                        moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
+                self.ar.data.standard_instances.append(moduleInst)
+                moduleInst.get_namespace_for_it(module[1])
+                if self.ar.data.ui_state:
+                    moduleInst.load_raw_guide(moduleInst.userGuideName)
+
+                # reload pinGuide scriptJob:
+                self.ar.ctrls.startPinGuide(module[2])

@@ -17,7 +17,13 @@ class Data:
     language_option_var: str = "dpAutoRigLastLanguage"
     validator_option_var: str = "dpAutoRigLastValidatorPreset"
     curve_option_var: str = "dpAutoRigLastCurvePreset"
-    degree_option_var: str = "dpAutoRigLastDegreeOption"
+    degree_option_var: str = "dpAutoRigLastCurveDegree"
+    colorize_curve_option_var: str = "dpAutoRigLastColorizeCurve"
+    supplementary_attr_option_var: str = "dpAutoRigLastSupplementaryAttr"
+    display_joint_option_var: str = "dpAutoRigLastDisplayJoint"
+    display_temp_grp_option_var: str = "dpAutoRigLastDisplayTempGrp"
+    integrate_all_option_var: str = "dpAutoRigLastIntegrateAll"
+    default_render_layer_option_var: str = "dpAutoRigLastDefaultRenderLayer"
     
     rig_type_biped: str = "biped"
     rig_type_quadruped: str = "quadruped"
@@ -90,22 +96,23 @@ class Data:
     modules_collapse_status: bool = False
     rebuilders_collapse_status: bool = True
     collapse_edit_sel_mod: bool = False
-    display_joint: bool = True
-    display_temp_grp: bool = False
-    integrate_module: bool = True
-    use_default_render_layer: bool = True
-    colorize_curve: bool = True
-    add_supplementary_attr: bool = True
-
+    
     degree_option: int = 0
-    auto_check_update: int = 1
+    colorize_curve: int = 1
+    display_joint: int = 1
+    supplementary_attr: int = 1
+    display_temp_grp: int = 0
+    integrate_all: int = 1
+    default_render_layer: int = 1
     agree_terms: int = 1
+    auto_check_update: int = 1
     select_change_job_id: int = 0
 
     transform_attrs: list = field(default_factory=lambda: ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"])
     rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
     axis: list = field(default_factory=lambda: ["X", "Y", "Z"])
     degrees: list = field(default_factory=lambda: ['Preset_0', 'Linear_1', 'Cubic_3'])
+    booleans: list = field(default_factory=lambda: [0, 1])
     
     to_ids: list = field(default_factory=list)
     

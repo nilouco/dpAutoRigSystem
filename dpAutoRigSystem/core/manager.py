@@ -1,12 +1,11 @@
 #import libraries
 from maya import cmds
-from importlib import reload
+
 
 
 
 class UIManager(object):
     def __init__(self, ar):
-#        print("init manager")
         self.ar = ar
 
 
@@ -52,7 +51,8 @@ class UIManager(object):
             self.ar.data.rebuilding = False
         #clear layouts
         self.clear_guide_layout()
-        self.fill_created_guides()
+        self.ar.filler.fill_created_guides()
+        self.update_footer_ui()
 
 #        self.checkImportedGuides()
 #        self.checkGuideNets()
@@ -88,80 +88,11 @@ class UIManager(object):
             cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
 
 
-    def fill_created_guides(self, *args):
-        """ Read all guide modules loaded in the scene and re-create the elements in the module_layout.
-        """
-        # create a new list in order to store all created guide modules in the scene and its userSpecNames:
-        self.ar.data.created_guides = []
-        self.ar.data.standard_instances = []
-        # list all namespaces:
-        cmds.namespace(setNamespace=":")
-        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
-        # find path where 'dpAutoRig.py' is been executed:
-        path = self.ar.data.dp_auto_rig_path
-        guideDir = self.ar.data.standard_folder
-        # find all module names:
-        moduleNameInfo = self.ar.utils.findAllModuleNames(path, guideDir)
-        validModules = moduleNameInfo[0]
-        validModuleNames = moduleNameInfo[1]
-        
-        # check if there is "__" (double undersore) in the namespaces:
-        for n in namespaceList:
-            divString = n.partition("__")
-            if divString[1] != "":
-                module = divString[0]
-                userSpecName = divString[2]
-                if module in validModuleNames:
-                    index = validModuleNames.index(module)
-                    # check if there is this module guide base in the scene:
-                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
-                    if cmds.objExists(curGuideName):
-                        self.ar.data.created_guides.append([validModules[index], userSpecName, curGuideName])
-                    else:
-                        cmds.namespace(moveNamespace=(n, ':'), force=True)
-                        cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
-
-        # if exists any guide module in the scene, recreate its instance as objectClass:
-        if self.ar.data.created_guides:
-            sortedAllGuidesList = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
-            # load again the modules:
-            guideFolder = self.ar.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder.replace("/", ".")
-            # this list will be used to rig all modules pressing the RIG button:
-            for module in sortedAllGuidesList:
-                mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
-                if self.ar.dev:
-                    reload(mod)
-                # identify the guide modules and add to the moduleInstancesList:
-                moduleClass = getattr(mod, mod.CLASS_NAME)
-                if "rigType" in cmds.listAttr(module[2]):
-                    curRigType = cmds.getAttr(module[2]+".rigType")
-                    moduleInst = moduleClass(self.ar)#, module[1], curRigType)
-                else:
-                    if "Style" in cmds.listAttr(module[2]):
-                        iStyle = cmds.getAttr(module[2]+".Style")
-                        if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
-                        else:
-                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
-                    else:
-                        moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
-                self.ar.data.standard_instances.append(moduleInst)
-                moduleInst.get_namespace_for_it(module[1])
-                if self.ar.data.ui_state:
-                    moduleInst.load_raw_guide(moduleInst.userGuideName)
-
-                # reload pinGuide scriptJob:
-                self.ar.ctrls.startPinGuide(module[2])
-        self.update_footer_ui()
-
-
-
     def update_footer_ui(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
         if not quantity:
             quantity = len(self.ar.data.created_guides)
         if self.ar.data.ui_state:
             cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
-
 
 
     def delete_exist_window(self, *args):

@@ -10,14 +10,12 @@ class Configuration(object):
     def __init__(self, ar):
         self.ar = ar
         self.ar.data.verbose = self.ar.dev
-
         self.load_path()
-
         self.load_language()
         self.load_validator_preset()
         self.load_curve_preset()
         self.load_curve_degree()
-
+        self.load_menu_options()
         self.load_icons()
 
         #self.set_values()
@@ -78,7 +76,38 @@ class Configuration(object):
                                                             self.ar.data.degrees
                                                          )
         self.ar.data.degree_option = int(self.ar.data.degree[-1])
-#        if cmds.objectExists()
+
+
+    def load_menu_options(self):
+        values = []
+        for item, option_var in zip([
+                                        self.ar.data.colorize_curve, 
+                                        self.ar.data.supplementary_attr,
+                                        self.ar.data.display_joint,
+                                        self.ar.data.display_temp_grp, 
+                                        self.ar.data.integrate_all, 
+                                        self.ar.data.default_render_layer 
+                                   ], 
+                                   [
+                                        self.ar.data.colorize_curve_option_var,
+                                        self.ar.data.supplementary_attr_option_var,
+                                        self.ar.data.display_joint_option_var,
+                                        self.ar.data.display_temp_grp_option_var,
+                                        self.ar.data.integrate_all_option_var,
+                                        self.ar.data.default_render_layer_option_var
+                                   ]):
+            values.append(self.check_last_option_var(
+                                                        option_var, 
+                                                        item, 
+                                                        self.ar.data.booleans,
+                                                        string=False
+                                                    ))
+        self.ar.data.colorize_curve = values[0]
+        self.ar.data.supplementary_attr = values[1]
+        self.ar.data.display_joint = values[2]
+        self.ar.data.display_temp_grp = values[3]
+        self.ar.data.integrate_all = values[4]
+        self.ar.data.default_render_layer = values[5]
 
 
     def check_option_data(self, name, default, folder):
@@ -125,23 +154,28 @@ class Configuration(object):
         return items, content
     
 
-    def check_last_option_var(self, name, preferable_name, founds):
+    def check_last_option_var(self, name, preferable, founds, string=True):
         """ Verify if there's an optionVar with this name or create it with the preferable given value.
             Returns the last_value found.
         """
         last_value_exists = cmds.optionVar(exists=name)
         if not last_value_exists:
-            # if not exists a last optionVar, set it to preferable_name if it exists, or to the first value in the list:
-            if preferable_name in founds:
-                cmds.optionVar(stringValue=(name, preferable_name))
-            else:
+            # if not exists a last optionVar, set it to preferable if it exists, or to the first value in the list:
+            if preferable in founds:
+                if string:
+                    cmds.optionVar(stringValue=(name, preferable))
+                else:
+                    cmds.optionVar(intValue=(name, preferable))
+            elif string:
                 cmds.optionVar(stringValue=(name, founds[0]))
+            else:
+                cmds.optionVar(intValue=(name, preferable))
         # get its value puting in a variable to return it:
         result_value = cmds.optionVar(query=name)
-        # if the last value in the system was different of json files, set it to preferable_name or to the first value in the list also:
+        # if the last value in the system was different of json files, set it to preferable or to the first value in the list also:
         if not result_value in founds:
-            if preferable_name in founds:
-                result_value = preferable_name
+            if preferable in founds:
+                result_value = preferable
             else:
                 result_value = result_value[0]
         return result_value
@@ -191,29 +225,15 @@ class Configuration(object):
         
 
     def get_instance_info(self, name, folders, info="instances"):
-
-        #print("WIP here.... get_instance_by_name =", name)
-        # Temporary renaming before refacotry files renaming is done:
+        # TODO Temporary renaming before refacotry files renaming is done:
         if name.startswith("dp"):
             name = name[2:] #removes initial dp string
-        #
-        # TODO: implement folder search here
-        #
-        #
-        #print("folder =", folder)
+        
         for folder in folders:
             if folder in self.ar.data.lib.keys():
-                # print("YES =", self.ar.data.lib[folder])
-                # if name in self.ar.data.lib[folder]["modules"]:
-                #     print("MERCI =")
                 for i, item in enumerate(self.ar.data.lib[folder]["instances"]):
-    #                print("item, name, item.name =", item, name, item.name)
                     if name == item.name:
-    #                    print("info =", info, item.name)
                         return self.ar.data.lib[folder][info][i]
-
-        # for item in self.ar.data.lib:
-        #     print("item =", item)
 
 
 
@@ -223,13 +243,13 @@ class Configuration(object):
     #     self.ar.customAttr.ui = False
 
 
+
+
+
+
 class Option(object):
     def __init__(self, ar):
         self.ar = ar
-        self.set_use_default_render_layer(True)
-        
-        
-        # TODO: getters and setters...
 
 
     def change_degree(self, value, *args):
@@ -241,13 +261,16 @@ class Option(object):
 
 
     def check_use_default_render_layer(self):
-        if self.ar.data.use_default_render_layer:
-            self.set_use_default_render_layer(True)
+        if self.ar.data.default_render_layer:
+            self.set_default_render_layer(True)
 
 
-    def set_option_var(self, opt_var, item):
+    def set_option_var(self, opt_var, value, string=True):
         cmds.optionVar(remove=opt_var)
-        cmds.optionVar(stringValue=(opt_var, item))
+        if string:
+            cmds.optionVar(stringValue=(opt_var, value))
+        else:
+            cmds.optionVar(intValue=(opt_var, value))
 
 
     def set_verbose(self, value):
@@ -256,20 +279,49 @@ class Option(object):
         self.ar.data.verbose = value
 
 
-    def set_display_joint(self, value):
-        self.ar.data.display_joint = value
-
-
-    def set_integrate_module(self, value):
-        self.ar.data.integrate_module = value
-
-
     def set_colorize_curve(self, value):
         self.ar.data.colorize_curve = value
+        self.set_option_var(self.ar.data.colorize_curve_option_var, value, False)
 
-    
-    def set_add_supplementary_attr(self, value):
-        self.ar.data.add_supplementary_attr = value
+
+    def set_supplementary_attr(self, value):
+        self.ar.data.supplementary_attr = value
+        self.set_option_var(self.ar.data.supplementary_attr_option_var, value, False)
+
+
+    def set_display_joint(self, value):
+        self.ar.data.display_joint = value
+        self.set_option_var(self.ar.data.display_joint_option_var, value, False)
+
+
+    def set_display_temp_grp(self, value):
+        """ Change display hidden guide groups in the Outliner:
+            dpAR_Temp_Grp
+            dpAR_GuideMirror_Grp
+        """
+        self.ar.data.display_temp_grp = not value #invert value (True -> False or False -> True)
+        if cmds.objExists(self.ar.data.temp_grp):
+            cmds.setAttr(self.ar.data.temp_grp+".hiddenInOutliner", self.ar.data.display_temp_grp)
+        if cmds.objExists(self.ar.data.guide_mirror_grp):
+            cmds.setAttr(self.ar.data.guide_mirror_grp+".hiddenInOutliner", self.ar.data.display_temp_grp)
+        mel.eval('source AEdagNodeCommon;')
+        mel.eval('AEdagNodeCommonRefreshOutliners();')
+        self.set_option_var(self.ar.data.display_temp_grp_option_var, value, False)
+
+
+    def set_integrate_all(self, value):
+        self.ar.data.integrate_all = value
+        self.set_option_var(self.ar.data.integrate_all_option_var, value, False)
+
+
+    def set_default_render_layer(self, value):
+        """ Analisys if must use the Default Render Layer (masterLayer) checking the option in the UI.
+            Set to use it if need.
+        """
+        self.ar.data.default_render_layer = value
+        self.set_option_var(self.ar.data.default_render_layer_option_var, value, False)
+        if value:
+            cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 
     def set_prefix(self, prefix=False):
@@ -293,35 +345,51 @@ class Option(object):
                 if not prefix.endswith("_"):
                     prefix = f"{prefix}_"
                 self.ar.data.prefix = prefix
-                if cmds.text("rig_prefix_txt", query=True, exists=True):
-                    cmds.text("rig_prefix_txt", edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
+                if self.ar.data.ui_state:
+                    if cmds.text("rig_prefix_txt", query=True, exists=True):
+                        cmds.text("rig_prefix_txt", edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
         else:
-            self.ar.data.prefix = ""
+            self.reset_prefix()
+
+        
+    def reset_prefix(self):
+        self.ar.data.prefix = ""
+        if self.ar.data.ui_state:
             if cmds.text("rig_prefix_txt", query=True, exists=True):
                 cmds.text("rig_prefix_txt", edit=True, label="", visible=False)
 
 
-    def set_display_temp_grp(self, value):
-        """ Change display hidden guide groups in the Outliner:
-            dpAR_Temp_Grp
-            dpAR_GuideMirror_Grp
-        """
-        self.ar.data.display_temp_grp = not value #invert value (True -> False or False -> True)
-        if cmds.objExists(self.ar.data.temp_grp):
-            cmds.setAttr(self.ar.data.temp_grp+".hiddenInOutliner", self.ar.data.display_temp_grp)
-        if cmds.objExists(self.ar.data.guide_mirror_grp):
-            cmds.setAttr(self.ar.data.guide_mirror_grp+".hiddenInOutliner", self.ar.data.display_temp_grp)
-        mel.eval('source AEdagNodeCommon;')
-        mel.eval('AEdagNodeCommonRefreshOutliners();')
+    def reset_options_to_default(self, *args):
+        self.set_option_var(self.ar.data.language_option_var, self.ar.data.language_default)
+        self.set_option_var(self.ar.data.validator_option_var, self.ar.data.validator_default)
+        self.set_option_var(self.ar.data.curve_option_var, self.ar.data.curve_default)
+        self.change_degree(self.ar.data.degree_default)
+        # same hard coded number than variables dataclass
+        self.set_colorize_curve(1)
+        self.set_supplementary_attr(1)
+        self.set_display_joint(1)
+        self.set_display_temp_grp(0)
+        self.set_integrate_all(1)
+        self.set_default_render_layer(1)
+        self.reset_prefix()
+
+        #
+        #
+        # WIP
+        #
+        #
+
+        #agree_terms: int = 1
+        #auto_check_update: int = 1
 
 
-    def set_use_default_render_layer(self, value):
-        """ Analisys if must use the Default Render Layer (masterLayer) checking the option in the UI.
-            Set to use it if need.
-        """
-        self.ar.data.use_default_render_layer = value
-        if value:
-            cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
+        # reload UI
+        cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
+
+
+
+
+
 
 
 

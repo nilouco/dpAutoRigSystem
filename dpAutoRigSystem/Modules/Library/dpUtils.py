@@ -278,7 +278,7 @@ class Utils(object):
     #     """ Analisys if must use the Default Render Layer (masterLayer) checking the option in the UI.
     #         Set to use it if need.
     #     """
-    #     if self.ar.data.use_default_render_layer:
+    #     if self.ar.data.default_render_layer:
     #         cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 

@@ -5,7 +5,7 @@
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2010-10-03",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2026-03-05",
+    "_updated"       : "2026-03-17",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field below to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to add a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -235,7 +235,7 @@
     "i063_skinAddBtn"           : "Add",
     "i064_skinRemBtn"           : "Remove",
     "i065_colorizeCtrl"         : "Colorize controllers.",
-    "i066_addAttr"              : "Add supplementary attributes.",
+    "i066_addAttr"              : "Add Option_Ctrl supplementary attributes.",
     "i067_duplicating"          : "Duplicating a module guide.",
     "i068_CtrlD"                : "Ctrl + D",
     "i069_notSkinJoint"         : "The listed joints below don't exist anymore:",

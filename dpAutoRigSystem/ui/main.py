@@ -43,7 +43,7 @@ class MainUI(object):
 
         self.create_main_ui()
         self.ar.ui_manager.set_ui_state(True)
-        self.ar.lib.fill_library()
+        self.ar.filler.fill_libraries()
         
         #
         #
@@ -98,32 +98,19 @@ class MainUI(object):
         self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_preset["_preset"], self.ar.data.validator_preset_data, self.ar.data.validator_option_var, refresh=True)
         self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"], self.ar.data.curve_preset_data, self.ar.data.curve_option_var, refresh=True)
         self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {d:0 for d in self.ar.data.degrees}, self.ar.data.degree_option_var, degree=True)
-        
-        #
-        #
-        # WIP
-        # TODO: save options by optionVars:
-        #
-        # Options
+        # options
         cmds.menuItem("options_mi", label=self.ar.data.lang['i002_options'], subMenu=True, parent="settings_menu")
-        
         cmds.menuItem("opt_colorize_curve_mi", label=self.ar.data.lang['i065_colorizeCtrl'], checkBox=self.ar.data.colorize_curve, command=self.ar.opt.set_colorize_curve, parent="options_mi")
-        cmds.menuItem("opt_add_supplementary_attr_mi", label=self.ar.data.lang['i066_addAttr'], checkBox=self.ar.data.add_supplementary_attr, command=self.ar.opt.set_add_supplementary_attr, parent="options_mi")
+        cmds.menuItem("opt_supplementary_attr_mi", label=self.ar.data.lang['i066_addAttr'], checkBox=self.ar.data.supplementary_attr, command=self.ar.opt.set_supplementary_attr, parent="options_mi")
         cmds.menuItem("opt_display_joint_mi", label=self.ar.data.lang['i009_displayJointsCB'], checkBox=self.ar.data.display_joint, command=self.ar.opt.set_display_joint, parent="options_mi")
         cmds.menuItem("opt_display_temp_grp_mi", label=self.ar.data.lang['i183_hideGuideGrp'], checkBox=self.ar.data.display_temp_grp, command=self.ar.opt.set_display_temp_grp, parent="options_mi")
-        cmds.menuItem("opt_integrate_module_mi", label=self.ar.data.lang['i010_integrateCB'], checkBox=self.ar.data.integrate_module, command=self.ar.opt.set_integrate_module, parent="options_mi")
-        cmds.menuItem("opt_default_render_layer_mi", label=self.ar.data.lang['i004_defaultRL'], checkBox=self.ar.data.use_default_render_layer, command=self.ar.opt.set_use_default_render_layer, parent="options_mi")
-
-
+        cmds.menuItem("opt_integrate_module_mi", label=self.ar.data.lang['i010_integrateCB'], checkBox=self.ar.data.integrate_all, command=self.ar.opt.set_integrate_all, parent="options_mi")
+        cmds.menuItem("opt_default_render_layer_mi", label=self.ar.data.lang['i004_defaultRL'], checkBox=self.ar.data.default_render_layer, command=self.ar.opt.set_default_render_layer, parent="options_mi")
         cmds.menuItem("opt_prefix_mi", label=f"{self.ar.data.lang['i272_set']} {self.ar.data.lang['i144_prefix']}", command=self.ar.opt.set_prefix, parent="settings_menu")
-        
-
-
-
+        cmds.menuItem("opt_reset_options_mi", label=self.ar.data.lang['i271_reset'], command=self.ar.opt.reset_options_to_default, parent="settings_menu")
 
 
     def create_the_create_menu(self):
-        # create menu:
         cmds.menu('create_menu', label='Create', parent='main_menu_bar')
         cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator, parent='create_menu')
         cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.config.open_pipeliner, parent='create_menu')
@@ -132,7 +119,6 @@ class MainUI(object):
 
 
     def create_window_menu(self):
-        # window menu:
         cmds.menu('window_menu', label='Window', parent='main_menu_bar')
         cmds.menuItem('dev_mode_mi', label='Dev mode', checkBox=self.ar.dev, command=self.ar.ui_manager.reload_dev_mode_ui, parent='window_menu')
         cmds.menuItem('reload_ui_mi', label='Reload UI', command=self.ar.ui_manager.reload_ui, parent='window_menu')
@@ -140,7 +126,6 @@ class MainUI(object):
 
 
     def create_help_menu(self):
-        # help menu:
         cmds.menu('help_menu', label='Help', helpMenu=True, parent='main_menu_bar')
         cmds.menuItem('about_mi"', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.dpARVersion, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('author_mi', label='Author', command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')

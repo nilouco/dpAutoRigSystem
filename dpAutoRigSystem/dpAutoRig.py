@@ -61,6 +61,7 @@ from .core import settings
 from .core import variables
 from .core import loading
 from .core import manager
+from .core import librarian
 from .core import filler
 
 
@@ -110,6 +111,7 @@ class Start(object):
             reload(variables)
             reload(loading)
             reload(manager)
+            reload(librarian)
             reload(filler)
             print("Reloaded imported modules")
     
@@ -135,7 +137,8 @@ class Start(object):
 
 
     def load_library(self):
-        self.lib = filler.UIFiller(self)
+        self.lib = librarian.Lib(self)
+        self.filler = filler.UIFiller(self)
         self.lib.start_library()
 
 
@@ -1759,7 +1762,7 @@ class Start(object):
             for guideModule in self.modulesToBeRiggedList:
                 guideModule.serializeGuide()
 
-            if self.data.integrate_module:
+            if self.data.integrate_all:
                 self.createBaseRigNode()
             # run RIG function for each guideModule:
             for guideModule in self.modulesToBeRiggedList:
@@ -1799,7 +1802,7 @@ class Start(object):
                             else:
                                 self.ctrls.colorShape([pCtrl], "yellow")
             
-            if self.data.integrate_module:
+            if self.data.integrate_all:
                 # Update progress window
                 self.utils.setProgress('Rigging: '+self.data.lang['i010_integrateCB'])
                 
@@ -2537,7 +2540,7 @@ class Start(object):
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
             # Add usefull attributes for the animators
-            if self.data.add_supplementary_attr:
+            if self.data.supplementary_attr:
                 # defining attribute name strings:
                 generalAttr = self.data.lang['c066_general']
                 vvAttr = self.data.lang['c031_volumeVariation']
@@ -2633,7 +2636,7 @@ class Start(object):
             self.initExtraModule("dpFingerHandPose", self.data.tools_folder, hidden=True)
 
             # show dialogBox if detected a bug:
-            if self.data.integrate_module:
+            if self.data.integrate_all:
                 if self.detectedBug:
                     print("\n\n")
                     print(self.bugMessage)

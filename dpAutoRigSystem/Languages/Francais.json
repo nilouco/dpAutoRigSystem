@@ -5,7 +5,7 @@
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-04",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2026-03-05",
+    "_updated"       : "2026-03-17",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas de caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -235,7 +235,7 @@
     "i063_skinAddBtn"           : "Ajouter",
     "i064_skinRemBtn"           : "Retirer",
     "i065_colorizeCtrl"         : "Colorer les contrôleurs.",
-    "i066_addAttr"              : "Ajouter les attributs supplémentaires.",
+    "i066_addAttr"              : "Ajouter les attributs supplémentaires dans l'Option_Ctrl.",
     "i067_duplicating"          : "Dupliquer un guide de module.",
     "i068_CtrlD"                : "Ctrl + D",
     "i069_notSkinJoint"         : "Ces joints listés en bas n'existent plus:",
