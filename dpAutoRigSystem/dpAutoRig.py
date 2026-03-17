@@ -60,6 +60,8 @@ from .ui import main
 from .core import settings
 from .core import variables
 from .core import loading
+from .core import manager
+from .core import filler
 
 
 class Start(object):
@@ -68,7 +70,6 @@ class Start(object):
         self.dpARVersion = DPAR_VERSION_5
         self.load_opening(intro)
         self.reload_modules()
-        #self.load_system() // loads inside of it?
         self.load_variables()
         self.load_settings()
         self.load_components()
@@ -108,6 +109,8 @@ class Start(object):
             reload(settings)
             reload(variables)
             reload(loading)
+            reload(manager)
+            reload(filler)
             print("Reloaded imported modules")
     
     
@@ -132,27 +135,17 @@ class Start(object):
 
 
     def load_library(self):
-        self.lib = main.Fill(self)
+        self.lib = filler.UIFiller(self)
         self.lib.start_library()
-        print("finished started library herhe")
 
 
     def load_ui(self):
-        self.ui_manager = main.Manager(self)
-        self.main_ui = main.UI(self)
-
-        print("after load_ui , standard_instances =", self.data.standard_instances)
+        self.ui_manager = manager.UIManager(self)
+        self.main_ui = main.MainUI(self)
 
 
     def ui(self):
         self.main_ui.create_ui()
-        
-        #WIP: calling again TODO call filling UI instead
-        #self.lib.start_library()
-        #self.ui_manager.refresh_ui()
-
-        print("after create_ui , standard_instances =", self.data.standard_instances)
-
 
 
 
@@ -733,42 +726,42 @@ class Start(object):
     #
     # WIP
     #
-    def import_library(self, guideModule, guideDir, path=None):
-        imported_module = None
-        basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
-#        print("basePath = ", basePath)
-#        #print("dp_auto_rig_path = ", self.data.dp_auto_rig_path)
-        try:
-            if guideDir:
-                guideDir = guideDir.replace("/", ".")
-                imported_module = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-            elif path:
-                sys.path.append(path)
-                imported_module = __import__(guideModule, {}, {}, [guideModule])
-            if self.dev:
-                reload(imported_module)
-        except Exception as e:
-            errorString = self.data.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
-            mel.eval('warning \"'+errorString+'\";')
-            return
-#        print("imported_module =====", imported_module)
-        return imported_module
+#     def import_library(self, guideModule, guideDir, path=None):
+#         imported_module = None
+#         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+# #        print("basePath = ", basePath)
+# #        #print("dp_auto_rig_path = ", self.data.dp_auto_rig_path)
+#         try:
+#             if guideDir:
+#                 guideDir = guideDir.replace("/", ".")
+#                 imported_module = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+#             elif path:
+#                 sys.path.append(path)
+#                 imported_module = __import__(guideModule, {}, {}, [guideModule])
+#             if self.dev:
+#                 reload(imported_module)
+#         except Exception as e:
+#             errorString = self.data.lang['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
+#             mel.eval('warning \"'+errorString+'\";')
+#             return
+# #        print("imported_module =====", imported_module)
+#         return imported_module
 
     #
-    def startModule_TEMP_Name(self, guideModule, guideDir, path=None):
-        """ Returns the started instance and the imported module objects.
-        """
-        imported_module = self.import_library(guideModule, guideDir, path)
-        if imported_module:
-            return [self.initGuide(imported_module, guideModule), imported_module]
+    # def startModule_TEMP_Name(self, guideModule, guideDir, path=None):
+    #     """ Returns the started instance and the imported module objects.
+    #     """
+    #     imported_module = self.import_library(guideModule, guideDir, path)
+    #     if imported_module:
+    #         return [self.initGuide(imported_module, guideModule), imported_module]
         
             # if guideDir == self.data.standard_folder:
             #     lib_instance = self.initGuide(lib, guideModule, self.data.rig_type_biped)
             #     #self.data.standard_instances.append(lib_instance)
             # else:
-            lib_instance = self.initGuide(lib, guideModule)
+            # lib_instance = self.initGuide(lib, guideModule)
             
-            return lib_instance
+            # return lib_instance
             # if guideDir == self.data.integrated_folder:
             #     self.data.template_instances.append(lib_instance)
             # if guideDir == self.data.curve_simple_folder:
