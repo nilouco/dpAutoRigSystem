@@ -46,10 +46,11 @@ class ControlClass(object):
         if not tempGrp:
             tempGrp = self.ar.data.temp_grp
         if not cmds.objExists(tempGrp):
+            hidden = not self.ar.data.display_temp_grp #invert to apply
             cmds.group(name=tempGrp, empty=True)
             cmds.setAttr(tempGrp+".visibility", 0)
             cmds.setAttr(tempGrp+".template", 1)
-            cmds.setAttr(tempGrp+".hiddenInOutliner", 1) #TODO: get this value from further optionVar
+            cmds.setAttr(tempGrp+".hiddenInOutliner", hidden)
             self.setLockHide([tempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
         return tempGrp
 

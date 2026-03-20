@@ -549,10 +549,11 @@ class BaseLayout(object):
         self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
         if self.mirrorAxis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
+                hidden = not self.ar.data.display_temp_grp #invert to apply
                 self.ar.data.guide_mirror_grp = cmds.group(name=self.ar.data.guide_mirror_grp, empty=True)
                 cmds.addAttr(self.ar.data.guide_mirror_grp, longName="selectionChanges", defaultValue=0, attributeType="byte")
                 cmds.setAttr(self.ar.data.guide_mirror_grp+".template", 1)
-                cmds.setAttr(self.ar.data.guide_mirror_grp+".hiddenInOutliner", 1)
+                cmds.setAttr(self.ar.data.guide_mirror_grp+".hiddenInOutliner", hidden)
                 for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v']:
                     cmds.setAttr(self.ar.data.guide_mirror_grp+"."+attr, lock=True, keyable=False)
                         
@@ -592,7 +593,7 @@ class BaseLayout(object):
                                     dupRenamed = cmds.rename(dup, self.moduleGrp[:self.moduleGrp.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
                                     originalGuide = self.moduleGrp[:self.moduleGrp.find(":")+1]+dup[dup.rfind("|")+1:]
                                     # unlock and unhide all attributes and connect original guide node transformations to the mirror guide node:
-                                    for attr in self.ar.data.transforms:
+                                    for attr in self.ar.data.transform_attrs:
                                         cmds.setAttr(dupRenamed+"."+attr, lock=False, keyable=True)
                                         cmds.connectAttr(originalGuide+'.'+attr, dupRenamed+'.'+attr, force=True)
                                     

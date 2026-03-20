@@ -63,6 +63,7 @@ from .core import loading
 from .core import manager
 from .core import librarian
 from .core import filler
+from .core import updater
 
 
 class Start(object):
@@ -76,6 +77,7 @@ class Start(object):
         self.load_components()
         self.load_library()
         self.load_ui()
+        #self.load_update(intro)
         self.opening.close_opening_ui()
         
 
@@ -113,6 +115,7 @@ class Start(object):
             reload(manager)
             reload(librarian)
             reload(filler)
+            reload(updater)
             print("Reloaded imported modules")
     
     
@@ -123,6 +126,7 @@ class Start(object):
     def load_settings(self):
         self.config = settings.Configuration(self)
         self.opt = settings.Option(self)
+        self.updater = updater.Updater(self)
 
 
     def load_components(self):

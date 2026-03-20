@@ -24,6 +24,11 @@ class Data:
     display_temp_grp_option_var: str = "dpAutoRigLastDisplayTempGrp"
     integrate_all_option_var: str = "dpAutoRigLastIntegrateAll"
     default_render_layer_option_var: str = "dpAutoRigLastDefaultRenderLayer"
+
+    check_update_option_var: str = "dpAutoRigAutoCheckUpdate"
+    check_update_last_option_var: str = "dpAutoRigLastDateAutoCheckUpdate"
+    terms_cond_option_var: str = "dpAutoRigAgreeTermsCond"
+    terms_cond_last_option_var: str = "dpAutoRigLastDateAgreeTermsCond"
     
     rig_type_biped: str = "biped"
     rig_type_quadruped: str = "quadruped"
@@ -96,6 +101,7 @@ class Data:
     modules_collapse_status: bool = False
     rebuilders_collapse_status: bool = True
     collapse_edit_sel_mod: bool = False
+    first_time_open: bool = False
     
     degree_option: int = 0
     colorize_curve: int = 1

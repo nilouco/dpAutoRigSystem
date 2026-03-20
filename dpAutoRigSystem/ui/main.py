@@ -1,8 +1,6 @@
 #import libraries
-import os
 from maya import cmds
 from functools import partial
-from importlib import reload
 
 
 class MainUI(object):
@@ -52,8 +50,11 @@ class MainUI(object):
         self.ar.ui_manager.refresh_ui()
 
 
-        self.ar.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
-        self.ar.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
+        #self.ar.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
+        #self.ar.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
+
+        self.ar.opt.load_terms_cond()
+        self.ar.updater.load_update()
         
         #self.ar.refreshMainUI()
 

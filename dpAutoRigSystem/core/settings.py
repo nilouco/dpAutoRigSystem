@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import datetime
 from maya import cmds
 from maya import mel
 
@@ -10,6 +11,8 @@ class Configuration(object):
     def __init__(self, ar):
         self.ar = ar
         self.ar.data.verbose = self.ar.dev
+        self.today = str(datetime.datetime.now().date())
+        print("TODAY = ", self.today)
         self.load_path()
         self.load_language()
         self.load_validator_preset()
@@ -17,6 +20,7 @@ class Configuration(object):
         self.load_curve_degree()
         self.load_menu_options()
         self.load_icons()
+        
 
         #self.set_values()
 
@@ -110,6 +114,13 @@ class Configuration(object):
         self.ar.data.default_render_layer = values[5]
 
 
+    def load_icons(self):
+        # TODO: review the 3: after renamed all images without the "dp_" prefix
+        self.ar.data.icon = {i[3:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
+        
+        #print(self.ar.data.icon)
+
+
     def check_option_data(self, name, default, folder):
         founds, datas = self.get_json_file_content(folder)
         if founds and datas:
@@ -158,8 +169,7 @@ class Configuration(object):
         """ Verify if there's an optionVar with this name or create it with the preferable given value.
             Returns the last_value found.
         """
-        last_value_exists = cmds.optionVar(exists=name)
-        if not last_value_exists:
+        if not cmds.optionVar(exists=name):
             # if not exists a last optionVar, set it to preferable if it exists, or to the first value in the list:
             if preferable in founds:
                 if string:
@@ -181,11 +191,6 @@ class Configuration(object):
         return result_value
 
 
-    def load_icons(self):
-        # TODO: review the 3: after renamed all images without the "dp_" prefix
-        self.ar.data.icon = {i[3:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
-        
-        #print(self.ar.data.icon)
 
         
         
@@ -236,8 +241,13 @@ class Configuration(object):
                         return self.ar.data.lib[folder][info][i]
 
 
+    def get_local_data(self):
+        print("temp, send it to Config or Options class.???")
 
 
+    def ask_terms_cond(self):
+        if self.ar.data.ui_state:
+            print("asking terms cond here...")
 
     # def set_values(self):
     #     self.ar.customAttr.ui = False
@@ -250,8 +260,25 @@ class Configuration(object):
 class Option(object):
     def __init__(self, ar):
         self.ar = ar
+        
 
 
+    def load_terms_cond(self):
+        print("loading terms and conditons here...")
+        #if not self.ar.dev:
+        if cmds.optionVar(exists=self.ar.data.terms_cond_option_var):
+            if cmds.optionVar(query=self.ar.data.terms_cond_option_var):
+                if not cmds.optionVar(query=self.ar.data.terms_cond_last_option_var) == self.ar.config.today:
+                    self.ar.config.get_local_data()
+        else:
+            self.set_option_var(self.ar.data.terms_cond_option_var, 1, False)
+            self.ar.config.ask_terms_cond()
+            self.ar.config.get_local_data()
+        self.set_option_var(self.ar.data.terms_cond_last_option_var, self.ar.config.today)
+
+
+
+    
     def change_degree(self, value, *args):
         self.set_option_var(self.ar.data.degree_option_var, value)
         self.ar.data.degree_option = int(value[-1])
@@ -394,7 +421,3 @@ class Option(object):
 
 
 
-
-class Update(object):
-    print("WIP... update")
-    # TODO: bring update setting to here
