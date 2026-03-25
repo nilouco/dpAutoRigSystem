@@ -6,9 +6,10 @@ import getpass
 import urllib.request
 import socket
 import platform
+from importlib import reload
 from maya import cmds
 from maya import mel
-from .. import version
+from . import version
 
 
 
@@ -25,6 +26,7 @@ class Configuration(object):
         self.load_curve_degree()
         self.load_menu_options()
         self.load_agree_terms()
+        self.load_auto_check_update()
         self.load_icons()
 
         print("version = ", self.ar.data.version)
@@ -55,8 +57,8 @@ class Configuration(object):
     
 
     def load_version(self):
-        self.ar.data.version = version.__version__
-        self.ar.data.update_log = version._update_log
+        self.ar.data.version = self.ar.version.__version__
+        self.ar.data.update_log = self.ar.version._update_log
 
 
     def load_language(self):
@@ -134,6 +136,15 @@ class Configuration(object):
                                                                 string=False
                                                                 )
 
+
+    def load_auto_check_update(self):
+        self.ar.data.auto_check_update = self.check_last_option_var(
+                                                                self.ar.data.check_update_option_var,
+                                                                self.ar.data.auto_check_update,
+                                                                self.ar.data.booleans,
+                                                                string=False
+                                                                )
+        
 
     def load_icons(self):
         # TODO: review the 3: after renamed all images without the "dp_" prefix
@@ -423,6 +434,10 @@ class Option(object):
         self.ar.data.agree_terms = value
         self.set_option_var(self.ar.data.terms_cond_option_var, value, False)
 
+
+    def set_auto_check_update(self, value):
+        self.ar.data.auto_check_update = value
+        self.set_option_var(self.ar.data.check_update_option_var, value, False)
 
 
 

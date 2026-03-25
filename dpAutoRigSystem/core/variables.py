@@ -81,6 +81,7 @@ class Data:
     joint_end_attr: str = "JEnd"
     
     raw_url: str = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
+    
     github_url: str = "https://github.com/nilouco/dpAutoRigSystem"
     master_url: str = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
     whats_changed_url: str = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
@@ -88,6 +89,9 @@ class Data:
     location_url: str = "https://ipinfo.io/json"
     wiki_url: str = "https://github.com/nilouco/dpAutoRigSystem/wiki/"
     discord_url: str = "https://discord.com/api/webhooks"
+    
+    # change it to get raw file from master branch:
+    version_url: str = "https://github.com/nilouco/dpAutoRigSystem/raw/refs/heads/699-dev-mode-reload/dpAutoRigSystem/version.py"
     
     temp_grp: str = "dpAR_Temp_Grp"
     guide_mirror_grp: str = "dpAR_GuideMirror_Grp"

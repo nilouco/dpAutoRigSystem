@@ -55,7 +55,6 @@ from .Pipeline import dpPipeliner
 from .Pipeline import dpPublisher
 from .Pipeline import dpPackager
 from .Pipeline import dpLogger
-from .ui import main
 from .core import settings
 from .core import variables
 from .core import loading
@@ -63,6 +62,9 @@ from .core import manager
 from .core import librarian
 from .core import filler
 from .core import updater
+from .ui import main
+from .ui import update
+from . import version
 
 
 class Start(object):
@@ -107,7 +109,6 @@ class Start(object):
             reload(dpPublisher)
             reload(dpPackager)
             reload(dpLogger)
-            reload(main)
             reload(settings)
             reload(variables)
             reload(loading)
@@ -115,6 +116,10 @@ class Start(object):
             reload(librarian)
             reload(filler)
             reload(updater)
+            reload(version)
+            # ui
+            reload(main)
+            reload(update)
             print("Reloaded imported modules")
     
     
@@ -123,6 +128,7 @@ class Start(object):
 
 
     def load_settings(self):
+        self.version = version
         self.config = settings.Configuration(self)
         self.opt = settings.Option(self)
         self.agree = settings.Agreement(self)
@@ -149,6 +155,7 @@ class Start(object):
     def load_ui(self):
         self.ui_manager = manager.UIManager(self)
         self.main_ui = main.MainUI(self)
+        self.update_ui = update.UpdateUI(self)
 
 
     def ui(self):
@@ -1136,63 +1143,63 @@ class Start(object):
         cmds.showWindow(dpDonateWin)
     
     
-    def updateWin(self, rawResult, text, *args):
-        """ Create a window showing the text info with the description about any module.
-        """
-        # declaring variables:
-        self.update_checkedNumber = rawResult[0]
-        self.update_remoteVersion = rawResult[1]
-        self.update_remoteLog     = rawResult[2]
-        self.update_text          = text
-        self.update_winWidth      = 305
-        self.update_winHeight     = 300
-        # creating Update Window:
-        if cmds.window('dpUpdateWindow', query=True, exists=True):
-            cmds.deleteUI('dpUpdateWindow', window=True)
-        dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.data.lang['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-        # creating text layout:
-        updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
-        if self.update_text:
-            updateDesc = cmds.text("\n"+self.data.lang[self.update_text], align="center", parent=updateLayout)
-            cmds.text("\n"+self.dpARVersion+self.data.lang['i090_currentVersion'], align="left", parent=updateLayout)
-        if self.update_remoteVersion:
-            remoteVersion = self.update_remoteVersion.replace("\\n", "\n")
-            cmds.text(remoteVersion+self.data.lang['i091_onlineVersion'], align="left", parent=updateLayout)
-            cmds.separator(height=30)
-            if self.update_remoteLog:
-                remoteLog = self.update_remoteLog.replace("\\n", "\n")
-                cmds.text(self.data.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
-                cmds.text(remoteLog, align="left", parent=updateLayout)
-                cmds.separator(height=30)
-            whatsChangedButton = cmds.button('whatsChangedButton', label=self.data.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.data.whats_changed_url), parent=updateLayout)
-            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.data.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.data.github_url), parent=updateLayout)
-            downloadButton = cmds.button('downloadButton', label=self.data.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.data.master_url, "zip"), parent=updateLayout)
-            installButton = cmds.button('installButton', label=self.data.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.data.master_url, self.update_remoteVersion), parent=updateLayout)
-        # automatically check for updates:
-        cmds.separator(height=30)
-        self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.data.lang['i092_autoCheckUpdate'], align="left", value=self.data.auto_check_update, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
-        cmds.separator(height=30)
-        # call Update Window:
-        cmds.showWindow(dpUpdateWin)
-        print(self.data.lang[self.update_text])
+    # def updateWin(self, rawResult, text, *args):
+    #     """ Create a window showing the text info with the description about any module.
+    #     """
+    #     # declaring variables:
+    #     self.update_checkedNumber = rawResult[0]
+    #     self.update_remoteVersion = rawResult[1]
+    #     self.update_remoteLog     = rawResult[2]
+    #     self.update_text          = text
+    #     self.update_winWidth      = 305
+    #     self.update_winHeight     = 300
+    #     # creating Update Window:
+    #     if cmds.window('dpUpdateWindow', query=True, exists=True):
+    #         cmds.deleteUI('dpUpdateWindow', window=True)
+    #     dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.data.lang['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+    #     # creating text layout:
+    #     updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
+    #     if self.update_text:
+    #         updateDesc = cmds.text("\n"+self.data.lang[self.update_text], align="center", parent=updateLayout)
+    #         cmds.text("\n"+self.dpARVersion+self.data.lang['i090_currentVersion'], align="left", parent=updateLayout)
+    #     if self.update_remoteVersion:
+    #         remoteVersion = self.update_remoteVersion.replace("\\n", "\n")
+    #         cmds.text(remoteVersion+self.data.lang['i091_onlineVersion'], align="left", parent=updateLayout)
+    #         cmds.separator(height=30)
+    #         if self.update_remoteLog:
+    #             remoteLog = self.update_remoteLog.replace("\\n", "\n")
+    #             cmds.text(self.data.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
+    #             cmds.text(remoteLog, align="left", parent=updateLayout)
+    #             cmds.separator(height=30)
+    #         whatsChangedButton = cmds.button('whatsChangedButton', label=self.data.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.data.whats_changed_url), parent=updateLayout)
+    #         visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.data.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.data.github_url), parent=updateLayout)
+    #         downloadButton = cmds.button('downloadButton', label=self.data.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.data.master_url, "zip"), parent=updateLayout)
+    #         installButton = cmds.button('installButton', label=self.data.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.data.master_url, self.update_remoteVersion), parent=updateLayout)
+    #     # automatically check for updates:
+    #     cmds.separator(height=30)
+    #     self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.data.lang['i092_autoCheckUpdate'], align="left", value=self.data.auto_check_update, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
+    #     cmds.separator(height=30)
+    #     # call Update Window:
+    #     cmds.showWindow(dpUpdateWin)
+    #     print(self.data.lang[self.update_text])
     
     
-    def downloadUpdate(self, url, ext, *args):
-        """ Download file from given url adrees and ask user to choose folder and file name to save
-        """
-        extFilter = "*."+ext
-        downloadFolder = cmds.fileDialog2(fileFilter=extFilter, dialogStyle=2)
-        if downloadFolder:
-            self.utils.setProgress('Downloading...', 'Download Update', amount=50)
-            try:
-                urllib.request.urlretrieve(url, downloadFolder[0])
-                self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
-                # closes dpUpdateWindow:
-                if cmds.window('dpUpdateWindow', query=True, exists=True):
-                    cmds.deleteUI('dpUpdateWindow', window=True)
-            except:
-                self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
-            self.utils.setProgress(endIt=True)
+    # def downloadUpdate(self, url, ext, *args):
+    #     """ Download file from given url adrees and ask user to choose folder and file name to save
+    #     """
+    #     extFilter = "*."+ext
+    #     downloadFolder = cmds.fileDialog2(fileFilter=extFilter, dialogStyle=2)
+    #     if downloadFolder:
+    #         self.utils.setProgress('Downloading...', 'Download Update', amount=50)
+    #         try:
+    #             urllib.request.urlretrieve(url, downloadFolder[0])
+    #             self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
+    #             # closes dpUpdateWindow:
+    #             if cmds.window('dpUpdateWindow', query=True, exists=True):
+    #                 cmds.deleteUI('dpUpdateWindow', window=True)
+    #         except:
+    #             self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
+    #         self.utils.setProgress(endIt=True)
     
     
     def keepJsonFilesWhenUpdate(self, currentDir, tempUpdateDir, *args):
@@ -1303,11 +1310,11 @@ class Start(object):
             print(self.data.lang['i038_canceled'])
     
     
-    def setAutoCheckUpdatePref(self, currentValue, *args):
-        """ Set the optionVar for auto check update preference as stored userDefAutoCheckUpdate read variable.
-        """
-        cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', int(currentValue)))
-        self.userDefAutoCheckUpdate = currentValue
+    # def setAutoCheckUpdatePref(self, currentValue, *args):
+    #     """ Set the optionVar for auto check update preference as stored userDefAutoCheckUpdate read variable.
+    #     """
+    #     cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', int(currentValue)))
+    #     self.userDefAutoCheckUpdate = currentValue
 
 
     # def setAutoCheckAgreePref(self, currentValue, *args):
