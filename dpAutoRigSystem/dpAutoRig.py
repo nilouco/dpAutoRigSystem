@@ -18,11 +18,10 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.02.00"
-DPAR_UPDATELOG = "N699 - Dev mode reload."
-
+DPAR_VERSION_5 = "6.00.00"
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
-DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
+DPAR_UPDATELOG = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 5, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
+DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 
 # Import libraries
 import os
@@ -126,6 +125,7 @@ class Start(object):
     def load_settings(self):
         self.config = settings.Configuration(self)
         self.opt = settings.Option(self)
+        self.agree = settings.Agreement(self)
         self.updater = updater.Updater(self)
 
 
@@ -656,30 +656,30 @@ class Start(object):
             pass
     
     
-    def checkForUpdate(self, verbose=True, *args):
-        """ Check if there's an update for this current script version.
-            Output the result in a window.
-        """
-        print("\n"+self.data.lang['i084_checkUpdate'])
+    # def checkForUpdate(self, verbose=True, *args):
+    #     """ Check if there's an update for this current script version.
+    #         Output the result in a window.
+    #     """
+    #     print("\n"+self.data.lang['i084_checkUpdate'])
         
-        # compare current version with GitHub master
-        rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, self.data.raw_url)
+    #     # compare current version with GitHub master
+    #     rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, self.data.raw_url)
         
-        # call Update Window about rawRsult:
-        if rawResult[0] == 0:
-            if verbose:
-                self.updateWin(rawResult, 'i085_updated')
-        elif rawResult[0] == 1:
-            self.updateWin(rawResult, 'i086_newVersion')
-        elif rawResult[0] == 2:
-            if verbose:
-                self.updateWin(rawResult, 'i087_rawURLFail')
-        elif rawResult[0] == 3:
-            if verbose:
-                self.updateWin(rawResult, 'i088_internetFail')
-        elif rawResult[0] == 4:
-            if verbose:
-                self.updateWin(rawResult, 'e008_failCheckUpdate')
+    #     # call Update Window about rawRsult:
+    #     if rawResult[0] == 0:
+    #         if verbose:
+    #             self.updateWin(rawResult, 'i085_updated')
+    #     elif rawResult[0] == 1:
+    #         self.updateWin(rawResult, 'i086_newVersion')
+    #     elif rawResult[0] == 2:
+    #         if verbose:
+    #             self.updateWin(rawResult, 'i087_rawURLFail')
+    #     elif rawResult[0] == 3:
+    #         if verbose:
+    #             self.updateWin(rawResult, 'i088_internetFail')
+    #     elif rawResult[0] == 4:
+    #         if verbose:
+    #             self.updateWin(rawResult, 'e008_failCheckUpdate')
     
     
     # Start working with Guide Modules:
@@ -1310,11 +1310,11 @@ class Start(object):
         self.userDefAutoCheckUpdate = currentValue
 
 
-    def setAutoCheckAgreePref(self, currentValue, *args):
-        """ Set the optionVar for auto check agree terms and conditions preference as stored userDefAgreeTerms read variable.
-        """
-        cmds.optionVar(intValue=('dpAutoRigAgreeTermsCond', int(currentValue)))
-        self.userDefAgreeTerms = currentValue
+    # def setAutoCheckAgreePref(self, currentValue, *args):
+    #     """ Set the optionVar for auto check agree terms and conditions preference as stored userDefAgreeTerms read variable.
+    #     """
+    #     cmds.optionVar(intValue=('dpAutoRigAgreeTermsCond', int(currentValue)))
+    #     self.userDefAgreeTerms = currentValue
     
     
     def autoCheckOptionVar(self, checkOptVar,  lastDateOptVar, mode, *args):
@@ -1357,50 +1357,50 @@ class Start(object):
                 self.checkTermsAndCond()
 
     
-    def getLocalData(self, *args):
-        """ Collect info for statistical purposes.
-        """
-        locDic = False
-        try:
-            locResponse = urllib.request.urlopen(self.locationURL)
-            locDic = json.loads(locResponse.read())
-        except:
-            pass
-        if locDic:
-            infoData = {}
-            infoData['country'] = locDic['country']
-            infoData['region'] = locDic['region']
-            infoData['city'] = locDic['city']
-            infoData['user'] = getpass.getuser()
-            infoData['host'] = socket.gethostname()
-            infoData['os'] = platform.system()
-            infoData['lang'] = self.data.langName
-            infoData['Maya'] = cmds.about(version=True)
-            infoData['dpAR'] = self.dpARVersion
-            #print(infoData)
-            if infoData:
-                wh = self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
-                self.packager.toDiscord(wh, str(infoData))
+    # def getLocalData(self, *args):
+    #     """ Collect info for statistical purposes.
+    #     """
+    #     locDic = False
+    #     try:
+    #         locResponse = urllib.request.urlopen(self.locationURL)
+    #         locDic = json.loads(locResponse.read())
+    #     except:
+    #         pass
+    #     if locDic:
+    #         infoData = {}
+    #         infoData['country'] = locDic['country']
+    #         infoData['region'] = locDic['region']
+    #         infoData['city'] = locDic['city']
+    #         infoData['user'] = getpass.getuser()
+    #         infoData['host'] = socket.gethostname()
+    #         infoData['os'] = platform.system()
+    #         infoData['lang'] = self.data.langName
+    #         infoData['Maya'] = cmds.about(version=True)
+    #         infoData['dpAR'] = self.dpARVersion
+    #         #print(infoData)
+    #         if infoData:
+    #             wh = self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
+    #             self.packager.toDiscord(wh, str(infoData))
 
     
-    def checkTermsAndCond(self, *args):
-        """ Create a window to ask user if agree to terms and conditions.
-        """
-        terms_winWidth  = 205
-        terms_winHeight = 200
-        # creating Terms and Conditions Window:
-        if cmds.window('dpTermsCondWindow', query=True, exists=True):
-            cmds.deleteUI('dpTermsCondWindow', window=True)
-        dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-        # creating text layout:
-        termsLayout = cmds.columnLayout('termsLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpTermsCondWin)
-        cmds.text("\n"+self.data.lang['i282_termsCondDesc'], align="center", parent=termsLayout)
-        # agreement:
-        cmds.separator(height=30)
-        self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.data.lang['i280_iAgreeTermsCond'], align="left", value=self.data.agree_terms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
-        cmds.separator(height=30)
-        # call window:
-        cmds.showWindow(dpTermsCondWin)
+    # def checkTermsAndCond(self, *args):
+    #     """ Create a window to ask user if agree to terms and conditions.
+    #     """
+    #     terms_winWidth  = 205
+    #     terms_winHeight = 200
+    #     # creating Terms and Conditions Window:
+    #     if cmds.window('dpTermsCondWindow', query=True, exists=True):
+    #         cmds.deleteUI('dpTermsCondWindow', window=True)
+    #     dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+    #     # creating text layout:
+    #     termsLayout = cmds.columnLayout('termsLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpTermsCondWin)
+    #     cmds.text("\n"+self.data.lang['i282_termsCondDesc'], align="center", parent=termsLayout)
+    #     # agreement:
+    #     cmds.separator(height=30)
+    #     self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.data.lang['i280_iAgreeTermsCond'], align="left", value=self.data.agree_terms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
+    #     cmds.separator(height=30)
+    #     # call window:
+    #     cmds.showWindow(dpTermsCondWin)
 
 
     ###################### End: UI

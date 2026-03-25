@@ -749,52 +749,52 @@ class Utils(object):
         return filteredList
         
         
-    def checkRawURLForUpdate(self, DPAR_VERSION, rawURL, *args):
-        """ Check for update using raw url.
-            Compares the remote version from GitHub to the current version.
+    # def checkRawURLForUpdate(self, rawURL, *args):
+    #     """ Check for update using raw url.
+    #         Compares the remote version from GitHub to the current version.
             
-            Returns a list with CheckedNumber and RemoteVersion or None.
+    #         Returns a list with CheckedNumber and RemoteVersion or None.
             
-            CheckedNumber:
-                    0 - the current version is up to date
-                    1 - there's a new version
-                    2 - remote file not found using given raw url
-                    3 - internet connection fail (probably)
-                    4 - error
+    #         CheckedNumber:
+    #                 0 - the current version is up to date
+    #                 1 - there's a new version
+    #                 2 - remote file not found using given raw url
+    #                 3 - internet connection fail (probably)
+    #                 4 - error
                     
-            if we have an update to do:
-                return [CheckedNumber, RemoteVersion, RemoteLog]
-            if not or ok:
-                return [CheckedNumber, None]
-        """
-        try:
-            gotRemoteFile = False
-            # getting dpAutoRig.py file from GitHub website using the Raw URL:
-            remoteSource = urllib.request.urlopen(rawURL)
-            remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
-            # find the line with the version and compare them:
-            for line in remoteContents:
-                if "DPAR_VERSION_5 = " in line:
-                    gotRemoteFile = True
-                    remoteVersion = line[18:-2] #these magic numbers filter only the version XX.YY.ZZ
-                    if remoteVersion == self.ar.dpARVersion:
-                        # 0 - the current version is up to date
-                        return [0, None, None]
-                    else:
-                        # 1 - there's a new version
-                        for extraLine in remoteContents:
-                            if "DPAR_UPDATELOG = " in extraLine:
-                                remoteLog = extraLine[18:-2] #these magic numbers filter only the log string sentence
-                                return [1, remoteVersion, remoteLog]
-                        return [1, remoteVersion, None]
-            if not gotRemoteFile:
-                # 2 - remote file not found using given raw url
-                return [2, None, None]
-        except:
-            # 3 - internet connection fail (probably)
-            return [3, None, None]
-        # 4 - error
-        return [4, None, None]
+    #         if we have an update to do:
+    #             return [CheckedNumber, RemoteVersion, RemoteLog]
+    #         if not or ok:
+    #             return [CheckedNumber, None]
+    #     """
+    #     try:
+    #         gotRemoteFile = False
+    #         # getting dpAutoRig.py file from GitHub website using the Raw URL:
+    #         remoteSource = urllib.request.urlopen(rawURL)
+    #         remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
+    #         # find the line with the version and compare them:
+    #         for line in remoteContents:
+    #             if "DPAR_VERSION_5 = " in line:
+    #                 gotRemoteFile = True
+    #                 remoteVersion = line[18:-2] #these magic numbers filter only the version XX.YY.ZZ
+    #                 if remoteVersion == self.ar.dpARVersion:
+    #                     # 0 - the current version is up to date
+    #                     return [0, None, None]
+    #                 else:
+    #                     # 1 - there's a new version
+    #                     for extraLine in remoteContents:
+    #                         if "DPAR_UPDATELOG = " in extraLine:
+    #                             remoteLog = extraLine[18:-2] #these magic numbers filter only the log string sentence
+    #                             return [1, remoteVersion, remoteLog]
+    #                     return [1, remoteVersion, None]
+    #         if not gotRemoteFile:
+    #             # 2 - remote file not found using given raw url
+    #             return [2, None, None]
+    #     except:
+    #         # 3 - internet connection fail (probably)
+    #         return [3, None, None]
+    #     # 4 - error
+    #     return [4, None, None]
 
 
     def visitWebSite(self, URL, *args):

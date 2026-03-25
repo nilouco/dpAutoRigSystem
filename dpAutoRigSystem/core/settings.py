@@ -2,8 +2,13 @@ import os
 import sys
 import json
 import datetime
+import getpass
+import urllib.request
+import socket
+import platform
 from maya import cmds
 from maya import mel
+from .. import version
 
 
 
@@ -12,15 +17,18 @@ class Configuration(object):
         self.ar = ar
         self.ar.data.verbose = self.ar.dev
         self.today = str(datetime.datetime.now().date())
-        print("TODAY = ", self.today)
         self.load_path()
+        self.load_version()
         self.load_language()
         self.load_validator_preset()
         self.load_curve_preset()
         self.load_curve_degree()
         self.load_menu_options()
+        self.load_agree_terms()
         self.load_icons()
-        
+
+        print("version = ", self.ar.data.version)
+        print("update_log = ", self.ar.data.update_log)
 
         #self.set_values()
 
@@ -45,6 +53,10 @@ class Configuration(object):
         #else:
         #    self.ar.data.dp_auto_rig_path = correct_path[correct_path.find("/")-2:]
     
+
+    def load_version(self):
+        self.ar.data.version = version.__version__
+        self.ar.data.update_log = version._update_log
 
 
     def load_language(self):
@@ -112,6 +124,15 @@ class Configuration(object):
         self.ar.data.display_temp_grp = values[3]
         self.ar.data.integrate_all = values[4]
         self.ar.data.default_render_layer = values[5]
+
+
+    def load_agree_terms(self):
+        self.ar.data.agree_terms = self.check_last_option_var(
+                                                                self.ar.data.terms_cond_option_var,
+                                                                self.ar.data.agree_terms,
+                                                                self.ar.data.booleans,
+                                                                string=False
+                                                                )
 
 
     def load_icons(self):
@@ -241,13 +262,7 @@ class Configuration(object):
                         return self.ar.data.lib[folder][info][i]
 
 
-    def get_local_data(self):
-        print("temp, send it to Config or Options class.???")
-
-
-    def ask_terms_cond(self):
-        if self.ar.data.ui_state:
-            print("asking terms cond here...")
+   
 
     # def set_values(self):
     #     self.ar.customAttr.ui = False
@@ -263,18 +278,7 @@ class Option(object):
         
 
 
-    def load_terms_cond(self):
-        print("loading terms and conditons here...")
-        #if not self.ar.dev:
-        if cmds.optionVar(exists=self.ar.data.terms_cond_option_var):
-            if cmds.optionVar(query=self.ar.data.terms_cond_option_var):
-                if not cmds.optionVar(query=self.ar.data.terms_cond_last_option_var) == self.ar.config.today:
-                    self.ar.config.get_local_data()
-        else:
-            self.set_option_var(self.ar.data.terms_cond_option_var, 1, False)
-            self.ar.config.ask_terms_cond()
-            self.ar.config.get_local_data()
-        self.set_option_var(self.ar.data.terms_cond_last_option_var, self.ar.config.today)
+    
 
 
 
@@ -399,6 +403,8 @@ class Option(object):
         self.set_integrate_all(1)
         self.set_default_render_layer(1)
         self.reset_prefix()
+        self.set_agree_terms_cond(1)
+        #auto_check_update: int = 1
 
         #
         #
@@ -406,18 +412,81 @@ class Option(object):
         #
         #
 
-        #agree_terms: int = 1
-        #auto_check_update: int = 1
+        
 
 
         # reload UI
         cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
 
 
+    def set_agree_terms_cond(self, value):
+        self.ar.data.agree_terms = value
+        self.set_option_var(self.ar.data.terms_cond_option_var, value, False)
 
 
 
 
 
 
+class Agreement(object):
+    def __init__(self, ar):
+        self.ar = ar
 
+    
+    def load_terms_cond(self):
+        if self.ar.data.ui_state and not self.ar.dev:
+            if cmds.optionVar(exists=self.ar.data.terms_cond_option_var):
+                if cmds.optionVar(query=self.ar.data.terms_cond_option_var):
+                    if not cmds.optionVar(query=self.ar.data.terms_cond_last_option_var) == self.ar.config.today:
+                        self.get_local_data()
+            else:
+                self.ar.opt.set_option_var(self.ar.data.terms_cond_option_var, 1, False)
+                self.ask_terms_cond()
+                self.get_local_data()
+            self.ar.opt.set_option_var(self.ar.data.terms_cond_last_option_var, self.ar.config.today)
+
+
+    def get_local_data(self):
+        """ Collect info for statistical purposes.
+        """
+        local_data = False
+        try:
+            local_response = urllib.request.urlopen(self.ar.data.location_url)
+            local_data = json.loads(local_response.read())
+        except:
+            pass
+        if local_data:
+            local_info = {}
+            local_info['country'] = local_data['country']
+            local_info['region'] = local_data['region']
+            local_info['city'] = local_data['city']
+            local_info['user'] = getpass.getuser()
+            local_info['host'] = socket.gethostname()
+            local_info['os'] = platform.system()
+            local_info['lang'] = self.ar.data.lang['_preset']
+            local_info['Maya'] = cmds.about(version=True)
+            local_info['dpAR'] = self.ar.dpARVersion
+            #print(local_info)
+            if local_info:
+                wh = self.ar.utils.mountWH(self.ar.data.discord_url, self.ar.pipeliner.pipeData['h000_location'])
+                self.ar.packager.toDiscord(wh, str(local_info))
+
+
+    def ask_terms_cond(self, *args):
+        """ Create a window to ask user if agree to terms and conditions.
+        """
+        if self.ar.data.ui_state:
+            terms_width  = 205
+            terms_height = 200
+            # creating Terms and Conditions Window:
+            self.ar.utils.closeUI('dpTermsCondWindow')
+            cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            # creating text layout:
+            cmds.columnLayout("terms_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpTermsCondWindow")
+            cmds.text("\n"+self.ar.data.lang['i282_termsCondDesc'], align="center", parent="terms_cl")
+            # agreement:
+            cmds.separator(height=30)
+            cmds.checkBox('terms_cond_cb', label=self.ar.data.lang['i280_iAgreeTermsCond'], align="left", value=self.ar.data.agree_terms, changeCommand=self.ar.opt.set_agree_terms_cond, parent="terms_cl")
+            cmds.separator(height=30)
+            # call window:
+            cmds.showWindow("dpTermsCondWindow")

@@ -8,7 +8,7 @@ import shutil
 import stat
 
 PIPE_FOLDER = "_dpPipeline"
-DISCORD_URL = "https://discord.com/api/webhooks"
+#DISCORD_URL = "https://discord.com/api/webhooks"
 
 DP_PIPELINER_VERSION = 1.19
 
@@ -702,7 +702,7 @@ class Pipeliner(object):
                     else:
                         wh = self.pipeData['h001_publishing']
                     if wh:
-                        self.pipeData['publishedWebhook'] = self.utils.mountWH(DISCORD_URL, wh)
+                        self.pipeData['publishedWebhook'] = self.utils.mountWH(self.ar.data.discord_url, wh)
             # callback
             if not self.pipeData['s_callback']:
                 callback = os.path.join(self.pipeData['path'], self.callbackFile)

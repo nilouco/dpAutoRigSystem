@@ -108,6 +108,7 @@ class UIManager(object):
                         "dpReplaceDPDataWindow", 
                         "dpSelectAssetWindow", 
                         "dpSaveVersionWindow", 
+                        "dpTermsCondWindow", 
                         self.ar.data.plus_info_win_name, 
                         self.ar.data.color_override_win_name
                        ]

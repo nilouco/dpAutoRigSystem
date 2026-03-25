@@ -87,6 +87,7 @@ class Data:
     donate_url: str = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
     location_url: str = "https://ipinfo.io/json"
     wiki_url: str = "https://github.com/nilouco/dpAutoRigSystem/wiki/"
+    discord_url: str = "https://discord.com/api/webhooks"
     
     temp_grp: str = "dpAR_Temp_Grp"
     guide_mirror_grp: str = "dpAR_GuideMirror_Grp"

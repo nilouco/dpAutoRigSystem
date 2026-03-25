@@ -53,7 +53,7 @@ class MainUI(object):
         #self.ar.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
         #self.ar.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
 
-        self.ar.opt.load_terms_cond()
+        self.ar.agree.load_terms_cond()
         self.ar.updater.load_update()
         
         #self.ar.refreshMainUI()
@@ -133,8 +133,8 @@ class MainUI(object):
         cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.ar.data.lang['_collaborators'], 'center', 305, 250), parent='help_menu')
         cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donateWin), parent='help_menu')
         cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.checkTermsAndCond, parent='help_menu')
-        cmds.menuItem('update_mi', label='Update', command=partial(self.ar.checkForUpdate, True), parent='help_menu')
+        cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
+        cmds.menuItem('update_mi', label='Update', command=partial(self.ar.updater.check_for_update, True), parent='help_menu')
         cmds.menuItem('help_mi', label='Wiki...', command=partial(self.ar.utils.visitWebSite, self.ar.data.wiki_url), parent='help_menu')
 
 
