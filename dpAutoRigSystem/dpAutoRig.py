@@ -78,7 +78,6 @@ class Start(object):
         self.load_components()
         self.load_library()
         self.load_ui()
-        #self.load_update(intro)
         self.opening.close_opening_ui()
         
 
@@ -217,40 +216,7 @@ class Start(object):
             urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", self.downloadFolder+"/dpAutoRigSystem-master.zip")
     
     
-    def getJsonFileInfo(self, dir, absolute=False):
-        """ Find all json files in the given path and get contents used for each file.
-            Create a dictionary with dictionaries of all file found.
-            Return a list with the name of the found files.
-        """
-        # declare the resulted list:
-        resultList = []
-        resultDic = {}
-        jsonPath = dir
-        if not absolute:
-            # find path where 'dpAutoRig.py' is been executed:
-            path = os.path.dirname(__file__)
-            # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
-            jsonPath = os.path.join(path, dir, "").replace("\\", "/")
-        # list all files in this directory:
-        allFileList = os.listdir(jsonPath)
-        for file in allFileList:
-            # verify if there is the extension ".json"
-            if file.endswith(".json"):
-                # get the name of the type from the file name:
-                typeName = file.partition(".json")[0]
-                # clear the old variable content and open the json file as read:
-                content = None
-                fileDictionary = open(jsonPath + file, "r", encoding='utf-8')
-                try:
-                    # read the json file content and store it in a dictionary:
-                    content = json.loads(fileDictionary.read())
-                    resultDic[typeName] = content
-                    resultList.append(typeName)
-                except:
-                    print("Error: json file corrupted:", file)
-                # close the json file:
-                fileDictionary.close()
-        return resultList, resultDic
+
     
     
 
@@ -1143,272 +1109,115 @@ class Start(object):
         cmds.showWindow(dpDonateWin)
     
     
-    # def updateWin(self, rawResult, text, *args):
-    #     """ Create a window showing the text info with the description about any module.
+    
+    # def keepJsonFilesWhenUpdate(self, currentDir, tempUpdateDir, *args):
+    #     """ Check in given folder if we have custom json files and keep then when we install a new update.
+    #         It will just check if there are user created json files, and copy them to temporarily extracted update folder.
+    #         So when the install overwrite all files, they will be copied (restored) again.
     #     """
-    #     # declaring variables:
-    #     self.update_checkedNumber = rawResult[0]
-    #     self.update_remoteVersion = rawResult[1]
-    #     self.update_remoteLog     = rawResult[2]
-    #     self.update_text          = text
-    #     self.update_winWidth      = 305
-    #     self.update_winHeight     = 300
-    #     # creating Update Window:
-    #     if cmds.window('dpUpdateWindow', query=True, exists=True):
-    #         cmds.deleteUI('dpUpdateWindow', window=True)
-    #     dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.data.lang['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-    #     # creating text layout:
-    #     updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
-    #     if self.update_text:
-    #         updateDesc = cmds.text("\n"+self.data.lang[self.update_text], align="center", parent=updateLayout)
-    #         cmds.text("\n"+self.dpARVersion+self.data.lang['i090_currentVersion'], align="left", parent=updateLayout)
-    #     if self.update_remoteVersion:
-    #         remoteVersion = self.update_remoteVersion.replace("\\n", "\n")
-    #         cmds.text(remoteVersion+self.data.lang['i091_onlineVersion'], align="left", parent=updateLayout)
-    #         cmds.separator(height=30)
-    #         if self.update_remoteLog:
-    #             remoteLog = self.update_remoteLog.replace("\\n", "\n")
-    #             cmds.text(self.data.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
-    #             cmds.text(remoteLog, align="left", parent=updateLayout)
-    #             cmds.separator(height=30)
-    #         whatsChangedButton = cmds.button('whatsChangedButton', label=self.data.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, self.data.whats_changed_url), parent=updateLayout)
-    #         visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.data.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, self.data.github_url), parent=updateLayout)
-    #         downloadButton = cmds.button('downloadButton', label=self.data.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, self.data.master_url, "zip"), parent=updateLayout)
-    #         installButton = cmds.button('installButton', label=self.data.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, self.data.master_url, self.update_remoteVersion), parent=updateLayout)
-    #     # automatically check for updates:
-    #     cmds.separator(height=30)
-    #     self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.data.lang['i092_autoCheckUpdate'], align="left", value=self.data.auto_check_update, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
-    #     cmds.separator(height=30)
-    #     # call Update Window:
-    #     cmds.showWindow(dpUpdateWin)
-    #     print(self.data.lang[self.update_text])
+    #     newUpdateList = []
+    #     # list all new json files:
+    #     for newRoot, newDirectories, newFiles in os.walk(tempUpdateDir):
+    #         for newItem in newFiles:
+    #             if newItem.endswith('.json'):
+    #                 newUpdateList.append(newItem)
+        
+    #     # check if some current json file is a custom file created by user to copy it to new update directory in order to avoid overwrite it:
+    #     for currentRoot, currentDirectories, currentFiles in os.walk(currentDir):
+    #         for currentItem in currentFiles:
+    #             if currentItem.endswith('.json'):
+    #                 if not currentItem in newUpdateList:
+    #                     # found custom file, then copy it to keep when install the new update
+    #                     shutil.copy2(os.path.join(currentRoot, currentItem), tempUpdateDir)
     
     
-    # def downloadUpdate(self, url, ext, *args):
-    #     """ Download file from given url adrees and ask user to choose folder and file name to save
+    # def installUpdate(self, url, newVersion, *args):
+    #     """ Install the last version from the given url address to download file
     #     """
-    #     extFilter = "*."+ext
-    #     downloadFolder = cmds.fileDialog2(fileFilter=extFilter, dialogStyle=2)
-    #     if downloadFolder:
-    #         self.utils.setProgress('Downloading...', 'Download Update', amount=50)
+    #     btContinue = self.data.lang['i174_continue']
+    #     btCancel = self.data.lang['i132_cancel']
+    #     confirmAutoInstall = cmds.confirmDialog(title=self.data.lang['i098_installing'], message=self.data.lang['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
+    #     if confirmAutoInstall == btContinue:
+    #         print(self.data.lang['i098_installing'])
+    #         # declaring variables:
+    #         dpAR_Folder = "dpAutoRigSystem"
+    #         dpAR_DestFolder = self.data.dp_auto_rig_path
+    #         self.utils.setProgress('Installing: 0%', self.data.lang['i098_installing'])
+            
     #         try:
-    #             urllib.request.urlretrieve(url, downloadFolder[0])
-    #             self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
+    #             # get remote file from url:
+    #             remoteSource = urllib.request.urlopen(url)
+    #             self.utils.setProgress('Installing')
+                
+    #             # read the downloaded Zip file stored in the RAM memory:
+    #             dpAR_Zip = zipfile.ZipFile(io.BytesIO(remoteSource.read()))
+    #             self.utils.setProgress('Installing')
+
+    #             # list Zip file contents in order to extract them in a temporarily folder:
+    #             zipNameList = dpAR_Zip.namelist()
+    #             for fileName in zipNameList:
+    #                 if dpAR_Folder in fileName:
+    #                     dpAR_Zip.extract(fileName, dpAR_DestFolder)
+    #             dpAR_Zip.close()
+    #             self.utils.setProgress('Installing')
+                
+    #             # declare temporarily folder:
+    #             dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
+
+    #             # store custom presets in order to avoid overwrite them when installing the update:
+    #             self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.data.languagesFolder, dpAR_TempDir+"/"+self.data.languagesFolder)
+    #             self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.curvesPresetsFolder, dpAR_TempDir+"/"+self.curvesPresetsFolder)
+    #             # keep dpPipelineInfo data
+    #             if os.path.exists(dpAR_DestFolder+"/Pipeline/dpPipelineSettings.json"):
+    #                 shutil.copy2(os.path.join(dpAR_DestFolder, "Pipeline/dpPipelineSettings.json"), dpAR_TempDir)
+    #             if os.path.exists(dpAR_DestFolder+"/dpPipelineInfo.json"):
+    #                 shutil.copy2(os.path.join(dpAR_DestFolder, "dpPipelineInfo.json"), dpAR_TempDir)
+
+    #             # remove all old live files and folders for this current version, that means delete myself, OMG!
+    #             for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
+    #                 if not "-"+dpAR_Folder+"-" in eachFolder:
+    #                     shutil.rmtree(dpAR_DestFolder+"/"+eachFolder)
+    #             for eachFile in next(os.walk(dpAR_DestFolder))[2]:
+    #                 os.remove(dpAR_DestFolder+"/"+eachFile)
+
+    #             # pass in all files to copy them (doing the simple installation):
+    #             for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
+    #                 # declare destination directory:
+    #                 destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
+    #                 self.utils.setProgress('Installing')
+                    
+    #                 # make sure we have all folders needed, otherwise, create them in the destination directory:
+    #                 if not os.path.exists(destDir):
+    #                     os.makedirs(destDir)
+
+    #                 for dpAR_File in fileList:
+    #                     sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
+    #                     destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
+    #                     # if the file exists (we expect that yes) then delete it:
+    #                     self.utils.deleteFile(destFile)
+    #                     # copy the dpAR_File:
+    #                     shutil.copy2(sourceFile, destDir)
+    #                     self.utils.setProgress('Installing')
+
+    #             # delete the temporarily folder used to download and install the update:
+    #             folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
+    #             shutil.rmtree(folderToDelete)
+
+    #             # report finished update installation:
+    #             self.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.data.lang['i173_reloadScript']+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
     #             # closes dpUpdateWindow:
     #             if cmds.window('dpUpdateWindow', query=True, exists=True):
     #                 cmds.deleteUI('dpUpdateWindow', window=True)
+    #             # quit UI in order to force user to refresh dpAutoRigSystem creating a new instance:
+    #             self.deleteExistWindow()
     #         except:
-    #             self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
+    #             # report fail update installation:
+    #             self.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
     #         self.utils.setProgress(endIt=True)
+    #     else:
+    #         print(self.data.lang['i038_canceled'])
     
     
-    def keepJsonFilesWhenUpdate(self, currentDir, tempUpdateDir, *args):
-        """ Check in given folder if we have custom json files and keep then when we install a new update.
-            It will just check if there are user created json files, and copy them to temporarily extracted update folder.
-            So when the install overwrite all files, they will be copied (restored) again.
-        """
-        newUpdateList = []
-        # list all new json files:
-        for newRoot, newDirectories, newFiles in os.walk(tempUpdateDir):
-            for newItem in newFiles:
-                if newItem.endswith('.json'):
-                    newUpdateList.append(newItem)
-        
-        # check if some current json file is a custom file created by user to copy it to new update directory in order to avoid overwrite it:
-        for currentRoot, currentDirectories, currentFiles in os.walk(currentDir):
-            for currentItem in currentFiles:
-                if currentItem.endswith('.json'):
-                    if not currentItem in newUpdateList:
-                        # found custom file, then copy it to keep when install the new update
-                        shutil.copy2(os.path.join(currentRoot, currentItem), tempUpdateDir)
-    
-    
-    def installUpdate(self, url, newVersion, *args):
-        """ Install the last version from the given url address to download file
-        """
-        btContinue = self.data.lang['i174_continue']
-        btCancel = self.data.lang['i132_cancel']
-        confirmAutoInstall = cmds.confirmDialog(title=self.data.lang['i098_installing'], message=self.data.lang['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
-        if confirmAutoInstall == btContinue:
-            print(self.data.lang['i098_installing'])
-            # declaring variables:
-            dpAR_Folder = "dpAutoRigSystem"
-            dpAR_DestFolder = self.data.dp_auto_rig_path
-            self.utils.setProgress('Installing: 0%', self.data.lang['i098_installing'])
-            
-            try:
-                # get remote file from url:
-                remoteSource = urllib.request.urlopen(url)
-                self.utils.setProgress('Installing')
-                
-                # read the downloaded Zip file stored in the RAM memory:
-                dpAR_Zip = zipfile.ZipFile(io.BytesIO(remoteSource.read()))
-                self.utils.setProgress('Installing')
-
-                # list Zip file contents in order to extract them in a temporarily folder:
-                zipNameList = dpAR_Zip.namelist()
-                for fileName in zipNameList:
-                    if dpAR_Folder in fileName:
-                        dpAR_Zip.extract(fileName, dpAR_DestFolder)
-                dpAR_Zip.close()
-                self.utils.setProgress('Installing')
-                
-                # declare temporarily folder:
-                dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
-
-                # store custom presets in order to avoid overwrite them when installing the update:
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.data.languagesFolder, dpAR_TempDir+"/"+self.data.languagesFolder)
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+self.curvesPresetsFolder, dpAR_TempDir+"/"+self.curvesPresetsFolder)
-                # keep dpPipelineInfo data
-                if os.path.exists(dpAR_DestFolder+"/Pipeline/dpPipelineSettings.json"):
-                    shutil.copy2(os.path.join(dpAR_DestFolder, "Pipeline/dpPipelineSettings.json"), dpAR_TempDir)
-                if os.path.exists(dpAR_DestFolder+"/dpPipelineInfo.json"):
-                    shutil.copy2(os.path.join(dpAR_DestFolder, "dpPipelineInfo.json"), dpAR_TempDir)
-
-                # remove all old live files and folders for this current version, that means delete myself, OMG!
-                for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
-                    if not "-"+dpAR_Folder+"-" in eachFolder:
-                        shutil.rmtree(dpAR_DestFolder+"/"+eachFolder)
-                for eachFile in next(os.walk(dpAR_DestFolder))[2]:
-                    os.remove(dpAR_DestFolder+"/"+eachFile)
-
-                # pass in all files to copy them (doing the simple installation):
-                for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
-                    # declare destination directory:
-                    destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
-                    self.utils.setProgress('Installing')
-                    
-                    # make sure we have all folders needed, otherwise, create them in the destination directory:
-                    if not os.path.exists(destDir):
-                        os.makedirs(destDir)
-
-                    for dpAR_File in fileList:
-                        sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
-                        destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
-                        # if the file exists (we expect that yes) then delete it:
-                        self.utils.deleteFile(destFile)
-                        # copy the dpAR_File:
-                        shutil.copy2(sourceFile, destDir)
-                        self.utils.setProgress('Installing')
-
-                # delete the temporarily folder used to download and install the update:
-                folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
-                shutil.rmtree(folderToDelete)
-
-                # report finished update installation:
-                self.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.data.lang['i173_reloadScript']+'\n\n'+self.data.lang['i018_thanks'], 'center', 205, 270)
-                # closes dpUpdateWindow:
-                if cmds.window('dpUpdateWindow', query=True, exists=True):
-                    cmds.deleteUI('dpUpdateWindow', window=True)
-                # quit UI in order to force user to refresh dpAutoRigSystem creating a new instance:
-                self.deleteExistWindow()
-            except:
-                # report fail update installation:
-                self.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.data.lang['i097_sorry'], 'center', 205, 270)
-            self.utils.setProgress(endIt=True)
-        else:
-            print(self.data.lang['i038_canceled'])
-    
-    
-    # def setAutoCheckUpdatePref(self, currentValue, *args):
-    #     """ Set the optionVar for auto check update preference as stored userDefAutoCheckUpdate read variable.
-    #     """
-    #     cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', int(currentValue)))
-    #     self.userDefAutoCheckUpdate = currentValue
-
-
-    # def setAutoCheckAgreePref(self, currentValue, *args):
-    #     """ Set the optionVar for auto check agree terms and conditions preference as stored userDefAgreeTerms read variable.
-    #     """
-    #     cmds.optionVar(intValue=('dpAutoRigAgreeTermsCond', int(currentValue)))
-    #     self.userDefAgreeTerms = currentValue
-    
-    
-    def autoCheckOptionVar(self, checkOptVar,  lastDateOptVar, mode, *args):
-        """ Store user choose about automatically check for update or agree terms and conditions in an optionVar.
-            If active, try to check for update or location once a day.
-        """
-        firstTimeOpenDPAR = False
-        # verify if there is an optionVar of last optionVar checkBox choose value by user in the maya system:
-        autoCheckExists = cmds.optionVar(exists=checkOptVar)
-        if not autoCheckExists:
-            cmds.optionVar(intValue=(checkOptVar, 1))
-            firstTimeOpenDPAR = True
-        
-        # get its value puting in a self variable:
-        optVarValue = cmds.optionVar(query=checkOptVar)
-        if mode == "update":
-            self.userDefAutoCheckUpdate = optVarValue
-        else: #terms
-            self.userDefAgreeTerms = optVarValue
-        if optVarValue == 1:
-            # verify if there is an optionVar for store the date of the lastest optionVar ran in order to avoid many hits in the GitHub server:
-            todayDate = str(datetime.datetime.now().date())
-            lastAutoCheckExists = cmds.optionVar(exists=lastDateOptVar)
-            if not lastAutoCheckExists:
-                cmds.optionVar(stringValue=(lastDateOptVar, todayDate))
-            # get its value puting in a variable:
-            lastDateAutoCheck = cmds.optionVar(query=lastDateOptVar)
-            if not lastDateAutoCheck == todayDate:
-                cmds.optionVar(stringValue=(lastDateOptVar, todayDate))
-                if mode == "update":
-                    self.checkForUpdate(verbose=False)
-                else: # agree terms and cond
-                    self.getLocalData()
-        
-        # force checkForUpdate if it's the first time openning the dpAutoRigSystem in this computer:
-        if firstTimeOpenDPAR:
-            if mode == "update":
-                self.checkForUpdate(verbose=True)
-            else: #terms
-                self.checkTermsAndCond()
-
-    
-    # def getLocalData(self, *args):
-    #     """ Collect info for statistical purposes.
-    #     """
-    #     locDic = False
-    #     try:
-    #         locResponse = urllib.request.urlopen(self.locationURL)
-    #         locDic = json.loads(locResponse.read())
-    #     except:
-    #         pass
-    #     if locDic:
-    #         infoData = {}
-    #         infoData['country'] = locDic['country']
-    #         infoData['region'] = locDic['region']
-    #         infoData['city'] = locDic['city']
-    #         infoData['user'] = getpass.getuser()
-    #         infoData['host'] = socket.gethostname()
-    #         infoData['os'] = platform.system()
-    #         infoData['lang'] = self.data.langName
-    #         infoData['Maya'] = cmds.about(version=True)
-    #         infoData['dpAR'] = self.dpARVersion
-    #         #print(infoData)
-    #         if infoData:
-    #             wh = self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
-    #             self.packager.toDiscord(wh, str(infoData))
-
-    
-    # def checkTermsAndCond(self, *args):
-    #     """ Create a window to ask user if agree to terms and conditions.
-    #     """
-    #     terms_winWidth  = 205
-    #     terms_winHeight = 200
-    #     # creating Terms and Conditions Window:
-    #     if cmds.window('dpTermsCondWindow', query=True, exists=True):
-    #         cmds.deleteUI('dpTermsCondWindow', window=True)
-    #     dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-    #     # creating text layout:
-    #     termsLayout = cmds.columnLayout('termsLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpTermsCondWin)
-    #     cmds.text("\n"+self.data.lang['i282_termsCondDesc'], align="center", parent=termsLayout)
-    #     # agreement:
-    #     cmds.separator(height=30)
-    #     self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.data.lang['i280_iAgreeTermsCond'], align="left", value=self.data.agree_terms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
-    #     cmds.separator(height=30)
-    #     # call window:
-    #     cmds.showWindow(dpTermsCondWin)
-
 
     ###################### End: UI
     

@@ -56,6 +56,7 @@ class Data:
     icons_folder: str = "Icons"
     tools_folder: str = "Tools"
     language_folder: str = "Languages"
+    pipeline_folder: str = "Pipeline"
     standard_folder: str = "Modules.Standard"
     integrated_folder: str = "Modules.Integrated"
     curve_simple_folder: str = "Modules.Curves.Simple"
@@ -80,10 +81,12 @@ class Data:
     module_instance_info_attr: str = "moduleInstanceInfo"
     joint_end_attr: str = "JEnd"
     
-    raw_url: str = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
+    #raw_url: str = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
+    raw_url: str = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/699-dev-mode-reload/dpAutoRigSystem/dpAutoRig.py"
     
     github_url: str = "https://github.com/nilouco/dpAutoRigSystem"
-    master_url: str = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
+    #master_url: str = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
+    master_url: str = "https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/"
     whats_changed_url: str = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
     donate_url: str = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
     location_url: str = "https://ipinfo.io/json"

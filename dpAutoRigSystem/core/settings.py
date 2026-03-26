@@ -9,7 +9,6 @@ import platform
 from importlib import reload
 from maya import cmds
 from maya import mel
-from . import version
 
 
 

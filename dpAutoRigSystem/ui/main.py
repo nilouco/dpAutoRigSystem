@@ -50,8 +50,6 @@ class MainUI(object):
         self.ar.ui_manager.refresh_ui()
 
 
-        #self.ar.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
-        #self.ar.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
 
         self.ar.agree.load_terms_cond()
         self.ar.updater.load_update()
