@@ -11,7 +11,6 @@ class UpdateUI(object):
     def create_ui(self, raw_result, text):
         """ Create a window showing the text info with the description about any module.
         """
-        print("HERE UPDATING WINDOW NEW EW ===", self.ar.data.lang[text])
         # declaring variables:
         #checked_number = raw_result[0]
         remote_version = raw_result[1]
@@ -23,9 +22,7 @@ class UpdateUI(object):
         cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i089_update'], iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         cmds.columnLayout("update_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpUpdateWindow")
-        print("here 999")
         cmds.text("update_description_txt", label="\n"+self.ar.data.lang[text], align="center", parent="update_cl")
-        print("here 999111")
         cmds.text("update_current_version_txt", label="\n"+self.ar.data.version+self.ar.data.lang['i090_currentVersion'], align="left", parent="update_cl")
         if remote_version:
             remote_version = remote_version.replace("\\n", "\n")
@@ -46,4 +43,3 @@ class UpdateUI(object):
         cmds.separator(height=30)
         # call Update Window:
         cmds.showWindow("dpUpdateWindow")
-        print(self.ar.data.lang[text])

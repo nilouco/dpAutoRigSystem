@@ -42,17 +42,14 @@ class MainUI(object):
         self.create_main_ui()
         self.ar.ui_manager.set_ui_state(True)
         self.ar.filler.fill_libraries()
+        self.ar.ui_manager.refresh_ui()
+        self.ar.agree.load_terms_cond()
+        self.ar.updater.load_update()
         
         #
         #
         # WIP:
         #
-        self.ar.ui_manager.refresh_ui()
-
-
-
-        self.ar.agree.load_terms_cond()
-        self.ar.updater.load_update()
         
         #self.ar.refreshMainUI()
 
@@ -126,7 +123,7 @@ class MainUI(object):
 
     def create_help_menu(self):
         cmds.menu('help_menu', label='Help', helpMenu=True, parent='main_menu_bar')
-        cmds.menuItem('about_mi"', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.dpARVersion, 'center', 305, 250), parent='help_menu')
+        cmds.menuItem('about_mi"', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('author_mi', label='Author', command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.ar.data.lang['_collaborators'], 'center', 305, 250), parent='help_menu')
         cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donateWin), parent='help_menu')

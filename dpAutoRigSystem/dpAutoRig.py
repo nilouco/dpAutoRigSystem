@@ -210,10 +210,10 @@ class Start(object):
         confirm = cmds.confirmDialog(title="Reinstall", message="There's an unexpected issue, sorry!\nPlease reinstall the dpAutoRigSystem.\nRemember to delete the current folder before install a new one from:\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/", button="Download", dismissString="No")
         if confirm == "Download":
             if os.name == "nt":
-                self.downloadFolder = f"{os.getenv('USERPROFILE')}\\Downloads"
+                download_folder = f"{os.getenv('USERPROFILE')}\\Downloads"
             else:  # PORT: For *Nix systems
-                self.downloadFolder = f"{os.getenv('HOME')}/Downloads"
-            urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", self.downloadFolder+"/dpAutoRigSystem-master.zip")
+                download_folder = f"{os.getenv('HOME')}/Downloads"
+            urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", download_folder+"/dpAutoRigSystem-master.zip")
     
     
 

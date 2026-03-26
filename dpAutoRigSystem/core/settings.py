@@ -6,7 +6,6 @@ import getpass
 import urllib.request
 import socket
 import platform
-from importlib import reload
 from maya import cmds
 from maya import mel
 
@@ -28,26 +27,14 @@ class Configuration(object):
         self.load_auto_check_update()
         self.load_icons()
 
-        print("version = ", self.ar.data.version)
-        print("update_log = ", self.ar.data.update_log)
-
-        #self.set_values()
-
-        
-
-        # TODO
-            # get_language()
-            # get_update()
-            # get_terms_cond()
-            # get_icon()
-            #
-            # load_updater() ===== settings. class Update
-
 
     def load_path(self):
         path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace("\\", "/")
         self.ar.data.dp_auto_rig_path = path[:path.rfind("/")] #remove '/core'
 
+        #
+        # TODO test it in Mac to see if we need to correct the path
+        #
         #correct_path = path[:path.rfind("/")] #remove '/core'
         #if os.name == "posix":
         #    self.ar.data.dp_auto_rig_path = stringPath[0:stringPath.rfind("/")]
@@ -221,14 +208,10 @@ class Configuration(object):
                 result_value = result_value[0]
         return result_value
 
-
-
-        
         
     def open_pipeliner(self, *args):
        print("WIP opening piliener UI", args)
        self.ar.pipeliner.mainUI(self.ar)
-
 
 
     def create_preset(self, preset_type="curve", preset_folder="Modules/Curves/Presets", set_option_var=True, *args):
@@ -272,25 +255,10 @@ class Configuration(object):
                         return self.ar.data.lib[folder][info][i]
 
 
-   
-
-    # def set_values(self):
-    #     self.ar.customAttr.ui = False
-
-
-
-
-
 
 class Option(object):
     def __init__(self, ar):
         self.ar = ar
-        
-
-
-    
-
-
 
     
     def change_degree(self, value, *args):
@@ -414,17 +382,7 @@ class Option(object):
         self.set_default_render_layer(1)
         self.reset_prefix()
         self.set_agree_terms_cond(1)
-        #auto_check_update: int = 1
-
-        #
-        #
-        # WIP
-        #
-        #
-
-        
-
-
+        self.set_auto_check_update(1)
         # reload UI
         cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
 
@@ -437,8 +395,6 @@ class Option(object):
     def set_auto_check_update(self, value):
         self.ar.data.auto_check_update = value
         self.set_option_var(self.ar.data.check_update_option_var, value, False)
-
-
 
 
 
