@@ -1088,8 +1088,8 @@ class Utils(object):
         """ Creates a json file as a Validator Preset and returns it.
         """
         resultString = None
-        validatorsList = self.ar.data.checkin_instances + self.ar.data.checkout_instances + self.ar.data.checkaddon_instances
-        if validatorsList:
+        validators = self.ar.config.get_validator_instances()
+        if validators:
             resultDialog = cmds.promptDialog(
                                                 title=self.ar.data.lang['i129_createPreset'],
                                                 message=self.ar.data.lang['i130_presetName'],
@@ -1104,7 +1104,7 @@ class Utils(object):
                 date = str(datetime.datetime.now().date())
                 resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
                 # add validators and its current active values
-                for validator in validatorsList:
+                for validator in validators:
                     resultString += ',"'+validator.name+'" : '+str(validator.active).lower()
                 resultString += "}"
         return resultString

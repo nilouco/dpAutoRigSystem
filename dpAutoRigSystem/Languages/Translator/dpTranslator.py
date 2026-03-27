@@ -129,7 +129,7 @@ class Translator(object):
         self.resultString = self.resultString.replace("\n", "\\n")
         
         # create json file:
-        resultDict = self.ar.createJsonFile(self.resultString, self.languagesFolder, '_preset')
+        resultDict = self.ar.config.save_json_file(self.resultString, self.languagesFolder, '_preset')
         # set this new lang as userDefined language:
         self.ar.langDic[resultDict['_preset']] = resultDict
         self.ar.langName = resultDict['_preset']

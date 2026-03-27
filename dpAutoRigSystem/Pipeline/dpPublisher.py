@@ -113,14 +113,11 @@ class Publisher(object):
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = self.ar.data.checkaddon_instances.copy()
-        toCheckValidatorList.extend(self.ar.data.checkin_instances)
-        toCheckValidatorList.extend(self.ar.data.checkout_instances)
-        toCheckValidatorList.extend(self.ar.checkFinishingInstanceList)
-        if toCheckValidatorList:
-            validationResultDataList = self.ar.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
+        validators = self.ar.config.get_validator_instances()
+        if validators:
+            validationResultDataList = self.ar.runSelectedActions(validators, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
-                stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].name                    
+                stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+validators[validationResultDataList[2]].name                    
                 return stoppedMessage
         return False
         

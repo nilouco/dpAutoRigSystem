@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_5 = "6.00.00"
-# to make old dpAR version compatible to receive this update message - it can be deleted in the future 
+# to make old dpAR version compatible to receive this update message - it can be deleted in the future
 DPAR_UPDATELOG = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 5, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 
@@ -307,27 +307,28 @@ class Start(object):
     def resetAllButtonColors(self, *args):
         """ Just reset the button colors to default for each validator or rebuilder module.
         """
+#        buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
         buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
         if buttonInstanceList:
             for item in buttonInstanceList:
                 item.resetButtonColors()
 
     
-    def createJsonFile(self, newString, fileDir, fileNameID, *args):
-        """ Load given string as a json dictionary and save it as a json file with the fileNameID in the fileDir.
-            Returns the loaded json dictionary.
-        """
-        # json file:
-        resultDic = json.loads(newString)
-        # find path where 'dpAutoRig.py' is been executed:
-        path = os.path.dirname(__file__)
-        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
-        jsonPath = os.path.join(path, fileDir, "").replace("\\", "/")
-        jsonFileName = jsonPath+resultDic[fileNameID]+'.json'
-        # write json file in the HD:
-        with open(jsonFileName, 'w') as jsonFile:
-            json.dump(resultDic, jsonFile, indent=4, sort_keys=True)
-        return resultDic
+    # def save_json_file(self, newString, fileDir, fileNameID, *args):
+    #     """ Load given string as a json dictionary and save it as a json file with the fileNameID in the fileDir.
+    #         Returns the loaded json dictionary.
+    #     """
+    #     # json file:
+    #     resultDic = json.loads(newString)
+    #     # find path where 'dpAutoRig.py' is been executed:
+    #     path = os.path.dirname(__file__)
+    #     # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+    #     jsonPath = os.path.join(path, fileDir, "").replace("\\", "/")
+    #     jsonFileName = jsonPath+resultDic[fileNameID]+'.json'
+    #     # write json file in the HD:
+    #     with open(jsonFileName, 'w') as jsonFile:
+    #         json.dump(resultDic, jsonFile, indent=4, sort_keys=True)
+    #     return resultDic
     
     
     def translator(self, *args):

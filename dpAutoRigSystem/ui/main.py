@@ -412,10 +412,12 @@ class MainUI(object):
         cmds.scrollLayout("validator_sl", parent="validator_tab")
         cmds.columnLayout("validator_cl", adjustableColumn=True, rowSpacing=3, parent="validator_sl")
         # validators
-        self.create_check_layout("i208_checkin", self.ar.data.checkin_instances, "validator_cl")
-        self.create_check_layout("i209_checkout", self.ar.data.checkout_instances, "validator_cl")
-        self.create_check_layout("i212_addOns", self.ar.data.checkaddon_instances, "validator_cl", False)
-        self.create_check_layout("i354_finishing", self.ar.data.checkfinishing_instances, "validator_cl", False)
+        self.create_check_layout("i208_checkin", self.ar.data.lib[self.ar.data.checkin_folder]["instances"], "validator_cl")
+        self.create_check_layout("i209_checkout", self.ar.data.lib[self.ar.data.checkout_folder]["instances"], "validator_cl")
+        if self.ar.data.checkaddon_folder:
+            self.create_check_layout("i212_addOns", self.ar.data.lib[self.ar.data.checkaddon_folder]["instances"], "validator_cl", False)
+        if self.ar.data.checkfinishing_folder:
+            self.create_check_layout("i354_finishing", self.ar.data.lib[self.ar.data.checkfinishing_folder]["instances"], "validator_cl", False)
         # publisher
         cmds.columnLayout('validator_footer_cl', adjustableColumn=True, parent="validator_tab")
         cmds.separator(style='none', height=3, parent="validator_footer_cl")

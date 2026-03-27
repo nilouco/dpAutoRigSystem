@@ -130,7 +130,7 @@ class Configuration(object):
                                                                 self.ar.data.booleans,
                                                                 string=False
                                                                 )
-        
+    
 
     def load_icons(self):
         # TODO: review the 3: after renamed all images without the "dp_" prefix
@@ -225,15 +225,32 @@ class Configuration(object):
             new_preset = self.ar.utils.dpCreateValidatorPreset()
         if new_preset:
             # create json file:
-            resultDic = self.ar.createJsonFile(new_preset, preset_folder, '_preset')
-            preset_name = resultDic['_preset']
+            result_data = self.save_json_file(new_preset, preset_folder, '_preset')
+            preset_name = result_data['_preset']
             # set this new preset as userDefined preset:
             if set_option_var:
                 self.ar.opt.set_option_var(preset_option_var, preset_name)
             # show preset creation result window:
-            self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+preset_name+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270)
+            button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
+            button_command = self.ar.packager.openFolder
+            button_argument = os.path.join(self.ar.data.dp_auto_rig_path, preset_folder.replace(".", "/"))
+            self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+preset_name+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             # close and reload dpAR UI in order to avoid Maya crash
             self.ar.ui_manager.reload_ui()
+
+
+    def save_json_file(self, data, folder, file_name_id, *args):
+        """ Load given string as a json dictionary and save it as a json file with the file_name_id in the folder.
+            Returns the loaded json dictionary.
+        """
+        # json file:
+        result_data = json.loads(data)
+        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+        path = os.path.join(self.ar.data.dp_auto_rig_path, folder.replace(".", "/"), "").replace("\\", "/")
+        # write json file in the HD:
+        with open(path+result_data[file_name_id]+'.json', 'w') as json_file:
+            json.dump(result_data, json_file, indent=4, sort_keys=True)
+        return result_data
 
 
     def get_validator_addons(self, path="addOnsPath"):
@@ -253,6 +270,17 @@ class Configuration(object):
                 for i, item in enumerate(self.ar.data.lib[folder]["instances"]):
                     if name == item.name:
                         return self.ar.data.lib[folder][info][i]
+                    
+
+    def get_validator_instances(self):
+        validators = []
+        if self.ar.data.checkaddon_folder:
+            validators.extend(self.ar.data.lib[self.ar.data.checkaddon_folder]["instances"])
+        validators.extend(self.ar.data.lib[self.ar.data.checkin_folder]["instances"])
+        validators.extend(self.ar.data.lib[self.ar.data.checkout_folder]["instances"])
+        if self.ar.data.checkfinishing_folder:
+            validators.extend(self.ar.data.lib[self.ar.data.checkfinishing_folder]["instances"])
+        return validators
 
 
 
