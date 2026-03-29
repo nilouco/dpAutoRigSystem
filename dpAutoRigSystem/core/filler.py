@@ -134,20 +134,148 @@ class UIFiller(object):
                 moduleClass = getattr(imported_module, imported_module.CLASS_NAME)
                 if "rigType" in cmds.listAttr(module[2]):
                     curRigType = cmds.getAttr(module[2]+".rigType")
-                    moduleInst = moduleClass(self.ar)#, module[1], curRigType)
+                    mod = moduleClass(self.ar)#, module[1], curRigType)
                 else:
                     if "Style" in cmds.listAttr(module[2]):
                         iStyle = cmds.getAttr(module[2]+".Style")
                         if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
+                            mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
                         else:
-                            moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
+                            mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
                     else:
-                        moduleInst = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
-                self.ar.data.standard_instances.append(moduleInst)
-                moduleInst.get_namespace_for_it(module[1])
+                        mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
+                self.ar.data.standard_instances.append(mod)
+                mod.get_namespace_for_it(module[1])
                 if self.ar.data.ui_state:
-                    moduleInst.load_raw_guide(moduleInst.userGuideName)
+                    mod.load_raw_guide(mod.userGuideName)
 
                 # reload pinGuide scriptJob:
                 self.ar.ctrls.startPinGuide(module[2])
+
+
+    def populate_joints(self, *args):
+        """ This function is responsable to list all joints or only dpAR joints in the interface in order to use in skinning.
+        """
+        # get current jointType (all or just dpAutoRig joints):
+        choose_joint = cmds.radioButton(cmds.radioCollection('skin_joint_rc', query=True, select=True), query=True, annotation=True)
+        
+        # list joints to be populated:
+        joints, sorted_joints = [], []
+        all_joints = cmds.ls(selection=False, type="joint")
+        if choose_joint == "allJoints":
+            joints = all_joints
+            cmds.checkBox('skin_jnt_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jar_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jad_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jcr_cb', edit=True, enable=False)
+            cmds.checkBox('skin_jis_cb', edit=True, enable=False)
+        elif choose_joint == "dpARJoints":
+            cmds.checkBox('skin_jnt_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jar_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jad_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jcr_cb', edit=True, enable=True)
+            cmds.checkBox('skin_jis_cb', edit=True, enable=True)
+            display_jnt = cmds.checkBox('skin_jnt_cb', query=True, value=True)
+            display_jar = cmds.checkBox('skin_jar_cb', query=True, value=True)
+            diaplay_jad = cmds.checkBox('skin_jad_cb', query=True, value=True)
+            display_jcr = cmds.checkBox('skin_jcr_cb', query=True, value=True)
+            display_jis = cmds.checkBox('skin_jis_cb', query=True, value=True)
+            for joint_node in all_joints:
+                if cmds.objExists(joint_node+'.'+self.ar.data.base_name+'joint'):
+                    if display_jnt:
+                        if joint_node.endswith("_Jnt"):
+                            joints.append(joint_node)
+                    if display_jar:
+                        if joint_node.endswith("_Jar"):
+                            joints.append(joint_node)
+                    if diaplay_jad:
+                        if joint_node.endswith("_Jad"):
+                            joints.append(joint_node)
+                    if display_jcr:
+                        if joint_node.endswith("_Jcr"):
+                            joints.append(joint_node)
+                    if display_jis:
+                        if joint_node.endswith("_Jis"):
+                            joints.append(joint_node)
+        
+        # sort joints by name filter:
+        joint_name = cmds.textField('skin_joint_name_tf', query=True, text=True)
+        if joints:
+            if joint_name:
+                sorted_joints = self.utils.filterName(joint_name, joints, " ")
+            else:
+                sorted_joints = joints
+        
+        # populate the list:
+        cmds.textScrollList('skin_joint_tsl', edit=True, removeAll=True)
+        cmds.textScrollList('skin_joint_tsl', edit=True, append=sorted_joints)
+        # atualize of footerB text:
+        self.ar.ui_manager.update_skinning_footer_ui()
+
+
+    def populate_geometries(self, *args):
+        """ This function is responsable to list all geometries or only selected geometries in the interface in order to use in skinning.
+        """
+        # get current geo_type (all or just selected):
+        choose_geo = cmds.radioButton(cmds.radioCollection('skin_geo_rc', query=True, select=True), query=True, annotation=True)
+        
+        # get user preference as long or short name:
+        display_long_name = cmds.checkBox('skin_geo_long_name_cb', query=True, value=True)
+        
+        # list geometries to be populated:
+        geos, same_names, sorted_geos = [], [], []
+        
+        selecteds = cmds.ls(selection=True, long=True)
+        for geo_type in ["mesh", "nurbsSurface", "subdiv"]:
+            all_geos = cmds.ls(selection=False, type=geo_type, long=True)
+            if all_geos:
+                for mesh in all_geos:
+                    if cmds.getAttr(mesh+".intermediateObject") == 0:
+                        transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
+                        if transforms:
+                            # do not add ribbon nurbs plane to the list:
+                            if not cmds.objExists(transforms[0]+"."+self.ar.skin.ignoreSkinningAttr):
+                                if not transforms[0] in geos:
+                                    if choose_geo == "allGeoms":
+                                        geos.append(transforms[0])
+                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
+                                    elif choose_geo == "selGeoms":
+                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
+                                        if transforms[0] in selecteds or mesh in selecteds:
+                                            if display_long_name:
+                                                geos.append(transforms[0])
+                                            else:
+                                                geos.append(transforms[0][transforms[0].rfind("|")+1:]) #short name
+
+        # check if we have same short name:
+        if geos:
+            for g, geo in enumerate(geos):
+                if geo in geos[:g]:
+                    same_names.append(geo)
+        if same_names:
+            geos.insert(0, "*")
+            geos.append(" ")
+            geos.append("-------")
+            geos.append(self.ar.data.lang['i074_attention'])
+            geos.append(self.ar.data.lang['i075_moreOne'])
+            geos.append(self.ar.data.lang['i076_sameName'])
+            for sameName in same_names:
+                geos.append(sameName)
+        
+        # sort geometries by name filter:
+        geo_name = cmds.textField('skin_geo_name_tf', query=True, text=True)
+        if geos:
+            if geo_name:
+                sorted_geos = self.utils.filterName(geo_name, geos, " ")
+            else:
+                sorted_geos = geos
+        
+        # populate the list:
+        cmds.textScrollList('skin_geo_tcl', edit=True, removeAll=True)
+        if same_names:
+            cmds.textScrollList('skin_geo_tcl', edit=True, lineFont=[(len(sorted_geos)-len(same_names)-2, 'boldLabelFont'), (len(sorted_geos)-len(same_names)-1, 'obliqueLabelFont'), (len(sorted_geos)-len(same_names), 'obliqueLabelFont')], append=sorted_geos)
+        else:
+            cmds.textScrollList('skin_geo_tcl', edit=True, append=sorted_geos)
+        # atualize of footerB text:
+        self.ar.ui_manager.update_skinning_footer_ui()
+        

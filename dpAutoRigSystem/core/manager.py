@@ -52,12 +52,15 @@ class UIManager(object):
         #clear layouts
         self.clear_guide_layout()
         self.ar.filler.fill_created_guides()
-        self.update_footer_ui()
+        self.update_guide_footer_ui()
 
 #        self.checkImportedGuides()
 #        self.checkGuideNets()
-#        self.populateJoints()
-#        self.populateGeoms()
+
+        self.ar.filler.populate_joints()
+        self.ar.filler.populate_geometries()
+        self.update_skinning_footer_ui()
+        
 #        if not self.ar.data.rebuilding:
 #            if resetButtons:
 #                self.resetAllButtonColors()
@@ -88,11 +91,37 @@ class UIManager(object):
             cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
 
 
-    def update_footer_ui(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
+    def update_guide_footer_ui(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
         if not quantity:
             quantity = len(self.ar.data.created_guides)
         if self.ar.data.ui_state:
             cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
+
+
+    def update_skinning_footer_ui(self, *args):
+        """ Edit the label of skin footer text.
+        """
+        if self.ar.data.ui_state:
+            # get the number of selected items for each textScrollLayout:
+            n_selected_joints = cmds.textScrollList('skin_joint_tsl', query=True, numberOfSelectedItems=True)
+            n_selected_geoms  = cmds.textScrollList('skin_geo_tcl', query=True, numberOfSelectedItems=True)
+            
+            # verify if there are not any selected items:
+            if n_selected_joints == 0:
+                n_joint_items = cmds.textScrollList('skin_joint_tsl', query=True, numberOfItems=True)
+                if n_joint_items != 0:
+                    n_selected_joints = n_joint_items
+            if n_selected_geoms == 0:
+                n_geom_items = cmds.textScrollList('skin_geo_tcl', query=True, numberOfItems=True)
+                if n_geom_items != 0:
+                    n_selected_geoms = n_geom_items
+            
+            # edit the footerB text:
+            if n_selected_joints != 0 and n_selected_geoms != 0:
+                cmds.text('skin_footer_txt', edit=True, label=str(n_selected_joints)+" "+self.ar.data.lang['i025_joints']+" "+str(n_selected_geoms)+" "+self.ar.data.lang['i024_geometries'])
+            else:
+                cmds.text('skin_footer_txt', edit=True, label=self.ar.data.lang['i029_skinNothing'])
+        
 
 
     def delete_exist_window(self, *args):

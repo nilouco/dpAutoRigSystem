@@ -234,30 +234,30 @@ class MainUI(object):
         # left
         cmds.columnLayout('skin_joint_cl', adjustableColumn=True, width=170, parent='skin_create_v2_pl')
         cmds.radioCollection('skin_joint_rc', parent='skin_joint_cl')
-        cmds.radioButton('skin_all_joint_rb', label=self.ar.data.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.ar.populateJoints, parent='skin_joint_cl') #all joints
-        cmds.radioButton('skin_dpar_joint_rb', label=self.ar.data.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.ar.populateJoints, parent='skin_joint_cl')
+        cmds.radioButton('skin_all_joint_rb', label=self.ar.data.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.ar.filler.populate_joints, parent='skin_joint_cl') #all joints
+        cmds.radioButton('skin_dpar_joint_rb', label=self.ar.data.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.ar.filler.populate_joints, parent='skin_joint_cl')
         cmds.rowColumnLayout('skin_joint_display_rcl', numberOfColumns=3, columnWidth=[(1, 45), (2, 45), (3, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10)], parent='skin_joint_cl')
-        cmds.checkBox('skin_jnt_cb', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.ar.populateJoints, parent='skin_joint_display_rcl')
-        cmds.checkBox('skin_jar_cb', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.ar.populateJoints, parent='skin_joint_display_rcl')
-        cmds.checkBox('skin_jad_cb', label="Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.ar.populateJoints, parent='skin_joint_display_rcl')
-        cmds.checkBox('skin_jcr_cb', label="Jcr", annotation="Skinned Corrective Joints", align='left', value=1, changeCommand=self.ar.populateJoints, parent='skin_joint_display_rcl')
-        cmds.checkBox('skin_jis_cb', label="Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.ar.populateJoints, parent='skin_joint_display_rcl')
-        cmds.textField('skin_joint_name_tf', width=30, changeCommand=self.ar.populateJoints, parent='skin_joint_cl')
+        cmds.checkBox('skin_jnt_cb', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_display_rcl')
+        cmds.checkBox('skin_jar_cb', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_display_rcl')
+        cmds.checkBox('skin_jad_cb', label="Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_display_rcl')
+        cmds.checkBox('skin_jcr_cb', label="Jcr", annotation="Skinned Corrective Joints", align='left', value=1, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_display_rcl')
+        cmds.checkBox('skin_jis_cb', label="Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_display_rcl')
+        cmds.textField('skin_joint_name_tf', width=30, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_cl')
         cmds.separator(style="none", height=3, parent='skin_joint_cl')
-        cmds.textScrollList('skin_joint_tsl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.actualizeSkinFooter, parent='skin_joint_cl')
+        cmds.textScrollList('skin_joint_tsl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.ui_manager.update_skinning_footer_ui, parent='skin_joint_cl')
         # -> skin_joint_tsl it'll be populated by joints...
         cmds.radioCollection('skin_joint_rc', edit=True, select="skin_dpar_joint_rb")
         # right
         cmds.columnLayout('skin_geo_cl', adjustableColumn=True, width=170, parent='skin_create_v2_pl')
         cmds.radioCollection('skin_geo_rc', parent='skin_geo_cl')
-        cmds.radioButton('skin_all_geo_rb', label=self.ar.data.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.ar.populateGeoms, parent='skin_geo_cl') #all geometries
-        cmds.radioButton('skin_selected_geo_rb', label=self.ar.data.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.ar.populateGeoms, parent='skin_geo_cl')
-        cmds.checkBox('skin_geo_long_name_cb', label=self.ar.data.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.ar.populateGeoms, parent='skin_geo_cl')
+        cmds.radioButton('skin_all_geo_rb', label=self.ar.data.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.ar.filler.populate_geometries, parent='skin_geo_cl') #all geometries
+        cmds.radioButton('skin_selected_geo_rb', label=self.ar.data.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.ar.filler.populate_geometries, parent='skin_geo_cl')
+        cmds.checkBox('skin_geo_long_name_cb', label=self.ar.data.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.ar.filler.populate_geometries, parent='skin_geo_cl')
         cmds.checkBox('skin_log_win_cb', label=self.ar.data.lang['i286_displaySkinLog'], align='left', value=1, parent='skin_geo_cl')
         cmds.separator(style="none", height=2, parent='skin_geo_cl')
-        cmds.textField('skin_geo_name_tf', width=30, changeCommand=self.ar.populateGeoms, parent='skin_geo_cl')
+        cmds.textField('skin_geo_name_tf', width=30, changeCommand=self.ar.filler.populate_geometries, parent='skin_geo_cl')
         cmds.separator(style="none", height=3, parent='skin_geo_cl')
-        cmds.textScrollList('skin_geo_tcl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.actualizeSkinFooter, parent='skin_geo_cl' )
+        cmds.textScrollList('skin_geo_tcl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.ui_manager.update_skinning_footer_ui, parent='skin_geo_cl' )
         # -> skin_geo_tcl it'll be populated by geometries...
         cmds.radioCollection('skin_geo_rc', edit=True, select="skin_selected_geo_rb")
         # footer
@@ -510,8 +510,8 @@ class MainUI(object):
     #     self.ar.fill_created_guides()
     #     self.ar.checkImportedGuides()
     #     self.ar.checkGuideNets()
-    #     self.ar.populateJoints()
-    #     self.ar.populateGeoms()
+    #     self.ar.filler.populate_joints()
+    #     self.ar.filler.populate_geometries()
     #     if not self.rebuilding:
     #         if resetButtons:
     #             self.ar.resetAllButtonColors()

@@ -458,135 +458,77 @@ class Start(object):
         return newGuideName
 
         
-    def populateJoints(self, *args):
-        """ This function is responsable to list all joints or only dpAR joints in the interface in order to use in skinning.
-        """
-        # get current jointType (all or just dpAutoRig joints):
-        jntSelectedRadioButton = cmds.radioCollection('skin_joint_rc', query=True, select=True)
-        chooseJnt = cmds.radioButton(jntSelectedRadioButton, query=True, annotation=True)
-        
-        # list joints to be populated:
-        jointList, sortedJointList = [], []
-        allJointList = cmds.ls(selection=False, type="joint")
-        if chooseJnt == "allJoints":
-            jointList = allJointList
-            cmds.checkBox('skin_jnt_cb', edit=True, enable=False)
-            cmds.checkBox('skin_jar_cb', edit=True, enable=False)
-            cmds.checkBox('skin_jad_cb', edit=True, enable=False)
-            cmds.checkBox('skin_jcr_cb', edit=True, enable=False)
-            cmds.checkBox('skin_jis_cb', edit=True, enable=False)
-        elif chooseJnt == "dpARJoints":
-            cmds.checkBox('skin_jnt_cb', edit=True, enable=True)
-            cmds.checkBox('skin_jar_cb', edit=True, enable=True)
-            cmds.checkBox('skin_jad_cb', edit=True, enable=True)
-            cmds.checkBox('skin_jcr_cb', edit=True, enable=True)
-            cmds.checkBox('skin_jis_cb', edit=True, enable=True)
-            displayJnt = cmds.checkBox('skin_jnt_cb', query=True, value=True)
-            displayJar = cmds.checkBox('skin_jar_cb', query=True, value=True)
-            displayJad = cmds.checkBox('skin_jad_cb', query=True, value=True)
-            displayJcr = cmds.checkBox('skin_jcr_cb', query=True, value=True)
-            displayJis = cmds.checkBox('skin_jis_cb', query=True, value=True)
-            for jointNode in allJointList:
-                if cmds.objExists(jointNode+'.'+self.data.base_name+'joint'):
-                    if displayJnt:
-                        if jointNode.endswith("_Jnt"):
-                            jointList.append(jointNode)
-                    if displayJar:
-                        if jointNode.endswith("_Jar"):
-                            jointList.append(jointNode)
-                    if displayJad:
-                        if jointNode.endswith("_Jad"):
-                            jointList.append(jointNode)
-                    if displayJcr:
-                        if jointNode.endswith("_Jcr"):
-                            jointList.append(jointNode)
-                    if displayJis:
-                        if jointNode.endswith("_Jis"):
-                            jointList.append(jointNode)
-        
-        # sort joints by name filter:
-        jointName = cmds.textField('skin_joint_name_tf', query=True, text=True)
-        if jointList:
-            if jointName:
-                sortedJointList = self.utils.filterName(jointName, jointList, " ")
-            else:
-                sortedJointList = jointList
-        
-        # populate the list:
-        cmds.textScrollList('skin_joint_tsl', edit=True, removeAll=True)
-        cmds.textScrollList('skin_joint_tsl', edit=True, append=sortedJointList)
-        # atualize of footerB text:
-        self.actualizeSkinFooter()
+    
         
         
-    def populateGeoms(self, *args):
-        """ This function is responsable to list all geometries or only selected geometries in the interface in order to use in skinning.
-        """
-        # get current geomType (all or just selected):
-        geomSelectedRadioButton = cmds.radioCollection('skin_geo_rc', query=True, select=True)
-        chooseGeom = cmds.radioButton(geomSelectedRadioButton, query=True, annotation=True)
+    # def populateGeoms(self, *args):
+    #     """ This function is responsable to list all geometries or only selected geometries in the interface in order to use in skinning.
+    #     """
+    #     # get current geomType (all or just selected):
+    #     geomSelectedRadioButton = cmds.radioCollection('skin_geo_rc', query=True, select=True)
+    #     chooseGeom = cmds.radioButton(geomSelectedRadioButton, query=True, annotation=True)
         
-        # get user preference as long or short name:
-        displayGeoLongName = cmds.checkBox('skin_geo_long_name_cb', query=True, value=True)
+    #     # get user preference as long or short name:
+    #     displayGeoLongName = cmds.checkBox('skin_geo_long_name_cb', query=True, value=True)
         
-        # list geometries to be populated:
-        geomList, shortNameList, sameNameList, sortedGeoList = [], [], [], []
+    #     # list geometries to be populated:
+    #     geomList, shortNameList, sameNameList, sortedGeoList = [], [], [], []
         
-        currentSelectedList = cmds.ls(selection=True, long=True)
-        geomTypeList = ["mesh", "nurbsSurface", "subdiv"]
-        for geomType in geomTypeList:
-            allGeomList = cmds.ls(selection=False, type=geomType, long=True)
-            if allGeomList:
-                for meshName in allGeomList:
-                    if cmds.getAttr(meshName+".intermediateObject") == 0:
-                        transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
-                        if transformNameList:
-                            # do not add ribbon nurbs plane to the list:
-                            if not cmds.objExists(transformNameList[0]+"."+self.skin.ignoreSkinningAttr):
-                                if not transformNameList[0] in geomList:
-                                    if chooseGeom == "allGeoms":
-                                        geomList.append(transformNameList[0])
-                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
-                                    elif chooseGeom == "selGeoms":
-                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
-                                        if transformNameList[0] in currentSelectedList or meshName in currentSelectedList:
-                                            if displayGeoLongName:
-                                                geomList.append(transformNameList[0])
-                                            else:
-                                                shortName = transformNameList[0][transformNameList[0].rfind("|")+1:]
-                                                geomList.append(shortName)
+    #     currentSelectedList = cmds.ls(selection=True, long=True)
+    #     geomTypeList = ["mesh", "nurbsSurface", "subdiv"]
+    #     for geomType in geomTypeList:
+    #         allGeomList = cmds.ls(selection=False, type=geomType, long=True)
+    #         if allGeomList:
+    #             for meshName in allGeomList:
+    #                 if cmds.getAttr(meshName+".intermediateObject") == 0:
+    #                     transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
+    #                     if transformNameList:
+    #                         # do not add ribbon nurbs plane to the list:
+    #                         if not cmds.objExists(transformNameList[0]+"."+self.skin.ignoreSkinningAttr):
+    #                             if not transformNameList[0] in geomList:
+    #                                 if chooseGeom == "allGeoms":
+    #                                     geomList.append(transformNameList[0])
+    #                                     cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
+    #                                 elif chooseGeom == "selGeoms":
+    #                                     cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
+    #                                     if transformNameList[0] in currentSelectedList or meshName in currentSelectedList:
+    #                                         if displayGeoLongName:
+    #                                             geomList.append(transformNameList[0])
+    #                                         else:
+    #                                             shortName = transformNameList[0][transformNameList[0].rfind("|")+1:]
+    #                                             geomList.append(shortName)
 
-        # check if we have same short name:
-        if geomList:
-            for g, geo in enumerate(geomList):
-                if geo in geomList[:g]:
-                    sameNameList.append(geo)
-        if sameNameList:
-            geomList.insert(0, "*")
-            geomList.append(" ")
-            geomList.append("-------")
-            geomList.append(self.data.lang['i074_attention'])
-            geomList.append(self.data.lang['i075_moreOne'])
-            geomList.append(self.data.lang['i076_sameName'])
-            for sameName in sameNameList:
-                geomList.append(sameName)
+    #     # check if we have same short name:
+    #     if geomList:
+    #         for g, geo in enumerate(geomList):
+    #             if geo in geomList[:g]:
+    #                 sameNameList.append(geo)
+    #     if sameNameList:
+    #         geomList.insert(0, "*")
+    #         geomList.append(" ")
+    #         geomList.append("-------")
+    #         geomList.append(self.data.lang['i074_attention'])
+    #         geomList.append(self.data.lang['i075_moreOne'])
+    #         geomList.append(self.data.lang['i076_sameName'])
+    #         for sameName in sameNameList:
+    #             geomList.append(sameName)
         
-        # sort geometries by name filter:
-        geoName = cmds.textField('skin_geo_name_tf', query=True, text=True)
-        if geomList:
-            if geoName:
-                sortedGeoList = self.utils.filterName(geoName, geomList, " ")
-            else:
-                sortedGeoList = geomList
+    #     # sort geometries by name filter:
+    #     geoName = cmds.textField('skin_geo_name_tf', query=True, text=True)
+    #     if geomList:
+    #         if geoName:
+    #             sortedGeoList = self.utils.filterName(geoName, geomList, " ")
+    #         else:
+    #             sortedGeoList = geomList
         
-        # populate the list:
-        cmds.textScrollList('skin_geo_tcl', edit=True, removeAll=True)
-        if sameNameList:
-            cmds.textScrollList('skin_geo_tcl', edit=True, lineFont=[(len(sortedGeoList)-len(sameNameList)-2, 'boldLabelFont'), (len(sortedGeoList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(sortedGeoList)-len(sameNameList), 'obliqueLabelFont')], append=sortedGeoList)
-        else:
-            cmds.textScrollList('skin_geo_tcl', edit=True, append=sortedGeoList)
-        # atualize of footerB text:
-        self.actualizeSkinFooter()
+    #     # populate the list:
+    #     cmds.textScrollList('skin_geo_tcl', edit=True, removeAll=True)
+    #     if sameNameList:
+    #         cmds.textScrollList('skin_geo_tcl', edit=True, lineFont=[(len(sortedGeoList)-len(sameNameList)-2, 'boldLabelFont'), (len(sortedGeoList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(sortedGeoList)-len(sameNameList), 'obliqueLabelFont')], append=sortedGeoList)
+    #     else:
+    #         cmds.textScrollList('skin_geo_tcl', edit=True, append=sortedGeoList)
+    #     # atualize of footerB text:
+    #     self.ui_manager.update_skinning_footer_ui()
     
     
     def reloadPopulatedGeoms(self, *args):
@@ -595,7 +537,7 @@ class Start(object):
         # store current selected items in the geometry list to skin:
         geomSelectedList = cmds.textScrollList('skin_geo_tcl', query=True, selectItem=True)
         # populate again the list of geometries:
-        self.populateGeoms()
+        self.ar.filler.populate_geometries()
         # re-select the old selected items in the list if possible:
         if geomSelectedList:
             try:
@@ -604,31 +546,31 @@ class Start(object):
                 pass
     
     
-    def actualizeSkinFooter(self, *args):
-        """ Edit the label of skin footer text.
-        """
-        try:
-            # get the number of selected items for each textScrollLayout:
-            nSelectedJoints = cmds.textScrollList('skin_joint_tsl', query=True, numberOfSelectedItems=True)
-            nSelectedGeoms  = cmds.textScrollList('skin_geo_tcl', query=True, numberOfSelectedItems=True)
+    # def actualizeSkinFooter(self, *args):
+    #     """ Edit the label of skin footer text.
+    #     """
+    #     try:
+    #         # get the number of selected items for each textScrollLayout:
+    #         nSelectedJoints = cmds.textScrollList('skin_joint_tsl', query=True, numberOfSelectedItems=True)
+    #         nSelectedGeoms  = cmds.textScrollList('skin_geo_tcl', query=True, numberOfSelectedItems=True)
             
-            # verify if there are not any selected items:
-            if nSelectedJoints == 0:
-                nJointItems = cmds.textScrollList('skin_joint_tsl', query=True, numberOfItems=True)
-                if nJointItems != 0:
-                    nSelectedJoints = nJointItems
-            if nSelectedGeoms == 0:
-                nGeomItems = cmds.textScrollList('skin_geo_tcl', query=True, numberOfItems=True)
-                if nGeomItems != 0:
-                    nSelectedGeoms = nGeomItems
+    #         # verify if there are not any selected items:
+    #         if nSelectedJoints == 0:
+    #             nJointItems = cmds.textScrollList('skin_joint_tsl', query=True, numberOfItems=True)
+    #             if nJointItems != 0:
+    #                 nSelectedJoints = nJointItems
+    #         if nSelectedGeoms == 0:
+    #             nGeomItems = cmds.textScrollList('skin_geo_tcl', query=True, numberOfItems=True)
+    #             if nGeomItems != 0:
+    #                 nSelectedGeoms = nGeomItems
             
-            # edit the footerB text:
-            if nSelectedJoints != 0 and nSelectedGeoms != 0:
-                cmds.text('skin_footer_txt', edit=True, label=str(nSelectedJoints)+" "+self.data.lang['i025_joints']+" "+str(nSelectedGeoms)+" "+self.data.lang['i024_geometries'])
-            else:
-                cmds.text('skin_footer_txt', edit=True, label=self.data.lang['i029_skinNothing'])
-        except:
-            pass
+    #         # edit the footerB text:
+    #         if nSelectedJoints != 0 and nSelectedGeoms != 0:
+    #             cmds.text('skin_footer_txt', edit=True, label=str(nSelectedJoints)+" "+self.data.lang['i025_joints']+" "+str(nSelectedGeoms)+" "+self.data.lang['i024_geometries'])
+    #         else:
+    #             cmds.text('skin_footer_txt', edit=True, label=self.data.lang['i029_skinNothing'])
+    #     except:
+    #         pass
     
     
     # def checkForUpdate(self, verbose=True, *args):
@@ -2469,7 +2411,7 @@ class Start(object):
             cmds.delete(self.data.guide_mirror_grp)
         
         # reload the jointSkinList:
-        self.populateJoints()
+        self.filler.populate_joints()
         if not self.data.rebuilding:
             self.refreshMainUI()
             # call log window:
