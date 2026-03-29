@@ -62,11 +62,11 @@ class Data:
     curve_simple_folder: str = "Modules.Curves.Simple"
     curve_combined_folder: str = "Modules.Curves.Combined"
     curve_preset_folder: str = "Modules.Curves.Presets"
-    validator_folder: str = "Pipeline.Validator"
+#    validator_folder: str = "Pipeline.Validator"
     checkin_folder: str = "Pipeline.Validator.CheckIn"
     checkout_folder: str = "Pipeline.Validator.CheckOut"
     validator_preset_folder: str = "Pipeline.Validator.Presets"
-    rebuilder_folder: str = "Pipeline.Rebuilder"
+#    rebuilder_folder: str = "Pipeline.Rebuilder"
     start_folder: str = "Pipeline.Rebuilder.Start"
     source_folder: str = "Pipeline.Rebuilder.Source"
     setup_folder: str = "Pipeline.Rebuilder.Setup"
@@ -136,11 +136,11 @@ class Data:
     curve_simple_instances: list = field(default_factory=list)
     curve_combined_instances: list = field(default_factory=list)
     tools_instances: list = field(default_factory=list)
-    checkin_instances: list = field(default_factory=list)
-    checkout_instances: list = field(default_factory=list)
-    checkaddon_instances: list = field(default_factory=list)
-    checkfinishing_instances: list = field(default_factory=list)
-    rebuilder_instances: list = field(default_factory=list)
+#    checkin_instances: list = field(default_factory=list)
+#    checkout_instances: list = field(default_factory=list)
+#    checkaddon_instances: list = field(default_factory=list)
+#    checkfinishing_instances: list = field(default_factory=list)
+#    rebuilder_instances: list = field(default_factory=list)
     start_instances: list = field(default_factory=list)
     source_instances: list = field(default_factory=list)
     setup_instances: list = field(default_factory=list)

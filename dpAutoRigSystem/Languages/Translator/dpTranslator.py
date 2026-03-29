@@ -12,7 +12,6 @@ class Translator(object):
         """
         # declaring variables
         self.ar = ar
-        self.languagesFolder = ar.data.language_folder
         self.translatorString = "dpAutoRigSystem - "+self.ar.data.lang['t000_translator']
         self.sourceLangList = list(self.ar.data.lang)
         self.keyLen = len(self.sourceLangList) - 1
@@ -129,7 +128,7 @@ class Translator(object):
         self.resultString = self.resultString.replace("\n", "\\n")
         
         # create json file:
-        resultDict = self.ar.config.save_json_file(self.resultString, self.languagesFolder, '_preset')
+        resultDict = self.ar.config.save_json_file(self.resultString, self.ar.data.language_folder, '_preset')
         # set this new lang as userDefined language:
         self.ar.langDic[resultDict['_preset']] = resultDict
         self.ar.langName = resultDict['_preset']

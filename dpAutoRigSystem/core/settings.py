@@ -283,6 +283,13 @@ class Configuration(object):
         return validators
 
 
+    def get_rebuilder_instances(self):
+        rebuilders = []
+        for folder in self.ar.filler.rebuilder_folders:
+            rebuilders.extend(self.ar.data.lib[folder]["instances"])
+        return rebuilders
+    
+
 
 class Option(object):
     def __init__(self, ar):

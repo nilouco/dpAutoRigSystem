@@ -143,6 +143,7 @@ class Start(object):
         self.customAttr = dpCustomAttr.CustomAttr(self)
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
+        self.translator = dpTranslator.Translator(self)
 
 
     def load_library(self):
@@ -331,11 +332,11 @@ class Start(object):
     #     return resultDic
     
     
-    def translator(self, *args):
-        """ call language translator.
-        """
-        self.translatorInst = dpTranslator.Translator(self)
-        self.translatorInst.dpTranslatorMain()
+    # def translator(self, *args):
+    #     """ call language translator.
+    #     """
+    #     self.translatorInst = dpTranslator.Translator(self)
+    #     self.translatorInst.dpTranslatorMain()
         
 
     

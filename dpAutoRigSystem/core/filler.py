@@ -10,8 +10,7 @@ class UIFiller(object):
         self.ar = ar
         self.validator_folders = [self.ar.data.checkin_folder, 
                                   self.ar.data.checkout_folder]
-        self.rebuilder_folders = [ self.ar.data.rebuilder_folder,
-                                   self.ar.data.start_folder,
+        self.rebuilder_folders = [ self.ar.data.start_folder,
                                    self.ar.data.source_folder,
                                    self.ar.data.setup_folder,
                                    self.ar.data.deforming_folder,

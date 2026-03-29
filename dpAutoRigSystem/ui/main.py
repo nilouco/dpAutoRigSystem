@@ -108,7 +108,7 @@ class MainUI(object):
 
     def create_the_create_menu(self):
         cmds.menu('create_menu', label='Create', parent='main_menu_bar')
-        cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator, parent='create_menu')
+        cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.dpTranslatorMain, parent='create_menu')
         cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.config.open_pipeliner, parent='create_menu')
         cmds.menuItem('create_curve_preset_mi', label='Curve Preset', command=partial(self.ar.config.create_preset, "curve", self.ar.data.curve_preset_folder, True), parent='create_menu')
         cmds.menuItem('create_validator_preset_mi', label='Validator Preset', command=partial(self.ar.config.create_preset, "validator", self.ar.data.validator_preset_folder, False), parent='create_menu')
@@ -464,11 +464,11 @@ class MainUI(object):
         # rebuilder
         cmds.columnLayout('rebuilder_footer_cl', adjustableColumn=False, parent="rebuilder_tab")
         cmds.separator(style='in', height=20, width=370, parent="rebuilder_footer_cl")
-        cmds.checkBox("rebuilder_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.changeActiveAllModules, self.ar.data.rebuilder_instances), parent="rebuilder_footer_cl")
+        cmds.checkBox("rebuilder_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.changeActiveAllModules, self.ar.config.get_rebuilder_instances()), parent="rebuilder_footer_cl")
         cmds.separator(style='none', height=10, parent="rebuilder_footer_cl")
         cmds.paneLayout("rebuilder_selected_pl", configuration="vertical2", separatorThickness=7.0, width=370, parent="rebuilder_footer_cl")
-        cmds.button("rebuilder_split_data_bt", label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.runSelectedActions, self.ar.data.rebuilder_instances, True, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
-        cmds.button("rebuilder_rebuild_bt", label=self.ar.data.lang['r001_rebuild'].upper(), command=partial(self.ar.runSelectedActions, self.ar.data.rebuilder_instances, False, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
+        cmds.button("rebuilder_split_data_bt", label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.runSelectedActions, self.ar.config.get_rebuilder_instances(), True, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
+        cmds.button("rebuilder_rebuild_bt", label=self.ar.data.lang['r001_rebuild'].upper(), command=partial(self.ar.runSelectedActions, self.ar.config.get_rebuilder_instances(), False, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
         cmds.separator(style='none', height=10, parent="rebuilder_footer_cl")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout("rebuilder_tab", edit=True,
