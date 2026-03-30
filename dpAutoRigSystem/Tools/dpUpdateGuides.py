@@ -24,9 +24,11 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+
+
+    def build_tool(self, *args):
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
-        self.currentDpArVersion = self.ar.dpARVersion
         # Receive the guides list from hook function
         self.guidesDictionary = self.ar.utils.hook()
         # List that will hold all new guides instances
@@ -35,20 +37,18 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         # and values are its current parent, this is used to search for possible new parent
         self.guidesToReParentDict = {}
 
-
-    def build_tool(self, *args):
         # If there are guides on the dictionary go on.
         if len(self.guidesDictionary) > 0:
             # Get all info nedeed and store in updateData dictionary
             self.getGuidesToUpdateData()
+            if self.ar.data.ui_state:
+                # Open the UI
+                self.updateGuidesUI()
+            else:
+                # Update existing outdated guides.
+                self.doUpdate()
         else:
             mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
-        if self.ui:
-            # Open the UI
-            self.updateGuidesUI()
-        elif len(self.guidesDictionary) > 0:
-            # In case of ui = False, update existing outdated guides.
-            self.doUpdate()
 
 
     def summaryUI(self):
@@ -82,27 +82,28 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         """
         self.ar.utils.closeUI('updateGuidesWindow')
         self.ar.utils.closeUI('updateSummary')
-        cmds.window('updateGuidesWindow', title="Guides Info")
-        updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
-        cmds.text(label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
-        if len(self.updateData) > 0:
-            updateGuidesSL = cmds.scrollLayout('updateGuidesSL', width=330, height=400, parent=updateGuidesCL)
-            updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesSL)
-            cmds.text(label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
-            cmds.text(label=self.ar.data.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-            cmds.text(label=self.ar.data.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-            for guide in self.updateData:
-                cmds.text(label=guide, align='left', parent=updateGuidesBaseRCL)
-                cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent=updateGuidesBaseRCL)
-                cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent=updateGuidesBaseRCL)
-            cmds.separator(style='none', height=10, parent=updateGuidesBaseRCL)
-            cmds.button(label=self.ar.data.lang['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
-        else:
-            cmds.text(label=self.ar.data.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
-        cmds.separator(style='none', height=10, parent=updateGuidesCL)
-        cmds.window('updateGuidesWindow', edit=True, height=1)
-        cmds.select(clear=True)
-        cmds.showWindow('updateGuidesWindow')
+        if self.ar.data.ui_state:
+            cmds.window('updateGuidesWindow', title="Guides Info")
+            updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
+            cmds.text(label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.ar.data.version), height=30, align="center", parent=updateGuidesCL)
+            if len(self.updateData) > 0:
+                updateGuidesSL = cmds.scrollLayout('updateGuidesSL', width=330, height=400, parent=updateGuidesCL)
+                updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesSL)
+                cmds.text(label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
+                cmds.text(label=self.ar.data.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+                cmds.text(label=self.ar.data.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+                for guide in self.updateData:
+                    cmds.text(label=guide, align='left', parent=updateGuidesBaseRCL)
+                    cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent=updateGuidesBaseRCL)
+                    cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent=updateGuidesBaseRCL)
+                cmds.separator(style='none', height=10, parent=updateGuidesBaseRCL)
+                cmds.button(label=self.ar.data.lang['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
+            else:
+                cmds.text(label=self.ar.data.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
+            cmds.separator(style='none', height=10, parent=updateGuidesCL)
+            cmds.window('updateGuidesWindow', edit=True, height=1)
+            cmds.select(clear=True)
+            cmds.showWindow('updateGuidesWindow')
     
 
     def filterNotNurbsCurveAndTransform(self, mayaObjList):
@@ -336,19 +337,18 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
     def getGuidesToUpdateData(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
         """
-        self.ar.populateCreatedGuideModules()
-        instancedModulesStrList = list(map(str, self.ar.modulesToBeRiggedList))
-
+        modulesToBeRiggedList = self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)
+        instancedModulesStrList = list(map(str, modulesToBeRiggedList))
         for baseGuide in self.guidesDictionary:
             guideVersion = cmds.getAttr(baseGuide+'.dpARVersion', silent=True)
-            if guideVersion != self.currentDpArVersion:
+            if guideVersion != self.ar.data.version:
                 # Create the database holder where the key is the baseGuide
                 self.updateData[baseGuide] = {}
                 self.updateData[baseGuide]["name"] = self.guidesDictionary[baseGuide]["name"]
                 guideAttrList = self.listKeyUserAttr(baseGuide)
                 # Create de attributes dictionary for each baseGuide
                 self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
-                self.updateData[baseGuide]['instance'] = self.ar.modulesToBeRiggedList[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
+                self.updateData[baseGuide]['instance'] = modulesToBeRiggedList[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
                 self.updateData[baseGuide]['children'] = {}
                 self.updateData[baseGuide]['parent'] = self.getGuideParent(baseGuide)
                 childrenList = self.listChildren(baseGuide)
@@ -363,15 +363,14 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
 
     def createNewGuides(self):
         for guide in self.updateData:
-            guideType = self.updateData[guide]['name']
-            # create the new guide
-            currentNewGuide = self.ar.initGuide("dp"+guideType, "Modules.Standard")
+            currentNewGuide = self.ar.config.get_instance_info("dp"+self.updateData[guide]['name'], [self.ar.data.standard_folder])
+            currentNewGuide.build_raw_guide()
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
             currentNewGuide.editGuideModuleName(guideName)
             self.updateData[guide]['newGuide'] = currentNewGuide.moduleGrp
             self.newGuidesInstanceList.append(currentNewGuide)
-            if self.ui:
+            if self.ar.data.ui_state:
                 cmds.refresh()
 
 
@@ -506,9 +505,9 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
              if self.updateData[guide]['instance'].guideNamespace in allNamespaceList:
-                    cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guideNamespace, ':'), force=True)
-                    cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guideNamespace, force=True)
-        self.ar.ui_manager.reload_ui()
+                cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guideNamespace, ':'), force=True)
+                cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guideNamespace, force=True)
+        self.ar.ui_manager.refresh_ui()
 
 
     def patchFootRfF(self, *args):
@@ -570,7 +569,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         cmds.select(clear=True)
         # Ends progress bar feedback
         self.ar.utils.setProgress(endIt=True)
-        if self.ui:
+        if self.ar.data.ui_state:
             # Calls for summary window
             self.summaryUI()
         else:

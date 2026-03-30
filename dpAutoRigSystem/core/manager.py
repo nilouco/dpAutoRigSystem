@@ -52,14 +52,16 @@ class UIManager(object):
         #clear layouts
         self.clear_guide_layout()
         self.ar.filler.fill_created_guides()
-        self.update_guide_footer_ui()
-
-#        self.checkImportedGuides()
-#        self.checkGuideNets()
-
+        # guide checkers
+        self.ar.filler.check_imported_guides()
+        self.ar.filler.check_guide_nets()
+        self.ar.filler.check_guide_versions()
+        # populates
         self.ar.filler.populate_joints()
         self.ar.filler.populate_geometries()
-        self.update_skinning_footer_ui()
+        # update ui footers
+        self.update_guide_footer()
+        self.update_skinning_footer()
         
 #        if not self.ar.data.rebuilding:
 #            if resetButtons:
@@ -91,14 +93,14 @@ class UIManager(object):
             cmds.columnLayout('rig_selected_module_cl', adjustableColumn=True, parent='rig_edit_selected_module_fl')
 
 
-    def update_guide_footer_ui(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
+    def update_guide_footer(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
         if not quantity:
             quantity = len(self.ar.data.created_guides)
         if self.ar.data.ui_state:
             cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
 
 
-    def update_skinning_footer_ui(self, *args):
+    def update_skinning_footer(self, *args):
         """ Edit the label of skin footer text.
         """
         if self.ar.data.ui_state:

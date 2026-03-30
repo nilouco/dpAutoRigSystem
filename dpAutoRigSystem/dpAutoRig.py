@@ -47,6 +47,7 @@ from .Modules.Library import dpSkinning
 from .Modules.Base import dpBaseStandard
 from .Modules.Base import dpBaseLayout
 from .Modules.Base import dpBaseCurve
+from .Tools import dpUpdateGuides
 from .Tools import dpUpdateRigInfo
 from .Tools import dpReorderAttr
 from .Tools import dpCustomAttr
@@ -100,6 +101,7 @@ class Start(object):
             reload(dpBaseStandard)
             reload(dpBaseLayout)
             reload(dpBaseCurve)
+            reload(dpUpdateGuides)
             reload(dpUpdateRigInfo)
             reload(dpReorderAttr)
             reload(dpCustomAttr)
@@ -232,7 +234,7 @@ class Start(object):
 #             self.selList = cmds.ls(selection=True)
 #             self.data.rebuilding = False
 #         self.populateCreatedGuideModules()
-#         self.checkImportedGuides()
+#         self.check_imported_guides()
 #         self.checkGuideNets()
 # #        self.populateJoints()
 # #        self.populateGeoms()
@@ -372,7 +374,7 @@ class Start(object):
         moduleDir = moduleDir[moduleDir.find(".")+1:]
         self.utils.setProgress(self.data.lang['i067_duplicating'])
         # initializing a new module instance
-        newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
+        newGuideInstance = eval('self.initGuide("'+thatModuleName+'")')#, "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
         newGuideNamespace = cmds.getAttr(newGuideName+"."+self.data.module_namespace_attr)
         
@@ -528,7 +530,7 @@ class Start(object):
     #     else:
     #         cmds.textScrollList('skin_geo_tcl', edit=True, append=sortedGeoList)
     #     # atualize of footerB text:
-    #     self.ui_manager.update_skinning_footer_ui()
+    #     self.ui_manager.update_skinning_footer()
     
     
     def reloadPopulatedGeoms(self, *args):
@@ -906,63 +908,63 @@ class Start(object):
     
 
 
-    def checkImportedGuides(self, askUser=True, *args):
-        """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
-            Use a recursive method to remove imported of imported guides.
-        """
-        importedNamespaceList = []
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
-        currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
-        cmds.namespace(setNamespace=':')
-        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
-        if namespaceList:
-            for n, name in enumerate(namespaceList):
-                if name != "UI" and name != "shared":
-                    if name.count(":") > 0:
-                        if name.find("_dpAR_") != -1:
-                            if askUser:
-                                # open dialog to confirm merge namespaces:
-                                yesTxt = self.data.lang['i071_yes']
-                                noTxt = self.data.lang['i072_no']
-                                result = cmds.confirmDialog(title=self.data.lang['i205_guide'], message=self.data.lang['i206_removeNamespace'], 
-                                                            button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
-                                if result == yesTxt:
-                                    askUser = False
-                                else:
-                                    return
-                            importedNamespaceList.append(name)
-            if importedNamespaceList:
-                # review guide custom name before remove namespaces
-                for name in importedNamespaceList:
-                    if cmds.objExists(name+":Guide_Base.customName"):
-                        n = 1
-                        oldCustomName = cmds.getAttr(name+":Guide_Base.customName")
-                        if oldCustomName:
-                            baseName = oldCustomName
-                            while oldCustomName in currentCustomNameList:
-                                oldCustomName = baseName+str(n)
-                                n += 1
-                            cmds.setAttr(name+":Guide_Base.customName", oldCustomName, type="string")
-                            currentCustomNameList.append(oldCustomName)
-                # remove namespaces
-                for name in importedNamespaceList:
-                    if ":" in name:
-                        if cmds.namespace(exists=name):
-                            namespaceString = name.split(":")[0]
-                            cmds.namespace(removeNamespace=namespaceString, mergeNamespaceWithRoot=True)
-                            print(f"{self.data.lang['m206_mergeNamespace']}: {namespaceString}")
-                            self.checkImportedGuides(False)
-                            break
+    # def check_imported_guides(self, askUser=True, *args):
+    #     """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
+    #         Use a recursive method to remove imported of imported guides.
+    #     """
+    #     importedNamespaceList = []
+    #     self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
+    #     currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
+    #     cmds.namespace(setNamespace=':')
+    #     namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
+    #     if namespaceList:
+    #         for n, name in enumerate(namespaceList):
+    #             if name != "UI" and name != "shared":
+    #                 if name.count(":") > 0:
+    #                     if name.find("_dpAR_") != -1:
+    #                         if askUser:
+    #                             # open dialog to confirm merge namespaces:
+    #                             yesTxt = self.data.lang['i071_yes']
+    #                             noTxt = self.data.lang['i072_no']
+    #                             result = cmds.confirmDialog(title=self.data.lang['i205_guide'], message=self.data.lang['i206_removeNamespace'], 
+    #                                                         button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
+    #                             if result == yesTxt:
+    #                                 askUser = False
+    #                             else:
+    #                                 return
+    #                         importedNamespaceList.append(name)
+    #         if importedNamespaceList:
+    #             # review guide custom name before remove namespaces
+    #             for name in importedNamespaceList:
+    #                 if cmds.objExists(name+":Guide_Base.customName"):
+    #                     n = 1
+    #                     oldCustomName = cmds.getAttr(name+":Guide_Base.customName")
+    #                     if oldCustomName:
+    #                         baseName = oldCustomName
+    #                         while oldCustomName in currentCustomNameList:
+    #                             oldCustomName = baseName+str(n)
+    #                             n += 1
+    #                         cmds.setAttr(name+":Guide_Base.customName", oldCustomName, type="string")
+    #                         currentCustomNameList.append(oldCustomName)
+    #             # remove namespaces
+    #             for name in importedNamespaceList:
+    #                 if ":" in name:
+    #                     if cmds.namespace(exists=name):
+    #                         namespaceString = name.split(":")[0]
+    #                         cmds.namespace(removeNamespace=namespaceString, mergeNamespaceWithRoot=True)
+    #                         print(f"{self.data.lang['m206_mergeNamespace']}: {namespaceString}")
+    #                         self.check_imported_guides(False)
+    #                         break
     
 
-    def checkGuideNets(self, *args):
-        """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
-        """
-        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
-        for item in self.modulesToBeRiggedList:
-            if not item.guideNet:
-                self.initExtraModule("dpUpdateGuides", self.data.tools_folder)
-                break
+    # def checkGuideNets(self, *args):
+    #     """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
+    #     """
+    #     self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
+    #     for item in self.modulesToBeRiggedList:
+    #         if not item.guideNet:
+    #             self.initExtraModule("dpUpdateGuides", self.data.tools_folder)
+    #             break
 
 
 
@@ -1480,7 +1482,7 @@ class Start(object):
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.data.rebuilding:
-            self.populateCreatedGuideModules()
+            self.filler.fill_created_guides()
         else:
             self.refreshMainUI()
         

@@ -249,18 +249,19 @@ class Utils(object):
         """
         normalText = ""
         enteredText = ''.join(c for c in unicodedata.normalize('NFD', enteredText) if unicodedata.category(c) != 'Mn') #strip accents
-        # analisys if it starts with number or has a whitespace or special character:
-        if re.match("[0-9]", enteredText[0]): #starts with number
-            return normalText
-        else:
-            #if re.search("\s", enteredText[:len(enteredText)-1]): #has space
-            enteredText = enteredText.replace(" ", "_")
-            while re.search("\W", enteredText): #special character
-                span = re.search("\W", enteredText).span()[0]
-                enteredText = enteredText[:span]+"_"+enteredText[span+1:]
-            if not len(enteredText) < prefixMax:
-                enteredText = enteredText[:prefixMax]
-            normalText = enteredText
+        if enteredText:
+            # analisys if it starts with number or has a whitespace or special character:
+            if re.match("[0-9]", enteredText[0]): #starts with number
+                return normalText
+            else:
+                #if re.search("\s", enteredText[:len(enteredText)-1]): #has space
+                enteredText = enteredText.replace(" ", "_")
+                while re.search("\W", enteredText): #special character
+                    span = re.search("\W", enteredText).span()[0]
+                    enteredText = enteredText[:span]+"_"+enteredText[span+1:]
+                if not len(enteredText) < prefixMax:
+                    enteredText = enteredText[:prefixMax]
+                normalText = enteredText
         return normalText
 
 

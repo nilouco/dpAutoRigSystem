@@ -8,8 +8,8 @@ from importlib import reload
 class UIFiller(object):
     def __init__(self, ar):
         self.ar = ar
-        self.validator_folders = [self.ar.data.checkin_folder, 
-                                  self.ar.data.checkout_folder]
+        self.validator_folders = [ self.ar.data.checkin_folder, 
+                                   self.ar.data.checkout_folder]
         self.rebuilder_folders = [ self.ar.data.start_folder,
                                    self.ar.data.source_folder,
                                    self.ar.data.setup_folder,
@@ -102,7 +102,7 @@ class UIFiller(object):
         # find all module names:
         module_name = self.ar.utils.findAllModuleNames(self.ar.data.dp_auto_rig_path, self.ar.data.standard_folder)
         valid_modules = module_name[0]
-        valid_module_ames = module_name[1]
+        valid_module_names = module_name[1]
         
         # check if there is "__" (double undersore) in the namespaces:
         for n in namespaces:
@@ -110,10 +110,10 @@ class UIFiller(object):
             if n_partitions[1] != "":
                 module = n_partitions[0]
                 userSpecName = n_partitions[2]
-                if module in valid_module_ames:
-                    index = valid_module_ames.index(module)
+                if module in valid_module_names:
+                    index = valid_module_names.index(module)
                     # check if there is this module guide base in the scene:
-                    curGuideName = valid_module_ames[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
+                    curGuideName = valid_module_names[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
                     if cmds.objExists(curGuideName):
                         self.ar.data.created_guides.append([valid_modules[index], userSpecName, curGuideName])
                     else:
@@ -124,26 +124,8 @@ class UIFiller(object):
         if self.ar.data.created_guides:
             sorted_guides = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
-            module_path = f"{self.ar.utils.findEnv('PYTHONPATH', 'dpAutoRigSystem')}.{self.ar.data.standard_folder.replace('/', '.')}"
-            # this list will be used to rig all modules pressing the RIG button:
             for module in sorted_guides:
-                imported_module = __import__(module_path+"."+module[0], {}, {}, [module[0]])
-                if self.ar.dev:
-                    reload(imported_module)
-                # identify the guide modules and add to the moduleInstancesList:
-                moduleClass = getattr(imported_module, imported_module.CLASS_NAME)
-                if "rigType" in cmds.listAttr(module[2]):
-                    curRigType = cmds.getAttr(module[2]+".rigType")
-                    mod = moduleClass(self.ar)#, module[1], curRigType)
-                else:
-                    if "Style" in cmds.listAttr(module[2]):
-                        iStyle = cmds.getAttr(module[2]+".Style")
-                        if (iStyle == 0 or iStyle == 1):
-                            mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
-                        else:
-                            mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
-                    else:
-                        mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
+                mod = self.start_module(module, self.ar.data.standard_folder)
                 self.ar.data.standard_instances.append(mod)
                 mod.get_namespace_for_it(module[1])
                 if self.ar.data.ui_state:
@@ -151,6 +133,28 @@ class UIFiller(object):
 
                 # reload pinGuide scriptJob:
                 self.ar.ctrls.startPinGuide(module[2])
+
+
+    def start_module(self, module, folder):
+        path = f"{self.ar.utils.findEnv('PYTHONPATH', 'dpAutoRigSystem')}.{folder.replace('/', '.')}"
+        imported_module = __import__(path+"."+module[0], {}, {}, [module[0]])
+        if self.ar.dev:
+            reload(imported_module)
+        # identify the guide modules and add to the moduleInstancesList:
+        moduleClass = getattr(imported_module, imported_module.CLASS_NAME)
+        if "rigType" in cmds.listAttr(module[2]):
+            curRigType = cmds.getAttr(module[2]+".rigType")
+            mod = moduleClass(self.ar)#, module[1], curRigType)
+        else:
+            if "Style" in cmds.listAttr(module[2]):
+                iStyle = cmds.getAttr(module[2]+".Style")
+                if (iStyle == 0 or iStyle == 1):
+                    mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
+                else:
+                    mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
+            else:
+                mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
+        return mod
 
 
     def populate_joints(self, *args):
@@ -202,7 +206,7 @@ class UIFiller(object):
         joint_name = cmds.textField('skin_joint_name_tf', query=True, text=True)
         if joints:
             if joint_name:
-                sorted_joints = self.utils.filterName(joint_name, joints, " ")
+                sorted_joints = self.ar.utils.filterName(joint_name, joints, " ")
             else:
                 sorted_joints = joints
         
@@ -210,7 +214,7 @@ class UIFiller(object):
         cmds.textScrollList('skin_joint_tsl', edit=True, removeAll=True)
         cmds.textScrollList('skin_joint_tsl', edit=True, append=sorted_joints)
         # atualize of footerB text:
-        self.ar.ui_manager.update_skinning_footer_ui()
+        self.ar.ui_manager.update_skinning_footer()
 
 
     def populate_geometries(self, *args):
@@ -266,7 +270,7 @@ class UIFiller(object):
         geo_name = cmds.textField('skin_geo_name_tf', query=True, text=True)
         if geos:
             if geo_name:
-                sorted_geos = self.utils.filterName(geo_name, geos, " ")
+                sorted_geos = self.ar.utils.filterName(geo_name, geos, " ")
             else:
                 sorted_geos = geos
         
@@ -277,5 +281,71 @@ class UIFiller(object):
         else:
             cmds.textScrollList('skin_geo_tcl', edit=True, append=sorted_geos)
         # atualize of footerB text:
-        self.ar.ui_manager.update_skinning_footer_ui()
+        self.ar.ui_manager.update_skinning_footer()
         
+    
+    def check_imported_guides(self, ask_user=True, *args):
+        """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
+            If there isn't an UI it runs as ask_user=False, removing the namespace automacally.
+            It uses a recursive method to remove imported of imported guides.
+        """
+        imported_namespaces = []
+        current_custom_names = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)))
+        cmds.namespace(setNamespace=':')
+        namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
+        if namespaces:
+            for n, name in enumerate(namespaces):
+                if name != "UI" and name != "shared":
+                    if name.count(":") > 0:
+                        if name.find("_dpAR_") != -1:
+                            if ask_user and self.ar.data.ui_state:
+                                # open dialog to confirm merge namespaces:
+                                yes_text = self.ar.data.lang['i071_yes']
+                                no_text = self.ar.data.lang['i072_no']
+                                result = cmds.confirmDialog(title=self.ar.data.lang['i205_guide'], message=self.ar.data.lang['i206_removeNamespace'], 
+                                                            button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
+                                if result == yes_text:
+                                    ask_user = False
+                                else:
+                                    return
+                            imported_namespaces.append(name)
+            if imported_namespaces:
+                # review guide custom name before remove namespaces
+                for name in imported_namespaces:
+                    if cmds.objExists(name+":Guide_Base.customName"):
+                        n = 1
+                        old_custom_name = cmds.getAttr(name+":Guide_Base.customName")
+                        if old_custom_name:
+                            base_name = old_custom_name
+                            while old_custom_name in current_custom_names:
+                                old_custom_name = base_name+str(n)
+                                n += 1
+                            cmds.setAttr(name+":Guide_Base.customName", old_custom_name, type="string")
+                            current_custom_names.append(old_custom_name)
+                # remove namespaces
+                for name in imported_namespaces:
+                    if ":" in name:
+                        if cmds.namespace(exists=name):
+                            namespace_string = name.split(":")[0]
+                            cmds.namespace(removeNamespace=namespace_string, mergeNamespaceWithRoot=True)
+                            print(f"{self.ar.data.lang['m206_mergeNamespace']}: {namespace_string}")
+                            self.check_imported_guides(False)
+                            break
+
+
+    def check_guide_nets(self, *args):
+        """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
+        """
+        for item in self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances):
+            if not item.guideNet:
+                item.createGuideNetwork()
+                print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.moduleGrp)
+
+
+    def check_guide_versions(self, *args):
+        """ Verify if there are guides with different version of the current dpAutoRig version.
+        """
+        for item in self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances):
+            if not self.ar.data.version == cmds.getAttr(item.moduleGrp+'.dpARVersion'):
+                self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
+                break

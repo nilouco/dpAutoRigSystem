@@ -67,9 +67,10 @@ class BaseStandard(object):
         #
         # WIP TODO: get new userGuideName by findLastNumber in utils
         #
-#        print("self.userGuideName before =", self.userGuideName)
+        print("self.userGuideName before =", self.userGuideName)
+        print("userGuideName =", userGuideName)
         self.get_namespace_for_it(userGuideName)
-#        print("self.userGuideName after =", self.userGuideName)
+        print("self.userGuideName after =", self.userGuideName)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -139,12 +140,12 @@ class BaseStandard(object):
 
         # print("self =", self)
         # print("self.name =", self.name)
-        # print("guide)info =", self.ar.config.get_instance_info(self.name, self.ar.data.standard_folder, "imported"))
+        print("guide)info =", self.ar.config.get_instance_info(self.name, self.ar.data.standard_folder, "imported"))
         # info = self.ar.data.lib
 
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.ar.config.get_instance_info(self.name, [self.ar.data.standard_folder], "imported"), type='string')
         cmds.setAttr(self.moduleGrp+".rigType", self.rigType, type='string')
-        cmds.setAttr(self.moduleGrp+".dpARVersion", self.ar.dpARVersion, type='string')
+        cmds.setAttr(self.moduleGrp+".dpARVersion", self.ar.data.version, type='string')
         
         baseFloatAttrList = ['shapeSize', 'worldSize']
         for baseFloatAttr in baseFloatAttrList:
@@ -178,7 +179,7 @@ class BaseStandard(object):
         self.ar.data.created_guides.append([self.name, self.userGuideName, self.moduleGrp])
 #        print("self.ar.data.created_guides =", self.ar.data.created_guides)
 #        print("valid =", self.name, self.userGuideName, self.moduleGrp)
-        self.ar.ui_manager.update_footer_ui()
+        self.ar.ui_manager.update_guide_footer()
     
     
     def updateModuleInstanceInfo(self, *args):
@@ -230,18 +231,11 @@ class BaseStandard(object):
             cmds.namespace(removeNamespace=self.guideNamespace, force=True)
         
         if self.ar.data.ui_state:
-            # delete the moduleFrameLayout from window UI:
-            #if cmds.frameLayout(self.moduleFrameLayout, query=True, exists=True):
-            #    cmds.deleteUI(self.moduleFrameLayout)
-            #self.clearSelectedModuleLayout()
-            
-            print("created_guides before =", self.ar.data.created_guides)
-            self.ar.ui_manager.clear_guide_layout()
-            self.ar.ui_manager.fill_created_guides()
-            #print("self.userGuideName =", self.name, self.userGuideName, self.moduleGrp)
+            # self.ar.ui_manager.clear_guide_layout()
+            # self.ar.filler.fill_created_guides()
+            # self.ar.ui_manager.update_guide_footer()
+            self.ar.ui_manager.refresh_ui()
 
-            # edit the footer A text:
-            self.ar.ui_manager.update_footer_ui()
             # self.currentText = cmds.text("footerRiggingText", query=True, label=True)
             # cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])
         
@@ -662,7 +656,8 @@ class BaseStandard(object):
         cmds.setAttr(self.guideNet+".moduleType", self.name, type="string")
         cmds.setAttr(self.guideNet+".guideName", self.userGuideName, type="string")
         cmds.setAttr(self.guideNet+".guideNumber", guideNumber, type="string")
-        cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
+        if not "net" in cmds.listAttr(self.moduleGrp):
+            cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
         optionCtrl = self.utils.getNodeByMessage("optionCtrl")

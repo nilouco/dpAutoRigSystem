@@ -244,7 +244,7 @@ class MainUI(object):
         cmds.checkBox('skin_jis_cb', label="Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_display_rcl')
         cmds.textField('skin_joint_name_tf', width=30, changeCommand=self.ar.filler.populate_joints, parent='skin_joint_cl')
         cmds.separator(style="none", height=3, parent='skin_joint_cl')
-        cmds.textScrollList('skin_joint_tsl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.ui_manager.update_skinning_footer_ui, parent='skin_joint_cl')
+        cmds.textScrollList('skin_joint_tsl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.ui_manager.update_skinning_footer, parent='skin_joint_cl')
         # -> skin_joint_tsl it'll be populated by joints...
         cmds.radioCollection('skin_joint_rc', edit=True, select="skin_dpar_joint_rb")
         # right
@@ -257,7 +257,7 @@ class MainUI(object):
         cmds.separator(style="none", height=2, parent='skin_geo_cl')
         cmds.textField('skin_geo_name_tf', width=30, changeCommand=self.ar.filler.populate_geometries, parent='skin_geo_cl')
         cmds.separator(style="none", height=3, parent='skin_geo_cl')
-        cmds.textScrollList('skin_geo_tcl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.ui_manager.update_skinning_footer_ui, parent='skin_geo_cl' )
+        cmds.textScrollList('skin_geo_tcl', width=30, height=500, allowMultiSelection=True, selectCommand=self.ar.ui_manager.update_skinning_footer, parent='skin_geo_cl' )
         # -> skin_geo_tcl it'll be populated by geometries...
         cmds.radioCollection('skin_geo_rc', edit=True, select="skin_selected_geo_rb")
         # footer
@@ -508,7 +508,7 @@ class MainUI(object):
     #         self.selList = cmds.ls(selection=True)
     #         self.rebuilding = False
     #     self.ar.fill_created_guides()
-    #     self.ar.checkImportedGuides()
+    #     self.ar.check_imported_guides()
     #     self.ar.checkGuideNets()
     #     self.ar.filler.populate_joints()
     #     self.ar.filler.populate_geometries()

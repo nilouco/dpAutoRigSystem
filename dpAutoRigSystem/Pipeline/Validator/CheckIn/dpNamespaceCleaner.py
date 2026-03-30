@@ -83,8 +83,8 @@ class NamespaceCleaner(dpBaseAction.ActionStartClass):
                 else: #fix
                     try:
                         if namespaceWithGuidesList:
-                            # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
-                            self.ar.checkImportedGuides(False)
+                            # call check_imported_guides from dpAutoRig, to remove namespace when it's guide.
+                            self.ar.filler.check_imported_guides(False)
                         elif namespaceWithoutGuidesList:
                             # call function inside validator to remove namespaces when it's not a guide.
                             self.removeNamespace()
