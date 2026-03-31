@@ -126,7 +126,7 @@ class MainUI(object):
         cmds.menuItem('about_mi"', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('author_mi', label='Author', command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.ar.data.lang['_collaborators'], 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donateWin), parent='help_menu')
+        cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donate.create_ui), parent='help_menu')
         cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
         cmds.menuItem('update_mi', label='Update', command=partial(self.ar.updater.check_for_update, True), parent='help_menu')

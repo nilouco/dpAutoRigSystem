@@ -65,6 +65,7 @@ from .core import filler
 from .core import updater
 from .ui import main
 from .ui import update
+from .ui import donate
 from . import version
 
 
@@ -117,6 +118,7 @@ class Start(object):
             reload(librarian)
             reload(filler)
             reload(updater)
+            reload(donate)
             reload(version)
             # ui
             reload(main)
@@ -146,6 +148,7 @@ class Start(object):
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
         self.translator = dpTranslator.Translator(self)
+        self.donate = donate.DonateUI(self)
 
 
     def load_library(self):
@@ -1030,29 +1033,6 @@ class Start(object):
         self.utils.setProgress(endIt=True)
         return actionResultData, False, 0
 
-    
-    def donateWin(self, *args):
-        """ Simple window with links to donate in order to support this free and openSource code via PayPal.
-        """
-        # declaring variables:
-        self.donate_title       = 'dpAutoRig - v'+self.dpARVersion+' - '+self.data.lang['i167_donate']
-        self.donate_description = self.data.lang['i168_donateDesc']
-        self.donate_winWidth    = 305
-        self.donate_winHeight   = 300
-        self.donate_align       = "center"
-        # creating Donate Window:
-        if cmds.window('dpDonateWindow', query=True, exists=True):
-            cmds.deleteUI('dpDonateWindow', window=True)
-        dpDonateWin = cmds.window('dpDonateWindow', title=self.donate_title, iconName='dpInfo', widthHeight=(self.donate_winWidth, self.donate_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-        # creating text layout:
-        donateColumnLayout = cmds.columnLayout('donateColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpDonateWin)
-        cmds.separator(style='none', height=10, parent=donateColumnLayout)
-        infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
-        cmds.separator(style='none', height=10, parent=donateColumnLayout)
-        brPaypalButton = cmds.button('brlPaypalButton', label=self.data.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(self.utils.visitWebSite, self.data.donate_url+"BRL"), parent=donateColumnLayout)
-        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.data.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(self.utils.visitWebSite, self.donateURL+"USD"), parent=donateColumnLayout)
-        # call Donate Window:
-        cmds.showWindow(dpDonateWin)
     
     
     
