@@ -135,7 +135,11 @@ class MainUI(object):
 
     def create_dev_menu(self):
         cmds.menu('dev_menu', label='Dev', visible=self.ar.dev, parent='main_menu_bar')
-        cmds.menuItem('verbose_mi', label='Verbose', checkBox=self.ar.data.verbose, command=self.ar.opt.set_verbose)
+        cmds.menuItem('verbose_mi', label='Verbose - TO DO', checkBox=self.ar.data.verbose, command=self.ar.opt.set_verbose, parent='dev_menu')
+        cmds.menuItem('check_guides_mi', label="Check guides", subMenu=True, parent='dev_menu')
+        cmds.menuItem('check_imported_guides_mi', label="Imported guides", command=partial(self.ar.filler.check_imported_guides, True), parent='check_guides_mi')
+        cmds.menuItem('check_guide_nets_mi', label="Guide networks", command=self.ar.filler.check_guide_nets, parent='check_guides_mi')
+        cmds.menuItem('check_guide_versions_mi', label="Guide versions", command=self.ar.filler.check_guide_versions, parent='check_guides_mi')
 
 
     def create_radio_menu(self, name, parent_menu, current, data, option_var=None, degree=False, refresh=False):

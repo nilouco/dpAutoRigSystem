@@ -67,10 +67,10 @@ class BaseStandard(object):
         #
         # WIP TODO: get new userGuideName by findLastNumber in utils
         #
-        print("self.userGuideName before =", self.userGuideName)
-        print("userGuideName =", userGuideName)
+#        print("self.userGuideName before =", self.userGuideName)
+#        print("userGuideName =", userGuideName)
         self.get_namespace_for_it(userGuideName)
-        print("self.userGuideName after =", self.userGuideName)
+#        print("self.userGuideName after =", self.userGuideName)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -140,7 +140,7 @@ class BaseStandard(object):
 
         # print("self =", self)
         # print("self.name =", self.name)
-        print("guide)info =", self.ar.config.get_instance_info(self.name, self.ar.data.standard_folder, "imported"))
+        #print("guide)info =", self.ar.config.get_instance_info(self.name, self.ar.data.standard_folder, "imported"))
         # info = self.ar.data.lib
 
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.ar.config.get_instance_info(self.name, [self.ar.data.standard_folder], "imported"), type='string')
@@ -256,7 +256,7 @@ class BaseStandard(object):
         # TODO: call refresh UI here?
         #
         #
-        print("created_guides after  =", self.ar.data.created_guides)
+        #print("created_guides after  =", self.ar.data.created_guides)
     
 
     def duplicateModule(self, *args):

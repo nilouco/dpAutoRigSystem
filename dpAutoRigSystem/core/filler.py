@@ -119,7 +119,7 @@ class UIFiller(object):
                     else:
                         cmds.namespace(moveNamespace=(n, ':'), force=True)
                         cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
-
+        
         # if exists any guide module in the scene, recreate its instance as objectClass:
         if self.ar.data.created_guides:
             sorted_guides = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
@@ -336,6 +336,8 @@ class UIFiller(object):
     def check_guide_nets(self, *args):
         """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
         """
+        if not self.ar.data.standard_instances:
+            self.fill_created_guides()
         for item in self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances):
             if not item.guideNet:
                 item.createGuideNetwork()
@@ -345,7 +347,10 @@ class UIFiller(object):
     def check_guide_versions(self, *args):
         """ Verify if there are guides with different version of the current dpAutoRig version.
         """
+        if not self.ar.data.standard_instances:
+            self.fill_created_guides()
         for item in self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances):
             if not self.ar.data.version == cmds.getAttr(item.moduleGrp+'.dpARVersion'):
+                self.check_guide_nets()
                 self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
                 break
