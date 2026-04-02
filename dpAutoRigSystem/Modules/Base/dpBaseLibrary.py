@@ -19,11 +19,11 @@ class BaseLibrary(object):
         self.wiki = WIKI
 
 
-    def ask_build_detail(title, opt1, opt2, cancel, message):
+    def ask_build_detail(self, title, opt1, opt2, cancel, default, message):
         """ Ask user the detail level we'll create the guides by a confirm dialog box window.
             Options:
                 Simple
                 Complete
             Returns the user choose option or None if canceled.
         """
-        return cmds.confirmDialog(title=title, message=message, button=[opt1, opt2, cancel], defaultButton=opt2, cancelButton=cancel, dismissString=cancel)
+        return cmds.confirmDialog(title=title, message=message, button=[opt1, opt2, cancel], defaultButton=default, cancelButton=cancel, dismissString=cancel)

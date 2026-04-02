@@ -148,7 +148,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # joint labelling:
                 self.utils.setJointLabel(self.centerJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['m156_wheel'])
                 # create end joint:
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_"+self.ar.jointEndAttr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 # main joint:
                 cmds.select(clear=True)
                 self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Jnt", scaleCompensate=False)
@@ -156,7 +156,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # joint labelling:
                 self.utils.setJointLabel(self.mainJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c058_main'])
                 # create end joint:
-                self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_"+self.ar.jointEndAttr, radius=0.5)
+                self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.utils.addJointEndAttr([self.endJoint, self.mainEndJoint])
                 
                 # create controls:

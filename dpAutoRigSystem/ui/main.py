@@ -6,6 +6,8 @@ from functools import partial
 class MainUI(object):
     def __init__(self, ar):
         self.ar = ar
+
+        # TODO: remove commented blocks
     
     
     def create_ui(self):
@@ -45,6 +47,8 @@ class MainUI(object):
         self.ar.ui_manager.refresh_ui()
         self.ar.agree.load_terms_cond()
         self.ar.updater.load_update()
+
+        self.ar.opening.close_opening_ui()
         
         #
         #

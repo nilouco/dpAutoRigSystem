@@ -34,7 +34,7 @@ class Arm(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFinger']
-        checkResultList = self.ar.startGuideModules(standardDir, "check", checkModuleList=checkModuleList)
+        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
         
         if len(checkResultList) == 0:
             self.ar.collapseEditSelModFL = True
@@ -54,52 +54,45 @@ class Arm(dpBaseLibrary.BaseLibrary):
             self.ar.utils.setProgress(doingName, armGuideName, maxProcess, addOne=False, addNumber=False)
             self.ar.utils.setProgress(doingName+armName)
             
-            # creating module instances:
-            armLimbInstance = self.ar.initGuide('dpLimb', guideDir)
+            # getting module instances:
+            limb = self.ar.config.get_instance("dpLimb", [guideDir])
+            finger = self.ar.config.get_instance("dpFinger", [guideDir])
+            
+            # creating arm:
+            arm_guide = limb.build_raw_guide()
             # change name to arm:
-            armLimbInstance.editGuideModuleName(armName.capitalize())
-            # create finger instances:
-            thumbFingerInstance  = self.ar.initGuide('dpFinger', guideDir)
-            thumbFingerInstance.editGuideModuleName(fingerThumbName)
-            indexFingerInstance  = self.ar.initGuide('dpFinger', guideDir)
-            indexFingerInstance.editGuideModuleName(fingerIndexName)
-            middleFingerInstance = self.ar.initGuide('dpFinger', guideDir)
-            middleFingerInstance.editGuideModuleName(fingerMiddleName)
-            ringFingerInstance   = self.ar.initGuide('dpFinger', guideDir)
-            ringFingerInstance.editGuideModuleName(fingerRingName)
-            pinkyFingerInstance  = self.ar.initGuide('dpFinger', guideDir)
-            pinkyFingerInstance.editGuideModuleName(fingerPinkyName)
-            
+            limb.editGuideModuleName(armName.capitalize())
             # edit arm limb guide:
-            armBaseGuide = armLimbInstance.moduleGrp
-            cmds.setAttr(armBaseGuide+".translateX", 2.5)
-            cmds.setAttr(armBaseGuide+".translateY", 16)
-            cmds.setAttr(armBaseGuide+".displayAnnotation", 0)
-            cmds.setAttr(armLimbInstance.cvExtremLoc+".translateZ", 7)
-            cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
-            armLimbInstance.changeStyle(self.ar.data.lang['m026_biped'])
+            cmds.setAttr(arm_guide+".translateX", 2.5)
+            cmds.setAttr(arm_guide+".translateY", 16)
+            cmds.setAttr(arm_guide+".displayAnnotation", 0)
+            cmds.setAttr(limb.cvExtremLoc+".translateZ", 7)
+            cmds.setAttr(limb.radiusCtrl+".translateX", 1.5)
+            limb.changeStyle(self.ar.data.lang['m026_biped'])
             cmds.refresh()
-            
+
             # edit finger guides:
-            fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
-            fingerTZList       = [0.72, 0.6, 0.2, -0.2, -0.6]
-            for n, fingerInstance in enumerate(fingerInstanceList):
+            finger_names = [fingerThumbName, fingerIndexName, fingerMiddleName, fingerRingName, fingerPinkyName]
+            fingerTZList = [0.72, 0.6, 0.2, -0.2, -0.6]
+            for n, finger_name in enumerate(finger_names):
                 self.ar.utils.setProgress(doingName+self.ar.data.lang['m007_finger'])
-                cmds.setAttr(fingerInstance.moduleGrp+".translateX", 11)
-                cmds.setAttr(fingerInstance.moduleGrp+".translateY", 16)
-                cmds.setAttr(fingerInstance.moduleGrp+".translateZ", fingerTZList[n])
-                cmds.setAttr(fingerInstance.moduleGrp+".displayAnnotation", 0)
-                cmds.setAttr(fingerInstance.radiusCtrl+".translateX", 0.3)
-                cmds.setAttr(fingerInstance.annotation+".visibility", 0)
-                cmds.setAttr(fingerInstance.moduleGrp+".shapeSize", 0.3)
+                finger_guide = finger.build_raw_guide()
+                finger.editGuideModuleName(finger_name)
+                cmds.setAttr(finger_guide+".translateX", 11)
+                cmds.setAttr(finger_guide+".translateY", 16)
+                cmds.setAttr(finger_guide+".translateZ", fingerTZList[n])
+                cmds.setAttr(finger_guide+".displayAnnotation", 0)
+                cmds.setAttr(finger_guide+".shapeSize", 0.3)
+                cmds.setAttr(finger.radiusCtrl+".translateX", 0.3)
+                cmds.setAttr(finger.annotation+".visibility", 0)
                 if n == 0:
                     # correct not commun values for thumb guide:
-                    cmds.setAttr(thumbFingerInstance.moduleGrp+".translateX", 10.1)
-                    cmds.setAttr(thumbFingerInstance.moduleGrp+".rotateX", 60)
-                    thumbFingerInstance.changeJointNumber(2)
-                    cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
+                    cmds.setAttr(finger_guide+".translateX", 10.1)
+                    cmds.setAttr(finger_guide+".rotateX", 60)
+                    finger.changeJointNumber(2)
+                    cmds.setAttr(finger_guide+".nJoints", 2)
                 # parent finger guide to the arm wrist guide:
-                cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
+                cmds.parent(finger_guide, limb.cvExtremLoc, absolute=True)
                 cmds.refresh()
             
             # Close progress window
@@ -107,7 +100,7 @@ class Arm(dpBaseLibrary.BaseLibrary):
 
             # select the armGuide_Base:
             self.ar.collapseEditSelModFL = False
-            cmds.select(armBaseGuide)
+            cmds.select(arm_guide)
             print(self.ar.data.lang['m091_createdArm'])
         else:
             # error checking modules in the folder:

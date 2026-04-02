@@ -101,6 +101,7 @@ class BaseLayout(object):
                 self.facialExists = cmds.objExists(self.moduleGrp+".facial")
                 self.deformedByExists = cmds.objExists(self.moduleGrp+".deformedBy")
                 self.jawExists = cmds.objExists(self.moduleGrp+".jaw")
+                self.styleExists = cmds.objExists(self.moduleGrp+".style")
                 
                 # UI
                 # edit label of frame layout:
@@ -332,6 +333,17 @@ class BaseLayout(object):
                                 self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
                                 cmds.setAttr(self.moduleGrp+".mainControls", 0)
+                
+                if self.styleExists:
+                    self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
+                    cmds.text(label=self.ar.data.lang['m041_style'], visible=True, parent=self.styleLayout)
+                    self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
+                    styleMenuItemList = [self.ar.data.lang['m042_default'], self.ar.data.lang['m026_biped'], self.ar.data.lang['m037_quadruped']]
+                    for item in styleMenuItemList:
+                        cmds.menuItem(label=item, parent=self.styleMenu)
+                    # read from guide attribute the current value to style:
+                    currentStyle = cmds.getAttr(self.moduleGrp+".style")
+                    cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle+1))
 
                 if self.deformerExists:
                     deformerEnableValue = cmds.getAttr(self.moduleGrp+".upperHead")
@@ -379,7 +391,6 @@ class BaseLayout(object):
                     if userType:
                         cmds.radioCollection(self.facialTypeRC, edit=True, select=jnt)
                     
-                    
                 if self.deformedByExists:
                     self.deformedByLayout = cmds.rowLayout('deformedByLayout', numberOfColumns=3, columnWidth3=(100, 170, 30), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="rig_selected_module_cl" )
                     cmds.text(self.ar.data.lang['i313_deformedBy'], parent=self.deformedByLayout)
@@ -397,10 +408,12 @@ class BaseLayout(object):
                         cmds.optionMenu(self.deformedByMenu, edit=True, value='3 - Head and Jaw Deformers')
                     else:
                         cmds.optionMenu(self.deformedByMenu, edit=True, value='0 - None')
-                if cmds.window(self.ar.plusInfoWinName, query=True, exists=True):
+                
+
+                if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
                     self.plusInfoWin()
-            except:
-                pass
+            except Exception as e:
+                print("Layout Error:", e)
     
     
     def displayAnnotation(self, value, *args):
@@ -688,11 +701,11 @@ class BaseLayout(object):
         widthSize = (0.8*plus_winWidth)
         # creating Plus Info Window:
         self.ar.utils.closeUI(self.ar.colorOverrideWinName)
-        if cmds.window(self.ar.plusInfoWinName, query=True, exists=True):
+        if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
             cmds.deleteUI('plusFL')
-            self.dpPlusInfo = self.ar.plusInfoWinName
+            self.dpPlusInfo = self.ar.data.plus_info_win_name
         else:
-            self.dpPlusInfo = cmds.window(self.ar.plusInfoWinName, title='dpAutoRig - '+self.ar.data.lang['i205_guide']+" "+self.ar.data.lang['i013_info'], iconName='dpPlus', widthHeight=(plus_winWidth, plus_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+            self.dpPlusInfo = cmds.window(self.ar.data.plus_info_win_name, title='dpAutoRig - '+self.ar.data.lang['i205_guide']+" "+self.ar.data.lang['i013_info'], iconName='dpPlus', widthHeight=(plus_winWidth, plus_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         plusFL = cmds.formLayout('plusFL', numberOfDivisions=100, parent=self.dpPlusInfo)
         plusSL = cmds.scrollLayout('plusSL', parent=plusFL)
         cmds.formLayout(plusFL, edit=True, attachForm=((plusSL, 'bottom', 10), (plusSL, 'top', 10), (plusSL, 'left', 10), (plusSL, 'right', 10)))

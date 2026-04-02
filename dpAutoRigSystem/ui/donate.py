@@ -17,7 +17,7 @@ class DonateUI(object):
         donate_winHeight = 300
         donate_align = "center"
         # creating Donate Window:
-        self.ar.ui_manager.delete_exist_window('dpDonateWindow')
+        self.ar.utils.closeUI('dpDonateWindow')
         cmds.window('dpDonateWindow', title=donate_title, iconName='dpInfo', widthHeight=(donate_winWidth, donate_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         cmds.columnLayout("donate_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpDonateWindow")

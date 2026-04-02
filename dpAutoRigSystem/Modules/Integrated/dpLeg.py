@@ -34,7 +34,7 @@ class Leg(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFoot', 'dpFkLine']
-        checkResultList = self.ar.startGuideModules(standardDir, "check", checkModuleList=checkModuleList)
+        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
         
         if len(checkResultList) == 0:
             self.ar.collapseEditSelModFL = True
@@ -51,7 +51,7 @@ class Leg(dpBaseLibrary.BaseLibrary):
             legGuideName = self.ar.data.lang['m030_leg']+" "+self.ar.data.lang['i205_guide']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(simple, complete, cancel, userMessage)
+            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, simple, userMessage)
             if not userDetail == cancel:
                 # number of modules to create:
                 if userDetail == simple:
@@ -62,33 +62,37 @@ class Leg(dpBaseLibrary.BaseLibrary):
                 # Starting progress window
                 self.ar.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False, addNumber=False)
 
+                # getting module instances:
+                limb = self.ar.config.get_instance("dpLimb", [guideDir])
+                foot = self.ar.config.get_instance("dpFoot", [guideDir])
+                fkline = self.ar.config.get_instance("dpFkLine", [guideDir])
+                
                 self.ar.utils.setProgress(doingName+legName)
                 # create leg module instance:
-                legLimbInstance = self.ar.initGuide('dpLimb', guideDir)
+                leg_guide = limb.build_raw_guide()
                 # change limb guide to leg type:
-                legLimbInstance.changeType(legName)
+                limb.changeType(legName)
                 # change name to leg:
-                legLimbInstance.editGuideModuleName(legName)
+                limb.editGuideModuleName(legName)
                 # editing leg base guide informations:
-                legBaseGuide = legLimbInstance.moduleGrp
-                cmds.setAttr(legBaseGuide+".type", 1)
-                cmds.setAttr(legBaseGuide+".translateX", 1.5)
-                cmds.setAttr(legBaseGuide+".translateY", 10)
-                cmds.setAttr(legBaseGuide+".rotateX", 0)
-                cmds.setAttr(legLimbInstance.radiusCtrl+".translateX", 1.5)
-                legLimbInstance.changeStyle(self.ar.data.lang['m026_biped'])
+                cmds.setAttr(leg_guide+".type", 1)
+                cmds.setAttr(leg_guide+".translateX", 1.5)
+                cmds.setAttr(leg_guide+".translateY", 10)
+                cmds.setAttr(leg_guide+".rotateX", 0)
+                cmds.setAttr(limb.radiusCtrl+".translateX", 1.5)
+                limb.changeStyle(self.ar.data.lang['m026_biped'])
                 # edit location of leg ankle guide:
-                cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
+                cmds.setAttr(limb.cvExtremLoc+".translateZ", 8.5)
                 cmds.refresh()
                 
                 self.ar.utils.setProgress(doingName+footName)
                 # create foot module instance:
-                footInstance = self.ar.initGuide('dpFoot', guideDir)
-                footInstance.editGuideModuleName(footName)
-                cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
-                cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
+                foot_guide = foot.build_raw_guide()
+                foot.editGuideModuleName(footName)
+                cmds.setAttr(foot_guide+".translateX", 1.5)
+                cmds.setAttr(foot.cvFootLoc+".translateZ", 1.5)
                 # parent foot guide to leg ankle guide:
-                cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
+                cmds.parent(foot_guide, limb.cvExtremLoc, absolute=True)
                 cmds.refresh()
                 
                 #
@@ -96,121 +100,123 @@ class Leg(dpBaseLibrary.BaseLibrary):
                 #
                 if userDetail == complete:
                     
+                    # working with Toes system:
                     self.ar.utils.setProgress(doingName+toeName)
                     # create toe1 module instance:
-                    toe1Instance = self.ar.initGuide('dpFkLine', guideDir)
+                    toe_1_guide = fkline.build_raw_guide()
                     # change name to toe:
-                    toe1Instance.editGuideModuleName(toeName+"_1")
+                    fkline.editGuideModuleName(toeName+"_1")
                     # editing toe base guide informations:
-                    cmds.setAttr(toe1Instance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe1Instance.moduleGrp+".translateX", 1)
-                    cmds.setAttr(toe1Instance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe1Instance.moduleGrp+".translateZ", 2.7)
-                    toe1Instance.changeJointNumber(2)
-                    cmds.setAttr(toe1Instance.cvJointLoc+".translateZ", 0.25)
-                    toe1Instance.changeJointNumber(3)
-                    cmds.setAttr(toe1Instance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe1Instance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe1Instance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe1Instance.moduleGrp+".flip", 1)
-                    toe1Instance.displayAnnotation(0)
+                    cmds.setAttr(toe_1_guide+".shapeSize", 0.3)
+                    cmds.setAttr(toe_1_guide+".translateX", 1)
+                    cmds.setAttr(toe_1_guide+".translateY", 0.5)
+                    cmds.setAttr(toe_1_guide+".translateZ", 2.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(toe_1_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
                     # parent toe1 guide to foot middle guide:
-                    cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                    cmds.parent(toe_1_guide, foot.cvRFFLoc, absolute=True)
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName)
                     # create toe2 module instance:
-                    toe2Instance = self.ar.initGuide('dpFkLine', guideDir)
+                    toe_2_guide = fkline.build_raw_guide()
                     # change name to toe:
-                    toe2Instance.editGuideModuleName(toeName+"_2")
+                    fkline.editGuideModuleName(toeName+"_2")
                     # editing toe base guide informations:
-                    cmds.setAttr(toe2Instance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe2Instance.moduleGrp+".translateX", 1.35)
-                    cmds.setAttr(toe2Instance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe2Instance.moduleGrp+".translateZ", 2.7)
-                    toe2Instance.changeJointNumber(2)
-                    cmds.setAttr(toe2Instance.cvJointLoc+".translateZ", 0.25)
-                    toe2Instance.changeJointNumber(3)
-                    cmds.setAttr(toe2Instance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe2Instance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe2Instance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe2Instance.moduleGrp+".flip", 1)
-                    toe2Instance.displayAnnotation(0)
+                    cmds.setAttr(toe_2_guide+".shapeSize", 0.3)
+                    cmds.setAttr(toe_2_guide+".translateX", 1.35)
+                    cmds.setAttr(toe_2_guide+".translateY", 0.5)
+                    cmds.setAttr(toe_2_guide+".translateZ", 2.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(toe_2_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
                     # parent toe2 guide to foot middle guide:
-                    cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                    cmds.parent(toe_2_guide, foot.cvRFFLoc, absolute=True)
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName)
                     # create toe3 module instance:
-                    toe3Instance = self.ar.initGuide('dpFkLine', guideDir)
+                    toe_3_guide = fkline.build_raw_guide()
                     # change name to toe:
-                    toe3Instance.editGuideModuleName(toeName+"_3")
+                    fkline.editGuideModuleName(toeName+"_3")
                     # editing toe base guide informations:
-                    cmds.setAttr(toe3Instance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe3Instance.moduleGrp+".translateX", 1.65)
-                    cmds.setAttr(toe3Instance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe3Instance.moduleGrp+".translateZ", 2.7)
-                    toe3Instance.changeJointNumber(2)
-                    cmds.setAttr(toe3Instance.cvJointLoc+".translateZ", 0.25)
-                    toe3Instance.changeJointNumber(3)
-                    cmds.setAttr(toe3Instance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe3Instance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe3Instance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe3Instance.moduleGrp+".flip", 1)
-                    toe3Instance.displayAnnotation(0)
+                    cmds.setAttr(toe_3_guide+".shapeSize", 0.3)
+                    cmds.setAttr(toe_3_guide+".translateX", 1.65)
+                    cmds.setAttr(toe_3_guide+".translateY", 0.5)
+                    cmds.setAttr(toe_3_guide+".translateZ", 2.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(toe_3_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
                     # parent toe3 guide to foot middle guide:
-                    cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                    cmds.parent(toe_3_guide, foot.cvRFFLoc, absolute=True)
                     cmds.refresh()
-                    
+
                     self.ar.utils.setProgress(doingName+toeName)
                     # create toe4 module instance:
-                    toe4Instance = self.ar.initGuide('dpFkLine', guideDir)
+                    toe_4_guide = fkline.build_raw_guide()
                     # change name to toe:
-                    toe4Instance.editGuideModuleName(toeName+"_4")
+                    fkline.editGuideModuleName(toeName+"_4")
                     # editing toe base guide informations:
-                    cmds.setAttr(toe4Instance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe4Instance.moduleGrp+".translateX", 1.95)
-                    cmds.setAttr(toe4Instance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe4Instance.moduleGrp+".translateZ", 2.7)
-                    toe4Instance.changeJointNumber(2)
-                    cmds.setAttr(toe4Instance.cvJointLoc+".translateZ", 0.25)
-                    toe4Instance.changeJointNumber(3)
-                    cmds.setAttr(toe4Instance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe4Instance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe4Instance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe4Instance.moduleGrp+".flip", 1)
-                    toe4Instance.displayAnnotation(0)
+                    cmds.setAttr(toe_4_guide+".shapeSize", 0.3)
+                    cmds.setAttr(toe_4_guide+".translateX", 1.95)
+                    cmds.setAttr(toe_4_guide+".translateY", 0.5)
+                    cmds.setAttr(toe_4_guide+".translateZ", 2.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(toe_4_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
                     # parent toe4 guide to foot middle guide:
-                    cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                    cmds.parent(toe_4_guide, foot.cvRFFLoc, absolute=True)
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName)
                     # create toe5 module instance:
-                    toe5Instance = self.ar.initGuide('dpFkLine', guideDir)
+                    toe_5_guide = fkline.build_raw_guide()
                     # change name to toe:
-                    toe5Instance.editGuideModuleName(toeName+"_5")
+                    fkline.editGuideModuleName(toeName+"_5")
                     # editing toe base guide informations:
-                    cmds.setAttr(toe5Instance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe5Instance.moduleGrp+".translateX", 2.25)
-                    cmds.setAttr(toe5Instance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe5Instance.moduleGrp+".translateZ", 2.7)
-                    toe5Instance.changeJointNumber(2)
-                    cmds.setAttr(toe5Instance.cvJointLoc+".translateZ", 0.25)
-                    toe5Instance.changeJointNumber(3)
-                    cmds.setAttr(toe5Instance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe5Instance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe5Instance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe5Instance.moduleGrp+".flip", 1)
-                    toe5Instance.displayAnnotation(0)
+                    cmds.setAttr(toe_5_guide+".shapeSize", 0.3)
+                    cmds.setAttr(toe_5_guide+".translateX", 2.25)
+                    cmds.setAttr(toe_5_guide+".translateY", 0.5)
+                    cmds.setAttr(toe_5_guide+".translateZ", 2.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(toe_5_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
                     # parent toe5 guide to foot middle guide:
-                    cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
+                    cmds.parent(toe_5_guide, foot.cvRFFLoc, absolute=True)
+                    cmds.refresh()
                 
                 # Close progress window
                 self.ar.utils.setProgress(endIt=True)
 
                 # select the legGuide_Base:
                 self.ar.collapseEditSelModFL = False
-                cmds.select(legBaseGuide)
+                cmds.select(leg_guide)
                 print(self.ar.data.lang['m092_createdLeg'])
         else:
             # error checking modules in the folder:

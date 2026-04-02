@@ -32,10 +32,8 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
         
 
     def build_tool(self, *args):
-        self.headCtrl = None
-        self.wellDone = True
         # call main function
-        if self.ui:
+        if self.ar.data.ui_state:
             self.dpHeadDeformer(self)
     
     
@@ -76,6 +74,8 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
     def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, guideNet=None, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
+        self.headCtrl = None
+        self.wellDone = True
         if self.ui:
             dialogName = self.dpHeadDeformerPromptDialog()
         if dialogName == None:
@@ -382,7 +382,7 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
             
             # try to integrate to Scalable_Grp
             for item in cmds.ls(selection=False, type="transform"):
-                if cmds.objExists(item+"."+self.ar.masterAttr) and cmds.getAttr(item+"."+self.ar.masterAttr) == 1:
+                if cmds.objExists(item+"."+self.ar.data.master_attr) and cmds.getAttr(item+"."+self.ar.data.master_attr) == 1:
                     scalableGrp = cmds.listConnections(item+".scalableGrp")[0]
                     cmds.parent(dataGrp, scalableGrp)
                     break

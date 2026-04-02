@@ -78,6 +78,7 @@ class BaseStandard(object):
             self.createGuide()
         
         self.load_raw_guide()
+        return self.moduleGrp
     
 
     def load_raw_guide(self, userGuideName=None):
@@ -428,6 +429,18 @@ class BaseStandard(object):
                 cmds.checkBox(self.mainCtrlsCB, edit=True, editable=False)
             cmds.intField(self.nMainCtrlIF, edit=True, value=self.nMainCtrlAttr)
         cmds.setAttr(self.moduleGrp+".nMain", self.nMainCtrlAttr)
+
+
+    def changeStyle(self, style, *args):
+        """ Change the style to be applyed custom actions to be more animator friendly.
+            We will optimise: control world orientation
+        """
+        if style == self.ar.data.lang['m042_default'] or style == 0:
+            cmds.setAttr(self.moduleGrp+".style", 0)
+        elif style == self.ar.data.lang['m026_biped'] or style == 1:
+            cmds.setAttr(self.moduleGrp+".style", 1)
+        elif style == self.ar.data.lang['m037_quadruped'] or style == 2:
+            cmds.setAttr(self.moduleGrp+".style", 2)
 
 
     def enableMainCtrls(self, value, *args):

@@ -34,14 +34,13 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
-        checkResultList = self.ar.startGuideModules(standardDir, "check", checkModuleList=checkModuleList)
+        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
         
         if len(checkResultList) == 0:
             self.ar.collapseEditSelModFL = True
             # defining naming:
             doingName = self.ar.data.lang['m094_doing']
-            bipedStyleName = self.ar.data.lang['m026_biped']
-            quadrupedStyleName = self.ar.data.lang['m155_quadrupedExtra']
+            quadrupedStyleName = self.ar.data.lang['m037_quadruped']
             # part names:
             spineName = self.ar.data.lang['m011_spine']
             headName = self.ar.data.lang['c024_head']
@@ -73,7 +72,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
             quadrupedGuideName = self.ar.data.lang['m037_quadruped']+" "+self.ar.data.lang['i205_guide']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(simple, complete, cancel, userMessage)
+            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
             if not userDetail == cancel:
                 # number of modules to create:
                 if userDetail == simple:
@@ -84,679 +83,705 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 # Starting progress window
                 self.ar.utils.setProgress(doingName, quadrupedGuideName, maxProcess, addOne=False, addNumber=False)
 
-                # woking with SPINE system:
+                # getting module instances:
+                limb = self.ar.config.get_instance("dpLimb", [guideDir])
+                foot = self.ar.config.get_instance("dpFoot", [guideDir])
+                spine = self.ar.config.get_instance("dpSpine", [guideDir])
+                head = self.ar.config.get_instance("dpHead", [guideDir])
+                fkline = self.ar.config.get_instance("dpFkLine", [guideDir])
+                eye = self.ar.config.get_instance("dpEye", [guideDir])
+                nose = self.ar.config.get_instance("dpNose", [guideDir])
+                single = self.ar.config.get_instance("dpSingle", [guideDir])
+
+                # working with SPINE system:
                 self.ar.utils.setProgress(doingName+spineName)
                 # create spine module instance:
-                spineInstance = self.ar.initGuide('dpSpine', guideDir, self.ar.data.rig_type_quadruped)
+                spine_guide = spine.build_raw_guide()
                 # editing spine base guide informations:
-                spineInstance.editGuideModuleName(spineName)
-                cmds.setAttr(spineInstance.moduleGrp+".translateY", 10)
-                cmds.setAttr(spineInstance.moduleGrp+".translateZ", -5)
-                cmds.setAttr(spineInstance.moduleGrp+".rotateX", 0)
-                cmds.setAttr(spineInstance.moduleGrp+".rotateY", 0)
-                cmds.setAttr(spineInstance.moduleGrp+".rotateZ", 90)
-                cmds.setAttr(spineInstance.cvLocator+".translateZ", 6)
-                cmds.setAttr(spineInstance.annotation+".translateX", 6)
-                cmds.setAttr(spineInstance.annotation+".translateY", 0)
-                spineInstance.changeStyle(bipedStyleName)
+                spine.editGuideModuleName(spineName)
+                cmds.setAttr(spine_guide+".translateY", 10)
+                cmds.setAttr(spine_guide+".translateZ", -5)
+                cmds.setAttr(spine_guide+".rotateX", 0)
+                cmds.setAttr(spine_guide+".rotateY", 0)
+                cmds.setAttr(spine_guide+".rotateZ", 90)
+                cmds.setAttr(spine.cvLocator+".translateZ", 6)
+                cmds.setAttr(spine.annotation+".translateX", 6)
+                cmds.setAttr(spine.annotation+".translateY", 0)
+                #spine.changeStyle(bipedStyleName)
+                spine.changeStyle(quadrupedStyleName)
                 cmds.refresh()
                 
-                # woking with HEAD system:
+                # working with HEAD system:
                 self.ar.utils.setProgress(doingName+headName)
                 # create head module instance:
-                headInstance = self.ar.initGuide('dpHead', guideDir, self.ar.data.rig_type_quadruped)
+                head_guide = head.build_raw_guide()
                 # editing head base guide informations:
-                headInstance.editGuideModuleName(headName)
-                cmds.setAttr(headInstance.moduleGrp+".translateY", 9.5)
-                cmds.setAttr(headInstance.moduleGrp+".translateZ", 5.5)
-                cmds.setAttr(headInstance.moduleGrp+".rotateX", 0)
-                cmds.setAttr(headInstance.moduleGrp+".rotateY", 45)
-                cmds.setAttr(headInstance.moduleGrp+".rotateZ", 90)
-                cmds.setAttr(headInstance.cvHeadLoc+".translateY", 5)
-                cmds.setAttr(headInstance.cvHeadLoc+".rotateX", -45)
-                cmds.setAttr(headInstance.cvUpperJawLoc+".translateY", 0.5)
-                cmds.setAttr(headInstance.cvUpperJawLoc+".translateZ", 1.3)
-                cmds.setAttr(headInstance.cvJawLoc+".translateY", -1.0)
-                cmds.setAttr(headInstance.cvJawLoc+".translateZ", 2.0)
-                cmds.setAttr(headInstance.cvJawLoc+".rotateY", 0)
-                cmds.setAttr(headInstance.cvLCornerLipLoc+".translateX", 0.6)
-                cmds.setAttr(headInstance.cvLCornerLipLoc+".translateY", -0.15)
-                cmds.setAttr(headInstance.cvLCornerLipLoc+".translateZ", 1.6)
-                cmds.setAttr(headInstance.cvUpperLipLoc+".translateY", -1.4)
-                cmds.setAttr(headInstance.cvUpperLipLoc+".translateZ", 3.5)
-                cmds.setAttr(headInstance.cvLowerLipLoc+".translateY", -0.2)
-                cmds.setAttr(headInstance.cvLowerLipLoc+".translateZ", 2.5)
-                cmds.setAttr(headInstance.annotation+".translateX", 4)
-                cmds.setAttr(headInstance.annotation+".translateY", 0)
-                headInstance.changeJointNumber(3)
+                head.editGuideModuleName(headName)
+                cmds.setAttr(head_guide+".translateY", 9.5)
+                cmds.setAttr(head_guide+".translateZ", 5.5)
+                cmds.setAttr(head_guide+".rotateX", 0)
+                cmds.setAttr(head_guide+".rotateY", 45)
+                cmds.setAttr(head_guide+".rotateZ", 90)
+                cmds.setAttr(head.cvHeadLoc+".translateY", 5)
+                cmds.setAttr(head.cvHeadLoc+".rotateX", -45)
+                cmds.setAttr(head.cvUpperJawLoc+".translateY", 0.5)
+                cmds.setAttr(head.cvUpperJawLoc+".translateZ", 1.3)
+                cmds.setAttr(head.cvJawLoc+".translateY", -1.0)
+                cmds.setAttr(head.cvJawLoc+".translateZ", 2.0)
+                cmds.setAttr(head.cvJawLoc+".rotateY", 0)
+                cmds.setAttr(head.cvLCornerLipLoc+".translateX", 0.6)
+                cmds.setAttr(head.cvLCornerLipLoc+".translateY", -0.15)
+                cmds.setAttr(head.cvLCornerLipLoc+".translateZ", 1.6)
+                cmds.setAttr(head.cvUpperLipLoc+".translateY", -1.4)
+                cmds.setAttr(head.cvUpperLipLoc+".translateZ", 3.5)
+                cmds.setAttr(head.cvLowerLipLoc+".translateY", -0.2)
+                cmds.setAttr(head.cvLowerLipLoc+".translateZ", 2.5)
+                cmds.setAttr(head.annotation+".translateX", 4)
+                cmds.setAttr(head.annotation+".translateY", 0)
+                head.changeJointNumber(3)
+                head.changeStyle(quadrupedStyleName)
                 # parent head guide to chest guide:
-                cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+                cmds.parent(head_guide, spine.cvLocator, absolute=True)
                 cmds.refresh()
                 
-                # woking with Eye system:
+                # working with Eye system:
                 self.ar.utils.setProgress(doingName+eyeName)
                 # create eyeLookAt module instance:
-                eyeInstance = self.ar.initGuide('dpEye', guideDir, self.ar.data.rig_type_quadruped)
+                eye_guide = eye.build_raw_guide()
                 # editing eyeLookAt base guide informations:
-                eyeInstance.editGuideModuleName(eyeName)
+                eye.editGuideModuleName(eyeName)
                 # setting X mirror:
-                eyeInstance.changeMirror("X")
-                cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
-                cmds.setAttr(eyeInstance.moduleGrp+".translateY", 13.5)
-                cmds.setAttr(eyeInstance.moduleGrp+".translateZ", 11)
-                cmds.setAttr(eyeInstance.annotation+".translateY", 3.5)
-                cmds.setAttr(eyeInstance.radiusCtrl+".translateX", 0.5)
-                cmds.setAttr(eyeInstance.cvEndJoint+".translateZ", 7)
-                cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
+                eye.changeMirror("X")
+                cmds.setAttr(eye_guide+".translateX", 0.5)
+                cmds.setAttr(eye_guide+".translateY", 13.5)
+                cmds.setAttr(eye_guide+".translateZ", 11)
+                cmds.setAttr(eye.annotation+".translateY", 3.5)
+                cmds.setAttr(eye.radiusCtrl+".translateX", 0.5)
+                cmds.setAttr(eye.cvEndJoint+".translateZ", 7)
+                cmds.setAttr(eye_guide+".flip", 1)
                 # parent head guide to spine guide:
-                cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
+                cmds.parent(eye_guide, head.cvUpperHeadLoc, absolute=True)
                 cmds.refresh()
                 
                 # working with BACK LEG (B) system:
                 self.ar.utils.setProgress(doingName+legName)
                 # create back leg module instance:
-                backLegLimbInstance = self.ar.initGuide('dpLimb', guideDir, self.ar.data.rig_type_quadruped)
+                back_leg_guide = limb.build_raw_guide()
                 # change limb guide to back leg type:
-                backLegLimbInstance.changeType(legName)
+                limb.changeType(legName)
                 # change limb guide to back leg style (quadruped):
-                backLegLimbInstance.changeStyle(quadrupedStyleName) 
-                backLegLimbInstance.changeNumBend(3)
+                limb.changeStyle(quadrupedStyleName) 
+                limb.changeNumBend(3)
                 # change name to back leg:
-                backLegLimbInstance.editGuideModuleName(legName+backName)
-                cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
+                limb.editGuideModuleName(legName+backName)
+                cmds.setAttr(limb.annotation+".translateY", -4)
                 # editing back leg base guide informations:
-                backLegBaseGuide = backLegLimbInstance.moduleGrp
-                cmds.setAttr(backLegBaseGuide+".type", 1)
-                cmds.setAttr(backLegBaseGuide+".translateX", 3)
-                cmds.setAttr(backLegBaseGuide+".translateY", 9.5)
-                cmds.setAttr(backLegBaseGuide+".translateZ", -6.5)
-                cmds.setAttr(backLegBaseGuide+".rotateX", 0)
+                cmds.setAttr(back_leg_guide+".type", 1)
+                cmds.setAttr(back_leg_guide+".translateX", 3)
+                cmds.setAttr(back_leg_guide+".translateY", 9.5)
+                cmds.setAttr(back_leg_guide+".translateZ", -6.5)
+                cmds.setAttr(back_leg_guide+".rotateX", 0)
                 # edit before, main and corners:
-                cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateX", 1)
-                cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateY", 0,5)
-                cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateZ", -2.5)
-                cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateX", 20)
-                cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateY", 10)
-                cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateZ", -105)
-                cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateX", 0.7)
-                cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateZ", -0.7)
+                cmds.setAttr(limb.cvBeforeLoc+".translateX", 1)
+                cmds.setAttr(limb.cvBeforeLoc+".translateY", 0,5)
+                cmds.setAttr(limb.cvBeforeLoc+".translateZ", -2.5)
+                cmds.setAttr(limb.cvBeforeLoc+".rotateX", 20)
+                cmds.setAttr(limb.cvBeforeLoc+".rotateY", 10)
+                cmds.setAttr(limb.cvBeforeLoc+".rotateZ", -105)
+                cmds.setAttr(limb.cvCornerLoc+".translateX", 0.7)
+                cmds.setAttr(limb.cvCornerLoc+".translateZ", -0.7)
                 # edit location of back leg ankle guide:
-                cmds.setAttr(backLegLimbInstance.cvExtremLoc+".translateZ", 8)
+                cmds.setAttr(limb.cvExtremLoc+".translateZ", 8)
                 # edit location of double back leg joint:
-                cmds.setAttr(backLegLimbInstance.cvCornerBLoc+".translateX", -2)
+                cmds.setAttr(limb.cvCornerBLoc+".translateX", -2)
                 # parent back leg guide to spine base guide:
-                cmds.parent(backLegBaseGuide, spineInstance.moduleGrp, absolute=True)
+                cmds.parent(back_leg_guide, spine_guide, absolute=True)
                 # setting X mirror:
-                backLegLimbInstance.changeMirror("X")
+                limb.changeMirror("X")
                 cmds.refresh()
                 
                 self.ar.utils.setProgress(doingName+footName)
                 # create BACK FOOT (B) module instance:
-                backFootInstance = self.ar.initGuide('dpFoot', guideDir, self.ar.data.rig_type_quadruped)
-                backFootInstance.editGuideModuleName(footName+backName)
-                cmds.setAttr(backFootInstance.annotation+".translateY", -3)
-                cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
-                cmds.setAttr(backFootInstance.moduleGrp+".translateZ", -6.5)
-                cmds.setAttr(backFootInstance.cvFootLoc+".translateZ", 1.5)
-                cmds.setAttr(backFootInstance.cvRFALoc+".translateX", 0)
-                cmds.setAttr(backFootInstance.cvRFBLoc+".translateX", 0)
-                cmds.setAttr(backFootInstance.cvRFDLoc+".translateX", -1.5)
-                cmds.setAttr(backFootInstance.cvRFFLoc+".translateZ", 1)
+                back_foot_guide = foot.build_raw_guide()
+                foot.editGuideModuleName(footName+backName)
+                cmds.setAttr(foot.annotation+".translateY", -3)
+                cmds.setAttr(back_foot_guide+".translateX", 3)
+                cmds.setAttr(back_foot_guide+".translateZ", -6.5)
+                cmds.setAttr(foot.cvFootLoc+".translateZ", 1.5)
+                cmds.setAttr(foot.cvRFALoc+".translateX", 0)
+                cmds.setAttr(foot.cvRFBLoc+".translateX", 0)
+                cmds.setAttr(foot.cvRFDLoc+".translateX", -1.5)
+                cmds.setAttr(foot.cvRFFLoc+".translateZ", 1)
                 # parent back foot guide to back leg ankle guide:
-                cmds.parent(backFootInstance.moduleGrp, backLegLimbInstance.cvExtremLoc, absolute=True)
-                backFootInstance.checkFatherMirror()
+                cmds.parent(back_foot_guide, limb.cvExtremLoc, absolute=True)
+                foot.checkFatherMirror()
                 cmds.refresh()
+
+                if userDetail == complete:
+                    limb.setCorrective(1)
+                    self.ar.utils.setProgress(doingName+toeName+backName)
+                    # create toe1 module instance:
+                    back_toe_1_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+backName+"_1")
+                    # editing toe base guide informations:
+                    cmds.setAttr(back_toe_1_guide+".shapeSize", 0.3)
+                    cmds.setAttr(back_toe_1_guide+".translateX", 2.5)
+                    cmds.setAttr(back_toe_1_guide+".translateY", 0.5)
+                    cmds.setAttr(back_toe_1_guide+".translateZ", -5.33)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(back_toe_1_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe1 guide to foot middle guide:
+                    cmds.parent(back_toe_1_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+                    
+                    self.ar.utils.setProgress(doingName+toeName+backName)
+                    # create toe2 module instance:
+                    back_toe_2_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+backName+"_2")
+                    # editing toe base guide informations:
+                    cmds.setAttr(back_toe_2_guide+".shapeSize", 0.3)
+                    cmds.setAttr(back_toe_2_guide+".translateX", 2.85)
+                    cmds.setAttr(back_toe_2_guide+".translateY", 0.5)
+                    cmds.setAttr(back_toe_2_guide+".translateZ", -5.33)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(back_toe_2_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe2 guide to foot middle guide:
+                    cmds.parent(back_toe_2_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+                    
+                    self.ar.utils.setProgress(doingName+toeName+backName)
+                    # create toe3 module instance:
+                    back_toe_3_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+backName+"_3")
+                    # editing toe base guide informations:
+                    cmds.setAttr(back_toe_3_guide+".shapeSize", 0.3)
+                    cmds.setAttr(back_toe_3_guide+".translateX", 3.15)
+                    cmds.setAttr(back_toe_3_guide+".translateY", 0.5)
+                    cmds.setAttr(back_toe_3_guide+".translateZ", -5.33)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(back_toe_3_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe3 guide to foot middle guide:
+                    cmds.parent(back_toe_3_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+                    
+                    self.ar.utils.setProgress(doingName+toeName+backName)
+                    # create toe4 module instance:
+                    back_toe_4_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+backName+"_4")
+                    # editing toe base guide informations:
+                    cmds.setAttr(back_toe_4_guide+".shapeSize", 0.3)
+                    cmds.setAttr(back_toe_4_guide+".translateX", 3.45)
+                    cmds.setAttr(back_toe_4_guide+".translateY", 0.5)
+                    cmds.setAttr(back_toe_4_guide+".translateZ", -5.33)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(back_toe_4_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe4 guide to foot middle guide:
+                    cmds.parent(back_toe_4_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
                 
                 # working with FRONT LEG (A) system:
                 self.ar.utils.setProgress(doingName+legName)
                 # create front leg module instance:
-                frontLegLimbInstance = self.ar.initGuide('dpLimb', guideDir, self.ar.data.rig_type_quadruped)
+                front_leg_guide = limb.build_raw_guide()
                 # change limb guide to front leg type:
-                frontLegLimbInstance.changeType(legName)
+                limb.changeType(legName)
                 # change limb guide to front leg style (biped):
-                frontLegLimbInstance.changeStyle(quadrupedStyleName)
-                frontLegLimbInstance.changeNumBend(3)
+                limb.changeStyle(quadrupedStyleName)
+                limb.changeNumBend(3)
                 # change name to front leg:
-                frontLegLimbInstance.editGuideModuleName(legName+frontName)
-                cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
+                limb.editGuideModuleName(legName+frontName)
+                cmds.setAttr(limb.annotation+".translateY", -4)
                 # editing front leg base guide informations:
-                frontLegBaseGuide = frontLegLimbInstance.moduleGrp
-                cmds.setAttr(frontLegBaseGuide+".type", 1)
-                cmds.setAttr(frontLegBaseGuide+".translateX", 2.5)
-                cmds.setAttr(frontLegBaseGuide+".translateY", 8)
-                cmds.setAttr(frontLegBaseGuide+".translateZ", 5.5)
-                cmds.setAttr(frontLegBaseGuide+".rotateX", 0)
+                cmds.setAttr(front_leg_guide+".type", 1)
+                cmds.setAttr(front_leg_guide+".translateX", 2.5)
+                cmds.setAttr(front_leg_guide+".translateY", 8)
+                cmds.setAttr(front_leg_guide+".translateZ", 5.5)
+                cmds.setAttr(front_leg_guide+".rotateX", 0)
                 # edit before, main and corners:
-                cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateX", -0.75)
-                cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateY", 0.5)
-                cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateZ", -2.5)
-                cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateX", -15)
-                cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateY", 15)
-                cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateZ", -90)
-                cmds.setAttr(frontLegLimbInstance.mainAic+".offsetY", -1)
-                cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateX", -2.0)
-                cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateZ", -0.6)
+                cmds.setAttr(limb.cvBeforeLoc+".translateX", -0.75)
+                cmds.setAttr(limb.cvBeforeLoc+".translateY", 0.5)
+                cmds.setAttr(limb.cvBeforeLoc+".translateZ", -2.5)
+                cmds.setAttr(limb.cvBeforeLoc+".rotateX", -15)
+                cmds.setAttr(limb.cvBeforeLoc+".rotateY", 15)
+                cmds.setAttr(limb.cvBeforeLoc+".rotateZ", -90)
+                cmds.setAttr(limb.mainAic+".offsetY", -1)
+                cmds.setAttr(limb.cvCornerLoc+".translateX", -2.0)
+                cmds.setAttr(limb.cvCornerLoc+".translateZ", -0.6)
                 # edit location of front leg ankle guide:
-                cmds.setAttr(frontLegLimbInstance.cvExtremLoc+".translateZ", 6.5)
+                cmds.setAttr(limb.cvExtremLoc+".translateZ", 6.5)
                 # edit location of double front leg joint:
-                cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateX", 1.75)
-                cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateZ", 2.75)
-                cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".rotateY", 10)
+                cmds.setAttr(limb.cvCornerBLoc+".translateX", 1.75)
+                cmds.setAttr(limb.cvCornerBLoc+".translateZ", 2.75)
+                cmds.setAttr(limb.cvCornerBLoc+".rotateY", 10)
                 # parent front leg guide to spine chest guide:
-                cmds.parent(frontLegBaseGuide, spineInstance.cvLocator, absolute=True)
+                cmds.parent(front_leg_guide, spine.cvLocator, absolute=True)
                 # setting X mirror:
-                frontLegLimbInstance.changeMirror("X")
+                limb.changeMirror("X")
+                if userDetail == complete:
+                    limb.setCorrective(1)
                 cmds.refresh()
 
                 self.ar.utils.setProgress(doingName+footName)
                 # create FRONT FOOT (A) module instance:
-                frontFootInstance = self.ar.initGuide('dpFoot', guideDir, self.ar.data.rig_type_quadruped)
-                frontFootInstance.editGuideModuleName(footName+frontName)
-                cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
-                cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
-                cmds.setAttr(frontFootInstance.moduleGrp+".translateZ", 5.5)
-                cmds.setAttr(frontFootInstance.cvFootLoc+".translateZ", 1.5)
-                cmds.setAttr(frontFootInstance.cvRFALoc+".translateX", 0)
-                cmds.setAttr(frontFootInstance.cvRFBLoc+".translateX", 0)
-                cmds.setAttr(frontFootInstance.cvRFDLoc+".translateX", -1.5)
-                cmds.setAttr(frontFootInstance.cvRFFLoc+".translateZ", 1)
+                front_foot_guide = foot.build_raw_guide()
+                foot.editGuideModuleName(footName+frontName)
+                cmds.setAttr(foot.annotation+".translateY", -3)
+                cmds.setAttr(front_foot_guide+".translateX", 2.5)
+                cmds.setAttr(front_foot_guide+".translateZ", 5.5)
+                cmds.setAttr(foot.cvFootLoc+".translateZ", 1.5)
+                cmds.setAttr(foot.cvRFALoc+".translateX", 0)
+                cmds.setAttr(foot.cvRFBLoc+".translateX", 0)
+                cmds.setAttr(foot.cvRFDLoc+".translateX", -1.5)
+                cmds.setAttr(foot.cvRFFLoc+".translateZ", 1)
                 # parent front foot guide to front leg ankle guide:
-                cmds.parent(frontFootInstance.moduleGrp, frontLegLimbInstance.cvExtremLoc, absolute=True)
-                frontFootInstance.checkFatherMirror()
+                cmds.parent(front_foot_guide, limb.cvExtremLoc, absolute=True)
+                foot.checkFatherMirror()
                 cmds.refresh()
                 
-                # woking with TAIL system:
+                if userDetail == complete:
+                    limb.setCorrective(1)
+                    self.ar.utils.setProgress(doingName+toeName+frontName)
+                    # create toe1 module instance:
+                    front_toe_1_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+frontName+"_1")
+                    # editing toe base guide informations:
+                    cmds.setAttr(front_toe_1_guide+".shapeSize", 0.3)
+                    cmds.setAttr(front_toe_1_guide+".translateX", 2)
+                    cmds.setAttr(front_toe_1_guide+".translateY", 0.5)
+                    cmds.setAttr(front_toe_1_guide+".translateZ", 6.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(front_toe_1_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe1 guide to foot middle guide:
+                    cmds.parent(front_toe_1_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+                    
+                    self.ar.utils.setProgress(doingName+toeName+frontName)
+                    # create toe2 module instance:
+                    front_toe_2_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+frontName+"_2")
+                    # editing toe base guide informations:
+                    cmds.setAttr(front_toe_2_guide+".shapeSize", 0.3)
+                    cmds.setAttr(front_toe_2_guide+".translateX", 2.35)
+                    cmds.setAttr(front_toe_2_guide+".translateY", 0.5)
+                    cmds.setAttr(front_toe_2_guide+".translateZ", 6.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(front_toe_2_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe2 guide to foot middle guide:
+                    cmds.parent(front_toe_2_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+                    
+                    self.ar.utils.setProgress(doingName+toeName+frontName)
+                    # create toe3 module instance:
+                    front_toe_3_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+frontName+"_3")
+                    # editing toe base guide informations:
+                    cmds.setAttr(front_toe_3_guide+".shapeSize", 0.3)
+                    cmds.setAttr(front_toe_3_guide+".translateX", 2.65)
+                    cmds.setAttr(front_toe_3_guide+".translateY", 0.5)
+                    cmds.setAttr(front_toe_3_guide+".translateZ", 6.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(front_toe_3_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe31 guide to foot middle guide:
+                    cmds.parent(front_toe_3_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+
+                    self.ar.utils.setProgress(doingName+toeName+frontName)
+                    # create toe4 module instance:
+                    front_toe_4_guide = fkline.build_raw_guide()
+                    # change name to toe:
+                    fkline.editGuideModuleName(toeName+frontName+"_4")
+                    # editing toe base guide informations:
+                    cmds.setAttr(front_toe_4_guide+".shapeSize", 0.3)
+                    cmds.setAttr(front_toe_4_guide+".translateX", 2.95)
+                    cmds.setAttr(front_toe_4_guide+".translateY", 0.5)
+                    cmds.setAttr(front_toe_4_guide+".translateZ", 6.7)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.25)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(front_toe_4_guide+".flip", 1)
+                    fkline.displayAnnotation(0)
+                    # parent toe4 guide to foot middle guide:
+                    cmds.parent(front_toe_4_guide, foot.cvRFFLoc, absolute=True)
+                    fkline.checkFatherMirror()
+                    cmds.refresh()
+
+
+
+                # working with TAIL system:
                 self.ar.utils.setProgress(doingName+tailName)
                 # create FkLine module instance:
-                tailInstance = self.ar.initGuide('dpFkLine', guideDir, self.ar.data.rig_type_quadruped)
+                tail_guide = fkline.build_raw_guide()
                 # editing tail base guide informations:
-                tailInstance.editGuideModuleName(tailName)
-                cmds.setAttr(tailInstance.moduleGrp+".translateY", 9.8)
-                cmds.setAttr(tailInstance.moduleGrp+".translateZ", -7.6)
-                cmds.setAttr(tailInstance.moduleGrp+".rotateX", 180)
-                cmds.setAttr(tailInstance.moduleGrp+".rotateY", 20)
-                cmds.setAttr(tailInstance.moduleGrp+".rotateZ", 90)
-                cmds.setAttr(tailInstance.annotation+".translateX", 4)
-                cmds.setAttr(tailInstance.annotation+".translateY", 0)
-                cmds.setAttr(tailInstance.radiusCtrl+".translateX", 1)
-                cmds.setAttr(tailInstance.moduleGrp+".mainControls", 1)
+                fkline.editGuideModuleName(tailName)
+                cmds.setAttr(tail_guide+".translateY", 9.8)
+                cmds.setAttr(tail_guide+".translateZ", -7.6)
+                cmds.setAttr(tail_guide+".rotateX", 180)
+                cmds.setAttr(tail_guide+".rotateY", 20)
+                cmds.setAttr(tail_guide+".rotateZ", 90)
+                cmds.setAttr(fkline.annotation+".translateX", 4)
+                cmds.setAttr(fkline.annotation+".translateY", 0)
+                cmds.setAttr(fkline.radiusCtrl+".translateX", 1)
+                cmds.setAttr(tail_guide+".mainControls", 1)
                 # change the number of joints to the tail module:
-                tailInstance.changeJointNumber(3)
+                fkline.changeJointNumber(3)
                 
                 if userDetail == simple:
                     # parent tail guide to spine guide:
-                    cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+                    cmds.parent(tail_guide, spine_guide, absolute=True)
                 
                 #
                 # complete part:
                 #
                 if userDetail == complete:
                     
-                    # woking with TAIL system:
+                    # working with TAIL system:
                     self.ar.utils.setProgress(doingName+tailName+baseName)
                     # create FkLine module instance:
-                    tailBaseInstance = self.ar.initGuide('dpFkLine', guideDir, self.ar.data.rig_type_quadruped)
+                    tail_base_guide = fkline.build_raw_guide()
                     # editing tail base guide informations:
-                    tailBaseInstance.editGuideModuleName(tailName+baseName)
-                    cmds.setAttr(tailBaseInstance.moduleGrp+".translateY", 10.0)
-                    cmds.setAttr(tailBaseInstance.moduleGrp+".translateZ", -7)
-                    cmds.setAttr(tailBaseInstance.moduleGrp+".rotateX", 180)
-                    cmds.setAttr(tailBaseInstance.moduleGrp+".rotateZ", 90)
-                    cmds.setAttr(tailBaseInstance.annotation+".translateX", 4)
-                    cmds.setAttr(tailBaseInstance.annotation+".translateY", 0)
+                    fkline.editGuideModuleName(tailName+baseName)
+                    cmds.setAttr(tail_base_guide+".translateY", 10.0)
+                    cmds.setAttr(tail_base_guide+".translateZ", -7)
+                    cmds.setAttr(tail_base_guide+".rotateX", 180)
+                    cmds.setAttr(tail_base_guide+".rotateZ", 90)
+                    cmds.setAttr(fkline.annotation+".translateX", 4)
+                    cmds.setAttr(fkline.annotation+".translateY", 0)
                     # parent tail base guide to spine guide:
-                    cmds.parent(tailBaseInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+                    cmds.parent(tail_base_guide, spine_guide, absolute=True)
                     # parent tail guide to tail base guide:
-                    cmds.parent(tailInstance.moduleGrp, tailBaseInstance.moduleGrp, absolute=True)
+                    cmds.parent(tail_guide, tail_base_guide, absolute=True)
                     cmds.refresh()
 
                     # set guides attributes to complete system
-                    headInstance.changeDeformer(1)
-                    headInstance.changeFacial(1)
-                    backLegLimbInstance.setCorrective(1)
-                    frontLegLimbInstance.setCorrective(1)
-                    eyeInstance.setCorrective(1)
+                    head.changeDeformer(1)
+                    head.changeFacial(1)
+                    eye.setCorrective(1)
                     
-                    # woking with EAR system:
+                    # working with EAR system:
                     self.ar.utils.setProgress(doingName+earName)
                     # create FkLine module instance:
-                    earBaseInstance = self.ar.initGuide('dpFkLine', guideDir, self.ar.data.rig_type_quadruped)
+                    ear_base_guide = fkline.build_raw_guide()
                     # editing ear base guide informations:
-                    earBaseInstance.editGuideModuleName(earName+baseName)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".translateX", 0.11)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".translateY", 14)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".translateZ", 10)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".rotateX", 90)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".rotateY", 20)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".rotateZ", 127)
-                    cmds.setAttr(earBaseInstance.annotation+".translateX", 4)
-                    cmds.setAttr(earBaseInstance.annotation+".translateY", 0)
-                    cmds.setAttr(earBaseInstance.radiusCtrl+".translateX", 0.5)
-                    cmds.setAttr(earBaseInstance.cvEndJoint+".translateZ", 0.5)
-                    cmds.setAttr(earBaseInstance.moduleGrp+".deformedBy", 1)
+                    fkline.editGuideModuleName(earName+baseName)
+                    cmds.setAttr(ear_base_guide+".translateX", 0.11)
+                    cmds.setAttr(ear_base_guide+".translateY", 14)
+                    cmds.setAttr(ear_base_guide+".translateZ", 10)
+                    cmds.setAttr(ear_base_guide+".rotateX", 90)
+                    cmds.setAttr(ear_base_guide+".rotateY", 20)
+                    cmds.setAttr(ear_base_guide+".rotateZ", 127)
+                    cmds.setAttr(fkline.annotation+".translateX", 4)
+                    cmds.setAttr(fkline.annotation+".translateY", 0)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.5)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.5)
+                    cmds.setAttr(ear_base_guide+".deformedBy", 1)
+                    cmds.setAttr(ear_base_guide+".flip", 1)
+                    fkline.changeMirror("X")
+                    cmds.parent(ear_base_guide, head.cvUpperHeadLoc, absolute=True)
 
                     self.ar.utils.setProgress(doingName+earName)
                     # create FkLine module instance:
-                    earInstance = self.ar.initGuide('dpFkLine', guideDir, self.ar.data.rig_type_quadruped)
+                    ear_guide = fkline.build_raw_guide()
                     # editing ear base guide informations:
-                    earInstance.editGuideModuleName(earName)
-                    cmds.setAttr(earInstance.moduleGrp+".translateX", 0.8)
-                    cmds.setAttr(earInstance.moduleGrp+".translateY", 14.5)
-                    cmds.setAttr(earInstance.moduleGrp+".translateZ", 10)
-                    cmds.setAttr(earInstance.moduleGrp+".rotateX", 90)
-                    cmds.setAttr(earInstance.moduleGrp+".rotateY", 20)
-                    cmds.setAttr(earInstance.moduleGrp+".rotateZ", 127)
-                    cmds.setAttr(earInstance.annotation+".translateX", 4)
-                    cmds.setAttr(earInstance.annotation+".translateY", 0)
-                    cmds.setAttr(earInstance.annotation+".translateZ", 1.4)
-                    cmds.setAttr(earInstance.radiusCtrl+".translateX", 1)
-                    cmds.setAttr(earInstance.moduleGrp+".mainControls", 1)
-                    cmds.setAttr(earInstance.moduleGrp+".deformedBy", 1)
-                    cmds.setAttr(earInstance.moduleGrp+".scaleX", 0.5)
-                    cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
-                    cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)
+                    fkline.editGuideModuleName(earName)
+                    cmds.setAttr(ear_guide+".translateX", 0.8)
+                    cmds.setAttr(ear_guide+".translateY", 14.5)
+                    cmds.setAttr(ear_guide+".translateZ", 10)
+                    cmds.setAttr(ear_guide+".rotateX", 90)
+                    cmds.setAttr(ear_guide+".rotateY", 20)
+                    cmds.setAttr(ear_guide+".rotateZ", 127)
+                    cmds.setAttr(fkline.annotation+".translateX", 4)
+                    cmds.setAttr(fkline.annotation+".translateY", 0)
+                    cmds.setAttr(fkline.annotation+".translateZ", 1.4)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 1)
+                    cmds.setAttr(ear_guide+".mainControls", 1)
+                    cmds.setAttr(ear_guide+".deformedBy", 1)
+                    cmds.setAttr(ear_guide+".scaleX", 0.5)
+                    cmds.setAttr(ear_guide+".scaleY", 0.5)
+                    cmds.setAttr(ear_guide+".scaleZ", 0.5)
                     # change the number of joints to the ear module:
-                    earInstance.changeJointNumber(2)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(ear_guide+".flip", 1)
+                    fkline.changeMirror("X")
+                    cmds.parent(ear_guide, ear_base_guide, absolute=True)
+                    ear_cv_joint_loc = fkline.cvJointLoc
 
                     self.ar.utils.setProgress(doingName+upperName+earName)
                     # create FkLine module instance:
-                    earUpperInstance = self.ar.initGuide('dpFkLine', guideDir, self.ar.data.rig_type_quadruped)
+                    upper_ear_guide = fkline.build_raw_guide()
                     # editing ear upper guide informations:
-                    earUpperInstance.editGuideModuleName(upperName+earName)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".translateX", 1.401)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".translateY", 15.365)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".translateZ", 9.88)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".rotateX", 90)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".rotateY", 20)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".rotateZ", 127)
-                    cmds.setAttr(earUpperInstance.annotation+".translateX", 4)
-                    cmds.setAttr(earUpperInstance.annotation+".translateY", 0)
-                    cmds.setAttr(earUpperInstance.radiusCtrl+".translateX", 0.3)
-                    cmds.setAttr(earUpperInstance.cvEndJoint+".translateZ", 0.5)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".scaleX", 0.4)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".scaleY", 0.4)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".scaleZ", 0.4)
-                    cmds.setAttr(earUpperInstance.moduleGrp+".deformedBy", 1)
+                    fkline.editGuideModuleName(upperName+earName)
+                    cmds.setAttr(upper_ear_guide+".translateX", 1.401)
+                    cmds.setAttr(upper_ear_guide+".translateY", 15.365)
+                    cmds.setAttr(upper_ear_guide+".translateZ", 9.88)
+                    cmds.setAttr(upper_ear_guide+".rotateX", 90)
+                    cmds.setAttr(upper_ear_guide+".rotateY", 20)
+                    cmds.setAttr(upper_ear_guide+".rotateZ", 127)
+                    cmds.setAttr(fkline.annotation+".translateX", 4)
+                    cmds.setAttr(fkline.annotation+".translateY", 0)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.3)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.5)
+                    cmds.setAttr(upper_ear_guide+".scaleX", 0.4)
+                    cmds.setAttr(upper_ear_guide+".scaleY", 0.4)
+                    cmds.setAttr(upper_ear_guide+".scaleZ", 0.4)
+                    cmds.setAttr(upper_ear_guide+".deformedBy", 1)
+                    cmds.setAttr(upper_ear_guide+".flip", 1)
+                    fkline.changeMirror("X")
+                    cmds.parent(upper_ear_guide, ear_cv_joint_loc, absolute=True)
                     
                     self.ar.utils.setProgress(doingName+lowerName+earName)
                     # create FkLine module instance:
-                    earLowerInstance = self.ar.initGuide('dpFkLine', guideDir, self.ar.data.rig_type_quadruped)
+                    lower_ear_guide = fkline.build_raw_guide()
                     # editing ear upper guide informations:
-                    earLowerInstance.editGuideModuleName(lowerName+earName)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".translateX", 1.796)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".translateY", 14.839)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".translateZ", 10.12)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".rotateX", 90)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".rotateY", 20)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".rotateZ", 127)
-                    cmds.setAttr(earLowerInstance.annotation+".translateX", 4)
-                    cmds.setAttr(earLowerInstance.annotation+".translateY", 0)
-                    cmds.setAttr(earLowerInstance.radiusCtrl+".translateX", 0.3)
-                    cmds.setAttr(earLowerInstance.cvEndJoint+".translateZ", 0.5)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".scaleX", 0.4)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".scaleY", 0.4)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".scaleZ", 0.4)
-                    cmds.setAttr(earLowerInstance.moduleGrp+".deformedBy", 1)
-
-                    # parent ears guides to spine and other ear guides:
-                    cmds.parent(earBaseInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
-                    cmds.parent(earUpperInstance.moduleGrp, earInstance.cvJointLoc, absolute=True)
-                    cmds.parent(earLowerInstance.moduleGrp, earInstance.cvJointLoc, absolute=True)
-                    cmds.parent(earInstance.moduleGrp, earBaseInstance.moduleGrp, absolute=True)
-                    # setting X mirror:
-                    earBaseInstance.changeMirror("X")
-                    cmds.setAttr(earBaseInstance.moduleGrp+".flip", 1)
-                    earUpperInstance.checkFatherMirror()
-                    earLowerInstance.checkFatherMirror()
+                    fkline.editGuideModuleName(lowerName+earName)
+                    cmds.setAttr(lower_ear_guide+".translateX", 1.796)
+                    cmds.setAttr(lower_ear_guide+".translateY", 14.839)
+                    cmds.setAttr(lower_ear_guide+".translateZ", 10.12)
+                    cmds.setAttr(lower_ear_guide+".rotateX", 90)
+                    cmds.setAttr(lower_ear_guide+".rotateY", 20)
+                    cmds.setAttr(lower_ear_guide+".rotateZ", 127)
+                    cmds.setAttr(fkline.annotation+".translateX", 4)
+                    cmds.setAttr(fkline.annotation+".translateY", 0)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.3)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.5)
+                    cmds.setAttr(lower_ear_guide+".scaleX", 0.4)
+                    cmds.setAttr(lower_ear_guide+".scaleY", 0.4)
+                    cmds.setAttr(lower_ear_guide+".scaleZ", 0.4)
+                    cmds.setAttr(lower_ear_guide+".deformedBy", 1)
+                    cmds.setAttr(lower_ear_guide+".flip", 1)
+                    fkline.changeMirror("X")
+                    cmds.parent(lower_ear_guide, ear_cv_joint_loc, absolute=True)
                     cmds.refresh()
-                    
-                    # woking with Teeth system:
+
+                    # working with Teeth system:
                     self.ar.utils.setProgress(doingName+upperTeethName)
                     # create FkLine module instance:
-                    upperTeethInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    upper_teeth_guide = fkline.build_raw_guide()
                     # editing upperTeeth base guide informations:
-                    upperTeethInstance.editGuideModuleName(upperTeethName)
-                    cmds.setAttr(upperTeethInstance.moduleGrp+".translateY", 12.5)
-                    cmds.setAttr(upperTeethInstance.moduleGrp+".translateZ", 12.7)
-                    cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
-                    cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
-                    cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
-                    cmds.setAttr(upperTeethInstance.moduleGrp+".deformedBy", 3)
+                    fkline.editGuideModuleName(upperTeethName)
+                    cmds.setAttr(upper_teeth_guide+".translateY", 12.5)
+                    cmds.setAttr(upper_teeth_guide+".translateZ", 12.7)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.5)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.1)
+                    cmds.setAttr(upper_teeth_guide+".shapeSize", 0.5)
+                    cmds.setAttr(upper_teeth_guide+".deformedBy", 3)
+                    upper_teeth_cv_joint_loc = fkline.cvJointLoc
                     # create FkLine module instance:
-                    upperTeethMiddleInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    upper_teeth_middle_guide = fkline.build_raw_guide()
                     # editing upperTeethMiddle base guide informations:
-                    upperTeethMiddleInstance.editGuideModuleName(upperTeethMiddleName)
-                    cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 12.3)
-                    cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateZ", 12.7)
-                    cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
-                    cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".deformedBy", 3)
-                    upperTeethMiddleInstance.displayAnnotation(0)
+                    fkline.editGuideModuleName(upperTeethMiddleName)
+                    cmds.setAttr(upper_teeth_middle_guide+".translateY", 12.3)
+                    cmds.setAttr(upper_teeth_middle_guide+".translateZ", 12.7)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.1)
+                    cmds.setAttr(upper_teeth_middle_guide+".shapeSize", 0.3)
+                    cmds.setAttr(upper_teeth_middle_guide+".deformedBy", 3)
+                    fkline.displayAnnotation(0)
                     # parent upperTeethMiddle guide to upperTeeth guide:
-                    cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
+                    cmds.parent(upper_teeth_middle_guide, upper_teeth_cv_joint_loc, absolute=True)
                     # create FkLine module instance:
-                    upperTeethSideInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    upper_teeth_side_guide = fkline.build_raw_guide()
                     # editing upperTeethSide base guide informations:
-                    upperTeethSideInstance.editGuideModuleName(upperTeethSideName)
-                    cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
-                    cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 12.3)
-                    cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 12.3)
-                    cmds.setAttr(upperTeethSideInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(upperTeethSideInstance.cvEndJoint+".translateZ", 0.1)
-                    cmds.setAttr(upperTeethSideInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(upperTeethSideInstance.moduleGrp+".deformedBy", 3)
-                    upperTeethSideInstance.changeMirror("X")
-                    cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
-                    upperTeethSideInstance.displayAnnotation(0)
+                    fkline.editGuideModuleName(upperTeethSideName)
+                    cmds.setAttr(upper_teeth_side_guide+".translateX", 0.2)
+                    cmds.setAttr(upper_teeth_side_guide+".translateY", 12.3)
+                    cmds.setAttr(upper_teeth_side_guide+".translateZ", 12.3)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.1)
+                    cmds.setAttr(upper_teeth_side_guide+".shapeSize", 0.3)
+                    cmds.setAttr(upper_teeth_side_guide+".deformedBy", 3)
+                    cmds.setAttr(upper_teeth_side_guide+".flip", 1)
+                    fkline.changeMirror("X")
+                    fkline.displayAnnotation(0)
                     # parent upperTeethSide guide to upperTeeth guide:
-                    cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
+                    cmds.parent(upper_teeth_side_guide, upper_teeth_cv_joint_loc, absolute=True)
                     # create FkLine module instance:
-                    lowerTeethInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    lower_teeth_guide = fkline.build_raw_guide()
                     # editing lowerTeeth base guide informations:
-                    lowerTeethInstance.editGuideModuleName(lowerTeethName)
-                    cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 11.7)
-                    cmds.setAttr(lowerTeethInstance.moduleGrp+".translateZ", 12.7)
-                    cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
-                    cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
-                    cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
-                    cmds.setAttr(lowerTeethInstance.moduleGrp+".deformedBy", 3)
+                    fkline.editGuideModuleName(lowerTeethName)
+                    cmds.setAttr(lower_teeth_guide+".translateY", 11.7)
+                    cmds.setAttr(lower_teeth_guide+".translateZ", 12.7)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.5)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.1)
+                    cmds.setAttr(lower_teeth_guide+".shapeSize", 0.5)
+                    cmds.setAttr(lower_teeth_guide+".deformedBy", 3)
+                    lower_teeth_cv_joint_loc = fkline.cvJointLoc
                     # parent lowerTeeth guide to head guide:
-                    cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
+                    cmds.parent(lower_teeth_guide, head.cvChinLoc, absolute=True)
                     # create FkLine module instance:
-                    lowerTeethMiddleInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    lower_teeth_middle_guide = fkline.build_raw_guide()
                     # editing lowerTeethMiddle base guide informations:
-                    lowerTeethMiddleInstance.editGuideModuleName(lowerTeethMiddleName)
-                    cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 11.9)
-                    cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateZ", 12.7)
-                    cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
-                    cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".deformedBy", 3)
-                    lowerTeethMiddleInstance.displayAnnotation(0)
+                    fkline.editGuideModuleName(lowerTeethMiddleName)
+                    cmds.setAttr(lower_teeth_middle_guide+".translateY", 11.9)
+                    cmds.setAttr(lower_teeth_middle_guide+".translateZ", 12.7)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.1)
+                    cmds.setAttr(lower_teeth_middle_guide+".shapeSize", 0.3)
+                    cmds.setAttr(lower_teeth_middle_guide+".deformedBy", 3)
+                    fkline.displayAnnotation(0)
                     # parent lowerTeeth guide to lowerTeeth guide:
-                    cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
+                    cmds.parent(lower_teeth_middle_guide, lower_teeth_cv_joint_loc, absolute=True)
                     # create FkLine module instance:
-                    lowerTeethSideInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    lower_teeth_side_guide = fkline.build_raw_guide()
                     # editing lowerTeethSide base guide informations:
-                    lowerTeethSideInstance.editGuideModuleName(lowerTeethSideName)
-                    cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
-                    cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 11.9)
-                    cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 12.3)
-                    cmds.setAttr(lowerTeethSideInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(lowerTeethSideInstance.cvEndJoint+".translateZ", 0.1)
-                    cmds.setAttr(lowerTeethSideInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(lowerTeethSideInstance.moduleGrp+".deformedBy", 3)
-                    lowerTeethSideInstance.changeMirror("X")
-                    cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
-                    lowerTeethSideInstance.displayAnnotation(0)
+                    fkline.editGuideModuleName(lowerTeethSideName)
+                    cmds.setAttr(lower_teeth_side_guide+".translateX", 0.2)
+                    cmds.setAttr(lower_teeth_side_guide+".translateY", 11.9)
+                    cmds.setAttr(lower_teeth_side_guide+".translateZ", 12.3)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.2)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.1)
+                    cmds.setAttr(lower_teeth_side_guide+".shapeSize", 0.3)
+                    cmds.setAttr(lower_teeth_side_guide+".deformedBy", 3)
+                    cmds.setAttr(lower_teeth_side_guide+".flip", 1)
+                    fkline.changeMirror("X")
+                    fkline.displayAnnotation(0)
                     # parent lowerTeethSide guide to lowerTeeth guide:
-                    cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
+                    cmds.parent(lower_teeth_side_guide, lower_teeth_cv_joint_loc, absolute=True)
                     cmds.refresh()
                     
-                    # woking with Tongue system:
+                    # working with Tongue system:
                     self.ar.utils.setProgress(doingName+tongueName)
                     # create FkLine module instance:
-                    tongueInstance = self.ar.initGuide('dpFkLine', guideDir)
+                    tongue_guide = fkline.build_raw_guide()
                     # editing tongue base guide informations:
-                    tongueInstance.editGuideModuleName(tongueName)
-                    cmds.setAttr(tongueInstance.moduleGrp+".translateY", 12)
-                    cmds.setAttr(tongueInstance.moduleGrp+".translateZ", 12)
-                    cmds.setAttr(tongueInstance.radiusCtrl+".translateX", 0.35)
-                    tongueInstance.changeJointNumber(2)
-                    cmds.setAttr(tongueInstance.moduleGrp+".nJoints", 2)
-                    cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
-                    tongueInstance.changeJointNumber(3)
-                    cmds.setAttr(tongueInstance.moduleGrp+".nJoints", 3)
-                    cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
-                    cmds.setAttr(tongueInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(tongueInstance.moduleGrp+".shapeSize", 0.4)
-                    cmds.setAttr(tongueInstance.moduleGrp+".deformedBy", 3)
+                    fkline.editGuideModuleName(tongueName)
+                    cmds.setAttr(tongue_guide+".translateY", 12)
+                    cmds.setAttr(tongue_guide+".translateZ", 12)
+                    cmds.setAttr(fkline.radiusCtrl+".translateX", 0.35)
+                    fkline.changeJointNumber(2)
+                    cmds.setAttr(tongue_guide+".nJoints", 2)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.3)
+                    fkline.changeJointNumber(3)
+                    cmds.setAttr(tongue_guide+".nJoints", 3)
+                    cmds.setAttr(fkline.cvJointLoc+".translateZ", 0.3)
+                    cmds.setAttr(fkline.cvEndJoint+".translateZ", 0.2)
+                    cmds.setAttr(tongue_guide+".shapeSize", 0.4)
+                    cmds.setAttr(tongue_guide+".deformedBy", 3)
                     # parent tongue guide to head guide:
-                    cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
+                    cmds.parent(tongue_guide, head.cvChinLoc, absolute=True)
                     cmds.refresh()
                     
-                    # woking with Nose system:
+                    # working with Nose system:
                     self.ar.utils.setProgress(doingName+noseName)
                     # create Nose module instance:
-                    noseInstance = self.ar.initGuide('dpNose', guideDir)
+                    nose_guide = nose.build_raw_guide()
                     # editing upperTeeth base guide informations:
-                    noseInstance.editGuideModuleName(noseName)
-                    cmds.setAttr(noseInstance.moduleGrp+".translateY", 13)
-                    cmds.setAttr(noseInstance.moduleGrp+".translateZ", 11.5)
-                    cmds.setAttr(noseInstance.radiusCtrl+".translateX", 0.3)
-                    cmds.setAttr(noseInstance.cvTopLoc+".rotateX", 25)
-                    noseInstance.changeJointNumber(2)
-                    cmds.setAttr(noseInstance.cvTopLoc+".translateY", 0.1)
-                    cmds.setAttr(noseInstance.cvTopLoc+".translateZ", 0.7)
-                    cmds.setAttr(noseInstance.cvTopLoc+".rotateX", -17)
-                    cmds.setAttr(noseInstance.cvMiddleLoc+".translateY", 0.3)
-                    cmds.setAttr(noseInstance.cvMiddleLoc+".translateZ", 1.3)
-                    cmds.setAttr(noseInstance.cvMiddleLoc+".rotateX", -25)
-                    cmds.setAttr(noseInstance.moduleGrp+".shapeSize", 0.5)
+                    nose.editGuideModuleName(noseName)
+                    cmds.setAttr(nose_guide+".translateY", 13)
+                    cmds.setAttr(nose_guide+".translateZ", 11.5)
+                    cmds.setAttr(nose.radiusCtrl+".translateX", 0.3)
+                    cmds.setAttr(nose.cvTopLoc+".rotateX", 25)
+                    nose.changeJointNumber(2)
+                    cmds.setAttr(nose.cvTopLoc+".translateY", 0.1)
+                    cmds.setAttr(nose.cvTopLoc+".translateZ", 0.7)
+                    cmds.setAttr(nose.cvTopLoc+".rotateX", -17)
+                    cmds.setAttr(nose.cvMiddleLoc+".translateY", 0.3)
+                    cmds.setAttr(nose.cvMiddleLoc+".translateZ", 1.3)
+                    cmds.setAttr(nose.cvMiddleLoc+".rotateX", -25)
+                    cmds.setAttr(nose_guide+".shapeSize", 0.5)
                     # parent nose guide and upperTeeth to head guide:
-                    cmds.parent(upperTeethInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
-                    cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
+                    cmds.parent(upper_teeth_guide, nose_guide, absolute=True)
+                    cmds.parent(nose_guide, head.cvUpperJawLoc, absolute=True)
                     cmds.refresh()
                     
-                    self.ar.utils.setProgress(doingName+toeName+frontName)
-                    # create toe1 module instance:
-                    toe1FrontInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe1FrontInstance.editGuideModuleName(toeName+frontName+"_1")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe1FrontInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe1FrontInstance.moduleGrp+".translateX", 2)
-                    cmds.setAttr(toe1FrontInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe1FrontInstance.moduleGrp+".translateZ", 6.7)
-                    toe1FrontInstance.changeJointNumber(2)
-                    cmds.setAttr(toe1FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    toe1FrontInstance.changeJointNumber(3)
-                    cmds.setAttr(toe1FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe1FrontInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe1FrontInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe1FrontInstance.moduleGrp+".flip", 1)
-                    toe1FrontInstance.displayAnnotation(0)
-                    # parent toe1 guide to foot middle guide:
-                    cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
-                    toe1FrontInstance.checkFatherMirror()
-                    cmds.refresh()
-                    
-                    self.ar.utils.setProgress(doingName+toeName+frontName)
-                    # create toe2 module instance:
-                    toe2FrontInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe2FrontInstance.editGuideModuleName(toeName+frontName+"_2")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe2FrontInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe2FrontInstance.moduleGrp+".translateX", 2.35)
-                    cmds.setAttr(toe2FrontInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe2FrontInstance.moduleGrp+".translateZ", 6.7)
-                    toe2FrontInstance.changeJointNumber(2)
-                    cmds.setAttr(toe2FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    toe2FrontInstance.changeJointNumber(3)
-                    cmds.setAttr(toe2FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe2FrontInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe2FrontInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe2FrontInstance.moduleGrp+".flip", 1)
-                    toe2FrontInstance.displayAnnotation(0)
-                    # parent toe2 guide to foot middle guide:
-                    cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
-                    toe2FrontInstance.checkFatherMirror()
-                    cmds.refresh()
-                    
-                    self.ar.utils.setProgress(doingName+toeName+frontName)
-                    # create toe3 module instance:
-                    toe3FrontInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe3FrontInstance.editGuideModuleName(toeName+frontName+"_3")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe3FrontInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe3FrontInstance.moduleGrp+".translateX", 2.65)
-                    cmds.setAttr(toe3FrontInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe3FrontInstance.moduleGrp+".translateZ", 6.7)
-                    toe3FrontInstance.changeJointNumber(2)
-                    cmds.setAttr(toe3FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    toe3FrontInstance.changeJointNumber(3)
-                    cmds.setAttr(toe3FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe3FrontInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe3FrontInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe3FrontInstance.moduleGrp+".flip", 1)
-                    toe3FrontInstance.displayAnnotation(0)
-                    # parent toe31 guide to foot middle guide:
-                    cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
-                    toe3FrontInstance.checkFatherMirror()
-                    cmds.refresh()
-
-                    self.ar.utils.setProgress(doingName+toeName+frontName)
-                    # create toe4 module instance:
-                    toe4FrontInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe4FrontInstance.editGuideModuleName(toeName+frontName+"_4")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe4FrontInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe4FrontInstance.moduleGrp+".translateX", 2.95)
-                    cmds.setAttr(toe4FrontInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe4FrontInstance.moduleGrp+".translateZ", 6.7)
-                    toe4FrontInstance.changeJointNumber(2)
-                    cmds.setAttr(toe4FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    toe4FrontInstance.changeJointNumber(3)
-                    cmds.setAttr(toe4FrontInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe4FrontInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe4FrontInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe4FrontInstance.moduleGrp+".flip", 1)
-                    toe4FrontInstance.displayAnnotation(0)
-                    # parent toe4 guide to foot middle guide:
-                    cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
-                    toe4FrontInstance.checkFatherMirror()
-                    cmds.refresh()
-
-                    self.ar.utils.setProgress(doingName+toeName+backName)
-                    # create toe1 module instance:
-                    toe1BackInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe1BackInstance.editGuideModuleName(toeName+backName+"_1")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe1BackInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe1BackInstance.moduleGrp+".translateX", 2.5)
-                    cmds.setAttr(toe1BackInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe1BackInstance.moduleGrp+".translateZ", -5.33)
-                    toe1BackInstance.changeJointNumber(2)
-                    cmds.setAttr(toe1BackInstance.cvJointLoc+".translateZ", 0.25)
-                    toe1BackInstance.changeJointNumber(3)
-                    cmds.setAttr(toe1BackInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe1BackInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe1BackInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe1BackInstance.moduleGrp+".flip", 1)
-                    toe1BackInstance.displayAnnotation(0)
-                    # parent toe1 guide to foot middle guide:
-                    cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
-                    toe1BackInstance.checkFatherMirror()
-                    cmds.refresh()
-                    
-                    self.ar.utils.setProgress(doingName+toeName+backName)
-                    # create toe2 module instance:
-                    toe2BackInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe2BackInstance.editGuideModuleName(toeName+backName+"_2")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe2BackInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe2BackInstance.moduleGrp+".translateX", 2.85)
-                    cmds.setAttr(toe2BackInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe2BackInstance.moduleGrp+".translateZ", -5.33)
-                    toe2BackInstance.changeJointNumber(2)
-                    cmds.setAttr(toe2BackInstance.cvJointLoc+".translateZ", 0.25)
-                    toe2BackInstance.changeJointNumber(3)
-                    cmds.setAttr(toe2BackInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe2BackInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe2BackInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe2BackInstance.moduleGrp+".flip", 1)
-                    toe2BackInstance.displayAnnotation(0)
-                    # parent toe2 guide to foot middle guide:
-                    cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
-                    toe2BackInstance.checkFatherMirror()
-                    cmds.refresh()
-                    
-                    self.ar.utils.setProgress(doingName+toeName+backName)
-                    # create toe3 module instance:
-                    toe3BackInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe3BackInstance.editGuideModuleName(toeName+backName+"_3")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe3BackInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe3BackInstance.moduleGrp+".translateX", 3.15)
-                    cmds.setAttr(toe3BackInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe3BackInstance.moduleGrp+".translateZ", -5.33)
-                    toe3BackInstance.changeJointNumber(2)
-                    cmds.setAttr(toe3BackInstance.cvJointLoc+".translateZ", 0.25)
-                    toe3BackInstance.changeJointNumber(3)
-                    cmds.setAttr(toe3BackInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe3BackInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe3BackInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe3BackInstance.moduleGrp+".flip", 1)
-                    toe3BackInstance.displayAnnotation(0)
-                    # parent toe3 guide to foot middle guide:
-                    cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
-                    toe3BackInstance.checkFatherMirror()
-                    cmds.refresh()
-                    
-                    self.ar.utils.setProgress(doingName+toeName+backName)
-                    # create toe4 module instance:
-                    toe4BackInstance = self.ar.initGuide('dpFkLine', guideDir)
-                    # change name to toe:
-                    toe4BackInstance.editGuideModuleName(toeName+backName+"_4")
-                    # editing toe base guide informations:
-                    cmds.setAttr(toe4BackInstance.moduleGrp+".shapeSize", 0.3)
-                    cmds.setAttr(toe4BackInstance.moduleGrp+".translateX", 3.45)
-                    cmds.setAttr(toe4BackInstance.moduleGrp+".translateY", 0.5)
-                    cmds.setAttr(toe4BackInstance.moduleGrp+".translateZ", -5.33)
-                    toe4BackInstance.changeJointNumber(2)
-                    cmds.setAttr(toe4BackInstance.cvJointLoc+".translateZ", 0.25)
-                    toe4BackInstance.changeJointNumber(3)
-                    cmds.setAttr(toe4BackInstance.cvJointLoc+".translateZ", 0.25)
-                    cmds.setAttr(toe4BackInstance.cvEndJoint+".translateZ", 0.2)
-                    cmds.setAttr(toe4BackInstance.radiusCtrl+".translateX", 0.2)
-                    cmds.setAttr(toe4BackInstance.moduleGrp+".flip", 1)
-                    toe4BackInstance.displayAnnotation(0)
-                    # parent toe4 guide to foot middle guide:
-                    cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
-                    toe4BackInstance.checkFatherMirror()
-                    cmds.refresh()
-
                     self.ar.utils.setProgress(doingName+breathName)
                     # create breath module instance:
-                    breathInstance = self.ar.initGuide('dpSingle', guideDir)
+                    breath_guide = single.build_raw_guide()
                     # change name to breath:
-                    breathInstance.editGuideModuleName(breathName)
+                    single.editGuideModuleName(breathName)
                     # editing breath base guide informations:
-                    cmds.setAttr(breathInstance.radiusCtrl+".translateX", 0.8)
-                    cmds.setAttr(breathInstance.moduleGrp+".translateY", 7)
-                    cmds.setAttr(breathInstance.moduleGrp+".translateZ", 4)
-                    cmds.setAttr(breathInstance.moduleGrp+".indirectSkin", 1)
+                    cmds.setAttr(single.radiusCtrl+".translateX", 0.8)
+                    cmds.setAttr(breath_guide+".translateY", 7)
+                    cmds.setAttr(breath_guide+".translateZ", 4)
                     # parent breath guide to spine chest guide:
-                    cmds.parent(breathInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+                    cmds.parent(breath_guide, spine.cvLocator, absolute=True)
                     cmds.refresh()
 
                     self.ar.utils.setProgress(doingName+bellyName)
                     # create belly module instance:
-                    bellyInstance = self.ar.initGuide('dpSingle', guideDir)
+                    belly_guide = single.build_raw_guide()
                     # change name to belly:
-                    bellyInstance.editGuideModuleName(bellyName)
+                    single.editGuideModuleName(bellyName)
                     # editing belly base guide informations:
-                    cmds.setAttr(bellyInstance.radiusCtrl+".translateX", 0.8)
-                    cmds.setAttr(bellyInstance.moduleGrp+".translateY", 8.5)
-                    cmds.setAttr(bellyInstance.moduleGrp+".translateZ", -3.5)
-                    cmds.setAttr(bellyInstance.moduleGrp+".indirectSkin", 1)
+                    cmds.setAttr(single.radiusCtrl+".translateX", 0.8)
+                    cmds.setAttr(belly_guide+".translateY", 8.5)
+                    cmds.setAttr(belly_guide+".translateZ", -3.5)
                     # parent breath guide to spine chest guide:
-                    cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+                    cmds.parent(belly_guide, spine_guide, absolute=True)
                 
                 # Close progress window
                 self.ar.utils.setProgress(endIt=True)
                 
                 # select spineGuide_Base:
                 self.ar.collapseEditSelModFL = False
-                cmds.select(spineInstance.moduleGrp)
+                cmds.select(spine_guide)
                 print(self.ar.data.lang['m090_createdQuadruped'])
+
+#
+#
+# TEST TODO:
+#                print("TESTING HERE filling guides 1")
+#                self.ar.filler.fill_created_guides()
+#                print("TESTING HERE filling guides 2")
+
         else:
             # error checking modules in the folder:
             mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

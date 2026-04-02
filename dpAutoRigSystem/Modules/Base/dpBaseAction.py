@@ -579,10 +579,10 @@ class ActionStartClass(object):
             unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
             if unparentedMeshList:
                 for item in unparentedMeshList:
-                    if not cmds.objExists(item+"."+self.ar.masterAttr):
+                    if not cmds.objExists(item+"."+self.ar.data.master_attr):
                         fatherNode = item[:item[1:].find("|")+1]
                         if fatherNode:
-                            if not cmds.objExists(fatherNode+"."+self.ar.masterAttr):
+                            if not cmds.objExists(fatherNode+"."+self.ar.data.master_attr):
                                 if not fatherNode in tempList:
                                     tempList.append(fatherNode)
         if tempList:

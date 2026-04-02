@@ -520,8 +520,8 @@ class RibbonClass(object):
         drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bottom_Jxt')
         drv_Jnt[1] = cmds.rename(drv_Jnt[1], name+'_Drv_Mid_Jxt')
         drv_Jnt[2] = cmds.rename(drv_Jnt[2], name+'_Drv_Top_Jxt')
-        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_'+self.ar.jointEndAttr)
-        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_'+self.ar.jointEndAttr)
+        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_'+self.ar.data.joint_end_attr)
+        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_'+self.ar.data.joint_end_attr)
         
         #place joints correctly accordaly with the user options choose
         if (horizontal and axis==(1, 0, 0)) or (horizontal and axis==(0, 0, 1)):

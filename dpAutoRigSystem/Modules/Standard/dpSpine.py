@@ -45,38 +45,12 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.createModuleLayout(self)
         dpBaseLayout.BaseLayout.basicModuleLayout(self)
     
-    
-    def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
-        dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
-        # style layout:
-        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
-        cmds.text(label=self.ar.data.lang['m041_style'], visible=True, parent=self.styleLayout)
-        self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
-        styleMenuItemList = [self.ar.data.lang['m042_default'], self.ar.data.lang['m026_biped']]
-        for item in styleMenuItemList:
-            cmds.menuItem(label=item, parent=self.styleMenu)
-        # read from guide attribute the current value to style:
-        currentStyle = cmds.getAttr(self.moduleGrp+".style")
-        cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle+1))
-        
-        
-    def changeStyle(self, style, *args):
-        """ Change the style to be applyed custom actions to be more animator friendly.
-            We will optimise: control world orientation
-        """
-        # for Default style:
-        if style == self.ar.data.lang['m042_default'] or style == 0:
-            cmds.setAttr(self.moduleGrp+".style", 0)
-        # for Biped style:
-        if style == self.ar.data.lang['m026_biped'] or style == 1:
-            cmds.setAttr(self.moduleGrp+".style", 1)
-
 
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped'])
+        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5, d=1, guide=True)
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -169,13 +143,13 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            self.currentStyle = cmds.getAttr(self.moduleGrp+".style")
+            style = cmds.getAttr(self.moduleGrp+".style")
             # naming main controls:
             hipsName  = self.ar.data.lang['c100_bottom']
             chestName = self.ar.data.lang['c099_top']
             baseName = self.ar.data.lang['c106_base']
             endName = self.ar.data.lang['c120_tip']
-            if self.currentStyle == 1: #Biped
+            if style == 1: #biped
                 hipsName  = self.ar.data.lang['c027_hips']
                 chestName = self.ar.data.lang['c028_chest']
             # run for all sides
@@ -199,7 +173,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(tempChestACluster+".scaleY", 0.4)
                 cmds.delete(self.chestACtrl, constructionHistory=True)
                 hipsFkCtrlCVPos = -0.4*self.ctrlRadius
-                if self.currentStyle == 1:
+                if style == 1: #biped
                     hipsFkCtrlCVPos = 0.4*self.ctrlRadius
                 cmds.move(0, hipsFkCtrlCVPos, 0, self.hipsFkCtrl+"0Shape.cv[0:5]", relative=True, worldSpace=True, worldSpaceDistance=True)
                 
@@ -222,7 +196,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # optimize control CV shapes:
                 tempBaseCluster = cmds.cluster(self.baseCtrl)[1]
                 tempTipCluster = cmds.cluster(self.tipCtrl)[1]
-                if self.currentStyle == 0: #default
+                if style == 0: #default
                     cmds.setAttr(tempBaseCluster+".translateY", 0.2*self.ctrlRadius)
                     cmds.setAttr(tempTipCluster+".translateY", -0.2*self.ctrlRadius)
                 else:
@@ -238,7 +212,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.shapeVisAttrList.append(attrNameLower+baseName+self.ar.data.lang['c126_display'])
 
                 # Setup axis order
-                if self.rigType == self.ar.data.rig_type_quadruped:
+                if style == 2: #quadruped
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.hipsBCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.chestACtrl + ".rotateOrder", 1)
@@ -270,7 +244,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.parent(self.chestFkCtrl, self.chestACtrl)
                 cmds.parent(self.baseCtrl, self.hipsBCtrl, relative=True)
                 cmds.parent(self.tipCtrl, self.chestBCtrl, relative=True)
-                if self.currentStyle == 0: #default
+                if style == 0: #default
                     cmds.rotate(-90, 0, 0, self.hipsACtrl, self.chestACtrl)
                     cmds.makeIdentity(self.hipsACtrl, self.chestACtrl, apply=True, rotate=True)
                 # position of controls:
@@ -281,7 +255,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(cmds.parentConstraint(topLocGuide, self.chestACtrl, maintainOffset=False))
                 
                 # change axis orientation for biped style
-                if self.currentStyle == 1: #biped
+                if style == 1: #biped
                     cmds.rotate(0, 0, 0, self.hipsACtrl, self.chestACtrl)
                     cmds.makeIdentity(self.hipsACtrl, self.chestACtrl, apply=True, rotate=True)
                 cmds.parent(self.chestACtrl, self.hipsACtrl)
@@ -413,14 +387,14 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(rbnCond+".secondTerm", 1)
                 # middle ribbon setup:
                 for n in range(1, self.nJoints - 1):
-                    if self.currentStyle == 0: #default
+                    if style == 0: #default
                         self.middleCtrl = self.ar.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
                         self.middleFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 4)
                         cmds.setAttr(self.middleFkCtrl+".rotateOrder", 4)
                         cmds.rotate(0, 0, 90, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
-                    else: #biped
+                    else: #biped or quadruped
                         self.middleCtrl = self.ar.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
                         self.middleFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 3)
@@ -434,9 +408,9 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     middleLocGuide = side+self.userGuideName+"_Guide_JointLoc"+str(n + 1)
                     cmds.delete(cmds.parentConstraint(middleLocGuide, self.middleCtrl, maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(middleLocGuide, self.middleFkCtrl, maintainOffset=False))
-                    if self.currentStyle == 1: #biped
+                    if style == 1: #biped
                         cmds.rotate(0, 0, 0, self.middleCtrl, self.middleFkCtrl)
-                    if self.rigType == self.ar.data.rig_type_quadruped:
+                    elif style == 2: #quadruped
                         cmds.rotate(90, 0, 0, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
                     self.middleCtrlGrp = self.utils.zeroOut([self.middleCtrl])[0]

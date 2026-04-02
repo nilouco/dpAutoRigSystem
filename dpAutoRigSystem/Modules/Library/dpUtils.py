@@ -135,11 +135,11 @@ class Utils(object):
     #     return absolutePath
 
 
-    def findAllFiles(self, path, dir, ext=".py"):
+    def findAllFiles(self, path, folder, ext=".py"):
         """ Find all files in the directory with the extension.
             Return a list of all module names (without '.py' extension).
         """
-        fileDir = path + "/" + dir.replace(".", "/")
+        fileDir = path + "/" + folder.replace(".", "/")
         allFilesList = os.listdir(fileDir)
         # select only files with extension:
         pyFilesList = []
@@ -149,14 +149,14 @@ class Utils(object):
         return pyFilesList
 
 
-    def findAllModules(self, path, dir):
+    def findAllModules(self, path, folder):
         """ Find all modules in the directory.
             If find a dpOrderList.txt file it will order the list for priority proporses.
             Return a list of all module names (without '.py' extension).
         """
         baseClassList = ["dpBaseStandard", "dpBaseLayout", "dpBaseCurve", "dpBaseAction", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
-        dir = dir.replace(".", "/")
-        allPyFilesList = self.findAllFiles(path, dir, ".py")
+        folder = folder.replace(".", "/")
+        allPyFilesList = self.findAllFiles(path, folder, ".py")
         moduleList = []
         for file in allPyFilesList:
             # ensure base class are skipped
@@ -164,14 +164,14 @@ class Utils(object):
                 moduleList.append(file)
         # check order list
         if moduleList:
-            textList = self.findAllFiles(path, dir, ".txt")
+            textList = self.findAllFiles(path, folder, ".txt")
             if textList:
                 for text in textList:
                     if self.dpOrderList in text:
                         desiredOrderList = []
                         dupList = moduleList
                         moduleList = []
-                        with open(path+"/"+dir+"/"+text+".txt", encoding='utf8') as filename:
+                        with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
                             for line in filename.readlines():
                                 desiredOrderList.append(line.strip())
                         if desiredOrderList:
@@ -184,13 +184,13 @@ class Utils(object):
         return moduleList
 
 
-    def findAllModuleNames(self, path, dir):
+    def findAllModuleNames(self, path, folder):
         """ Find all modules names for this directory.
             Return a list with the valid modules and valid modules names.
         """
-        validModules = self.findAllModules(path, dir)
+        validModules = self.findAllModules(path, folder)
         validModuleNames = []
-        #guideFolder = (path+"/"+dir).partition("/Modules/")[2]
+        #guideFolder = (path+"/"+folder).partition("/Modules/")[2]
         guideFolder = self.findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules.Standard"
         for m in validModules:
             mod = __import__(guideFolder+"."+m, {}, {}, [m])

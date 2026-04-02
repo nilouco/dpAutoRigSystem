@@ -48,8 +48,8 @@ class JointEndCleaner(dpBaseAction.ActionStartClass):
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # list joint ends
-                jEndList = [j for j in toCheckList if self.ar.jointEndAttr in cmds.listAttr(j)] #by attribute
-                jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.jointEndAttr)]) #by suffix
+                jEndList = [j for j in toCheckList if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
+                jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
                 if jEndList:
                     # check connection with skinCluster to avoid delete it and crash the setup
                     jEndList = list(set(jEndList)-set(self.ar.skin.getSkinnedJointList())) #remove duplicated and skinned joints

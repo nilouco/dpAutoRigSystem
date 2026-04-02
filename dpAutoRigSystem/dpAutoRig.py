@@ -80,7 +80,9 @@ class Start(object):
         self.load_components()
         self.load_library()
         self.load_ui()
-        self.opening.close_opening_ui()
+        
+        # called by main.show_ui when it's finished:
+        #self.opening.close_opening_ui()
         
 
     def load_opening(self, intro=True):
@@ -118,11 +120,11 @@ class Start(object):
             reload(librarian)
             reload(filler)
             reload(updater)
-            reload(donate)
             reload(version)
             # ui
             reload(main)
             reload(update)
+            reload(donate)
             print("Reloaded imported modules")
     
     
@@ -148,7 +150,6 @@ class Start(object):
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
         self.translator = dpTranslator.Translator(self)
-        self.donate = donate.DonateUI(self)
 
 
     def load_library(self):
@@ -161,6 +162,7 @@ class Start(object):
         self.ui_manager = manager.UIManager(self)
         self.main_ui = main.MainUI(self)
         self.update_ui = update.UpdateUI(self)
+        self.donate = donate.DonateUI(self)
 
 
     def ui(self):
@@ -300,7 +302,7 @@ class Start(object):
         if not selectedGuideNodeList:
             try:
                 cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.data.lang['i011_editSelected']+" "+self.data.lang['i143_module'])
-                cmds.deleteUI("selectedModuleColumn")
+                cmds.deleteUI("rig_selected_module_cl")
             except:
                 pass
         # re-create module layout:
@@ -605,50 +607,42 @@ class Start(object):
     
     
     # Start working with Guide Modules:
-    def startGuideModules(self, guideDir, action, checkModuleList=None, path=None):
-        """ Find and return the modules in the directory 'Modules'.
-            Returns a list with the found modules.
+    def check_missing_modules(self, folder, check_modules):
+        """ Verifies if the modules exists in the given folder.
+            Returns a list of missing modules or []
         """
-        libs, imported_modules = [], []
-        if not path:
-            # find path where 'dpAutoRig.py' is been executed:
-            path = self.data.dp_auto_rig_path
-        if not self.data.loaded_path:
-            if self.data.verbose:
-                print("dpAutoRigPath: "+path)
-            self.data.loaded_path = True
-        # list all guide modules:
-        guideModuleList = self.utils.findAllModules(path, guideDir)
-        if guideModuleList:
-            if action == "start":
-                for guideModule in guideModuleList:
-                    lib_instance, imported_module = self.startModule_TEMP_Name(guideModule, guideDir, path)
-                    self.data.lib_instances.append(lib_instance)
-                    libs.append(lib_instance)
-                    imported_modules.append(imported_module)
-            elif action == "check":
-                notFoundModuleList = []
-                # verify the list if exists all elements in the folder:
-                if checkModuleList:
-                    for checkModule in checkModuleList:
-                        if not checkModule in guideModuleList:
-                            notFoundModuleList.append(checkModule)
-                return notFoundModuleList
-            elif action == "exists":
-                return guideModuleList
-            # avoid print again the same message:
-            if guideDir == "":
-                guideDir = path
-            if not guideDir in self.data.lib.keys():
-                self.data.lib[guideDir] = { 
-                                            "modules" : guideModuleList,
-                                            "instances": libs,
-                                            "imported" : imported_modules
-                                            }
-                if self.data.verbose:
-                    print(guideDir+" : "+str(guideModuleList))
-            #print("self.data.lib =", self.data.lib)
-        return guideModuleList
+        # results = []
+        # modules = self.utils.findAllModules(self.data.dp_auto_rig_path, folder)
+        return [m for m in check_modules if not m in self.utils.findAllModules(self.data.dp_auto_rig_path, folder)]
+        # if modules:
+        #     for module in check_modules:
+        #         if not module in modules:
+        #             results.append(module)
+        # return results
+
+            # if action == "start":
+            #     for guideModule in guideModuleList:
+            #         lib_instance, imported_module = self.startModule_TEMP_Name(guideModule, guideDir, path)
+            #         self.data.lib_instances.append(lib_instance)
+            #         libs.append(lib_instance)
+            #         imported_modules.append(imported_module)
+            # elif action == "check":
+
+        #     elif action == "exists":
+        #         return guideModuleList
+        #     # avoid print again the same message:
+        #     if guideDir == "":
+        #         guideDir = path
+        #     if not guideDir in self.data.lib.keys():
+        #         self.data.lib[guideDir] = { 
+        #                                     "modules" : guideModuleList,
+        #                                     "instances": libs,
+        #                                     "imported" : imported_modules
+        #                                     }
+        #         if self.data.verbose:
+        #             print(guideDir+" : "+str(guideModuleList))
+        #     #print("self.data.lib =", self.data.lib)
+        # return guideModuleList
     
 
 
@@ -1247,7 +1241,7 @@ class Start(object):
             cmds.setAttr(self.masterGrp+".dpAutoRigSystem", self.data.github_url, type="string")
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
-            cmds.setAttr(self.masterGrp+".system", self.dpARVersion, type="string")
+            cmds.setAttr(self.masterGrp+".system", self.data.version, type="string")
             cmds.setAttr(self.masterGrp+".language", self.data.lang["_preset"], type="string")
             #
             # TODO WIP (self.presetName)
@@ -1429,7 +1423,7 @@ class Start(object):
         if objList and attrList:
             for obj in objList:
                 # load dpReorderAttribute:
-                dpRAttr = dpReorderAttr.ReorderAttr(self, False)
+                dpRAttr = dpReorderAttr.ReorderAttr(self)
                 if verbose and not self.data.rebuilding:
                     self.utils.setProgress('Reordering: '+self.data.lang['c110_start'], 'Reordering Attributes', len(attrList), addOne=False, addNumber=False)
                 delta = 0
@@ -1464,7 +1458,7 @@ class Start(object):
         if self.data.rebuilding:
             self.filler.fill_created_guides()
         else:
-            self.refreshMainUI()
+            self.ui_manager.refresh_ui()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.data.standard_instances)
@@ -1480,11 +1474,11 @@ class Start(object):
             # check guide versions to be sure we are building with the same dpAutoRigSystem version:
             for guideModule in self.modulesToBeRiggedList:
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
-                if not guideVersion == self.dpARVersion:
+                if not guideVersion == self.data.version:
                     btYes = self.data.lang['i071_yes']
                     btUpdateGuides = self.data.lang['m186_updateGuides']
                     btNo = self.data.lang['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+self.dpARVersion, message=self.data.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+self.data.version, message=self.data.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
                     if userChoose == btNo:
                         return
                     elif userChoose == btUpdateGuides:
@@ -2379,7 +2373,7 @@ class Start(object):
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpLimbSpaceSwitch", self.data.tools_folder)
             # add fingers hand pose:
-            self.initExtraModule("dpFingerHandPose", self.data.tools_folder, hidden=True)
+            self.initExtraModule("dpFingerHandPose", self.data.tools_folder)#, hidden=True)
 
             # show dialogBox if detected a bug:
             if self.data.integrate_all:
@@ -2395,7 +2389,7 @@ class Start(object):
         # reload the jointSkinList:
         self.filler.populate_joints()
         if not self.data.rebuilding:
-            self.refreshMainUI()
+            self.ui_manager.refresh_ui()
             # call log window:
             self.logger.logWin()
             # close progress window

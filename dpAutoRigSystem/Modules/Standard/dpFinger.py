@@ -314,7 +314,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     
                     if n == self.nJoints:
                         # create end joint:
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.jointEndAttr, radius=0.5)
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
                         self.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 
@@ -362,8 +362,8 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.joint(jointNode, edit=True, setPreferredAngles=True)
                         cmds.setAttr(jointNode+".rotateY", currentRY)
                         cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_Jnt", "_Ik_Jxt"))
-                    elif "_"+self.ar.jointEndAttr in jointNode[jointNode.rfind("|"):]:
-                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.ar.jointEndAttr, "_Ik_"+self.ar.jointEndAttr))
+                    elif "_"+self.ar.data.joint_end_attr in jointNode[jointNode.rfind("|"):]:
+                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.ar.data.joint_end_attr, "_Ik_"+self.ar.data.joint_end_attr))
                 ikBaseJoint = cmds.rename(dupIk, dupIk.replace("_Jnt1", "_Ik_Jxt"))
                 ikJointList = cmds.listRelatives(ikBaseJoint, children=True, allDescendents=True)
                 ikJointList.append(ikBaseJoint)
@@ -380,15 +380,15 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 for jointNode in jointFkList:
                     if "_Jnt" in jointNode[jointNode.rfind("|"):]:
                         cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_Jnt", "_Fk_Jxt"))
-                    elif "_"+self.ar.jointEndAttr in jointNode[jointNode.rfind("|"):]:
-                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.ar.jointEndAttr, "_Fk_"+self.ar.jointEndAttr))
+                    elif "_"+self.ar.data.joint_end_attr in jointNode[jointNode.rfind("|"):]:
+                        cmds.rename(jointNode, jointNode[jointNode.rfind("|")+1:].replace("_"+self.ar.data.joint_end_attr, "_Fk_"+self.ar.data.joint_end_attr))
                 fkBaseJoint = cmds.rename(dupFk, dupFk.replace("_Jnt2", "_Fk_Jxt"))
                 fkJointList = cmds.listRelatives(fkBaseJoint, children=True, allDescendents=True)
                 fkJointList.append(fkBaseJoint)
 
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
-                    if not "_"+self.ar.jointEndAttr in fkJoint:
+                    if not "_"+self.ar.data.joint_end_attr in fkJoint:
                         self.utils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
                         self.scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
@@ -404,7 +404,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     else:
                         ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_01_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IKH")
                     cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
-                    endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.ar.jointEndAttr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
+                    endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.ar.data.joint_end_attr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
                     cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
                     self.ikCtrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.ctrlList[1])
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
@@ -452,7 +452,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
-                    if not "_"+self.ar.jointEndAttr in ikJoint:
+                    if not "_"+self.ar.data.joint_end_attr in ikJoint:
                         self.utils.clearDpArAttr([ikJoint])
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")

@@ -15,6 +15,19 @@ class Configuration(object):
     def __init__(self, ar):
         self.ar = ar
         self.ar.data.verbose = self.ar.dev
+        self.lib_folders = [
+                            self.ar.data.standard_folder,
+                            self.ar.data.integrated_folder,
+                            self.ar.data.curve_simple_folder,
+                            self.ar.data.curve_combined_folder,
+                            self.ar.data.checkin_folder,
+                            self.ar.data.checkout_folder,
+                            self.ar.data.start_folder,
+                            self.ar.data.source_folder,
+                            self.ar.data.setup_folder,
+                            self.ar.data.deforming_folder,
+                            self.ar.data.custom_folder
+                            ]
         self.today = str(datetime.datetime.now().date())
         self.load_path()
         self.load_version()
@@ -257,7 +270,7 @@ class Configuration(object):
         """ Return a list of Validator's AddOns or Finishing to load.
         """
         if os.path.exists(self.ar.pipeliner.pipeData[path]):
-            return self.ar.startGuideModules("", "exists", path=self.ar.pipeliner.pipeData[path])
+            return self.ar.utils.findAllModules(self.ar.pipeliner.pipeData[path])
         
 
     def get_instance_info(self, name, folders, info="instances"):
@@ -288,7 +301,16 @@ class Configuration(object):
         for folder in self.ar.filler.rebuilder_folders:
             rebuilders.extend(self.ar.data.lib[folder]["instances"])
         return rebuilders
-    
+
+
+    def get_instance(self, name, folders=None):
+        if not folders:
+            folders = self.lib_folders
+        for folder in folders:
+            if folder in list(self.ar.data.lib.keys()):
+                for i, item in enumerate(self.ar.data.lib[folder]["modules"]):
+                    if item == name:
+                        return self.ar.data.lib[folder]["instances"][i]
 
 
 class Option(object):

@@ -34,12 +34,11 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpSingle']
-        checkResultList = self.ar.startGuideModules(standardDir, "check", checkModuleList=checkModuleList)
+        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
         
         if len(checkResultList) == 0:
             self.ar.collapseEditSelModFL = True
             # defining naming:
-            doingName = self.ar.data.lang['m094_doing']
             # part names:
             mainName = self.ar.data.lang['c058_main']
             tweaksName = self.ar.data.lang['m081_tweaks']
@@ -111,389 +110,130 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
             faceMessage = self.ar.data.lang['i182_facialMessage']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(simple, complete, cancel, complete, userMessage)
+            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
             if not userDetail == cancel:
                 # number of modules to create:
                 if userDetail == simple:
-                    maxProcess = 3
+                    maxProcess = 14
                 else:
-                    maxProcess = 6
+                    maxProcess = 37
                 
                 # getting Indirect Skinning user prefer:
-                userIndirectSkin = self.ask_build_detail(indSkin, faceJoint, cancel, indSkin, faceMessage)
+                userIndirectSkin = self.ask_build_detail(self.title, indSkin, faceJoint, cancel, indSkin, faceMessage)
                 if not userIndirectSkin == cancel:
                     if userIndirectSkin == indSkin:
-                        indSkinValue = 1
+                        self.indSkinValue = 1
                     else:
-                        indSkinValue = 0
+                        self.indSkinValue = 0
                 
                     # Starting progress window
-                    self.ar.utils.setProgress(doingName, tweaksGuideName, maxProcess, addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(self.ar.data.lang['m094_doing'], tweaksGuideName, maxProcess, addOne=False, addNumber=False)
                     
-                    self.ar.utils.setProgress(doingName+eyebrowMainName)
-                    # creating Single instances:
-                    holderMainInstance = self.ar.initGuide('dpSingle', guideDir)
-                    holderMainInstance.editGuideModuleName(holderMainName)
-                    
-                    eyebrowMainInstance = self.ar.initGuide('dpSingle', guideDir)
-                    eyebrowMainInstance.editGuideModuleName(eyebrowMainName)
-                    eyebrowMainInstance.changeMirror("X")
-                    cmds.setAttr(eyebrowMainInstance.moduleGrp+".deformedBy", 1)
-                    
-                    eyebrowInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                    eyebrowInstance1.editGuideModuleName(eyebrowName1)
-                    eyebrowInstance1.changeMirror("X")
-                    
-                    eyebrowInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                    eyebrowInstance2.editGuideModuleName(eyebrowName2)
-                    eyebrowInstance2.changeMirror("X")
-                    
-                    eyebrowInstance3 = self.ar.initGuide('dpSingle', guideDir)
-                    eyebrowInstance3.editGuideModuleName(eyebrowName3)
-                    eyebrowInstance3.changeMirror("X")
+                    # getting module instances:
+                    self.single = self.ar.config.get_instance("dpSingle", [guideDir])
+
+                    # creating guides:
+                    holder_main_guide = self.setTweak(holderMainName, radius=2, mirror=None)
+                    cmds.setAttr(holder_main_guide+".holder", 1)
+                    # brows
+                    brow_main_guide = self.setTweak(eyebrowMainName, tx=0.65, ty=2.8, tz=2, radius=0.3, deformed=1)
+                    brow_1_guide = self.setTweak(eyebrowName1, tx=0.45, ty=2.8, tz=2.1)
+                    brow_2_guide = self.setTweak(eyebrowName2, tx=0.65, ty=2.85, tz=2.1)
+                    brow_3_guide = self.setTweak(eyebrowName3, tx=0.85, ty=2.8, tz=2.1)
                     cmds.refresh()
-                    
-                    self.ar.utils.setProgress(doingName+lipMainName)
-
-                    lipMainInstance = self.ar.initGuide('dpSingle', guideDir)
-                    lipMainInstance.editGuideModuleName(lipMainName)
-                    cmds.setAttr(lipMainInstance.moduleGrp+".deformedBy", 3)
-                    
-                    upperLipMiddleInstance = self.ar.initGuide('dpSingle', guideDir)
-                    upperLipMiddleInstance.editGuideModuleName(upperLipMiddleName)
-                    
-                    upperLipInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                    upperLipInstance1.editGuideModuleName(checkText=upperLipName1)
-                    upperLipInstance1.changeMirror("X")
-                    
-                    upperLipInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                    upperLipInstance2.editGuideModuleName(upperLipName2)
-                    upperLipInstance2.changeMirror("X")
-                    
-                    lowerLipMiddleInstance = self.ar.initGuide('dpSingle', guideDir)
-                    lowerLipMiddleInstance.editGuideModuleName(lowerLipMiddleName)
-                    
-                    lowerLipInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                    lowerLipInstance1.editGuideModuleName(lowerLipName1)
-                    lowerLipInstance1.changeMirror("X")
-                    
-                    lowerLipInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                    lowerLipInstance2.editGuideModuleName(lowerLipName2)
-                    lowerLipInstance2.changeMirror("X")
-                    
-                    lipCornerInstance = self.ar.initGuide('dpSingle', guideDir)
-                    lipCornerInstance.editGuideModuleName(lipCornerName)
-                    lipCornerInstance.changeMirror("X")
+                    # lips
+                    lip_main_guide = self.setTweak(lipMainName, ty=1, tz=1, radius=0.3, mirror=None, deformed=3)
+                    upper_lip_middle_guide = self.setTweak(upperLipMiddleName, ty=1.1, tz=2.5, mirror=None)
+                    upper_lip_1_guide = self.setTweak(upperLipName1, tx=0.2, ty=1.07, tz=2.5)
+                    upper_lip_2_guide = self.setTweak(upperLipName2, tx=0.4, ty=1.05, tz=2.5)
+                    lower_lip_middle_guide = self.setTweak(lowerLipMiddleName, ty=0.9, tz=2.5, mirror=None)
+                    lower_lip_1_guide = self.setTweak(lowerLipName1, tx=0.2, ty=0.93, tz=2.5)
+                    lower_lip_2_guide = self.setTweak(lowerLipName2, tx=0.4, ty=0.95, tz=2.5)
+                    lip_corner_guide = self.setTweak(lipCornerName, tx=0.55, ty=1, tz=2.5)
                     cmds.refresh()
-                    
-                    #
-                    # complete part:
-                    #
-                    if userDetail == complete:
-                        
-                        self.ar.utils.setProgress(doingName+eyelidMainName)
-
-                        eyebrowMiddleInstance = self.ar.initGuide('dpSingle', guideDir)
-                        eyebrowMiddleInstance.editGuideModuleName(eyebrowMiddleName)
-
-                        eyebrowInstance4 = self.ar.initGuide('dpSingle', guideDir)
-                        eyebrowInstance4.editGuideModuleName(eyebrowName4)
-                        eyebrowInstance4.changeMirror("X")
-
-                        if userIndirectSkin == indSkin:
-                            eyelidMainInstance = self.ar.initGuide('dpSingle', guideDir)
-                            eyelidMainInstance.editGuideModuleName(eyelidMainName)
-                            eyelidMainInstance.changeMirror("X")
-                            cmds.setAttr(eyelidMainInstance.moduleGrp+".deformedBy", 1)
-                            
-                            upperEyelidInstance0 = self.ar.initGuide('dpSingle', guideDir)
-                            upperEyelidInstance0.editGuideModuleName(upperEyelidName0)
-                            upperEyelidInstance0.changeMirror("X")
-                            
-                            upperEyelidInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                            upperEyelidInstance1.editGuideModuleName(upperEyelidName1)
-                            upperEyelidInstance1.changeMirror("X")
-                            
-                            upperEyelidInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                            upperEyelidInstance2.editGuideModuleName(upperEyelidName2)
-                            upperEyelidInstance2.changeMirror("X")
-                            
-                            lowerEyelidInstance0 = self.ar.initGuide('dpSingle', guideDir)
-                            lowerEyelidInstance0.editGuideModuleName(lowerEyelidName0)
-                            lowerEyelidInstance0.changeMirror("X")
-                            
-                            lowerEyelidInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                            lowerEyelidInstance1.editGuideModuleName(lowerEyelidName1)
-                            lowerEyelidInstance1.changeMirror("X")
-                            
-                            lowerEyelidInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                            lowerEyelidInstance2.editGuideModuleName(lowerEyelidName2)
-                            lowerEyelidInstance2.changeMirror("X")
-                            
-                            eyelidCornerInstance0 = self.ar.initGuide('dpSingle', guideDir)
-                            eyelidCornerInstance0.editGuideModuleName(eyelidCornerName0)
-                            eyelidCornerInstance0.changeMirror("X")
-                            
-                            eyelidCornerInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                            eyelidCornerInstance1.editGuideModuleName(eyelidCornerName1)
-                            eyelidCornerInstance1.changeMirror("X")
-
-                            upperEyeSocketInstance0 = self.ar.initGuide('dpSingle', guideDir)
-                            upperEyeSocketInstance0.editGuideModuleName(upperEyeSocketName0)
-                            upperEyeSocketInstance0.changeMirror("X")
-                            
-                            upperEyeSocketInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                            upperEyeSocketInstance1.editGuideModuleName(upperEyeSocketName1)
-                            upperEyeSocketInstance1.changeMirror("X")
-                            
-                            upperEyeSocketInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                            upperEyeSocketInstance2.editGuideModuleName(upperEyeSocketName2)
-                            upperEyeSocketInstance2.changeMirror("X")
-                            
-                            lowerEyeSocketInstance0 = self.ar.initGuide('dpSingle', guideDir)
-                            lowerEyeSocketInstance0.editGuideModuleName(lowerEyeSocketName0)
-                            lowerEyeSocketInstance0.changeMirror("X")
-                            
-                            lowerEyeSocketInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                            lowerEyeSocketInstance1.editGuideModuleName(lowerEyeSocketName1)
-                            lowerEyeSocketInstance1.changeMirror("X")
-                            
-                            lowerEyeSocketInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                            lowerEyeSocketInstance2.editGuideModuleName(lowerEyeSocketName2)
-                            lowerEyeSocketInstance2.changeMirror("X")
-
-                        cmds.refresh()                    
-                        self.ar.utils.setProgress(doingName+eyeSocketName)
-
-
-
-                        cmds.refresh()                    
-                        self.ar.utils.setProgress(doingName+squintMainName)
-                        
-                        squintMainInstance = self.ar.initGuide('dpSingle', guideDir)
-                        squintMainInstance.editGuideModuleName(squintMainName)
-                        squintMainInstance.changeMirror("X")
-                        cmds.setAttr(squintMainInstance.moduleGrp+".deformedBy", 1)
-                        
-                        squintInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                        squintInstance1.editGuideModuleName(checkText=squintName1)
-                        squintInstance1.changeMirror("X")
-                        
-                        squintInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                        squintInstance2.editGuideModuleName(squintName2)
-                        squintInstance2.changeMirror("X")
-                        
-                        squintInstance3 = self.ar.initGuide('dpSingle', guideDir)
-                        squintInstance3.editGuideModuleName(squintName3)
-                        squintInstance3.changeMirror("X")
-
-                        cheekInstance1 = self.ar.initGuide('dpSingle', guideDir)
-                        cheekInstance1.editGuideModuleName(cheekName1)
-                        cheekInstance1.changeMirror("X")
-
-                        cheekInstance2 = self.ar.initGuide('dpSingle', guideDir)
-                        cheekInstance2.editGuideModuleName(cheekName2)
-                        cheekInstance2.changeMirror("X")
-                    
-                    # woking with Single indirect skinning setup:
-                    # declaring a instanceList in order to clear the code a little:
-                    instanceList = [holderMainInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                    sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                    mainInstanceList = [eyebrowMainInstance, lipMainInstance]
                     
                     if userDetail == complete:
+                        brow_middle_guide = self.setTweak(eyebrowMiddleName, ty=2.8, tz=2, mirror=None)
+                        brow_4_guide = self.setTweak(eyebrowName4, tx=1.05, ty=2.7, tz=2.1)
+                        # eyelids, eyesockets
                         if userIndirectSkin == indSkin:
-                            instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, upperEyeSocketInstance0, upperEyeSocketInstance1, upperEyeSocketInstance2, lowerEyeSocketInstance0, lowerEyeSocketInstance1, lowerEyeSocketInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                            sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, upperEyeSocketInstance0, upperEyeSocketInstance1, upperEyeSocketInstance2, lowerEyeSocketInstance0, lowerEyeSocketInstance1, lowerEyeSocketInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                            mainInstanceList = [eyebrowMainInstance, eyelidMainInstance, squintMainInstance, lipMainInstance]
-                        else:
-                            instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                            sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyebrowInstance4, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, cheekInstance2, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
-                            mainInstanceList = [eyebrowMainInstance, squintMainInstance, lipMainInstance]
+                            eyelid_main_guide = self.setTweak(eyelidMainName, tx=0.5, ty=2, tz=1.3, radius=0.3, deformed=1)
+                            upper_eyelid_0_guide = self.setTweak(upperEyelidName0, tx=0.33, ty=2.1, tz=1.8)
+                            upper_eyelid_1_guide = self.setTweak(upperEyelidName1, tx=0.5, ty=2.14, tz=1.8)
+                            upper_eyelid_2_guide = self.setTweak(upperEyelidName2, tx=0.67, ty=2.1, tz=1.8)
+                            lower_eyelid_0_guide = self.setTweak(lowerEyelidName0, tx=0.33, ty=1.9, tz=1.8)
+                            lower_eyelid_1_guide = self.setTweak(lowerEyelidName1, tx=0.5, ty=1.86, tz=1.8)
+                            lower_eyelid_2_guide = self.setTweak(lowerEyelidName2, tx=0.67, ty=1.9, tz=1.8)
+                            eyelid_corner_0_guide = self.setTweak(eyelidCornerName0, tx=0.2, ty=2, tz=1.8)
+                            eyelid_corner_1_guide = self.setTweak(eyelidCornerName1, tx=0.8, ty=2, tz=1.8)
+                            upper_eyesocket_0_guide = self.setTweak(upperEyeSocketName0, tx=0.25, ty=2.25, tz=1.8)
+                            upper_eyesocket_1_guide = self.setTweak(upperEyeSocketName1, tx=0.5, ty=2.3, tz=1.8)
+                            upper_eyesocket_2_guide = self.setTweak(upperEyeSocketName2, tx=0.75, ty=2.25, tz=1.8)
+                            lower_eyesocket_0_guide = self.setTweak(lowerEyeSocketName0, tx=0.25, ty=1.75, tz=1.8)
+                            lower_eyesocket_1_guide = self.setTweak(lowerEyeSocketName1, tx=0.5, ty=1.7, tz=1.8)
+                            lower_eyesocket_2_guide = self.setTweak(lowerEyeSocketName2, tx=0.75, ty=1.75, tz=1.8)
+                        cmds.refresh()
+                        # squint
+                        squint_main_guide = self.setTweak(squintMainName, tx=0.5, ty=1.4, tz=1.6, radius=0.3, deformed=1)
+                        squint_1_guide = self.setTweak(squintName1, tx=0.32, ty=1.47, tz=2.02)
+                        squint_2_guide = self.setTweak(squintName2, tx=0.57, ty=1.36, tz=1.95)
+                        squint_3_guide = self.setTweak(squintName3, tx=0.86, ty=1.39, tz=1.8)
+                        cheek_1_guide = self.setTweak(cheekName1, tx=1.1, ty=0.9, tz=2.1)
+                        cheek_2_guide = self.setTweak(cheekName2, tx=0.8, ty=1.15, tz=2.3)
                     
-                    # turn on indirectSkinning:
-                    for inst in instanceList:
-                        cmds.setAttr(inst.moduleGrp+".indirectSkin", indSkinValue)
-                        cmds.setAttr(inst.radiusCtrl+".translateX", 0.05)
-                        cmds.setAttr(inst.cvEndJoint+".translateZ", 0.1)
-                        cmds.setAttr(inst.moduleGrp+".displayAnnotation", 0)
-                        cmds.setAttr(inst.moduleGrp+"_Ant.visibility", 0)
-                        cmds.setAttr(inst.moduleGrp+".shapeSize", 0.03)
-
-                    # turn on mirroring and flipping:
-                    for sideInst in sideInstanceList:
-                        cmds.setAttr(sideInst.moduleGrp+".flip", 1)
-                        
-                    # change main size:
-                    for mainInst in mainInstanceList:
-                        cmds.setAttr(mainInst.radiusCtrl+".translateX", 0.3)
-                    
-                    cmds.setAttr(holderMainInstance.radiusCtrl+".translateX", 2)
-                    cmds.setAttr(holderMainInstance.moduleGrp+".holder", 0.7)
-                    
-                    self.ar.utils.setProgress(doingName+" hierarchy")
                     cmds.refresh()
+                    self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+" hierarchy")
                     
                     # working on hierarchy
-                    cmds.parent([eyebrowMainInstance.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
-                    cmds.parent([upperLipMiddleInstance.moduleGrp, upperLipInstance1.moduleGrp, upperLipInstance2.moduleGrp, lowerLipMiddleInstance.moduleGrp, lowerLipInstance1.moduleGrp, lowerLipInstance2.moduleGrp, lipCornerInstance.moduleGrp], lipMainInstance.moduleGrp, absolute=True)
+                    cmds.parent([brow_main_guide, lip_main_guide], holder_main_guide, absolute=True)
+                    cmds.parent([upper_lip_middle_guide, upper_lip_1_guide, upper_lip_2_guide, lower_lip_middle_guide, lower_lip_1_guide, lower_lip_2_guide, lip_corner_guide], lip_main_guide, absolute=True)
                     
                     if userDetail == complete:
-                        cmds.parent([eyebrowMiddleInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, cheekInstance2.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
-                        cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
-                        cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp, eyebrowInstance4.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
+                        cmds.parent([brow_middle_guide, squint_main_guide, cheek_1_guide, cheek_2_guide], holder_main_guide, absolute=True)
+                        cmds.parent([squint_1_guide, squint_2_guide, squint_3_guide], squint_main_guide, absolute=True)
+                        cmds.parent([brow_1_guide, brow_2_guide, brow_3_guide, brow_4_guide], brow_main_guide, absolute=True)
                         if userIndirectSkin == indSkin:
-                            cmds.parent(eyelidMainInstance.moduleGrp, holderMainInstance.moduleGrp, absolute=True)
-                            cmds.parent([upperEyelidInstance0.moduleGrp, upperEyelidInstance1.moduleGrp, upperEyelidInstance2.moduleGrp, lowerEyelidInstance0.moduleGrp, lowerEyelidInstance1.moduleGrp, lowerEyelidInstance2.moduleGrp, eyelidCornerInstance0.moduleGrp, eyelidCornerInstance1.moduleGrp, upperEyeSocketInstance0.moduleGrp, upperEyeSocketInstance1.moduleGrp, upperEyeSocketInstance2.moduleGrp, lowerEyeSocketInstance0.moduleGrp, lowerEyeSocketInstance1.moduleGrp, lowerEyeSocketInstance2.moduleGrp], eyelidMainInstance.moduleGrp, absolute=True)
+                            cmds.parent(eyelid_main_guide, holder_main_guide, absolute=True)
+                            cmds.parent([upper_eyelid_0_guide, upper_eyelid_1_guide, upper_eyelid_2_guide, lower_eyelid_0_guide, lower_eyelid_1_guide, lower_eyelid_2_guide, eyelid_corner_0_guide, eyelid_corner_1_guide, upper_eyesocket_0_guide, upper_eyesocket_1_guide, upper_eyesocket_2_guide, lower_eyesocket_0_guide, lower_eyesocket_1_guide, lower_eyesocket_2_guide], eyelid_main_guide, absolute=True)
                     else:
-                        cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp], eyebrowMainInstance.moduleGrp, absolute=True)
+                        cmds.parent([brow_1_guide, brow_2_guide, brow_3_guide], brow_main_guide, absolute=True)
                             
                     # try to parent to HEAD guide or control
                     if cmds.objExists("*__*:Guide_Head"):
                         if cmds.objExists("*__*:Guide_UpperJaw"):
-                            cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Head")[0], relative=True)
-                            cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_UpperJaw")[0], relative=False)
+                            cmds.parent(holder_main_guide, cmds.ls("*__*:Guide_Head")[0], relative=True)
+                            cmds.parent(holder_main_guide, cmds.ls("*__*:Guide_UpperJaw")[0], relative=False)
                         else:
-                            cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Head")[0], relative=True)
+                            cmds.parent(holder_main_guide, cmds.ls("*__*:Guide_Head")[0], relative=True)
                     elif cmds.objExists("Head_UpperJaw_Ctrl"):
-                        cmds.parent(holderMainInstance.moduleGrp, "Head_UpperJaw_Ctrl", relative=True)
-                        
-                    # set tweaks guides position
-                    cmds.setAttr(eyebrowMainInstance.moduleGrp+".translateX", 0.65)
-                    cmds.setAttr(eyebrowMainInstance.moduleGrp+".translateY", 2.8)
-                    cmds.setAttr(eyebrowMainInstance.moduleGrp+".translateZ", 2)
-                    
-                    cmds.setAttr(eyebrowInstance1.moduleGrp+".translateX", -0.2)
-                    cmds.setAttr(eyebrowInstance1.moduleGrp+".translateZ", 0.1)
-                    
-                    cmds.setAttr(eyebrowInstance2.moduleGrp+".translateY", 0.05)
-                    cmds.setAttr(eyebrowInstance2.moduleGrp+".translateZ", 0.1)
-                    
-                    cmds.setAttr(eyebrowInstance3.moduleGrp+".translateX", 0.2)
-                    cmds.setAttr(eyebrowInstance3.moduleGrp+".translateZ", 0.1)
-                    
-                    cmds.setAttr(lipMainInstance.moduleGrp+".translateY", 1)
-                    cmds.setAttr(lipMainInstance.moduleGrp+".translateZ", 1)
-                    
-                    cmds.setAttr(upperLipMiddleInstance.moduleGrp+".translateY", 0.1)
-                    cmds.setAttr(upperLipMiddleInstance.moduleGrp+".translateZ", 1.5)
-                    
-                    cmds.setAttr(lowerLipMiddleInstance.moduleGrp+".translateY", -0.1)
-                    cmds.setAttr(lowerLipMiddleInstance.moduleGrp+".translateZ", 1.5)
-                    
-                    cmds.setAttr(upperLipInstance1.moduleGrp+".translateX", 0.2)
-                    cmds.setAttr(upperLipInstance1.moduleGrp+".translateY", 0.07)
-                    cmds.setAttr(upperLipInstance1.moduleGrp+".translateZ", 1.5)
-                    
-                    cmds.setAttr(upperLipInstance2.moduleGrp+".translateX", 0.4)
-                    cmds.setAttr(upperLipInstance2.moduleGrp+".translateY", 0.05)
-                    cmds.setAttr(upperLipInstance2.moduleGrp+".translateZ", 1.5)
-                    
-                    cmds.setAttr(lowerLipInstance1.moduleGrp+".translateX", 0.2)
-                    cmds.setAttr(lowerLipInstance1.moduleGrp+".translateY", -0.07)
-                    cmds.setAttr(lowerLipInstance1.moduleGrp+".translateZ", 1.5)
-                    
-                    cmds.setAttr(lowerLipInstance2.moduleGrp+".translateX", 0.4)
-                    cmds.setAttr(lowerLipInstance2.moduleGrp+".translateY", -0.05)
-                    cmds.setAttr(lowerLipInstance2.moduleGrp+".translateZ", 1.5)
-                    
-                    cmds.setAttr(lipCornerInstance.moduleGrp+".translateX", 0.55)
-                    cmds.setAttr(lipCornerInstance.moduleGrp+".translateZ", 1.5)
-                    
-                    if userDetail == complete:
-                        
-                        cmds.setAttr(eyebrowMiddleInstance.moduleGrp+".translateY", 2.8)
-                        cmds.setAttr(eyebrowMiddleInstance.moduleGrp+".translateZ", 2)
-
-                        cmds.setAttr(eyebrowInstance4.moduleGrp+".translateX", 0.4)
-                        cmds.setAttr(eyebrowInstance4.moduleGrp+".translateY", -0.1)
-                        cmds.setAttr(eyebrowInstance4.moduleGrp+".translateZ", 0.1)
-                        
-                        cmds.setAttr(squintMainInstance.moduleGrp+".translateX", 0.5)
-                        cmds.setAttr(squintMainInstance.moduleGrp+".translateY", 1.4)
-                        cmds.setAttr(squintMainInstance.moduleGrp+".translateZ", 1.6)
-                        
-                        cmds.setAttr(squintInstance1.moduleGrp+".translateX", -0.18)
-                        cmds.setAttr(squintInstance1.moduleGrp+".translateY", 0.07)
-                        cmds.setAttr(squintInstance1.moduleGrp+".translateZ", 0.42)
-                        
-                        cmds.setAttr(squintInstance2.moduleGrp+".translateX", 0.07)
-                        cmds.setAttr(squintInstance2.moduleGrp+".translateY", -0.04)
-                        cmds.setAttr(squintInstance2.moduleGrp+".translateZ", 0.35)
-                        
-                        cmds.setAttr(squintInstance3.moduleGrp+".translateX", 0.36)
-                        cmds.setAttr(squintInstance3.moduleGrp+".translateY", -0.01)
-                        cmds.setAttr(squintInstance3.moduleGrp+".translateZ", 0.2)
-                        
-                        cmds.setAttr(cheekInstance1.moduleGrp+".translateX", 1.1)
-                        cmds.setAttr(cheekInstance1.moduleGrp+".translateY", 0.9)
-                        cmds.setAttr(cheekInstance1.moduleGrp+".translateZ", 2.1)
-                        
-                        cmds.setAttr(cheekInstance2.moduleGrp+".translateX", 0.8)
-                        cmds.setAttr(cheekInstance2.moduleGrp+".translateY", 1.15)
-                        cmds.setAttr(cheekInstance2.moduleGrp+".translateZ", 2.3)
-                        
-                        if userIndirectSkin == indSkin:
-                            cmds.setAttr(eyelidMainInstance.moduleGrp+".translateX", 0.5)
-                            cmds.setAttr(eyelidMainInstance.moduleGrp+".translateY", 2)
-                            cmds.setAttr(eyelidMainInstance.moduleGrp+".translateZ", 1.3)
-                            
-                            cmds.setAttr(upperEyelidInstance0.moduleGrp+".translateX", -0.17)
-                            cmds.setAttr(upperEyelidInstance0.moduleGrp+".translateY", 0.1)
-                            cmds.setAttr(upperEyelidInstance0.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(upperEyelidInstance1.moduleGrp+".translateY", 0.14)
-                            cmds.setAttr(upperEyelidInstance1.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(upperEyelidInstance2.moduleGrp+".translateX", 0.17)
-                            cmds.setAttr(upperEyelidInstance2.moduleGrp+".translateY", 0.1)
-                            cmds.setAttr(upperEyelidInstance2.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(lowerEyelidInstance0.moduleGrp+".translateX", -0.17)
-                            cmds.setAttr(lowerEyelidInstance0.moduleGrp+".translateY", -0.1)
-                            cmds.setAttr(lowerEyelidInstance0.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(lowerEyelidInstance1.moduleGrp+".translateY", -0.14)
-                            cmds.setAttr(lowerEyelidInstance1.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(lowerEyelidInstance2.moduleGrp+".translateX", 0.17)
-                            cmds.setAttr(lowerEyelidInstance2.moduleGrp+".translateY", -0.1)
-                            cmds.setAttr(lowerEyelidInstance2.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(eyelidCornerInstance0.moduleGrp+".translateX", -0.3)
-                            cmds.setAttr(eyelidCornerInstance0.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(eyelidCornerInstance1.moduleGrp+".translateX", 0.3)
-                            cmds.setAttr(eyelidCornerInstance1.moduleGrp+".translateZ", 0.5)
-
-                            cmds.setAttr(upperEyeSocketInstance0.moduleGrp+".translateX", -0.25)
-                            cmds.setAttr(upperEyeSocketInstance0.moduleGrp+".translateY", 0.25)
-                            cmds.setAttr(upperEyeSocketInstance0.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(upperEyeSocketInstance1.moduleGrp+".translateY", 0.3)
-                            cmds.setAttr(upperEyeSocketInstance1.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(upperEyeSocketInstance2.moduleGrp+".translateX", 0.25)
-                            cmds.setAttr(upperEyeSocketInstance2.moduleGrp+".translateY", 0.25)
-                            cmds.setAttr(upperEyeSocketInstance2.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(lowerEyeSocketInstance0.moduleGrp+".translateX", -0.25)
-                            cmds.setAttr(lowerEyeSocketInstance0.moduleGrp+".translateY", -0.25)
-                            cmds.setAttr(lowerEyeSocketInstance0.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(lowerEyeSocketInstance1.moduleGrp+".translateY", -0.3)
-                            cmds.setAttr(lowerEyeSocketInstance1.moduleGrp+".translateZ", 0.5)
-                            
-                            cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateX", 0.25)
-                            cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateY", -0.25)
-                            cmds.setAttr(lowerEyeSocketInstance2.moduleGrp+".translateZ", 0.5)
+                        cmds.parent(holder_main_guide, "Head_UpperJaw_Ctrl", relative=True)
                     
                     # Close progress window
                     self.ar.utils.setProgress(endIt=True)
 
                     self.ar.collapseEditSelModFL = False
-                    cmds.select(holderMainInstance.moduleGrp)
+                    cmds.select(holder_main_guide)
                     print(self.ar.data.lang['m093_createdTweaks'])
         else:
             # error checking modules in the folder:
             mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+
+
+    def setTweak(self, name, tx=0, ty=0, tz=0, radius=0.05, end=0.1, mirror="X", deformed=0):
+        self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+name)
+        guide = self.single.build_raw_guide()
+        self.single.editGuideModuleName(name)
+        cmds.setAttr(self.single.radiusCtrl+".translateX", radius)
+        cmds.setAttr(self.single.cvEndJoint+".translateZ", end)
+        cmds.setAttr(guide+".translateX", tx)
+        cmds.setAttr(guide+".translateY", ty)
+        cmds.setAttr(guide+".translateZ", tz)
+        cmds.setAttr(guide+".indirectSkin", self.indSkinValue)
+        cmds.setAttr(guide+".deformedBy", deformed)
+        if mirror:
+            self.single.changeMirror(mirror)
+            cmds.setAttr(guide+".flip", 1)
+        cmds.setAttr(guide+".displayAnnotation", 0)
+        cmds.setAttr(guide+"_Ant.visibility", 0)
+        cmds.setAttr(guide+".shapeSize", 0.03)
+        return guide

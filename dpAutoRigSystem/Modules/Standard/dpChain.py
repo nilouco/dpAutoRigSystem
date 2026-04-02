@@ -198,8 +198,8 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         renamedList = []
         for item in reversed(jntList):
             if cmds.objectType(item) == "joint":
-                if self.ar.jointEndAttr in cmds.listAttr(item):
-                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_"+self.ar.jointEndAttr, toName+"_"+self.ar.jointEndAttr))
+                if self.ar.data.joint_end_attr in cmds.listAttr(item):
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_"+self.ar.data.joint_end_attr, toName+"_"+self.ar.data.joint_end_attr))
                     renamedList.append(newName)
                     continue
                 elif "_Jax" in item:
@@ -238,7 +238,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dynJntList.insert(0, firstDynJnt)
         self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
         self.utils.addJointEndAttr([self.skinJointList[-1]])
-        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_"+self.ar.jointEndAttr)
+        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_"+self.ar.data.joint_end_attr)
         self.utils.removeUserDefinedAttr(self.skinJointList[:-1])
         newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
         cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
@@ -326,7 +326,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # creating joint chains:
                 self.chainDic = {}
                 self.jSuffixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt']
-                self.jEndSuffixList = ['_'+self.ar.jointEndAttr, '_Ik_'+self.ar.jointEndAttr, '_Fk_'+self.ar.jointEndAttr]
+                self.jEndSuffixList = ['_'+self.ar.data.joint_end_attr, '_Ik_'+self.ar.data.joint_end_attr, '_Fk_'+self.ar.data.joint_end_attr]
                 for t, suffix in enumerate(self.jSuffixList):
                     self.wipList = []
                     cmds.select(clear=True)

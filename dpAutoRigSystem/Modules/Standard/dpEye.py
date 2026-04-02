@@ -440,7 +440,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # joint position:
         cmds.delete(cmds.parentConstraint(cvLoc, mainJnt, maintainOffset=False))
         # create end joint:
-        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang[codeName]+"_"+self.ar.jointEndAttr, scaleCompensate=False, radius=0.5)
+        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang[codeName]+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
         self.utils.addJointEndAttr([endJoint])
         cmds.delete(cmds.parentConstraint(mainJnt, endJoint, maintainOffset=False))
         cmds.setAttr(endJoint+".translateZ", self.ctrlRadius)
@@ -555,7 +555,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.ctrls.setLockHide([self.fkEyeCtrl], ['tx', 'ty', 'tz'])
                 # create end joint:
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.jointEndAttr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 cmds.parent(self.endJoint, self.jnt, absolute=True)
                 # create parent and scale constraint from ctrl to jxt:
@@ -599,7 +599,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # jointScale position:
                 cmds.delete(cmds.parentConstraint(self.guide, self.eyeScaleJnt, maintainOffset=False))
                 # create endScale joint:
-                self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_"+self.ar.jointEndAttr, radius=0.5)
+                self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_"+self.ar.data.joint_end_attr, radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.eyeScaleJnt, self.endScaleJoint, maintainOffset=False))
                 cmds.setAttr(self.endScaleJoint+".translateZ", self.ctrlRadius)
                 if s == 1:
@@ -626,7 +626,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.setJointLabel(self.eyeSpecScaleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"Specular_2")
                     cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", self.ctrlRadius)
                     # create endSpecular joint:
-                    self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_"+self.ar.jointEndAttr, radius=0.5)
+                    self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_"+self.ar.data.joint_end_attr, radius=0.5)
                     self.utils.addJointEndAttr([self.endSpecJoint])
                     cmds.setAttr(self.endSpecJoint+".translateZ", 0.2*self.ctrlRadius)
                     cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)

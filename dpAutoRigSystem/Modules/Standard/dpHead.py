@@ -79,6 +79,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.addAttr(self.moduleGrp, longName=CHIN, attributeType='bool', defaultValue=1)
         cmds.addAttr(self.moduleGrp, longName=LIPS, attributeType='bool', defaultValue=1)
         cmds.addAttr(self.moduleGrp, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
         
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
@@ -332,6 +333,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         except:
             pass #maybe it's just a call from a procedural integrated module script
         cmds.setAttr(self.moduleGrp+".facial", value)
+        self.redeclareVariables(self.guideName)
         for item in list(self.facialLocDic.keys()):
             cmds.setAttr(self.facialLocDic[item]+".visibility", False)
             if value:
@@ -590,6 +592,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
+            style = cmds.getAttr(self.moduleGrp+".style")
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
@@ -609,11 +612,11 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     headJntName = side+self.userGuideName+"_02_"+self.ar.data.lang['c024_head']+"_Jnt"
                 upperJawJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c025_jaw']+"_Jnt"
                 upperHeadJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head']+"_Jnt"
-                upperEndJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head']+"_"+self.ar.jointEndAttr
+                upperEndJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head']+"_"+self.ar.data.joint_end_attr
                 jawJntName = side+self.userGuideName+"_"+self.ar.data.lang['c025_jaw']+"_Jnt"
                 chinJntName = side+self.userGuideName+"_"+self.ar.data.lang['c026_chin']+"_Jnt"
                 chewJntName = side+self.userGuideName+"_"+self.ar.data.lang['c048_chew']+"_Jnt"
-                endJntName = side+self.userGuideName+"_"+self.ar.jointEndAttr
+                endJntName = side+self.userGuideName+"_"+self.ar.data.joint_end_attr
                 lCornerLipJntName = side+self.userGuideName+"_"+self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c043_corner']+self.ar.data.lang['c039_lip']+"_Jnt"
                 rCornerLipJntName = side+self.userGuideName+"_"+self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c043_corner']+self.ar.data.lang['c039_lip']+"_Jnt"
                 upperLipJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c039_lip']+"_Jnt"
@@ -798,7 +801,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.delete([self.chinCtrl, self.chewCtrl], constructionHistory=True)
                 
                 #Setup Axis Order
-                if self.rigType == self.ar.data.rig_type_quadruped:
+                if style == 2: #quadruped
                     for n in range(0, self.nJoints):
                         cmds.setAttr(self.neckCtrlList[n]+".rotateOrder", 1)
                     cmds.setAttr(self.headCtrl+".rotateOrder", 1)
@@ -995,7 +998,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.ar.data.lang['c047_autoRotate'], neckARMD+".input2Y", force=True)
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.ar.data.lang['c047_autoRotate'], neckARMD+".input2Z", force=True)
                     cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
-                    if self.rigType == self.ar.data.rig_type_quadruped:
+                    if style == 2: #quadruped
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
                         quadrupedRotYZFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YZ_Fix_MD")
                         self.toIDList.append(quadrupedRotYZFixMD)
@@ -1473,12 +1476,13 @@ for net in cmds.ls(type="network"):
         """ Returns the defomedBy list for this Head module based in the integrated hook dictionary.
         """
         guideList, resultList = [], []
-        for item in self.ar.hookDic.keys():
-            if self.guideName in self.ar.hookDic[item]['fatherGuide']:
+        hookDic = self.ar.utils.hook()
+        for item in hookDic.keys():
+            if self.guideName in hookDic[item]['fatherGuide']:
                 if not item in guideList:
                     guideList.append(item.split(":")[0])
-                    if self.ar.hookDic[item]['childrenList']:
-                        for child in self.ar.hookDic[item]['childrenList']:
+                    if hookDic[item]['childrenList']:
+                        for child in hookDic[item]['childrenList']:
                             if not child in guideList:
                                 guideList.append(child.split(":")[0])
         if guideList:

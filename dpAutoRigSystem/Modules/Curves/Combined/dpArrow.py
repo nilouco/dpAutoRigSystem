@@ -33,7 +33,7 @@ class Arrow(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.ar.startGuideModules(self.ar.data.curve_simple_folder, "check", checkModuleList=self.checkModuleList)
+        checkResultList = self.ar.check_missing_modules(self.ar.data.curve_simple_folder, self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)

@@ -101,7 +101,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.userGuideName+"_"+letter+"_1_Jnt", scaleCompensate=False)
-                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.ar.jointEndAttr, scaleCompensate=False, radius=0.5)
+                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
                     self.utils.addJointEndAttr([endJoint])
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
