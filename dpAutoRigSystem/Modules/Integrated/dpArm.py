@@ -25,83 +25,53 @@ class Arm(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+        # dependence module list:
+        self.check_modules = ['dpLimb', 'dpFinger']
         
 
     def build_template(self, *args):
         """ This function will create all guides needed to compose an arm.
         """
         # check modules integrity:
-        guideDir = 'Modules.Standard'
-        standardDir = 'Modules/Standard'
-        checkModuleList = ['dpLimb', 'dpFinger']
-        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
-        
-        if len(checkResultList) == 0:
-            self.ar.collapseEditSelModFL = True
+        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
+        if not missing_modules:
+            self.ar.data.collapse_edit_sel_mod = True
+            
             # defining naming:
-            doingName = self.ar.data.lang['m094_doing']
-            # part names:
-            armName = self.ar.data.lang['c037_arm']
-            fingerIndexName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m032_index']
-            fingerMiddleName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m033_middle']
-            fingerRingName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m034_ring']
-            fingerPinkyName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m035_pinky']
-            fingerThumbName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m036_thumb']
-            armGuideName = self.ar.data.lang['c037_arm']+" "+self.ar.data.lang['i205_guide']
-        
+            arm = self.ar.data.lang['c037_arm'].capitalize()
+            index = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m032_index']
+            middle = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m033_middle']
+            ring = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m034_ring']
+            pinky = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m035_pinky']
+            thumb = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m036_thumb']
+            arm_guide_name = self.ar.data.lang['c037_arm']+" "+self.ar.data.lang['i205_guide']
+
             # Starting progress window
             maxProcess = 6 # number of modules to create
-            self.ar.utils.setProgress(doingName, armGuideName, maxProcess, addOne=False, addNumber=False)
-            self.ar.utils.setProgress(doingName+armName)
-            
-            # getting module instances:
-            limb = self.ar.config.get_instance("dpLimb", [guideDir])
-            finger = self.ar.config.get_instance("dpFinger", [guideDir])
-            
-            # creating arm:
-            arm_guide = limb.build_raw_guide()
-            # change name to arm:
-            limb.editGuideModuleName(armName.capitalize())
-            # edit arm limb guide:
-            cmds.setAttr(arm_guide+".translateX", 2.5)
-            cmds.setAttr(arm_guide+".translateY", 16)
-            cmds.setAttr(arm_guide+".displayAnnotation", 0)
-            cmds.setAttr(limb.cvExtremLoc+".translateZ", 7)
-            cmds.setAttr(limb.radiusCtrl+".translateX", 1.5)
-            limb.changeStyle(self.ar.data.lang['m026_biped'])
-            cmds.refresh()
+            self.ar.utils.setProgress(self.ar.data.lang['m094_doing'], arm_guide_name, maxProcess, addOne=False, addNumber=False)
 
-            # edit finger guides:
-            finger_names = [fingerThumbName, fingerIndexName, fingerMiddleName, fingerRingName, fingerPinkyName]
-            fingerTZList = [0.72, 0.6, 0.2, -0.2, -0.6]
+            # creating arm:
+            limb, arm_guide = self.ar.maker.set_new_guide("dpLimb", arm, t=(2.5, 16, 0), r=(90, 0, 90), annot=0, radius=1.5)
+            cmds.setAttr(limb.cvExtremLoc+".translateZ", 7)
+            limb.changeStyle(self.ar.data.lang['m026_biped'])
+
+            # finger guides:
+            finger_names = [thumb, index, middle, ring, pinky]
+            tz_fingers = [0.72, 0.6, 0.2, -0.2, -0.6]
             for n, finger_name in enumerate(finger_names):
-                self.ar.utils.setProgress(doingName+self.ar.data.lang['m007_finger'])
-                finger_guide = finger.build_raw_guide()
-                finger.editGuideModuleName(finger_name)
-                cmds.setAttr(finger_guide+".translateX", 11)
-                cmds.setAttr(finger_guide+".translateY", 16)
-                cmds.setAttr(finger_guide+".translateZ", fingerTZList[n])
-                cmds.setAttr(finger_guide+".displayAnnotation", 0)
-                cmds.setAttr(finger_guide+".shapeSize", 0.3)
-                cmds.setAttr(finger.radiusCtrl+".translateX", 0.3)
-                cmds.setAttr(finger.annotation+".visibility", 0)
-                if n == 0:
-                    # correct not commun values for thumb guide:
-                    cmds.setAttr(finger_guide+".translateX", 10.1)
-                    cmds.setAttr(finger_guide+".rotateX", 60)
+                finger, finger_guide = self.ar.maker.set_new_guide("dpFinger", finger_name, t=(11, 16, tz_fingers[n]), r=(90, 0, 90), annot=0, size=0.3, radius=0.3, parent=limb.cvExtremLoc)
+                if n == 0: #thumb
+                    cmds.setAttr(finger_guide+".translateY", 0.72)
+                    cmds.setAttr(finger_guide+".translateZ", 0.6)
+                    cmds.setAttr(finger_guide+".rotateX", -30)
                     finger.changeJointNumber(2)
-                    cmds.setAttr(finger_guide+".nJoints", 2)
-                # parent finger guide to the arm wrist guide:
-                cmds.parent(finger_guide, limb.cvExtremLoc, absolute=True)
-                cmds.refresh()
             
             # Close progress window
             self.ar.utils.setProgress(endIt=True)
-
             # select the armGuide_Base:
-            self.ar.collapseEditSelModFL = False
+            self.ar.data.collapse_edit_sel_mod = False
             cmds.select(arm_guide)
             print(self.ar.data.lang['m091_createdArm'])
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')

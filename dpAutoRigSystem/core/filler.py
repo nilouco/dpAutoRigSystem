@@ -66,7 +66,7 @@ class UIFiller(object):
             module_layout = cmds.rowLayout(item.name+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
             cmds.image(item.name+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
             if folder == self.ar.data.standard_folder:
-                cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_raw_guide, parent=module_layout)
+                cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=partial(self.ar.maker.create_raw_guide, item.name), parent=module_layout)
             elif folder == self.ar.data.integrated_folder:
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
             elif folder == self.ar.data.tools_folder:
@@ -125,7 +125,7 @@ class UIFiller(object):
             sorted_guides = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
             for module in sorted_guides:
-                mod = self.start_module(module, self.ar.data.standard_folder)
+                mod = self.ar.maker.import_module(module[0], self.ar.data.standard_folder)
                 self.ar.data.standard_instances.append(mod)
                 mod.get_namespace_for_it(module[1])
                 if self.ar.data.ui_state:
@@ -133,28 +133,6 @@ class UIFiller(object):
 
                 # reload pinGuide scriptJob:
                 self.ar.ctrls.startPinGuide(module[2])
-
-
-    def start_module(self, module, folder):
-        path = f"{self.ar.utils.findEnv('PYTHONPATH', 'dpAutoRigSystem')}.{folder.replace('/', '.')}"
-        imported_module = __import__(path+"."+module[0], {}, {}, [module[0]])
-        if self.ar.dev:
-            reload(imported_module)
-        # identify the guide modules and add to the moduleInstancesList:
-        moduleClass = getattr(imported_module, imported_module.CLASS_NAME)
-        if "rigType" in cmds.listAttr(module[2]):
-            curRigType = cmds.getAttr(module[2]+".rigType")
-            mod = moduleClass(self.ar)#, module[1], curRigType)
-        else:
-            if "Style" in cmds.listAttr(module[2]):
-                iStyle = cmds.getAttr(module[2]+".Style")
-                if (iStyle == 0 or iStyle == 1):
-                    mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_biped)
-                else:
-                    mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_quadruped)
-            else:
-                mod = moduleClass(self.ar, module[1], self.ar.data.rig_type_default)
-        return mod
 
 
     def populate_joints(self, *args):

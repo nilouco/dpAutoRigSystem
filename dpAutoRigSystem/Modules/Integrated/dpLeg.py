@@ -25,6 +25,8 @@ class Leg(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+        # dependence module list:
+        self.check_modules = ['dpLimb', 'dpFoot', 'dpFkLine']
 
 
     def build_template(self, *args):
@@ -34,10 +36,10 @@ class Leg(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFoot', 'dpFkLine']
-        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
+        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         
-        if len(checkResultList) == 0:
-            self.ar.collapseEditSelModFL = True
+        if not missing_modules:
+            self.ar.data.collapse_edit_sel_mod = True
             # defining naming:
             doingName = self.ar.data.lang['m094_doing']
             # part names:
@@ -51,16 +53,16 @@ class Leg(dpBaseLibrary.BaseLibrary):
             legGuideName = self.ar.data.lang['m030_leg']+" "+self.ar.data.lang['i205_guide']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, simple, userMessage)
-            if not userDetail == cancel:
+            user_choice = self.ask_build_detail(self.title, simple, complete, cancel, simple, userMessage)
+            if not user_choice == cancel:
                 # number of modules to create:
-                if userDetail == simple:
+                maxProcess = 7
+                if user_choice == simple:
                     maxProcess = 2
-                else:
-                    maxProcess = 7
+                
                     
                 # Starting progress window
-                self.ar.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False, addNumber=False)
+                self.ar.utils.setProgress(self.ar.data.lang['m094_doing'], legGuideName, maxProcess, addOne=False, addNumber=False)
 
                 # getting module instances:
                 limb = self.ar.config.get_instance("dpLimb", [guideDir])
@@ -98,7 +100,7 @@ class Leg(dpBaseLibrary.BaseLibrary):
                 #
                 # complete part:
                 #
-                if userDetail == complete:
+                if user_choice == complete:
                     
                     # working with Toes system:
                     self.ar.utils.setProgress(doingName+toeName)
@@ -215,9 +217,9 @@ class Leg(dpBaseLibrary.BaseLibrary):
                 self.ar.utils.setProgress(endIt=True)
 
                 # select the legGuide_Base:
-                self.ar.collapseEditSelModFL = False
+                self.ar.data.collapse_edit_sel_mod = False
                 cmds.select(leg_guide)
                 print(self.ar.data.lang['m092_createdLeg'])
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')

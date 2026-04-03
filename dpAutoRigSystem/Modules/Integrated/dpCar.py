@@ -25,6 +25,8 @@ class Car(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+        # dependence module list:
+        self.check_modules = ['dpFkLine', 'dpWheel', 'dpSteering', 'dpSuspension']
 
 
     def build_template(self, *args):
@@ -34,10 +36,10 @@ class Car(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpFkLine', 'dpWheel', 'dpSteering', 'dpSuspension']
-        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
+        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         
-        if len(checkResultList) == 0:
-            self.ar.collapseEditSelModFL = True
+        if not missing_modules:
+            self.ar.data.collapse_edit_sel_mod = True
             # defining naming:
             doingName = self.ar.data.lang['m094_doing']
             # part names:
@@ -85,16 +87,16 @@ class Car(dpBaseLibrary.BaseLibrary):
             carGuideName = self.ar.data.lang['m163_car']+" "+self.ar.data.lang['i205_guide']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, simple, userMessage)
-            if not userDetail == cancel:
+            user_choice = self.ask_build_detail(self.title, simple, complete, cancel, simple, userMessage)
+            if not user_choice == cancel:
                 # number of modules to create:
-                if userDetail == simple:
+                maxProcess = 37
+                if user_choice == simple:
                     maxProcess = 9
-                else:
-                    maxProcess = 37
+                
                 
                 # Starting progress window
-                self.ar.utils.setProgress(doingName, carGuideName, maxProcess, addOne=False, addNumber=False)
+                self.ar.utils.setProgress(self.ar.data.lang['m094_doing'], carGuideName, maxProcess, addOne=False, addNumber=False)
                 
                 # getting module instances:
                 fkline = self.ar.config.get_instance("dpFkLine", [guideDir])
@@ -268,7 +270,7 @@ class Car(dpBaseLibrary.BaseLibrary):
                 #
                 # complete part:
                 #
-                if userDetail == complete:
+                if user_choice == complete:
                 
                     # working with HORN system:
                     self.ar.utils.setProgress(doingName+hornName)
@@ -719,9 +721,9 @@ class Car(dpBaseLibrary.BaseLibrary):
                 self.ar.utils.setProgress(endIt=True)
                 
                 # select spineGuide_Base:
-                self.ar.collapseEditSelModFL = False
+                self.ar.data.collapse_edit_sel_mod = False
                 cmds.select(chassis_guide)
                 print(self.ar.data.lang['m167_createdCar'])
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')

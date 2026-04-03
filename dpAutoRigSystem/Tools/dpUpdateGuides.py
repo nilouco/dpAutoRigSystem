@@ -288,7 +288,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
                 self.setAttrValue(dpGuide, attr, value)
             if lock:
                 cmds.setAttr(f'{dpGuide}.{attr}', lock=True)
-            if self.ui:
+            if self.ar.data.ui_state:
                 cmds.refresh()
     
 
@@ -402,7 +402,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
                     cmds.parent(self.updateData[guide]['newGuide'], newParentFinal)
                 except:
                     mel.eval('print \"dpAR: '+self.ar.data.lang['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
-            if self.ui:
+            if self.ar.data.ui_state:
                 cmds.refresh()
 
 

@@ -31,9 +31,10 @@ class CopyPasteAttr(dpBaseLibrary.BaseLibrary):
 #        self.ar.ctrls = dpControls.ControlClass(self.ar)
 
 
-    def build_tool(self):
+    def build_tool(self, *args):
         # call main function
-        self.copyPasteAttrUI()
+        if self.ar.data.ui_state:
+            self.copyPasteAttrUI()
     
     
     # def closeCopyPasteAttrUI(self, *args):

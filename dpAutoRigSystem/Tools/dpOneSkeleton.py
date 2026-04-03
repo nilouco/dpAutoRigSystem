@@ -33,7 +33,7 @@ class OneSkeleton(dpBaseLibrary.BaseLibrary):
         
     def build_tool(self, *args):
         # call main UI function
-        if self.ui:
+        if self.ar.data.ui_state:
             name = self.oneSkeletonPromptDialog()
             if name:
                 self.createOneSkeleton(name)

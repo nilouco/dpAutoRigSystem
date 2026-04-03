@@ -42,7 +42,7 @@ class Renamer(dpBaseLibrary.BaseLibrary):
 
     def build_tool(self, *args):
         # call main function
-        if self.ui:
+        if self.ar.data.ui_state:
             self.renamerUI()
             cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
     
@@ -308,7 +308,7 @@ class Renamer(dpBaseLibrary.BaseLibrary):
     def resetUI(self, *args):
         """ Just back UI to default initial values.
         """
-        if self.ui:
+        if self.ar.data.ui_state:
             cmds.radioButtonGrp(self.selectRB, edit=True, select=1)
             # checkBoxes
             cmds.checkBox(self.sequenceCB, edit=True, value=False)

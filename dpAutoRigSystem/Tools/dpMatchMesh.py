@@ -30,7 +30,7 @@ class MatchMesh(dpBaseLibrary.BaseLibrary):
 
     def build_tool(self, *args):
         # call main function
-        self.dpMatchMesh(self)
+        self.dpMatchMesh()
     
 
     def dpMatchMesh(self):
@@ -156,7 +156,8 @@ class MatchMesh(dpBaseLibrary.BaseLibrary):
 
                     if not cancelled:
                         cmds.select(selList)
-                        self.ar.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
+                        if self.ar.data.ui_state:
+                            self.ar.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
                         print(self.ar.data.lang['i035_transfData'], self.ar.data.lang['i036_from'].upper(), ":", fromMesh, ",", self.ar.data.lang['i037_to'].upper(), ":", toMesh)
                     else:
                         print(self.ar.data.lang['i038_canceled'])

@@ -37,7 +37,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
         self.hikNode = self.hikGetLatestNode()
         self.hikDic = None
         # call main function:
-        if self.ui:
+        if self.ar.data.ui_state:
             self.dpMotionCaptureUI(self)
 
     
@@ -470,7 +470,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
     def hikRetarget(self, rib=False, *args):
         """ Run the HumanIk retargeting processes.
         """
-        if self.ui:
+        if self.ar.data.ui_state:
             rib = cmds.checkBox(self.mapRibbonCB, query=True, value=True)
         self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], addOne=False, addNumber=False, max=8)
         self.hikCreateCharacterDefinition()

@@ -25,6 +25,8 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+        # dependence module list:
+        self.check_modules = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
 
 
     def build_template(self, *args):
@@ -32,12 +34,12 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
         """
         # check modules integrity:
         guideDir = 'Modules.Standard'
-        standardDir = 'Modules/Standard'
-        checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
-        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
+        #standardDir = 'Modules/Standard'
+        #checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
+        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         
-        if len(checkResultList) == 0:
-            self.ar.collapseEditSelModFL = True
+        if not missing_modules:
+            self.ar.data.collapse_edit_sel_mod = True
             # defining naming:
             doingName = self.ar.data.lang['m094_doing']
             quadrupedStyleName = self.ar.data.lang['m037_quadruped']
@@ -72,16 +74,16 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
             quadrupedGuideName = self.ar.data.lang['m037_quadruped']+" "+self.ar.data.lang['i205_guide']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
-            if not userDetail == cancel:
+            user_choice = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
+            if not user_choice == cancel:
                 # number of modules to create:
-                if userDetail == simple:
+                maxProcess = 22
+                if user_choice == simple:
                     maxProcess = 8
-                else:
-                    maxProcess = 22
+                
                     
                 # Starting progress window
-                self.ar.utils.setProgress(doingName, quadrupedGuideName, maxProcess, addOne=False, addNumber=False)
+                self.ar.utils.setProgress(self.ar.data.lang['m094_doing'], quadrupedGuideName, maxProcess, addOne=False, addNumber=False)
 
                 # getting module instances:
                 limb = self.ar.config.get_instance("dpLimb", [guideDir])
@@ -96,7 +98,8 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 # working with SPINE system:
                 self.ar.utils.setProgress(doingName+spineName)
                 # create spine module instance:
-                spine_guide = spine.build_raw_guide()
+                #spine_guide = spine.build_raw_guide()
+                spine, spine_guide = self.ar.maker.create_raw_guide("dpSpine")
                 # editing spine base guide informations:
                 spine.editGuideModuleName(spineName)
                 cmds.setAttr(spine_guide+".translateY", 10)
@@ -217,11 +220,11 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 foot.checkFatherMirror()
                 cmds.refresh()
 
-                if userDetail == complete:
+                if user_choice == complete:
                     limb.setCorrective(1)
                     self.ar.utils.setProgress(doingName+toeName+backName)
                     # create toe1 module instance:
-                    back_toe_1_guide = fkline.build_raw_guide()
+                    fkline, back_toe_1_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+backName+"_1")
                     # editing toe base guide informations:
@@ -244,7 +247,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     
                     self.ar.utils.setProgress(doingName+toeName+backName)
                     # create toe2 module instance:
-                    back_toe_2_guide = fkline.build_raw_guide()
+                    fkline, back_toe_2_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+backName+"_2")
                     # editing toe base guide informations:
@@ -267,7 +270,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     
                     self.ar.utils.setProgress(doingName+toeName+backName)
                     # create toe3 module instance:
-                    back_toe_3_guide = fkline.build_raw_guide()
+                    fkline, back_toe_3_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+backName+"_3")
                     # editing toe base guide informations:
@@ -290,7 +293,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     
                     self.ar.utils.setProgress(doingName+toeName+backName)
                     # create toe4 module instance:
-                    back_toe_4_guide = fkline.build_raw_guide()
+                    fkline, back_toe_4_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+backName+"_4")
                     # editing toe base guide informations:
@@ -349,7 +352,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 cmds.parent(front_leg_guide, spine.cvLocator, absolute=True)
                 # setting X mirror:
                 limb.changeMirror("X")
-                if userDetail == complete:
+                if user_choice == complete:
                     limb.setCorrective(1)
                 cmds.refresh()
 
@@ -370,11 +373,11 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 foot.checkFatherMirror()
                 cmds.refresh()
                 
-                if userDetail == complete:
+                if user_choice == complete:
                     limb.setCorrective(1)
                     self.ar.utils.setProgress(doingName+toeName+frontName)
                     # create toe1 module instance:
-                    front_toe_1_guide = fkline.build_raw_guide()
+                    fkline, front_toe_1_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+frontName+"_1")
                     # editing toe base guide informations:
@@ -397,7 +400,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     
                     self.ar.utils.setProgress(doingName+toeName+frontName)
                     # create toe2 module instance:
-                    front_toe_2_guide = fkline.build_raw_guide()
+                    fkline, front_toe_2_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+frontName+"_2")
                     # editing toe base guide informations:
@@ -420,7 +423,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     
                     self.ar.utils.setProgress(doingName+toeName+frontName)
                     # create toe3 module instance:
-                    front_toe_3_guide = fkline.build_raw_guide()
+                    fkline, front_toe_3_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+frontName+"_3")
                     # editing toe base guide informations:
@@ -443,7 +446,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
 
                     self.ar.utils.setProgress(doingName+toeName+frontName)
                     # create toe4 module instance:
-                    front_toe_4_guide = fkline.build_raw_guide()
+                    fkline, front_toe_4_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # change name to toe:
                     fkline.editGuideModuleName(toeName+frontName+"_4")
                     # editing toe base guide informations:
@@ -469,7 +472,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 # working with TAIL system:
                 self.ar.utils.setProgress(doingName+tailName)
                 # create FkLine module instance:
-                tail_guide = fkline.build_raw_guide()
+                fkline, tail_guide = self.ar.maker.create_raw_guide("dpFkLine")
                 # editing tail base guide informations:
                 fkline.editGuideModuleName(tailName)
                 cmds.setAttr(tail_guide+".translateY", 9.8)
@@ -484,19 +487,19 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 # change the number of joints to the tail module:
                 fkline.changeJointNumber(3)
                 
-                if userDetail == simple:
+                if user_choice == simple:
                     # parent tail guide to spine guide:
                     cmds.parent(tail_guide, spine_guide, absolute=True)
                 
                 #
                 # complete part:
                 #
-                if userDetail == complete:
+                if user_choice == complete:
                     
                     # working with TAIL system:
                     self.ar.utils.setProgress(doingName+tailName+baseName)
                     # create FkLine module instance:
-                    tail_base_guide = fkline.build_raw_guide()
+                    fkline, tail_base_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing tail base guide informations:
                     fkline.editGuideModuleName(tailName+baseName)
                     cmds.setAttr(tail_base_guide+".translateY", 10.0)
@@ -519,7 +522,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # working with EAR system:
                     self.ar.utils.setProgress(doingName+earName)
                     # create FkLine module instance:
-                    ear_base_guide = fkline.build_raw_guide()
+                    fkline, ear_base_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing ear base guide informations:
                     fkline.editGuideModuleName(earName+baseName)
                     cmds.setAttr(ear_base_guide+".translateX", 0.11)
@@ -539,7 +542,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
 
                     self.ar.utils.setProgress(doingName+earName)
                     # create FkLine module instance:
-                    ear_guide = fkline.build_raw_guide()
+                    fkline, ear_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing ear base guide informations:
                     fkline.editGuideModuleName(earName)
                     cmds.setAttr(ear_guide+".translateX", 0.8)
@@ -566,7 +569,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
 
                     self.ar.utils.setProgress(doingName+upperName+earName)
                     # create FkLine module instance:
-                    upper_ear_guide = fkline.build_raw_guide()
+                    fkline, upper_ear_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing ear upper guide informations:
                     fkline.editGuideModuleName(upperName+earName)
                     cmds.setAttr(upper_ear_guide+".translateX", 1.401)
@@ -589,7 +592,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     
                     self.ar.utils.setProgress(doingName+lowerName+earName)
                     # create FkLine module instance:
-                    lower_ear_guide = fkline.build_raw_guide()
+                    fkline, lower_ear_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing ear upper guide informations:
                     fkline.editGuideModuleName(lowerName+earName)
                     cmds.setAttr(lower_ear_guide+".translateX", 1.796)
@@ -614,7 +617,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # working with Teeth system:
                     self.ar.utils.setProgress(doingName+upperTeethName)
                     # create FkLine module instance:
-                    upper_teeth_guide = fkline.build_raw_guide()
+                    fkline, upper_teeth_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing upperTeeth base guide informations:
                     fkline.editGuideModuleName(upperTeethName)
                     cmds.setAttr(upper_teeth_guide+".translateY", 12.5)
@@ -625,7 +628,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     cmds.setAttr(upper_teeth_guide+".deformedBy", 3)
                     upper_teeth_cv_joint_loc = fkline.cvJointLoc
                     # create FkLine module instance:
-                    upper_teeth_middle_guide = fkline.build_raw_guide()
+                    fkline, upper_teeth_middle_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing upperTeethMiddle base guide informations:
                     fkline.editGuideModuleName(upperTeethMiddleName)
                     cmds.setAttr(upper_teeth_middle_guide+".translateY", 12.3)
@@ -638,7 +641,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # parent upperTeethMiddle guide to upperTeeth guide:
                     cmds.parent(upper_teeth_middle_guide, upper_teeth_cv_joint_loc, absolute=True)
                     # create FkLine module instance:
-                    upper_teeth_side_guide = fkline.build_raw_guide()
+                    fkline, upper_teeth_side_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing upperTeethSide base guide informations:
                     fkline.editGuideModuleName(upperTeethSideName)
                     cmds.setAttr(upper_teeth_side_guide+".translateX", 0.2)
@@ -654,7 +657,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # parent upperTeethSide guide to upperTeeth guide:
                     cmds.parent(upper_teeth_side_guide, upper_teeth_cv_joint_loc, absolute=True)
                     # create FkLine module instance:
-                    lower_teeth_guide = fkline.build_raw_guide()
+                    fkline, lower_teeth_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing lowerTeeth base guide informations:
                     fkline.editGuideModuleName(lowerTeethName)
                     cmds.setAttr(lower_teeth_guide+".translateY", 11.7)
@@ -667,7 +670,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # parent lowerTeeth guide to head guide:
                     cmds.parent(lower_teeth_guide, head.cvChinLoc, absolute=True)
                     # create FkLine module instance:
-                    lower_teeth_middle_guide = fkline.build_raw_guide()
+                    fkline, lower_teeth_middle_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing lowerTeethMiddle base guide informations:
                     fkline.editGuideModuleName(lowerTeethMiddleName)
                     cmds.setAttr(lower_teeth_middle_guide+".translateY", 11.9)
@@ -680,7 +683,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # parent lowerTeeth guide to lowerTeeth guide:
                     cmds.parent(lower_teeth_middle_guide, lower_teeth_cv_joint_loc, absolute=True)
                     # create FkLine module instance:
-                    lower_teeth_side_guide = fkline.build_raw_guide()
+                    fkline, lower_teeth_side_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing lowerTeethSide base guide informations:
                     fkline.editGuideModuleName(lowerTeethSideName)
                     cmds.setAttr(lower_teeth_side_guide+".translateX", 0.2)
@@ -700,7 +703,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     # working with Tongue system:
                     self.ar.utils.setProgress(doingName+tongueName)
                     # create FkLine module instance:
-                    tongue_guide = fkline.build_raw_guide()
+                    fkline, tongue_guide = self.ar.maker.create_raw_guide("dpFkLine")
                     # editing tongue base guide informations:
                     fkline.editGuideModuleName(tongueName)
                     cmds.setAttr(tongue_guide+".translateY", 12)
@@ -771,7 +774,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 self.ar.utils.setProgress(endIt=True)
                 
                 # select spineGuide_Base:
-                self.ar.collapseEditSelModFL = False
+                self.ar.data.collapse_edit_sel_mod = False
                 cmds.select(spine_guide)
                 print(self.ar.data.lang['m090_createdQuadruped'])
 
@@ -784,4 +787,4 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
 
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')

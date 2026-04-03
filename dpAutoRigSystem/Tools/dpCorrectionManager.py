@@ -45,9 +45,9 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
         self.net = None
 
     
-    def build_tool(self):
+    def build_tool(self, *args):
         # call main UI function
-        if self.ui:
+        if self.ar.data.ui_state:
 #            self.closeUI()
             self.ar.utils.closeUI("dpCorrectionManagerWindow")
             self.mainUI()
@@ -152,14 +152,14 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
         """
         oldName = cmds.getAttr(self.net+".name")
         if not name:
-            if self.ui:
+            if self.ar.data.ui_state:
                 name = cmds.textFieldGrp(self.nameTFG, query=True, text=True)
         if name:
             name = self.ar.utils.resolveName(name, self.netSuffix)[0]
             self.renameLinkedNodes(oldName, name)
             cmds.setAttr(self.net+".name", name, type="string")
             self.net = cmds.rename(self.net, self.net.replace(oldName, name))
-            if self.ui:
+            if self.ar.data.ui_state:
                 self.populateNetUI()
                 #self.actualizeEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
                 cmds.textFieldGrp(self.nameTFG, label=self.ar.data.lang['m006_name'], edit=True, text=name)
@@ -243,7 +243,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                     cmds.delete(self.correctionManagerDataGrp)
                 except:
                     pass
-        if self.ui:
+        if self.ar.data.ui_state:
             self.populateNetUI()
             self.actualizeEditLayout()
 
@@ -621,7 +621,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                     self.ar.customAttr.addAttr(0, self.toIDList) #dpID
                     self.ar.customAttr.addAttr(0, [self.correctionManagerDataGrp], descendents=True) #dpID
                     # update UI                    
-                    if self.ui:
+                    if self.ar.data.ui_state:
                         self.populateNetUI()
                         self.actualizeEditLayout()
                     cmds.undoInfo(closeChunk=True)

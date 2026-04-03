@@ -64,7 +64,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
 
     def build_tool(self, *args):
         # call main function
-        if self.ui:
+        if self.ar.data.ui_state:
             self.dpRivetUI()
             # try to fill UI items from selection
             self.dpFillUI()
@@ -935,7 +935,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
     def deformFaceToRivet(self, geometry, origGeo, *args):
         """ Do deformation from original mesh to faceToRivet geo.
         """
-        if self.ui:
+        if self.ar.data.ui_state:
             # Create deformer by user selection
             deformerSelectedRadioButton = cmds.radioCollection(self.deformerCollection, query=True, select=True)
             self.deformerToUse = cmds.radioButton(deformerSelectedRadioButton, query=True, annotation=True)

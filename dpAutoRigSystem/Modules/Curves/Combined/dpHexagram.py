@@ -22,7 +22,7 @@ class Hexagram(dpBaseCurve.BaseCurve):
         kwargs["WIKI"] = None
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
         # dependence module list:
-        self.checkModuleList = ['dpTriangle']
+        self.check_modules = ['dpTriangle']
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
@@ -30,14 +30,14 @@ class Hexagram(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        checkResultList = self.ar.check_missing_modules(self.ar.data.curve_simple_folder, self.checkModuleList)
-        if len(checkResultList) == 0:
+        missing_modules = self.ar.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
+        if not missing_modules:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
             
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):

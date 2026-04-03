@@ -63,6 +63,7 @@ from .core import manager
 from .core import librarian
 from .core import filler
 from .core import updater
+from .core import maker
 from .ui import main
 from .ui import update
 from .ui import donate
@@ -120,6 +121,7 @@ class Start(object):
             reload(librarian)
             reload(filler)
             reload(updater)
+            reload(maker)
             reload(version)
             # ui
             reload(main)
@@ -141,6 +143,7 @@ class Start(object):
 
 
     def load_components(self):
+        self.maker = maker.Maker(self)
         self.utils = dpUtils.Utils(self)
         self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager(self)
@@ -613,7 +616,7 @@ class Start(object):
         """
         # results = []
         # modules = self.utils.findAllModules(self.data.dp_auto_rig_path, folder)
-        return [m for m in check_modules if not m in self.utils.findAllModules(self.data.dp_auto_rig_path, folder)]
+        return [m for m in check_modules if not m in self.utils.findAllModules(self.data.dp_auto_rig_path, folder.replace(".", "/"))]
         # if modules:
         #     for module in check_modules:
         #         if not module in modules:
@@ -720,6 +723,18 @@ class Start(object):
             #         self.data.deforming_instances.append(lib_instance)
             #     elif guideDir == self.data.custom_folder:
             #         self.data.custom_instances.append(lib_instance)
+
+    # def test(self, name, folder, *args):
+    #     #
+    #     # TODO: review after rename modules without dp
+    #     #
+    #     if not name.startswith("dp"):
+    #         name = "dp"+name
+
+    #     mod = self.filler.create_raw_guide(name, folder)
+    #     print("mod =", mod)
+    #     return [mod, mod.build_raw_guide()]
+
 
 
     #@dpUtils.profiler

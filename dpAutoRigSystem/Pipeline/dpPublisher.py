@@ -13,7 +13,6 @@ class Publisher(object):
         """
         # defining variables:
         self.ar = ar
-        self.ui = ui
         self.verbose = verbose
         self.publisherName = self.ar.data.lang['m046_publisher']
         self.currentAssetName = None
@@ -35,7 +34,6 @@ class Publisher(object):
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-        self.ui = True
         self.utils.closeUI('dpSuccessPublishedWindow')
         self.utils.closeUI('dpPublisherWindow')
         savedScene = self.utils.checkSavedScene()
@@ -60,7 +58,7 @@ class Publisher(object):
             publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
             cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
-            cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, True, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
             cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly

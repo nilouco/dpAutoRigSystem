@@ -11,7 +11,6 @@ class BaseLibrary(object):
         """
         # defining variables:
         self.ar = ar
-        self.ui = self.ar.data.ui_state
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION

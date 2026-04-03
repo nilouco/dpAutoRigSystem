@@ -12,7 +12,6 @@ class Logger(object):
         """
         # defining variables:
         self.ar = ar
-        self.ui = ui
         self.verbose = verbose
         self.lang = ar.data.lang
         self.utils = ar.utils

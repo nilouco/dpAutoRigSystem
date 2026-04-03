@@ -40,9 +40,9 @@ class CustomAttr(dpBaseLibrary.BaseLibrary):
         self.typeList = DEFAULTTYPE_LIST.copy()
 
 
-    def build_tool(self):
+    def build_tool(self, *args):
         # call main UI function
-        if self.ui:
+        if self.ar.data.ui_state:
             self.ar.utils.closeUI(self.mainWindowName)
             self.ar.utils.closeUI(self.addWindowName)
             self.ar.utils.closeUI(self.removeWindowName)
@@ -261,7 +261,7 @@ class CustomAttr(dpBaseLibrary.BaseLibrary):
                     if attrIndex == "custom":
                         if attrName:
                             attr = attrName
-                        elif self.ui:
+                        elif self.ar.data.ui_state:
                             attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
                             if attr:
                                 if not attr == ATTR_START:
@@ -288,7 +288,7 @@ class CustomAttr(dpBaseLibrary.BaseLibrary):
                         if not cmds.attributeQuery(attr, node=item, exists=True):
                             cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
                             cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
-            if self.ui and cmds.textFieldButtonGrp("addCustomAttrTFG", exists=True):
+            if self.ar.data.ui_state and cmds.textFieldButtonGrp("addCustomAttrTFG", exists=True):
                 cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
         return idList
 
@@ -324,7 +324,7 @@ class CustomAttr(dpBaseLibrary.BaseLibrary):
                 if cmds.attributeQuery(attr, node=item, exists=True):
                     cmds.setAttr(item+"."+attr, edit=True, lock=False)
                     cmds.deleteAttr(item+"."+attr)
-                    if self.ui:
+                    if self.ar.data.ui_state:
                         if cmds.button("removeButton"+attr, query=True, exists=True):
                             cmds.deleteUI("removeButton"+attr)
 

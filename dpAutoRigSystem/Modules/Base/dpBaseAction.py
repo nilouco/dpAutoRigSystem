@@ -29,7 +29,6 @@ class ActionStartClass(object):
         self.description = DESCRIPTION
         self.icon = ICON
         self.wiki = WIKI
-        self.ui = ui
         self.verbose = verbose
         self.active = True
         self.actionCB = None
@@ -112,7 +111,7 @@ class ActionStartClass(object):
     def resetButtonColors(self, *args):
         """ Just set the button colors as default.
         """
-        if self.ui:
+        if self.ar.data.ui_state:
             if cmds.button(self.firstBT, exists=True):
                 cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
                 cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
@@ -121,7 +120,7 @@ class ActionStartClass(object):
     def updateButtonColors(self, running=False, *args):
         """ Update button background colors if using UI.
         """
-        if self.ui:
+        if self.ar.data.ui_state:
             if cmds.button(self.firstBT, exists=True):
                 if running:
                     if self.firstMode: #verify/export

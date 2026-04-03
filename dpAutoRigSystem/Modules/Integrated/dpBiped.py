@@ -25,6 +25,8 @@ class Biped(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+        # dependence module list:
+        self.check_modules = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
 
 
     def build_template(self, *args):
@@ -34,10 +36,10 @@ class Biped(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
-        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
+        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         
-        if len(checkResultList) == 0:
-            self.ar.collapseEditSelModFL = True
+        if not missing_modules:
+            self.ar.data.collapse_edit_sel_mod = True
             # defining naming:
             doingName = self.ar.data.lang['m094_doing']
             bipedStyleName = self.ar.data.lang['m026_biped']
@@ -73,16 +75,16 @@ class Biped(dpBaseLibrary.BaseLibrary):
             
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
-            if not userDetail == cancel:
+            user_choice = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
+            if not user_choice == cancel:
                 # number of modules to create:
-                if userDetail == simple:
+                maxProcess = 18
+                if user_choice == simple:
                     maxProcess = 7
-                else:
-                    maxProcess = 18
+                
             
                 # Starting progress window
-                self.ar.utils.setProgress(doingName, bipedGuideName, maxProcess, addOne=False, addNumber=False)
+                self.ar.utils.setProgress(self.ar.data.lang['m094_doing'], bipedGuideName, maxProcess, addOne=False, addNumber=False)
 
                 # getting module instances:
                 limb = self.ar.config.get_instance("dpLimb", [guideDir])
@@ -138,7 +140,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                 cmds.setAttr(eye_guide+".flip", 1)
                 # parent eye guide to spine guide:
                 cmds.parent(eye_guide, head.cvUpperHeadLoc, absolute=True)
-                if userDetail == complete:
+                if user_choice == complete:
                         eye.setCorrective(1)
                 cmds.refresh()
                 
@@ -165,7 +167,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                 cmds.setAttr(limb.cvExtremLoc+".translateZ", 8.5)
                 # parent leg guide to spine base guide:
                 cmds.parent(leg_guide, spine_guide, absolute=True)
-                if userDetail == complete:
+                if user_choice == complete:
                         limb.setCorrective(1)
                 cmds.refresh()
                 
@@ -202,7 +204,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                 cmds.setAttr(limb.radiusCtrl+".translateX", 1.5)
                 # parent arm guide to spine chest guide:
                 cmds.parent(arm_guide, spine.cvLocator, absolute=True)
-                if userDetail == complete:
+                if user_choice == complete:
                         limb.setCorrective(1)
                 cmds.refresh()
                 
@@ -230,14 +232,14 @@ class Biped(dpBaseLibrary.BaseLibrary):
                         cmds.setAttr(finger_guide+".nJoints", 2)
                     # parent finger guide to the arm wrist guide:
                     cmds.parent(finger_guide, limb.cvExtremLoc, absolute=True)
-                    if userDetail == complete:
+                    if user_choice == complete:
                         finger.setCorrective(1)
                     cmds.refresh()
                 
                 #
                 # complete part:
                 #
-                if userDetail == complete:
+                if user_choice == complete:
                 
                     # set guides attributes to complete system
                     head.changeDeformer(1)
@@ -539,9 +541,9 @@ class Biped(dpBaseLibrary.BaseLibrary):
                 self.ar.utils.setProgress(endIt=True)
                 
                 # select spineGuide_Base:
-                self.ar.collapseEditSelModFL = False
+                self.ar.data.collapse_edit_sel_mod = False
                 cmds.select(spine_guide)
                 print(self.ar.data.lang['m089_createdBiped'])
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')

@@ -32,7 +32,7 @@ class ReorderAttr(dpBaseLibrary.BaseLibrary):
 
     def build_tool(self, *args):
         # call main function
-        if self.ui:
+        if self.ar.data.ui_state:
             self.dpReorderAttrUI(self)
     
     

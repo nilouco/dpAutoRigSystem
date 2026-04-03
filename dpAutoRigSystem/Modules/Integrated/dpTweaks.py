@@ -25,6 +25,8 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
         dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(dpBaseLibrary)
+        # dependence module list:
+        self.check_modules = ['dpSingle']
 
 
     def build_template(self, *args):
@@ -34,10 +36,10 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpSingle']
-        checkResultList = self.ar.check_missing_modules(standardDir, checkModuleList)
+        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         
-        if len(checkResultList) == 0:
-            self.ar.collapseEditSelModFL = True
+        if not missing_modules:
+            self.ar.data.collapse_edit_sel_mod = True
             # defining naming:
             # part names:
             mainName = self.ar.data.lang['c058_main']
@@ -110,13 +112,13 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
             faceMessage = self.ar.data.lang['i182_facialMessage']
             
             # getting Simple or Complete module guides to create:
-            userDetail = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
-            if not userDetail == cancel:
+            user_choice = self.ask_build_detail(self.title, simple, complete, cancel, complete, userMessage)
+            if not user_choice == cancel:
                 # number of modules to create:
-                if userDetail == simple:
+                maxProcess = 37
+                if user_choice == simple:
                     maxProcess = 14
-                else:
-                    maxProcess = 37
+                
                 
                 # getting Indirect Skinning user prefer:
                 userIndirectSkin = self.ask_build_detail(self.title, indSkin, faceJoint, cancel, indSkin, faceMessage)
@@ -136,50 +138,50 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
                     holder_main_guide = self.setTweak(holderMainName, radius=2, mirror=None)
                     cmds.setAttr(holder_main_guide+".holder", 1)
                     # brows
-                    brow_main_guide = self.setTweak(eyebrowMainName, tx=0.65, ty=2.8, tz=2, radius=0.3, deformed=1)
-                    brow_1_guide = self.setTweak(eyebrowName1, tx=0.45, ty=2.8, tz=2.1)
-                    brow_2_guide = self.setTweak(eyebrowName2, tx=0.65, ty=2.85, tz=2.1)
-                    brow_3_guide = self.setTweak(eyebrowName3, tx=0.85, ty=2.8, tz=2.1)
+                    brow_main_guide = self.setTweak(eyebrowMainName, tx=0.65, ty=2.8, tz=2, radius=0.3, deformed=1, mirror="X")
+                    brow_1_guide = self.setTweak(eyebrowName1, tx=0.45, ty=2.8, tz=2.1, mirror="X")
+                    brow_2_guide = self.setTweak(eyebrowName2, tx=0.65, ty=2.85, tz=2.1, mirror="X")
+                    brow_3_guide = self.setTweak(eyebrowName3, tx=0.85, ty=2.8, tz=2.1, mirror="X")
                     cmds.refresh()
                     # lips
                     lip_main_guide = self.setTweak(lipMainName, ty=1, tz=1, radius=0.3, mirror=None, deformed=3)
                     upper_lip_middle_guide = self.setTweak(upperLipMiddleName, ty=1.1, tz=2.5, mirror=None)
-                    upper_lip_1_guide = self.setTweak(upperLipName1, tx=0.2, ty=1.07, tz=2.5)
-                    upper_lip_2_guide = self.setTweak(upperLipName2, tx=0.4, ty=1.05, tz=2.5)
+                    upper_lip_1_guide = self.setTweak(upperLipName1, tx=0.2, ty=1.07, tz=2.5, mirror="X")
+                    upper_lip_2_guide = self.setTweak(upperLipName2, tx=0.4, ty=1.05, tz=2.5, mirror="X")
                     lower_lip_middle_guide = self.setTweak(lowerLipMiddleName, ty=0.9, tz=2.5, mirror=None)
-                    lower_lip_1_guide = self.setTweak(lowerLipName1, tx=0.2, ty=0.93, tz=2.5)
-                    lower_lip_2_guide = self.setTweak(lowerLipName2, tx=0.4, ty=0.95, tz=2.5)
-                    lip_corner_guide = self.setTweak(lipCornerName, tx=0.55, ty=1, tz=2.5)
+                    lower_lip_1_guide = self.setTweak(lowerLipName1, tx=0.2, ty=0.93, tz=2.5, mirror="X")
+                    lower_lip_2_guide = self.setTweak(lowerLipName2, tx=0.4, ty=0.95, tz=2.5, mirror="X")
+                    lip_corner_guide = self.setTweak(lipCornerName, tx=0.55, ty=1, tz=2.5, mirror="X")
                     cmds.refresh()
                     
-                    if userDetail == complete:
+                    if user_choice == complete:
                         brow_middle_guide = self.setTweak(eyebrowMiddleName, ty=2.8, tz=2, mirror=None)
-                        brow_4_guide = self.setTweak(eyebrowName4, tx=1.05, ty=2.7, tz=2.1)
+                        brow_4_guide = self.setTweak(eyebrowName4, tx=1.05, ty=2.7, tz=2.1, mirror="X")
                         # eyelids, eyesockets
                         if userIndirectSkin == indSkin:
-                            eyelid_main_guide = self.setTweak(eyelidMainName, tx=0.5, ty=2, tz=1.3, radius=0.3, deformed=1)
-                            upper_eyelid_0_guide = self.setTweak(upperEyelidName0, tx=0.33, ty=2.1, tz=1.8)
-                            upper_eyelid_1_guide = self.setTweak(upperEyelidName1, tx=0.5, ty=2.14, tz=1.8)
-                            upper_eyelid_2_guide = self.setTweak(upperEyelidName2, tx=0.67, ty=2.1, tz=1.8)
-                            lower_eyelid_0_guide = self.setTweak(lowerEyelidName0, tx=0.33, ty=1.9, tz=1.8)
-                            lower_eyelid_1_guide = self.setTweak(lowerEyelidName1, tx=0.5, ty=1.86, tz=1.8)
-                            lower_eyelid_2_guide = self.setTweak(lowerEyelidName2, tx=0.67, ty=1.9, tz=1.8)
-                            eyelid_corner_0_guide = self.setTweak(eyelidCornerName0, tx=0.2, ty=2, tz=1.8)
-                            eyelid_corner_1_guide = self.setTweak(eyelidCornerName1, tx=0.8, ty=2, tz=1.8)
-                            upper_eyesocket_0_guide = self.setTweak(upperEyeSocketName0, tx=0.25, ty=2.25, tz=1.8)
-                            upper_eyesocket_1_guide = self.setTweak(upperEyeSocketName1, tx=0.5, ty=2.3, tz=1.8)
-                            upper_eyesocket_2_guide = self.setTweak(upperEyeSocketName2, tx=0.75, ty=2.25, tz=1.8)
-                            lower_eyesocket_0_guide = self.setTweak(lowerEyeSocketName0, tx=0.25, ty=1.75, tz=1.8)
-                            lower_eyesocket_1_guide = self.setTweak(lowerEyeSocketName1, tx=0.5, ty=1.7, tz=1.8)
-                            lower_eyesocket_2_guide = self.setTweak(lowerEyeSocketName2, tx=0.75, ty=1.75, tz=1.8)
+                            eyelid_main_guide = self.setTweak(eyelidMainName, tx=0.5, ty=2, tz=1.3, radius=0.3, deformed=1, mirror="X")
+                            upper_eyelid_0_guide = self.setTweak(upperEyelidName0, tx=0.33, ty=2.1, tz=1.8, mirror="X")
+                            upper_eyelid_1_guide = self.setTweak(upperEyelidName1, tx=0.5, ty=2.14, tz=1.8, mirror="X")
+                            upper_eyelid_2_guide = self.setTweak(upperEyelidName2, tx=0.67, ty=2.1, tz=1.8, mirror="X")
+                            lower_eyelid_0_guide = self.setTweak(lowerEyelidName0, tx=0.33, ty=1.9, tz=1.8, mirror="X")
+                            lower_eyelid_1_guide = self.setTweak(lowerEyelidName1, tx=0.5, ty=1.86, tz=1.8, mirror="X")
+                            lower_eyelid_2_guide = self.setTweak(lowerEyelidName2, tx=0.67, ty=1.9, tz=1.8, mirror="X")
+                            eyelid_corner_0_guide = self.setTweak(eyelidCornerName0, tx=0.2, ty=2, tz=1.8, mirror="X")
+                            eyelid_corner_1_guide = self.setTweak(eyelidCornerName1, tx=0.8, ty=2, tz=1.8, mirror="X")
+                            upper_eyesocket_0_guide = self.setTweak(upperEyeSocketName0, tx=0.25, ty=2.25, tz=1.8, mirror="X")
+                            upper_eyesocket_1_guide = self.setTweak(upperEyeSocketName1, tx=0.5, ty=2.3, tz=1.8, mirror="X")
+                            upper_eyesocket_2_guide = self.setTweak(upperEyeSocketName2, tx=0.75, ty=2.25, tz=1.8, mirror="X")
+                            lower_eyesocket_0_guide = self.setTweak(lowerEyeSocketName0, tx=0.25, ty=1.75, tz=1.8, mirror="X")
+                            lower_eyesocket_1_guide = self.setTweak(lowerEyeSocketName1, tx=0.5, ty=1.7, tz=1.8, mirror="X")
+                            lower_eyesocket_2_guide = self.setTweak(lowerEyeSocketName2, tx=0.75, ty=1.75, tz=1.8, mirror="X")
                         cmds.refresh()
                         # squint
-                        squint_main_guide = self.setTweak(squintMainName, tx=0.5, ty=1.4, tz=1.6, radius=0.3, deformed=1)
-                        squint_1_guide = self.setTweak(squintName1, tx=0.32, ty=1.47, tz=2.02)
-                        squint_2_guide = self.setTweak(squintName2, tx=0.57, ty=1.36, tz=1.95)
-                        squint_3_guide = self.setTweak(squintName3, tx=0.86, ty=1.39, tz=1.8)
-                        cheek_1_guide = self.setTweak(cheekName1, tx=1.1, ty=0.9, tz=2.1)
-                        cheek_2_guide = self.setTweak(cheekName2, tx=0.8, ty=1.15, tz=2.3)
+                        squint_main_guide = self.setTweak(squintMainName, tx=0.5, ty=1.4, tz=1.6, radius=0.3, deformed=1, mirror="X")
+                        squint_1_guide = self.setTweak(squintName1, tx=0.32, ty=1.47, tz=2.02, mirror="X")
+                        squint_2_guide = self.setTweak(squintName2, tx=0.57, ty=1.36, tz=1.95, mirror="X")
+                        squint_3_guide = self.setTweak(squintName3, tx=0.86, ty=1.39, tz=1.8, mirror="X")
+                        cheek_1_guide = self.setTweak(cheekName1, tx=1.1, ty=0.9, tz=2.1, mirror="X")
+                        cheek_2_guide = self.setTweak(cheekName2, tx=0.8, ty=1.15, tz=2.3, mirror="X")
                     
                     cmds.refresh()
                     self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+" hierarchy")
@@ -188,7 +190,7 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
                     cmds.parent([brow_main_guide, lip_main_guide], holder_main_guide, absolute=True)
                     cmds.parent([upper_lip_middle_guide, upper_lip_1_guide, upper_lip_2_guide, lower_lip_middle_guide, lower_lip_1_guide, lower_lip_2_guide, lip_corner_guide], lip_main_guide, absolute=True)
                     
-                    if userDetail == complete:
+                    if user_choice == complete:
                         cmds.parent([brow_middle_guide, squint_main_guide, cheek_1_guide, cheek_2_guide], holder_main_guide, absolute=True)
                         cmds.parent([squint_1_guide, squint_2_guide, squint_3_guide], squint_main_guide, absolute=True)
                         cmds.parent([brow_1_guide, brow_2_guide, brow_3_guide, brow_4_guide], brow_main_guide, absolute=True)
@@ -211,12 +213,12 @@ class Tweaks(dpBaseLibrary.BaseLibrary):
                     # Close progress window
                     self.ar.utils.setProgress(endIt=True)
 
-                    self.ar.collapseEditSelModFL = False
+                    self.ar.data.collapse_edit_sel_mod = False
                     cmds.select(holder_main_guide)
                     print(self.ar.data.lang['m093_createdTweaks'])
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')
 
 
     def setTweak(self, name, tx=0, ty=0, tz=0, radius=0.05, end=0.1, mirror="X", deformed=0):

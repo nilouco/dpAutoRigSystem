@@ -76,7 +76,7 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
         """
         self.headCtrl = None
         self.wellDone = True
-        if self.ui:
+        if self.ar.data.ui_state:
             dialogName = self.dpHeadDeformerPromptDialog()
         if dialogName == None:
             return

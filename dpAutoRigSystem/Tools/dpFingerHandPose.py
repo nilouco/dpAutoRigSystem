@@ -113,6 +113,6 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
                 newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))
             self.toIDList.extend(newDrivenKeyList)
             self.ar.customAttr.addAttr(0, self.toIDList) #dpID
-            if self.ui: #verbose
+            if self.ar.data.ui_state: #verbose
                 cmds.select(handCtrlList)
                 self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)

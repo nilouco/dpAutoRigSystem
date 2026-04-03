@@ -43,9 +43,9 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
         self.combinationTargetList = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
         
 
-    def build_tool(self):
+    def build_tool(self, *args):
         # call main function:
-        if self.ui:
+        if self.ar.data.ui_state:
             self.dpFacialConnectionUI(self)
     
 
@@ -182,7 +182,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
             geoList, resultList = [], []
             for geoBase in fromMeshList:
                 prefix = baseName
-                if self.ui:
+                if self.ar.data.ui_state:
                     btContinue = self.ar.data.lang['i174_continue']
                     btCancel = self.ar.data.lang['i132_cancel']
                     result = cmds.promptDialog(
@@ -241,7 +241,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
                 # if createBsNode is checked, it will create the blendShape node connecting combination if needed
                 if createBsNode:
                     self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=combinationTargets)
-            if self.ui and resultList:
+            if self.ar.data.ui_state and resultList:
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.ar.data.lang["i042_notSelection"]+"\";")
@@ -323,7 +323,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
                 if combResultList:
                     for result in combResultList:
                         resultList.append(result)
-        if self.ui and resultList:
+        if self.ar.data.ui_state and resultList:
             self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.ar.utils.closeUI('dpFacialConnectionWindow')
     
@@ -388,7 +388,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
                                                         print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
                                                         resultList.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
                     self.ar.customAttr.addAttr(0, self.toIDList) #dpID
-                    if self.ui and resultList:
+                    if self.ar.data.ui_state and resultList:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.ar.utils.closeUI('dpFacialConnectionWindow')
 
