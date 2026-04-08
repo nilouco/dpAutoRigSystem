@@ -135,53 +135,53 @@ class Utils(object):
     #     return absolutePath
 
 
-    def findAllFiles(self, path, folder, ext=".py"):
+    def findAllFiles(self, path, folder, ext="py"):
         """ Find all files in the directory with the extension.
-            Return a list of all module names (without '.py' extension).
+            Return a list of all module names (without the given extension).
         """
         fileDir = path + "/" + folder.replace(".", "/")
-        allFilesList = os.listdir(fileDir)
+        all_files = os.listdir(fileDir)
         # select only files with extension:
-        pyFilesList = []
-        for file in allFilesList:
-            if file.endswith(ext) and str(file) != "__init__.py":
-                pyFilesList.append(str(file)[:file.rfind(".")])
-        return pyFilesList
+        files = []
+        for file in all_files:
+            if file.endswith(f".{ext}") and str(file) != "__init__.py":
+                files.append(str(file)[:file.rfind(".")])
+        return files
 
 
-    def findAllModules(self, path, folder):
+    def findAllModules(self, path, folder, ext="py"):
         """ Find all modules in the directory.
             If find a dpOrderList.txt file it will order the list for priority proporses.
-            Return a list of all module names (without '.py' extension).
+            Return a list of all module names (without the given extension).
         """
-        baseClassList = ["dpBaseStandard", "dpBaseLayout", "dpBaseCurve", "dpBaseAction", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
+        base_classes = ["dpBaseStandard", "dpBaseLayout", "dpBaseCurve", "dpBaseAction", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
         folder = folder.replace(".", "/")
-        allPyFilesList = self.findAllFiles(path, folder, ".py")
-        moduleList = []
-        for file in allPyFilesList:
+        files = self.findAllFiles(path, folder, ext)
+        modules = []
+        for file in files:
             # ensure base class are skipped
-            if not file in baseClassList:
-                moduleList.append(file)
+            if not file in base_classes:
+                modules.append(file)
         # check order list
-        if moduleList:
-            textList = self.findAllFiles(path, folder, ".txt")
-            if textList:
-                for text in textList:
+        if modules:
+            texts = self.findAllFiles(path, folder, "txt")
+            if texts:
+                for text in texts:
                     if self.dpOrderList in text:
                         desiredOrderList = []
-                        dupList = moduleList
-                        moduleList = []
+                        dupList = modules
+                        modules = []
                         with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
                             for line in filename.readlines():
                                 desiredOrderList.append(line.strip())
                         if desiredOrderList:
                             for item in desiredOrderList:
                                 if item in dupList:
-                                    moduleList.append(item)
+                                    modules.append(item)
                                     dupList.remove(item)
                         if dupList:
-                            moduleList.extend(dupList)
-        return moduleList
+                            modules.extend(dupList)
+        return modules
 
 
     def findAllModuleNames(self, path, folder):

@@ -21,8 +21,13 @@ class UIFiller(object):
         # rigging
         for item in self.ar.data.lib[self.ar.data.standard_folder]["instances"]:
             self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_cl")
-        for item in self.ar.data.lib[self.ar.data.integrated_folder]["instances"]:
-            self.populate_library(item, self.ar.data.integrated_folder, "rig_guides_integrated_cl")
+
+#        for item in self.ar.data.lib[self.ar.data.integrated_folder]["instances"]:
+#            self.populate_library(item, self.ar.data.integrated_folder, "rig_guides_integrated_cl")
+        print("hereh 000", self.ar.data.lib[self.ar.data.template_folder]["instances"])
+        for item in self.ar.data.lib[self.ar.data.template_folder]["instances"]:
+            self.populate_library(item, self.ar.data.template_folder, "rig_guides_integrated_cl")
+
         # controllers
         for item in self.ar.data.lib[self.ar.data.curve_simple_folder]["instances"]:
             self.populate_library(item, self.ar.data.curve_simple_folder, "ctr_simple_module_gl")
@@ -67,7 +72,7 @@ class UIFiller(object):
             cmds.image(item.name+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
             if folder == self.ar.data.standard_folder:
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=partial(self.ar.maker.create_raw_guide, item.name), parent=module_layout)
-            elif folder == self.ar.data.integrated_folder:
+            elif folder == self.ar.data.template_folder:
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
             elif folder == self.ar.data.tools_folder:
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=module_layout)
@@ -125,7 +130,7 @@ class UIFiller(object):
             sorted_guides = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
             for module in sorted_guides:
-                mod = self.ar.maker.import_module(module[0], self.ar.data.standard_folder)
+                mod = self.ar.lib.initialize_library(module[0], self.ar.data.standard_folder)[0]
                 self.ar.data.standard_instances.append(mod)
                 mod.get_namespace_for_it(module[1])
                 if self.ar.data.ui_state:

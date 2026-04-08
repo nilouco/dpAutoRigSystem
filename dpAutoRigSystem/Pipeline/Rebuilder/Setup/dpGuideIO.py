@@ -178,7 +178,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                           "upperHead"
                           ]
         for item in list(self.netDic["GuideData"]):
-            if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
+            if "guideBase" in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                 for baseAttr in list(self.netDic["GuideData"][item]):
                     if baseAttr == "customName":
                         customNameData = self.netDic["GuideData"][item]["customName"]
@@ -186,7 +186,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
                             self.instance.editGuideModuleName(customNameData)
                     elif baseAttr == "mirrorAxis":
                         cmds.setAttr(item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
-                        cmds.setAttr(item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")                                                        
+                        cmds.setAttr(item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")
+                        self.instance.createPreviewMirror()
                     elif baseAttr == "articulation":
                         self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
                     elif baseAttr == "nJoints":
@@ -205,6 +206,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         geoData = self.netDic["GuideData"][item]["geo"]
                         if geoData:
                             cmds.setAttr(item+".geo", geoData, type="string")
+                    #TODO: modernize rigType to rigStyle new code
                     elif baseAttr == "rigType": #all
                         rigTypeData = self.netDic["GuideData"][item]["rigType"]
                         if rigTypeData:
@@ -240,7 +242,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         fatherNodeData = netDic["GuideData"][item]['FatherNode']
                         if fatherNodeData:
                             if cmds.objExists(fatherNodeData):
-                                cmds.parent(item, fatherNodeData)
+                                if not cmds.listRelatives(item, parent=True) or not cmds.listRelatives(item, parent=True)[0] == fatherNodeData:
+                                    cmds.parent(item, fatherNodeData)
 
 
     def importGuide(self, guideDic, *args):
@@ -266,10 +269,13 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         self.netDic = guideDic[net]
                         self.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
                         # create a module instance:
-                        self.instance = self.ar.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                        self.instance = self.ar.lib.initialize_library("dp"+self.netDic['ModuleType'], self.ar.data.standard_folder)[0]
+                        self.instance.build_raw_guide()
                         self.setupInstanceChanges()
                         self.setupGuideTransformations()
+                        cmds.select(clear=True)
                     except Exception as e:
+                        print("e =", e)
                         wellImported = False
                         self.notWorkedWellIO(net+": "+str(e))
                         break

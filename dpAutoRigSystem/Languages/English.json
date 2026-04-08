@@ -894,7 +894,7 @@
 
     "v000_validator"                   : "Validator",
     "v001_template"                    : "Template",
-    "v002_templateDesc"                : "Template description to check if there's\na _Mesh suffix.",
+    "v002_templateDesc"                : "This is a template library.",
     "v003_mode"                        : "Mode",
     "v004_fixed"                       : "Fixed",
     "v005_cantFix"                     : "Can't fix",

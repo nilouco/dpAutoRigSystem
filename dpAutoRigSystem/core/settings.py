@@ -270,7 +270,11 @@ class Configuration(object):
         """ Return a list of Validator's AddOns or Finishing to load.
         """
         if os.path.exists(self.ar.pipeliner.pipeData[path]):
-            return self.ar.utils.findAllModules(self.ar.pipeliner.pipeData[path])
+            start_path = self.ar.pipeliner.pipeData[path][:self.ar.pipeliner.pipeData[path].rfind("/")]
+            end_path = self.ar.pipeliner.pipeData[path][self.ar.pipeliner.pipeData[path].rfind("/")+1:]
+            print("start_path = ", start_path)
+            print("end_path = ", end_path)
+            return self.ar.utils.findAllModules(start_path, end_path)
         
 
     def get_instance_info(self, name, folders, info="instances"):
@@ -309,6 +313,7 @@ class Configuration(object):
         for folder in folders:
             if folder in list(self.ar.data.lib.keys()):
                 for i, item in enumerate(self.ar.data.lib[folder]["modules"]):
+                    print("HEHEHE item =", item)
                     if item == name:
                         return self.ar.data.lib[folder]["instances"][i]
 

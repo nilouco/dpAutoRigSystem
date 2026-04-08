@@ -26,3 +26,11 @@ class BaseLibrary(object):
             Returns the user choose option or None if canceled.
         """
         return cmds.confirmDialog(title=title, message=message, button=[opt1, opt2, cancel], defaultButton=default, cancelButton=cancel, dismissString=cancel)
+
+
+    def build_template(self, *args):
+        self.ar.data.collapse_edit_sel_mod = True
+        guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
+        guide_io.importGuide(self.template_data)
+        guide_io.setupGuideBaseParenting(self.template_data)
+        self.ar.data.collapse_edit_sel_mod = False

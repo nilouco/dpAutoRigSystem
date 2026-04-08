@@ -180,7 +180,6 @@ class BaseLayout(object):
                     self.aimDirectionLayout = cmds.rowLayout('aimDirectionLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(self.ar.data.lang['i082_aimDirection'], parent=self.aimDirectionLayout)
                     self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.aimDirectionLayout)
-                    self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
                     for item in self.aimMenuItemList:
                         cmds.menuItem(label=item, parent=self.aimMenu)
                     currentAimDirection = cmds.getAttr(self.moduleGrp+".aimDirection")

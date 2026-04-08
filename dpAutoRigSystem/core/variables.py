@@ -59,6 +59,7 @@ class Data:
     pipeline_folder: str = "Pipeline"
     standard_folder: str = "Modules.Standard"
     integrated_folder: str = "Modules.Integrated"
+    template_folder: str = "library.template"
     curve_simple_folder: str = "Modules.Curves.Simple"
     curve_combined_folder: str = "Modules.Curves.Combined"
     curve_preset_folder: str = "Modules.Curves.Presets"

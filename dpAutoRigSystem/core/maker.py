@@ -16,16 +16,20 @@ class Maker(object):
         if not module.startswith("dp"):
             module = "dp"+module
 
-        mod = self.import_module(module, self.ar.data.standard_folder)
+        #mod1 = self.import_module(module, self.ar.data.standard_folder)
+        mod = self.ar.lib.initialize_library(module, self.ar.data.standard_folder)[0]
+        #print(mod1)
+        print(mod)
         return [mod, mod.build_raw_guide()]
 
 
-    def import_module(self, module, folder):
-        path = f"{self.ar.utils.findEnv('PYTHONPATH', 'dpAutoRigSystem')}.{folder.replace('/', '.')}"
-        imported_module = __import__(path+"."+module, {}, {}, [module])
-        if self.ar.dev:
-            reload(imported_module)
-        return getattr(imported_module, imported_module.CLASS_NAME)(self.ar)
+    # def import_module(self, module, folder):
+    #     path = f"{self.ar.utils.findEnv('PYTHONPATH', 'dpAutoRigSystem')}.{folder.replace('/', '.')}"
+    #     imported_module = __import__(path+"."+module, {}, {}, [module])
+    #     if self.ar.dev:
+    #         reload(imported_module)
+    #     return self.ar.lib.create_instance(imported_module)
+    #     #return getattr(imported_module, imported_module.CLASS_NAME)(self.ar)
     
 
     def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, annot_pos=None, parent=None, progress=True):

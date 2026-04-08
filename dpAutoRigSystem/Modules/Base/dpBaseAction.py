@@ -260,7 +260,7 @@ class ActionStartClass(object):
         if self.verbose:
             self.ar.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.ar.data.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n\n"+logText)
-            if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.ar.dpData+"/"+self.ar.dpLog):
+            if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
 
     

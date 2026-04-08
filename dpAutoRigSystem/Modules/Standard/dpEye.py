@@ -29,6 +29,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["WIKI"] = WIKI
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         self.cValue = 70
+        self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
     
     
     def createModuleLayout(self, *args):

@@ -494,41 +494,42 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
-        # if there is a type attribute:
-        self.typeLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
-        cmds.text(self.ar.data.lang['m021_type'], parent=self.typeLayout)
-        self.typeMenu = cmds.optionMenu("typeMenu", label='', changeCommand=self.changeType, parent=self.typeLayout)
-        typeMenuItemList = [self.ar.data.lang['m028_arm'], self.ar.data.lang['m030_leg']]
-        for item in typeMenuItemList:
-            cmds.menuItem(label=item, parent=self.typeMenu)
-        # read from guide attribute the current value to type:
-        currentType = cmds.getAttr(self.moduleGrp+".type")
-        cmds.optionMenu(self.typeMenu, edit=True, select=int(currentType+1))
-        self.reOrientBT = cmds.button(label=self.ar.data.lang['m022_reOrient'], annotation=self.ar.data.lang['m023_reOrientDesc'], command=self.reOrientGuideButton, parent=self.typeLayout)
+        if self.ar.data.ui_state:
+            # if there is a type attribute:
+            self.typeLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
+            cmds.text(self.ar.data.lang['m021_type'], parent=self.typeLayout)
+            self.typeMenu = cmds.optionMenu("typeMenu", label='', changeCommand=self.changeType, parent=self.typeLayout)
+            typeMenuItemList = [self.ar.data.lang['m028_arm'], self.ar.data.lang['m030_leg']]
+            for item in typeMenuItemList:
+                cmds.menuItem(label=item, parent=self.typeMenu)
+            # read from guide attribute the current value to type:
+            currentType = cmds.getAttr(self.moduleGrp+".type")
+            cmds.optionMenu(self.typeMenu, edit=True, select=int(currentType+1))
+            self.reOrientBT = cmds.button(label=self.ar.data.lang['m022_reOrient'], annotation=self.ar.data.lang['m023_reOrientDesc'], command=self.reOrientGuideButton, parent=self.typeLayout)
 
-        # bend layout:
-        self.bendMainLayout = cmds.rowColumnLayout("bendMainLayout", numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="rig_selected_module_cl")
-        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent=self.bendMainLayout)
-        cmds.text(label=self.ar.data.lang['m044_addBend'], visible=True, parent=self.bendLayout)
-        self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', changeCommand=self.changeBend, parent=self.bendLayout)
-        self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
-        bendNumMenuItemList = [3, 5, 7]
-        for item in bendNumMenuItemList:
-            cmds.menuItem(label=item, parent=self.bendNumJointsMenu)
-        # read from guide attribute the current value to number of joints for bend:
-        currentNumberBendJoints = cmds.getAttr(self.moduleGrp+".numBendJoints")
-        for i, item in enumerate(bendNumMenuItemList):
-            if currentNumberBendJoints == item:
-                cmds.optionMenu(self.bendNumJointsMenu, edit=True, select=i+1)
-                break
-        # additional ribbon joint:
-        self.hasAdditional = self.getHasAdditional()
-        self.additionalCB = cmds.checkBox("additionalCB", label=self.ar.data.lang['m180_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
-        
-        # align world layout:
-        self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="rig_selected_module_cl")
-        cmds.text(label=self.ar.data.lang['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
-        self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
+            # bend layout:
+            self.bendMainLayout = cmds.rowColumnLayout("bendMainLayout", numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="rig_selected_module_cl")
+            self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent=self.bendMainLayout)
+            cmds.text(label=self.ar.data.lang['m044_addBend'], visible=True, parent=self.bendLayout)
+            self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', changeCommand=self.changeBend, parent=self.bendLayout)
+            self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
+            bendNumMenuItemList = [3, 5, 7]
+            for item in bendNumMenuItemList:
+                cmds.menuItem(label=item, parent=self.bendNumJointsMenu)
+            # read from guide attribute the current value to number of joints for bend:
+            currentNumberBendJoints = cmds.getAttr(self.moduleGrp+".numBendJoints")
+            for i, item in enumerate(bendNumMenuItemList):
+                if currentNumberBendJoints == item:
+                    cmds.optionMenu(self.bendNumJointsMenu, edit=True, select=i+1)
+                    break
+            # additional ribbon joint:
+            self.hasAdditional = self.getHasAdditional()
+            self.additionalCB = cmds.checkBox("additionalCB", label=self.ar.data.lang['m180_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
+            
+            # align world layout:
+            self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="rig_selected_module_cl")
+            cmds.text(label=self.ar.data.lang['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
+            self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
 
         
     def setAlignWorld(self, value, *args):
@@ -539,9 +540,10 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Just set bend values and enable or disable UI elements.
         """
         self.hasBend = value
-        cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=value)
-        cmds.checkBox(self.additionalCB, edit=True, enable=value)
         cmds.setAttr(self.moduleGrp+".hasBend", value)
+        if self.ar.data.ui_state:
+            cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=value)
+            cmds.checkBox(self.additionalCB, edit=True, enable=value)
 
 
     def changeNumBend(self, numberBendJoints, *args):

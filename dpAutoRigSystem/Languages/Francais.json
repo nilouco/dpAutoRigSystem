@@ -894,7 +894,7 @@
 
     "v000_validator"                   : "Validateur",
     "v001_template"                    : "Template",
-    "v002_templateDesc"                : "Template description à tester s'il y a de\nsuffixe _Mesh.",
+    "v002_templateDesc"                : "C'est une librarie de template.",
     "v003_mode"                        : "Mode",
     "v004_fixed"                       : "Fixé",
     "v005_cantFix"                     : "Ne peut pas réparer",

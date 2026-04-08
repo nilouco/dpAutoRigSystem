@@ -180,7 +180,8 @@ class BaseStandard(object):
         self.ar.data.created_guides.append([self.name, self.userGuideName, self.moduleGrp])
 #        print("self.ar.data.created_guides =", self.ar.data.created_guides)
 #        print("valid =", self.name, self.userGuideName, self.moduleGrp)
-        self.ar.ui_manager.update_guide_footer()
+        if self.ar.data.ui_state:
+            self.ar.ui_manager.update_guide_footer()
     
     
     def updateModuleInstanceInfo(self, *args):
