@@ -188,5 +188,8 @@ class UIManager(object):
         if hasattr(item, "name"):
             icon_name = item.name[0].lower()+item.name[1:]
         if not icon_name in self.ar.data.icon.keys():
-            icon_name = alternative
+            if icon_name.split("_")[0] in self.ar.data.icon.keys():
+                icon_name = icon_name.split("_")[0]
+            else:
+                icon_name = alternative
         return icon_name

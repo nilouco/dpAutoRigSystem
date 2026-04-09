@@ -313,9 +313,15 @@ class Configuration(object):
         for folder in folders:
             if folder in list(self.ar.data.lib.keys()):
                 for i, item in enumerate(self.ar.data.lib[folder]["modules"]):
-                    print("HEHEHE item =", item)
                     if item == name:
                         return self.ar.data.lib[folder]["instances"][i]
+
+
+    def get_template_name(self, item):
+        for name in self.ar.data.lang.keys():
+            if name.endswith(f"_{item}"):
+                return name
+        return self.ar.data.template_default
 
 
 class Option(object):

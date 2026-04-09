@@ -166,12 +166,13 @@ class BaseStandard(object):
             cmds.setAttr(self.moduleGrp+"."+guideColorAttr, self.ar.ctrls.colorList[0][c])
 
         # create annotation to this module:
-        self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
+        self.annotation = cmds.annotate(self.moduleGrp, tx=self.moduleGrp, point=(0,2,0))
         self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]
         self.annotation = cmds.rename(self.annotation, self.moduleGrp+"_Ant")
         cmds.parent(self.annotation, self.moduleGrp)
         cmds.setAttr(self.annotation+'.text', self.moduleGrp[self.moduleGrp.find("__")+2:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
+        cmds.connectAttr(self.moduleGrp+"_RadiusCtrl.translateX", self.annotation+".translateY", force=True)
         # setup worldSize
         self.ar.ctrls.getDPARTempGrp()
         self.createWorldSize()

@@ -1,7 +1,6 @@
 #import libraries
 from maya import cmds
 from functools import partial
-from importlib import reload
 
 
 
@@ -18,16 +17,15 @@ class UIFiller(object):
 
     
     def fill_libraries(self):
+        template_base_names = []
         # rigging
         for item in self.ar.data.lib[self.ar.data.standard_folder]["instances"]:
             self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_cl")
-
-#        for item in self.ar.data.lib[self.ar.data.integrated_folder]["instances"]:
-#            self.populate_library(item, self.ar.data.integrated_folder, "rig_guides_integrated_cl")
-        print("hereh 000", self.ar.data.lib[self.ar.data.template_folder]["instances"])
+        # templates
         for item in self.ar.data.lib[self.ar.data.template_folder]["instances"]:
-            self.populate_library(item, self.ar.data.template_folder, "rig_guides_integrated_cl")
-
+            if not item.base_name in template_base_names:
+                self.populate_library(item, self.ar.data.template_folder, "rig_guides_integrated_cl")
+                template_base_names.append(item.base_name)
         # controllers
         for item in self.ar.data.lib[self.ar.data.curve_simple_folder]["instances"]:
             self.populate_library(item, self.ar.data.curve_simple_folder, "ctr_simple_module_gl")
@@ -65,28 +63,40 @@ class UIFiller(object):
     def populate_library(self, item, folder, layout, columns=5):
         if cmds.layout(layout, query=True, exists=True):
             icon_name = self.ar.ui_manager.get_icon_name(item)
+            # controller curves
             if folder == self.ar.data.curve_simple_folder or folder == self.ar.data.curve_combined_folder:
                 cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.name, annotation=item.name, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
                 return
+            # layout and icon
             module_layout = cmds.rowLayout(item.name+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)
             cmds.image(item.name+"_img", image=self.ar.data.icon[icon_name], width=32, parent=module_layout)
+            # standard
             if folder == self.ar.data.standard_folder:
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=partial(self.ar.maker.create_raw_guide, item.name), parent=module_layout)
+            # templates
             elif folder == self.ar.data.template_folder:
-                cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
+                if item.title == self.ar.data.template_default:
+                    cmds.button(item.name+'_bt', label=item.name.capitalize().replace("_", "\n"), height=32, command=item.build_template, parent=module_layout)
+                else:
+                    cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, command=item.build_template, parent=module_layout)
+            # tools
             elif folder == self.ar.data.tools_folder:
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=module_layout)
+            # validators and rebuilders
             else:
                 item.actionCB = cmds.checkBox(label=self.ar.data.lang[item.title], value=item.active, changeCommand=item.changeActive, parent=module_layout)
                 item.firstBT = cmds.button(label=item.firstBTLabel, width=45, command=partial(item.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.firstBTEnable, parent=module_layout)
                 item.secondBT = cmds.button(label=item.secondBTLabel.capitalize(), width=45, command=partial(item.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.secondBTEnable, parent=module_layout)
+                # validators
                 if folder == "" or folder in self.validator_folders:
                     if item.customName:
                         cmds.checkBox(item.actionCB, edit=True, label=item.customName)
                         item.title = item.customName
+                # rebuilders
                 if folder in self.rebuilder_folders:
                     item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
                     item.updateActionButtons(color=False)
+            # info icon
             cmds.iconTextButton(item.name+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
 
 

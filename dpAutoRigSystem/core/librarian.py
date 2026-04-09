@@ -1,16 +1,17 @@
 #import libraries
 import os
 import sys
-from maya import cmds
 from maya import mel
 from importlib import reload
-from ..Modules.Base import dpBaseLibrary
+from ..Modules.Base import dpBaseTemplate
 
 
 
 class Lib(object):
     def __init__(self, ar):
         self.ar = ar
+        if self.ar.dev:
+            reload(dpBaseTemplate)
 
 
     def start_library(self):
@@ -78,47 +79,30 @@ class Lib(object):
     
 
     def start_templates(self):
-        print("WIP starting templates...")
-        #
-        # WIP
-        #
         templates, content = self.ar.config.get_json_file_content(self.ar.data.template_folder)
         if templates:
-            print("yes, here is templates inside...", templates, content)
-
             libs = self.initialize_templates(templates, content)
-
             self.ar.data.lib[self.ar.data.template_folder] = {
                                                                 "templates" : templates,
                                                                 "content" : content,
                                                                 "instances" : libs
                                                               }
-            print(self.ar.data.lib[self.ar.data.template_folder])
-            #for item in templates:
-                
-            #    self.initialize_template(content[item])
-            #    print("started template:", item)
-
+            if self.ar.data.verbose:
+                print(self.ar.data.template_folder+" : "+str(templates))
 
     
     def initialize_templates(self, templates, content):
         libs = []
         for item in templates:
-            lib = dpBaseLibrary.BaseLibrary(self.ar, item, "v001_template", "v002_templateDesc", item, "03-‐-Guides#template")
+            base_name = item
+            if "_" in item:
+                base_name = item.split("_")[0]
+            name = self.ar.config.get_template_name(base_name)
+            lib = dpBaseTemplate.BaseTemplate(self.ar, item, name, "v002_templateDesc", item, f"03-‐-Guides#-{item}")
             lib.template_data = content[item]
+            lib.base_name = base_name
             libs.append(lib)
         return libs
-
-
-
-
-        #guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
-        #guide_io.importGuide(data)
-        #guide_io.setupGuideBaseParenting(data)
-
-
-
-
 
 
     def initialize_library(self, module, folder, path=None):

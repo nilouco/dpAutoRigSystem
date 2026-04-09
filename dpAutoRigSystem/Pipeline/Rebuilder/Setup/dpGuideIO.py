@@ -108,6 +108,9 @@ class GuideIO(dpBaseAction.ActionStartClass):
         self.reportLog()
         self.endProgress()
         self.refreshView()
+        if self.ar.data.ui_state:
+            self.ar.ui_manager.clear_guide_layout()
+            self.ar.filler.fill_created_guides()
         return self.dataLogDic
 
 
@@ -178,56 +181,59 @@ class GuideIO(dpBaseAction.ActionStartClass):
                           "upperHead"
                           ]
         for item in list(self.netDic["GuideData"]):
-            if "guideBase" in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
-                for baseAttr in list(self.netDic["GuideData"][item]):
-                    if baseAttr == "customName":
-                        customNameData = self.netDic["GuideData"][item]["customName"]
-                        if customNameData:
-                            self.instance.editGuideModuleName(customNameData)
-                    elif baseAttr == "mirrorAxis":
-                        cmds.setAttr(item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
-                        cmds.setAttr(item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")
-                        self.instance.createPreviewMirror()
-                    elif baseAttr == "articulation":
-                        self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
-                    elif baseAttr == "nJoints":
-                        self.instance.changeJointNumber(self.netDic["GuideData"][item]["nJoints"])
-                    elif baseAttr == "type": #limb
-                        self.instance.changeType(self.netDic["GuideData"][item]["type"])
-                    elif baseAttr == "hasBend": #limb
-                        self.instance.changeBend(self.netDic["GuideData"][item]["hasBend"])
-                    elif baseAttr == "aimDirection": #eye
-                        self.instance.changeAimDirection(directionList[(int(self.netDic["GuideData"][item]["aimDirection"]))])
-                    elif baseAttr == "fatherB": #suspention
-                        fatherBData = self.netDic["GuideData"][item]["fatherB"]
-                        if fatherBData:
-                            cmds.setAttr(item+".fatherB", fatherBData, type="string")
-                    elif baseAttr == "geo": #wheel
-                        geoData = self.netDic["GuideData"][item]["geo"]
-                        if geoData:
-                            cmds.setAttr(item+".geo", geoData, type="string")
-                    #TODO: modernize rigType to rigStyle new code
-                    elif baseAttr == "rigType": #all
-                        rigTypeData = self.netDic["GuideData"][item]["rigType"]
-                        if rigTypeData:
-                            cmds.setAttr(item+".rigType", rigTypeData, type="string")
-                            self.instance.rigType = rigTypeData
-                    else: #just set simple attributes
-                        if baseAttr in customAttrList:
-                            cmds.setAttr(item+"."+baseAttr, self.netDic["GuideData"][item][baseAttr])
-                    cmds.refresh()
+            new_item = self.get_new_name(item)
+            if cmds.objExists(new_item):
+                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #moduleGrp
+                    for baseAttr in list(self.netDic["GuideData"][item]):
+                        if baseAttr == "customName":
+                            customNameData = self.netDic["GuideData"][item]["customName"]
+                            if customNameData:
+                                self.instance.editGuideModuleName(customNameData)
+                        elif baseAttr == "mirrorAxis":
+                            cmds.setAttr(new_item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
+                            cmds.setAttr(new_item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")
+                            self.instance.createPreviewMirror()
+                        elif baseAttr == "articulation":
+                            self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
+                        elif baseAttr == "nJoints":
+                            self.instance.changeJointNumber(self.netDic["GuideData"][item]["nJoints"])
+                        elif baseAttr == "type": #limb
+                            self.instance.changeType(self.netDic["GuideData"][item]["type"])
+                        elif baseAttr == "hasBend": #limb
+                            self.instance.changeBend(self.netDic["GuideData"][item]["hasBend"])
+                        elif baseAttr == "aimDirection": #eye
+                            self.instance.changeAimDirection(directionList[(int(self.netDic["GuideData"][item]["aimDirection"]))])
+                        elif baseAttr == "fatherB": #suspention
+                            fatherBData = self.netDic["GuideData"][item]["fatherB"]
+                            if fatherBData:
+                                cmds.setAttr(item+".fatherB", fatherBData, type="string")
+                        elif baseAttr == "geo": #wheel
+                            geoData = self.netDic["GuideData"][item]["geo"]
+                            if geoData:
+                                cmds.setAttr(new_item+".geo", geoData, type="string")
+                        #TODO: modernize rigType to rigStyle new code
+                        elif baseAttr == "rigType": #all
+                            rigTypeData = self.netDic["GuideData"][item]["rigType"]
+                            if rigTypeData:
+                                cmds.setAttr(new_item+".rigType", rigTypeData, type="string")
+                                self.instance.rigType = rigTypeData
+                        else: #just set simple attributes
+                            if baseAttr in customAttrList:
+                                cmds.setAttr(new_item+"."+baseAttr, self.netDic["GuideData"][item][baseAttr])
+                        cmds.refresh()
 
 
     def setupGuideTransformations(self, *args):
         """ Work with guide transformations to put the transform as imported data.
         """
         for item in list(self.netDic["GuideData"]):
-            if self.netDic["GuideData"][item]:
+            if item in self.netDic["GuideData"].keys():
+                new_item = self.get_new_name(item)
                 for attr in list(self.netDic["GuideData"][item]):
                     if attr in self.ar.data.transform_attrs:
-                        if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
-                            if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
-                                cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])
+                        if not cmds.getAttr(new_item+"."+attr, lock=True): #unlocked attribute
+                            if not cmds.listConnections(new_item+"."+attr, destination=False, source=True): #without input connection
+                                cmds.setAttr(new_item+"."+attr, self.netDic["GuideData"][item][attr])
                     cmds.refresh()
 
 
@@ -238,19 +244,26 @@ class GuideIO(dpBaseAction.ActionStartClass):
             netDic = guideDic[net]
             if "GuideData" in netDic.keys():
                 for item in list(netDic["GuideData"]):
-                    if "guideBase" in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
-                        fatherNodeData = netDic["GuideData"][item]['FatherNode']
-                        if fatherNodeData:
-                            if cmds.objExists(fatherNodeData):
-                                if not cmds.listRelatives(item, parent=True) or not cmds.listRelatives(item, parent=True)[0] == fatherNodeData:
-                                    cmds.parent(item, fatherNodeData)
+                    new_item = self.get_new_name(item)
+                    if cmds.objExists(new_item):
+                        if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #moduleGrp
+                            fatherNodeData = netDic["GuideData"][item]['FatherNode']
+                            if fatherNodeData:
+                                new_father = self.get_new_name(fatherNodeData)
+                                if cmds.objExists(new_father):
+                                    if not cmds.listRelatives(new_item, parent=True) or not cmds.listRelatives(new_item, parent=True)[0] == new_father:
+                                        cmds.parent(new_item, new_father)
 
 
     def importGuide(self, guideDic, *args):
         """ Import guide info and initialize guide setting it attribute values.
         """
         wellImported = True
+        self.correlations = {}
         self.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
+        if self.ar.data.ui_state:
+            self.ar.data.collapse_edit_sel_mod = True
+            self.ar.filler.fill_created_guides()
         for net in guideDic.keys():
             if "moduleType" in guideDic[net].keys():
                 if guideDic[net]["moduleType"] == self.dpHeadDeformer.headDeformerName:
@@ -264,21 +277,25 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         cmds.lockNode(net, lock=False)
                         cmds.delete(net)
                 if toInitializeGuide:
-                    try:
+                    #try:
                         #self.netDic = json.loads(guideDic[net])
                         self.netDic = guideDic[net]
                         self.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library("dp"+self.netDic['ModuleType'], self.ar.data.standard_folder)[0]
+                        self.correlations[f"{self.netDic['ModuleType']}__dpAR_{self.netDic['GuideNumber']}"] = self.instance.guideNamespace
                         self.instance.build_raw_guide()
                         self.setupInstanceChanges()
                         self.setupGuideTransformations()
                         cmds.select(clear=True)
-                    except Exception as e:
-                        print("e =", e)
-                        wellImported = False
-                        self.notWorkedWellIO(net+": "+str(e))
-                        break
+                    #except Exception as e:
+                    #    print("Error:", e)
+                    #    wellImported = False
+                    #    self.notWorkedWellIO(net+": "+str(e))
+                    #    break
+        if self.ar.data.ui_state:
+            self.ar.data.collapse_edit_sel_mod = False
+
         return wellImported
 
 
@@ -286,3 +303,11 @@ class GuideIO(dpBaseAction.ActionStartClass):
         """ Process the headDeformer importing.
         """
         return self.dpHeadDeformer.dpHeadDeformer(hdNet["hdName"], hdNet["hdList"])
+
+
+    def get_new_name(self, name):
+        if not cmds.objExists(name):
+            base = name.split(":")[0]
+            if base in self.correlations.keys():
+                return name.replace(base, self.correlations[base])
+        return name

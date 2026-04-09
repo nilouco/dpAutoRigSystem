@@ -13,6 +13,7 @@ class Data:
     validator_default: str = "AllCheckOuts"
     curve_default: str = "Default"
     degree_default: str = "Preset_0"
+    template_default: str = "v001_template"
     
     language_option_var: str = "dpAutoRigLastLanguage"
     validator_option_var: str = "dpAutoRigLastValidatorPreset"

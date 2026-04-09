@@ -163,10 +163,7 @@ class Updater(object):
                 # store custom presets in order to avoid overwrite them when installing the update:
                 self.keep_files_when_update(dest_folder+"/"+self.ar.data.language_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.language_folder.replace(".", "/"))
                 self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"))
-                #
-                #
-                # TODO: include Template files
-                #
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.template_folder.replace(".", "/"))
 
                 # keep dpPipelineInfo data
                 if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/")+"/dpPipelineSettings.json"):
