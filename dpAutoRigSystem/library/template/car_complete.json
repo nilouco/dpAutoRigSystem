@@ -8,12 +8,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_000:Guide_Base": {
+            "FkLine__dpAR_000:Guide_Base": {
                 "FatherNode": null,
-                "customName": "Tweaks_Holder_Main",
+                "articulation": false,
+                "customName": "Chassis",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": false,
                 "guideBase": true,
@@ -21,18 +22,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": true,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F65B10>",
-                "moduleNamespace": "Single__dpAR_000",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB15E10>",
+                "moduleNamespace": "FkLine__dpAR_000",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_000_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -42,16 +44,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
+                "shapeSize": 1.0,
                 "translateX": 0.0,
-                "translateY": 0.0,
+                "translateY": 12.0,
                 "translateZ": 0.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_000:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
+            "FkLine__dpAR_000:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -59,17 +60,17 @@
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
                 "translateX": 0.0,
-                "translateY": 2.0,
+                "translateY": 16.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_000:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "translateX": 2.0,
                 "visibility": true
             },
-            "Single__dpAR_000:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_000:Guide_JointLoc1",
+            "FkLine__dpAR_000:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "translateX": 12.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_000:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_000:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -81,12 +82,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_000:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
+            "FkLine__dpAR_000:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -103,7 +104,7 @@
             }
         },
         "GuideNumber": "000",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_001_Net": {
@@ -115,50 +116,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_001:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Eyebrow_Main",
-                "deformedBy": 1,
+            "FkLine__dpAR_001:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "SteeringHandle",
+                "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBA1EBD0>",
-                "moduleNamespace": "Single__dpAR_001",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFAD9090>",
+                "moduleNamespace": "FkLine__dpAR_001",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_001_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 10.499999999999995,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.65,
-                "translateY": 2.8,
-                "translateZ": 2.0,
+                "shapeSize": 1.0,
+                "translateX": 4.5,
+                "translateY": 11.2,
+                "translateZ": 9.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_001:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
+            "FkLine__dpAR_001:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_001:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -168,15 +170,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_001:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
-                "translateX": 0.3,
                 "visibility": true
             },
-            "Single__dpAR_001:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_001:Guide_JointLoc1",
+            "FkLine__dpAR_001:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_001:Guide_Base",
+                "translateX": 3.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_001:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_001:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -188,12 +190,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_001:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
+            "FkLine__dpAR_001:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_001:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -210,7 +212,7 @@
             }
         },
         "GuideNumber": "001",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_002_Net": {
@@ -222,50 +224,46 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_002:Guide_Base": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
-                "customName": "Tweaks_Eyebrow_01",
-                "deformedBy": 0,
+            "Steering__dpAR_002:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_001:Guide_Base",
+                "customName": "SteeringWheel",
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSteering' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSteering.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F56CD0>",
-                "moduleNamespace": "Single__dpAR_002",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSteering.Steering object at 0x0000021BAFB2BE50>",
+                "moduleNamespace": "Steering__dpAR_002",
+                "moduleType": "Steering",
                 "net": "dpGuide_002_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 27.99999999999999,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.45,
-                "translateY": 2.8,
-                "translateZ": 2.1,
+                "shapeSize": 1.0,
+                "translateX": 4.5,
+                "translateY": 12.1,
+                "translateZ": 6.800000000000001,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_002:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_002:Guide_Base",
+            "Steering__dpAR_002:Guide_Base_Ant": {
+                "FatherNode": "Steering__dpAR_002:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -275,15 +273,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_002:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_002:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_002:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_002:Guide_JointLoc1",
+            "Steering__dpAR_002:Guide_Base_RadiusCtrl": {
+                "FatherNode": "Steering__dpAR_002:Guide_Base",
+                "translateX": 2.0,
+                "visibility": true
+            },
+            "Steering__dpAR_002:Guide_JointEnd": {
+                "FatherNode": "Steering__dpAR_002:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -295,12 +293,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 3.0,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_002:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_002:Guide_Base",
+            "Steering__dpAR_002:Guide_JointLoc1": {
+                "FatherNode": "Steering__dpAR_002:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -317,7 +315,7 @@
             }
         },
         "GuideNumber": "002",
-        "ModuleType": "Single",
+        "ModuleType": "Steering",
         "RawGuide": true
     },
     "dpGuide_003_Net": {
@@ -325,54 +323,56 @@
             "moduleGrp",
             "radiusCtrl",
             "annotation",
-            "JointLoc1",
-            "JointEnd"
+            "CenterLoc",
+            "FrontLoc",
+            "InsideLoc",
+            "OutsideLoc"
         ],
         "GuideData": {
-            "Single__dpAR_003:Guide_Base": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
-                "customName": "Tweaks_Eyebrow_02",
-                "deformedBy": 0,
+            "Wheel__dpAR_003:Guide_Base": {
+                "FatherNode": "Steering__dpAR_002:Guide_Base",
+                "customName": "FrontWheel",
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
+                "geo": null,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpWheel' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpWheel.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F545D0>",
-                "moduleNamespace": "Single__dpAR_003",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpWheel.Wheel object at 0x0000021BAE3BBB90>",
+                "moduleNamespace": "Wheel__dpAR_003",
+                "moduleType": "Wheel",
                 "net": "dpGuide_003_Net",
                 "pinGuide": false,
                 "rigType": "biped",
                 "rotateX": 0.0,
-                "rotateY": 0.0,
+                "rotateY": -90.0,
                 "rotateZ": 0.0,
-                "scaleX": 1.0,
+                "scaleX": 0.9999999999999998,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.65,
-                "translateY": 2.8499999999999996,
-                "translateZ": 2.1,
+                "shapeSize": 1.0,
+                "showControls": true,
+                "startFrame": 1,
+                "steering": true,
+                "translateX": 9.0,
+                "translateY": 4.000000000000005,
+                "translateZ": 17.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_003:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_003:Guide_Base",
+            "Wheel__dpAR_003:Guide_Base_Ant": {
+                "FatherNode": "Wheel__dpAR_003:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -382,15 +382,36 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_003:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_003:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_003:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_003:Guide_JointLoc1",
+            "Wheel__dpAR_003:Guide_Base_RadiusCtrl": {
+                "FatherNode": "Wheel__dpAR_003:Guide_Base",
+                "translateX": 4.0,
+                "visibility": true
+            },
+            "Wheel__dpAR_003:Guide_CenterLoc": {
+                "FatherNode": "Wheel__dpAR_003:Guide_Base",
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "visibility": true
+            },
+            "Wheel__dpAR_003:Guide_FrontLoc": {
+                "FatherNode": "Wheel__dpAR_003:Guide_CenterLoc",
+                "className": "ArrowFlat",
+                "controlID": "id_059_AimLoc",
+                "cvRotX": 0.0,
+                "cvRotY": 0.0,
+                "cvRotZ": 90.0,
+                "degree": 1,
+                "direction": "+Y",
+                "dpControl": true,
+                "size": 0.30000001192092896,
+                "version": "5.01.45",
+                "visibility": true
+            },
+            "Wheel__dpAR_003:Guide_InsideLoc": {
+                "FatherNode": "Wheel__dpAR_003:Guide_CenterLoc",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -400,31 +421,36 @@
                 "direction": "+Y",
                 "dpControl": true,
                 "dpGuide": true,
-                "nJoint": 1,
-                "size": 0.10000000149011612,
-                "translateZ": 0.1,
-                "version": "5.01.45",
-                "visibility": true
-            },
-            "Single__dpAR_003:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_003:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
-                "rotateX": 0.0,
-                "rotateY": 0.0,
-                "rotateZ": 0.0,
-                "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 1.0,
-                "translateX": 0.0,
-                "translateY": 0.0,
-                "translateZ": 0.0,
+                "size": 0.20000000298023224,
+                "translateZ": 1.4,
+                "version": "5.01.45",
+                "visibility": true
+            },
+            "Wheel__dpAR_003:Guide_OutsideLoc": {
+                "FatherNode": "Wheel__dpAR_003:Guide_CenterLoc",
+                "className": "Locator",
+                "controlID": "Locator",
+                "cvRotX": 0.0,
+                "cvRotY": 0.0,
+                "cvRotZ": 0.0,
+                "degree": 1,
+                "direction": "+Y",
+                "dpControl": true,
+                "dpGuide": true,
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "size": 0.20000000298023224,
+                "translateZ": -1.4,
+                "version": "5.01.45",
                 "visibility": true
             }
         },
         "GuideNumber": "003",
-        "ModuleType": "Single",
+        "ModuleType": "Wheel",
         "RawGuide": true
     },
     "dpGuide_004_Net": {
@@ -432,54 +458,56 @@
             "moduleGrp",
             "radiusCtrl",
             "annotation",
-            "JointLoc1",
-            "JointEnd"
+            "CenterLoc",
+            "FrontLoc",
+            "InsideLoc",
+            "OutsideLoc"
         ],
         "GuideData": {
-            "Single__dpAR_004:Guide_Base": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
-                "customName": "Tweaks_Eyebrow_03",
-                "deformedBy": 0,
+            "Wheel__dpAR_004:Guide_Base": {
+                "FatherNode": "Steering__dpAR_002:Guide_Base",
+                "customName": "BackWheel",
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
+                "geo": null,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpWheel' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpWheel.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBB705D0>",
-                "moduleNamespace": "Single__dpAR_004",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpWheel.Wheel object at 0x0000021AAA358B50>",
+                "moduleNamespace": "Wheel__dpAR_004",
+                "moduleType": "Wheel",
                 "net": "dpGuide_004_Net",
                 "pinGuide": false,
                 "rigType": "biped",
                 "rotateX": 0.0,
-                "rotateY": 0.0,
+                "rotateY": -90.0,
                 "rotateZ": 0.0,
-                "scaleX": 1.0,
+                "scaleX": 0.9999999999999998,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.8500000000000001,
-                "translateY": 2.8,
-                "translateZ": 2.1,
+                "shapeSize": 1.0,
+                "showControls": true,
+                "startFrame": 1,
+                "steering": false,
+                "translateX": 9.0,
+                "translateY": 4.0,
+                "translateZ": -14.499999999999996,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_004:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_004:Guide_Base",
+            "Wheel__dpAR_004:Guide_Base_Ant": {
+                "FatherNode": "Wheel__dpAR_004:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -489,15 +517,36 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_004:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_004:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_004:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_004:Guide_JointLoc1",
+            "Wheel__dpAR_004:Guide_Base_RadiusCtrl": {
+                "FatherNode": "Wheel__dpAR_004:Guide_Base",
+                "translateX": 4.0,
+                "visibility": true
+            },
+            "Wheel__dpAR_004:Guide_CenterLoc": {
+                "FatherNode": "Wheel__dpAR_004:Guide_Base",
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "visibility": true
+            },
+            "Wheel__dpAR_004:Guide_FrontLoc": {
+                "FatherNode": "Wheel__dpAR_004:Guide_CenterLoc",
+                "className": "ArrowFlat",
+                "controlID": "id_059_AimLoc",
+                "cvRotX": 0.0,
+                "cvRotY": 0.0,
+                "cvRotZ": 90.0,
+                "degree": 1,
+                "direction": "+Y",
+                "dpControl": true,
+                "size": 0.30000001192092896,
+                "version": "5.01.45",
+                "visibility": true
+            },
+            "Wheel__dpAR_004:Guide_InsideLoc": {
+                "FatherNode": "Wheel__dpAR_004:Guide_CenterLoc",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -507,31 +556,36 @@
                 "direction": "+Y",
                 "dpControl": true,
                 "dpGuide": true,
-                "nJoint": 1,
-                "size": 0.10000000149011612,
-                "translateZ": 0.1,
-                "version": "5.01.45",
-                "visibility": true
-            },
-            "Single__dpAR_004:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_004:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
-                "rotateX": 0.0,
-                "rotateY": 0.0,
-                "rotateZ": 0.0,
-                "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 1.0,
-                "translateX": 0.0,
-                "translateY": 0.0,
-                "translateZ": 0.0,
+                "size": 0.20000000298023224,
+                "translateZ": 1.4,
+                "version": "5.01.45",
+                "visibility": true
+            },
+            "Wheel__dpAR_004:Guide_OutsideLoc": {
+                "FatherNode": "Wheel__dpAR_004:Guide_CenterLoc",
+                "className": "Locator",
+                "controlID": "Locator",
+                "cvRotX": 0.0,
+                "cvRotY": 0.0,
+                "cvRotZ": 0.0,
+                "degree": 1,
+                "direction": "+Y",
+                "dpControl": true,
+                "dpGuide": true,
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "size": 0.20000000298023224,
+                "translateZ": -1.4,
+                "version": "5.01.45",
                 "visibility": true
             }
         },
         "GuideNumber": "004",
-        "ModuleType": "Single",
+        "ModuleType": "Wheel",
         "RawGuide": true
     },
     "dpGuide_005_Net": {
@@ -539,54 +593,51 @@
             "moduleGrp",
             "radiusCtrl",
             "annotation",
-            "JointLoc1",
-            "JointEnd"
+            "JointLocA",
+            "JointLocB"
         ],
         "GuideData": {
-            "Single__dpAR_005:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Lip_Main",
-                "deformedBy": 3,
+            "Suspension__dpAR_005:Guide_Base": {
+                "FatherNode": "Wheel__dpAR_003:Guide_Base",
+                "customName": "FrontSuspension",
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": false,
+                "fatherB": "FkLine__dpAR_000:Guide_Base",
+                "flip": true,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSuspension' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSuspension.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "off",
+                "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BB8B02CD0>",
-                "moduleNamespace": "Single__dpAR_005",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSuspension.Suspension object at 0x0000021BAE3F7010>",
+                "moduleNamespace": "Suspension__dpAR_005",
+                "moduleType": "Suspension",
                 "net": "dpGuide_005_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": -100.00000000000001,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.0,
-                "translateY": 1.0,
-                "translateZ": 1.0,
+                "scaleY": 0.9999999999999996,
+                "scaleZ": 0.9999999999999998,
+                "shapeSize": 1.0,
+                "translateX": 6.5,
+                "translateY": 4.000000000000005,
+                "translateZ": 17.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_005:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
+            "Suspension__dpAR_005:Guide_Base_Ant": {
+                "FatherNode": "Suspension__dpAR_005:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -596,32 +647,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_005:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "translateX": 0.3,
                 "visibility": true
             },
-            "Single__dpAR_005:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_005:Guide_JointLoc1",
-                "className": "Locator",
-                "controlID": "Locator",
-                "cvRotX": 0.0,
-                "cvRotY": 0.0,
-                "cvRotZ": 0.0,
-                "degree": 1,
-                "direction": "+Y",
-                "dpControl": true,
-                "dpGuide": true,
-                "nJoint": 1,
-                "size": 0.10000000149011612,
-                "translateZ": 0.1,
-                "version": "5.01.45",
+            "Suspension__dpAR_005:Guide_Base_RadiusCtrl": {
+                "FatherNode": "Suspension__dpAR_005:Guide_Base",
+                "translateX": 0.6,
                 "visibility": true
             },
-            "Single__dpAR_005:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
+            "Suspension__dpAR_005:Guide_JointLocA": {
+                "FatherNode": "Suspension__dpAR_005:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -635,10 +669,18 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "Suspension__dpAR_005:Guide_JointLocB": {
+                "FatherNode": "Suspension__dpAR_005:Guide_JointLocA",
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "translateZ": 6.5,
+                "visibility": true
             }
         },
         "GuideNumber": "005",
-        "ModuleType": "Single",
+        "ModuleType": "Suspension",
         "RawGuide": true
     },
     "dpGuide_006_Net": {
@@ -646,54 +688,51 @@
             "moduleGrp",
             "radiusCtrl",
             "annotation",
-            "JointLoc1",
-            "JointEnd"
+            "JointLocA",
+            "JointLocB"
         ],
         "GuideData": {
-            "Single__dpAR_006:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Upper_Lip_00",
-                "deformedBy": 0,
+            "Suspension__dpAR_006:Guide_Base": {
+                "FatherNode": "Wheel__dpAR_004:Guide_Base",
+                "customName": "BackSuspension",
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": false,
+                "fatherB": "FkLine__dpAR_000:Guide_Base",
+                "flip": true,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSuspension' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSuspension.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "off",
+                "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F3F510>",
-                "moduleNamespace": "Single__dpAR_006",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSuspension.Suspension object at 0x0000021BAFAD8F50>",
+                "moduleNamespace": "Suspension__dpAR_006",
+                "moduleType": "Suspension",
                 "net": "dpGuide_006_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": -85.00000000000001,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
-                "scaleY": 1.0,
+                "scaleY": 0.9999999999999998,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.0,
-                "translateY": 1.1,
-                "translateZ": 2.5,
+                "shapeSize": 1.0,
+                "translateX": 6.0,
+                "translateY": 3.9999999999999982,
+                "translateZ": -13.999999999999996,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_006:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_006:Guide_Base",
+            "Suspension__dpAR_006:Guide_Base_Ant": {
+                "FatherNode": "Suspension__dpAR_006:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -703,32 +742,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_006:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_006:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_006:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_006:Guide_JointLoc1",
-                "className": "Locator",
-                "controlID": "Locator",
-                "cvRotX": 0.0,
-                "cvRotY": 0.0,
-                "cvRotZ": 0.0,
-                "degree": 1,
-                "direction": "+Y",
-                "dpControl": true,
-                "dpGuide": true,
-                "nJoint": 1,
-                "size": 0.10000000149011612,
-                "translateZ": 0.1,
-                "version": "5.01.45",
+            "Suspension__dpAR_006:Guide_Base_RadiusCtrl": {
+                "FatherNode": "Suspension__dpAR_006:Guide_Base",
+                "translateX": 0.6,
                 "visibility": true
             },
-            "Single__dpAR_006:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_006:Guide_Base",
+            "Suspension__dpAR_006:Guide_JointLocA": {
+                "FatherNode": "Suspension__dpAR_006:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -742,10 +764,18 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "Suspension__dpAR_006:Guide_JointLocB": {
+                "FatherNode": "Suspension__dpAR_006:Guide_JointLocA",
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "translateZ": 6.5,
+                "visibility": true
             }
         },
         "GuideNumber": "006",
-        "ModuleType": "Single",
+        "ModuleType": "Suspension",
         "RawGuide": true
     },
     "dpGuide_007_Net": {
@@ -757,12 +787,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_007:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Upper_Lip_01",
+            "FkLine__dpAR_007:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "FrontDoor",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -770,18 +801,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F98650>",
-                "moduleNamespace": "Single__dpAR_007",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAE3D3450>",
+                "moduleNamespace": "FkLine__dpAR_007",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_007_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -791,16 +823,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.2,
-                "translateY": 1.07,
-                "translateZ": 2.5,
+                "shapeSize": 1.0,
+                "translateX": 9.9,
+                "translateY": 9.9,
+                "translateZ": 10.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_007:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_007:Guide_Base",
+            "FkLine__dpAR_007:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -810,15 +841,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_007:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_007:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_007:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_007:Guide_JointLoc1",
+            "FkLine__dpAR_007:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
+                "translateX": 3.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_007:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_007:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -830,12 +861,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_007:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_007:Guide_Base",
+            "FkLine__dpAR_007:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -852,7 +883,7 @@
             }
         },
         "GuideNumber": "007",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_008_Net": {
@@ -864,12 +895,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_008:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Upper_Lip_02",
+            "FkLine__dpAR_008:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "BackDoor",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -877,18 +909,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F99F50>",
-                "moduleNamespace": "Single__dpAR_008",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAE386410>",
+                "moduleNamespace": "FkLine__dpAR_008",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_008_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -898,16 +931,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.4,
-                "translateY": 1.05,
-                "translateZ": 2.5,
+                "shapeSize": 1.0,
+                "translateX": 9.9,
+                "translateY": 9.9,
+                "translateZ": -1.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_008:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_008:Guide_Base",
+            "FkLine__dpAR_008:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_008:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -917,15 +949,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_008:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_008:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_008:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_008:Guide_JointLoc1",
+            "FkLine__dpAR_008:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_008:Guide_Base",
+                "translateX": 3.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_008:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_008:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -937,12 +969,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_008:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_008:Guide_Base",
+            "FkLine__dpAR_008:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_008:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -959,7 +991,7 @@
             }
         },
         "GuideNumber": "008",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_009_Net": {
@@ -971,12 +1003,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_009:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Lower_Lip_00",
+            "FkLine__dpAR_009:Guide_Base": {
+                "FatherNode": "Steering__dpAR_002:Guide_JointLoc1",
+                "articulation": false,
+                "customName": "Horn",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": false,
                 "guideBase": true,
@@ -984,37 +1017,37 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBBD2B50>",
-                "moduleNamespace": "Single__dpAR_009",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB16210>",
+                "moduleNamespace": "FkLine__dpAR_009",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_009_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 27.999999999999986,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.0,
-                "translateY": 0.9,
-                "translateZ": 2.5,
+                "scaleY": 0.9999999999999999,
+                "scaleZ": 0.9999999999999999,
+                "shapeSize": 1.0,
+                "translateX": 4.5,
+                "translateY": 12.300000000000002,
+                "translateZ": 6.5,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_009:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_009:Guide_Base",
+            "FkLine__dpAR_009:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_009:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1024,15 +1057,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_009:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_009:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_009:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_009:Guide_JointLoc1",
+            "FkLine__dpAR_009:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_009:Guide_Base",
+                "translateX": 0.7,
+                "visibility": true
+            },
+            "FkLine__dpAR_009:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_009:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1044,12 +1077,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_009:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_009:Guide_Base",
+            "FkLine__dpAR_009:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_009:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1066,7 +1099,7 @@
             }
         },
         "GuideNumber": "009",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_010_Net": {
@@ -1078,12 +1111,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_010:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Lower_Lip_01",
+            "FkLine__dpAR_010:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
+                "articulation": false,
+                "customName": "FrontDoorHandle",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -1091,18 +1125,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F98350>",
-                "moduleNamespace": "Single__dpAR_010",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021AA8B7C510>",
+                "moduleNamespace": "FkLine__dpAR_010",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_010_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -1112,16 +1147,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.2,
-                "translateY": 0.9299999999999999,
-                "translateZ": 2.5,
+                "shapeSize": 1.0,
+                "translateX": 10.4,
+                "translateY": 11.2,
+                "translateZ": 1.6999999999999993,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_010:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_010:Guide_Base",
+            "FkLine__dpAR_010:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_010:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1131,15 +1165,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_010:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_010:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_010:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_010:Guide_JointLoc1",
+            "FkLine__dpAR_010:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_010:Guide_Base",
+                "translateX": 0.8,
+                "visibility": true
+            },
+            "FkLine__dpAR_010:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_010:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1151,12 +1185,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_010:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_010:Guide_Base",
+            "FkLine__dpAR_010:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_010:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1173,7 +1207,7 @@
             }
         },
         "GuideNumber": "010",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_011_Net": {
@@ -1185,12 +1219,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_011:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Lower_Lip_02",
+            "FkLine__dpAR_011:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_008:Guide_Base",
+                "articulation": false,
+                "customName": "BackDoorHandle",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -1198,18 +1233,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F98F50>",
-                "moduleNamespace": "Single__dpAR_011",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB851D0>",
+                "moduleNamespace": "FkLine__dpAR_011",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_011_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -1219,16 +1255,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.4,
-                "translateY": 0.95,
-                "translateZ": 2.5,
+                "shapeSize": 1.0,
+                "translateX": 10.4,
+                "translateY": 11.2,
+                "translateZ": -9.5,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_011:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_011:Guide_Base",
+            "FkLine__dpAR_011:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_011:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1238,15 +1273,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_011:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_011:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_011:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_011:Guide_JointLoc1",
+            "FkLine__dpAR_011:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_011:Guide_Base",
+                "translateX": 0.8,
+                "visibility": true
+            },
+            "FkLine__dpAR_011:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_011:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1258,12 +1293,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_011:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_011:Guide_Base",
+            "FkLine__dpAR_011:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_011:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1280,7 +1315,7 @@
             }
         },
         "GuideNumber": "011",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_012_Net": {
@@ -1289,53 +1324,55 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2"
         ],
         "GuideData": {
-            "Single__dpAR_012:Guide_Base": {
-                "FatherNode": "Single__dpAR_005:Guide_Base",
-                "customName": "Tweaks_Corner_Lip",
+            "FkLine__dpAR_012:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "FrontWiper_A",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C69B90>",
-                "moduleNamespace": "Single__dpAR_012",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB92450>",
+                "moduleNamespace": "FkLine__dpAR_012",
+                "moduleType": "FkLine",
+                "nJoints": 2,
+                "nMain": 1,
                 "net": "dpGuide_012_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
-                "rotateY": 0.0,
-                "rotateZ": 0.0,
+                "rotateX": -63.0,
+                "rotateY": -7.951386703658792e-16,
+                "rotateZ": -8.5,
                 "scaleX": 1.0,
-                "scaleY": 1.0,
+                "scaleY": 1.0000000000000004,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.55,
-                "translateY": 1.0,
-                "translateZ": 2.5,
+                "shapeSize": 1.0,
+                "translateX": 5.5,
+                "translateY": 13.7,
+                "translateZ": 12.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_012:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_012:Guide_Base",
+            "FkLine__dpAR_012:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_012:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1345,15 +1382,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_012:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_012:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_012:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_012:Guide_JointLoc1",
+            "FkLine__dpAR_012:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_012:Guide_Base",
+                "translateX": 0.7,
+                "visibility": true
+            },
+            "FkLine__dpAR_012:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_012:Guide_JointLoc2",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1365,12 +1402,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_012:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_012:Guide_Base",
+            "FkLine__dpAR_012:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_012:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1384,10 +1421,26 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "FkLine__dpAR_012:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_012:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": -10.3,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": -5.2,
+                "translateY": 0.2,
+                "translateZ": -0.4,
+                "visibility": true
             }
         },
         "GuideNumber": "012",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_013_Net": {
@@ -1396,15 +1449,17 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2"
         ],
         "GuideData": {
-            "Single__dpAR_013:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Middle_Eyebrow",
+            "FkLine__dpAR_013:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "FrontWiper_B",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": false,
                 "guideBase": true,
@@ -1412,37 +1467,37 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F3EFD0>",
-                "moduleNamespace": "Single__dpAR_013",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB846D0>",
+                "moduleNamespace": "FkLine__dpAR_013",
+                "moduleType": "FkLine",
+                "nJoints": 2,
+                "nMain": 1,
                 "net": "dpGuide_013_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
-                "rotateY": 0.0,
-                "rotateZ": 0.0,
+                "rotateX": -62.00000000000002,
+                "rotateY": -10.30000000000001,
+                "rotateZ": -11.599999999999998,
                 "scaleX": 1.0,
-                "scaleY": 1.0,
-                "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.0,
-                "translateY": 2.8,
-                "translateZ": 2.0,
+                "scaleY": 1.0000000000000002,
+                "scaleZ": 1.0000000000000002,
+                "shapeSize": 1.0,
+                "translateX": 0.7,
+                "translateY": 13.7,
+                "translateZ": 13.5,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_013:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_013:Guide_Base",
+            "FkLine__dpAR_013:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_013:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1452,15 +1507,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_013:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_013:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_013:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_013:Guide_JointLoc1",
+            "FkLine__dpAR_013:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_013:Guide_Base",
+                "translateX": 0.7,
+                "visibility": true
+            },
+            "FkLine__dpAR_013:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_013:Guide_JointLoc2",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1472,12 +1527,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_013:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_013:Guide_Base",
+            "FkLine__dpAR_013:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_013:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1491,10 +1546,26 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "FkLine__dpAR_013:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_013:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": -10.3,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": -5.2,
+                "translateY": 0.2,
+                "translateZ": -0.4,
+                "visibility": true
             }
         },
         "GuideNumber": "013",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_014_Net": {
@@ -1506,50 +1577,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_014:Guide_Base": {
-                "FatherNode": "Single__dpAR_001:Guide_Base",
-                "customName": "Tweaks_Eyebrow_04",
+            "FkLine__dpAR_014:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Trunk",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C8E5D0>",
-                "moduleNamespace": "Single__dpAR_014",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFBA6CD0>",
+                "moduleNamespace": "FkLine__dpAR_014",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_014_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": -36.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 1.05,
-                "translateY": 2.6999999999999997,
-                "translateZ": 2.1,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 19.4,
+                "translateZ": -18.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_014:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_014:Guide_Base",
+            "FkLine__dpAR_014:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_014:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1559,15 +1631,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_014:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_014:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_014:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_014:Guide_JointLoc1",
+            "FkLine__dpAR_014:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_014:Guide_Base",
+                "translateX": 3.3,
+                "visibility": true
+            },
+            "FkLine__dpAR_014:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_014:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1579,12 +1651,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_014:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_014:Guide_Base",
+            "FkLine__dpAR_014:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_014:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1601,7 +1673,7 @@
             }
         },
         "GuideNumber": "014",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_015_Net": {
@@ -1610,53 +1682,55 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2"
         ],
         "GuideData": {
-            "Single__dpAR_015:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Eyelid_Main",
-                "deformedBy": 1,
+            "FkLine__dpAR_015:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_014:Guide_Base",
+                "articulation": false,
+                "customName": "BackWiper",
+                "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C9D4D0>",
-                "moduleNamespace": "Single__dpAR_015",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFBA6C10>",
+                "moduleNamespace": "FkLine__dpAR_015",
+                "moduleType": "FkLine",
+                "nJoints": 2,
+                "nMain": 1,
                 "net": "dpGuide_015_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 34.00000000000001,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5,
-                "translateY": 2.0,
-                "translateZ": 1.3,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 14.8,
+                "translateZ": -24.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_015:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
+            "FkLine__dpAR_015:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_015:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1666,15 +1740,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_015:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "translateX": 0.3,
                 "visibility": true
             },
-            "Single__dpAR_015:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_015:Guide_JointLoc1",
+            "FkLine__dpAR_015:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_015:Guide_Base",
+                "translateX": 0.7,
+                "visibility": true
+            },
+            "FkLine__dpAR_015:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_015:Guide_JointLoc2",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1686,12 +1760,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_015:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
+            "FkLine__dpAR_015:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_015:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1705,10 +1779,26 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "FkLine__dpAR_015:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_015:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": -7.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": -2.7,
+                "translateY": 0.4,
+                "translateZ": 0.1,
+                "visibility": true
             }
         },
         "GuideNumber": "015",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_016_Net": {
@@ -1720,31 +1810,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_016:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Upper_Eyelid_00",
+            "FkLine__dpAR_016:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Gas",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C8E010>",
-                "moduleNamespace": "Single__dpAR_016",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB92D90>",
+                "moduleNamespace": "FkLine__dpAR_016",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_016_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -1754,16 +1846,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.32999999999999996,
-                "translateY": 2.1,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": -10.0,
+                "translateY": 13.0,
+                "translateZ": -17.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_016:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_016:Guide_Base",
+            "FkLine__dpAR_016:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_016:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1773,15 +1864,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_016:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_016:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_016:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_016:Guide_JointLoc1",
+            "FkLine__dpAR_016:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_016:Guide_Base",
+                "translateX": 0.6,
+                "visibility": true
+            },
+            "FkLine__dpAR_016:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_016:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1793,12 +1884,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_016:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_016:Guide_Base",
+            "FkLine__dpAR_016:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_016:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1815,7 +1906,7 @@
             }
         },
         "GuideNumber": "016",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_017_Net": {
@@ -1827,50 +1918,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_017:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Upper_Eyelid_01",
+            "FkLine__dpAR_017:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Hood",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBADDB90>",
-                "moduleNamespace": "Single__dpAR_017",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFB92DD0>",
+                "moduleNamespace": "FkLine__dpAR_017",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_017_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 12.5,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5,
-                "translateY": 2.14,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 13.5,
+                "translateZ": 12.5,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_017:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_017:Guide_Base",
+            "FkLine__dpAR_017:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_017:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1880,15 +1972,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_017:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_017:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_017:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_017:Guide_JointLoc1",
+            "FkLine__dpAR_017:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_017:Guide_Base",
+                "translateX": 5.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_017:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_017:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -1900,12 +1992,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_017:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_017:Guide_Base",
+            "FkLine__dpAR_017:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_017:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -1922,7 +2014,7 @@
             }
         },
         "GuideNumber": "017",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_018_Net": {
@@ -1934,31 +2026,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_018:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Upper_Eyelid_02",
+            "FkLine__dpAR_018:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Sunroof",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C58B50>",
-                "moduleNamespace": "Single__dpAR_018",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAE1FC890>",
+                "moduleNamespace": "FkLine__dpAR_018",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_018_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -1968,16 +2062,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.67,
-                "translateY": 2.1,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 19.0,
+                "translateZ": -2.5,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_018:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_018:Guide_Base",
+            "FkLine__dpAR_018:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_018:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -1987,15 +2080,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_018:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_018:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_018:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_018:Guide_JointLoc1",
+            "FkLine__dpAR_018:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_018:Guide_Base",
+                "translateX": 2.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_018:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_018:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2007,12 +2100,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_018:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_018:Guide_Base",
+            "FkLine__dpAR_018:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_018:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2029,7 +2122,7 @@
             }
         },
         "GuideNumber": "018",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_019_Net": {
@@ -2038,53 +2131,56 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2",
+            "JointLoc3"
         ],
         "GuideData": {
-            "Single__dpAR_019:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Lower_Eyelid_00",
+            "FkLine__dpAR_019:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Antenna",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBB97B50>",
-                "moduleNamespace": "Single__dpAR_019",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021AAA066950>",
+                "moduleNamespace": "FkLine__dpAR_019",
+                "moduleType": "FkLine",
+                "nJoints": 3,
+                "nMain": 1,
                 "net": "dpGuide_019_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": -136.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.32999999999999996,
-                "translateY": 1.9,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 18.8,
+                "translateZ": 3.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_019:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_019:Guide_Base",
+            "FkLine__dpAR_019:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_019:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2094,15 +2190,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_019:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_019:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_019:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_019:Guide_JointLoc1",
+            "FkLine__dpAR_019:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_019:Guide_Base",
+                "translateX": 0.5,
+                "visibility": true
+            },
+            "FkLine__dpAR_019:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_019:Guide_JointLoc3",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2114,12 +2210,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_019:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_019:Guide_Base",
+            "FkLine__dpAR_019:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_019:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2133,10 +2229,42 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "FkLine__dpAR_019:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_019:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 0.0,
+                "translateZ": 2.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_019:Guide_JointLoc3": {
+                "FatherNode": "FkLine__dpAR_019:Guide_JointLoc2",
+                "lockedList": null,
+                "nJoint": 3,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 0.0,
+                "translateZ": 2.0,
+                "visibility": true
             }
         },
         "GuideNumber": "019",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_020_Net": {
@@ -2148,50 +2276,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_020:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Lower_Eyelid_01",
+            "FkLine__dpAR_020:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_001:Guide_Base",
+                "articulation": false,
+                "customName": "L_TurnHandle",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBAF3350>",
-                "moduleNamespace": "Single__dpAR_020",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0006550>",
+                "moduleNamespace": "FkLine__dpAR_020",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_020_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 27.99999999999999,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5,
-                "translateY": 1.8599999999999999,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 5.5,
+                "translateY": 11.5,
+                "translateZ": 7.3,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_020:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_020:Guide_Base",
+            "FkLine__dpAR_020:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_020:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2201,15 +2330,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_020:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_020:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_020:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_020:Guide_JointLoc1",
+            "FkLine__dpAR_020:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_020:Guide_Base",
+                "translateX": 1.1,
+                "visibility": true
+            },
+            "FkLine__dpAR_020:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_020:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2221,12 +2350,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_020:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_020:Guide_Base",
+            "FkLine__dpAR_020:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_020:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2243,7 +2372,7 @@
             }
         },
         "GuideNumber": "020",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_021_Net": {
@@ -2255,50 +2384,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_021:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Lower_Eyelid_02",
+            "FkLine__dpAR_021:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_001:Guide_Base",
+                "articulation": false,
+                "customName": "R_TurnHandle",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C74850>",
-                "moduleNamespace": "Single__dpAR_021",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB002AD50>",
+                "moduleNamespace": "FkLine__dpAR_021",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_021_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 27.99999999999999,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.67,
-                "translateY": 1.9,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 3.4,
+                "translateY": 11.5,
+                "translateZ": 7.3,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_021:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_021:Guide_Base",
+            "FkLine__dpAR_021:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_021:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2308,15 +2438,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_021:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_021:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_021:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_021:Guide_JointLoc1",
+            "FkLine__dpAR_021:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_021:Guide_Base",
+                "translateX": 1.1,
+                "visibility": true
+            },
+            "FkLine__dpAR_021:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_021:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2328,12 +2458,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_021:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_021:Guide_Base",
+            "FkLine__dpAR_021:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_021:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2350,7 +2480,7 @@
             }
         },
         "GuideNumber": "021",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_022_Net": {
@@ -2362,31 +2492,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_022:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Corner_Eyelid_00",
+            "FkLine__dpAR_022:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "GearLever",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBB34810>",
-                "moduleNamespace": "Single__dpAR_022",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0032D90>",
+                "moduleNamespace": "FkLine__dpAR_022",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_022_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -2396,16 +2528,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.2,
-                "translateY": 2.0,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 7.5,
+                "translateZ": 7.9,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_022:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_022:Guide_Base",
+            "FkLine__dpAR_022:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_022:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2415,15 +2546,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_022:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_022:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_022:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_022:Guide_JointLoc1",
+            "FkLine__dpAR_022:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_022:Guide_Base",
+                "translateX": 1.7,
+                "visibility": true
+            },
+            "FkLine__dpAR_022:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_022:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2435,12 +2566,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_022:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_022:Guide_Base",
+            "FkLine__dpAR_022:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_022:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2457,7 +2588,7 @@
             }
         },
         "GuideNumber": "022",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_023_Net": {
@@ -2469,31 +2600,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_023:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Corner_Eyelid_01",
+            "FkLine__dpAR_023:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "HandBrake",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BBBBBDB90>",
-                "moduleNamespace": "Single__dpAR_023",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB002A990>",
+                "moduleNamespace": "FkLine__dpAR_023",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_023_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -2503,16 +2636,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.8,
-                "translateY": 2.0,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 7.9,
+                "translateZ": 2.3,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_023:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_023:Guide_Base",
+            "FkLine__dpAR_023:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_023:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2522,15 +2654,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_023:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_023:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_023:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_023:Guide_JointLoc1",
+            "FkLine__dpAR_023:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_023:Guide_Base",
+                "translateX": 1.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_023:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_023:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2542,12 +2674,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_023:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_023:Guide_Base",
+            "FkLine__dpAR_023:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_023:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2564,7 +2696,7 @@
             }
         },
         "GuideNumber": "023",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_024_Net": {
@@ -2576,31 +2708,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_024:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Upper_EyeSocket_00",
+            "FkLine__dpAR_024:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Brake",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F9B950>",
-                "moduleNamespace": "Single__dpAR_024",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFBA6550>",
+                "moduleNamespace": "FkLine__dpAR_024",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_024_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -2610,16 +2744,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.25,
-                "translateY": 2.25,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 4.3,
+                "translateY": 7.3,
+                "translateZ": 13.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_024:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_024:Guide_Base",
+            "FkLine__dpAR_024:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_024:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2629,15 +2762,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_024:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_024:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_024:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_024:Guide_JointLoc1",
+            "FkLine__dpAR_024:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_024:Guide_Base",
+                "translateX": 1.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_024:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_024:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2649,12 +2782,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_024:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_024:Guide_Base",
+            "FkLine__dpAR_024:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_024:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2671,7 +2804,7 @@
             }
         },
         "GuideNumber": "024",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_025_Net": {
@@ -2683,31 +2816,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_025:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Upper_EyeSocket_01",
+            "FkLine__dpAR_025:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Accelerator",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1F6D790>",
-                "moduleNamespace": "Single__dpAR_025",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0055E50>",
+                "moduleNamespace": "FkLine__dpAR_025",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_025_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -2717,16 +2852,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5,
-                "translateY": 2.3,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 3.2,
+                "translateY": 7.3,
+                "translateZ": 13.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_025:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_025:Guide_Base",
+            "FkLine__dpAR_025:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_025:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2736,15 +2870,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_025:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_025:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_025:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_025:Guide_JointLoc1",
+            "FkLine__dpAR_025:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_025:Guide_Base",
+                "translateX": 1.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_025:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_025:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2756,12 +2890,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_025:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_025:Guide_Base",
+            "FkLine__dpAR_025:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_025:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2778,7 +2912,7 @@
             }
         },
         "GuideNumber": "025",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_026_Net": {
@@ -2790,31 +2924,33 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_026:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Upper_EyeSocket_02",
+            "FkLine__dpAR_026:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Clutch",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1CD75D0>",
-                "moduleNamespace": "Single__dpAR_026",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BAFBA4450>",
+                "moduleNamespace": "FkLine__dpAR_026",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_026_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -2824,16 +2960,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.75,
-                "translateY": 2.25,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 5.4,
+                "translateY": 7.3,
+                "translateZ": 13.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_026:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_026:Guide_Base",
+            "FkLine__dpAR_026:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_026:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2843,15 +2978,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_026:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_026:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_026:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_026:Guide_JointLoc1",
+            "FkLine__dpAR_026:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_026:Guide_Base",
+                "translateX": 1.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_026:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_026:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2863,12 +2998,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_026:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_026:Guide_Base",
+            "FkLine__dpAR_026:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_026:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2885,7 +3020,7 @@
             }
         },
         "GuideNumber": "026",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_027_Net": {
@@ -2897,50 +3032,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_027:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Lower_EyeSocket_00",
+            "FkLine__dpAR_027:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Dashboard_A",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1CE5590>",
-                "moduleNamespace": "Single__dpAR_027",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0075D50>",
+                "moduleNamespace": "FkLine__dpAR_027",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_027_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 22.5,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.25,
-                "translateY": 1.75,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 5.2,
+                "translateY": 12.8,
+                "translateZ": 10.9,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_027:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_027:Guide_Base",
+            "FkLine__dpAR_027:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_027:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -2950,15 +3086,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_027:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_027:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_027:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_027:Guide_JointLoc1",
+            "FkLine__dpAR_027:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_027:Guide_Base",
+                "translateX": 0.4,
+                "visibility": true
+            },
+            "FkLine__dpAR_027:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_027:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -2970,12 +3106,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_027:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_027:Guide_Base",
+            "FkLine__dpAR_027:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_027:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -2992,7 +3128,7 @@
             }
         },
         "GuideNumber": "027",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_028_Net": {
@@ -3004,50 +3140,51 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_028:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Lower_EyeSocket_01",
+            "FkLine__dpAR_028:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "Dashboard_B",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1CE4810>",
-                "moduleNamespace": "Single__dpAR_028",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0074F90>",
+                "moduleNamespace": "FkLine__dpAR_028",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_028_Net",
                 "pinGuide": false,
                 "rigType": "biped",
-                "rotateX": 0.0,
+                "rotateX": 22.5,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5,
-                "translateY": 1.7,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 3.7,
+                "translateY": 12.8,
+                "translateZ": 10.9,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_028:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_028:Guide_Base",
+            "FkLine__dpAR_028:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_028:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3057,15 +3194,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_028:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_028:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_028:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_028:Guide_JointLoc1",
+            "FkLine__dpAR_028:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_028:Guide_Base",
+                "translateX": 0.4,
+                "visibility": true
+            },
+            "FkLine__dpAR_028:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_028:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3077,12 +3214,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_028:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_028:Guide_Base",
+            "FkLine__dpAR_028:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_028:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3099,7 +3236,7 @@
             }
         },
         "GuideNumber": "028",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_029_Net": {
@@ -3108,15 +3245,18 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2",
+            "JointLoc3"
         ],
         "GuideData": {
-            "Single__dpAR_029:Guide_Base": {
-                "FatherNode": "Single__dpAR_015:Guide_Base",
-                "customName": "Tweaks_Lower_EyeSocket_02",
+            "FkLine__dpAR_029:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "FrontSeat",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -3124,18 +3264,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1CF6950>",
-                "moduleNamespace": "Single__dpAR_029",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0084FD0>",
+                "moduleNamespace": "FkLine__dpAR_029",
+                "moduleType": "FkLine",
+                "nJoints": 3,
+                "nMain": 1,
                 "net": "dpGuide_029_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3145,16 +3286,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.75,
-                "translateY": 1.75,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 5.2,
+                "translateY": 7.7,
+                "translateZ": 2.8,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_029:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_029:Guide_Base",
+            "FkLine__dpAR_029:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_029:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3164,15 +3304,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_029:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_029:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_029:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_029:Guide_JointLoc1",
+            "FkLine__dpAR_029:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_029:Guide_Base",
+                "translateX": 2.5,
+                "visibility": true
+            },
+            "FkLine__dpAR_029:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_029:Guide_JointLoc3",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3184,12 +3324,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_029:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_029:Guide_Base",
+            "FkLine__dpAR_029:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_029:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3203,10 +3343,42 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "FkLine__dpAR_029:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_029:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 0.6,
+                "translateZ": -1.9,
+                "visibility": true
+            },
+            "FkLine__dpAR_029:Guide_JointLoc3": {
+                "FatherNode": "FkLine__dpAR_029:Guide_JointLoc2",
+                "lockedList": null,
+                "nJoint": 3,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 6.5,
+                "translateZ": -2.7,
+                "visibility": true
             }
         },
         "GuideNumber": "029",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_030_Net": {
@@ -3215,34 +3387,37 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2"
         ],
         "GuideData": {
-            "Single__dpAR_030:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Squint_Main",
-                "deformedBy": 1,
+            "FkLine__dpAR_030:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "BackSeat",
+                "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
-                "flip": true,
+                "flip": false,
                 "guideBase": true,
                 "guideColorB": 0.6269999742507935,
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
-                "mirrorAxis": "X",
+                "mainControls": false,
+                "mirrorAxis": "off",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C9DB10>",
-                "moduleNamespace": "Single__dpAR_030",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0084F90>",
+                "moduleNamespace": "FkLine__dpAR_030",
+                "moduleType": "FkLine",
+                "nJoints": 2,
+                "nMain": 1,
                 "net": "dpGuide_030_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3252,16 +3427,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5,
-                "translateY": 1.4,
-                "translateZ": 1.6,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 7.7,
+                "translateZ": -6.0,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_030:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_030:Guide_Base",
+            "FkLine__dpAR_030:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_030:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3271,15 +3445,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_030:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_030:Guide_Base",
-                "translateX": 0.3,
                 "visibility": true
             },
-            "Single__dpAR_030:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_030:Guide_JointLoc1",
+            "FkLine__dpAR_030:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_030:Guide_Base",
+                "translateX": 3.5,
+                "visibility": true
+            },
+            "FkLine__dpAR_030:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_030:Guide_JointLoc2",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3291,12 +3465,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_030:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_030:Guide_Base",
+            "FkLine__dpAR_030:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_030:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3310,10 +3484,26 @@
                 "translateY": 0.0,
                 "translateZ": 0.0,
                 "visibility": true
+            },
+            "FkLine__dpAR_030:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_030:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 0.6,
+                "translateZ": -1.9,
+                "visibility": true
             }
         },
         "GuideNumber": "030",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_031_Net": {
@@ -3325,12 +3515,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_031:Guide_Base": {
-                "FatherNode": "Single__dpAR_030:Guide_Base",
-                "customName": "Tweaks_Squint_01",
+            "FkLine__dpAR_031:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
+                "articulation": false,
+                "customName": "FrontDoorInsideHandle",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -3338,18 +3529,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1CFE990>",
-                "moduleNamespace": "Single__dpAR_031",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB009D010>",
+                "moduleNamespace": "FkLine__dpAR_031",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_031_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3359,16 +3551,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.32,
-                "translateY": 1.47,
-                "translateZ": 2.02,
+                "shapeSize": 1.0,
+                "translateX": 9.1,
+                "translateY": 11.4,
+                "translateZ": 6.3,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_031:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_031:Guide_Base",
+            "FkLine__dpAR_031:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_031:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3378,15 +3569,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_031:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_031:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_031:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_031:Guide_JointLoc1",
+            "FkLine__dpAR_031:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_031:Guide_Base",
+                "translateX": 0.6,
+                "visibility": true
+            },
+            "FkLine__dpAR_031:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_031:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3398,12 +3589,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_031:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_031:Guide_Base",
+            "FkLine__dpAR_031:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_031:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3420,7 +3611,7 @@
             }
         },
         "GuideNumber": "031",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_032_Net": {
@@ -3432,12 +3623,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_032:Guide_Base": {
-                "FatherNode": "Single__dpAR_030:Guide_Base",
-                "customName": "Tweaks_Squint_02",
+            "FkLine__dpAR_032:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_008:Guide_Base",
+                "articulation": false,
+                "customName": "BackDoorInsideHandle",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -3445,18 +3637,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1D08310>",
-                "moduleNamespace": "Single__dpAR_032",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0077610>",
+                "moduleNamespace": "FkLine__dpAR_032",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_032_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3466,16 +3659,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.5700000000000001,
-                "translateY": 1.3599999999999999,
-                "translateZ": 1.9500000000000002,
+                "shapeSize": 1.0,
+                "translateX": 8.8,
+                "translateY": 11.4,
+                "translateZ": -3.6,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_032:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_032:Guide_Base",
+            "FkLine__dpAR_032:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_032:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3485,15 +3677,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_032:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_032:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_032:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_032:Guide_JointLoc1",
+            "FkLine__dpAR_032:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_032:Guide_Base",
+                "translateX": 0.6,
+                "visibility": true
+            },
+            "FkLine__dpAR_032:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_032:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3505,12 +3697,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_032:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_032:Guide_Base",
+            "FkLine__dpAR_032:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_032:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3527,7 +3719,7 @@
             }
         },
         "GuideNumber": "032",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_033_Net": {
@@ -3539,12 +3731,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_033:Guide_Base": {
-                "FatherNode": "Single__dpAR_030:Guide_Base",
-                "customName": "Tweaks_Squint_03",
+            "FkLine__dpAR_033:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
+                "articulation": false,
+                "customName": "FrontDoorWindow",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -3552,18 +3745,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1D082D0>",
-                "moduleNamespace": "Single__dpAR_033",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0094850>",
+                "moduleNamespace": "FkLine__dpAR_033",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_033_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3573,16 +3767,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.86,
-                "translateY": 1.39,
-                "translateZ": 1.8,
+                "shapeSize": 1.0,
+                "translateX": 9.5,
+                "translateY": 13.0,
+                "translateZ": 2.9000000000000004,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_033:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_033:Guide_Base",
+            "FkLine__dpAR_033:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_033:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3592,15 +3785,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_033:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_033:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_033:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_033:Guide_JointLoc1",
+            "FkLine__dpAR_033:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_033:Guide_Base",
+                "translateX": 0.8,
+                "visibility": true
+            },
+            "FkLine__dpAR_033:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_033:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3612,12 +3805,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_033:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_033:Guide_Base",
+            "FkLine__dpAR_033:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_033:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3634,7 +3827,7 @@
             }
         },
         "GuideNumber": "033",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_034_Net": {
@@ -3646,12 +3839,13 @@
             "JointEnd"
         ],
         "GuideData": {
-            "Single__dpAR_034:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Cheek_01",
+            "FkLine__dpAR_034:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_008:Guide_Base",
+                "articulation": false,
+                "customName": "BackDoorWindow",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -3659,18 +3853,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1D1D790>",
-                "moduleNamespace": "Single__dpAR_034",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB009F3D0>",
+                "moduleNamespace": "FkLine__dpAR_034",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
                 "net": "dpGuide_034_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3680,16 +3875,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 1.1,
-                "translateY": 0.9,
-                "translateZ": 2.1,
+                "shapeSize": 1.0,
+                "translateX": 9.5,
+                "translateY": 13.5,
+                "translateZ": -7.1,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_034:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_034:Guide_Base",
+            "FkLine__dpAR_034:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_034:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3699,15 +3893,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_034:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_034:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_034:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_034:Guide_JointLoc1",
+            "FkLine__dpAR_034:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_034:Guide_Base",
+                "translateX": 0.8,
+                "visibility": true
+            },
+            "FkLine__dpAR_034:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_034:Guide_JointLoc1",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3719,12 +3913,12 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_034:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_034:Guide_Base",
+            "FkLine__dpAR_034:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_034:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3741,7 +3935,7 @@
             }
         },
         "GuideNumber": "034",
-        "ModuleType": "Single",
+        "ModuleType": "FkLine",
         "RawGuide": true
     },
     "dpGuide_035_Net": {
@@ -3750,15 +3944,17 @@
             "radiusCtrl",
             "annotation",
             "JointLoc1",
-            "JointEnd"
+            "JointEnd",
+            "JointLoc2"
         ],
         "GuideData": {
-            "Single__dpAR_035:Guide_Base": {
-                "FatherNode": "Single__dpAR_000:Guide_Base",
-                "customName": "Tweaks_Cheek_02",
+            "FkLine__dpAR_035:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_007:Guide_Base",
+                "articulation": false,
+                "customName": "Mirror",
                 "deformedBy": 0,
                 "degree": 0,
-                "displayAnnotation": false,
+                "displayAnnotation": true,
                 "dpARVersion": "5.01.45",
                 "flip": true,
                 "guideBase": true,
@@ -3766,18 +3962,19 @@
                 "guideColorG": 0.6269999742507935,
                 "guideColorIndex": 0,
                 "guideColorR": 0.6269999742507935,
-                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpSingle' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpSingle.py'>",
-                "holder": false,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
                 "hookNode": "_Grp",
-                "indirectSkin": true,
                 "lockedList": null,
+                "mainControls": false,
                 "mirrorAxis": "X",
                 "mirrorEnable": true,
                 "mirrorName": "L --> R",
                 "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
-                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpSingle.Single object at 0x0000021BC1C9FC90>",
-                "moduleNamespace": "Single__dpAR_035",
-                "moduleType": "Single",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB0097090>",
+                "moduleNamespace": "FkLine__dpAR_035",
+                "moduleType": "FkLine",
+                "nJoints": 2,
+                "nMain": 1,
                 "net": "dpGuide_035_Net",
                 "pinGuide": false,
                 "rigType": "biped",
@@ -3787,16 +3984,15 @@
                 "scaleX": 1.0,
                 "scaleY": 1.0,
                 "scaleZ": 1.0,
-                "sdkLocator": false,
-                "shapeSize": 0.029999999329447746,
-                "translateX": 0.8,
-                "translateY": 1.15,
-                "translateZ": 2.3,
+                "shapeSize": 1.0,
+                "translateX": 9.8,
+                "translateY": 13.1,
+                "translateZ": 8.7,
                 "visibility": true,
                 "worldSize": 1.0
             },
-            "Single__dpAR_035:Guide_Base_Ant": {
-                "FatherNode": "Single__dpAR_035:Guide_Base",
+            "FkLine__dpAR_035:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_035:Guide_Base",
                 "rotateX": 0.0,
                 "rotateY": 0.0,
                 "rotateZ": 0.0,
@@ -3806,15 +4002,15 @@
                 "translateX": 0.0,
                 "translateY": 2.0,
                 "translateZ": 0.0,
-                "visibility": false
-            },
-            "Single__dpAR_035:Guide_Base_RadiusCtrl": {
-                "FatherNode": "Single__dpAR_035:Guide_Base",
-                "translateX": 0.05,
                 "visibility": true
             },
-            "Single__dpAR_035:Guide_JointEnd": {
-                "FatherNode": "Single__dpAR_035:Guide_JointLoc1",
+            "FkLine__dpAR_035:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_035:Guide_Base",
+                "translateX": 1.1,
+                "visibility": true
+            },
+            "FkLine__dpAR_035:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_035:Guide_JointLoc2",
                 "className": "Locator",
                 "controlID": "Locator",
                 "cvRotX": 0.0,
@@ -3826,12 +4022,136 @@
                 "dpGuide": true,
                 "nJoint": 1,
                 "size": 0.10000000149011612,
-                "translateZ": 0.1,
+                "translateZ": 1.3,
                 "version": "5.01.45",
                 "visibility": true
             },
-            "Single__dpAR_035:Guide_JointLoc1": {
-                "FatherNode": "Single__dpAR_035:Guide_Base",
+            "FkLine__dpAR_035:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_035:Guide_Base",
+                "lockedList": null,
+                "nJoint": 1,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 0.0,
+                "translateZ": 0.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_035:Guide_JointLoc2": {
+                "FatherNode": "FkLine__dpAR_035:Guide_JointLoc1",
+                "lockedList": null,
+                "nJoint": 2,
+                "pinGuide": false,
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 0.8,
+                "translateZ": 1.0,
+                "visibility": true
+            }
+        },
+        "GuideNumber": "035",
+        "ModuleType": "FkLine",
+        "RawGuide": true
+    },
+    "dpGuide_036_Net": {
+        "BeforeData": [
+            "moduleGrp",
+            "radiusCtrl",
+            "annotation",
+            "JointLoc1",
+            "JointEnd"
+        ],
+        "GuideData": {
+            "FkLine__dpAR_036:Guide_Base": {
+                "FatherNode": "FkLine__dpAR_000:Guide_Base",
+                "articulation": false,
+                "customName": "insideMirror",
+                "deformedBy": 0,
+                "degree": 0,
+                "displayAnnotation": true,
+                "dpARVersion": "5.01.45",
+                "flip": false,
+                "guideBase": true,
+                "guideColorB": 0.6269999742507935,
+                "guideColorG": 0.6269999742507935,
+                "guideColorIndex": 0,
+                "guideColorR": 0.6269999742507935,
+                "guideObjectInfo": "<module 'dpAutoRigSystem.Modules.Standard.dpFkLine' from 'D:\\\\Documents/maya/scripts\\\\dpAutoRigSystem\\\\Modules\\\\Standard\\\\dpFkLine.py'>",
+                "hookNode": "_Grp",
+                "lockedList": null,
+                "mainControls": false,
+                "mirrorAxis": "off",
+                "mirrorEnable": true,
+                "mirrorName": "L --> R",
+                "mirrorNameList": "L --> R;R --> L;T --> B;B --> T;F --> B;B --> F;",
+                "moduleInstanceInfo": "<dpAutoRigSystem.Modules.Standard.dpFkLine.FkLine object at 0x0000021BB00C7010>",
+                "moduleNamespace": "FkLine__dpAR_036",
+                "moduleType": "FkLine",
+                "nJoints": 1,
+                "nMain": 1,
+                "net": "dpGuide_036_Net",
+                "pinGuide": false,
+                "rigType": "biped",
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "shapeSize": 1.0,
+                "translateX": 0.0,
+                "translateY": 18.0,
+                "translateZ": 3.5,
+                "visibility": true,
+                "worldSize": 1.0
+            },
+            "FkLine__dpAR_036:Guide_Base_Ant": {
+                "FatherNode": "FkLine__dpAR_036:Guide_Base",
+                "rotateX": 0.0,
+                "rotateY": 0.0,
+                "rotateZ": 0.0,
+                "scaleX": 1.0,
+                "scaleY": 1.0,
+                "scaleZ": 1.0,
+                "translateX": 0.0,
+                "translateY": 2.0,
+                "translateZ": 0.0,
+                "visibility": true
+            },
+            "FkLine__dpAR_036:Guide_Base_RadiusCtrl": {
+                "FatherNode": "FkLine__dpAR_036:Guide_Base",
+                "translateX": 1.5,
+                "visibility": true
+            },
+            "FkLine__dpAR_036:Guide_JointEnd": {
+                "FatherNode": "FkLine__dpAR_036:Guide_JointLoc1",
+                "className": "Locator",
+                "controlID": "Locator",
+                "cvRotX": 0.0,
+                "cvRotY": 0.0,
+                "cvRotZ": 0.0,
+                "degree": 1,
+                "direction": "+Y",
+                "dpControl": true,
+                "dpGuide": true,
+                "nJoint": 1,
+                "size": 0.10000000149011612,
+                "translateZ": 1.3,
+                "version": "5.01.45",
+                "visibility": true
+            },
+            "FkLine__dpAR_036:Guide_JointLoc1": {
+                "FatherNode": "FkLine__dpAR_036:Guide_Base",
                 "lockedList": null,
                 "nJoint": 1,
                 "pinGuide": false,
@@ -3847,8 +4167,8 @@
                 "visibility": true
             }
         },
-        "GuideNumber": "035",
-        "ModuleType": "Single",
+        "GuideNumber": "036",
+        "ModuleType": "FkLine",
         "RawGuide": true
     }
 }

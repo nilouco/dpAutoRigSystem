@@ -193,3 +193,24 @@ class UIManager(object):
             else:
                 icon_name = alternative
         return icon_name
+
+
+    def ask_prompt_dialog(self, title, message, text="", buttons=None, *args):
+        """ Prompt dialog to get the name of the root joint to receive all the web joints as children.
+        """
+        if not buttons:
+            continue_button = self.ar.data.lang['i174_continue']
+            cancel_button = self.ar.data.lang['i132_cancel']
+            buttons = [continue_button, cancel_button]
+        result = cmds.promptDialog(title=title, 
+                                   message=message,
+                                   text=text,
+                                   button=buttons, 
+                                   defaultButton=buttons[0], 
+                                   cancelButton=buttons[0], 
+                                   dismissString=buttons[0])
+        if result == buttons[0]:
+            return cmds.promptDialog(query=True, text=True)
+        elif result is None:
+            return None
+    

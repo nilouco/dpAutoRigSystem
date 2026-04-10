@@ -72,3 +72,24 @@ class Maker(object):
         if parent:
             cmds.parent(guide, parent, absolute=True)
         return [mod, guide]
+
+
+    def create_template(self, name=None, *args):
+        self.ar.ui_manager.refresh_ui()
+        nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
+        nets.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
+        if nets:
+            self.ar.ctrls.unPinGuide(force=True)
+            guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
+            guides_data = guide_io.getGuideDataDic(nets)
+            if not name:
+                if self.ar.data.ui_state:
+                    if self.ar.data.ui_state:
+                        name = self.ar.ui_manager.ask_prompt_dialog("Template", self.ar.data.lang["m006_name"]).lower()
+            if name:
+                # export json file
+                self.ar.pipeliner.saveJsonFile(guides_data, f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.template_folder.replace('.', '/')}/{name}.json")
+                print(self.ar.data.lang["i133_presetCreated"], name)
+                self.ar.ui_manager.reload_ui()
+        else:
+            print(self.ar.data.lang["e000_guideNotFound"])

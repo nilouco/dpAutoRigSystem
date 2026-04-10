@@ -112,6 +112,7 @@ class MainUI(object):
 
     def create_the_create_menu(self):
         cmds.menu('create_menu', label='Create', parent='main_menu_bar')
+        cmds.menuItem('template_mi', label='Template', command=self.ar.maker.create_template, parent='create_menu')
         cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.dpTranslatorMain, parent='create_menu')
         cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.config.open_pipeliner, parent='create_menu')
         cmds.menuItem('create_curve_preset_mi', label='Curve Preset', command=partial(self.ar.config.create_preset, "curve", self.ar.data.curve_preset_folder, True), parent='create_menu')
@@ -188,9 +189,9 @@ class MainUI(object):
         cmds.columnLayout("rig_guides_standard_cl", adjustableColumn=True, width=140, rowSpacing=3, parent='rig_guides_start_sl')
         # -> rig_guides_standard_cl it will be populated here by guides of standard library...
         cmds.separator(style='doubleDash', height=10, width=140, parent='rig_guides_start_sl')
-        cmds.text('rig_integrated_txt', label=self.ar.data.lang['i031_integrated'], font="obliqueLabelFont", align='left', parent='rig_guides_start_sl')
-        cmds.columnLayout("rig_guides_integrated_cl", adjustableColumn=True, width=140, rowSpacing=3, parent='rig_guides_start_sl')
-        # -> rig_guides_integrated_cl it will be populated here by guides of integrated templates...
+        cmds.text('rig_integrated_txt', label=self.ar.data.lang['v001_template'], font="obliqueLabelFont", align='left', parent='rig_guides_start_sl')
+        cmds.columnLayout("rig_guides_template_cl", adjustableColumn=True, width=140, rowSpacing=3, parent='rig_guides_start_sl')
+        # -> rig_guides_template_cl it will be populated here by guides of integrated templates read from json...
         # middle right
         cmds.scrollLayout("rig_guides_inst_sl", width=120, parent='rigging_tab')
         cmds.columnLayout("rig_guides_inst_cl", adjustableColumn=True, width=120, parent='rig_guides_inst_sl')

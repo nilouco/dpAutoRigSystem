@@ -56,6 +56,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
             if self.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
+                    self.ar.ui_manager.refresh_ui()
                     if self.firstMode: #export
                         netList = None
                         if objList:
@@ -175,6 +176,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                           "deformer",
                           "deformedBy",
                           "worldSize",
+                          "shapeSize",
                           "jaw",
                           "chin",
                           "lips",
@@ -217,6 +219,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
                             if rigTypeData:
                                 cmds.setAttr(new_item+".rigType", rigTypeData, type="string")
                                 self.instance.rigType = rigTypeData
+                        elif baseAttr == "style":  #to be compatible with old versions of style value 4 (quadruped extra control)
+                            cmds.setAttr(new_item+"."+baseAttr, min(self.netDic["GuideData"][item][baseAttr], 2))
                         else: #just set simple attributes
                             if baseAttr in customAttrList:
                                 cmds.setAttr(new_item+"."+baseAttr, self.netDic["GuideData"][item][baseAttr])
