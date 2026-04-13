@@ -64,6 +64,7 @@ from .core import librarian
 from .core import filler
 from .core import updater
 from .core import maker
+from .core import job
 from .ui import main
 from .ui import update
 from .ui import donate
@@ -122,6 +123,7 @@ class Start(object):
             reload(filler)
             reload(updater)
             reload(maker)
+            reload(job)
             reload(version)
             # ui
             reload(main)
@@ -140,6 +142,7 @@ class Start(object):
         self.opt = settings.Option(self)
         self.agree = settings.Agreement(self)
         self.updater = updater.Updater(self)
+        self.job = job.Job(self)
 
 
     def load_components(self):
@@ -265,64 +268,64 @@ class Start(object):
 # #        self.data.rebuilding = False
 
 
-    def jobSelectedGuide(self):
-        """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
-        """
-        # run the UI part:
-        self.selectedModuleInstanceList = []
-        selectedGuideNodeList = []
-        selectedList = []
-        # get selected items:
-        selectedList = cmds.ls(selection=True, long=True)
-        if selectedList:
-            updatedGuideNodeList = []
-            needUpdateSelect = False
-            for selectedItem in selectedList:
-                if cmds.objExists(selectedItem+"."+self.data.guide_base_attr) and cmds.getAttr(selectedItem+"."+self.data.guide_base_attr) == 1:
-                    if not ":" in selectedItem[selectedItem.rfind("|"):]:
-                        newGuide = self.setupDuplicatedGuide(selectedItem)
-                        updatedGuideNodeList.append(newGuide)
-                        needUpdateSelect = True
-                    else:
-                        selectedGuideNodeList.append(selectedItem)
-            if needUpdateSelect:
-                self.refreshMainUI()
-                cmds.select(updatedGuideNodeList)
-        # update UI
-        for m, moduleInstance in enumerate(self.data.standard_instances):
-            if cmds.objExists(moduleInstance.moduleGrp):
-                if moduleInstance.selectButton:
-                    currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
-                    if currentColorList:
-                        cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
-                    if selectedGuideNodeList:
-                        for selectedGuide in selectedGuideNodeList:
-                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.data.module_instance_info_attr)
-                            if selectedGuideInfo == str(moduleInstance):
-                                cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
-                                self.selectedModuleInstanceList.append(moduleInstance)
-        # delete module layout:
-        if not selectedGuideNodeList:
-            try:
-                cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.data.lang['i011_editSelected']+" "+self.data.lang['i143_module'])
-                cmds.deleteUI("rig_selected_module_cl")
-            except:
-                pass
-        # re-create module layout:
-        if self.selectedModuleInstanceList:
-            self.selectedModuleInstanceList[-1].reCreateEditSelectedModuleLayout(bSelect=False)
-        # call reload the geometries in skin UI:
-        self.reloadPopulatedGeoms()
+    # def jobSelectedGuide(self):
+    #     """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
+    #     """
+    #     # run the UI part:
+    #     self.selectedModuleInstanceList = []
+    #     selectedGuideNodeList = []
+    #     selectedList = []
+    #     # get selected items:
+    #     selectedList = cmds.ls(selection=True, long=True)
+    #     if selectedList:
+    #         updatedGuideNodeList = []
+    #         needUpdateSelect = False
+    #         for selectedItem in selectedList:
+    #             if cmds.objExists(selectedItem+"."+self.data.guide_base_attr) and cmds.getAttr(selectedItem+"."+self.data.guide_base_attr) == 1:
+    #                 if not ":" in selectedItem[selectedItem.rfind("|"):]:
+    #                     newGuide = self.setupDuplicatedGuide(selectedItem)
+    #                     updatedGuideNodeList.append(newGuide)
+    #                     needUpdateSelect = True
+    #                 else:
+    #                     selectedGuideNodeList.append(selectedItem)
+    #         if needUpdateSelect:
+    #             self.refreshMainUI()
+    #             cmds.select(updatedGuideNodeList)
+    #     # update UI
+    #     for m, moduleInstance in enumerate(self.data.standard_instances):
+    #         if cmds.objExists(moduleInstance.moduleGrp):
+    #             if moduleInstance.selectButton:
+    #                 currentColorList = self.ctrls.getGuideRGBColorList(moduleInstance)
+    #                 if currentColorList:
+    #                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
+    #                 if selectedGuideNodeList:
+    #                     for selectedGuide in selectedGuideNodeList:
+    #                         selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.data.module_instance_info_attr)
+    #                         if selectedGuideInfo == str(moduleInstance):
+    #                             cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
+    #                             self.selectedModuleInstanceList.append(moduleInstance)
+    #     # delete module layout:
+    #     if not selectedGuideNodeList:
+    #         try:
+    #             cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.data.lang['i011_editSelected']+" "+self.data.lang['i143_module'])
+    #             cmds.deleteUI("rig_selected_module_cl")
+    #         except:
+    #             pass
+    #     # re-create module layout:
+    #     if self.selectedModuleInstanceList:
+    #         self.selectedModuleInstanceList[-1].reCreateEditSelectedModuleLayout(bSelect=False)
+    #     # call reload the geometries in skin UI:
+    #     self.reloadPopulatedGeoms()
     
 
-    def resetAllButtonColors(self, *args):
-        """ Just reset the button colors to default for each validator or rebuilder module.
-        """
-#        buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
-        buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
-        if buttonInstanceList:
-            for item in buttonInstanceList:
-                item.resetButtonColors()
+#     def resetAllButtonColors(self, *args):
+#         """ Just reset the button colors to default for each validator or rebuilder module.
+#         """
+# #        buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
+#         buttonInstanceList = self.data.checkin_instances + self.data.checkout_instances + self.data.checkaddon_instances + self.data.checkfinishing_instances + self.data.rebuilder_instances
+#         if buttonInstanceList:
+#             for item in buttonInstanceList:
+#                 item.resetButtonColors()
 
     
     # def save_json_file(self, newString, fileDir, fileNameID, *args):
@@ -350,122 +353,122 @@ class Start(object):
         
 
     
-    def setupDuplicatedGuide(self, selectedItem, *args):
-        """ This method will create a new module instance for a duplicated guide found.
-            Returns a guideBase for a new module instance.
-        """
-        # Duplicating a module guide
-        print(self.data.lang['i067_duplicating'])
-        self.utils.setProgress("dpAutoRigSystem", self.data.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
-        # declaring variables
-        nSegmentsAttr = "nJoints"
-        customNameAttr = "customName"
-        mirrorAxisAttr = "mirrorAxis"
-        dispAnnotAttr = "displayAnnotation"
-        netAttr = "net"
+    # def setupDuplicatedGuide(self, selectedItem, *args):
+    #     """ This method will create a new module instance for a duplicated guide found.
+    #         Returns a guideBase for a new module instance.
+    #     """
+    #     # Duplicating a module guide
+    #     print(self.data.lang['i067_duplicating'])
+    #     self.utils.setProgress("dpAutoRigSystem", self.data.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
+    #     # declaring variables
+    #     nSegmentsAttr = "nJoints"
+    #     customNameAttr = "customName"
+    #     mirrorAxisAttr = "mirrorAxis"
+    #     dispAnnotAttr = "displayAnnotation"
+    #     netAttr = "net"
 
-        # unparenting
-        parentList = cmds.listRelatives(selectedItem, parent=True)
-        if parentList:
-            cmds.parent(selectedItem, world=True)
-            selectedItem = selectedItem[selectedItem.rfind("|"):]
+    #     # unparenting
+    #     parentList = cmds.listRelatives(selectedItem, parent=True)
+    #     if parentList:
+    #         cmds.parent(selectedItem, world=True)
+    #         selectedItem = selectedItem[selectedItem.rfind("|"):]
 
-        # getting duplicated item values
-        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+self.data.module_namespace_attr)
-        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+self.data.module_instance_info_attr)
-        # generating naming values
-        origGuideName = moduleNamespaceValue+":"+self.data.guide_base_name
-        thatClassName = moduleNamespaceValue.partition("__")[0]
-        thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
-        thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
-        moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
-        moduleDir = moduleDir[moduleDir.find(".")+1:]
-        self.utils.setProgress(self.data.lang['i067_duplicating'])
-        # initializing a new module instance
-        newGuideInstance = eval('self.initGuide("'+thatModuleName+'")')#, "'+moduleDir+'")')
-        newGuideName = cmds.ls(selection=True)[0]
-        newGuideNamespace = cmds.getAttr(newGuideName+"."+self.data.module_namespace_attr)
+    #     # getting duplicated item values
+    #     moduleNamespaceValue = cmds.getAttr(selectedItem+"."+self.data.module_namespace_attr)
+    #     moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+self.data.module_instance_info_attr)
+    #     # generating naming values
+    #     origGuideName = moduleNamespaceValue+":"+self.data.guide_base_name
+    #     thatClassName = moduleNamespaceValue.partition("__")[0]
+    #     thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
+    #     thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
+    #     moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
+    #     moduleDir = moduleDir[moduleDir.find(".")+1:]
+    #     self.utils.setProgress(self.data.lang['i067_duplicating'])
+    #     # initializing a new module instance
+    #     newGuideInstance = eval('self.initGuide("'+thatModuleName+'")')#, "'+moduleDir+'")')
+    #     newGuideName = cmds.ls(selection=True)[0]
+    #     newGuideNamespace = cmds.getAttr(newGuideName+"."+self.data.module_namespace_attr)
         
-        # reset radius as original
-        origRadius = cmds.getAttr(moduleNamespaceValue+":"+self.data.guide_base_name+"_RadiusCtrl.translateX")
-        cmds.setAttr(newGuideName+"_RadiusCtrl.translateX", origRadius)
+    #     # reset radius as original
+    #     origRadius = cmds.getAttr(moduleNamespaceValue+":"+self.data.guide_base_name+"_RadiusCtrl.translateX")
+    #     cmds.setAttr(newGuideName+"_RadiusCtrl.translateX", origRadius)
         
-        # getting a good attribute list
-        toSetAttrList = cmds.listAttr(selectedItem)
-        currentAttrList = toSetAttrList.copy()
-        guideBaseAttrIdx = toSetAttrList.index(self.data.guide_base_attr)
-        toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
-        toSetAttrList.remove(self.data.guide_base_attr)
-        toSetAttrList.remove(self.data.module_namespace_attr)
-        toSetAttrList.remove(customNameAttr)
-        toSetAttrList.remove(mirrorAxisAttr)
-        # check for special attributes
-        if nSegmentsAttr in currentAttrList:
-            toSetAttrList.remove(nSegmentsAttr)
-            nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue > 0:
-                newGuideInstance.changeJointNumber(nJointsValue)
-        self.utils.setProgress(self.data.lang['i067_duplicating'])
-        if customNameAttr in currentAttrList:
-            customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
-            if customNameValue != "" and customNameValue != None:
-                newGuideInstance.editGuideModuleName(customNameValue)
-        self.utils.setProgress(self.data.lang['i067_duplicating'])
-        if mirrorAxisAttr in currentAttrList:
-            mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
-            if mirroirAxisValue != "off":
-                newGuideInstance.changeMirror(mirroirAxisValue)
-        if dispAnnotAttr in currentAttrList:
-            toSetAttrList.remove(dispAnnotAttr)
-            currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
-            newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
-        if netAttr in currentAttrList:
-            toSetAttrList.remove(netAttr)
+    #     # getting a good attribute list
+    #     toSetAttrList = cmds.listAttr(selectedItem)
+    #     currentAttrList = toSetAttrList.copy()
+    #     guideBaseAttrIdx = toSetAttrList.index(self.data.guide_base_attr)
+    #     toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
+    #     toSetAttrList.remove(self.data.guide_base_attr)
+    #     toSetAttrList.remove(self.data.module_namespace_attr)
+    #     toSetAttrList.remove(customNameAttr)
+    #     toSetAttrList.remove(mirrorAxisAttr)
+    #     # check for special attributes
+    #     if nSegmentsAttr in currentAttrList:
+    #         toSetAttrList.remove(nSegmentsAttr)
+    #         nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
+    #         if nJointsValue > 0:
+    #             newGuideInstance.changeJointNumber(nJointsValue)
+    #     self.utils.setProgress(self.data.lang['i067_duplicating'])
+    #     if customNameAttr in currentAttrList:
+    #         customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
+    #         if customNameValue != "" and customNameValue != None:
+    #             newGuideInstance.editGuideModuleName(customNameValue)
+    #     self.utils.setProgress(self.data.lang['i067_duplicating'])
+    #     if mirrorAxisAttr in currentAttrList:
+    #         mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
+    #         if mirroirAxisValue != "off":
+    #             newGuideInstance.changeMirror(mirroirAxisValue)
+    #     if dispAnnotAttr in currentAttrList:
+    #         toSetAttrList.remove(dispAnnotAttr)
+    #         currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
+    #         newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
+    #     if netAttr in currentAttrList:
+    #         toSetAttrList.remove(netAttr)
         
-        # TODO: change to unify style and type attributes        
-        if "type" in currentAttrList:
-            typeValue = cmds.getAttr(selectedItem+'.type')
-            newGuideInstance.changeType(typeValue)
-        if "style" in currentAttrList:
-            styleValue = cmds.getAttr(selectedItem+'.style')
-            newGuideInstance.changeStyle(styleValue)
+    #     # TODO: change to unify style and type attributes        
+    #     if "type" in currentAttrList:
+    #         typeValue = cmds.getAttr(selectedItem+'.type')
+    #         newGuideInstance.changeType(typeValue)
+    #     if "style" in currentAttrList:
+    #         styleValue = cmds.getAttr(selectedItem+'.style')
+    #         newGuideInstance.changeStyle(styleValue)
         
-        # get and set transformations
-        childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
-        if childrenList:
-            for child in childrenList:
-                if not "|Guide_Base|Guide_Base" in child:
-                    newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
-                    for transfAttr in self.data.transform_attrs:
-                        try:
-                            isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
-                            cmds.setAttr(newChild+"."+transfAttr, lock=False)
-                            cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
-                            if isLocked:
-                                cmds.setAttr(newChild+"."+transfAttr, lock=True)
-                        except:
-                            pass
+    #     # get and set transformations
+    #     childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
+    #     if childrenList:
+    #         for child in childrenList:
+    #             if not "|Guide_Base|Guide_Base" in child:
+    #                 newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
+    #                 for transfAttr in self.data.transform_attrs:
+    #                     try:
+    #                         isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
+    #                         cmds.setAttr(newChild+"."+transfAttr, lock=False)
+    #                         cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
+    #                         if isLocked:
+    #                             cmds.setAttr(newChild+"."+transfAttr, lock=True)
+    #                     except:
+    #                         pass
         
-        # set transformation for Guide_Base
-        for transfAttr in self.data.transform_attrs:
-            cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
+    #     # set transformation for Guide_Base
+    #     for transfAttr in self.data.transform_attrs:
+    #         cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
         
-        # setting new guide attributes
-        for toSetAttr in toSetAttrList:
-            try:
-                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr))
-            except:
-                if cmds.getAttr(selectedItem+"."+toSetAttr):
-                    cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
+    #     # setting new guide attributes
+    #     for toSetAttr in toSetAttrList:
+    #         try:
+    #             cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr))
+    #         except:
+    #             if cmds.getAttr(selectedItem+"."+toSetAttr):
+    #                 cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
         
-        # parenting correctly
-        if parentList:
-            cmds.parent(newGuideName, parentList[0])
+    #     # parenting correctly
+    #     if parentList:
+    #         cmds.parent(newGuideName, parentList[0])
 
-        cmds.delete(selectedItem)
-        print(self.data.lang['r006_wellDone']+" "+newGuideName)
-        self.utils.setProgress(endIt=True)
-        return newGuideName
+    #     cmds.delete(selectedItem)
+    #     print(self.data.lang['r006_wellDone']+" "+newGuideName)
+    #     self.utils.setProgress(endIt=True)
+    #     return newGuideName
 
         
     
@@ -805,23 +808,23 @@ class Start(object):
         return guideInstance
     
     
-    def installControllerModule(self, ctrlInstance, useUI, *args):
-        """  Start the creation of this Controller module using the UI info.
-        """
-        ctrlInstance.cvMain(useUI)
+    # def installControllerModule(self, ctrlInstance, useUI, *args):
+    #     """  Start the creation of this Controller module using the UI info.
+    #     """
+    #     ctrlInstance.cvMain(useUI)
     
     
-    def execIntegratedGuide(self, guideModule, guideDir, *args):
-        """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
-        """
-        print("hehreheheheheheheh 1111")
-        # import this scripted module:
-        basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
-        guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        if self.dev:
-            reload(guide)
-        print("getattr(guide, guide.CLASS_NAME) =", getattr(guide, guide.CLASS_NAME))
-        return guide
+    # def execIntegratedGuide(self, guideModule, guideDir, *args):
+    #     """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
+    #     """
+    #     print("hehreheheheheheheh 1111")
+    #     # import this scripted module:
+    #     basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+    #     guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+    #     if self.dev:
+    #         reload(guide)
+    #     print("getattr(guide, guide.CLASS_NAME) =", getattr(guide, guide.CLASS_NAME))
+    #     return guide
         # get the CLASS_NAME from guideModule:
 #        startScriptFunction = getattr(guide, guide.CLASS_NAME)
         # execute this scriptedGuideModule:

@@ -295,11 +295,11 @@ class ControlClass(object):
         """
         currentRBGColor = self.getCurrentRGBColor(instance.moduleGrp)
         currentRBGOutlinerColor = self.getCurrentRGBColor(instance.moduleGrp, True)
-        self.ar.utils.closeUI(self.ar.colorOverrideWinName)
+        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
         # creating colorOverride Window:
         colorOverride_winWidth  = 170
         colorOverride_winHeight = 115
-        dpColorOverrideWin = cmds.window(self.ar.colorOverrideWinName, title=self.ar.data.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpColorOverrideWin = cmds.window(self.ar.data.color_override_win_name, title=self.ar.data.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         colorTabLayout = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=dpColorOverrideWin)
         # Index layout:

@@ -47,7 +47,7 @@ class UIManager(object):
 #            def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
 
         if savedScene:
-            self.selList = cmds.ls(selection=True)
+            selected = cmds.ls(selection=True)
             self.ar.data.rebuilding = False
         #clear layouts
         self.clear_guide_layout()
@@ -63,23 +63,23 @@ class UIManager(object):
         self.update_guide_footer()
         self.update_skinning_footer()
         
-#        if not self.ar.data.rebuilding:
-#            if resetButtons:
-#                self.resetAllButtonColors()
-#            self.pipeliner.refreshAssetData()
-#            for rebuildInstance in self.rebuilderInstanceList:
-#                rebuildInstance.updateActionButtons(color=False)
+        if not self.ar.data.rebuilding:
+           if resetButtons:
+               self.reset_button_colors()
+           self.ar.pipeliner.refreshAssetData()
+           for item in self.ar.config.get_rebuilder_instances():
+               item.updateActionButtons(color=False)
 #        try:
 #            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
 #        except:
 #            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
-#        if savedScene:
-#            cmds.select(clear=True)
-#            if self.selList:
-#                cmds.select(self.selList)
-#        if clearSel:
-#            cmds.select(clear=True)
-#        self.ar.data.rebuilding = False
+        if savedScene:
+            cmds.select(clear=True)
+            if selected:
+                cmds.select(selected)
+        if clearSel:
+            cmds.select(clear=True)
+        self.ar.data.rebuilding = False
 
 
     def clear_guide_layout(self):
@@ -214,3 +214,12 @@ class UIManager(object):
         elif result is None:
             return None
     
+    
+    def reset_button_colors(self, *args):
+        """ Just reset the button colors to default for each validator or rebuilder module.
+        """
+        items = self.ar.config.get_validator_instances()
+        items.extend(self.ar.config.get_rebuilder_instances())
+        if items:
+            for item in items:
+                item.resetButtonColors()

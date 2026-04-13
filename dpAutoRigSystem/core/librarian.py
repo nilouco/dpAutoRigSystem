@@ -152,11 +152,7 @@ class Lib(object):
 
     
     def set_validator_preset(self):
-        check_instances = self.ar.data.lib[self.ar.data.checkin_folder]["instances"] + self.ar.data.lib[self.ar.data.checkout_folder]["instances"]
-        if self.ar.data.checkaddon_folder in self.ar.data.lib.keys():
-            check_instances = check_instances + self.ar.data.lib[self.ar.data.checkaddon_folder]["instances"]
-        if self.ar.data.checkfinishing_folder in self.ar.data.lib.keys():
-            check_instances = check_instances + self.ar.data.lib[self.ar.data.checkfinishing_folder]["instances"]
+        check_instances = self.ar.config.get_validator_instances()
         if check_instances:
             for validator_name in self.ar.data.validator_preset:
                 for validator_instance in check_instances:

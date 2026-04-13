@@ -699,7 +699,7 @@ class BaseLayout(object):
         plus_winHeight = 180
         widthSize = (0.8*plus_winWidth)
         # creating Plus Info Window:
-        self.ar.utils.closeUI(self.ar.colorOverrideWinName)
+        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
         if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
             cmds.deleteUI('plusFL')
             self.dpPlusInfo = self.ar.data.plus_info_win_name
@@ -709,7 +709,7 @@ class BaseLayout(object):
         plusSL = cmds.scrollLayout('plusSL', parent=plusFL)
         cmds.formLayout(plusFL, edit=True, attachForm=((plusSL, 'bottom', 10), (plusSL, 'top', 10), (plusSL, 'left', 10), (plusSL, 'right', 10)))
         # get selected module guides
-        guideInstanceList = self.ar.selectedModuleInstanceList.copy()
+        guideInstanceList = self.ar.job.selectedModuleInstanceList.copy()
         if not guideInstanceList:
             guideInstanceList = [self]
         if instance:
@@ -733,7 +733,7 @@ class BaseLayout(object):
             guideInstance.shapeSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['m067_shape']+" "+guideInstance.ar.data.lang['i115_size'], width=widthSize, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.moduleGrp+'.shapeSize'), changeCommand=guideInstance.changeShapeSize, dragCommand=guideInstance.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=10, parent=plusSL)
             currentRGBGuideColor = guideInstance.ar.ctrls.getGuideRGBColorList(guideInstance)
-            guideInstance.colorButton = cmds.button(label=guideInstance.ar.data.lang['m013_color'], annotation=guideInstance.ar.data.lang['m013_color'], width=widthSize, align="center", command=partial(guideInstance.ctrls.colorizeUI, guideInstance), backgroundColor=currentRGBGuideColor, parent=plusSL)
+            guideInstance.colorButton = cmds.button(label=guideInstance.ar.data.lang['m013_color'], annotation=guideInstance.ar.data.lang['m013_color'], width=widthSize, align="center", command=partial(guideInstance.ar.ctrls.colorizeUI, guideInstance), backgroundColor=currentRGBGuideColor, parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
             cmds.separator(style='in', height=10, width=widthSize, parent=plusSL)
         # call Info Window:

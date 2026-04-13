@@ -40,31 +40,16 @@ class MainUI(object):
         """ Call mainUI method and the following instructions to check optionVars, refresh UI elements, start the scriptJobs and close loading window.
         """
         startSelList = cmds.ls(selection=True)
-
         self.create_main_ui()
         self.ar.ui_manager.set_ui_state(True)
         self.ar.filler.fill_libraries()
         self.ar.ui_manager.refresh_ui()
         self.ar.agree.load_terms_cond()
         self.ar.updater.load_update()
-
+        self.ar.job.start_jobs()
         self.ar.opening.close_opening_ui()
-        
-        #
-        #
-        # WIP:
-        #
-        
-        #self.ar.refreshMainUI()
-
-
-
-#        self.ar.startScriptJobs()
-#        self.ar.utils.closeUI("dpar_load_win")
-#        cmds.select(startSelList)
-#        print("dpAutoRigSystem "+self.ar.data.lang['i346_loadedSuccess'])
-
-
+        cmds.select(startSelList)
+        print("dpAutoRigSystem "+self.ar.data.lang['i346_loadedSuccess'])
 
 
 
