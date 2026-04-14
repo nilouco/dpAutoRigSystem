@@ -36,9 +36,10 @@ class BaseTemplate(dpBaseLibrary.BaseLibrary):
                     return
                 template_data = self.ar.data.lib[self.ar.data.template_folder]["content"][f"{base_name}_{user_choice.lower()}"]
         guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
-        guide_io.importGuide(template_data)
+        guide_io.importGuide(template_data, False)
         guide_io.setupGuideBaseParenting(template_data)
         self.ar.utils.setProgress(endIt=True)
+        self.ar.ui_manager.refresh_ui()
         print(self.ar.data.lang["m089_createdTemplate"]+self.name)
 
 

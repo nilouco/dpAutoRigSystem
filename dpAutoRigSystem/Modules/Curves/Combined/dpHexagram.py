@@ -30,7 +30,7 @@ class Hexagram(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        missing_modules = self.ar.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
+        missing_modules = self.ar.ui_manager.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
         if not missing_modules:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)

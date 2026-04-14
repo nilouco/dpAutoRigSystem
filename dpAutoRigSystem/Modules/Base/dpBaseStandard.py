@@ -233,11 +233,11 @@ class BaseStandard(object):
             cmds.namespace(moveNamespace=(self.guideNamespace, ':'), force=True)
             cmds.namespace(removeNamespace=self.guideNamespace, force=True)
         
-        if self.ar.data.ui_state:
+        #if self.ar.data.ui_state:
             # self.ar.ui_manager.clear_guide_layout()
             # self.ar.filler.fill_created_guides()
             # self.ar.ui_manager.update_guide_footer()
-            self.ar.ui_manager.refresh_ui()
+        self.ar.ui_manager.refresh_ui()
 
             # self.currentText = cmds.text("footerRiggingText", query=True, label=True)
             # cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])

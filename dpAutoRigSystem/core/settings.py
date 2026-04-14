@@ -317,10 +317,13 @@ class Configuration(object):
                         return self.ar.data.lib[folder]["instances"][i]
 
 
-    def get_template_name(self, item):
-        for name in self.ar.data.lang.keys():
-            if name.endswith(f"_{item}"):
-                return name
+    def get_template_name(self, name):
+        keys = self.ar.utils.get_keys_by_value(self.ar.data.lang_preset_data["English"], name.capitalize())
+        if keys:
+            for key in keys:
+                if key.startswith("m") or key.startswith("i"):
+                    return key
+            return keys[0]
         return self.ar.data.template_default
 
 

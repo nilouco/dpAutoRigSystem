@@ -33,7 +33,7 @@ class Arm(dpBaseLibrary.BaseLibrary):
         """ This function will create all guides needed to compose an arm.
         """
         # check modules integrity:
-        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
+        missing_modules = self.ar.ui_manager.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         if not missing_modules:
             self.ar.data.collapse_edit_sel_mod = True
             

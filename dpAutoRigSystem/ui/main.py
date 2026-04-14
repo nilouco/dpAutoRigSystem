@@ -458,11 +458,11 @@ class MainUI(object):
         # rebuilder
         cmds.columnLayout('rebuilder_footer_cl', adjustableColumn=False, parent="rebuilder_tab")
         cmds.separator(style='in', height=20, width=370, parent="rebuilder_footer_cl")
-        cmds.checkBox("rebuilder_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.changeActiveAllModules, self.ar.config.get_rebuilder_instances()), parent="rebuilder_footer_cl")
+        cmds.checkBox("rebuilder_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.ui_manager.changeActiveAllModules, self.ar.config.get_rebuilder_instances()), parent="rebuilder_footer_cl")
         cmds.separator(style='none', height=10, parent="rebuilder_footer_cl")
         cmds.paneLayout("rebuilder_selected_pl", configuration="vertical2", separatorThickness=7.0, width=370, parent="rebuilder_footer_cl")
-        cmds.button("rebuilder_split_data_bt", label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.runSelectedActions, self.ar.config.get_rebuilder_instances(), True, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
-        cmds.button("rebuilder_rebuild_bt", label=self.ar.data.lang['r001_rebuild'].upper(), command=partial(self.ar.runSelectedActions, self.ar.config.get_rebuilder_instances(), False, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
+        cmds.button("rebuilder_split_data_bt", label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, self.ar.config.get_rebuilder_instances(), True, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
+        cmds.button("rebuilder_rebuild_bt", label=self.ar.data.lang['r001_rebuild'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, self.ar.config.get_rebuilder_instances(), False, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
         cmds.separator(style='none', height=10, parent="rebuilder_footer_cl")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout("rebuilder_tab", edit=True,
@@ -479,10 +479,10 @@ class MainUI(object):
         cmds.columnLayout(name+"_module_cl", adjustableColumn=True, parent=name+"_fl") #rowSpacing=3
         # it'll be filled further...
         cmds.separator(style="none", parent=name+"_fl")
-        cmds.checkBox(name+"_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang[name], value=False, changeCommand=partial(self.ar.changeActiveAllModules, instances), parent=name+"_fl")
+        cmds.checkBox(name+"_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang[name], value=False, changeCommand=partial(self.ar.ui_manager.changeActiveAllModules, instances), parent=name+"_fl")
         cmds.paneLayout(name+"_select_v2_pl", configuration="vertical2", separatorThickness=7.0, parent=name+"_fl")
-        cmds.button(name+"_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.runSelectedActions, instances, True, True), parent=name+"_select_v2_pl")
-        cmds.button(name+"_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.runSelectedActions, instances, False, True), parent=name+"_select_v2_pl")
+        cmds.button(name+"_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, instances, True, True), parent=name+"_select_v2_pl")
+        cmds.button(name+"_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, instances, False, True), parent=name+"_select_v2_pl")
         cmds.separator(height=30, parent=name+"_fl")
 
 

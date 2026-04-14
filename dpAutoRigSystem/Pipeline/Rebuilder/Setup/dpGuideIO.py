@@ -137,7 +137,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         return toExportDataDic
 
 
-    def setupInstanceChanges(self, *args):
+    def setupInstanceChanges(self, rebuilding=True, *args):
         """ Run instance code to Guide_Base node configuration or just set the simple attributes.
         """
         directionList = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
@@ -188,12 +188,16 @@ class GuideIO(dpBaseAction.ActionStartClass):
                 if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #moduleGrp
                     for baseAttr in list(self.netDic["GuideData"][item]):
                         if baseAttr == "customName":
-                            customNameData = self.netDic["GuideData"][item]["customName"]
-                            if customNameData:
-                                self.instance.editGuideModuleName(customNameData)
+                            custom_name = self.netDic["GuideData"][item]["customName"]
+                            if custom_name:
+                                if not rebuilding: #template
+                                    custom_name = self.ar.utils.get_translated_names(custom_name)
+                                self.instance.editGuideModuleName(custom_name)
                         elif baseAttr == "mirrorAxis":
                             cmds.setAttr(new_item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
-                            cmds.setAttr(new_item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")
+                            start = self.ar.utils.get_translated_names(self.netDic["GuideData"][item]["mirrorName"][0])
+                            end = self.ar.utils.get_translated_names(self.netDic["GuideData"][item]["mirrorName"][-1])
+                            cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
                             self.instance.createPreviewMirror()
                         elif baseAttr == "articulation":
                             self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
@@ -259,7 +263,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                                         cmds.parent(new_item, new_father)
 
 
-    def importGuide(self, guideDic, *args):
+    def importGuide(self, guideDic, rebuilding=True, *args):
         """ Import guide info and initialize guide setting it attribute values.
         """
         wellImported = True
@@ -274,29 +278,39 @@ class GuideIO(dpBaseAction.ActionStartClass):
                     wellImported = self.importHeadDeformer(guideDic[net])
             else:
                 toInitializeGuide = True
-                if cmds.objExists(net):
-                    if cmds.getAttr(net+".rawGuide"):
-                        toInitializeGuide = False
-                    else:
-                        cmds.lockNode(net, lock=False)
-                        cmds.delete(net)
+                if rebuilding:
+                    if cmds.objExists(net):
+                        if cmds.getAttr(net+".rawGuide"):
+                           toInitializeGuide = False
+                        else:
+                           cmds.lockNode(net, lock=False)
+                           cmds.delete(net)
+                else: #problably template
+                    net_data = self.get_nets_info()
+                    for module_type in net_data.keys():
+                        if module_type == guideDic[net]["ModuleType"]:
+                            net_custom_name = guideDic[net]["GuideData"][f"{module_type}__dpAR_{guideDic[net]['GuideNumber']}:Guide_Base"]["customName"]
+                            if not net_custom_name is None:
+                                for item in net_data[module_type].keys():
+                                    if net_data[module_type][item] == net_custom_name:
+                                        toInitializeGuide = False
+                                        break
                 if toInitializeGuide:
-                    #try:
-                        #self.netDic = json.loads(guideDic[net])
+                    try:
                         self.netDic = guideDic[net]
                         self.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library("dp"+self.netDic['ModuleType'], self.ar.data.standard_folder)[0]
                         self.correlations[f"{self.netDic['ModuleType']}__dpAR_{self.netDic['GuideNumber']}"] = self.instance.guideNamespace
                         self.instance.build_raw_guide()
-                        self.setupInstanceChanges()
+                        self.setupInstanceChanges(rebuilding)
                         self.setupGuideTransformations()
                         cmds.select(clear=True)
-                    #except Exception as e:
-                    #    print("Error:", e)
-                    #    wellImported = False
-                    #    self.notWorkedWellIO(net+": "+str(e))
-                    #    break
+                    except Exception as e:
+                        print("Error:", e)
+                        wellImported = False
+                        self.notWorkedWellIO(net+": "+str(e))
+                        break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False
 
@@ -315,3 +329,20 @@ class GuideIO(dpBaseAction.ActionStartClass):
             if base in self.correlations.keys():
                 return name.replace(base, self.correlations[base])
         return name
+
+
+    def get_nets_info(self):
+        net_data = {}
+        nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
+        if nets:
+            module_types = list(set([cmds.getAttr(f"{n}.moduleType") for n in nets]))
+            for module_type in module_types:
+                net_data[module_type] = {}
+                for net in nets:
+                    if cmds.getAttr(f"{net}.moduleType") == module_type:
+                        net_data[module_type][net] = self.get_net_custom_name(net)
+        return net_data
+    
+
+    def get_net_custom_name(self, net):
+        return cmds.getAttr(f"{cmds.listConnections(f'{net}.linkedNode', source=True, destination=False)[0]}.customName")

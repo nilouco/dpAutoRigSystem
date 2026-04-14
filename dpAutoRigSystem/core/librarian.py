@@ -98,7 +98,7 @@ class Lib(object):
             if "_" in item:
                 base_name = item.split("_")[0]
             name = self.ar.config.get_template_name(base_name)
-            lib = dpBaseTemplate.BaseTemplate(self.ar, item, name, "v002_templateDesc", item, f"03-‐-Guides#-{item}")
+            lib = dpBaseTemplate.BaseTemplate(self.ar, item, name, "v002_templateDesc", item, f"03-‐-Guides#-{base_name}")
             lib.template_data = content[item]
             lib.base_name = base_name
             libs.append(lib)

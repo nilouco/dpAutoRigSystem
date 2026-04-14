@@ -314,40 +314,42 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
     def actualizeEditLayout(self, *args):
         """ Clean up the current edit layout, check the selected node and update the UI.
         """
-        self.clearEditLayout()
-        selList = cmds.textScrollList(self.existingNetTSL, query=True, selectItem=True)
-        if selList:
-            if cmds.objExists(selList[0]):
-                cmds.select(selList[0])
-                self.net = selList[0]
-        self.recreateSelectedLayout()
+        if cmds.textScrollList('existingNetTSL', exists=True):
+            self.clearEditLayout()
+            selList = cmds.textScrollList(self.existingNetTSL, query=True, selectItem=True)
+            if selList:
+                if cmds.objExists(selList[0]):
+                    cmds.select(selList[0])
+                    self.net = selList[0]
+            self.recreateSelectedLayout()
 
 
     def populateNetUI(self, *args):
         """ Check existing network node to populate UI.
         """
-        cmds.textScrollList(self.existingNetTSL, edit=True, deselectAll=True)
-        cmds.textScrollList(self.existingNetTSL, edit=True, removeAll=True)
-        currentNetList = cmds.ls(selection=False, type="network")
-        if currentNetList:
-            self.netList = []
-            filterName = cmds.textField(self.filterNameTF, query=True, text=True)
-            if filterName:
-                self.net = None
-                self.clearEditLayout()
-                currentNetList = self.ar.utils.filterName(filterName, currentNetList, " ")
-            for item in currentNetList:
-                if "dpNetwork" in cmds.listAttr(item):
-                    if cmds.getAttr(item+".dpNetwork") == 1:
-                        if "dpCorrectionManager" in cmds.listAttr(item):
-                            if cmds.getAttr(item+".dpCorrectionManager") == 1:
-                                #TODO validate correctionManager node integrity here
-                                self.netList.append(item)
-            if self.netList:
-                cmds.textScrollList(self.existingNetTSL, edit=True, append=self.netList)
-                if self.net:
-                    if cmds.objExists(self.net):
-                        cmds.textScrollList(self.existingNetTSL, edit=True, selectItem=self.net)
+        if cmds.textScrollList('existingNetTSL', exists=True):
+            cmds.textScrollList(self.existingNetTSL, edit=True, deselectAll=True)
+            cmds.textScrollList(self.existingNetTSL, edit=True, removeAll=True)
+            currentNetList = cmds.ls(selection=False, type="network")
+            if currentNetList:
+                self.netList = []
+                filterName = cmds.textField(self.filterNameTF, query=True, text=True)
+                if filterName:
+                    self.net = None
+                    self.clearEditLayout()
+                    currentNetList = self.ar.utils.filterName(filterName, currentNetList, " ")
+                for item in currentNetList:
+                    if "dpNetwork" in cmds.listAttr(item):
+                        if cmds.getAttr(item+".dpNetwork") == 1:
+                            if "dpCorrectionManager" in cmds.listAttr(item):
+                                if cmds.getAttr(item+".dpCorrectionManager") == 1:
+                                    #TODO validate correctionManager node integrity here
+                                    self.netList.append(item)
+                if self.netList:
+                    cmds.textScrollList(self.existingNetTSL, edit=True, append=self.netList)
+                    if self.net:
+                        if cmds.objExists(self.net):
+                            cmds.textScrollList(self.existingNetTSL, edit=True, selectItem=self.net)
 
 
     def clearEditLayout(self, *args):

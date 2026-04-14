@@ -45,41 +45,41 @@ class UIManager(object):
         #
 
 #            def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
-
-        if savedScene:
-            selected = cmds.ls(selection=True)
+        if self.ar.data.ui_state:
+            if savedScene:
+                selected = cmds.ls(selection=True)
+                self.ar.data.rebuilding = False
+            #clear layouts
+            self.clear_guide_layout()
+            self.ar.filler.fill_created_guides()
+            # guide checkers
+            self.ar.filler.check_imported_guides()
+            self.ar.filler.check_guide_nets()
+            self.ar.filler.check_guide_versions()
+            # populates
+            self.ar.filler.populate_joints()
+            self.ar.filler.populate_geometries()
+            # update ui footers
+            self.update_guide_footer()
+            self.update_skinning_footer()
+            # buttons
+            if not self.ar.data.rebuilding:
+                if resetButtons:
+                    self.reset_button_colors()
+                self.ar.pipeliner.refreshAssetData()
+                for item in self.ar.config.get_rebuilder_instances():
+                    item.updateActionButtons(color=False)
+            try:
+                self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.ar.job.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True)
+            except:
+                self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.ar.job.selected_guide), parent='main_menu_bar', replacePrevious=False, killWithScene=False, compressUndo=True)
+            if savedScene:
+                cmds.select(clear=True)
+                if selected:
+                    cmds.select(selected)
+            if clearSel:
+                cmds.select(clear=True)
             self.ar.data.rebuilding = False
-        #clear layouts
-        self.clear_guide_layout()
-        self.ar.filler.fill_created_guides()
-        # guide checkers
-        self.ar.filler.check_imported_guides()
-        self.ar.filler.check_guide_nets()
-        self.ar.filler.check_guide_versions()
-        # populates
-        self.ar.filler.populate_joints()
-        self.ar.filler.populate_geometries()
-        # update ui footers
-        self.update_guide_footer()
-        self.update_skinning_footer()
-        
-        if not self.ar.data.rebuilding:
-           if resetButtons:
-               self.reset_button_colors()
-           self.ar.pipeliner.refreshAssetData()
-           for item in self.ar.config.get_rebuilder_instances():
-               item.updateActionButtons(color=False)
-#        try:
-#            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=False, compressUndo=True)
-#        except:
-#            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=False, compressUndo=True)
-        if savedScene:
-            cmds.select(clear=True)
-            if selected:
-                cmds.select(selected)
-        if clearSel:
-            cmds.select(clear=True)
-        self.ar.data.rebuilding = False
 
 
     def clear_guide_layout(self):
@@ -223,3 +223,73 @@ class UIManager(object):
         if items:
             for item in items:
                 item.resetButtonColors()
+
+
+    def check_missing_modules(self, folder, check_modules):
+        """ Verifies if the modules exists in the given folder.
+            Returns a list of missing modules or []
+        """
+        return [m for m in check_modules if not m in self.ar.utils.findAllModules(self.ar.data.dp_auto_rig_path, folder.replace(".", "/"))]
+
+
+    def changeActiveAllModules(self, items, value, *args):
+        """ Set all module instances active attribute as True or False.
+            Used by validators and rebuilders.
+        """
+        if items:
+            for item in items:
+                item.changeActive(value)
+
+    
+    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", *args):
+        """ Run the code for each active validator/rebuilder instance.
+            firstMode = True for verify/export
+                      = False for fix/import
+        """
+        if firstMode and actionType == "r000_rebuilder": #splitData
+            if self.ar.utils.getDuplicatedNames():
+                confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+                if confirm == self.ar.data.lang['i072_no']:
+                    return
+        self.reset_button_colors()
+        actionResultData = {}
+        logText = ""
+        if publishLog:
+            logText = "\nPublisher"
+            logText += "\nScene: "+publishLog["scene"]
+            logText += "\nPublished: "+publishLog["published"]
+            logText += "\nExported: "+publishLog["exportPath"]
+            logText += "\nComments: "+publishLog["comments"]+"\n"
+        if actionInstList:
+            self.ar.utils.setProgress(self.ar.data.lang[actionType]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[actionType], len(actionInstList))
+            for a, actionInst in enumerate(actionInstList):
+                if actionInst.active:
+                    self.ar.utils.setProgress(actionInst.name)
+                    actionInst.verbose = False
+                    actionResultData[actionInst.name] = actionInst.runAction(firstMode)
+                    actionInst.verbose = True
+                    if stopIfFoundBlock:
+                        if True in actionInst.foundIssueList:
+                            if False in actionInst.resultOkList:
+                                return actionResultData, True, a
+        if actionResultData:
+            dataList = list(actionResultData.keys())
+            dataList.sort()
+            for i, dataItem in enumerate(dataList):
+                logText += actionResultData[dataItem]["logText"]
+                if i != len(dataList)-1:
+                    logText += "\n"
+            heightSize = len(dataList)
+        else:
+            logText += "\n"+self.ar.data.lang['i207_notMarked']
+            heightSize = 2
+        logText = self.ar.pipeliner.getToday(True)+"\n\n"+logText+"\n"
+        if verbose:
+            self.ar.logger.infoWin('i019_log', actionType, logText, "left", 250, (150+(heightSize)*13))
+            print("\n-------------\n"+self.ar.data.lang[actionType]+"\n"+logText)
+            if publishLog:
+                actionResultData["Publisher"] = publishLog
+            if not self.ar.utils.exportLogDicToJson(actionResultData, subFolder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+                print(self.ar.data.lang['i201_saveScene'])
+        self.ar.utils.setProgress(endIt=True)
+        return actionResultData, False, 0

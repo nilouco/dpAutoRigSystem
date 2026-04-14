@@ -36,7 +36,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
         guideDir = 'Modules.Standard'
         standardDir = 'Modules/Standard'
         checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
-        missing_modules = self.ar.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
+        missing_modules = self.ar.ui_manager.check_missing_modules(self.ar.data.standard_folder, self.check_modules)
         
         if not missing_modules:
             self.ar.data.collapse_edit_sel_mod = True

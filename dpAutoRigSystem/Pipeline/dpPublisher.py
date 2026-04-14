@@ -113,7 +113,7 @@ class Publisher(object):
         """
         validators = self.ar.config.get_validator_instances()
         if validators:
-            validationResultDataList = self.ar.runSelectedActions(validators, firstMode, True, stopIfFoundBlock, publishLog)
+            validationResultDataList = self.ar.ui_manager.runSelectedActions(validators, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
                 stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+validators[validationResultDataList[2]].name                    
                 return stoppedMessage

@@ -30,7 +30,7 @@ class Diamond(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        missing_modules = self.ar.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
+        missing_modules = self.ar.ui_manager.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
         if not missing_modules:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -45,10 +45,13 @@ class Diamond(dpBaseCurve.BaseCurve):
         """
         square = self.ar.config.get_instance_info("dpSquare", [self.ar.data.curve_simple_folder])
         curve1 = square.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve2 = square.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve3 = square.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve1+".rotateZ", 45)
-        cmds.makeIdentity(curve1, apply=True)
-        curve2 = cmds.duplicate(curve1)[0]
         cmds.setAttr(curve2+".rotateX", 90)
-        curve3 = cmds.duplicate(curve1)[0]
-        cmds.setAttr(curve3+".rotateY", 90)
+        cmds.setAttr(curve2+".rotateY", 45)
+        cmds.setAttr(curve3+".rotateX", 90)
+        cmds.setAttr(curve3+".rotateY", 45)
+        cmds.setAttr(curve3+".rotateZ", 90)
+        cmds.makeIdentity(curve1, apply=True)
         return self.combineCurves([curve1, curve2, curve3])

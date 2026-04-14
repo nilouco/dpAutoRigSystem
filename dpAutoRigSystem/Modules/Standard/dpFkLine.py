@@ -216,7 +216,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseLayout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
         if self.ar.data.ui_state:
             # Create the reOrient button in the flip layout:
-            self.reOrientBT = cmds.button(label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent=self.flipLayout)
+            self.reOrientBT = cmds.button(label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent="flipLayout")
 
 
     def rigModule(self, *args):

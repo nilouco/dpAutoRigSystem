@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from maya import OpenMaya
 from io import TextIOWrapper
 from importlib import reload
@@ -1569,3 +1570,33 @@ class Utils(object):
         dagPath = OpenMaya.MDagPath()
         selectionList.getDagPath(0, dagPath)
         return dagPath
+
+
+    def get_keys_by_value(self, data, value):
+        return [k for k, v in data.items() if v == value]
+
+
+    def get_translated_names(self, name, from_lang="English"):
+        custom_name = ""
+        splitted_names = name.split("_")
+        for n, splitted_name in enumerate(splitted_names):
+            # splits capital letters and numbers:
+            capitals = re.findall(r'\d+|[A-Z][a-z]*', splitted_name)
+            for capitalized_name in capitals:
+                capitalize = False
+                lang_names = self.get_keys_by_value(self.ar.data.lang_preset_data[from_lang], capitalized_name)
+                if not lang_names:
+                    lang_names = self.get_keys_by_value(self.ar.data.lang_preset_data[from_lang], capitalized_name.lower())
+                    capitalize = True
+                if lang_names:
+                    if capitalize:
+                        custom_name += self.ar.data.lang[lang_names[0]].capitalize()
+                    else:
+                        custom_name += self.ar.data.lang[lang_names[0]]
+                else:
+                    custom_name += capitalized_name
+            if n < len(splitted_names)-1:
+                custom_name += "_"
+        if custom_name:
+            return custom_name
+        return name

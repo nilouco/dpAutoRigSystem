@@ -120,7 +120,7 @@ class Maker(object):
 
         newGuideInstance = self.ar.lib.initialize_library(thatModuleName, self.ar.data.standard_folder)[0]
         newGuideName = newGuideInstance.build_raw_guide()
-        print("newGuideInstance, newGuideName =", newGuideInstance, newGuideName)
+#        print("newGuideInstance, newGuideName =", newGuideInstance, newGuideName)
         newGuideNamespace = cmds.getAttr(newGuideName+"."+self.ar.data.module_namespace_attr)
         
         # reset radius as original
