@@ -189,34 +189,35 @@ class Publisher(object):
 
                     # try to store data into All_Grp if it exists
                     self.pipeliner.pipeData['modelVersion'] = None
-                    if not self.ar.checkIfNeedCreateAllGrp():
+                    masterGrp = self.ar.utils.getAllGrp()
+                    if masterGrp:
                         # published from file
-                        if not cmds.objExists(self.ar.masterGrp+".publishedFromFile"):
-                            cmds.addAttr(self.ar.masterGrp, longName="publishedFromFile", dataType="string")
-                        cmds.setAttr(self.ar.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        if not cmds.objExists(masterGrp+".publishedFromFile"):
+                            cmds.addAttr(masterGrp, longName="publishedFromFile", dataType="string")
+                        cmds.setAttr(masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
                         # asset name
-                        if not cmds.objExists(self.ar.masterGrp+".assetName"):
-                            cmds.addAttr(self.ar.masterGrp, longName="assetName", dataType="string")
-                        cmds.setAttr(self.ar.masterGrp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
+                        if not cmds.objExists(masterGrp+".assetName"):
+                            cmds.addAttr(masterGrp, longName="assetName", dataType="string")
+                        cmds.setAttr(masterGrp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
                         # comments
-                        if not cmds.objExists(self.ar.masterGrp+".comment"):
-                            cmds.addAttr(self.ar.masterGrp, longName="comment", dataType="string")
-                        cmds.setAttr(self.ar.masterGrp+".comment", commentValue, type="string")
+                        if not cmds.objExists(masterGrp+".comment"):
+                            cmds.addAttr(masterGrp, longName="comment", dataType="string")
+                        cmds.setAttr(masterGrp+".comment", commentValue, type="string")
                         # model version
                         shortName = cmds.file(query=True, sceneName=True, shortName=True)
                         if self.pipeliner.pipeData['s_model'] in shortName:
                             modelVersion = shortName[shortName.find(self.pipeliner.pipeData['s_model'])+len(self.pipeliner.pipeData['s_model']):]
                             modelVersion = int(modelVersion[:modelVersion.find("_")])
-                            if not cmds.objExists(self.ar.masterGrp+".modelVersion"):
-                                cmds.addAttr(self.ar.masterGrp, longName="modelVersion", attributeType="long")
-                            cmds.setAttr(self.ar.masterGrp+".modelVersion", modelVersion)
+                            if not cmds.objExists(masterGrp+".modelVersion"):
+                                cmds.addAttr(masterGrp, longName="modelVersion", attributeType="long")
+                            cmds.setAttr(masterGrp+".modelVersion", modelVersion)
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
-                        if cmds.objExists(self.ar.masterGrp+".system"):
-                            builtVersion = cmds.getAttr(self.ar.masterGrp+".system")
+                        if cmds.objExists(masterGrp+".system"):
+                            builtVersion = cmds.getAttr(masterGrp+".system")
                             if "dpAutoRig_" in builtVersion: #suport old rigged files
                                 builtVersion = builtVersion.split("dpAutoRig_")[1]
                     else:
-                        builtVersion = self.ar.dpARVersion
+                        builtVersion = self.ar.data.version
 
                     self.utils.setProgress(self.ar.data.lang['i227_getImage']+"...", addNumber=False)
 

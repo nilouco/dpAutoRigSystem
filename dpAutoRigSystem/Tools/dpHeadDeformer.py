@@ -71,12 +71,12 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
                 return deformerName+"_"
             
 
-    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, guideNet=None, *args):
+    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, guideNet=None, ui=True, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         self.headCtrl = None
         self.wellDone = True
-        if self.ar.data.ui_state:
+        if ui:
             dialogName = self.dpHeadDeformerPromptDialog()
         if dialogName == None:
             return

@@ -16,7 +16,7 @@ class MainUI(object):
         if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
             cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
         labelText = "dpAutoRigSystem"
-        labelText += " - "+self.ar.dpARVersion
+        labelText += " - "+self.ar.data.version
         if self.ar.dev:
             labelText += " ~ dev"
         uiCallScript = "import dpAutoRigSystem; from dpAutoRigSystem import dpAutoRig; ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.main_ui.show_ui();"
@@ -187,7 +187,7 @@ class MainUI(object):
         # footer
         cmds.columnLayout('rig_footer_cl', adjustableColumn=True, parent='rigging_tab')
         cmds.text("rig_prefix_txt", label="", font="boldLabelFont", height=25, visible=False, parent="rig_footer_cl")
-        cmds.button('rig_all_bt', label=self.ar.data.lang['i020_rigAll'], annotation=self.ar.data.lang['i021_rigAllDesc'], backgroundColor=(0.6, 1.0, 0.6), command=self.ar.rigAll, parent='rig_footer_cl')
+        cmds.button('rig_all_bt', label=self.ar.data.lang['i020_rigAll'], annotation=self.ar.data.lang['i021_rigAllDesc'], backgroundColor=(0.6, 1.0, 0.6), command=self.ar.maker.rigAll, parent='rig_footer_cl')
         cmds.separator(style='none', height=5, parent='rig_footer_cl')
         # this text will be actualized by the number of module instances created in the scene...
         cmds.text('rig_footer_txt', label="# "+self.ar.data.lang['i005_footerRigging'], align='center', parent='rig_footer_cl')

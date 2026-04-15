@@ -882,28 +882,28 @@ class Utils(object):
         """
         if not masterAttr:
             masterAttr = self.ar.data.master_attr
-        allTransformList = cmds.ls(selection=False, type="transform")
-        if allTransformList:
-            for transform in allTransformList:
-                if cmds.objExists(transform+"."+masterAttr):
-                    if cmds.getAttr(transform+"."+masterAttr) == 1:
-                        return transform #All_Grp found
+        transform_nodes = [n for n in cmds.ls(selection=False, type="transform") if masterAttr in cmds.listAttr(n)]
+        if transform_nodes:
+            for item in transform_nodes:
+                if not cmds.referenceQuery(item, isNodeReferenced=True):
+                    if self.validateMasterGrp(item):
+                        return item
 
 
-    def validateMasterGrp(self, nodeGrp, *args):
-        """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
+    def validateMasterGrp(self, item, *args):
+        """ Check if the current item is a valid masterGrp (All_Grp) verifying it's message attribute connections.
         """
         masterGroupAttrList = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
         oldAttrList = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
         for m, masterGroupAttr in enumerate(masterGroupAttrList):
-            if not masterGroupAttr in cmds.listAttr(nodeGrp):
+            if not masterGroupAttr in cmds.listAttr(item):
                 if not oldAttrList[m]:
-                    cmds.setAttr(nodeGrp+"."+self.ar.data.master_attr, 0)
+                    cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
                     return False
-                elif not oldAttrList[m] in cmds.listAttr(nodeGrp):
-                    cmds.setAttr(nodeGrp+"."+self.ar.data.master_attr, 0)
+                elif not oldAttrList[m] in cmds.listAttr(item):
+                    cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
                     return False
-        return cmds.getAttr(nodeGrp+"."+self.ar.data.master_attr)
+        return cmds.getAttr(item+"."+self.ar.data.master_attr)
     
 
     def getNodeByMessage(self, attrName, node=None, *args):

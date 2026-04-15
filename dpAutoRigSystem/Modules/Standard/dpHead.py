@@ -2,9 +2,6 @@
 from maya import cmds
 from ..Base import dpBaseStandard
 from ..Base import dpBaseLayout
-from ...Tools import dpFacialConnection
-from ...Tools import dpHeadDeformer
-from importlib import reload
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -32,19 +29,6 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.facialAttrList = ["facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         self.loadVariables()
-        if self.ar.dev:
-            self.reloadModules()
-        self.dpFacialConnect = dpFacialConnection.FacialConnection(self.ar)
-        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.ar)
-        self.dpFacialConnect.ui = False
-        self.dpHeadDeformer.ui = False
-
-
-    def reloadModules(self, *args):
-        """ DEV reloading modules.
-        """ 
-        reload(dpFacialConnection)
-        reload(dpHeadDeformer)
 
 
     def loadVariables(self, *args):
@@ -1213,7 +1197,10 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             headDefCtrlList.extend([self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl])
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
-                    hdNet = self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet)
+
+                    #hdNet = self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet)
+                    hdNet = self.ar.config.get_instance_info("dpHeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet, ui=False)
+
                     self.addNodeToGuideNet([hdNet], ["hdNet"])
                     cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
                 elif cmds.objExists(self.guideName+"_DeformerCube_MD"):
@@ -1232,9 +1219,9 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.moduleGrp+".facial"):
                 if self.connectUserType == self.bsType:
-                    self.dpFacialConnect.dpConnectToBlendShape()
+                    self.ar.config.get_instance_info("dpFacialConnection", [self.ar.data.tools_folder]).dpConnectToBlendShape()
                 else:
-                    self.dpFacialConnect.dpConnectToJoints()
+                    self.ar.config.get_instance_info("dpFacialConnection", [self.ar.data.tools_folder]).dpConnectToJoints()
 
             # finalize this rig:
             self.serializeGuide()

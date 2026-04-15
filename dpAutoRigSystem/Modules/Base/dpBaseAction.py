@@ -246,7 +246,7 @@ class ActionStartClass(object):
         self.dataLogDic["log"] = self.ar.data.lang[self.actionType]
         self.dataLogDic["user"] = getpass.getuser()
         self.dataLogDic["time"] = self.pipeliner.getToday(True)
-        self.dataLogDic["dpARVersion"] = self.ar.dpARVersion
+        self.dataLogDic["dpARVersion"] = self.ar.data.version
         self.dataLogDic["module"] = self.name
         self.dataLogDic["version"] = self.version
         self.dataLogDic["name"] = self.title

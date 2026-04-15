@@ -29,9 +29,9 @@ class Logger(object):
         self.info_align       = align
         # creating Info Window:
         self.ar.utils.closeUI("dpInfoWindow")
-        dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.ar.data.version+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.ar.data.version+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpInfoWin)
+        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent="dpInfoWindow")
         cmds.separator(style='none', height=10, parent=infoColumnLayout)
         infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
         if self.info_description:
@@ -47,7 +47,7 @@ class Logger(object):
             cmds.separator(style='none', height=20, parent=infoLayout)
             cmds.button(label="Wiki", command=partial(self.utils.visitWebSite, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
-        cmds.showWindow(dpInfoWin)
+        cmds.showWindow("dpInfoWindow")
 
 
     def logWin(self, *args):
@@ -57,7 +57,7 @@ class Logger(object):
         logText = self.lang['i014_logStart'] + '\n'
         logText += str( time.asctime( time.localtime(time.time()) ) ) + '\n\n'
         # get the number of riggedModules:
-        nRiggedModule = len(self.ar.riggedModuleDic)
+        nRiggedModule = len(self.ar.maker.riggedModuleDic)
         # pass for rigged module to add informations in logText:
         if nRiggedModule != 0:
             if nRiggedModule == 1:
@@ -67,11 +67,11 @@ class Logger(object):
                 logText += str(nRiggedModule).zfill(3) + ' ' + self.lang['i016_success'] + ':\n\n'
                 print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang['i016_success'] + ', thanks!\n')
             riggedGuideModuleList = []
-            for riggedGuideModule in self.ar.riggedModuleDic:
+            for riggedGuideModule in self.ar.maker.riggedModuleDic:
                 riggedGuideModuleList.append(riggedGuideModule)
             riggedGuideModuleList.sort()
             for riggedGuideModule in riggedGuideModuleList:
-                moduleCustomName= self.ar.riggedModuleDic[riggedGuideModule]
+                moduleCustomName= self.ar.maker.riggedModuleDic[riggedGuideModule]
                 if moduleCustomName == None:
                     logText += riggedGuideModule + '\n'
                 else:

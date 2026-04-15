@@ -14,7 +14,14 @@ from maya import mel
 class Configuration(object):
     def __init__(self, ar):
         self.ar = ar
+        
+        
+        #
+        # TODO: define verbose as il fault here
+        #
         self.ar.data.verbose = self.ar.dev
+
+
         self.lib_folders = [
                             self.ar.data.standard_folder,
                             self.ar.data.integrated_folder,
@@ -58,6 +65,9 @@ class Configuration(object):
     def load_version(self):
         self.ar.data.version = self.ar.version.__version__
         self.ar.data.update_log = self.ar.version._update_log
+        if cmds.text("loading_text", query=True, exists=True):
+            cmds.text("loading_text", edit=True, label=f"Loading dpAutoRigSystem v{self.ar.data.version} ... ")
+            cmds.refresh()
 
 
     def load_language(self):
@@ -506,7 +516,7 @@ class Agreement(object):
             local_info['os'] = platform.system()
             local_info['lang'] = self.ar.data.lang['_preset']
             local_info['Maya'] = cmds.about(version=True)
-            local_info['dpAR'] = self.ar.dpARVersion
+            local_info['dpAR'] = self.ar.data.version
             #print(local_info)
             if local_info:
                 wh = self.ar.utils.mountWH(self.ar.data.discord_url, self.ar.pipeliner.pipeData['h000_location'])

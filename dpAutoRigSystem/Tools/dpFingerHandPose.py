@@ -107,12 +107,13 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
                             cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=-1, value=45)
                             cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=0, value=0)
                             cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=1, value=-10)
-            currentDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
-            newDrivenKeyList = currentDrivenKeyList
-            if self.oldDrivenKeyList:
-                newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))
-            self.toIDList.extend(newDrivenKeyList)
-            self.ar.customAttr.addAttr(0, self.toIDList) #dpID
-            if self.ar.data.ui_state: #verbose
-                cmds.select(handCtrlList)
-                self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)
+                if handCtrlList:
+                    currentDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+                    newDrivenKeyList = currentDrivenKeyList
+                    if self.oldDrivenKeyList:
+                        newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))
+                    self.toIDList.extend(newDrivenKeyList)
+                    self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+                    if self.ar.data.ui_state: #verbose
+                        cmds.select(handCtrlList)
+                        self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)

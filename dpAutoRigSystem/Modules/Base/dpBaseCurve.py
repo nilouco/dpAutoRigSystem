@@ -63,7 +63,7 @@ class BaseCurve(object):
             cmds.addAttr(cvNode, longName="dpGuide", attributeType='bool')
             cmds.setAttr(cvNode+".dpGuide", 1)
         cmds.addAttr(cvNode, longName="version", dataType='string')
-        cmds.setAttr(cvNode+".version", self.ar.dpARVersion, type="string")
+        cmds.setAttr(cvNode+".version", self.ar.data.version, type="string")
         if self.cvID:
             cmds.addAttr(cvNode, longName="controlID", dataType='string')
             cmds.setAttr(cvNode+".controlID", self.cvID, type="string")

@@ -153,7 +153,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
         oldName = cmds.getAttr(self.net+".name")
         if not name:
             if self.ar.data.ui_state:
-                name = cmds.textFieldGrp(self.nameTFG, query=True, text=True)
+                name = cmds.textFieldGrp("nameTFG", query=True, text=True)
         if name:
             name = self.ar.utils.resolveName(name, self.netSuffix)[0]
             self.renameLinkedNodes(oldName, name)
@@ -161,8 +161,8 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
             self.net = cmds.rename(self.net, self.net.replace(oldName, name))
             if self.ar.data.ui_state:
                 self.populateNetUI()
-                #self.actualizeEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
-                cmds.textFieldGrp(self.nameTFG, label=self.ar.data.lang['m006_name'], edit=True, text=name)
+                self.actualizeEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
+                #cmds.textFieldGrp("nameTFG", label=self.ar.data.lang['m006_name'], edit=True, text=name)
         return name
 
 
@@ -257,7 +257,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                 self.selectedLayout = cmds.columnLayout('selectedLayout', adjustableColumn=True, parent=self.editSelectedNetLayout)
                 self.nameLayout = cmds.rowLayout('nameLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
                 currentName = cmds.getAttr(self.net+".name")
-                self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.ar.data.lang['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
+                cmds.textFieldGrp("nameTFG", label=self.ar.data.lang['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
                 self.delete_BT = cmds.button('delete_BT', label=self.ar.data.lang['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
                 # type:
                 self.typeLayout = cmds.rowLayout('typeLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
