@@ -167,7 +167,7 @@ class BaseStandard(object):
         # delete the guide module:
         self.utils.clearNodeGrp(self.moduleGrp, 'guideBase', unparent=True)
         # clear default 'dpAR_GuideMirror_Grp':
-        self.utils.clearNodeGrp()
+        #self.utils.clearNodeGrp()
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
