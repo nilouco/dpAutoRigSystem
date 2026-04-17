@@ -10,7 +10,7 @@ DESCRIPTION = "m255_oneSkeletonDesc"
 ICON = "/Icons/dp_oneSkeleton.png"
 WIKI = "06-‐-Tools#-one-skeleton"
 
-DP_ONESKELETON_VERSION = 1.02
+DP_ONESKELETON_VERSION = 1.03
 
 
 class OneSkeleton(object):
@@ -49,7 +49,7 @@ class OneSkeleton(object):
             return None
 
 
-    def createOneSkeleton(self, root=None, *args):
+    def createOneSkeleton(self, root=None, hierarchy=True, *args):
         """ Create one skeleton hierarchy using the given name as a root joint name or use the default root name.
         """
         if not root:
@@ -60,8 +60,11 @@ class OneSkeleton(object):
                 self.createRootJoint(root)
             newJointList = self.transferJoint(uniqueInfList)
             if newJointList:
-                newJointList.sort()
-                cmds.parent(newJointList, root)
+                #newJointList.sort()
+                if hierarchy:
+                    self.mountHierarchy(newJointList, root)
+                else:
+                    cmds.parent(newJointList, root)
                 cmds.select(root)
             self.ctrls.setControllerScaleCompensate(False)
             self.utils.setProgress(endIt=True)
@@ -178,3 +181,93 @@ class OneSkeleton(object):
         cmds.joint(name=root, scaleCompensate=False)
         cmds.setAttr(root+".visibility", 0)
         self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)
+
+
+    def mountHierarchy(self, joints, root, *args):
+        hierarchyData = self.getHierarchyData()
+        for item in hierarchyData.keys():
+            if cmds.objExists(self.prefix+item+self.suffix):
+                for p, parent in enumerate(hierarchyData[item]):
+                    if cmds.objExists(self.prefix+hierarchyData[item][p]+self.suffix):
+                        cmds.parent(self.prefix+item+self.suffix, self.prefix+hierarchyData[item][p]+self.suffix)
+                        break
+                    else:
+                        cmds.parent(self.prefix+item+self.suffix, root)
+            joints.remove(self.prefix+item+self.suffix)
+        cmds.parent(joints, root)
+
+
+    def getHierarchyData(self, *args):
+        data = {
+                "Arm_00_Clavicle_Jar" : ["Arm_00_Clavicle_Jnt"],
+                "Arm_01_Shoulder_Jar" : ["Arm_00_Clavicle_Jnt"],
+                "Arm_02_Jnt" : ["Arm_01_Shoulder_Jar"],
+                "Arm_03_Jnt" : ["Arm_02_Jnt"],
+                "Arm_04_Jnt" : ["Arm_03_Jnt"],
+                "Arm_05_Jnt" : ["Arm_04_Jnt"],
+                "Arm_06_Jnt" : ["Arm_05_Jnt"],
+                "Arm_07_Elbow_Jar" : ["Arm_06_Jnt"],
+                "Arm_08_Jnt" : ["Arm_07_Elbow_Jar"],
+                "Arm_09_Jnt" : ["Arm_08_Jnt"],
+                "Arm_10_Jnt" : ["Arm_09_Jnt"],
+                "Arm_11_Jnt" : ["Arm_10_Jnt"],
+                "Arm_12_Jnt" : ["Arm_11_Jnt"],
+                "Arm_13_Wrist_Jnt" : ["Arm_12_Jnt"],
+                "Arm_13_Wrist_Jar" : ["Arm_13_Wrist_Jnt", "Arm_12_Jnt"],
+                "Finger_Thumb_00_Jnt" : ["Arm_13_Wrist_Jar", "Arm_13_Wrist_Jnt"],
+                "Finger_Thumb_01_Jnt" : ["Finger_Thumb_00_Jnt"],
+                "Finger_Thumb_01_Jar" : ["Finger_Thumb_01_Jnt"],
+                "Finger_Thumb_02_Jnt" : ["Finger_Thumb_01_Jar", "Finger_Thumb_01_Jnt"],
+                "Finger_Thumb_02_Jar" : ["Finger_Thumb_02_Jnt"],
+                "Finger_Index_00_Jnt" : ["Arm_13_Wrist_Jar", "Arm_13_Wrist_Jnt"],
+                "Finger_Index_01_Jnt" : ["Finger_Index_00_Jnt"],
+                "Finger_Index_01_Jar" : ["Finger_Index_01_Jnt"],
+                "Finger_Index_02_Jnt" : ["Finger_Index_01_Jar", "Finger_Index_01_Jnt"],
+                "Finger_Index_02_Jar" : ["Finger_Index_02_Jnt"],
+                "Finger_Index_03_Jnt" : ["Finger_Index_02_Jar", "Finger_Index_02_Jnt"],
+                "Finger_Index_03_Jar" : ["Finger_Index_03_Jnt"],
+                "Finger_Middle_00_Jnt" : ["Arm_13_Wrist_Jar", "Arm_13_Wrist_Jnt"],
+                "Finger_Middle_01_Jnt" : ["Finger_Middle_00_Jnt"],
+                "Finger_Middle_01_Jar" : ["Finger_Middle_01_Jnt"],
+                "Finger_Middle_02_Jnt" : ["Finger_Middle_01_Jar", "Finger_Middle_01_Jnt"],
+                "Finger_Middle_02_Jar" : ["Finger_Middle_02_Jnt"],
+                "Finger_Middle_03_Jnt" : ["Finger_Middle_02_Jar", "Finger_Middle_02_Jnt"],
+                "Finger_Middle_03_Jar" : ["Finger_Middle_03_Jnt"],
+                "Finger_Ring_00_Jnt" : ["Arm_13_Wrist_Jar", "Arm_13_Wrist_Jnt"],
+                "Finger_Ring_01_Jnt" : ["Finger_Ring_00_Jnt"],
+                "Finger_Ring_01_Jar" : ["Finger_Ring_01_Jnt"],
+                "Finger_Ring_02_Jnt" : ["Finger_Ring_01_Jar", "Finger_Ring_01_Jnt"],
+                "Finger_Ring_02_Jar" : ["Finger_Ring_02_Jnt"],
+                "Finger_Ring_03_Jnt" : ["Finger_Ring_02_Jar", "Finger_Ring_02_Jnt"],
+                "Finger_Ring_03_Jar" : ["Finger_Ring_03_Jnt"],
+                "Finger_Pinky_00_Jnt" : ["Arm_13_Wrist_Jar", "Arm_13_Wrist_Jnt"],
+                "Finger_Pinky_01_Jnt" : ["Finger_Pinky_00_Jnt"],
+                "Finger_Pinky_01_Jar" : ["Finger_Pinky_01_Jnt"],
+                "Finger_Pinky_02_Jnt" : ["Finger_Pinky_01_Jar", "Finger_Pinky_01_Jnt"],
+                "Finger_Pinky_02_Jar" : ["Finger_Pinky_02_Jnt"],
+                "Finger_Pinky_03_Jnt" : ["Finger_Pinky_02_Jar", "Finger_Pinky_02_Jnt"],
+                "Finger_Pinky_03_Jar" : ["Finger_Pinky_03_Jnt"]
+                # "" : [""],
+                # "" : [""],
+                # "" : [""],
+                # "" : [""],
+                # "" : [""],
+
+        }
+
+
+        return data
+
+
+
+
+#TODO:
+# UI
+#   prefix
+#   suffix
+#   hierarchy/float joint
+# translate dic
+# sides
+# All_Grp.prefix
+# many ribbons options (joints naming, numbers)
+# 
