@@ -2710,29 +2710,29 @@ class Start(object):
                                             cmds.parent(footJnt, footJntFather)
                                             cmds.parent(footJntChildrenList, footJnt)
                                             self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
-                                        # extracting angle to avoid orientConstraint issue when uniform scaling
-                                        extractAngleMM  = cmds.createNode("multMatrix", name=ankleArticList[0]+"_ExtractAngle_MM")
-                                        extractAngleDM  = cmds.createNode("decomposeMatrix", name=ankleArticList[0]+"_ExtractAngle_DM")
-                                        extractAngleQtE = cmds.createNode("quatToEuler", name=ankleArticList[0]+"_ExtractAngle_QtE")
-                                        extractAngleMD  = cmds.createNode("multiplyDivide", name=ankleArticList[0]+"_ExtractAngle_MD")
-                                        origLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Orig_Loc")[0]
-                                        actionLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Action_Loc")[0]
-                                        cmds.matchTransform(origLoc, actionLoc, ankleArticList[2], position=True, rotation=True)
-                                        cmds.parent(origLoc, ankleArticList[2])
-                                        cmds.parent(actionLoc, footJnt)
-                                        cmds.setAttr(origLoc+".visibility", 0)
-                                        cmds.setAttr(actionLoc+".visibility", 0)
-                                        cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
-                                        cmds.connectAttr(origLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
-                                        cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
-                                        for axis in self.axisList:
-                                            cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
-                                            cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
-                                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE, origLoc, actionLoc])
+                                            # extracting angle to avoid orientConstraint issue when uniform scaling
+                                            extractAngleMM  = cmds.createNode("multMatrix", name=ankleArticList[0]+"_ExtractAngle_MM")
+                                            extractAngleDM  = cmds.createNode("decomposeMatrix", name=ankleArticList[0]+"_ExtractAngle_DM")
+                                            extractAngleQtE = cmds.createNode("quatToEuler", name=ankleArticList[0]+"_ExtractAngle_QtE")
+                                            extractAngleMD  = cmds.createNode("multiplyDivide", name=ankleArticList[0]+"_ExtractAngle_MD")
+                                            origLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Orig_Loc")[0]
+                                            actionLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Action_Loc")[0]
+                                            cmds.matchTransform(origLoc, actionLoc, ankleArticList[2], position=True, rotation=True)
+                                            cmds.parent(origLoc, ankleArticList[2])
+                                            cmds.parent(actionLoc, footJnt)
+                                            cmds.setAttr(origLoc+".visibility", 0)
+                                            cmds.setAttr(actionLoc+".visibility", 0)
+                                            cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
+                                            cmds.connectAttr(origLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
+                                            cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
+                                            cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
+                                            cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
+                                            cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
+                                            cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
+                                            for axis in self.axisList:
+                                                cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
+                                                cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
+                                            self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE, origLoc, actionLoc])
                                         if addCorrective:
                                             for netNode in ankleCorrectiveList:
                                                 if netNode:

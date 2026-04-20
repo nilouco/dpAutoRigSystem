@@ -207,6 +207,7 @@ class OneSkeleton(object):
         shoulder = self.dpUIinst.lang['c001_arm_main']
         elbow = self.dpUIinst.lang['c002_arm_corner']
         wrist = self.dpUIinst.lang['c004_arm_extrem']
+        forearm = self.dpUIinst.lang['c030_forearm']
         
         hip = self.dpUIinst.lang['c005_leg_before']
         leg = self.dpUIinst.lang['c006_leg_main']
@@ -220,13 +221,21 @@ class OneSkeleton(object):
         ring = self.dpUIinst.lang['m034_ring']
         pinky = self.dpUIinst.lang['m035_pinky']
         
+        foot = self.dpUIinst.lang['c038_foot']
+        toe = self.dpUIinst.lang['c013_revFoot_D'].capitalize()
+        
 
         # declaring result dictionary
         data = {
                 # arm
+                f"{arm}_{shoulder}_Jnt" : [f"{arm}_{clavicle}_Jnt"],
+                f"{arm}_{elbow}_Jar" : [f"{arm}_{shoulder}_Jnt"],
+                f"{arm}_{elbow}_Jnt" : [f"{arm}_{shoulder}_Jnt"],
+                f"{arm}_{forearm}_Jnt" : [f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_{wrist}_Jnt" : [f"{arm}_{forearm}_Jnt", f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt"],
                 f"{arm}_00_{clavicle}_Jar" : [f"{arm}_00_{clavicle}_Jnt"],
-                f"{arm}_00_{clavicle}_0_Jcr" : [f"{arm}_00_{clavicle}_Jnt"],
-                f"{arm}_01_{shoulder}_Jar" : [f"{arm}_00_{clavicle}_Jnt"],
+                f"{arm}_00_{clavicle}_0_Jcr" : [f"{arm}_00_{clavicle}_Jar", f"{arm}_00_{clavicle}_Jnt"],
+                f"{arm}_01_{shoulder}_Jar" : [f"{arm}_01_{shoulder}_Jnt", f"{arm}_00_{clavicle}_Jnt", f"{arm}_{shoulder}_Jnt"],
                 f"{arm}_{shoulder}_0_Jcr" : [f"{arm}_01_{shoulder}_Jar"],
                 f"{arm}_{shoulder}_1_Jcr" : [f"{arm}_01_{shoulder}_Jar"],
                 f"{arm}_02_Jnt" : [f"{arm}_01_{shoulder}_Jar"],
@@ -276,14 +285,14 @@ class OneSkeleton(object):
                 f"{arm}_17_{wrist}_3_Jcr" : [f"{arm}_17_{wrist}_Jar"],
                 
                 # fingers
-                f"{finger}_{thumb}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt"],
+                f"{finger}_{thumb}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{thumb}_01_Jnt" : [f"{finger}_{thumb}_00_Jnt"],
                 f"{finger}_{thumb}_01_Jar" : [f"{finger}_{thumb}_01_Jnt"],
                 f"{finger}_{thumb}_01_0_Jcr" : [f"{finger}_{thumb}_01_Jar"],
                 f"{finger}_{thumb}_02_Jnt" : [f"{finger}_{thumb}_01_Jar", f"{finger}_{thumb}_01_Jnt"],
                 f"{finger}_{thumb}_02_Jar" : [f"{finger}_{thumb}_02_Jnt"],
                 f"{finger}_{thumb}_02_0_Jcr" : [f"{finger}_{thumb}_02_Jar"],
-                f"{finger}_{index}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt"],
+                f"{finger}_{index}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{index}_01_Jnt" : [f"{finger}_{index}_00_Jnt"],
                 f"{finger}_{index}_01_Jar" : [f"{finger}_{index}_01_Jnt"],
                 f"{finger}_{index}_01_0_Jcr" : [f"{finger}_{index}_01_Jar"],
@@ -293,7 +302,7 @@ class OneSkeleton(object):
                 f"{finger}_{index}_03_Jnt" : [f"{finger}_{index}_02_Jar", f"{finger}_{index}_02_Jnt"],
                 f"{finger}_{index}_03_Jar" : [f"{finger}_{index}_03_Jnt"],
                 f"{finger}_{index}_03_0_Jcr" : [f"{finger}_{index}_03_Jar"],
-                f"{finger}_{middle}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt"],
+                f"{finger}_{middle}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{middle}_01_Jnt" : [f"{finger}_{middle}_00_Jnt"],
                 f"{finger}_{middle}_01_Jar" : [f"{finger}_{middle}_01_Jnt"],
                 f"{finger}_{middle}_01_0_Jcr" : [f"{finger}_{middle}_01_Jar"],
@@ -303,7 +312,7 @@ class OneSkeleton(object):
                 f"{finger}_{middle}_03_Jnt" : [f"{finger}_{middle}_02_Jar", f"{finger}_{middle}_02_Jnt"],
                 f"{finger}_{middle}_03_Jar" : [f"{finger}_{middle}_03_Jnt"],
                 f"{finger}_{middle}_03_0_Jcr" : [f"{finger}_{middle}_03_Jar"],
-                f"{finger}_{ring}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt"],
+                f"{finger}_{ring}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{ring}_01_Jnt" : [f"{finger}_{ring}_00_Jnt"],
                 f"{finger}_{ring}_01_Jar" : [f"{finger}_{ring}_01_Jnt"],
                 f"{finger}_{ring}_01_0_Jcr" : [f"{finger}_{ring}_01_Jar"],
@@ -313,7 +322,7 @@ class OneSkeleton(object):
                 f"{finger}_{ring}_03_Jnt" : [f"{finger}_{ring}_02_Jar", f"{finger}_{ring}_02_Jnt"],
                 f"{finger}_{ring}_03_Jar" : [f"{finger}_{ring}_03_Jnt"],
                 f"{finger}_{ring}_03_0_Jcr" : [f"{finger}_{ring}_03_Jar"],
-                f"{finger}_{pinky}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt"],
+                f"{finger}_{pinky}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{pinky}_01_Jnt" : [f"{finger}_{pinky}_00_Jnt"],
                 f"{finger}_{pinky}_01_Jar" : [f"{finger}_{pinky}_01_Jnt"],
                 f"{finger}_{pinky}_01_0_Jcr" : [f"{finger}_{pinky}_01_Jar"],
@@ -325,9 +334,13 @@ class OneSkeleton(object):
                 f"{finger}_{pinky}_03_0_Jcr" : [f"{finger}_{pinky}_03_Jar"],
 
                 # leg
+                f"{leg}_{leg}_Jnt" : [f"{leg}_{hip}_Jnt"],
+                f"{leg}_{knee}_Jar" : [f"{leg}_{leg}_Jnt"],
+                f"{leg}_{knee}_Jnt" : [f"{leg}_{leg}_Jnt"],
+                f"{leg}_{ankle}_Jnt" : [f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt"],
                 f"{leg}_00_{hip}_Jar" : [f"{leg}_00_{hip}_Jnt"],
-                f"{leg}_00_{hip}_0_Jcr" : [f"{leg}_00_{hip}_Jnt"],
-                f"{leg}_01_{leg}_Jar" : [f"{leg}_00_{hip}_Jnt"],
+                f"{leg}_00_{hip}_0_Jcr" : [f"{leg}_00_{hip}_Jar", f"{leg}_00_{hip}_Jnt"],
+                f"{leg}_01_{leg}_Jar" : [f"{leg}_00_{leg}_Jnt", f"{leg}_00_{hip}_Jnt", f"{leg}_{leg}_Jnt"],
                 f"{leg}_{leg}_0_Jcr" : [f"{leg}_01_{leg}_Jar"],
                 f"{leg}_{leg}_1_Jcr" : [f"{leg}_01_{leg}_Jar"],
                 f"{leg}_02_Jnt" : [f"{leg}_01_{leg}_Jar"],
@@ -374,12 +387,35 @@ class OneSkeleton(object):
                 f"{leg}_17_{ankle}_0_Jcr" : [f"{leg}_17_{ankle}_Jar"],
                 f"{leg}_17_{ankle}_1_Jcr" : [f"{leg}_17_{ankle}_Jar"],
                 f"{leg}_17_{ankle}_2_Jcr" : [f"{leg}_17_{ankle}_Jar"],
-                f"{leg}_17_{ankle}_3_Jcr" : [f"{leg}_17_{ankle}_Jar"]
-                # "" : [""],
-                # "" : [""],
-                # "" : [""],
-                # "" : [""],
-                # "" : [""],
+                f"{leg}_17_{ankle}_3_Jcr" : [f"{leg}_17_{ankle}_Jar"],
+                
+                # foot
+                f"{foot}_{ankle}_Jnt" : [f"{leg}_17_{ankle}_Jar", f"{leg}_13_{ankle}_Jar", f"{leg}_09_{ankle}_Jar", f"{leg}_17_{ankle}_Jnt", f"{leg}_13_{ankle}_Jnt", f"{leg}_09_{ankle}_Jnt", f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt"],
+                f"{foot}_{middle}_Jnt" : [f"{foot}_{ankle}_Jar", f"{foot}_{ankle}_Jnt"],
+                
+                # toes
+                f"{toe}_1_00_Jnt" : [f"{foot}_{middle}_Jar", f"{foot}_{middle}_Jnt"],
+                f"{toe}_1_01_Jnt" : [f"{toe}_1_00_Jnt"],
+                f"{toe}_1_02_Jnt" : [f"{toe}_1_01_Jnt"],
+                f"{toe}_2_00_Jnt" : [f"{foot}_{middle}_Jar", f"{foot}_{middle}_Jnt"],
+                f"{toe}_2_01_Jnt" : [f"{toe}_2_00_Jnt"],
+                f"{toe}_2_02_Jnt" : [f"{toe}_2_01_Jnt"],
+                f"{toe}_3_00_Jnt" : [f"{foot}_{middle}_Jar", f"{foot}_{middle}_Jnt"],
+                f"{toe}_3_01_Jnt" : [f"{toe}_3_00_Jnt"],
+                f"{toe}_3_02_Jnt" : [f"{toe}_3_01_Jnt"],
+                f"{toe}_4_00_Jnt" : [f"{foot}_{middle}_Jar", f"{foot}_{middle}_Jnt"],
+                f"{toe}_4_01_Jnt" : [f"{toe}_4_00_Jnt"],
+                f"{toe}_4_02_Jnt" : [f"{toe}_4_01_Jnt"],
+                f"{toe}_5_00_Jnt" : [f"{foot}_{middle}_Jar", f"{foot}_{middle}_Jnt"],
+                f"{toe}_5_01_Jnt" : [f"{toe}_5_00_Jnt"],
+                f"{toe}_5_02_Jnt" : [f"{toe}_5_01_Jnt"]
+
+                # f"{}" : [f"{}"],
+                # f"{}" : [f"{}"],
+                # f"{}" : [f"{}"],
+                # f"{}" : [f"{}"],
+                # f"{}" : [f"{}"],
+                
 
         }
 
@@ -394,8 +430,17 @@ class OneSkeleton(object):
 #   prefix
 #   suffix
 #   hierarchy/float joint
-# translate dic
-# sides
 # All_Grp.prefix
 # many ribbons options (joints naming, numbers)
 # 
+# Foot
+# Head
+# Spine
+# Tweak
+# Nose
+# Ear
+# Tongue
+# Teeth
+# Eye
+# Toes
+#
