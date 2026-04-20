@@ -186,6 +186,7 @@ class OneSkeleton(object):
 
     def mount_hierarchy(self, joints, root, *args):
         hierarchy_data = self.get_hierarchy_data()
+        integration_data = self.get_integration_data()
         for side in self.sides:
             for item in hierarchy_data.keys():
                 if cmds.objExists(f"{self.prefix}{side}{item}{self.suffix}"):
@@ -193,6 +194,10 @@ class OneSkeleton(object):
                         if cmds.objExists(f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}"):
                             cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}")
                             break
+                        elif item in integration_data.keys():
+                            if cmds.objExists(f"{self.prefix}{integration_data[item][p]}{self.suffix}"):
+                                cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{integration_data[item][p]}{self.suffix}")
+                                break
                         else:
                             cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", root)
                 if f"{self.prefix}{side}{item}{self.suffix}" in joints:
@@ -201,7 +206,7 @@ class OneSkeleton(object):
 
 
     def get_hierarchy_data(self, *args):
-        # getting names
+        # getting default names
         arm = self.dpUIinst.lang['c037_arm']
         clavicle = self.dpUIinst.lang['c000_arm_before']
         shoulder = self.dpUIinst.lang['c001_arm_main']
@@ -227,6 +232,47 @@ class OneSkeleton(object):
         back = self.dpUIinst.lang['c057_back']
         front = self.dpUIinst.lang['c056_front']
         
+        spine = self.dpUIinst.lang['m011_spine']
+        base = self.dpUIinst.lang['c106_base']
+        tip = self.dpUIinst.lang['c120_tip']
+        hips = self.dpUIinst.lang['c027_hips']
+        chest = self.dpUIinst.lang['c028_chest']
+        
+        neck = self.dpUIinst.lang['c023_neck']
+        head = self.dpUIinst.lang['c024_head']
+        jaw = self.dpUIinst.lang['c025_jaw']
+        chin = self.dpUIinst.lang['c026_chin']
+        chew = self.dpUIinst.lang['c048_chew']
+        upper = self.dpUIinst.lang['c044_upper']
+        lower = self.dpUIinst.lang['c045_lower']
+        lip = self.dpUIinst.lang['c039_lip']
+        corner = self.dpUIinst.lang['c043_corner']
+        
+        upper_teeth = self.dpUIinst.lang['m075_upperTeeth']
+        lower_teeth = self.dpUIinst.lang['m076_lowerTeeth']
+        tongue = self.dpUIinst.lang['m077_tongue']
+        ear = self.dpUIinst.lang['m040_ear']
+        
+        nose = self.dpUIinst.lang['m078_nose']
+        nostril = self.dpUIinst.lang['m079_nostril']
+        bottom = self.dpUIinst.lang['c100_bottom']
+        
+        eye = self.dpUIinst.lang['c036_eye']
+        eyelid = self.dpUIinst.lang['c042_eyelid']
+        pupil = self.dpUIinst.lang['i081_pupil']
+        iris = self.dpUIinst.lang['i080_iris']
+        
+        breath = self.dpUIinst.lang['c095_breath']
+        belly = self.dpUIinst.lang['c096_belly']
+
+        tail = self.dpUIinst.lang['m039_tail']
+        
+        tweaks = self.dpUIinst.lang['m081_tweaks']
+        eyebrow = self.dpUIinst.lang['c041_eyebrow']
+        squint = self.dpUIinst.lang['c054_squint']
+        cheek = self.dpUIinst.lang['c055_cheek']
+        main = self.dpUIinst.lang['c058_main']
+        holder = self.dpUIinst.lang['c046_holder']
 
         # declaring result dictionary
         data = {
@@ -872,20 +918,229 @@ class OneSkeleton(object):
                 f"{leg}{front}_16_03_Jad" : [f"{leg}{front}_16_Jnt"],
                 f"{leg}{front}_16_04_Jad" : [f"{leg}{front}_16_Jnt"],
 
-                # f"{}" : [f"{}"],
-                # f"{}" : [f"{}"],
-                # f"{}" : [f"{}"],
-                # f"{}" : [f"{}"],
-                # f"{}" : [f"{}"],
+                # spine
+                f"{spine}_01_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{spine}_02_Jnt" : [f"{spine}_01_Jnt"],
+                f"{spine}_03_Jnt" : [f"{spine}_02_Jnt"],
+                f"{spine}_04_Jnt" : [f"{spine}_03_Jnt"],
+                f"{spine}_05_Jnt" : [f"{spine}_04_Jnt"],
+                f"{spine}_06_Jnt" : [f"{spine}_05_Jnt"],
+                f"{spine}_04_{tip}_Jnt" : [f"{spine}_03_Jnt"],
+                f"{spine}_04_{chest}_Jnt" : [f"{spine}_03_Jnt"],
+                f"{spine}_05_{tip}_Jnt" : [f"{spine}_04_Jnt"],
+                f"{spine}_05_{chest}_Jnt" : [f"{spine}_04_Jnt"],
+                f"{spine}_06_{tip}_Jnt" : [f"{spine}_05_Jnt"],
+                f"{spine}_06_{chest}_Jnt" : [f"{spine}_05_Jnt"],
+                f"{spine}_07_{tip}_Jnt" : [f"{spine}_06_Jnt"],
+                f"{spine}_07_{chest}_Jnt" : [f"{spine}_06_Jnt"],
+
+                # head
+                f"{head}_{neck}_00_Jnt" : [f"{spine}_04_{chest}_Jnt", f"{spine}_04_{tip}_Jnt", f"{spine}_05_{chest}_Jnt", f"{spine}_05_{tip}_Jnt", f"{spine}_06_{chest}_Jnt", f"{spine}_06_{tip}_Jnt", f"{spine}_05_{chest}_Jnt", f"{spine}_05_{tip}_Jnt"],
+                f"{head}_{neck}_00_Jar" : [f"{head}_{neck}_00_Jnt"],
+                f"{head}_{neck}_01_Jnt" : [f"{head}_{neck}_00_Jnt"],
+                f"{head}_{neck}_01_Jar" : [f"{head}_{neck}_01_Jnt"],
+                f"{head}_{neck}_02_Jnt" : [f"{head}_{neck}_01_Jnt"],
+                f"{head}_{neck}_02_Jar" : [f"{head}_{neck}_02_Jnt"],
+                f"{head}_{neck}_03_Jnt" : [f"{head}_{neck}_02_Jnt"],
+                f"{head}_{neck}_03_Jar" : [f"{head}_{neck}_03_Jnt"],
+                f"{head}_{neck}_04_Jnt" : [f"{head}_{neck}_03_Jnt"],
+                f"{head}_{neck}_04_Jar" : [f"{head}_{neck}_04_Jnt"],
+                f"{head}_{neck}_05_Jnt" : [f"{head}_{neck}_04_Jnt"],
+                f"{head}_{neck}_05_Jar" : [f"{head}_{neck}_05_Jnt"],
+                f"{head}_{neck}_06_Jnt" : [f"{head}_{neck}_05_Jnt"],
+                f"{head}_{neck}_06_Jar" : [f"{head}_{neck}_06_Jnt"],
+                f"{head}_{neck}_07_Jnt" : [f"{head}_{neck}_06_Jnt"],
+                f"{head}_{neck}_07_Jar" : [f"{head}_{neck}_07_Jnt"],
+                f"{head}_01_{head}_Jnt" : [f"{head}_{neck}_07_Jar", f"{head}_{neck}_07_Jnt", f"{head}_{neck}_06_Jar", f"{head}_{neck}_06_Jnt", f"{head}_{neck}_05_Jar", f"{head}_{neck}_05_Jnt", f"{head}_{neck}_04_Jar", f"{head}_{neck}_04_Jnt", f"{head}_{neck}_03_Jar", f"{head}_{neck}_03_Jnt", f"{head}_{neck}_02_Jar", f"{head}_{neck}_02_Jnt", f"{head}_{neck}_01_Jar", f"{head}_{neck}_01_Jnt", f"{head}_{neck}_00_Jar", f"{head}_{neck}_00_Jnt"],
+                f"{head}_01_{head}_Jar" : [f"{head}_01_{head}_Jnt"],
+                f"{head}_02_{head}_Jnt" : [f"{head}_01_{head}_Jar", f"{head}_01_{head}_Jnt"],
+                f"{head}_02_{head}_Jar" : [f"{head}_02_{head}_Jnt"],
+                f"{head}_{upper}{jaw}_Jnt" : [f"{head}_01_{head}_Jar", f"{head}_01_{head}_Jnt"],
+                f"{head}_{upper}{head}_Jnt" : [f"{head}_{upper}{jaw}_Jnt"],
+                f"{head}_{upper}{lip}_Jnt" : [f"{head}_{upper}{jaw}_Jnt"],
+                f"{head}_{jaw}_Jnt" : [f"{head}_01_{head}_Jar", f"{head}_01_{head}_Jnt"],
+                f"{head}_{chin}_Jnt" : [f"{head}_{jaw}_Jnt"],
+                f"{head}_{lower}{lip}_Jnt" : [f"{head}_{jaw}_Jnt"],
+                f"{head}_L_{corner}{lip}_Jnt" : [f"{head}_{jaw}_Jnt"],
+                f"{head}_R_{corner}{lip}_Jnt" : [f"{head}_{jaw}_Jnt"],
+                f"{head}_E_{corner}{lip}_Jnt" : [f"{head}_{jaw}_Jnt"],
+                f"{head}_D_{corner}{lip}_Jnt" : [f"{head}_{jaw}_Jnt"],
+                f"{head}_{chew}_Jnt" : [f"{head}_{chin}_Jnt"],
+
+                # nose
+                f"{nose}_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{nose}_00_Jar" : [f"{nose}_00_Jnt"],
+                f"{nose}_01_Jnt" : [f"{nose}_00_Jar", f"{nose}_00_Jnt"],
+                f"{nose}_01_Jar" : [f"{nose}_01_Jnt"],
+                f"{nose}_02_{middle}_Jnt" : [f"{nose}_01_Jar", f"{nose}_01_Jnt"],
+                f"{nose}_02_{middle}_Jar" : [f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_03_{tip}_Jnt" : [f"{nose}_02_{middle}_Jar", f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_03_{bottom}_Jnt" : [f"{nose}_02_{middle}_Jar", f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_04_L_Side_Jnt" : [f"{nose}_02_{middle}_Jar", f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_04_R_Side_Jnt" : [f"{nose}_02_{middle}_Jar", f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_04_E_Side_Jnt" : [f"{nose}_02_{middle}_Jar", f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_04_D_Side_Jnt" : [f"{nose}_02_{middle}_Jar", f"{nose}_02_{middle}_Jnt"],
+                f"{nose}_05_L_{nostril}_Jnt" : [f"{nose}_04_L_Side_Jar", f"{nose}_04_L_Side_Jnt"],
+                f"{nose}_05_R_{nostril}_Jnt" : [f"{nose}_04_R_Side_Jar", f"{nose}_04_R_Side_Jnt"],
+                f"{nose}_05_E_{nostril}_Jnt" : [f"{nose}_04_E_Side_Jar", f"{nose}_04_E_Side_Jnt"],
+                f"{nose}_05_D_{nostril}_Jnt" : [f"{nose}_04_D_Side_Jar", f"{nose}_04_D_Side_Jnt"],
                 
+                # ear
+                f"{ear}_01_Jnt" : [f"{ear}_00_Jnt"],
+                f"{ear}_02_Jnt" : [f"{ear}_01_Jnt"],
+                f"{upper}{ear}_00_Jnt" : [f"{ear}_01_Jnt"],
+                f"{lower}{ear}_00_Jnt" : [f"{ear}_01_Jnt"],
 
+                # tongue
+                f"{tongue}_00_Jnt" : [f"{head}_{chin}_Jnt"],
+                f"{tongue}_01_Jnt" : [f"{tongue}_00_Jnt"],
+                f"{tongue}_02_Jnt" : [f"{tongue}_01_Jnt"],
+                f"{tongue}_03_Jnt" : [f"{tongue}_02_Jnt"],
+                f"{tongue}_04_Jnt" : [f"{tongue}_03_Jnt"],
+
+                # teeth
+                f"{upper_teeth}_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_teeth}_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_teeth}{middle}_00_Jnt" : [f"{upper_teeth}_00_Jnt", f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_teeth}{middle}_00_Jnt" : [f"{lower_teeth}_00_Jnt", f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                
+                # eye
+                f"{eye}_1_Jnt" : [f"{eye}Base_1_Jnt"],
+                f"{eye}Scale_1_Jnt" : [f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_{iris}_1_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_{pupil}_1_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_{upper}_{eyelid}_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_{lower}_{eyelid}_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_{upper}_{eyelid}{middle}_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_{lower}_{eyelid}{middle}_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+
+                # singles
+                f"{breath}_Jnt" : [f"{spine}_04_{chest}_Jnt", f"{spine}_04_{tip}_Jnt", f"{spine}_05_{chest}_Jnt", f"{spine}_05_{tip}_Jnt", f"{spine}_06_{chest}_Jnt", f"{spine}_06_{tip}_Jnt", f"{spine}_05_{chest}_Jnt", f"{spine}_05_{tip}_Jnt"],
+                f"{belly}_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+
+                # tail
+                f"{tail}{base}_00_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{tail}_00_Jnt" : [f"{tail}{base}_00_Jnt", f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{tail}_01_Jnt" : [f"{tail}_00_Jnt"],
+                f"{tail}_02_Jnt" : [f"{tail}_01_Jnt"],
+                f"{tail}_03_Jnt" : [f"{tail}_02_Jnt"],
+                f"{tail}_04_Jnt" : [f"{tail}_03_Jnt"],
+                f"{tail}_05_Jnt" : [f"{tail}_04_Jnt"],
+                f"{tail}_06_Jnt" : [f"{tail}_05_Jnt"],
+                f"{tail}_07_Jnt" : [f"{tail}_06_Jnt"],
+                f"{tail}_08_Jnt" : [f"{tail}_07_Jnt"],
+                f"{tail}_09_Jnt" : [f"{tail}_08_Jnt"],
+                f"{tail}_10_Jnt" : [f"{tail}_09_Jnt"],
+
+                # tweaks
+                f"{tweaks}_{squint}_01_Jnt" : [f"{tweaks}_{squint}_{main}_Jnt"],
+                f"{tweaks}_{squint}_02_Jnt" : [f"{tweaks}_{squint}_{main}_Jnt"],
+                f"{tweaks}_{squint}_03_Jnt" : [f"{tweaks}_{squint}_{main}_Jnt"],
+                f"{tweaks}_{eyebrow}_01_Jnt" : [f"{tweaks}_{eyebrow}_{main}_Jnt"],
+                f"{tweaks}_{eyebrow}_02_Jnt" : [f"{tweaks}_{eyebrow}_{main}_Jnt"],
+                f"{tweaks}_{eyebrow}_03_Jnt" : [f"{tweaks}_{eyebrow}_{main}_Jnt"],
+                f"{tweaks}_{eyebrow}_04_Jnt" : [f"{tweaks}_{eyebrow}_{main}_Jnt"],
+                f"{tweaks}_{middle}_{eyebrow}_Jnt" : [f"{head}_{upper}{head}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{tweaks}_{holder}_{main}_Jnt" : [f"{head}_01_{head}_Jnt"],
+
+                # to be integrated after
+                f"{leg}_{hip}_Jnt" : [""],
+                f"{leg}{back}_{hip}_Jnt" : [""],
+                f"{leg}{front}_{hip}_Jnt" : [""],
+                f"{arm}_{clavicle}_Jnt" : [""],
+                f"{leg}_00_{hip}_Jnt" : [""],
+                f"{leg}{back}_00_{hip}_Jnt" : [""],
+                f"{leg}{front}_00_{hip}_Jnt" : [""],
+                f"{arm}_00_{clavicle}_Jnt" : [""],
+                f"{ear}_00_Jnt" : [f"{ear}{base}_00_Jnt"],
+                f"{ear}{base}_00_Jnt" : [""],
+                f"{upper_teeth}Side_00_Jnt" : [""],
+                f"{lower_teeth}Side_00_Jnt" : [""],
+                f"{eye}_1_Jnt" : [""],
+                f"{tweaks}_{squint}_{main}_Jnt" : [""],
+                f"{tweaks}_{cheek}_01_Jnt" : [""],
+                f"{tweaks}_{cheek}_02_Jnt" : [""],
+                f"{tweaks}_{eyebrow}_{main}_Jnt" : [""],
+                f"{tweaks}_{lip}_{main}_Jnt" : [""],
+                f"{tweaks}_{upper}_{lip}_00_Jnt" : [""],
+                f"{tweaks}_{upper}_{lip}_01_Jnt" : [""],
+                f"{tweaks}_{upper}_{lip}_02_Jnt" : [""],
+                f"{tweaks}_{corner}_{lip}_Jnt" : [""],
+                f"{tweaks}_{lower}_{lip}_00_Jnt" : [""],
+                f"{tweaks}_{lower}_{lip}_01_Jnt" : [""],
+                f"{tweaks}_{lower}_{lip}_02_Jnt" : [""],
         }
-
-
         return data
 
 
+    def get_integration_data(self, *args):
+        # getting default names
+        middle = self.dpUIinst.lang['m033_middle']
 
+        arm = self.dpUIinst.lang['c037_arm']
+        clavicle = self.dpUIinst.lang['c000_arm_before']
+        hip = self.dpUIinst.lang['c005_leg_before']
+        leg = self.dpUIinst.lang['c006_leg_main']
+        back = self.dpUIinst.lang['c057_back']
+        front = self.dpUIinst.lang['c056_front']
+        spine = self.dpUIinst.lang['m011_spine']
+        base = self.dpUIinst.lang['c106_base']
+        tip = self.dpUIinst.lang['c120_tip']
+        hips = self.dpUIinst.lang['c027_hips']
+        chest = self.dpUIinst.lang['c028_chest']
+        
+        head = self.dpUIinst.lang['c024_head']
+        upper = self.dpUIinst.lang['c044_upper']
+        jaw = self.dpUIinst.lang['c025_jaw']
+        
+        upper_teeth = self.dpUIinst.lang['m075_upperTeeth']
+        lower_teeth = self.dpUIinst.lang['m076_lowerTeeth']
+        ear = self.dpUIinst.lang['m040_ear']
+        eye = self.dpUIinst.lang['c036_eye']
+
+        tweaks = self.dpUIinst.lang['m081_tweaks']
+        eyebrow = self.dpUIinst.lang['c041_eyebrow']
+        squint = self.dpUIinst.lang['c054_squint']
+        cheek = self.dpUIinst.lang['c055_cheek']
+        main = self.dpUIinst.lang['c058_main']
+        lower = self.dpUIinst.lang['c045_lower']
+        lip = self.dpUIinst.lang['c039_lip']
+        corner = self.dpUIinst.lang['c043_corner']
+        
+        # declaring result dictionary
+        data = {
+                # integrations modules
+                # limb
+                f"{leg}_{hip}_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{leg}{back}_{hip}_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{leg}{front}_{hip}_Jnt" : [f"{spine}_04_{tip}_Jnt", f"{spine}_04_{chest}_Jnt"],
+                f"{arm}_{clavicle}_Jnt" : [f"{spine}_04_{tip}_Jnt", f"{spine}_04_{chest}_Jnt"],
+                f"{leg}_00_{hip}_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{leg}{back}_00_{hip}_Jnt" : [f"{spine}_00_{base}_Jnt", f"{spine}_00_{hips}_Jnt"],
+                f"{leg}{front}_00_{hip}_Jnt" : [f"{spine}_04_{tip}_Jnt", f"{spine}_04_{chest}_Jnt"],
+                f"{arm}_00_{clavicle}_Jnt" : [f"{spine}_04_{tip}_Jnt", f"{spine}_04_{chest}_Jnt"],
+                # ear
+                f"{ear}_00_Jnt" : [f"{head}_{upper}{head}_Jnt", f"{head}_1_{head}_Jnt"],
+                f"{ear}{base}_00_Jnt" : [f"{head}_{upper}{head}_Jnt", f"{head}_1_{head}_Jnt"],
+                f"{upper_teeth}Side_00_Jnt" : [f"{upper_teeth}{middle}_00_Jnt", f"{head}_1_{head}_Jnt"],
+                f"{lower_teeth}Side_00_Jnt" : [f"{lower_teeth}{middle}_00_Jnt", f"{head}_1_{head}_Jnt"],
+                # eye
+                f"{eye}_1_Jnt" : [f"{head}_{upper}{head}_Jnt", f"{head}_1_{head}_Jnt"],
+                # tweaks
+                f"{tweaks}_{cheek}_01_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{tweaks}_{cheek}_02_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{tweaks}_{squint}_{main}_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{tweaks}_{eyebrow}_{main}_Jnt" : [f"{head}_{upper}{head}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{tweaks}_{lip}_{main}_Jnt" : [f"{head}_01_{head}_Jnt"],
+                f"{tweaks}_{upper}_{lip}_00_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                f"{tweaks}_{upper}_{lip}_01_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                f"{tweaks}_{upper}_{lip}_02_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                f"{tweaks}_{corner}_{lip}_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                f"{tweaks}_{lower}_{lip}_00_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                f"{tweaks}_{lower}_{lip}_01_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                f"{tweaks}_{lower}_{lip}_02_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+        }
+        return data
 
 #TODO:
 # UI
@@ -893,16 +1148,3 @@ class OneSkeleton(object):
 #   suffix
 #   hierarchy/float joint
 # All_Grp.prefix
-# many ribbons options (joints naming, numbers)
-# 
-# Foot
-# Head
-# Spine
-# Tweak
-# Nose
-# Ear
-# Tongue
-# Teeth
-# Eye
-# Toes
-#
