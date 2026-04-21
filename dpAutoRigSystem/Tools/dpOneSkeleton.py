@@ -26,11 +26,65 @@ class OneSkeleton(object):
         self.ui = ui
         # call main UI function
         if self.ui:
-            name = self.oneSkeletonPromptDialog()
-            if name:
-                self.createOneSkeleton(name)
+            self.create_ui()
+            #name = self.oneSkeletonPromptDialog()
+            #if name:
+            #    self.createOneSkeleton(name)
+
+
+    def create_ui(self, *args):
+        # creating Window:
+        self.utils.closeUI('one_skeleton_win')
+        winWidth  = 230
+        winHeight = 230
+        cmds.window('one_skeleton_win', title=self.dpUIinst.lang["m254_oneSkeleton"]+" "+str(DP_ONESKELETON_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        # creating layout:
+        cmds.columnLayout('main_layout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='one_skeleton_win')
+        cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')
+        cmds.rowColumnLayout('naming_rcl', numberOfColumns=2, adjustableColumn=2, columnWidth=(80, 100), rowSpacing=(7, 7), parent='main_layout')
+        cmds.text('prefix_txt', label=self.dpUIinst.lang['i144_prefix'], parent='naming_rcl')
+        cmds.textField('prefix_tf', text=self.prefix, textChangedCommand=self.change_prefix, parent='naming_rcl')
+        cmds.text('root_txt', label="Root", parent='naming_rcl')
+        cmds.textField('root_tf', text=self.rootName, textChangedCommand=self.change_root, parent='naming_rcl')
+        cmds.text('suffix_txt', label=self.dpUIinst.lang['m217_suffix'], parent='naming_rcl')
+        cmds.textField('suffix_tf', text=self.suffix, textChangedCommand=self.change_suffix, parent='naming_rcl')
+        cmds.text('header_txt', label=self.dpUIinst.lang['m223_preview'], parent='naming_rcl')
+        cmds.text('preview_txt', label=f"{self.prefix}{self.rootName}{self.suffix}", font="boldLabelFont", parent='naming_rcl')
+        cmds.radioButtonGrp("skeleton_rbg", label=self.dpUIinst.lang['i138_type'], labelArray2=["Floating Joints", self.dpUIinst.lang['m216_hierarchy']], vertical=True, numberOfRadioButtons=2, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth2=(40, 100), parent="main_layout")
+        cmds.radioButtonGrp("skeleton_rbg", edit=True, select=1) #hierarchy = 1
+        cmds.button("run_one_skeleton_bt", label=self.dpUIinst.lang['i158_create'], command=self.create_by_ui, parent="main_layout")
+        cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')
+        # call Window:
+        cmds.showWindow('one_skeleton_win')
+        
+
+    def create_by_ui(self, *args):
+        joint_type = cmds.radioButtonGrp('skeleton_rbg', query=True, select=True)-1
+        self.createOneSkeleton(hierarchy=joint_type)
+        self.dpUIinst.utils.closeUI('one_skeleton_win')
+
+
+    def change_prefix(self, value, *args):
+        self.prefix = value
+        self.refresh_preview()
 
     
+    def change_root(self, value, *args):
+        self.rootName = value
+        self.refresh_preview()
+
+
+    def change_suffix(self, value, *args):
+        self.suffix = value
+        self.refresh_preview()
+
+
+    def refresh_preview(self, *args):
+        """ Reload the preview naming list and populate its UI textScrollList.
+        """
+        cmds.text('preview_txt', edit=True, label=f"{self.prefix}{self.rootName}{self.suffix}")
+    
+
     def oneSkeletonPromptDialog(self, *args):
         """ Prompt dialog to get the name of the root joint to receive all the web joints as children.
         """
@@ -54,7 +108,7 @@ class OneSkeleton(object):
         """ Create one skeleton hierarchy using the given name as a root joint name or use the default root name.
         """
         if not root:
-            root = self.rootName
+            root = f"{self.prefix}{self.rootName}{self.suffix}"
         uniqueInfList = self.getInfList(self.getMeshList())
         if uniqueInfList:
             if not cmds.objExists(root):
@@ -1141,10 +1195,3 @@ class OneSkeleton(object):
                 f"{tweaks}_{lower}_{lip}_02_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
         }
         return data
-
-#TODO:
-# UI
-#   prefix
-#   suffix
-#   hierarchy/float joint
-# All_Grp.prefix

@@ -1415,7 +1415,8 @@ class Utils(object):
                     elif cmds.attributeQuery("input1", node=item, exists=True):
                         newName = self.getCapitalsName(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
                     newName += "_"
-                    newName += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
+                    if cmds.listConnections(item+".output", plugs=True, source=False, destination=True):
+                        newName += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
                     newName += suffix
                     cmds.rename(item, newName)
 
