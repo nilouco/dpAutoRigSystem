@@ -142,6 +142,7 @@ class OneSkeleton(object):
         """ Make a duplicated joints and transfer connections and deformation to them.
             Returns the new created joint list.
         """
+        scale_constraints = []
         newJointList = []
         self.utils.setProgress(self.dpUIinst.lang['m254_oneSkeleton'], self.dpUIinst.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
         for sourceNode in sourceList:
@@ -169,24 +170,23 @@ class OneSkeleton(object):
                 cmds.setAttr(f"{newJoint}.{attr}", value)
             # Constraint to the original
             pac = cmds.parentConstraint([sourceNode, newJoint], maintainOffset=False, name=newJoint+"_PaC")[0]
-            if scale:
-                scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
-                # fixes for negative scale joints
-                parentList = cmds.listRelatives(sourceNode, parent=True)
-                if parentList:
-                    if not "_Jar" in parentList[0]:
-                        for axis in ["X", "Y", "Z"]:
-                            if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
-                                for a in ["X", "Y", "Z"]:
-                                    if not a == axis:
-                                        cmds.setAttr(scc+".offset"+a, -1)
+            scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
+            scale_constraints.append(scc)
+            # fixes for negative scale joints
+            parentList = cmds.listRelatives(sourceNode, parent=True)
+            if parentList:
+                if not "_Jar" in parentList[0]:
+                    for axis in ["X", "Y", "Z"]:
+                        if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
+                            for a in ["X", "Y", "Z"]:
+                                if not a == axis:
+                                    cmds.setAttr(scc+".offset"+a, -1)
             # corrective joints
             if "_Jcr" in newJoint:
                 for axis in ["X", "Y", "Z"]:
                     if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
                         cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
-                    if scale:
-                        cmds.setAttr(scc+".offset"+axis, 1)
+                    cmds.setAttr(scc+".offset"+axis, 1)
             # Ensure the new joint doesn't have segmentScaleCompensate enabled
             # But do allow the scale constraint to compensate
             cmds.refresh()
@@ -195,12 +195,11 @@ class OneSkeleton(object):
                 cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
             except:
                 pass
-            if scale:
-                cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
-                self.dpUIinst.customAttr.addAttr(0, [newJoint, pac, scc]) #dpID
-            else:
-                # dpIDs
-                self.dpUIinst.customAttr.addAttr(0, [newJoint, pac]) #dpID
+            cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
+            # dpIDs
+            self.dpUIinst.customAttr.addAttr(0, [newJoint, pac]) #dpID
+        if not scale:
+            cmds.delete(scale_constraints)
         return newJointList
 
 
