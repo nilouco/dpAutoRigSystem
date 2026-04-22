@@ -51,7 +51,8 @@ class OneSkeleton(object):
         cmds.text('header_txt', label=self.dpUIinst.lang['m223_preview'], parent='naming_rcl')
         cmds.text('preview_txt', label=f"{self.prefix}{self.rootName}{self.suffix}", font="boldLabelFont", parent='naming_rcl')
         cmds.radioButtonGrp("skeleton_rbg", label=self.dpUIinst.lang['i138_type'], labelArray2=["Floating Joints", self.dpUIinst.lang['m216_hierarchy']], vertical=True, numberOfRadioButtons=2, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth2=(40, 100), parent="main_layout")
-        cmds.radioButtonGrp("skeleton_rbg", edit=True, select=1) #hierarchy = 1
+        cmds.radioButtonGrp("skeleton_rbg", edit=True, select=2) #hierarchy = 2
+        cmds.checkBox("use_scale_cb", label="Scale constraint", value=False, parent="main_layout")
         cmds.button("run_one_skeleton_bt", label=self.dpUIinst.lang['i158_create'], command=self.create_by_ui, parent="main_layout")
         cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')
         # call Window:
@@ -60,7 +61,8 @@ class OneSkeleton(object):
 
     def create_by_ui(self, *args):
         joint_type = cmds.radioButtonGrp('skeleton_rbg', query=True, select=True)-1
-        self.createOneSkeleton(hierarchy=joint_type)
+        use_scale = cmds.checkBox('use_scale_cb', query=True, value=True)
+        self.createOneSkeleton(hierarchy=joint_type, scale=use_scale)
         self.dpUIinst.utils.closeUI('one_skeleton_win')
 
 
@@ -104,7 +106,7 @@ class OneSkeleton(object):
             return None
 
 
-    def createOneSkeleton(self, root=None, hierarchy=True, *args):
+    def createOneSkeleton(self, root=None, hierarchy=True, scale=True, *args):
         """ Create one skeleton hierarchy using the given name as a root joint name or use the default root name.
         """
         if not root:
@@ -113,7 +115,7 @@ class OneSkeleton(object):
         if uniqueInfList:
             if not cmds.objExists(root):
                 self.createRootJoint(root)
-            newJointList = self.transferJoint(uniqueInfList)
+            newJointList = self.transferJoint(uniqueInfList, scale)
             if newJointList:
                 #newJointList.sort()
                 if hierarchy:
@@ -136,7 +138,7 @@ class OneSkeleton(object):
         return zip_longest(fillvalue=fillvalue, *args)
 
 
-    def transferJoint(self, sourceList, *args):
+    def transferJoint(self, sourceList, scale=True, *args):
         """ Make a duplicated joints and transfer connections and deformation to them.
             Returns the new created joint list.
         """
@@ -167,22 +169,24 @@ class OneSkeleton(object):
                 cmds.setAttr(f"{newJoint}.{attr}", value)
             # Constraint to the original
             pac = cmds.parentConstraint([sourceNode, newJoint], maintainOffset=False, name=newJoint+"_PaC")[0]
-            scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
-            # fixes for negative scale joints
-            parentList = cmds.listRelatives(sourceNode, parent=True)
-            if parentList:
-                if not "_Jar" in parentList[0]:
-                    for axis in ["X", "Y", "Z"]:
-                        if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
-                            for a in ["X", "Y", "Z"]:
-                                if not a == axis:
-                                    cmds.setAttr(scc+".offset"+a, -1)
+            if scale:
+                scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
+                # fixes for negative scale joints
+                parentList = cmds.listRelatives(sourceNode, parent=True)
+                if parentList:
+                    if not "_Jar" in parentList[0]:
+                        for axis in ["X", "Y", "Z"]:
+                            if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
+                                for a in ["X", "Y", "Z"]:
+                                    if not a == axis:
+                                        cmds.setAttr(scc+".offset"+a, -1)
             # corrective joints
             if "_Jcr" in newJoint:
                 for axis in ["X", "Y", "Z"]:
                     if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
                         cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
-                    cmds.setAttr(scc+".offset"+axis, 1)
+                    if scale:
+                        cmds.setAttr(scc+".offset"+axis, 1)
             # Ensure the new joint doesn't have segmentScaleCompensate enabled
             # But do allow the scale constraint to compensate
             cmds.refresh()
@@ -191,9 +195,12 @@ class OneSkeleton(object):
                 cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
             except:
                 pass
-            cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
-            # dpIDs
-            self.dpUIinst.customAttr.addAttr(0, [newJoint, pac, scc]) #dpID
+            if scale:
+                cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
+                self.dpUIinst.customAttr.addAttr(0, [newJoint, pac, scc]) #dpID
+            else:
+                # dpIDs
+                self.dpUIinst.customAttr.addAttr(0, [newJoint, pac]) #dpID
         return newJointList
 
 
