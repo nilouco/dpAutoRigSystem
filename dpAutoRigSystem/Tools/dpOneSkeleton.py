@@ -19,7 +19,7 @@ class OneSkeleton(object):
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
         self.ctrls = dpUIinst.ctrls
-        self.prefix = "Web_"
+        self.prefix = "Engine_"
         self.rootName = "Root"
         self.suffix = "_Joint"
         self.sides = [f"{self.dpUIinst.lang['p002_left']}_", f"{self.dpUIinst.lang['p003_right']}_", ""]
@@ -240,8 +240,9 @@ class OneSkeleton(object):
         """
         cmds.select(clear=True)
         cmds.joint(name=root, scaleCompensate=False)
+        cmds.addAttr(root, longName="dpRootJoint", attributeType="bool", defaultValue=1)
         cmds.setAttr(root+".visibility", 0)
-        self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], cb=True)
+        self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
 
 
     def mount_hierarchy(self, joints, root, *args):
@@ -1101,8 +1102,8 @@ class OneSkeleton(object):
                 f"{lower_teeth}{middle}_00_Jnt" : [f"{lower_teeth}_00_Jnt", f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
                 
                 # eye
-                f"{eye}_1_Jnt" : [f"{eye}Base_1_Jnt"],
-                f"{eye}Scale_1_Jnt" : [f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
+                f"{eye}_1_Jnt" : [f"{eye}Base_1_Jnt", f"{head}_{upper}{head}_Jnt"],
+                f"{eye}Scale_1_Jnt" : [f"{eye}_1_Jnt", f"{eye}Base_1_Jnt", f"{head}_{upper}{head}_Jnt"],
                 f"{eye}_{iris}_1_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
                 f"{eye}_{pupil}_1_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
                 f"{eye}_{upper}_{eyelid}_Jnt" : [f"{eye}Scale_1_Jnt", f"{eye}_1_Jnt", f"{eye}Base_1_Jnt"],
