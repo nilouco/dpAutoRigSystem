@@ -541,7 +541,7 @@ class BaseLayout(object):
             cmds.delete(self.previewMirrorGrpName)
         
         # verify if there is not any guide module in the dpUIinst.guideMirrorGrp and then delete it:
-        self.utils.clearNodeGrp(self.dpUIinst.guideMirrorGrp, 'guideBaseMirror', unparent=False)
+        #self.utils.clearNodeGrp(self.dpUIinst.guideMirrorGrp, 'guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
         guideChildrenList = self.utils.getGuideChildrenList(self.moduleGrp)
