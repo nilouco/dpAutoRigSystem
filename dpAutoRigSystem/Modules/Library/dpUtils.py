@@ -544,19 +544,15 @@ class Utils(object):
         if cmds.objExists(nodeGrpName):
             if cmds.listRelatives(nodeGrpName, children=True, allDescendents=True, type="transform"):
                 foundChildrenList = [child for child in cmds.listRelatives(nodeGrpName, children=True, allDescendents=True, type="transform") if attrFind in cmds.listAttr(child) and cmds.getAttr(child+"."+attrFind) == 1]
-                if foundChildrenList:
-                    if unparent:
-                        fatherList = cmds.listRelatives(nodeGrpName, parent=True)
-                        for child in foundChildrenList:
-                            if nodeGrpName.split(":")[0] in cmds.listRelatives(child, parent=True)[0]:
-                                if fatherList:
-                                    cmds.parent(child, fatherList[0])
-                                else:
-                                    cmds.parent(child, world=True)
-                else:
-                    cmds.delete(nodeGrpName)
-            else:
-                cmds.delete(nodeGrpName)
+                if unparent and foundChildrenList:
+                    fatherList = cmds.listRelatives(nodeGrpName, parent=True)
+                    for child in foundChildrenList:
+                        if nodeGrpName.split(":")[0] in cmds.listRelatives(child, parent=True)[0]:
+                            if fatherList:
+                                cmds.parent(child, fatherList[0])
+                            else:
+                                cmds.parent(child, world=True)
+            cmds.delete(nodeGrpName)
 
 
     def getGuideChildrenList(self, nodeName):
