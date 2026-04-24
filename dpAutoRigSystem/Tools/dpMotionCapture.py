@@ -39,7 +39,7 @@ class MotionCapture(object):
         # creating MotionCaptureUI Window:
         self.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 280
-        mocap_winHeight = 420
+        mocap_winHeight = 470
         dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
@@ -75,6 +75,7 @@ class MotionCapture(object):
         cmds.text(label=self.lang['i292_processes'], parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['m241_prepareTPose'], annotation="prepareTPose", width=240, command=self.prepareTPose, parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.hikRetarget, parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['v032_resetPose'], annotation="resetPose", width=240, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
         # animation buttons
         cmds.separator(style='in', height=10, width=240, parent=motionCaptureMainLayout)
         cmds.text(label=self.lang['i185_animation'], parent=motionCaptureMainLayout)
@@ -766,12 +767,13 @@ class MotionCapture(object):
                 legMode   = "legIk"
         """
         ikList = []
-        if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
-            ikList.extend(["Spine", "Spine1", "Spine2"])
-        if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
-            ikList.extend(["LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand"])
-        if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
-            ikList.extend(["LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"])
+        if self.ui:
+            if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+                ikList.extend(["Spine", "Spine1", "Spine2"])
+            if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
+                ikList.extend(["LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand"])
+            if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
+                ikList.extend(["LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"])
         self.hikMapBipedControllers(ikList, rib)
 
 
@@ -810,13 +812,14 @@ class MotionCapture(object):
                     checkOutInst.verbose = False
                     checkOutInst.runAction(False) #fix
                     checkOutInst.endProgress()
+        self.utils.setProgress(endIt=True)
 
 
     def setIkFkBipedControllersByUI(self, *args):
         """ Set the ikFk attributes in the optionCtrl as the choose UI.
         """
         optCtrl = self.setCtrlMode() #fk
-        if optCtrl:
+        if optCtrl and self.ui:
             if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
                 cmds.setAttr(optCtrl+"."+self.lang['m011_spine'].lower()+"Fk", 0)
             if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
@@ -871,7 +874,7 @@ class MotionCapture(object):
         """ Set HumanIk Chest controller.
         """
         cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"A_Fk_Ctrl")
-        if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+        if self.ui and cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
             cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl")
         mel.eval('hikControlRigSelectionChangedCallback; hikCustomRigAssignEffector 1000;')
         cmds.select(clear=True)
