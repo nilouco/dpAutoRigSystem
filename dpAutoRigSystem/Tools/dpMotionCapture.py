@@ -10,7 +10,7 @@ DESCRIPTION = "m240_motionCaptureDesc"
 ICON = "/Icons/dp_motionCapture.png"
 WIKI = "06-‐-Tools#-motion-capture"
 
-DP_MOTIONCAPTURE_VERSION = 1.02
+DP_MOTIONCAPTURE_VERSION = 1.03
 
 
 class MotionCapture(object):
@@ -39,7 +39,7 @@ class MotionCapture(object):
         # creating MotionCaptureUI Window:
         self.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 280
-        mocap_winHeight = 420
+        mocap_winHeight = 470
         dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
@@ -75,6 +75,7 @@ class MotionCapture(object):
         cmds.text(label=self.lang['i292_processes'], parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['m241_prepareTPose'], annotation="prepareTPose", width=240, command=self.prepareTPose, parent=motionCaptureMainLayout)
         cmds.button(label=self.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.hikRetarget, parent=motionCaptureMainLayout)
+        cmds.button(label=self.lang['v032_resetPose'], annotation="resetPose", width=240, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
         # animation buttons
         cmds.separator(style='in', height=10, width=240, parent=motionCaptureMainLayout)
         cmds.text(label=self.lang['i185_animation'], parent=motionCaptureMainLayout)
@@ -100,10 +101,12 @@ class MotionCapture(object):
                                       "control" : self.lang['m011_spine']+"_"+self.lang['c027_hips']+"A_Ctrl"},
                 "LeftUpLeg"        : {"id"      : 2,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Jxt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftLeg"          : {"id"      : 3,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Jxt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftFoot"         : {"id"      : 4,
@@ -115,10 +118,12 @@ class MotionCapture(object):
                                       "control" : self.lang['p002_left']+"_"+self.lang['c038_foot']+"_"+self.lang['c029_middle']+"_Ctrl"},
                 "RightUpLeg"       : {"id"      : 5,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Jxt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c006_leg_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightLeg"         : {"id"      : 6,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Jxt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c006_leg_main']+"_"+self.lang['c007_leg_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightFoot"        : {"id"      : 7,
@@ -138,13 +143,16 @@ class MotionCapture(object):
                                       "ikCtrl"  : self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl"},
                 "LeftShoulder"     : {"id"      : 18,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_00_"+self.lang['c000_arm_before']+"_Jnt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c000_arm_before']+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c000_arm_before']+"_Ctrl"},
                 "LeftArm"          : {"id"      : 9,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Jxt",
+                                      "joint1"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftForeArm"      : {"id"      : 10,
                                       "joint"   : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Jxt",
+                                      "joint1"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftHand"         : {"id"      : 11,
@@ -153,6 +161,7 @@ class MotionCapture(object):
                                       "joint2"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_09_"+self.lang['c004_arm_extrem']+"_Jnt",
                                       "joint3"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_17_"+self.lang['c004_arm_extrem']+"_Jnt",
                                       "joint4"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_14_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint5"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Jnt",
                                       "control" : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Fk_Ctrl",
                                       "ikCtrl"  : self.lang['p002_left']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Ik_Ctrl"},
                 "LeftHandThumb1"   : {"id"      : 50,
@@ -214,13 +223,16 @@ class MotionCapture(object):
                                       "control" : self.lang['p002_left']+"_"+self.lang['m007_finger']+"_"+self.lang['m035_pinky']+"_03_Ctrl"},
                 "RightShoulder"    : {"id"      : 19,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_00_"+self.lang['c000_arm_before']+"_Jnt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c000_arm_before']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c000_arm_before']+"_Ctrl"},
                 "RightArm"         : {"id"      : 12,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Jxt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c001_arm_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightForeArm"     : {"id"      : 13,
                                       "joint"   : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Jxt",
+                                      "joint1"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c002_arm_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightHand"        : {"id"      : 14,
@@ -229,6 +241,7 @@ class MotionCapture(object):
                                       "joint2"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_09_"+self.lang['c004_arm_extrem']+"_Jnt",
                                       "joint3"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_17_"+self.lang['c004_arm_extrem']+"_Jnt",
                                       "joint4"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_14_"+self.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint5"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Jnt",
                                       "control" : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Fk_Ctrl",
                                       "ikCtrl"  : self.lang['p003_right']+"_"+self.lang['c037_arm']+"_"+self.lang['c004_arm_extrem']+"_Ik_Ctrl"},
                 "RightHandThumb1"  : {"id"      : 74,
@@ -694,7 +707,7 @@ class MotionCapture(object):
                     if "Roll" in hikKey: #ribbon
                         if not rib:
                             continue
-                    for r in ["", "1", "2", "3", "4"]: #workaround to accept many ribbons renaming
+                    for r in ["", "1", "2", "3", "4", "5"]: #workaround to accept many ribbons renaming
                         if "joint"+r in self.hikDic[hikKey].keys():
                             if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
                                 if r == "" and "needJnt" in self.hikDic[hikKey].keys():
@@ -737,6 +750,7 @@ class MotionCapture(object):
                             cmds.select(self.hikDic[hikKey][ctrl])
                             mel.eval('hikControlRigSelectionChangedCallback;')
                             mel.eval('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
+                            #print(self.hikDic[hikKey]["id"], self.hikDic[hikKey][ctrl])
                 print(self.lang['m253_assignCtrlDefinition'])
                 cmds.select(clear=True)
             else:
@@ -753,12 +767,13 @@ class MotionCapture(object):
                 legMode   = "legIk"
         """
         ikList = []
-        if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
-            ikList.extend(["Spine", "Spine1", "Spine2"])
-        if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
-            ikList.extend(["LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand"])
-        if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
-            ikList.extend(["LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"])
+        if self.ui:
+            if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+                ikList.extend(["Spine", "Spine1", "Spine2"])
+            if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
+                ikList.extend(["LeftArm", "LeftForeArm", "LeftHand", "RightArm", "RightForeArm", "RightHand"])
+            if cmds.radioCollection(self.legModeRBC, query=True, select=True) == "legIk":
+                ikList.extend(["LeftUpLeg", "LeftLeg", "LeftFoot", "RightUpLeg", "RightLeg", "RightFoot"])
         self.hikMapBipedControllers(ikList, rib)
 
 
@@ -797,13 +812,14 @@ class MotionCapture(object):
                     checkOutInst.verbose = False
                     checkOutInst.runAction(False) #fix
                     checkOutInst.endProgress()
+        self.utils.setProgress(endIt=True)
 
 
     def setIkFkBipedControllersByUI(self, *args):
         """ Set the ikFk attributes in the optionCtrl as the choose UI.
         """
         optCtrl = self.setCtrlMode() #fk
-        if optCtrl:
+        if optCtrl and self.ui:
             if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
                 cmds.setAttr(optCtrl+"."+self.lang['m011_spine'].lower()+"Fk", 0)
             if cmds.radioCollection(self.armModeRBC, query=True, select=True) == "armIk":
@@ -837,7 +853,7 @@ class MotionCapture(object):
 
 
     def hikMapCustomElements(self, rib=False, *args):
-        """ Set cutom HumanIk controllers properly mapping.
+        """ Set custom HumanIk controllers properly mapping.
         """
         fingerList = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
         for hikKey in self.hikDic.keys():
@@ -858,7 +874,7 @@ class MotionCapture(object):
         """ Set HumanIk Chest controller.
         """
         cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"A_Fk_Ctrl")
-        if cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
+        if self.ui and cmds.radioCollection(self.spineModeRBC, query=True, select=True) == "spineIk":
             cmds.select(self.lang['m011_spine']+"_"+self.lang['c028_chest']+"B_Ctrl")
         mel.eval('hikControlRigSelectionChangedCallback; hikCustomRigAssignEffector 1000;')
         cmds.select(clear=True)
