@@ -9,7 +9,7 @@ DESCRIPTION = "v139_emptyTransformCleanerDesc"
 ICON = "/Icons/dp_emptyTransformCleaner.png"
 WIKI = "07-‐-Validator#-empty-transform-cleaner"
 
-DP_EMPTYTRANSFORMCLEANER_VERSION = 1.01
+DP_EMPTYTRANSFORMCLEANER_VERSION = 1.02
 
 
 class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
@@ -43,7 +43,7 @@ class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
             if objList:
                 toCheckList = objList
             else:
-                toCheckList =  cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
+                toCheckList = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
             if toCheckList:
                 self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 emptyTransformList = self.filterEmptyTransformList(toCheckList)
@@ -58,8 +58,11 @@ class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                cmds.lockNode(item, lock=False)
-                                cmds.delete(item)
+                                if "dpKeepIt" in cmds.listAttr(item) and cmds.getAttr(item+".dpKeepIt") == True:
+                                    pass
+                                else:
+                                    cmds.lockNode(item, lock=False)
+                                    cmds.delete(item)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
