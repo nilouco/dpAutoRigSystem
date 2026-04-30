@@ -141,10 +141,6 @@ class SoftIkClass(object):
             while ( i < len(ikJointList)-1 ):
                 cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scaleZ", force=True)
                 cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scaleZ", force=True)
-                
-                #for k in ["X", "Y", "Z"]:
-                #    cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+k, force=True)
-                #    cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1
         
         self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
