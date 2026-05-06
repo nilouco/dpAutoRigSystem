@@ -1,6 +1,8 @@
 # importing libraries:
+import re
 from maya import cmds
 from maya import mel
+from maya.api import OpenMaya
 from itertools import zip_longest
 
 # global variables to this module:    
@@ -10,7 +12,7 @@ DESCRIPTION = "m255_oneSkeletonDesc"
 ICON = "/Icons/dp_oneSkeleton.png"
 WIKI = "06-‐-Tools#-one-skeleton"
 
-DP_ONESKELETON_VERSION = 1.04
+DP_ONESKELETON_VERSION = 1.05
 
 
 class OneSkeleton(object):
@@ -52,7 +54,7 @@ class OneSkeleton(object):
         cmds.text('preview_txt', label=f"{self.prefix}{self.rootName}{self.suffix}", font="boldLabelFont", parent='naming_rcl')
         cmds.radioButtonGrp("skeleton_rbg", label=self.dpUIinst.lang['i138_type'], labelArray2=["Floating Joints", self.dpUIinst.lang['m216_hierarchy']], vertical=True, numberOfRadioButtons=2, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth2=(40, 100), parent="main_layout")
         cmds.radioButtonGrp("skeleton_rbg", edit=True, select=2) #hierarchy = 2
-        cmds.checkBox("use_scale_cb", label="Scale constraint", value=False, parent="main_layout")
+        cmds.checkBox("use_scale_cb", label="Scale constraint", value=False, enable=False, parent="main_layout")
         cmds.button("run_one_skeleton_bt", label=self.dpUIinst.lang['i158_create'], command=self.create_by_ui, parent="main_layout")
         cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')
         # call Window:
@@ -115,7 +117,7 @@ class OneSkeleton(object):
         if uniqueInfList:
             if not cmds.objExists(root):
                 self.createRootJoint(root)
-            newJointList = self.transferJoint(uniqueInfList, scale)
+            newJointList = self.createNewJoints(uniqueInfList, scale)
             if newJointList:
                 #newJointList.sort()
                 if hierarchy:
@@ -123,6 +125,7 @@ class OneSkeleton(object):
                 else:
                     cmds.parent(newJointList, root)
                 cmds.select(root)
+            self.reSetScale(uniqueInfList)
             self.ctrls.setControllerScaleCompensate(False)
             self.utils.setProgress(endIt=True)
         else:
@@ -138,7 +141,7 @@ class OneSkeleton(object):
         return zip_longest(fillvalue=fillvalue, *args)
 
 
-    def transferJoint(self, sourceList, scale=True, *args):
+    def createNewJoints(self, sourceList, scale=True, *args):
         """ Make a duplicated joints and transfer connections and deformation to them.
             Returns the new created joint list.
         """
@@ -150,6 +153,49 @@ class OneSkeleton(object):
             cmds.select(clear=True)
             newJoint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             newJointList.append(newJoint)
+            
+            # Match joint orient
+            for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
+                value = cmds.getAttr(f"{sourceNode}.{attr}")
+                cmds.setAttr(f"{newJoint}.{attr}", value)
+            # Constraint to the original
+            pac = cmds.parentConstraint([sourceNode, newJoint], maintainOffset=False, name=newJoint+"_PaC")[0]
+
+            #scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
+            #cmds.delete(scc)
+            # 
+
+            #scale_constraints.append(scc)
+            # fixes for negative scale joints
+            # parentList = cmds.listRelatives(sourceNode, parent=True)
+            # if parentList:
+            #     if not "_Jar" in parentList[0]:
+            #         for axis in ["X", "Y", "Z"]:
+            #             if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
+            #                 for a in ["X", "Y", "Z"]:
+            #                     if not a == axis:
+            #                         cmds.setAttr(scc+".offset"+a, -1)
+
+            # corrective joints
+            # if "_Jcr" in newJoint:
+            #     for axis in ["X", "Y", "Z"]:
+            #         if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
+            #             cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
+# #                    cmds.setAttr(scc+".offset"+axis, 1)
+            # Ensure the new joint doesn't have segmentScaleCompensate enabled
+            # But do allow the scale constraint to compensate
+            cmds.refresh()
+            #cmds.setAttr(f"{newJoint}.segmentScaleCompensate", False)
+            #try:
+            #    cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
+            #except:
+            #    pass
+#            cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
+            # dpIDs
+            self.dpUIinst.customAttr.addAttr(0, [newJoint, pac]) #dpID
+#        if not scale:
+#            cmds.delete(scale_constraints)
+
             # Transfer skinCluster + bindPose connection from the original
             connectionList = cmds.listConnections(sourceNode, destination=True, source=False, connections=True, plugs=True) or []
             for src, dest in self.grouper(connectionList, 2):
@@ -164,43 +210,53 @@ class OneSkeleton(object):
                         # Transfer connection to the new node
                         cmds.disconnectAttr(src, dest)
                         cmds.connectAttr(newJoint+"."+sourceAttr, dest, force=True)
-            # Match joint orient
-            for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
-                value = cmds.getAttr(f"{sourceNode}.{attr}")
-                cmds.setAttr(f"{newJoint}.{attr}", value)
-            # Constraint to the original
-            pac = cmds.parentConstraint([sourceNode, newJoint], maintainOffset=False, name=newJoint+"_PaC")[0]
-            scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
-            scale_constraints.append(scc)
-            # fixes for negative scale joints
-            parentList = cmds.listRelatives(sourceNode, parent=True)
-            if parentList:
-                if not "_Jar" in parentList[0]:
-                    for axis in ["X", "Y", "Z"]:
-                        if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
-                            for a in ["X", "Y", "Z"]:
-                                if not a == axis:
-                                    cmds.setAttr(scc+".offset"+a, -1)
-            # corrective joints
-            if "_Jcr" in newJoint:
-                for axis in ["X", "Y", "Z"]:
-                    if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
-                        cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
-                    cmds.setAttr(scc+".offset"+axis, 1)
-            # Ensure the new joint doesn't have segmentScaleCompensate enabled
-            # But do allow the scale constraint to compensate
-            cmds.refresh()
-            cmds.setAttr(f"{newJoint}.segmentScaleCompensate", False)
-            try:
-                cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
-            except:
-                pass
-            cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
-            # dpIDs
-            self.dpUIinst.customAttr.addAttr(0, [newJoint, pac]) #dpID
-        if not scale:
-            cmds.delete(scale_constraints)
+
+            self.bindPreMatrixNode(newJoint)
+            
         return newJointList
+
+
+    def reSetScale(self, sourceList, *args):
+        for sourceNode in sourceList:
+            for axis in ["X", "Y", "Z"]:
+                cmds.setAttr(self.prefix+sourceNode+self.suffix+".scale"+axis, cmds.getAttr(sourceNode+".scale"+axis))
+
+
+    def bindPreMatrixNode(self, newJoint, *args):
+        grp = "Bind_PreMatrix_Grp"
+        if not cmds.objExists(grp):
+            cmds.group(name=grp, empty=True)
+            cmds.parent(grp, self.utils.getNodeByMessage("staticGrp"))
+
+        destinations = cmds.listConnections(newJoint + ".worldMatrix", source=False, destination=True, plugs=True, type="skinCluster") or []
+        for destination in destinations:
+            skin, attr = destination.split(".", 1)
+            match = re.search(r"^matrix\[(\d+)\]$", attr)
+            if not match:
+                continue
+                
+            index = int(match.group(1))
+            
+            # Get the bindPreMatrix for that influence index
+            bind_prematrix_plug = f"{skin}.bindPreMatrix[{index}]"
+            bind_prematrix = cmds.getAttr(bind_prematrix_plug)
+            
+            if bind_prematrix is None:
+                # Can happen if the value is not initialiezd - if so
+                # assume the current joints position
+                bind_prematrix = cmds.xform(newJoint, query=True, worldSpace=True, matrix=True)
+                bind_prematrix = OpenMaya.MMatrix(bind_prematrix).inverse()
+                
+            bind_prematrix_inv = OpenMaya.MMatrix(bind_prematrix).inverse()
+            bind_prematrix_inv = list(bind_prematrix_inv)
+            
+            # Create matching prebind joint as input
+            bind_prematrix_joint = cmds.createNode("joint", name=f"{newJoint}_bindPreMatrix_for_{skin}")
+            cmds.xform(bind_prematrix_joint, worldSpace=True, matrix=bind_prematrix_inv)
+            cmds.connectAttr(bind_prematrix_joint + ".worldInverseMatrix[0]", bind_prematrix_plug)
+
+            cmds.parent(bind_prematrix_joint, grp)
+
 
 
     def getMeshList(self, *args):
@@ -243,6 +299,10 @@ class OneSkeleton(object):
         cmds.addAttr(root, longName="dpRootJoint", attributeType="bool", defaultValue=1)
         cmds.setAttr(root+".visibility", 0)
         self.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
+        try:
+            cmds.parent(root, self.dpUIinst.utils.getAllGrp())
+        except:
+            pass
 
 
     def mount_hierarchy(self, joints, root, *args):
@@ -252,7 +312,7 @@ class OneSkeleton(object):
             for item in hierarchy_data.keys():
                 if cmds.objExists(f"{self.prefix}{side}{item}{self.suffix}"):
                     for p, parent in enumerate(hierarchy_data[item]):
-                        if cmds.objExists(f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}"):
+                        if cmds.objExists(f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}") and not f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}" in cmds.listRelatives(f"{self.prefix}{side}{item}{self.suffix}", children=True):
                             cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}")
                             break
                         elif item in integration_data.keys():
