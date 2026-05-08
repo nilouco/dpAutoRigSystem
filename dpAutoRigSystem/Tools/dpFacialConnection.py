@@ -2,6 +2,7 @@
 from maya import cmds
 from maya import mel
 import os
+from functools import partial
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -423,15 +424,15 @@ class FacialConnection(object):
         """ Creates the nodes to remap values and connect it to final output (jntTarget) item.
         """
         fromNodeName = self.utils.extractSuffix(fromNode)
-        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
+        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(3)+"_"+toAttr.upper()+"_RmV")
         self.toIDList.append(remap)
-        outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
+        outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(3)+"_"+toAttr.upper()
         if not cmds.objExists(fromNode+"."+outMaxAttr):
             cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
         if "t" in toAttr:
             if not cmds.objExists(fromNode+".sizeFactor"):
                 cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
-            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
+            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(3)+"_"+toAttr.upper()+"_SizeFactor_MD")
             self.toIDList.append(md)
             cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
             cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
@@ -681,18 +682,10 @@ class FacialConnection(object):
 
     
     def dpCalibrateFacialJointsUI(self, *args):
-        #
-        # WIP
-        #
-        print("WIP ... calibration facial joints here....")
-        #
-        # TODO: close facialConnectionWindow?
-       
-
         # creating targetMirrorUI Window:
         self.utils.closeUI('dpCalibrateFacialJointsWindow')
-        winWidth  = 230
-        winHeight = 400
+        winWidth  = 430
+        winHeight = 500
         cmds.window('dpCalibrateFacialJointsWindow', title=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint']+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.columnLayout('calibrateFacialJointsLayout', columnOffset=("both", 10), rowSpacing=10)
@@ -702,19 +695,15 @@ class FacialConnection(object):
         cmds.text("attribute_TXT", label="Attribute", parent="facialCtrl_RCL")
         cmds.textScrollList("facialCtrl_TSL", selectCommand=self.loadSelectedAttrs, allowMultiSelection=False, parent='facialCtrl_RCL')
         cmds.textScrollList("attrCtrl_TSL", selectCommand=self.loadSelectedOffsets, allowMultiSelection=False, parent='facialCtrl_RCL')
-
-
         cmds.separator(height=5, style="in", horizontal=True, width=winWidth, parent='calibrateFacialJointsLayout')
-        
         cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent='calibrateFacialJointsLayout')
-        
-        cmds.button(label=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint'], annotation="Calibrate facial joints for gaming.", width=220, command=self.dpCalibrateFacialJointsUI, parent='calibrateFacialJointsLayout')
-        
+        cmds.scrollLayout("calibrateFacialJointsScrollLayout", width=480, height=200, parent="calibrateFacialJointsLayout")
+#        cmds.button(label=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint'], annotation="Calibrate facial joints for gaming.", width=220, command=self.dpCalibrateFacialJointsUI, parent='calibrateFacialJointsLayout')
+        cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, parent='calibrateFacialJointsScrollLayout')
         # call facialControlUI Window:
         cmds.showWindow('dpCalibrateFacialJointsWindow')
         # load data
         self.loadUIData()
-
 
 
     def getFacialCtrlList(self, *args):
@@ -745,6 +734,7 @@ class FacialConnection(object):
         attrList = self.getFacialAttrList(ctrl)
         cmds.textScrollList("attrCtrl_TSL", edit=True, removeAll=True)
         cmds.textScrollList("attrCtrl_TSL", edit=True, append=attrList)
+        self.clearFacialCalibrationAttributesLayout()
 
 
     def loadSelectedOffsets(self, *args):
@@ -752,6 +742,10 @@ class FacialConnection(object):
         attr = cmds.textScrollList("attrCtrl_TSL", query=True, selectItem=True)[0]
         print("ctrl, attr =", ctrl, attr)
         
+        #
+        #
+        # L_Tweaks_Eyebrow_03_383_TY
+        #
         #
         # find offsetGrps and their joint controllers
         # list connected attributes to the offsetGrp
@@ -764,6 +758,41 @@ class FacialConnection(object):
         # list buttons to select or a new scrollList to 
         # show not stored values (if editing the controller)
         # set values by UI after posing the controllers
+        #
+        #
+        #
+        # WIP:
+        self.clearFacialCalibrationAttributesLayout()
+        calibAttrList = self.getFacialCalibrationAttrList(ctrl, attr)
+
+        
+
+        print("calibAttrList =", calibAttrList)
+
+        for calibAttr in calibAttrList:
+            offsetCtrl = calibAttr[:calibAttr.rfind("_")]
+            offsetCtrl = offsetCtrl[:offsetCtrl.rfind("_")]+"_Ctrl"
+            calibAttrValue = cmds.getAttr(ctrl+"."+calibAttr)
+            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), parent='attrsLayout')
 
 
-    
+
+    def getFacialCalibrationAttrList(self, ctrl, attr, *args):
+        attrList = []
+        outputList = cmds.listConnections(ctrl+"."+attr, destination=True, source=False) or []
+        for item in outputList:
+            if cmds.objectType(item) == "remapValue":
+                sourceNode = cmds.listConnections(item+".outputMax", destination=False, source=True)[0]
+                plug = cmds.listConnections(item+".outputMax", destination=False, source=True, plugs=True)[0]
+                if sourceNode == ctrl:
+                    attrList.append(plug[plug.rfind(".")+1:])
+                elif cmds.objectType(sourceNode) == "multiplyDivide":
+                    plug = cmds.listConnections(sourceNode+".input1X", destination=False, source=True, plugs=True)[0]
+                    attrList.append(plug[plug.rfind(".")+1:])
+        return attrList
+
+
+    def clearFacialCalibrationAttributesLayout(self, *args):
+        if cmds.columnLayout('attrsLayout', query=True, exists=True):
+            cmds.deleteUI('attrsLayout')
+            cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, parent='calibrateFacialJointsScrollLayout')
