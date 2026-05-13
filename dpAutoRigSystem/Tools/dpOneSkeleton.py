@@ -163,7 +163,6 @@ class OneSkeleton(object):
             cmds.select(clear=True)
             newJoint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             newJointList.append(newJoint)
-            
             # Match joint orient
             for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
                 value = cmds.getAttr(f"{sourceNode}.{attr}")
@@ -198,16 +197,12 @@ class OneSkeleton(object):
     
     def scaleConnect(self, sourceList, *args):
         for sourceNode in sourceList:
-            scc = cmds.scaleConstraint(sourceNode, self.prefix+sourceNode+self.suffix, name=self.prefix+sourceNode+self.suffix+"_ScC")[0]
+            scc = cmds.scaleConstraint(sourceNode, self.prefix+sourceNode+self.suffix, maintainOffset=True, name=self.prefix+sourceNode+self.suffix+"_ScC")[0]
             #cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
 
 
     def bindPreMatrixNode(self, newJoint, *args):
-        grp = "Bind_PreMatrix_Grp"
-        if not cmds.objExists(grp):
-            cmds.group(name=grp, empty=True)
-            cmds.parent(grp, self.utils.getNodeByMessage("staticGrp"))
-        destinations = cmds.listConnections(newJoint + ".worldMatrix", source=False, destination=True, plugs=True, type="skinCluster") or []
+        destinations = cmds.listConnections(newJoint+".worldMatrix", source=False, destination=True, plugs=True, type="skinCluster") or []
         for destination in destinations:
             skin, attr = destination.split(".", 1)
             match = re.search(r"^matrix\[(\d+)\]$", attr)
@@ -222,13 +217,8 @@ class OneSkeleton(object):
                 # assume the current joints position
                 bind_prematrix = cmds.xform(newJoint, query=True, worldSpace=True, matrix=True)
                 bind_prematrix = OpenMaya.MMatrix(bind_prematrix).inverse()
-            bind_prematrix_inv = OpenMaya.MMatrix(bind_prematrix).inverse()
-            bind_prematrix_inv = list(bind_prematrix_inv)
-            # Create matching prebind joint as input
-            bind_prematrix_joint = cmds.createNode("joint", name=f"{newJoint}_bindPreMatrix_for_{skin}")
-            cmds.xform(bind_prematrix_joint, worldSpace=True, matrix=bind_prematrix_inv)
-            cmds.connectAttr(bind_prematrix_joint + ".worldInverseMatrix[0]", bind_prematrix_plug)
-            cmds.parent(bind_prematrix_joint, grp)
+            # set bindPreMatrix
+            cmds.setAttr(bind_prematrix_plug, bind_prematrix, type="matrix")
 
 
     def getMeshList(self, *args):
