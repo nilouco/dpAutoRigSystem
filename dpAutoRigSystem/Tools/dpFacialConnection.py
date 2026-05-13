@@ -688,17 +688,19 @@ class FacialConnection(object):
         winHeight = 500
         cmds.window('dpCalibrateFacialJointsWindow', title=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint']+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        cmds.columnLayout('calibrateFacialJointsLayout', columnOffset=("both", 10), rowSpacing=10)
-        cmds.separator(height=5, style="none", horizontal=True, width=winWidth, parent='calibrateFacialJointsLayout')
-        cmds.rowColumnLayout('facialCtrl_RCL', numberOfColumns=2, columnWidth=[(1, 130), (2, 130)], rowSpacing=(1, 10), columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent="calibrateFacialJointsLayout")
+        mainFormLayout = cmds.formLayout('calibrateFacialJointsForm', numberOfDivisions=100)
+        topColumnLayout = cmds.columnLayout('calibrateFacialJointsLayout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent=mainFormLayout)
+        cmds.separator(height=5, style="none", horizontal=True, width=winWidth, parent=topColumnLayout)
+        cmds.rowColumnLayout('facialCtrl_RCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 130), (2, 130)], rowSpacing=(1, 10), columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=topColumnLayout)
         cmds.text("facialCtrl_TXT", label="Facial Ctrl", parent="facialCtrl_RCL")
         cmds.text("attribute_TXT", label="Attribute", parent="facialCtrl_RCL")
         cmds.textScrollList("facialCtrl_TSL", selectCommand=self.loadSelectedAttrs, allowMultiSelection=False, parent='facialCtrl_RCL')
         cmds.textScrollList("attrCtrl_TSL", selectCommand=self.loadSelectedOffsets, allowMultiSelection=False, parent='facialCtrl_RCL')
-        cmds.separator(height=5, style="in", horizontal=True, width=winWidth, parent='calibrateFacialJointsLayout')
-        cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent='calibrateFacialJointsLayout')
-        cmds.scrollLayout("calibrateFacialJointsScrollLayout", width=480, height=200, parent="calibrateFacialJointsLayout")
-        cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, parent='calibrateFacialJointsScrollLayout')
+        cmds.separator(height=5, style="in", horizontal=True, width=winWidth, parent=topColumnLayout)
+        cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent=topColumnLayout)
+        scroll = cmds.scrollLayout("calibrateFacialJointsScrollLayout", childResizable=True, parent=mainFormLayout)
+        cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='calibrateFacialJointsScrollLayout')
+        cmds.formLayout(mainFormLayout, edit=True, attachForm=[(topColumnLayout, 'left', 0), (topColumnLayout, 'right', 0), (topColumnLayout, 'top', 0), (scroll, 'left', 0), (scroll, 'right', 0), (scroll, 'bottom', 0)], attachControl=[(scroll, 'top', 0, topColumnLayout)])
         # call facialControlUI Window:
         cmds.showWindow('dpCalibrateFacialJointsWindow')
         # load data
