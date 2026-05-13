@@ -698,7 +698,6 @@ class FacialConnection(object):
         cmds.separator(height=5, style="in", horizontal=True, width=winWidth, parent='calibrateFacialJointsLayout')
         cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent='calibrateFacialJointsLayout')
         cmds.scrollLayout("calibrateFacialJointsScrollLayout", width=480, height=200, parent="calibrateFacialJointsLayout")
-#        cmds.button(label=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint'], annotation="Calibrate facial joints for gaming.", width=220, command=self.dpCalibrateFacialJointsUI, parent='calibrateFacialJointsLayout')
         cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, parent='calibrateFacialJointsScrollLayout')
         # call facialControlUI Window:
         cmds.showWindow('dpCalibrateFacialJointsWindow')
@@ -740,41 +739,13 @@ class FacialConnection(object):
     def loadSelectedOffsets(self, *args):
         ctrl = cmds.textScrollList("facialCtrl_TSL", query=True, selectItem=True)[0]
         attr = cmds.textScrollList("attrCtrl_TSL", query=True, selectItem=True)[0]
-        print("ctrl, attr =", ctrl, attr)
-        
-        #
-        #
-        # L_Tweaks_Eyebrow_03_383_TY
-        #
-        #
-        # find offsetGrps and their joint controllers
-        # list connected attributes to the offsetGrp
-        # put floatFields to adjust them by the UI (first pass)
-        # connect/set UI fields to facialCtrl calibration attr
-        #
-        # wich list: (EditMode)
-        #
-        # store initial state and values
-        # list buttons to select or a new scrollList to 
-        # show not stored values (if editing the controller)
-        # set values by UI after posing the controllers
-        #
-        #
-        #
-        # WIP:
         self.clearFacialCalibrationAttributesLayout()
         calibAttrList = self.getFacialCalibrationAttrList(ctrl, attr)
-
-        
-
-        print("calibAttrList =", calibAttrList)
-
         for calibAttr in calibAttrList:
             offsetCtrl = calibAttr[:calibAttr.rfind("_")]
             offsetCtrl = offsetCtrl[:offsetCtrl.rfind("_")]+"_Ctrl"
             calibAttrValue = cmds.getAttr(ctrl+"."+calibAttr)
             cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), parent='attrsLayout')
-
 
 
     def getFacialCalibrationAttrList(self, ctrl, attr, *args):
