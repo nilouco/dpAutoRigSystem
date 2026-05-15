@@ -118,7 +118,7 @@ class FacialConnection(object):
         # creating FacialConnectionUI Window:
         self.utils.closeUI('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 230
-        facialCtrl_winHeight = 400
+        facialCtrl_winHeight = 405
         dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.dpUIinst.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
@@ -747,7 +747,7 @@ class FacialConnection(object):
             offsetCtrl = calibAttr[:calibAttr.rfind("_")]
             offsetCtrl = offsetCtrl[:offsetCtrl.rfind("_")]+"_Ctrl"
             calibAttrValue = cmds.getAttr(ctrl+"."+calibAttr)
-            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-100.0, maxValue=100.0, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), parent='attrsLayout')
+            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-100.0, maxValue=100.0, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='attrsLayout')
 
 
     def getFacialCalibrationAttrList(self, ctrl, attr, *args):
