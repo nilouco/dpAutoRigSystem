@@ -747,7 +747,7 @@ class FacialConnection(object):
             offsetCtrl = calibAttr[:calibAttr.rfind("_")]
             offsetCtrl = offsetCtrl[:offsetCtrl.rfind("_")]+"_Ctrl"
             calibAttrValue = cmds.getAttr(ctrl+"."+calibAttr)
-            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-100.0, maxValue=100.0, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='attrsLayout')
+            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-360, maxValue=360, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='attrsLayout')
 
 
     def getFacialCalibrationAttrList(self, ctrl, attr, *args):
