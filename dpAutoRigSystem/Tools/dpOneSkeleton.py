@@ -278,7 +278,10 @@ class OneSkeleton(object):
                             cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}")
                             break
                         elif item in integration_data.keys():
+                            print(item, f"{self.prefix}{integration_data[item][p]}{self.suffix}")
                             if cmds.objExists(f"{self.prefix}{integration_data[item][p]}{self.suffix}"):
+                                if "Tooth" in hierarchy_data[item]:
+                                    print("B", hierarchy_data[item], f"{self.prefix}{integration_data[item][p]}{self.suffix}")
                                 cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{integration_data[item][p]}{self.suffix}")
                                 break
                 if f"{self.prefix}{side}{item}{self.suffix}" in joints:
@@ -335,6 +338,8 @@ class OneSkeleton(object):
         lower_teeth = self.dpUIinst.lang['m076_lowerTeeth']
         tongue = self.dpUIinst.lang['m077_tongue']
         ear = self.dpUIinst.lang['m040_ear']
+        upper_tooth = self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['m267_tooth']
+        lower_tooth = self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['m267_tooth']
         
         nose = self.dpUIinst.lang['m078_nose']
         nostril = self.dpUIinst.lang['m079_nostril']
@@ -1122,6 +1127,21 @@ class OneSkeleton(object):
                 f"{tweaks}_{lower}_{lip}_00_Jnt" : [""],
                 f"{tweaks}_{lower}_{lip}_01_Jnt" : [""],
                 f"{tweaks}_{lower}_{lip}_02_Jnt" : [""],
+                # tooth
+                f"{upper_tooth}_1_00_Jnt" : [""],
+                f"{upper_tooth}_2_00_Jnt" : [""],
+                f"{upper_tooth}_3_00_Jnt" : [""],
+                f"{upper_tooth}_4_00_Jnt" : [""],
+                f"{upper_tooth}_5_00_Jnt" : [""],
+                f"{upper_tooth}_6_00_Jnt" : [""],
+                f"{upper_tooth}_7_00_Jnt" : [""],
+                f"{lower_tooth}_1_00_Jnt" : [""],
+                f"{lower_tooth}_2_00_Jnt" : [""],
+                f"{lower_tooth}_3_00_Jnt" : [""],
+                f"{lower_tooth}_4_00_Jnt" : [""],
+                f"{lower_tooth}_5_00_Jnt" : [""],
+                f"{lower_tooth}_6_00_Jnt" : [""],
+                f"{lower_tooth}_7_00_Jnt" : [""],
         }
         return data
 
@@ -1145,11 +1165,14 @@ class OneSkeleton(object):
         head = self.dpUIinst.lang['c024_head']
         upper = self.dpUIinst.lang['c044_upper']
         jaw = self.dpUIinst.lang['c025_jaw']
+        chin = self.dpUIinst.lang['c026_chin']
         
         upper_teeth = self.dpUIinst.lang['m075_upperTeeth']
         lower_teeth = self.dpUIinst.lang['m076_lowerTeeth']
         ear = self.dpUIinst.lang['m040_ear']
         eye = self.dpUIinst.lang['c036_eye']
+        upper_tooth = self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['m267_tooth']
+        lower_tooth = self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['m267_tooth']
 
         tweaks = self.dpUIinst.lang['m081_tweaks']
         eyebrow = self.dpUIinst.lang['c041_eyebrow']
@@ -1192,6 +1215,21 @@ class OneSkeleton(object):
                 f"{tweaks}_{lower}_{lip}_00_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
                 f"{tweaks}_{lower}_{lip}_01_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
                 f"{tweaks}_{lower}_{lip}_02_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                # tooth
+                f"{upper_tooth}_1_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_2_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_3_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_4_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_5_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_6_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_7_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_1_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_2_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_3_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_4_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_5_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_6_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_7_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
         }
         return data
 

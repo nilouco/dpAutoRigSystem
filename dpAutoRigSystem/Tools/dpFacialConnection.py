@@ -691,13 +691,15 @@ class FacialConnection(object):
         mainFormLayout = cmds.formLayout('calibrateFacialJointsForm', numberOfDivisions=100)
         topColumnLayout = cmds.columnLayout('calibrateFacialJointsLayout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent=mainFormLayout)
         cmds.separator(height=5, style="none", horizontal=True, width=winWidth, parent=topColumnLayout)
-        cmds.rowColumnLayout('facialCtrl_RCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 130), (2, 130)], rowSpacing=(1, 10), columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=topColumnLayout)
+        cmds.rowColumnLayout('facialCtrl_RCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 150), (2, 130)], rowSpacing=(1, 10), columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=topColumnLayout)
         cmds.text("facialCtrl_TXT", label="Facial Ctrl", parent="facialCtrl_RCL")
         cmds.text("attribute_TXT", label="Attribute", parent="facialCtrl_RCL")
         cmds.textScrollList("facialCtrl_TSL", selectCommand=self.loadSelectedAttrs, allowMultiSelection=False, parent='facialCtrl_RCL')
         cmds.textScrollList("attrCtrl_TSL", selectCommand=self.loadSelectedOffsets, allowMultiSelection=False, parent='facialCtrl_RCL')
+        cmds.checkBox('autoCalibrate_CB', label=self.dpUIinst.lang['c121_side']+" "+self.dpUIinst.lang['c119_auto']+" "+self.dpUIinst.lang['c111_calibrate'], value=True, parent=topColumnLayout)
         cmds.separator(height=5, style="in", horizontal=True, width=winWidth, parent=topColumnLayout)
         cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent=topColumnLayout)
+        cmds.separator(height=3, style="none", horizontal=True, width=winWidth, parent=topColumnLayout)
         scroll = cmds.scrollLayout("calibrateFacialJointsScrollLayout", childResizable=True, parent=mainFormLayout)
         cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='calibrateFacialJointsScrollLayout')
         cmds.formLayout(mainFormLayout, edit=True, attachForm=[(topColumnLayout, 'left', 0), (topColumnLayout, 'right', 0), (topColumnLayout, 'top', 0), (scroll, 'left', 0), (scroll, 'right', 0), (scroll, 'bottom', 0)], attachControl=[(scroll, 'top', 0, topColumnLayout)])
@@ -747,21 +749,22 @@ class FacialConnection(object):
             offsetCtrl = calibAttr[:calibAttr.rfind("_")]
             offsetCtrl = offsetCtrl[:offsetCtrl.rfind("_")]+"_Ctrl"
             calibAttrValue = cmds.getAttr(ctrl+"."+calibAttr)
-            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-360, maxValue=360, dragCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), changeCommand=partial(cmds.setAttr, ctrl+"."+calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='attrsLayout')
+            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-360, maxValue=360, dragCommand=partial(self.setFacialJointCalibration, ctrl, attr, calibAttr), changeCommand=partial(self.setFacialJointCalibration, ctrl, attr, calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='attrsLayout')
 
 
     def getFacialCalibrationAttrList(self, ctrl, attr, *args):
         attrList = []
-        outputList = cmds.listConnections(ctrl+"."+attr, destination=True, source=False) or []
-        for item in outputList:
-            if cmds.objectType(item) == "remapValue":
-                sourceNode = cmds.listConnections(item+".outputMax", destination=False, source=True)[0]
-                plug = cmds.listConnections(item+".outputMax", destination=False, source=True, plugs=True)[0]
-                if sourceNode == ctrl:
-                    attrList.append(plug[plug.rfind(".")+1:])
-                elif cmds.objectType(sourceNode) == "multiplyDivide":
-                    plug = cmds.listConnections(sourceNode+".input1X", destination=False, source=True, plugs=True)[0]
-                    attrList.append(plug[plug.rfind(".")+1:])
+        if attr in cmds.listAttr(ctrl):
+            outputList = cmds.listConnections(ctrl+"."+attr, destination=True, source=False) or []
+            for item in outputList:
+                if cmds.objectType(item) == "remapValue":
+                    sourceNode = cmds.listConnections(item+".outputMax", destination=False, source=True)[0]
+                    plug = cmds.listConnections(item+".outputMax", destination=False, source=True, plugs=True)[0]
+                    if sourceNode == ctrl:
+                        attrList.append(plug[plug.rfind(".")+1:])
+                    elif cmds.objectType(sourceNode) == "multiplyDivide":
+                        plug = cmds.listConnections(sourceNode+".input1X", destination=False, source=True, plugs=True)[0]
+                        attrList.append(plug[plug.rfind(".")+1:])
         return attrList
 
 
@@ -769,3 +772,67 @@ class FacialConnection(object):
         if cmds.columnLayout('attrsLayout', query=True, exists=True):
             cmds.deleteUI('attrsLayout')
             cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, parent='calibrateFacialJointsScrollLayout')
+
+
+    def getOppositeSide(self, name, n=2):
+        opposite, start, end = None, None, None
+        l = self.dpUIinst.lang["p002_left"]+"_"
+        r = self.dpUIinst.lang["p003_right"]+"_"
+        if name.startswith(l):
+            opposite = r+name[2:]
+        elif name.startswith(r):
+            opposite = l+name[2:]
+        if opposite:
+            start, end = self.getNameStartEnd(opposite, n)
+        return [opposite, start, end]
+
+
+    def getNameStartEnd(self, name, n=2):
+        start = name[:name.rfind("_")]
+        if n > 1:
+            for s in range(1, n):
+                if s == (n-1):
+                    start = start[:start.rfind("_")+1]
+                else:
+                    start = start[:start.rfind("_")]
+        end = name[name.rfind("_"):]
+        return [start, end]
+
+
+    def setFacialJointCalibration(self, ctrl, attr, calibAttr, value, *args):
+        if calibAttr in cmds.listAttr(ctrl):
+            cmds.setAttr(ctrl+"."+calibAttr, value)
+            if cmds.checkBox("autoCalibrate_CB", query=True, exists=True):
+                if cmds.checkBox("autoCalibrate_CB", query=True, value=True):
+                    self.setOppositeCalibration(ctrl, attr, calibAttr, value)
+                    oppositeCtrlList = self.getOppositeSide(ctrl, 1)
+                    if oppositeCtrlList[0]:
+                        ctrlList = self.getFacialCtrlList()
+                        for anotherCtrl in ctrlList:
+                            if anotherCtrl.startswith(oppositeCtrlList[1]) and anotherCtrl.endswith(oppositeCtrlList[2]):
+                                self.setOppositeCalibration(anotherCtrl, attr, calibAttr, value)
+
+
+    def setOppositeCalibration(self, ctrl, attr, calibAttr, value):
+        oppositeCalibAttrList = self.getOppositeSide(calibAttr)
+        if oppositeCalibAttrList[0]:
+            calibAttrList = self.getFacialCalibrationAttrList(ctrl, attr)
+            for anotherCalibAttr in calibAttrList:
+                self.setOppositeCalibrationAttr(ctrl, anotherCalibAttr, value, oppositeCalibAttrList[1], oppositeCalibAttrList[2])
+        oppositeAttrList = self.getOppositeSide(attr, 1)
+        if oppositeAttrList[0]:
+            if oppositeAttrList[0] in cmds.listAttr(ctrl):
+                attrList = self.getFacialCalibrationAttrList(ctrl, oppositeAttrList[0])
+                for anotherAttr in attrList:
+                    if oppositeCalibAttrList[1]:
+                        self.setOppositeCalibrationAttr(ctrl, anotherAttr, value, oppositeCalibAttrList[1], oppositeCalibAttrList[2])
+                    else:
+                        startAttr, endAttr = self.getNameStartEnd(calibAttr)
+                        self.setOppositeCalibrationAttr(ctrl, anotherAttr, value, startAttr, endAttr)
+
+
+    def setOppositeCalibrationAttr(self, ctrl, attr, value, start, end):
+        if attr.startswith(start) and attr.endswith(end):
+            cmds.setAttr(ctrl+"."+attr, value)
+            if cmds.floatSliderButtonGrp(attr+"_fsbg", query=True, exists=True):
+                cmds.floatSliderButtonGrp(attr+"_fsbg", edit=True, value=value)
