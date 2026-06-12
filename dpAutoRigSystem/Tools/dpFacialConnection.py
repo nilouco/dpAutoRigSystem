@@ -189,6 +189,8 @@ class FacialConnection(object):
                                                 dismissString=btCancel)
                     if result == btContinue:
                         prefix = cmds.promptDialog(query=True, text=True)
+                    else: #cancel
+                        return
                 if prefix == "": # if no name provided in the promptDialog, use the geoBase name
                     prefix = geoBase
                     if "|" in geoBase:
