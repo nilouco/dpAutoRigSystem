@@ -637,12 +637,24 @@ class FacialConnection(object):
                         cancelled = False
                         nbTarget = len(targetList)
                         reconnectList = []
+                        isLockedList = []
+                        valueList = []
                         cmds.select([newMesh, oldMesh])
                         mel.eval("CreateWrap;")
                         tgtGrp = cmds.group(name="New_Tgt_Grp", empty=True)
                         # clear selection
                         cmds.select(clear=True)
                         newTgtList = []
+                        for item in targetList:
+                            if not item == oldMesh:
+                                valueList.append(cmds.getAttr(bsNode[0]+"."+item))
+                                isLockedList.append(cmds.getAttr(bsNode[0]+"."+item, lock=True))
+                                cmds.setAttr(bsNode[0]+"."+item, lock=False)
+                                reconnectList.append(cmds.listConnections(bsNode[0]+"."+item, source=True, destination=False, plugs=True) or None)
+                                if reconnectList[-1]:
+                                    cmds.disconnectAttr(reconnectList[-1][0], bsNode[0]+"."+item)
+                                # set blendShape slider as 0
+                                cmds.setAttr(bsNode[0]+"."+item, 0)
                         for item in targetList:
                             # update progress window
                             progressAmount += 1
@@ -652,12 +664,6 @@ class FacialConnection(object):
                                 break
                             cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
                             if not item == oldMesh:
-                                hasConnection = cmds.listConnections(bsNode[0]+"."+item, source=True, destination=False, plugs=True)
-                                if hasConnection:
-                                    cmds.disconnectAttr(hasConnection[0], bsNode[0]+"."+item)
-                                    reconnectList.append(hasConnection[0])
-                                else:
-                                    reconnectList.append(None)
                                 # set blendShape slider as 1
                                 cmds.setAttr(bsNode[0]+"."+item, 1)
                                 # renaming old target
@@ -667,16 +673,21 @@ class FacialConnection(object):
                                 newTgtList.append(tgt)
                                 # back to zero
                                 cmds.setAttr(bsNode[0]+"."+item, 0)
-                                if hasConnection:
-                                    cmds.connectAttr(hasConnection[0], bsNode[0]+"."+item)
                                 # clear undo
                                 mel.eval("flushUndo;")
                         cmds.delete(newMesh, constructionHistory=True)
                         cmds.rename(bsNode[0], bsNode[0]+"_Old")
                         cmds.blendShape(newTgtList, newMesh, topologyCheck=False, name=bsNode[0])
+                        for v, value in enumerate(valueList):
+                            cmds.setAttr(bsNode[0]+"."+newTgtList[v], value)
+                            cmds.setAttr(bsNode[0]+"_Old."+newTgtList[v], value)
                         for p, plug in enumerate(reconnectList):
                             if plug:
-                                cmds.connectAttr(plug, bsNode[0]+"."+newTgtList[p], force=True)
+                                cmds.connectAttr(plug[0], bsNode[0]+"."+newTgtList[p], force=True)
+                                cmds.connectAttr(plug[0], bsNode[0]+"_Old."+newTgtList[p], force=True)
+                                if isLockedList[p]:
+                                    cmds.setAttr(bsNode[0]+"."+newTgtList[p], lock=True)
+                                    cmds.setAttr(bsNode[0]+"_Old."+newTgtList[p], lock=True)
                         if cmds.objExists(oldMesh+"Base"):
                             cmds.delete(oldMesh+"Base")
                         cmds.progressWindow(endProgress=True)
