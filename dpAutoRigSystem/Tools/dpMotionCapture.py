@@ -31,7 +31,6 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
         self.autoRotateAttrList = [self.ar.data.lang['c047_autoRotate'], self.ar.data.lang['c032_follow']]
         self.hikCharacterAttr = "Character"
         
-        
 
     def build_tool(self, *args):
         self.hikNode = self.hikGetLatestNode()
@@ -47,7 +46,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
         # creating MotionCaptureUI Window:
         self.ar.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 280
-        mocap_winHeight = 420
+        mocap_winHeight = 470
         dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.ar.data.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
@@ -83,6 +82,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
         cmds.text(label=self.ar.data.lang['i292_processes'], parent=motionCaptureMainLayout)
         cmds.button(label=self.ar.data.lang['m241_prepareTPose'], annotation="prepareTPose", width=240, command=self.prepareTPose, parent=motionCaptureMainLayout)
         cmds.button(label=self.ar.data.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.hikRetarget, parent=motionCaptureMainLayout)
+        cmds.button(label=self.ar.data.lang['v032_resetPose'], annotation="resetPose", width=240, command=self.resetDefaultPose, parent=motionCaptureMainLayout)
         # animation buttons
         cmds.separator(style='in', height=10, width=240, parent=motionCaptureMainLayout)
         cmds.text(label=self.ar.data.lang['i185_animation'], parent=motionCaptureMainLayout)
@@ -108,10 +108,12 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                       "control" : self.ar.data.lang['m011_spine']+"_"+self.ar.data.lang['c027_hips']+"A_Ctrl"},
                 "LeftUpLeg"        : {"id"      : 2,
                                       "joint"   : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c006_leg_main']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c006_leg_main']+"_Jnt",
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c006_leg_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftLeg"          : {"id"      : 3,
                                       "joint"   : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c007_leg_corner']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c007_leg_corner']+"_Jnt",
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c007_leg_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftFoot"         : {"id"      : 4,
@@ -123,10 +125,12 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c038_foot']+"_"+self.ar.data.lang['c029_middle']+"_Ctrl"},
                 "RightUpLeg"       : {"id"      : 5,
                                       "joint"   : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c006_leg_main']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c006_leg_main']+"_Jnt",
                                       "control" : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c006_leg_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightLeg"         : {"id"      : 6,
                                       "joint"   : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c007_leg_corner']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c007_leg_corner']+"_Jnt",
                                       "control" : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c007_leg_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightFoot"        : {"id"      : 7,
@@ -146,13 +150,16 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                       "ikCtrl"  : self.ar.data.lang['m011_spine']+"_"+self.ar.data.lang['c028_chest']+"B_Ctrl"},
                 "LeftShoulder"     : {"id"      : 18,
                                       "joint"   : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_00_"+self.ar.data.lang['c000_arm_before']+"_Jnt",
+                                      "joint1"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c000_arm_before']+"_Jnt",
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c000_arm_before']+"_Ctrl"},
                 "LeftArm"          : {"id"      : 9,
                                       "joint"   : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c001_arm_main']+"_Jxt",
+                                      "joint1"   : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c001_arm_main']+"_Jnt",
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c001_arm_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftForeArm"      : {"id"      : 10,
                                       "joint"   : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c002_arm_corner']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c002_arm_corner']+"_Jnt",
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c002_arm_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "LeftHand"         : {"id"      : 11,
@@ -161,6 +168,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                       "joint2"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_09_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
                                       "joint3"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_17_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
                                       "joint4"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_14_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint5"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem']+"_Fk_Ctrl",
                                       "ikCtrl"  : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem']+"_Ik_Ctrl"},
                 "LeftHandThumb1"   : {"id"      : 50,
@@ -222,13 +230,16 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                       "control" : self.ar.data.lang['p002_left']+"_"+self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m035_pinky']+"_03_Ctrl"},
                 "RightShoulder"    : {"id"      : 19,
                                       "joint"   : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_00_"+self.ar.data.lang['c000_arm_before']+"_Jnt",
+                                      "joint1"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c000_arm_before']+"_Jnt",
                                       "control" : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c000_arm_before']+"_Ctrl"},
                 "RightArm"         : {"id"      : 12,
                                       "joint"   : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c001_arm_main']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c001_arm_main']+"_Jnt",
                                       "control" : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c001_arm_main']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightForeArm"     : {"id"      : 13,
                                       "joint"   : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c002_arm_corner']+"_Jxt",
+                                      "joint1"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c002_arm_corner']+"_Jnt",
                                       "control" : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c002_arm_corner']+"_Fk_Ctrl",
                                       "ikCtrl"  : ""},
                 "RightHand"        : {"id"      : 14,
@@ -237,6 +248,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                                       "joint2"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_09_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
                                       "joint3"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_17_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
                                       "joint4"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_14_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
+                                      "joint5"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem']+"_Jnt",
                                       "control" : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem']+"_Fk_Ctrl",
                                       "ikCtrl"  : self.ar.data.lang['p003_right']+"_"+self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem']+"_Ik_Ctrl"},
                 "RightHandThumb1"  : {"id"      : 74,
@@ -573,7 +585,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
             for ctrl in ctrlList:
                 self.lockAutoRotateAttr(ctrl, True)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.ar.axisList:
+                for axis in self.ar.data.axis:
                     cmds.mute(zeroGrp+".rotate"+axis, force=True)
         print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
@@ -606,7 +618,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
             hipList = self.getOrderedByTimeID(hipList)
             cmds.xform(clavList[0], rotation=(90, 0, 90), worldSpace=True) #left clavicle
             cmds.xform(hipList[0], rotation=(90, 0, 0), worldSpace=True) #left hips
-            for axis in self.ar.axisList:
+            for axis in self.ar.data.axis:
                 cmds.setAttr(clavList[1]+".rotate"+axis, cmds.getAttr(clavList[0]+".rotate"+axis)) #right clavicle
                 cmds.setAttr(hipList[1]+".rotate"+axis, cmds.getAttr(hipList[0]+".rotate"+axis)) #right hips
         # arm/leg
@@ -702,7 +714,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                     if "Roll" in hikKey: #ribbon
                         if not rib:
                             continue
-                    for r in ["", "1", "2", "3", "4"]: #workaround to accept many ribbons renaming
+                    for r in ["", "1", "2", "3", "4", "5"]: #workaround to accept many ribbons renaming
                         if "joint"+r in self.hikDic[hikKey].keys():
                             if cmds.objExists(self.hikDic[hikKey]["joint"+r]):
                                 if r == "" and "needJnt" in self.hikDic[hikKey].keys():
@@ -745,6 +757,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
                             cmds.select(self.hikDic[hikKey][ctrl])
                             mel.eval('hikControlRigSelectionChangedCallback;')
                             mel.eval('hikCustomRigAssignEffector '+str(self.hikDic[hikKey]["id"])+';')
+                            #print(self.hikDic[hikKey]["id"], self.hikDic[hikKey][ctrl])
                 print(self.ar.data.lang['m253_assignCtrlDefinition'])
                 cmds.select(clear=True)
             else:
@@ -791,7 +804,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
             for ctrl in ctrlList:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.ar.axisList:
+                for axis in self.ar.data.axis:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
             print(self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
@@ -799,12 +812,11 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
     def resetDefaultPose(self, *args):
         """ Back rig to default pose calling the ResetPose validator.
         """
-        if self.ar.data.checkout_instances:
-            for checkOutInst in self.ar.data.checkout_instances:
-                if "ResetPose" in str(checkOutInst):
-                    checkOutInst.verbose = False
-                    checkOutInst.runAction(False) #fix
-                    checkOutInst.endProgress()
+        reset_pose = self.ar.config.get_instance_info("ResetPose", [self.ar.data.checkout_folder])
+        reset_pose.verbose = False
+        reset_pose.runAction(False) #fix
+        reset_pose.endProgress()
+        self.ar.utils.setProgress(endIt=True)
 
 
     def setIkFkBipedControllersByUI(self, *args):
@@ -845,7 +857,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
 
 
     def hikMapCustomElements(self, rib=False, *args):
-        """ Set cutom HumanIk controllers properly mapping.
+        """ Set custom HumanIk controllers properly mapping.
         """
         fingerList = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
         for hikKey in self.hikDic.keys():
