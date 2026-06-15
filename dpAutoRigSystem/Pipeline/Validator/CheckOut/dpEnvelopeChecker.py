@@ -10,7 +10,7 @@ DESCRIPTION = "v095_envelopeCheckerDesc"
 ICON = "/Icons/dp_envelopeChecker.png"
 WIKI = "07-‐-Validator#-envelope-checker"
 
-DP_ENVELOPECHECKER_VERSION = 1.02
+DP_ENVELOPECHECKER_VERSION = 1.03
 
 
 class EnvelopeChecker(dpBaseAction.ActionStartClass):
@@ -31,7 +31,8 @@ class EnvelopeChecker(dpBaseAction.ActionStartClass):
         notConnected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
         nodeStateNormal = cmds.getAttr(node+".nodeState") == 0
         notUserDefined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
-        return notConnected and nodeStateNormal and notUserDefined
+        notLocked = not cmds.getAttr(node+".envelope", lock=True)
+        return notConnected and nodeStateNormal and notUserDefined and notLocked
 
 
     def verifyEnvelope(self, node):

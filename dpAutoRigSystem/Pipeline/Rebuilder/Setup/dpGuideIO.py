@@ -13,7 +13,7 @@ WIKI = "10-‐-Rebuilder#-guide"
 
 MODULES = "Modules.Standard"
 
-DP_GUIDEIO_VERSION = 1.05
+DP_GUIDEIO_VERSION = 1.06
 
 
 class GuideIO(dpBaseAction.ActionStartClass):
@@ -164,6 +164,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                           "facialSneer",
                           "facialGrimace",
                           "facialFace",
+                          "connectUserType",
                           "deformer",
                           "deformedBy",
                           "worldSize",

@@ -2,6 +2,7 @@
 from maya import cmds
 from maya import mel
 import os
+from functools import partial
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -15,7 +16,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONNECTION_VERSION = 2.00
+DP_FACIALCONNECTION_VERSION = 2.01
 
 
 class FacialConnection(object):
@@ -114,10 +115,10 @@ class FacialConnection(object):
     def dpFacialConnectionUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
-        # creating targetMirrorUI Window:
+        # creating FacialConnectionUI Window:
         self.utils.closeUI('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 230
-        facialCtrl_winHeight = 330
+        facialCtrl_winHeight = 405
         dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.dpUIinst.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
@@ -126,14 +127,17 @@ class FacialConnection(object):
         self.createBsNodeCB = cmds.checkBox(label=self.dpUIinst.lang['m258_createBSNode'], annotation=self.dpUIinst.lang["m259_createBSNodeDesc"], value=1, parent=facialCtrlLayout)
         self.combinationTgtCB = cmds.checkBox(label=self.dpUIinst.lang['m260_combinationTargets'], annotation=self.dpUIinst.lang["m261_combinationTargetsDesc"], value=1, parent=facialCtrlLayout)
         self.tweakTgtOnlyCB = cmds.checkBox(label=self.dpUIinst.lang['m262_tweakTargetOnly'], annotation=self.dpUIinst.lang["m263_tweakTargetOnlyDesc"], value=0, changeCommand=self.dpDisableCombination, parent=facialCtrlLayout)
-        cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
+        cmds.separator(height=5, style="single", horizontal=True, width=facialCtrl_winWidth, parent=facialCtrlLayout)
         cmds.text(label=self.dpUIinst.lang['m264_rebuildTargetsText'], parent=facialCtrlLayout)
         cmds.button(label=self.dpUIinst.lang['m265_rebuildTargets'], annotation=self.dpUIinst.lang["m266_rebuildTargetsDesc"], width=220, command=self.dpRebuildTargets, parent=facialCtrlLayout)
-        cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
+        cmds.separator(height=5, style="single", horizontal=True, width=facialCtrl_winWidth, parent=facialCtrlLayout)
         cmds.text(label=self.dpUIinst.lang['m142_connectFacialAttr'], parent=facialCtrlLayout)
         cmds.button(label=self.dpUIinst.lang['m170_blendShapes']+" - "+self.dpUIinst.lang['i185_animation'], annotation="Create selected facial controls.", width=220, command=self.dpConnectToBlendShape, parent=facialCtrlLayout)
         cmds.button(label=self.dpUIinst.lang['i181_facialJoint']+" - "+self.dpUIinst.lang['i186_gaming'], annotation="Create default facial controls package.", width=220, command=self.dpConnectToJoints, parent=facialCtrlLayout)
-        # call facialControlUI Window:
+        cmds.separator(height=5, style="in", horizontal=True, width=facialCtrl_winWidth, parent=facialCtrlLayout)
+        cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent=facialCtrlLayout)
+        cmds.button(label=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint'], annotation="Calibrate facial joints for gaming.", width=220, command=self.dpCalibrateFacialJointsUI, parent=facialCtrlLayout)
+        # call FacialConnectionUI Window:
         cmds.showWindow(dpFacialControlWin)
     
 
@@ -185,6 +189,8 @@ class FacialConnection(object):
                                                 dismissString=btCancel)
                     if result == btContinue:
                         prefix = cmds.promptDialog(query=True, text=True)
+                    else: #cancel
+                        return
                 if prefix == "": # if no name provided in the promptDialog, use the geoBase name
                     prefix = geoBase
                     if "|" in geoBase:
@@ -420,15 +426,15 @@ class FacialConnection(object):
         """ Creates the nodes to remap values and connect it to final output (jntTarget) item.
         """
         fromNodeName = self.utils.extractSuffix(fromNode)
-        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
+        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(3)+"_"+toAttr.upper()+"_RmV")
         self.toIDList.append(remap)
-        outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
+        outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(3)+"_"+toAttr.upper()
         if not cmds.objExists(fromNode+"."+outMaxAttr):
             cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
         if "t" in toAttr:
             if not cmds.objExists(fromNode+".sizeFactor"):
                 cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
-            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
+            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(3)+"_"+toAttr.upper()+"_SizeFactor_MD")
             self.toIDList.append(md)
             cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
             cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
@@ -440,17 +446,14 @@ class FacialConnection(object):
         cmds.setAttr(remap+".outputMin", oMin)
         cmds.connectAttr(fromNode+"."+fromAttr, remap+".inputValue", force=True)
         # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
-        connectedList = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=False)
+        connectedList = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=False, skipConversionNodes=True)
         if connectedList:
             if cmds.objectType(connectedList[0]) == "plusMinusAverage":
                 inputList = cmds.listConnections(connectedList[0]+".input1D", destination=False, source=True, plugs=False)
                 cmds.connectAttr(remap+".outValue", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
             else:
-                if cmds.objectType(connectedList[0]) == "unitConversion":
-                    connectedAttr = cmds.listConnections(connectedList[0]+".input", destination=False, source=True, plugs=True)[0]
-                else:
-                    connectedAttr = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=True)[0]
-                pma = cmds.createNode("plusMinusAverage", name=jntTarget+"_"+toAttr.upper()+"_PMA")
+                connectedAttr = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=True)[0]
+                pma = cmds.createNode("plusMinusAverage", name=jntTarget+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_PMA")
                 self.toIDList.append(pma)
                 cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
                 cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
@@ -634,12 +637,24 @@ class FacialConnection(object):
                         cancelled = False
                         nbTarget = len(targetList)
                         reconnectList = []
+                        isLockedList = []
+                        valueList = []
                         cmds.select([newMesh, oldMesh])
                         mel.eval("CreateWrap;")
                         tgtGrp = cmds.group(name="New_Tgt_Grp", empty=True)
                         # clear selection
                         cmds.select(clear=True)
                         newTgtList = []
+                        for item in targetList:
+                            if not item == oldMesh:
+                                valueList.append(cmds.getAttr(bsNode[0]+"."+item))
+                                isLockedList.append(cmds.getAttr(bsNode[0]+"."+item, lock=True))
+                                cmds.setAttr(bsNode[0]+"."+item, lock=False)
+                                reconnectList.append(cmds.listConnections(bsNode[0]+"."+item, source=True, destination=False, plugs=True) or None)
+                                if reconnectList[-1]:
+                                    cmds.disconnectAttr(reconnectList[-1][0], bsNode[0]+"."+item)
+                                # set blendShape slider as 0
+                                cmds.setAttr(bsNode[0]+"."+item, 0)
                         for item in targetList:
                             # update progress window
                             progressAmount += 1
@@ -649,12 +664,6 @@ class FacialConnection(object):
                                 break
                             cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
                             if not item == oldMesh:
-                                hasConnection = cmds.listConnections(bsNode[0]+"."+item, source=True, destination=False, plugs=True)
-                                if hasConnection:
-                                    cmds.disconnectAttr(hasConnection[0], bsNode[0]+"."+item)
-                                    reconnectList.append(hasConnection[0])
-                                else:
-                                    reconnectList.append(None)
                                 # set blendShape slider as 1
                                 cmds.setAttr(bsNode[0]+"."+item, 1)
                                 # renaming old target
@@ -664,17 +673,179 @@ class FacialConnection(object):
                                 newTgtList.append(tgt)
                                 # back to zero
                                 cmds.setAttr(bsNode[0]+"."+item, 0)
-                                if hasConnection:
-                                    cmds.connectAttr(hasConnection[0], bsNode[0]+"."+item)
                                 # clear undo
                                 mel.eval("flushUndo;")
                         cmds.delete(newMesh, constructionHistory=True)
                         cmds.rename(bsNode[0], bsNode[0]+"_Old")
                         cmds.blendShape(newTgtList, newMesh, topologyCheck=False, name=bsNode[0])
+                        for v, value in enumerate(valueList):
+                            cmds.setAttr(bsNode[0]+"."+newTgtList[v], value)
+                            cmds.setAttr(bsNode[0]+"_Old."+newTgtList[v], value)
                         for p, plug in enumerate(reconnectList):
                             if plug:
-                                cmds.connectAttr(plug, bsNode[0]+"."+newTgtList[p], force=True)
+                                cmds.connectAttr(plug[0], bsNode[0]+"."+newTgtList[p], force=True)
+                                cmds.connectAttr(plug[0], bsNode[0]+"_Old."+newTgtList[p], force=True)
+                                if isLockedList[p]:
+                                    cmds.setAttr(bsNode[0]+"."+newTgtList[p], lock=True)
+                                    cmds.setAttr(bsNode[0]+"_Old."+newTgtList[p], lock=True)
                         if cmds.objExists(oldMesh+"Base"):
                             cmds.delete(oldMesh+"Base")
                         cmds.progressWindow(endProgress=True)
                         cmds.select(clear=True)
+
+    
+    def dpCalibrateFacialJointsUI(self, *args):
+        # creating targetMirrorUI Window:
+        self.utils.closeUI('dpCalibrateFacialJointsWindow')
+        winWidth  = 430
+        winHeight = 500
+        cmds.window('dpCalibrateFacialJointsWindow', title=self.dpUIinst.lang['c111_calibrate']+" "+self.dpUIinst.lang['i181_facialJoint']+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        # creating layout:
+        mainFormLayout = cmds.formLayout('calibrateFacialJointsForm', numberOfDivisions=100)
+        topColumnLayout = cmds.columnLayout('calibrateFacialJointsLayout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent=mainFormLayout)
+        cmds.separator(height=5, style="none", horizontal=True, width=winWidth, parent=topColumnLayout)
+        cmds.rowColumnLayout('facialCtrl_RCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 150), (2, 130)], rowSpacing=(1, 10), columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=topColumnLayout)
+        cmds.text("facialCtrl_TXT", label="Facial Ctrl", parent="facialCtrl_RCL")
+        cmds.text("attribute_TXT", label="Attribute", parent="facialCtrl_RCL")
+        cmds.textScrollList("facialCtrl_TSL", selectCommand=self.loadSelectedAttrs, allowMultiSelection=False, parent='facialCtrl_RCL')
+        cmds.textScrollList("attrCtrl_TSL", selectCommand=self.loadSelectedOffsets, allowMultiSelection=False, parent='facialCtrl_RCL')
+        cmds.checkBox('autoCalibrate_CB', label=self.dpUIinst.lang['c121_side']+" "+self.dpUIinst.lang['c119_auto']+" "+self.dpUIinst.lang['c111_calibrate'], value=True, parent=topColumnLayout)
+        cmds.separator(height=5, style="in", horizontal=True, width=winWidth, parent=topColumnLayout)
+        cmds.text(label=self.dpUIinst.lang['i193_calibration'], parent=topColumnLayout)
+        cmds.separator(height=3, style="none", horizontal=True, width=winWidth, parent=topColumnLayout)
+        scroll = cmds.scrollLayout("calibrateFacialJointsScrollLayout", childResizable=True, parent=mainFormLayout)
+        cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='calibrateFacialJointsScrollLayout')
+        cmds.formLayout(mainFormLayout, edit=True, attachForm=[(topColumnLayout, 'left', 0), (topColumnLayout, 'right', 0), (topColumnLayout, 'top', 0), (scroll, 'left', 0), (scroll, 'right', 0), (scroll, 'bottom', 0)], attachControl=[(scroll, 'top', 0, topColumnLayout)])
+        # call facialControlUI Window:
+        cmds.showWindow('dpCalibrateFacialJointsWindow')
+        # load data
+        self.loadUIData()
+
+
+    def getFacialCtrlList(self, *args):
+        facialCtrlList = []
+        ctrlIDList = ["id_046_FacialBrow", "id_047_FacialEyelid", "id_048_FacialMouth", "id_049_FacialLips", "id_050_FacialSneer", "id_051_FacialGrimace", "id_052_FacialFace"]
+        allCtrlList = self.dpUIinst.ctrls.getControlList()
+        if allCtrlList:
+            for ctrl in allCtrlList:
+                if cmds.getAttr(ctrl+".controlID") in ctrlIDList:
+                    facialCtrlList.append(ctrl)
+        return facialCtrlList
+
+
+    def getFacialAttrList(self, ctrl, *args):
+        return [a for a in cmds.listAttr(ctrl, userDefined=True) if not any(char.isdigit() for char in a) and cmds.listConnections(ctrl+"."+a, destination=True, source=False) and cmds.objectType(cmds.listConnections(ctrl+"."+a, destination=True, source=False)[0]) == "remapValue"]
+
+
+    def loadUIData(self, *args):
+        facialCtrlList = self.getFacialCtrlList()
+        if facialCtrlList:
+            tslHeight = (len(facialCtrlList)+1)*15
+            cmds.textScrollList("facialCtrl_TSL", edit=True, height=tslHeight, append=facialCtrlList)
+            cmds.textScrollList("attrCtrl_TSL", edit=True, height=tslHeight)
+
+
+    def loadSelectedAttrs(self, *args):
+        ctrl = cmds.textScrollList("facialCtrl_TSL", query=True, selectItem=True)[0]
+        attrList = self.getFacialAttrList(ctrl)
+        cmds.textScrollList("attrCtrl_TSL", edit=True, removeAll=True)
+        cmds.textScrollList("attrCtrl_TSL", edit=True, append=attrList)
+        self.clearFacialCalibrationAttributesLayout()
+
+
+    def loadSelectedOffsets(self, *args):
+        ctrl = cmds.textScrollList("facialCtrl_TSL", query=True, selectItem=True)[0]
+        attr = cmds.textScrollList("attrCtrl_TSL", query=True, selectItem=True)[0]
+        self.clearFacialCalibrationAttributesLayout()
+        calibAttrList = self.getFacialCalibrationAttrList(ctrl, attr)
+        for calibAttr in calibAttrList:
+            offsetCtrl = calibAttr[:calibAttr.rfind("_")]
+            offsetCtrl = offsetCtrl[:offsetCtrl.rfind("_")]+"_Ctrl"
+            calibAttrValue = cmds.getAttr(ctrl+"."+calibAttr)
+            cmds.floatSliderButtonGrp(calibAttr+"_fsbg", label=calibAttr, field=True, buttonLabel=self.dpUIinst.lang['m004_select'], value=calibAttrValue, minValue=-360, maxValue=360, dragCommand=partial(self.setFacialJointCalibration, ctrl, attr, calibAttr), changeCommand=partial(self.setFacialJointCalibration, ctrl, attr, calibAttr), buttonCommand=partial(cmds.select, offsetCtrl), columnWidth4=(180, 50, 120, 50), adjustableColumn=3, parent='attrsLayout')
+
+
+    def getFacialCalibrationAttrList(self, ctrl, attr, *args):
+        attrList = []
+        if attr in cmds.listAttr(ctrl):
+            outputList = cmds.listConnections(ctrl+"."+attr, destination=True, source=False) or []
+            for item in outputList:
+                if cmds.objectType(item) == "remapValue":
+                    sourceNode = cmds.listConnections(item+".outputMax", destination=False, source=True)[0]
+                    plug = cmds.listConnections(item+".outputMax", destination=False, source=True, plugs=True)[0]
+                    if sourceNode == ctrl:
+                        attrList.append(plug[plug.rfind(".")+1:])
+                    elif cmds.objectType(sourceNode) == "multiplyDivide":
+                        plug = cmds.listConnections(sourceNode+".input1X", destination=False, source=True, plugs=True)[0]
+                        attrList.append(plug[plug.rfind(".")+1:])
+        return attrList
+
+
+    def clearFacialCalibrationAttributesLayout(self, *args):
+        if cmds.columnLayout('attrsLayout', query=True, exists=True):
+            cmds.deleteUI('attrsLayout')
+            cmds.columnLayout('attrsLayout', columnOffset=("both", 10), rowSpacing=10, parent='calibrateFacialJointsScrollLayout')
+
+
+    def getOppositeSide(self, name, n=2):
+        opposite, start, end = None, None, None
+        l = self.dpUIinst.lang["p002_left"]+"_"
+        r = self.dpUIinst.lang["p003_right"]+"_"
+        if name.startswith(l):
+            opposite = r+name[2:]
+        elif name.startswith(r):
+            opposite = l+name[2:]
+        if opposite:
+            start, end = self.getNameStartEnd(opposite, n)
+        return [opposite, start, end]
+
+
+    def getNameStartEnd(self, name, n=2):
+        start = name[:name.rfind("_")]
+        if n > 1:
+            for s in range(1, n):
+                if s == (n-1):
+                    start = start[:start.rfind("_")+1]
+                else:
+                    start = start[:start.rfind("_")]
+        end = name[name.rfind("_"):]
+        return [start, end]
+
+
+    def setFacialJointCalibration(self, ctrl, attr, calibAttr, value, *args):
+        if calibAttr in cmds.listAttr(ctrl):
+            cmds.setAttr(ctrl+"."+calibAttr, value)
+            if cmds.checkBox("autoCalibrate_CB", query=True, exists=True):
+                if cmds.checkBox("autoCalibrate_CB", query=True, value=True):
+                    self.setOppositeCalibration(ctrl, attr, calibAttr, value)
+                    oppositeCtrlList = self.getOppositeSide(ctrl, 1)
+                    if oppositeCtrlList[0]:
+                        ctrlList = self.getFacialCtrlList()
+                        for anotherCtrl in ctrlList:
+                            if anotherCtrl.startswith(oppositeCtrlList[1]) and anotherCtrl.endswith(oppositeCtrlList[2]):
+                                self.setOppositeCalibration(anotherCtrl, attr, calibAttr, value)
+
+
+    def setOppositeCalibration(self, ctrl, attr, calibAttr, value):
+        oppositeCalibAttrList = self.getOppositeSide(calibAttr)
+        if oppositeCalibAttrList[0]:
+            calibAttrList = self.getFacialCalibrationAttrList(ctrl, attr)
+            for anotherCalibAttr in calibAttrList:
+                self.setOppositeCalibrationAttr(ctrl, anotherCalibAttr, value, oppositeCalibAttrList[1], oppositeCalibAttrList[2])
+        oppositeAttrList = self.getOppositeSide(attr, 1)
+        if oppositeAttrList[0]:
+            if oppositeAttrList[0] in cmds.listAttr(ctrl):
+                attrList = self.getFacialCalibrationAttrList(ctrl, oppositeAttrList[0])
+                for anotherAttr in attrList:
+                    if oppositeCalibAttrList[1]:
+                        self.setOppositeCalibrationAttr(ctrl, anotherAttr, value, oppositeCalibAttrList[1], oppositeCalibAttrList[2])
+                    else:
+                        startAttr, endAttr = self.getNameStartEnd(calibAttr)
+                        self.setOppositeCalibrationAttr(ctrl, anotherAttr, value, startAttr, endAttr)
+
+
+    def setOppositeCalibrationAttr(self, ctrl, attr, value, start, end):
+        if attr.startswith(start) and attr.endswith(end):
+            cmds.setAttr(ctrl+"."+attr, value)
+            if cmds.floatSliderButtonGrp(attr+"_fsbg", query=True, exists=True):
+                cmds.floatSliderButtonGrp(attr+"_fsbg", edit=True, value=value)

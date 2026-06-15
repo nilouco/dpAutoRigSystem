@@ -1565,10 +1565,11 @@ class Utils(object):
             setList = list(set(setList)-set(renderSetList))
             if setList:
                 for setNode in setList:
-                    cmds.sets(item, remove=setNode)
-                    cmds.sets(item+".vtx[*]", remove=setNode)
-                    cmds.sets(item+".f[*]", remove=setNode)
-                    cmds.sets(item+".e[*]", remove=setNode)
+                    if cmds.objExists(setNode):
+                        cmds.sets(item, remove=setNode)
+                        cmds.sets(item+".vtx[*]", remove=setNode)
+                        cmds.sets(item+".f[*]", remove=setNode)
+                        cmds.sets(item+".e[*]", remove=setNode)
 
 
     def replaceItemSuffix(self, item, sourceDic, suffixList=None, *args):

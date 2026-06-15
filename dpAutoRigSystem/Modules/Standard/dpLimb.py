@@ -17,7 +17,7 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 WIKI = "03-‐-Guides#-limb"
 
-DP_LIMB_VERSION = 3.13
+DP_LIMB_VERSION = 3.14
 
 
 class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
@@ -745,6 +745,9 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
 
     def rigModule(self, *args):
+        # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
+        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
         dpBaseStandard.BaseStandard.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
@@ -1363,8 +1366,8 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
                 if self.limbTypeName == self.armName and self.getHasBend() == False:
                     # create forearm joint:
-                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.dpUIinst.lang[ 'c030_forearm']+self.jSufixList[0])[0]
-                    self.utils.setJointLabel(forearmJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang[ 'c030_forearm'])
+                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.dpUIinst.lang['c030_forearm']+self.jSufixList[0])[0]
+                    self.utils.setJointLabel(forearmJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm'])
                     # delete its children:
                     childList = cmds.listRelatives(forearmJnt, children=True, fullPath=True)
                     cmds.delete(childList)
@@ -1390,14 +1393,21 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.addAttr(forearmCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                     self.ctrls.setLockHide([forearmCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # make rotate connections:
-                    forearmMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang[ 'c030_forearm']+"_MD")
-                    self.toIDList.append(forearmMD)
-                    cmds.connectAttr(forearmCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], forearmMD+'.input1X')
-                    cmds.connectAttr(self.skinJointList[3]+'.rotateZ', forearmMD+'.input2X')
-                    cmds.connectAttr(forearmMD+'.outputX', forearmGrp+'.rotateZ')
                     ikExtremOrientPaC = cmds.parentConstraint(forearmCtrl, self.ikExtremSubCtrl, self.fkJointList[-2], self.extremOrientCtrlZero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.extremOrientCtrlZero+"_PaC")[0]
                     ikExtremOrientPaCW0 = forearmCtrl+"W0"
                     cmds.pointConstraint(self.skinJointList[-2], self.extremOrientCtrlZero, maintainOffset=True, name=self.extremOrientCtrlZero+"_PoC")
+                    # autoRotate forearm by quaternion
+                    if loadedQuatNode and loadedMatrixPlugin:
+                        forearmWristLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Wrist_Loc")[0]
+                        forearmElbowLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Elbow_Loc")[0]
+                        cmds.setAttr(forearmWristLoc+".visibility", 0)
+                        cmds.setAttr(forearmElbowLoc+".visibility", 0)
+                        cmds.delete(cmds.parentConstraint(self.skinJointList[3], forearmElbowLoc, mo=False))
+                        cmds.parent(forearmElbowLoc, self.skinJointList[2])
+                        cmds.parent(forearmWristLoc, self.skinJointList[3], relative=True)
+                        forearmTwistBoneMD = self.utils.twistBoneMatrix(forearmElbowLoc, forearmWristLoc, side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_TwistBone")
+                        cmds.connectAttr(forearmCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], forearmTwistBoneMD+'.input1Z')
+                        cmds.connectAttr(forearmTwistBoneMD+'.outputZ', forearmGrp+'.rotateZ')
 
                 # creating a group to receive the reverseFootCtrlGrp (if module integration is on):
                 self.ikFkBlendGrpToRevFoot = cmds.group(empty=True, name=side+self.userGuideName+"_IkFkBlendGrpToRevFoot_Grp")
@@ -1573,9 +1583,6 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                             self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                         
                         # implementing auto rotate twist bones:
-                        # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
-                        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
                         if loadedQuatNode and loadedMatrixPlugin:
                             twistBoneMD = self.bendGrps['twistBoneMD']
                             shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
@@ -1610,9 +1617,6 @@ class Limb(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", ikExtremOrientPaC+"."+self.fkJointList[-2]+"W2")
 
                 # auto clavicle:
-                # loading Maya matrix node
-                loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-                loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
                 if loadedQuatNode and loadedMatrixPlugin:
                     # create auto clavicle group:
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)

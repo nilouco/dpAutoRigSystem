@@ -798,6 +798,7 @@
     "m264_rebuildTargetsText"    : "Selecione a mesh antiga e a novo mesh para:",
     "m265_rebuildTargets"        : "Reconstruir as Targets",
     "m266_rebuildTargetsDesc"    : "Primeiro selecione a mesh antiga com o node de blendShape, em seguida a nova mesh.",
+    "m267_tooth"                 : "Dente",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

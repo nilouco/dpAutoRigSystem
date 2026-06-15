@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_5 = "5.01.49"
-DPAR_UPDATELOG = "N993 - KeepIt to EmptyTransform checkout validator."
+DPAR_VERSION_5 = "5.01.50"
+DPAR_UPDATELOG = "N990 - Conform to Maya 2027.\nIt's the latest update to version 5."
 
 # to make old dpAR version compatible to receive this update message - it can be deleted in the future 
 DPAR_VERSION_PY3 = "5.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
