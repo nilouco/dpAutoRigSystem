@@ -30,19 +30,19 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     
     
     def getModuleAttr(self, moduleAttr, *args):
-        return cmds.getAttr(self.moduleGrp + "." + moduleAttr)
+        return cmds.getAttr(self.guide_base + "." + moduleAttr)
         
     
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="fatherB", dataType='string')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="fatherB", dataType='string')
         
         self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocA", r=0.3, d=1, guide=True)
         self.jAGuide = cmds.joint(name=self.guideName+"_jAGuide", radius=0.001)
         cmds.setAttr(self.jAGuide+".template", 1)
-        cmds.parent(self.jAGuide, self.moduleGrp, relative=True)
+        cmds.parent(self.jAGuide, self.guide_base, relative=True)
         
         self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocB", r=0.3, d=1, guide=True)
         cmds.parent(self.cvBLoc, self.cvALoc)
@@ -53,7 +53,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvBLoc, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvBLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        cmds.parent(self.cvALoc, self.moduleGrp)
+        cmds.parent(self.cvALoc, self.guide_base)
         cmds.parent(self.jBGuide, self.jAGuide)
         cmds.parentConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_PaC")
         cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_PaC")
@@ -70,20 +70,20 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         if selList:
             if cmds.objExists(selList[0]):
                 cmds.textField(self.fatherBTF, edit=True, text=selList[0])
-                cmds.setAttr(self.moduleGrp+".fatherB", selList[0], type='string')
+                cmds.setAttr(self.guide_base+".fatherB", selList[0], type='string')
     
     
     def changeFatherB(self, *args):
-        """ Update moduleGrp fatherB attribute from UI textField.
+        """ Update main fatherB attribute from UI textField.
         """
         newFatherBValue = cmds.textField(self.fatherBTF, query=True, text=True)
-        cmds.setAttr(self.moduleGrp+".fatherB", newFatherBValue, type='string')
+        cmds.setAttr(self.guide_base+".fatherB", newFatherBValue, type='string')
     
     
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # declare lists to store names and attributes:
             self.suspensionBCtrlGrpList, self.fatherBList, self.ctrlHookGrpList = [], [], []
             # run for all sides
@@ -138,7 +138,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(mainCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        if cmds.getAttr(self.guide_base+".flip") == 1:
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleX", -1)
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleY", -1)
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleZ", -1)
@@ -168,7 +168,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.connectAttr(self.ctrlList[1]+"."+self.ar.data.lang['c118_active'], bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
                 # integrating data:
-                self.loadedFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
+                self.loadedFatherB = cmds.getAttr(self.guide_base+".fatherB")
                 if self.loadedFatherB:
                     self.fatherBList.append(self.loadedFatherB)
                 else:
@@ -181,7 +181,7 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
@@ -193,10 +193,8 @@ class Suspension(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "suspensionBCtrlGrpList" : self.suspensionBCtrlGrpList,
-                                                "fatherBList"        : self.fatherBList,
-                                                "ctrlHookGrpList"    : self.ctrlHookGrpList,
-                                              }
+        self.integrated = {
+                                        "suspensionBCtrlGrpList" : self.suspensionBCtrlGrpList,
+                                        "fatherBList"        : self.fatherBList,
+                                        "ctrlHookGrpList"    : self.ctrlHookGrpList,
                                     }

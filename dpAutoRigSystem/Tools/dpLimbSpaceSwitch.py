@@ -33,7 +33,7 @@ class LimbSpaceSwitch(dpBaseLibrary.BaseLibrary):
             self.rootCtrl = self.ar.utils.getNodeByMessage("ctrlsVisibilityGrp", allGrp)
             self.globalCtrl = self.ar.utils.getNodeByMessage("globalCtrl", allGrp)
             self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
-            self.toIDList = []
+            self.to_ids = []
 
             self.globalName = "Global"
             self.rootName = "Root"
@@ -114,7 +114,7 @@ class LimbSpaceSwitch(dpBaseLibrary.BaseLibrary):
                         cmds.setAttr(ikCtrl+"."+self.followAttr, edit=True, keyable=True)
                         
                         self.pac = cmds.parentConstraint(self.globalCtrl, self.rootCtrl, self.spineHipsACtrl, self.spineHipsBCtrl, self.spineChestACtrl, self.spineChestBCtrl, self.headSubCtrl, ikCtrl+"_Orient_Grp", maintainOffset=True, name=ikCtrl+"_Orient_Grp_PaC")[0]
-                        self.toIDList.append(self.pac)
+                        self.to_ids.append(self.pac)
 
                         cmds.setAttr(ikCtrl+"."+self.followAttr, 0)
                         cmds.setAttr(self.pac+"."+self.globalCtrl+"W0", 1)
@@ -162,5 +162,5 @@ class LimbSpaceSwitch(dpBaseLibrary.BaseLibrary):
         newDrivenKeyList = currentDrivenKeyList
         if oldDrivenKeyList:
             newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
-        self.toIDList.extend(newDrivenKeyList)
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.to_ids.extend(newDrivenKeyList)
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID

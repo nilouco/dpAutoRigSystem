@@ -396,23 +396,23 @@ class Utils(object):
                     self.addCustomAttr([objName], self.ignoreTransformIOAttr)
 
 
-    def hook(self):
+    def get_hook(self):
         """ Mount a dictionary with guide modules hierarchies.
             Return a dictionary with the father and children lists inside of each guide like:
             {guide{'guideModuleNamespace':"...", 'name':"...", 'guideCustomName':"...", 'guideMirrorAxis':"...", 'guideMirrorName':"...", 'fatherGuide':"...", 'fatherNode':"...", 'fatherModule':"...", 'fatherCustomName':"...", 'fatherMirrorAxis':"...", 'fatherMirrorName':"...", 'fatherGuideLoc':"...", 'childrenList':[...]}}
         """
-        hookDic = {}
+        hook = {}
         allList = cmds.ls(type='transform')
         for item in allList:
             if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1:
                 # module info:
                 guideModuleNamespace = item[:item.find(":")]
-                name      = item[:item.find("__")]
-                guideInstance        = item[item.rfind("__")+2:item.find(":")]
-                guideCustomName      = cmds.getAttr(item+".customName")
-                guideMirrorAxis      = cmds.getAttr(item+".mirrorAxis")
-                tempAMirrorName      = cmds.getAttr(item+".mirrorName")
-                guideMirrorName      = [tempAMirrorName[0]+"_" , tempAMirrorName[len(tempAMirrorName)-1:]+"_"]
+                name = item[:item.find("__")]
+                guideInstance = item[item.rfind("__")+2:item.find(":")]
+                guideCustomName = cmds.getAttr(item+".customName")
+                guideMirrorAxis = cmds.getAttr(item+".mirrorAxis")
+                tempAMirrorName = cmds.getAttr(item+".mirrorName")
+                guideMirrorName = [tempAMirrorName[0]+"_" , tempAMirrorName[len(tempAMirrorName)-1:]+"_"]
                 
                 # get children:
                 guideChildrenList = []
@@ -470,14 +470,14 @@ class Utils(object):
                 
                 # mounting dictionary:
                 if guideParentList and guideChildrenList:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":guideChildrenList}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":guideChildrenList}
                 elif guideParentList:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":[]}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":[]}
                 elif guideChildrenList:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":guideChildrenList}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":guideChildrenList}
                 else:
-                    hookDic[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":[]}
-        return hookDic
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":[]}
+        return hook
 
 
     def distanceBet(self, a, b, name="temp_DistBet", keep=False):
@@ -603,12 +603,12 @@ class Utils(object):
         return allParentsList
 
 
-    def getModulesToBeRigged(self, instanceList):
+    def get_guides_to_rig(self, instanceList):
         """ Get all valid loaded modules to be rigged (They are valid instances with namespaces in the scene, then they are not deleted).
             Currently named as rawGuide instances.
             Return a list of modules to be rigged.
         """
-        modulesToBeRiggedList = []
+        guides_to_rig = []
         headModuleList = []
         allNamespaceList = cmds.namespaceInfo(listNamespace=True)
         for guideModule in instanceList:
@@ -619,14 +619,14 @@ class Utils(object):
                     userGuideName = guideModule.userGuideName
                     if not cmds.objExists(userGuideName+'_Static_Grp'):
                         if not "dpHead" in str(guideModule):
-                            modulesToBeRiggedList.append(guideModule)
+                            guides_to_rig.append(guideModule)
                         else:
                             # store Head guides to rig it later
                             headModuleList.append(guideModule)
         if headModuleList:
             # hack to rig Head modules at the end in order to call FacialConnection properly for joint target Singles tweakers.
-            modulesToBeRiggedList.extend(headModuleList)
-        return modulesToBeRiggedList
+            guides_to_rig.extend(headModuleList)
+        return guides_to_rig
 
 
     def getCtrlRadius(self, nodeName):
@@ -1459,7 +1459,7 @@ class Utils(object):
     def cleanupDeletedGuides(self, *args):
         """ Check for broken guides by deleted base using keyboard.
             Remove unused guide namespaces.
-            Return True if found a namespace without moduleGrp guide base or False if it's okay.
+            Return True if found a namespace without main guide base or False if it's okay.
         """
         cleanned = False
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
@@ -1597,3 +1597,8 @@ class Utils(object):
         if custom_name:
             return custom_name
         return name
+
+
+    def clear_guide_mirror_grp(self):
+        if cmds.objExists(self.ar.data.guide_mirror_grp):
+            cmds.delete(self.ar.data.guide_mirror_grp)

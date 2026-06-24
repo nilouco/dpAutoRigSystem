@@ -1,7 +1,7 @@
 {
     "dpGuide_000_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Before",
@@ -229,7 +229,7 @@
     },
     "dpGuide_001_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Foot",

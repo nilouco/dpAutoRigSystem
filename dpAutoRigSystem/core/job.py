@@ -60,7 +60,7 @@ class Job(object):
                 cmds.select(updatedGuideNodeList)
         # update UI
         for m, moduleInstance in enumerate(self.ar.data.standard_instances):
-            if cmds.objExists(moduleInstance.moduleGrp):
+            if cmds.objExists(moduleInstance.guide_base):
                 if moduleInstance.selectButton:
                     currentColorList = self.ar.ctrls.getGuideRGBColorList(moduleInstance)
                     if currentColorList:

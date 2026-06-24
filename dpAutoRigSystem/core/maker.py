@@ -484,791 +484,212 @@ class Maker(object):
     
 
 
-    #maker
-    def rigAll(self, integrate=None, *args):
-        """ Create the RIG based in the Guide Modules in the scene.
-            Most important function to automate the generating process.
-        """
+
+
+    #
+    #
+    # WIP
+    #
+    # bring rig_all to here..
+    #
+    #
+
+
+    def before_rig_all(self):
         print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
         self.ar.utils.setProgress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
         self.ar.utils.closeUI(self.ar.data.plus_info_win_name)
         self.ar.utils.closeUI(self.ar.data.color_override_win_name)
+
+
+    def refresh_before_build(self):
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.ar.data.rebuilding:
             self.ar.filler.fill_created_guides()
         else:
             self.ar.ui_manager.refresh_ui()
-        
-        # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
-        self.modulesToBeRiggedList = self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)
-        self.riggedModuleDic = {}
-        
-        # declare a list to store all integrating information:
-        self.integratedTaskDic = {}
-        
-        # verify if there are instances of modules (guides) to rig in the scene:
-        if self.modulesToBeRiggedList:
-            self.ar.utils.setProgress(max=len(self.modulesToBeRiggedList), addOne=False, addNumber=False)
-            
-            # check guide versions to be sure we are building with the same dpAutoRigSystem version:
-            for guideModule in self.modulesToBeRiggedList:
-                guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
-                if not guideVersion == self.ar.data.version:
-                    btYes = self.ar.data.lang['i071_yes']
-                    btUpdateGuides = self.ar.data.lang['m186_updateGuides']
-                    btNo = self.ar.data.lang['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+self.ar.data.version, message=self.ar.data.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
-                    if userChoose == btNo:
-                        return
-                    elif userChoose == btUpdateGuides:
-                        
-                        #self.initExtraModule("dpUpdateGuides", self.ar.data.tools_folder)
-                        #self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
-                        self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
-                        return
-                    else:
-                        break
-            
-            # clear all duplicated names in order to run without find same names if they exists:
-            if cmds.objExists(self.ar.data.guide_mirror_grp):
-                cmds.delete(self.ar.data.guide_mirror_grp)
-            
-            # regenerate mirror information for all guides:
-            for guideModule in self.modulesToBeRiggedList:
-                guideModule.checkFatherMirror()
-            
-            # store hierarchy from guides:
-            self.hookDic = self.ar.utils.hook()
-            
-            # serialize all guides before build them
-            for guideModule in self.modulesToBeRiggedList:
-                guideModule.serializeGuide()
 
+
+    def check_good_guide_version(self, guides_to_rig):
+        # check guide versions to be sure we are building with the same dpAutoRigSystem version:
+        for item in self.guides_to_rig:
+            guide_version = cmds.getAttr(f"{item.guide_base}.dpARVersion")
+            if not guide_version == self.ar.data.version:
+                yes_text = self.ar.data.lang['i071_yes']
+                update_guides_text = self.ar.data.lang['m186_updateGuides']
+                not_text = self.ar.data.lang['i072_no']
+                user_choose = cmds.confirmDialog(title=f"dpAutoRigSystem - v{self.ar.data.version}", message=self.ar.data.lang['i127_guideVersionDif'], button=[yes_text, update_guides_text, not_text], defaultButton=yes_text, cancelButton=not_text, dismissString=not_text)
+                if user_choose == not_text:
+                    return False
+                elif user_choose == update_guides_text:
+                    self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
+                    return False
+        return True
+
+
+    def colorize_curves(self):
+        # colorize all controller in yellow as a base if not find the pattern
+        ground_ctrls = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
+        left_pattern = re.compile(f"{self.ar.data.lang['p002_left']}_.*._Ctrl")
+        right_pattern = re.compile(f"{self.ar.data.lang['p003_right']}_.*._Ctrl")
+        for ctrl in self.ar.ctrls.getControlList():
+            shapes = cmds.listRelatives(ctrl, children=True, allDescendents=True, fullPath=True, type="shape")
+            if shapes:
+                if not cmds.getAttr(shapes[0]+".overrideEnabled"):
+                    if (left_pattern.match(ctrl)):
+                        self.ar.ctrls.colorShape([ctrl], "red")
+                    elif (right_pattern.match(ctrl)):
+                        self.ar.ctrls.colorShape([ctrl], "blue")
+                    elif (ctrl in ground_ctrls):
+                        self.ar.ctrls.colorShape([ctrl], "black")
+                    else:
+                        self.ar.ctrls.colorShape([ctrl], "yellow")
+
+
+    def get_mirror_names(self, item):
+        mirror_names = [""]
+        if self.hook[item.guide_base]['guideMirrorAxis'] != "off":
+            mirror_names = self.hook[item.guide_base]['guideMirrorName']
+        return mirror_names
+
+
+    def organize_hierarchy(self):
+        # verify if it's necessary organize the hierarchies for each module:
+        for item in self.guides_to_rig:
+            for s, side in enumerate(self.get_mirror_names(item)):
+                # get hook groups info:
+                self.static_hook_grp = cmds.listConnections(f"{item.guideNet}.{side}StaticHookGrp", destination=False, source=True)[0]
+                self.scalable_hook_grp = cmds.listConnections(f"{item.guideNet}.{side}ScalableHookGrp", destination=False, source=True)[0]
+                self.ctrl_hook_grp = cmds.listConnections(f"{item.guideNet}.{side}ControlHookGrp", destination=False, source=True)[0]
+                # get father info:
+                if self.hook[item.guide_base]['fatherGuide']:
+                    # working with father mirror:
+                    father_mirror_names = [""]
+                    # get fatherName:
+                    if self.hook[item.guide_base]['fatherMirrorAxis'] != "off":
+                        father_mirror_names = self.hook[item.guide_base]['fatherMirrorName']
+                    for f, side_father in enumerate(father_mirror_names):
+                        father_name = f"{side_father}{self.ar.data.prefix}{self.hook[item.guide_base]['fatherInstance']}"
+                        if self.hook[item.guide_base]['fatherCustomName']:
+                            father_name = f"{side_father}{self.ar.data.prefix}{self.hook[item.guide_base]['fatherCustomName']}"
+                        # get final rigged parent node from originedFromDic:
+                        father_rigged_parent_node = self.originedFromDic[father_name+"_Guide_"+self.hook[item.guide_base]['fatherGuideLoc']]
+                        if father_rigged_parent_node:
+                            if len(father_mirror_names) != 1: # tell us 'the father has mirror'
+                                if s == f:
+                                    # parent them to the correct side of the father's mirror:
+                                    if self.ctrl_hook_grp:
+                                        cmds.parent(self.ctrl_hook_grp, father_rigged_parent_node)
+                            else:
+                                # parent them to the unique father:
+                                if self.ctrl_hook_grp:
+                                    cmds.parent(self.ctrl_hook_grp, father_rigged_parent_node)
+                elif self.hook[item.guide_base]['parentNode']:
+                    # parent module control to just a node in the scene:
+                    cmds.parent(self.ctrl_hook_grp, self.hook[item.guide_base]['parentNode'])
+                else:
+                    # parent module control to default masterGrp:
+                    cmds.parent(self.ctrl_hook_grp, self.ctrlsVisGrp)
+                # put static and scalable groups in dataGrp:
+                cmds.parent(self.static_hook_grp, self.staticGrp)
+                cmds.parent(self.scalable_hook_grp, self.scalableGrp)
+                # finish hookGrps:
+                cmds.setAttr(f"{self.static_hook_grp}.staticHook", 0)
+                cmds.setAttr(f"{self.scalable_hook_grp}.scalableHook", 0)
+                cmds.setAttr(f"{self.ctrl_hook_grp}.ctrlHook", 0)
+                cmds.lockNode(item.guideNet, lock=False)
+                cmds.deleteAttr(f"{item.guideNet}.{side}StaticHookGrp")
+                cmds.deleteAttr(f"{item.guideNet}.{side}ScalableHookGrp")
+                cmds.deleteAttr(f"{item.guideNet}.{side}ControlHookGrp")
+                cmds.lockNode(item.guideNet, lock=True)
+
+
+    def set_option_ctrl_corrective(self, item):
+        # display corrective controls by an Option_Ctrl attribute:
+        if "correctiveCtrlGrpList" in item.integrated.keys():
+            if not f"{self.ar.data.lang['c124_corrective']}Ctrls" in cmds.listAttr(self.optionCtrl):
+                cmds.addAttr(self.optionCtrl, longName=f"{self.ar.data.lang['c124_corrective']}Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                cmds.setAttr(f"{self.optionCtrl}.{self.ar.data.lang['c124_corrective']}Ctrls", channelBox=True)
+            for corrective_grp in item.integrated['correctiveCtrlGrpList']:
+                cmds.connectAttr(f"{self.optionCtrl}.{self.ar.data.lang['c124_corrective']}Ctrls", f"{corrective_grp}.visibility", force=True)
+
+
+    
+
+
+    #maker
+    def rig_all(self, *args):
+        """ Create the RIG based in the Guide Modules in the scene.
+            Most important function to automate the generating process.
+        """
+        self.hook = self.ar.utils.get_hook()
+        self.before_rig_all()
+        self.refresh_before_build()
+
+        # verify if there are instances of modules (guides) to rig in the scene:
+        self.guides_to_rig = self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)
+        if self.guides_to_rig:
+            self.ar.utils.setProgress(max=len(self.guides_to_rig), addOne=False, addNumber=False)
+            if not self.check_good_guide_version(self.guides_to_rig):
+                return
+            
             if self.ar.data.integrate_all:
                 self.createBaseRigNode()
-            # run RIG function for each guideModule:
-            for guideModule in self.modulesToBeRiggedList:
-                # create the rig for this guideModule:
-                guideModuleCustomName = cmds.getAttr(guideModule.moduleGrp+'.customName')
+
+            # regenerate mirror information for all guides:
+            self.ar.utils.clear_guide_mirror_grp()
+            for item in self.guides_to_rig:
+                item.check_father_mirror()
+                item.serialize_guide()
+                if item.customName:
+                    self.ar.utils.setProgress('Rigging: '+str(item.customName))
+                else:
+                    self.ar.utils.setProgress('Rigging: '+str(item.guideNamespace))
                 
-                # Update progress window
-                guideName = guideModuleCustomName
-                if not guideName:
-                    guideName = cmds.getAttr(guideModule.moduleGrp+'.moduleNamespace')
-                self.ar.utils.setProgress('Rigging: '+str(guideName))
-                
-                # Rig it :)
-                guideModule.rigModule()
-                # get rigged module name:
-                self.riggedModuleDic[guideModule.moduleGrp.split(":")[0]] = guideModuleCustomName
-                # get integrated information:
-                if guideModule.integratedActionsDic:
-                    self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
+                item.rig_me() #rig it :)
             
-            #Colorize all controller in yellow as a base
-            if self.ar.data.colorize_curve:
-                aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
-                aAllCtrls = cmds.ls("*_Ctrl")
-                lPattern = re.compile(self.ar.data.lang['p002_left'] + '_.*._Ctrl')
-                rPattern = re.compile(self.ar.data.lang['p003_right'] + '_.*._Ctrl')
-                for pCtrl in aAllCtrls:
-                    shapeList = cmds.listRelatives(pCtrl, children=True, allDescendents=True, fullPath=True, type="shape")
-                    if shapeList:
-                        if not cmds.getAttr(shapeList[0]+".overrideEnabled"):
-                            if (lPattern.match(pCtrl)):
-                                self.ar.ctrls.colorShape([pCtrl], "red")
-                            elif (rPattern.match(pCtrl)):
-                                self.ar.ctrls.colorShape([pCtrl], "blue")
-                            elif (pCtrl in aBCtrl):
-                                self.ar.ctrls.colorShape([pCtrl], "black")
-                            else:
-                                self.ar.ctrls.colorShape([pCtrl], "yellow")
-            
+            # integrating modules together:
             if self.ar.data.integrate_all:
-                # Update progress window
                 self.ar.utils.setProgress('Rigging: '+self.ar.data.lang['i010_integrateCB'])
                 
-                # get all parent info from rigged modules:
-                self.originedFromDic = self.ar.utils.getOriginedFromDic()
-                
-                # verify if is necessary organize the hierarchies for each module:
-                for guideModule in self.modulesToBeRiggedList:
-                    # get guideModule info:
-                    self.itemGuideModule         = self.hookDic[guideModule.moduleGrp]['name']
-                    self.itemGuideInstance       = self.hookDic[guideModule.moduleGrp]['guideInstance']
-                    self.itemGuideCustomName     = self.hookDic[guideModule.moduleGrp]['guideCustomName']
-                    self.itemGuideMirrorAxis     = self.hookDic[guideModule.moduleGrp]['guideMirrorAxis']
-                    self.itemGuideMirrorNameList = self.hookDic[guideModule.moduleGrp]['guideMirrorName']
-                    
-                    # working with item guide mirror:
-                    self.itemMirrorNameList = [""]
-                    
-                    # get itemGuideName:
-                    if self.itemGuideMirrorAxis != "off":
-                        self.itemMirrorNameList = self.itemGuideMirrorNameList
-                    
-                    for s, sideName in enumerate(self.itemMirrorNameList):
-                        
-                        if self.itemGuideCustomName:
-                            self.itemGuideName = sideName + self.ar.data.prefix + self.itemGuideCustomName
-                        else:
-                            self.itemGuideName = sideName + self.ar.data.prefix + self.itemGuideInstance
-                        
-                        # get hook groups info:
-                        self.staticHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"StaticHookGrp", destination=False, source=True)[0]
-                        self.scalableHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ScalableHookGrp", destination=False, source=True)[0]
-                        self.ctrlHookGrp = cmds.listConnections(guideModule.guideNet+"."+sideName+"ControlHookGrp", destination=False, source=True)[0]
-                        
-                        # get guideModule hierarchy data:
-                        self.fatherGuide = self.hookDic[guideModule.moduleGrp]['fatherGuide']
-                        self.parentNode  = self.hookDic[guideModule.moduleGrp]['parentNode']
-                        # get father info:
-                        if self.fatherGuide:
-                            self.fatherModule              = self.hookDic[guideModule.moduleGrp]['fatherModule']
-                            self.fatherInstance            = self.hookDic[guideModule.moduleGrp]['fatherInstance']
-                            self.fatherNode                = self.hookDic[guideModule.moduleGrp]['fatherNode']
-                            self.fatherGuideLoc            = self.hookDic[guideModule.moduleGrp]['fatherGuideLoc']
-                            self.fatherCustomName          = self.hookDic[guideModule.moduleGrp]['fatherCustomName']
-                            self.fatherMirrorAxis          = self.hookDic[guideModule.moduleGrp]['fatherMirrorAxis']
-                            self.fatherGuideMirrorNameList = self.hookDic[guideModule.moduleGrp]['fatherMirrorName']
-                            # working with father mirror:
-                            self.fatherMirrorNameList = [""]
-                            # get fatherName:
-                            if self.fatherMirrorAxis != "off":
-                                self.fatherMirrorNameList = self.fatherGuideMirrorNameList
-                            for f, sideFatherName in enumerate(self.fatherMirrorNameList):
-                                if self.fatherCustomName:
-                                    self.fatherName = sideFatherName + self.ar.data.prefix + self.fatherCustomName
-                                else:
-                                    self.fatherName = sideFatherName + self.ar.data.prefix + self.fatherInstance
-                                # get final rigged parent node from originedFromDic:
-                                self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
-                                if self.fatherRiggedParentNode:
-                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'
-                                        if s == f:
-                                            # parent them to the correct side of the father's mirror:
-                                            if self.ctrlHookGrp:
-                                                cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                    else:
-                                        # parent them to the unique father:
-                                        if self.ctrlHookGrp:
-                                            cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                        elif self.parentNode:
-                            # parent module control to just a node in the scene:
-                            cmds.parent(self.ctrlHookGrp, self.parentNode)
-                        else:
-                            # parent module control to default masterGrp:
-                            cmds.parent(self.ctrlHookGrp, self.ctrlsVisGrp)
-                        # put static and scalable groups in dataGrp:
-                        cmds.parent(self.staticHookGrp, self.staticGrp)
-                        cmds.parent(self.scalableHookGrp, self.scalableGrp)
-                        # finish hookGrps:
-                        cmds.setAttr(self.staticHookGrp+".staticHook", 0)
-                        cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
-                        cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-                        cmds.lockNode(guideModule.guideNet, lock=False)
-                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"StaticHookGrp")
-                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"ScalableHookGrp")
-                        cmds.deleteAttr(guideModule.guideNet+"."+sideName+"ControlHookGrp")
-                        cmds.lockNode(guideModule.guideNet, lock=True)
-
-                
-                # prepare to show a dialog box if find a bug:
+                # prepare to show a dialog box if it finds a bug:
                 self.detectedBug = False
                 self.bugMessage = self.ar.data.lang['b000_bugGeneral']
                 
-                # integrating modules together:
-                if self.integratedTaskDic:
-                    self.toIDList = []
-                    # working with specific cases:
-                    for moduleDic in self.integratedTaskDic:
-                        moduleType = moduleDic[:moduleDic.find("__")]
-                        
-                        # display corrective controls by Option_Ctrl attribute:
-                        try:
-                            correctiveGrpList = self.integratedTaskDic[moduleDic]['correctiveCtrlGrpList']
-                            if correctiveGrpList:
-                                if not cmds.objExists(self.optionCtrl+"."+self.ar.data.lang['c124_corrective']+"Ctrls"):
-                                    cmds.addAttr(self.optionCtrl, longName=self.ar.data.lang['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                                    cmds.setAttr(self.optionCtrl+"."+self.ar.data.lang['c124_corrective']+"Ctrls", channelBox=True)
-                                for correctiveGrp in correctiveGrpList:
-                                    cmds.connectAttr(self.optionCtrl+"."+self.ar.data.lang['c124_corrective']+"Ctrls", correctiveGrp+".visibility", force=True)
-                        except:
-                            pass
-
-                        # footGuide parented in the extremGuide of the limbModule:
-                        if moduleType == self.ar.data.foot_name:
-                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == self.ar.data.limb_name and fatherGuideLoc == 'Extrem':
-                                self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                                self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                                # working with item guide mirror:
-                                self.itemMirrorNameList = [""]
-                                # get itemGuideName:
-                                if self.itemGuideMirrorAxis != "off":
-                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
-                                for s, sideName in enumerate(self.itemMirrorNameList):
-                                    # getting foot data:
-                                    revFootCtrl       = self.integratedTaskDic[moduleDic]['revFootCtrlList'][s]
-                                    revFootCtrlGrp    = self.integratedTaskDic[moduleDic]['revFootCtrlGrpList'][s]
-                                    revFootCtrlShape  = self.integratedTaskDic[moduleDic]['revFootCtrlShapeList'][s]
-                                    toLimbIkHandleGrp = self.integratedTaskDic[moduleDic]['toLimbIkHandleGrpList'][s]
-                                    parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
-                                    scaleConst        = self.integratedTaskDic[moduleDic]['scaleConstList'][s]
-                                    footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
-                                    ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
-                                    # getting limb data:
-                                    fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
-                                    ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
-                                    ikHandleGrp           = self.integratedTaskDic[fatherGuide]['ikHandleGrpList'][s]
-                                    ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
-                                    ikHandleGrpConstList  = self.integratedTaskDic[fatherGuide]['ikHandleGrpConstList'][s]
-                                    ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
-                                    extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
-                                    ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
-                                    limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
-                                    worldRef              = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
-                                    addArticJoint         = self.integratedTaskDic[fatherGuide]['addArticJoint']
-                                    addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
-                                    ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
-                                    ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
-                                    # do task actions in order to integrate the limb and foot:
-                                    cmds.cycleCheck(evaluation=False)
-                                    cmds.delete(ikHandleConstList, ikHandleGrpConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
-                                    cmds.cycleCheck(evaluation=True)
-                                    cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
-                                    cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
-                                    if limbTypeName == self.ar.data.leg_name:
-                                        cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
-                                        cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
-                                        cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
-                                        if ikStretchExtremLoc: # avoid issue parenting if quadruped
-                                            cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
-                                        if cmds.objExists(extremJnt+".dpAR_joint"):
-                                            cmds.deleteAttr(extremJnt+".dpAR_joint")
-                                        # reconnect correctly the interation for ankle and correctives
-                                        if addArticJoint:
-                                            cmds.delete(ankleArticList[1])
-                                            # workaround to avoid orientConstraint offset issue
-                                            footJntFather = cmds.listRelatives(footJnt, parent=True)[0]
-                                            cmds.delete(cmds.listRelatives(footJnt, children=True, type="parentConstraint")[0])
-                                            footJntChildrenList = cmds.listRelatives(footJnt, children=True)
-                                            cmds.parent(footJntChildrenList, world=True)
-                                            cmds.parent(footJnt, extremJnt, relative=True)
-                                            cmds.makeIdentity(footJnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
-                                            cmds.parent(footJnt, footJntFather)
-                                            cmds.parent(footJntChildrenList, footJnt)
-                                            self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
-                                        # extracting angle to avoid orientConstraint issue when uniform scaling
-                                        extractAngleMM  = cmds.createNode("multMatrix", name=ankleArticList[0]+"_ExtractAngle_MM")
-                                        extractAngleDM  = cmds.createNode("decomposeMatrix", name=ankleArticList[0]+"_ExtractAngle_DM")
-                                        extractAngleQtE = cmds.createNode("quatToEuler", name=ankleArticList[0]+"_ExtractAngle_QtE")
-                                        extractAngleMD  = cmds.createNode("multiplyDivide", name=ankleArticList[0]+"_ExtractAngle_MD")
-                                        origLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Orig_Loc")[0]
-                                        actionLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Action_Loc")[0]
-                                        cmds.matchTransform(origLoc, actionLoc, ankleArticList[2], position=True, rotation=True)
-                                        cmds.parent(origLoc, ankleArticList[2])
-                                        cmds.parent(actionLoc, footJnt)
-                                        cmds.setAttr(origLoc+".visibility", 0)
-                                        cmds.setAttr(actionLoc+".visibility", 0)
-                                        cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
-                                        cmds.connectAttr(origLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
-                                        cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
-                                        cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
-                                        for axis in self.ar.data.axis:
-                                            cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
-                                            cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
-                                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE, origLoc, actionLoc])
-                                        if addCorrective:
-                                            for netNode in ankleCorrectiveList:
-                                                if netNode:
-                                                    if cmds.objExists(netNode):
-                                                        actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
-                                                        if actionLocList:
-                                                            cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
-                                                            actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
-                                                            cmds.delete(actionLocGrp+"_PaC")
-                                                            self.toIDList.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
-                                    scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                    self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
-                                    # hide this controller shape
-                                    cmds.setAttr(revFootCtrlShape+".visibility", 0)
-                                    # add attributes and connect from ikCtrl to revFootCtrl:
-                                    userAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, userDefined=True)
-                                    for attr in userAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+attr):
-                                            attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
-                                            keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
-                                            channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
-                                            attrMinValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, minValue=True)
-                                            attrMaxValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, maxValue=True)
-                                            cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
-                                            if not attrMinValue == None:
-                                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, minValue=attrMinValue)
-                                            if not attrMaxValue == None:
-                                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, maxValue=attrMaxValue)
-                                            cmds.setAttr(ikCtrl+'.'+attr, currentValue)
-                                            if not keyableStatus:
-                                                cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
-                                            cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
-                                            if attr == "visIkFk":
-                                                if not cmds.objExists(worldRef):
-                                                    worldRef = worldRef.replace("_Ctrl", "_Grp")
-                                                if cmds.objExists(worldRef):
-                                                    wrAttrList = cmds.listAttr(worldRef, userDefined=True)
-                                                    for wrAttr in wrAttrList:
-                                                        if "Fk_ikFkBlendRevOutputX" in wrAttr:
-                                                            cmds.connectAttr(worldRef+"."+wrAttr, ikCtrl+'.'+attr, force=True)
-                                    revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
-                                    self.ar.customAttr.removeAttr("dpControl", [revFootCtrlOld])
-                                    self.ar.customAttr.updateID([revFootCtrlOld])
-                        
-                        # worldRef of extremGuide from limbModule controlled by optionCtrl:
-                        if moduleType == self.ar.data.limb_name:
-                            # getting limb data:
-                            worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
-                            worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
-                            ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
-                            lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
-                            masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
-                            rootCtrlRefList   = self.integratedTaskDic[moduleDic]['rootCtrlRefList']
-                            softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList']
-                            for w, worldRef in enumerate(worldRefList):
-                                # do actions in order to make limb be controlled by optionCtrl:
-                                floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
-                                for f, floatAttr in enumerate(floatAttrList):
-                                    if f != len(floatAttrList):
-                                        if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
-                                            currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
-                                            if floatAttr == lvvAttr:
-                                                cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
-                                                # TODO fix or remove Limb manual volume variation attribute
-                                                cmds.setAttr(self.optionCtrl+"."+floatAttr, channelBox=False, keyable=False)
-                                            else:
-                                                cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
-                                        cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
-                                if not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
-                                    cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
-                                    cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
-                                cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
-                                bendAttrList = ["bends", "extraBends"]
-                                for bendAttr in bendAttrList:
-                                    if cmds.objExists(self.optionCtrl+"."+bendAttr):
-                                        cmds.setAttr(self.optionCtrl+"."+bendAttr, keyable=False, channelBox=True)
-                                # connect Option_Ctrl RigScale_MD output to the radiusScale:
-                                if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
-                                    cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
-
-                                cmds.delete(worldRefShapeList[w])
-                                worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
-                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
-
-                                # remove dpControl attribute
-                                self.ar.customAttr.removeAttr("dpControl", [worldRef])
-                                self.toIDList.append(worldRef)
-
-                                # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
-                                self.toIDList.extend(cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))
-                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC"))
-                            
-                            # parenting correctly the ikCtrlZero to spineModule:
-                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
-
-                                if fatherModule == self.ar.data.spine_name:
-                                    # getting limb data:
-                                    limbTypeName         = self.integratedTaskDic[moduleDic]['limbTypeName']
-                                    ikCtrlZero           = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
-                                    ikPoleVectorCtrlZero = self.integratedTaskDic[moduleDic]['ikPoleVectorZeroList'][s]
-                                    limbStyle            = self.integratedTaskDic[moduleDic]['limbStyle']
-                                    ikHandleGrp          = self.integratedTaskDic[moduleDic]['ikHandleGrpList'][s]
-                                    
-                                    # getting spine data:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    hipsA  = self.integratedTaskDic[fatherGuide]['hipsAList'][0]
-                                    tipCtrl = self.integratedTaskDic[fatherGuide]['tipList'][0]
-
-                                    cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
-                                    # verifying what part will be used, the hips or chest:
-                                    if limbTypeName == self.ar.data.leg_name:
-                                        # do task actions in order to integrate the limb of leg type to rootCtrl:
-                                        cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
-                                    else:
-                                        # do task actions in order to integrate the limb and spine (ikCtrl):
-                                        self.toIDList.extend(cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC"))
-                                        # poleVector autoOrient for arm
-                                        cmds.delete(rootCtrlRefList[s]+"_PaC")
-                                        self.toIDList.extend(cmds.parentConstraint(tipCtrl, rootCtrlRefList[s], maintainOffset=True, name=rootCtrlRefList[s]+"_PaC"))
-
-                                    # verify if is quadruped
-                                    if limbStyle == self.ar.data.lang['m037_quadruped']:
-                                        if fatherGuideLoc != "JointLoc1":
-                                            # get extra info from limb module data:
-                                            quadFrontLeg = self.integratedTaskDic[moduleDic]['quadFrontLegList'][s]
-                                            ikCtrl       = self.integratedTaskDic[moduleDic]['ikCtrlList'][s]
-                                            # if quadruped, create a parent contraint from tipCtrl to front leg:
-                                            quadChestParentConst = cmds.parentConstraint(self.rootCtrl, tipCtrl, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
-                                            revNode = cmds.createNode('reverse', name=quadFrontLeg+"_Rev")
-                                            self.toIDList.extend([quadChestParentConst, revNode])
-                                            cmds.addAttr(ikCtrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                                            cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+tipCtrl+"W1", force=True)
-                                            cmds.connectAttr(ikCtrl+".followChestA", revNode+".inputX", force=True)
-                                            cmds.connectAttr(revNode+".outputX", quadChestParentConst+"."+self.rootCtrl+"W0", force=True)
-                            
-                            # fixing ikSpringSolver parenting for quadrupeds:
-                            # getting limb data:
-                            fixIkSpringSolverGrp = self.integratedTaskDic[moduleDic]['fixIkSpringSolverGrpList']
-                            if fixIkSpringSolverGrp:
-                                cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
-                                for nFix in fixIkSpringSolverGrp:
-                                    self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScC"))
-                            
-                        # integrate the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
-                        if moduleType == self.ar.data.spine_name:
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                # connect the optionCtrl vvAttr to hipsA vvAttr and hide it for each side of the mirror (if it exists):
-                                hipsA  = self.integratedTaskDic[moduleDic]['hipsAList'][s]
-                                vvAttr = self.integratedTaskDic[moduleDic]['volumeVariationAttrList'][s]
-                                actVVAttr = self.integratedTaskDic[moduleDic]['ActiveVolumeVariationAttrList'][s]
-                                mScaleVVAttr = self.integratedTaskDic[moduleDic]['MasterScaleVolumeVariationAttrList'][s]
-                                ikFkBlendAttr = self.integratedTaskDic[moduleDic]['IkFkBlendAttrList'][s]
-                                clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                shapeVisAttrList = self.integratedTaskDic[moduleDic]["shapeVisAttrList"]
-                                self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC"))
-                                cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
-                                cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
-                                cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
-                                cmds.addAttr(self.optionCtrl, longName=actVVAttr, attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                                cmds.connectAttr(self.optionCtrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
-                                cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
-                                cmds.connectAttr(self.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
-                                cmds.setAttr(hipsA+'.'+mScaleVVAttr, keyable=False)
-                                cmds.addAttr(self.optionCtrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
-                                cmds.connectAttr(self.optionCtrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
-                                cmds.setAttr(hipsA+'.'+ikFkBlendAttr, keyable=False)
-                                if shapeVisAttrList:
-                                    for shapeVisAttr in shapeVisAttrList:
-                                        if not cmds.objExists(self.optionCtrl+"."+shapeVisAttr):
-                                            cmds.addAttr(self.optionCtrl, longName=shapeVisAttr, attributeType="long", min=0, max=1, defaultValue=0, keyable=False)
-                                            cmds.setAttr(self.optionCtrl+'.'+shapeVisAttr, channelBox=True)
-                                            cmds.connectAttr(self.optionCtrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
-                                            cmds.setAttr(hipsA+'.'+shapeVisAttr, keyable=False)
-                                if self.ar.data.colorize_curve:
-                                    self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
-                                    self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
-                        
-                        # integrate the head orient from the masterCtrl and facial controllers to optionCtrl:
-                        if moduleType == self.ar.data.head_name:
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            self.facialCtrlGrpList       = self.integratedTaskDic[moduleDic]['facialCtrlGrpList']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                # connect the masterCtrl to head group using a orientConstraint:
-                                worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
-                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
-                                if self.ar.data.colorize_curve:
-                                    if self.integratedTaskDic[moduleDic]['ctrlList']:
-                                        self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
-                                    if self.integratedTaskDic[moduleDic]['InnerCtrls']:
-                                        self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
-                                    if self.integratedTaskDic[moduleDic]['lCtrls']:
-                                        self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
-                                    if self.integratedTaskDic[moduleDic]['rCtrls']:
-                                        self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
-                            if self.facialCtrlGrpList:
-                                if not cmds.objExists(self.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower()):
-                                    cmds.addAttr(self.optionCtrl, longName=self.ar.data.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                    cmds.setAttr(self.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower(), channelBox=True)
-                                for facialCtrlGrp in self.facialCtrlGrpList:
-                                    cmds.connectAttr(self.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
-                        
-                        # integrate the Eye with the Head setup:
-                        if moduleType == self.ar.data.eye_name:
-                            eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
-                            eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
-                            upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
-                            cmds.parent(eyeGrp, self.ctrlsVisGrp, relative=False)
-                            # get father module:
-                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == self.ar.data.head_name:
-                                # getting head data:
-                                fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
-                                headParentConst = cmds.parentConstraint(self.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
-                                eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
-                                self.toIDList.extend([headParentConst, eyeRevNode])
-                                cmds.connectAttr(eyeCtrl+'.'+self.ar.data.lang['c032_follow'], eyeRevNode+".inputX", force=True)
-                                cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
-                                cmds.connectAttr(eyeCtrl+'.'+self.ar.data.lang['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
-                                cmds.parent(upLocGrp, upperCtrl, relative=False)
-                                cmds.setAttr(upLocGrp+".visibility", 0)
-                                # head drives eyeScaleGrp:
-                                self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                                self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                                # working with item guide mirror:
-                                self.itemMirrorNameList = [""]
-                                # get itemGuideName:
-                                if self.itemGuideMirrorAxis != "off":
-                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
-                                for s, sideName in enumerate(self.itemMirrorNameList):
-                                    eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
-                                    self.toIDList.extend(cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC"))
-                            # changing iris and pupil color override:
-                            if self.ar.data.colorize_curve:
-                                self.itemMirrorNameList = [""]
-                                # get itemGuideName:
-                                self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
-                                if self.itemGuideMirrorAxis != "off":
-                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
-                                for s, sideName in enumerate(self.itemMirrorNameList):
-                                    if self.integratedTaskDic[moduleDic]['hasIris']:
-                                        irisCtrl = self.integratedTaskDic[moduleDic]['irisCtrl'][s]
-                                        self.ar.ctrls.colorShape([irisCtrl], "cyan")
-                                    if self.integratedTaskDic[moduleDic]['hasPupil']:
-                                        pupilCtrl = self.integratedTaskDic[moduleDic]['pupilCtrl'][s]
-                                        self.ar.ctrls.colorShape([pupilCtrl], "yellow")
-                        
-                        # integrate the Finger module:
-                        if moduleType == self.ar.data.finger_name:
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                ikCtrlZero = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
-                                scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
-                                self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
-                                # correct ikCtrl parent to root ctrl:
-                                cmds.parent(ikCtrlZero, self.ctrlsVisGrp, relative=True)
-                                # get father guide data:
-                                fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                                fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                                if fatherModule == self.ar.data.limb_name and fatherGuideLoc == 'Extrem':
-                                    # getting limb type:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    limbTypeName = self.integratedTaskDic[fatherGuide]['limbTypeName']
-                                    if limbTypeName == self.ar.data.arm_name:
-                                        origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
-                                        origFrom = origFromList[-1]
-                                        self.toIDList.extend(cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True, name=scalableGrp+"_PaC"))
+                if self.ar.data.colorize_curve:
+                    self.colorize_curves()
                 
-                        # integrate the Single module with another Single as a father:
-                        if moduleType == self.ar.data.single_name:
-                            # connect Option_Ctrl display attribute to the visibility:
-                            if not cmds.objExists(self.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower()):
-                                cmds.addAttr(self.optionCtrl, longName=self.ar.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                cmds.setAttr(self.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower(), channelBox=True)
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                ctrlGrp = self.integratedTaskDic[moduleDic]["ctrlGrpList"][s]
-                                cmds.connectAttr(self.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
-                            # get father module:
-                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            if fatherModule == self.ar.data.single_name:
-                                for s, sideName in enumerate(self.itemMirrorNameList):
-                                    # getting child Single Static_Grp:
-                                    staticGrp = self.integratedTaskDic[moduleDic]["staticGrpList"][s]
-                                    # getting father Single mainJis (indirect skinning joint) data:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    try:
-                                        mainJis = self.integratedTaskDic[fatherGuide]['mainJisList'][s]
-                                    except:
-                                        mainJis = self.integratedTaskDic[fatherGuide]['mainJisList'][0]
-                                    # father's mainJis drives child's staticGrp:
-                                    self.toIDList.extend(cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_PaC"))
-                                    self.toIDList.extend(cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_ScC"))
-                                    
-                        # integrate the Wheel module with another Option_Ctrl:
-                        if moduleType == self.ar.data.wheel_name:
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                wheelCtrl = self.integratedTaskDic[moduleDic]["wheelCtrlList"][s]
-                                # connect Option_Ctrl RigScale_MD output to the radiusScale:
-                                if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
-                                    cmds.connectAttr(self.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
-                                # get father module:
-                                fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                                if fatherModule == self.ar.data.steering_name:
-                                    # getting Steering data:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    try:
-                                        steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][s]
-                                    except:
-                                        steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][0]
-                                    # connect modules to be integrated:
-                                    cmds.connectAttr(steeringCtrl+'.'+self.ar.data.lang['c070_steering'], wheelCtrl+'.'+self.ar.data.lang['i037_to']+self.ar.data.lang['c070_steering'].capitalize(), force=True)
-                                    # reparent wheel module:
-                                    wheelHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
-                                    cmds.parent(wheelHookCtrlGrp, self.ctrlsVisGrp)
-                        
-                        # integrate the Suspension module with Wheel:
-                        if moduleType == self.ar.data.suspension_name:
-                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                            # working with item guide mirror:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                loadedFatherB = self.integratedTaskDic[moduleDic]['fatherBList'][s]
-                                if loadedFatherB:
-                                    suspensionBCtrlGrp = self.integratedTaskDic[moduleDic]['suspensionBCtrlGrpList'][s]
-                                    # find the correct fatherB node in order to parent the B_Ctrl:
-                                    if "__" in loadedFatherB and ":" in loadedFatherB: # means we need to parent to a rigged guide
-                                        # find fatherB module dic:
-                                        fatherBNamespace = loadedFatherB[:loadedFatherB.find(":")]
-                                        for hookItem in self.hookDic:
-                                            if self.hookDic[hookItem]['guideModuleNamespace'] == fatherBNamespace:
-                                                # got father module dic:
-                                                fatherBModuleDic = hookItem
-                                                self.fatherBGuideMirrorAxis     = self.hookDic[fatherBModuleDic]['guideMirrorAxis']
-                                                self.fatherBGuideMirrorNameList = self.hookDic[fatherBModuleDic]['guideMirrorName']
-                                                self.fatherBCustomName          = self.hookDic[fatherBModuleDic]['guideCustomName']
-                                                self.fatherBGuideInstance       = self.hookDic[fatherBModuleDic]['guideInstance']
-                                                # working with fatherB guide mirror:
-                                                self.fatherBMirrorNameList = [""]
-                                                # get itemGuideName:
-                                                if self.fatherBGuideMirrorAxis != "off":
-                                                    self.fatherBMirrorNameList = self.fatherBGuideMirrorNameList
-                                                for fB, fBSideName in enumerate(self.fatherBMirrorNameList):
-                                                    if self.fatherBCustomName:
-                                                        fatherB = fBSideName + self.ar.data.prefix + self.fatherBCustomName + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
-                                                    else:
-                                                        fatherB = fBSideName + self.ar.data.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
-                                                    fatherBRiggedNode = self.originedFromDic[fatherB]
-                                                    if cmds.objExists(fatherBRiggedNode):
-                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
-                                                            if s == fB:
-                                                                self.toIDList.extend(cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
-                                                                self.toIDList.extend(cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
-                                                        else:
-                                                            self.toIDList.extend(cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
-                                                            self.toIDList.extend(cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
-                                    else: # probably we will parent to a control curve already generated and rigged before
-                                        if cmds.objExists(loadedFatherB):
-                                            self.toIDList.extend(cmds.parentConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
-                                            self.toIDList.extend(cmds.scaleConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
-                                # get father module:
-                                fatherModule = self.hookDic[moduleDic]['fatherModule']
-                                if fatherModule == self.ar.data.wheel_name:
-                                    # getting spine data:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    # parent suspension control group to wheel Main_Ctrl
-                                    suspensionHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
-                                    wheelMainCtrl = self.integratedTaskDic[fatherGuide]['mainCtrlList'][s]
-                                    self.toIDList.extend(cmds.parentConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_PaC"))
-                                    self.toIDList.extend(cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScC"))
+                # get all parent info from rigged modules:
+                self.originedFromDic = self.ar.utils.getOriginedFromDic()
+                self.organize_hierarchy()
+                
+                # working with specific cases:
+                for item in self.guides_to_rig:
+                    father = self.ar.config.get_father_instance(self.hook[item.guide_base]['fatherGuide'])
+                    self.set_option_ctrl_corrective(item)
+                    self.ar.composer.comp_rigged(item, father)
 
-                        # integrate the nose control colors:
-                        if moduleType == self.ar.data.nose_name:
-                            self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
-                            if self.itemGuideMirrorAxis == "off":
-                                if self.ar.data.colorize_curve:
-                                    self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][0], "yellow")
-                                    self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][0], "red")
-                                    self.ar.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][0], "blue")
-                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                            if fatherModule == self.ar.data.head_name:
-                                fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
-                                upperJawCtrl = self.integratedTaskDic[fatherGuide]['upperJawCtrlList'][0]
-                                if not upperJawCtrl == upperCtrl:
-                                    ctrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][0]
-                                    mainCtrl = self.integratedTaskDic[moduleDic]['mainCtrlList'][0]
-                                    cmds.addAttr(mainCtrl, longName="spaceSwitch", attributeType="enum", en="Upper Jaw:Upper Head", keyable=True)
-                                    revNode = cmds.createNode("reverse", name="Nose_SpaceSwitch_Rev")
-                                    pac = cmds.parentConstraint(upperJawCtrl, upperCtrl, ctrlGrp, maintainOffset=True, name=ctrlGrp+"_PaC")[0]
-                                    cmds.connectAttr(mainCtrl+".spaceSwitch", pac+"."+upperCtrl+"W1", force=True)
-                                    cmds.connectAttr(mainCtrl+".spaceSwitch", revNode+".inputX", force=True)
-                                    cmds.connectAttr(revNode+".outputX", pac+"."+upperJawCtrl+"W0", force=True)
-                                    self.toIDList.extend([pac, revNode])
-                        
-                        # worldRef of chain controlled by optionCtrl:
-                        if moduleType == self.ar.data.chain_name:
-                            # getting limb data:
-                            worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
-                            worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
-                            for w, worldRef in enumerate(worldRefList):
-                                # do actions in order to make chain be controlled by optionCtrl:
-                                floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
-                                for f, floatAttr in enumerate(floatAttrList):
-                                    if f != len(floatAttrList):
-                                        if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
-                                            currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
-                                            cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
-                                        cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
-                                if not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
-                                    cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
-                                    cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
-                                cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
-                                cmds.delete(worldRefShapeList[w])
-                                worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
-                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
-                                # remove dpControl attribute
-                                self.ar.customAttr.removeAttr("dpControl", [worldRef])
 
-                    # dpID
-                    if self.toIDList:
-                        self.toIDList = list(set(self.toIDList))
-                        self.ar.customAttr.addAttr(0, self.toIDList, descendents=True)
+
+
+
+
+
+#
+#
+# WIP ...
+#
+#
 
                 # actualise the number of rigged guides by type
                 for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
                     typeCounter = 0
                     guideNetList = cmds.ls(selection=False, type="network")
                     for net in guideNetList:
-                        if cmds.objExists(net+'.moduleType'):
-                            dpARType = 'dp'+(cmds.getAttr(net+'.moduleType'))
+                        if cmds.objExists(net+'.module_type'):
+                            dpARType = 'dp'+(cmds.getAttr(net+'.module_type'))
                             if dpARType == guideType:
                                 typeCounter = typeCounter + 1
                     if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
@@ -1290,8 +711,8 @@ class Maker(object):
                                 if "guideSource" in cmds.listAttr(pTagCtrl):
                                     guideSource = cmds.getAttr(pTagCtrl+".guideSource")
                                     guideBase = guideSource.split(":")[0]+":Guide_Base"
-                                    parentNode = self.hookDic[guideBase]['parentNode']
-                                    fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                    parentNode = self.hook[guideBase]['parentNode']
+                                    fatherGuide = self.hook[guideBase]['fatherGuide']
                                     if parentNode:
                                         if not parentNode in guideSourceDic.keys():
                                             parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
@@ -1301,14 +722,14 @@ class Maker(object):
                                         if foundCtrl in holderCtrlList: #holder
                                             guideSource = cmds.getAttr(foundCtrl+".guideSource")
                                             guideBase = guideSource.split(":")[0]+":Guide_Base"
-                                            parentNode = self.hookDic[guideBase]['parentNode']
-                                            fatherGuide = self.hookDic[guideBase]['fatherGuide']
+                                            parentNode = self.hook[guideBase]['parentNode']
+                                            fatherGuide = self.hook[guideBase]['fatherGuide']
                                             parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
                                             if not parentNode in guideSourceDic.keys():
                                                 continue
                                             foundCtrl = guideSourceDic[parentNode]
-                                        if not self.hookDic[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
-                                            mirrorNameList = self.hookDic[fatherGuide]['guideMirrorName']
+                                        if not self.hook[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                            mirrorNameList = self.hook[fatherGuide]['guideMirrorName']
                                             if pTagCtrl.startswith(mirrorNameList[0]):
                                                 if not foundCtrl.startswith(mirrorNameList[0]):
                                                     foundCtrl = mirrorNameList[0]+foundCtrl[2:]
@@ -1322,7 +743,7 @@ class Maker(object):
 
 
             # Add usefull attributes for the animators
-            if self.ar.data.supplementary_attr:
+            if self.ar.data.integrate_all and self.ar.data.supplementary_attr:
                 # defining attribute name strings:
                 generalAttr = self.ar.data.lang['c066_general']
                 vvAttr = self.ar.data.lang['c031_volumeVariation']
@@ -1433,9 +854,7 @@ class Maker(object):
                     print(self.bugMessage)
                     cmds.confirmDialog(title=self.ar.data.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
-        # re-declaring guideMirror and previewMirror groups:
-        if cmds.objExists(self.ar.data.guide_mirror_grp):
-            cmds.delete(self.ar.data.guide_mirror_grp)
+        self.ar.utils.clear_guide_mirror_grp()
         
         # reload the jointSkinList:
         self.ar.filler.populate_joints()
@@ -1450,3 +869,546 @@ class Maker(object):
 
 
         
+
+class Composer(object):
+    def __init__(self, ar):
+        self.ar = ar
+
+
+    def comp_rigged(self, item, father):
+        self.to_ids = []
+        if item.name == self.ar.data.foot_name:
+            self.foot_limb(item, father)
+        elif item.name == self.ar.data.limb_name:
+            self.limb_options(item)
+            self.limb_spine(item, father)
+            self.limb_spring_solver(item)
+        elif item.name == self.ar.data.spine_name:
+            self.spine_options(item)
+        elif item.name == self.ar.data.head_name:
+            self.head_options(item)
+        elif item.name == self.ar.data.eye_name:
+            self.eye_head(item, father)
+            self.eye_color(item)
+        elif item.name == self.ar.data.finger_name:
+            self.finger_scalable(item)
+            self.finger_limb(item, father)
+        elif item.name == self.ar.data.single_name:
+            self.single_single(item, father)
+        elif item.name == self.ar.data.wheel_name:
+            self.wheel_options(item)
+            self.wheel_steering(item, father)
+        elif item.name == self.ar.data.suspension_name:
+            self.suspension_wheel(item, father)
+        elif item.name == self.ar.data.nose_name:
+            self.nose_options(item)
+            self.nose_head(item, father)
+        elif item.name == self.ar.data.chain_name:
+            self.chain_options(item)
+
+        if self.to_ids:
+            self.ar.customAttr.addAttr(0, list(set(self.to_ids)), descendents=True)
+
+
+    def foot_limb(self, foot, limb):
+        # footGuide parented in the extremGuide of the limbModule:
+        if limb:
+            if self.ar.maker.hook[foot.guide_base]['fatherModule'] == self.ar.data.limb_name and self.ar.maker.hook[foot.guide_base]['fatherGuideLoc'] == 'Extrem':
+                for s, side in enumerate(self.ar.maker.get_mirror_names(foot)):
+                    # getting foot data:
+                    revFootCtrl       = foot.integrated['revFootCtrlList'][s]
+                    revFootCtrlGrp    = foot.integrated['revFootCtrlGrpList'][s]
+                    revFootCtrlShape  = foot.integrated['revFootCtrlShapeList'][s]
+                    toLimbIkHandleGrp = foot.integrated['toLimbIkHandleGrpList'][s]
+                    parentConst       = foot.integrated['parentConstList'][s]
+                    scaleConst        = foot.integrated['scaleConstList'][s]
+                    footJnt           = foot.integrated['footJntList'][s]
+                    ballRFList        = foot.integrated['ballRFList'][s]
+                    # getting limb data:
+                    ikCtrl                = limb.integrated['ikCtrlList'][s]
+                    ikHandleGrp           = limb.integrated['ikHandleGrpList'][s]
+                    ikHandleConstList     = limb.integrated['ikHandleConstList'][s]
+                    ikHandleGrpConstList  = limb.integrated['ikHandleGrpConstList'][s]
+                    ikFkBlendGrpToRevFoot = limb.integrated['ikFkBlendGrpToRevFootList'][s]
+                    extremJnt             = limb.integrated['extremJntList'][s]
+                    ikStretchExtremLoc    = limb.integrated['ikStretchExtremLoc'][s]
+                    limbTypeName          = limb.integrated['limbTypeName']
+                    worldRef              = limb.integrated['worldRefList'][s]
+                    addArticJoint         = limb.integrated['addArticJoint']
+                    addCorrective         = limb.integrated['addCorrective']
+                    ankleArticList        = limb.integrated['ankleArticList'][s]
+                    ankleCorrectiveList   = limb.integrated['ankleCorrectiveList'][s]
+                    # do task actions in order to integrate the limb and foot:
+                    cmds.cycleCheck(evaluation=False)
+                    cmds.delete(ikHandleConstList, ikHandleGrpConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
+                    cmds.cycleCheck(evaluation=True)
+                    cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
+                    cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
+                    self.to_ids.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
+                    if limbTypeName == self.ar.data.leg_name:
+                        cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
+                        cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
+                        cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
+                        if ikStretchExtremLoc: # avoid issue parenting if quadruped
+                            cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
+                        if cmds.objExists(extremJnt+".dpAR_joint"):
+                            cmds.deleteAttr(extremJnt+".dpAR_joint")
+                        # reconnect correctly the interation for ankle and correctives
+                        if addArticJoint:
+                            cmds.delete(ankleArticList[1])
+                            # workaround to avoid orientConstraint offset issue
+                            footJntFather = cmds.listRelatives(footJnt, parent=True)[0]
+                            cmds.delete(cmds.listRelatives(footJnt, children=True, type="parentConstraint")[0])
+                            footJntChildrenList = cmds.listRelatives(footJnt, children=True)
+                            cmds.parent(footJntChildrenList, world=True)
+                            cmds.parent(footJnt, extremJnt, relative=True)
+                            cmds.makeIdentity(footJnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
+                            cmds.parent(footJnt, footJntFather)
+                            cmds.parent(footJntChildrenList, footJnt)
+                            self.to_ids.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
+                        # extracting angle to avoid orientConstraint issue when uniform scaling
+                        extractAngleMM  = cmds.createNode("multMatrix", name=ankleArticList[0]+"_ExtractAngle_MM")
+                        extractAngleDM  = cmds.createNode("decomposeMatrix", name=ankleArticList[0]+"_ExtractAngle_DM")
+                        extractAngleQtE = cmds.createNode("quatToEuler", name=ankleArticList[0]+"_ExtractAngle_QtE")
+                        extractAngleMD  = cmds.createNode("multiplyDivide", name=ankleArticList[0]+"_ExtractAngle_MD")
+                        origLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Orig_Loc")[0]
+                        actionLoc = cmds.spaceLocator(name=ankleArticList[0]+"_ExtractAngle_Action_Loc")[0]
+                        cmds.matchTransform(origLoc, actionLoc, ankleArticList[2], position=True, rotation=True)
+                        cmds.parent(origLoc, ankleArticList[2])
+                        cmds.parent(actionLoc, footJnt)
+                        cmds.setAttr(origLoc+".visibility", 0)
+                        cmds.setAttr(actionLoc+".visibility", 0)
+                        cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
+                        cmds.connectAttr(origLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
+                        cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
+                        for axis in self.ar.data.axis:
+                            cmds.setAttr(extractAngleMD+".input2"+axis, 0.5)
+                            cmds.connectAttr(extractAngleQtE+".outputRotate"+axis, ankleArticList[0]+".rotate"+axis, force=True)
+                        self.to_ids.extend([extractAngleMM, extractAngleDM, extractAngleQtE, origLoc, actionLoc])
+                        if addCorrective:
+                            for netNode in ankleCorrectiveList:
+                                if netNode:
+                                    if cmds.objExists(netNode):
+                                        actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
+                                        if actionLocList:
+                                            cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
+                                            actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
+                                            cmds.delete(actionLocGrp+"_PaC")
+                                            self.to_ids.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
+                    scalableGrp = foot.integrated["scalableGrp"][s]
+                    self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
+                    # hide this controller shape
+                    cmds.setAttr(revFootCtrlShape+".visibility", 0)
+                    # add attributes and connect from ikCtrl to revFootCtrl:
+                    userAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, userDefined=True)
+                    for attr in userAttrList:
+                        if not cmds.objExists(ikCtrl+'.'+attr):
+                            attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
+                            currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
+                            keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
+                            channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
+                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
+                            attrMinValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, minValue=True)
+                            attrMaxValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, maxValue=True)
+                            cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
+                            if not attrMinValue == None:
+                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, minValue=attrMinValue)
+                            if not attrMaxValue == None:
+                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, maxValue=attrMaxValue)
+                            cmds.setAttr(ikCtrl+'.'+attr, currentValue)
+                            if not keyableStatus:
+                                cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
+                            cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
+                            if attr == "visIkFk":
+                                if not cmds.objExists(worldRef):
+                                    worldRef = worldRef.replace("_Ctrl", "_Grp")
+                                if cmds.objExists(worldRef):
+                                    wrAttrList = cmds.listAttr(worldRef, userDefined=True)
+                                    for wrAttr in wrAttrList:
+                                        if "Fk_ikFkBlendRevOutputX" in wrAttr:
+                                            cmds.connectAttr(worldRef+"."+wrAttr, ikCtrl+'.'+attr, force=True)
+                    revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
+                    self.ar.customAttr.removeAttr("dpControl", [revFootCtrlOld])
+                    self.ar.customAttr.updateID([revFootCtrlOld])
+
+
+    def limb_options(self, limb):
+        # worldRef of extremGuide from limbModule controlled by optionCtrl:
+        # getting limb data:
+        worldRefList      = limb.integrated['worldRefList']
+        worldRefShapeList = limb.integrated['worldRefShapeList']
+        ikCtrlList        = limb.integrated['ikCtrlList']
+        lvvAttr           = limb.integrated['limbManualVolume']
+        masterCtrlRefList = limb.integrated['masterCtrlRefList']
+        rootCtrlRefList   = limb.integrated['rootCtrlRefList']
+        softIkCalibList   = limb.integrated['softIkCalibrateList']
+        for w, worldRef in enumerate(worldRefList):
+            # do actions in order to make limb be controlled by optionCtrl:
+            floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
+            for f, floatAttr in enumerate(floatAttrList):
+                if f != len(floatAttrList):
+                    if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttr):
+                        currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
+                        if floatAttr == lvvAttr:
+                            cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
+                            # TODO fix or remove Limb manual volume variation attribute
+                            cmds.setAttr(self.ar.maker.optionCtrl+"."+floatAttr, channelBox=False, keyable=False)
+                        else:
+                            cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                    cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+            if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
+                cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+            cmds.connectAttr(self.ar.maker.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
+            bendAttrList = ["bends", "extraBends"]
+            for bendAttr in bendAttrList:
+                if cmds.objExists(self.ar.maker.optionCtrl+"."+bendAttr):
+                    cmds.setAttr(self.ar.maker.optionCtrl+"."+bendAttr, keyable=False, channelBox=True)
+            # connect Option_Ctrl RigScale_MD output to the radiusScale:
+            if cmds.objExists(self.ar.maker.rigScaleMD+".dpRigScale") and cmds.getAttr(self.ar.maker.rigScaleMD+".dpRigScale") == True:
+                cmds.connectAttr(self.ar.maker.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
+
+            cmds.delete(worldRefShapeList[w])
+            worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
+
+            # remove dpControl attribute
+            self.ar.customAttr.removeAttr("dpControl", [worldRef])
+            self.to_ids.append(worldRef)
+
+            # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC"))
+
+
+    def limb_spine(self, limb, spine):
+        if spine:
+            # parenting correctly the ikCtrlZero to spineModule:
+            for s, side in enumerate(self.ar.maker.get_mirror_names(limb)):
+                scalableGrp = limb.integrated["scalableGrp"][s]
+                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
+
+                if self.ar.maker.hook[limb.guide_base]['fatherModule'] == self.ar.data.spine_name:
+                    # getting limb data:
+                    limbTypeName         = limb.integrated['limbTypeName']
+                    ikCtrlZero           = limb.integrated['ikCtrlZeroList'][s]
+                    ikPoleVectorCtrlZero = limb.integrated['ikPoleVectorZeroList'][s]
+                    limbStyle            = limb.integrated['limbStyle']
+                    ikHandleGrp          = limb.integrated['ikHandleGrpList'][s]
+                    rootCtrlRefList   = limb.integrated['rootCtrlRefList']
+                    
+                    # getting spine data:
+                    hipsA  = spine.integrated['hipsAList'][0]
+                    tipCtrl = spine.integrated['tipList'][0]
+
+                    cmds.parent(ikCtrlZero, self.ar.maker.ctrlsVisGrp, absolute=True)
+                    # verifying what part will be used, the hips or chest:
+                    if limbTypeName == self.ar.data.leg_name:
+                        # do task actions in order to integrate the limb of leg type to rootCtrl:
+                        cmds.parent(ikPoleVectorCtrlZero, self.ar.maker.ctrlsVisGrp, absolute=True)
+                    else:
+                        # do task actions in order to integrate the limb and spine (ikCtrl):
+                        self.to_ids.extend(cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC"))
+                        # poleVector autoOrient for arm
+                        cmds.delete(rootCtrlRefList[s]+"_PaC")
+                        self.to_ids.extend(cmds.parentConstraint(tipCtrl, rootCtrlRefList[s], maintainOffset=True, name=rootCtrlRefList[s]+"_PaC"))
+
+                    # verify if is quadruped
+                    if limbStyle == self.ar.data.lang['m037_quadruped']:
+                        if self.hook[limb.guide_base]['fatherGuideLoc'] != "JointLoc1":
+                            # get extra info from limb module data:
+                            quadFrontLeg = limb.integrated['quadFrontLegList'][s]
+                            ikCtrl       = limb.integrated['ikCtrlList'][s]
+                            # if quadruped, create a parent contraint from tipCtrl to front leg:
+                            quadChestParentConst = cmds.parentConstraint(self.ar.maker.rootCtrl, tipCtrl, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
+                            revNode = cmds.createNode('reverse', name=quadFrontLeg+"_Rev")
+                            self.to_ids.extend([quadChestParentConst, revNode])
+                            cmds.addAttr(ikCtrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                            cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+tipCtrl+"W1", force=True)
+                            cmds.connectAttr(ikCtrl+".followChestA", revNode+".inputX", force=True)
+                            cmds.connectAttr(revNode+".outputX", quadChestParentConst+"."+self.ar.maker.rootCtrl+"W0", force=True)
+
+
+    def limb_spring_solver(self, limb):
+        # fixing ikSpringSolver parenting for quadrupeds:
+        # getting limb data:
+        fixIkSpringSolverGrp = limb.integrated['fixIkSpringSolverGrpList']
+        if fixIkSpringSolverGrp:
+            cmds.parent(fixIkSpringSolverGrp, self.ar.maker.scalableGrp, absolute=True)
+            for nFix in fixIkSpringSolverGrp:
+                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, nFix, name=nFix+"_ScC"))
+
+
+    def spine_options(self, spine):
+        # integrate the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
+        for s, side in enumerate(self.ar.maker.get_mirror_names(spine)):
+            # connect the optionCtrl vvAttr to hipsA vvAttr and hide it for each side of the mirror (if it exists):
+            hipsA  = spine.integrated['hipsAList'][s]
+            vvAttr = spine.integrated['volumeVariationAttrList'][s]
+            actVVAttr = spine.integrated['ActiveVolumeVariationAttrList'][s]
+            mScaleVVAttr = spine.integrated['MasterScaleVolumeVariationAttrList'][s]
+            ikFkBlendAttr = spine.integrated['IkFkBlendAttrList'][s]
+            clusterGrp = spine.integrated["scalableGrp"][s]
+            shapeVisAttrList = spine.integrated["shapeVisAttrList"]
+            self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, clusterGrp, name=clusterGrp+"_ScC"))
+            cmds.addAttr(self.ar.maker.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
+            cmds.connectAttr(self.ar.maker.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
+            cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
+            cmds.addAttr(self.ar.maker.optionCtrl, longName=actVVAttr, attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+            cmds.connectAttr(self.ar.maker.optionCtrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
+            cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
+            cmds.connectAttr(self.ar.maker.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
+            cmds.setAttr(hipsA+'.'+mScaleVVAttr, keyable=False)
+            cmds.addAttr(self.ar.maker.optionCtrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+            cmds.connectAttr(self.ar.maker.optionCtrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
+            cmds.setAttr(hipsA+'.'+ikFkBlendAttr, keyable=False)
+            if shapeVisAttrList:
+                for shapeVisAttr in shapeVisAttrList:
+                    if not cmds.objExists(self.ar.maker.optionCtrl+"."+shapeVisAttr):
+                        cmds.addAttr(self.ar.maker.optionCtrl, longName=shapeVisAttr, attributeType="long", min=0, max=1, defaultValue=0, keyable=False)
+                        cmds.setAttr(self.ar.maker.optionCtrl+'.'+shapeVisAttr, channelBox=True)
+                        cmds.connectAttr(self.ar.maker.optionCtrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
+                        cmds.setAttr(hipsA+'.'+shapeVisAttr, keyable=False)
+            if self.ar.data.colorize_curve:
+                self.ar.ctrls.colorShape(spine.integrated['InnerCtrls'][s], "cyan")
+                self.ar.ctrls.colorShape(spine.integrated['OuterCtrls'][s], "yellow")
+
+
+    def head_options(self, head):
+        # integrate the head orient from the masterCtrl and facial controllers to optionCtrl:
+        self.facialCtrlGrpList = head.integrated['facialCtrlGrpList']
+        for s, side in enumerate(self.ar.maker.get_mirror_names(head)):
+            # connect the masterCtrl to head group using a orientConstraint:
+            worldRef = head.integrated['worldRefList'][s]
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
+            if self.ar.data.colorize_curve:
+                if head.integrated['ctrlList']:
+                    self.ar.ctrls.colorShape(head.integrated['ctrlList'][s], "yellow")
+                if head.integrated['InnerCtrls']:
+                    self.ar.ctrls.colorShape(head.integrated['InnerCtrls'][s], "cyan")
+                if head.integrated['lCtrls']:
+                    self.ar.ctrls.colorShape(head.integrated['lCtrls'][s], "red")
+                if head.integrated['rCtrls']:
+                    self.ar.ctrls.colorShape(head.integrated['rCtrls'][s], "blue")
+        if self.facialCtrlGrpList:
+            if not cmds.objExists(self.ar.maker.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower()):
+                cmds.addAttr(self.ar.maker.optionCtrl, longName=self.ar.data.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                cmds.setAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower(), channelBox=True)
+            for facialCtrlGrp in self.facialCtrlGrpList:
+                cmds.connectAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
+
+
+    def eye_head(self, eye, head):
+        # integrate the Eye with the Head setup:
+        eyeCtrl = eye.integrated['eyeCtrl']
+        eyeGrp = eye.integrated['eyeGrp']
+        upLocGrp = eye.integrated['upLocGrp']
+        cmds.parent(eyeGrp, self.ar.maker.ctrlsVisGrp, relative=False)
+        # get head module:
+        if self.ar.maker.hook[eye.guide_base]['fatherModule'] == self.ar.data.head_name:
+            # getting head data:
+            upperCtrl  = head.integrated['upperCtrlList'][0]
+            headParentConst = cmds.parentConstraint(self.ar.maker.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
+            eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
+            self.to_ids.extend([headParentConst, eyeRevNode])
+            cmds.connectAttr(eyeCtrl+'.'+self.ar.data.lang['c032_follow'], eyeRevNode+".inputX", force=True)
+            cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.ar.maker.rootCtrl+"W0", force=True)
+            cmds.connectAttr(eyeCtrl+'.'+self.ar.data.lang['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
+            cmds.parent(upLocGrp, upperCtrl, relative=False)
+            cmds.setAttr(upLocGrp+".visibility", 0)
+            # head drives eyeScaleGrp:
+            for s, side in enumerate(self.ar.maker.get_mirror_names(eye)):
+                eyeScaleGrp = eye.integrated['eyeScaleGrp'][s]
+                self.to_ids.extend(cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC"))
+    
+
+    def eye_color(self, eye):
+        # changing iris and pupil color override:
+        if self.ar.data.colorize_curve:
+            for s, side in enumerate(self.ar.maker.get_mirror_names(eye)):
+                if eye.integrated['hasIris']:
+                    irisCtrl = eye.integrated['irisCtrl'][s]
+                    self.ar.ctrls.colorShape([irisCtrl], "cyan")
+                if eye.integrated['hasPupil']:
+                    pupilCtrl = eye.integrated['pupilCtrl'][s]
+                    self.ar.ctrls.colorShape([pupilCtrl], "yellow")
+
+
+    def finger_scalable(self, finger):
+        for s, side in enumerate(self.ar.maker.get_mirror_names(finger)):
+            ikCtrlZero = finger.integrated['ikCtrlZeroList'][s]
+            scalableGrp = finger.integrated['scalableGrpList'][s]
+            self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
+            # correct ikCtrl parent to root ctrl:
+            cmds.parent(ikCtrlZero, self.ar.maker.ctrlsVisGrp, relative=True)
+
+
+    def finger_limb(self, finger, limb):
+        # integrate the Finger module:
+        if limb:
+            for s, side in enumerate(self.ar.maker.get_mirror_names(finger)):
+                scalableGrp = finger.integrated['scalableGrpList'][s]
+                # get limb guide data:
+                if self.ar.maker.hook[finger.guide_base]['fatherModule'] == self.ar.data.limb_name and self.ar.maker.hook[finger.guide_base]['fatherGuideLoc'] == 'Extrem':
+                    # getting limb type:
+                    limbTypeName = limb.integrated['limbTypeName']
+                    if limbTypeName == self.ar.data.arm_name:
+                        origFromList = limb.integrated['integrateOrigFromList'][s]
+                        origFrom = origFromList[-1]
+                        self.to_ids.extend(cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True, name=scalableGrp+"_PaC"))
+
+
+    def single_options(self, single):
+        # connect Option_Ctrl display attribute to the visibility:
+        if not cmds.objExists(self.ar.maker.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower()):
+            cmds.addAttr(self.ar.maker.optionCtrl, longName=self.ar.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+            cmds.setAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower(), channelBox=True)
+        for s, side in enumerate(self.ar.maker.get_mirror_names(single)):
+            ctrlGrp = single.integrated["ctrlGrpList"][s]
+            cmds.connectAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
+
+
+    def single_single(self, single, father):
+        # integrate the Single module with another Single as a father:
+        # get father module:
+        if self.ar.maker.hook[single.guide_base]['fatherModule'] == self.ar.data.single_name:
+            for s, side in enumerate(self.ar.maker.get_mirror_names(single)):
+                # getting child Single Static_Grp:
+                staticGrp = single.integrated["staticGrpList"][s]
+                # getting father Single mainJis (indirect skinning joint) data:
+                try:
+                    mainJis = father.integrated['mainJisList'][s]
+                except:
+                    mainJis = father.integrated['mainJisList'][0]
+                # father's mainJis drives child's staticGrp:
+                self.to_ids.extend(cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_PaC"))
+                self.to_ids.extend(cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_ScC"))
+
+
+    def wheel_options(self, wheel):
+        # integrate the Wheel module with another Option_Ctrl:
+        for s, side in enumerate(self.ar.maker.get_mirror_names(wheel)):
+            wheelCtrl = wheel.integrated["wheelCtrlList"][s]
+            # connect Option_Ctrl RigScale_MD output to the radiusScale:
+            if cmds.objExists(self.ar.maker.rigScaleMD+".dpRigScale") and cmds.getAttr(self.ar.maker.rigScaleMD+".dpRigScale") == True:
+                cmds.connectAttr(self.ar.maker.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
+        
+
+    def wheel_steering(self, wheel, steering):
+        for s, side in enumerate(self.ar.maker.get_mirror_names(wheel)):
+            wheelCtrl = wheel.integrated["wheelCtrlList"][s]
+            # get steering module:
+            if self.ar.maker.hook[wheel.guide_base]['fatherModule'] == self.ar.data.steering_name:
+                # getting Steering data:
+                try:
+                    steeringCtrl  = steering.integrated['steeringCtrlList'][s]
+                except:
+                    steeringCtrl  = steering.integrated['steeringCtrlList'][0]
+                # connect modules to be integrated:
+                cmds.connectAttr(steeringCtrl+'.'+self.ar.data.lang['c070_steering'], wheelCtrl+'.'+self.ar.data.lang['i037_to']+self.ar.data.lang['c070_steering'].capitalize(), force=True)
+                # reparent wheel module:
+                wheelHookCtrlGrp = wheel.integrated['ctrlHookGrpList'][s]
+                cmds.parent(wheelHookCtrlGrp, self.ar.maker.ctrlsVisGrp)
+
+
+    def suspension_wheel(self, suspension, wheel):
+        # integrate the Suspension module with Wheel:
+        for s, side in enumerate(self.ar.maker.get_mirror_names(suspension)):
+            loadedFatherB = suspension.integrated['fatherBList'][s]
+            if loadedFatherB:
+                suspensionBCtrlGrp = suspension.integrated['suspensionBCtrlGrpList'][s]
+                # find the correct fatherB node in order to parent the B_Ctrl:
+                if "__" in loadedFatherB and ":" in loadedFatherB: # means we need to parent to a rigged guide
+                    # find fatherB module dic:
+                    fatherBNamespace = loadedFatherB[:loadedFatherB.find(":")]
+                    for hookItem in self.ar.maker.hook:
+                        if self.ar.maker.hook[hookItem]['guideModuleNamespace'] == fatherBNamespace:
+                            # got wheel module dic:
+                            fatherBModuleDic = hookItem
+                            fatherBGuideMirrorAxis     = self.ar.maker.hook[fatherBModuleDic]['guideMirrorAxis']
+                            fatherBGuideMirrorNameList = self.ar.maker.hook[fatherBModuleDic]['guideMirrorName']
+                            fatherBCustomName          = self.ar.maker.hook[fatherBModuleDic]['guideCustomName']
+                            fatherBGuideInstance       = self.ar.maker.hook[fatherBModuleDic]['guideInstance']
+                            # working with fatherB guide mirror:
+                            self.fatherBMirrorNameList = [""]
+                            if fatherBGuideMirrorAxis != "off":
+                                self.fatherBMirrorNameList = fatherBGuideMirrorNameList
+                            for fB, fBSideName in enumerate(self.fatherBMirrorNameList):
+                                if fatherBCustomName:
+                                    fatherB = fBSideName + self.ar.data.prefix + fatherBCustomName + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
+                                else:
+                                    fatherB = fBSideName + self.ar.data.prefix + fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
+                                fatherBRiggedNode = self.ar.maker.originedFromDic[fatherB]
+                                if cmds.objExists(fatherBRiggedNode):
+                                    if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
+                                        if s == fB:
+                                            self.to_ids.extend(cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
+                                            self.to_ids.extend(cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
+                                    else:
+                                        self.to_ids.extend(cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
+                                        self.to_ids.extend(cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
+                else: # probably we will parent to a control curve already generated and rigged before
+                    if cmds.objExists(loadedFatherB):
+                        self.to_ids.extend(cmds.parentConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
+                        self.to_ids.extend(cmds.scaleConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
+            if wheel:
+                # get wheel module:
+                if self.ar.maker.hook[suspension.guide_base]['fatherModule'] == self.ar.data.wheel_name:
+                    # parent suspension control group to wheel Main_Ctrl
+                    suspensionHookCtrlGrp = suspension.integrated['ctrlHookGrpList'][s]
+                    wheelMainCtrl = wheel.integrated['mainCtrlList'][s]
+                    self.to_ids.extend(cmds.parentConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_PaC"))
+                    self.to_ids.extend(cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScC"))
+
+
+    def nose_options(self, nose):
+        # integrate the nose control colors:
+        if self.ar.maker.hook[nose.guide_base]['guideMirrorAxis'] == "off":
+            if self.ar.data.colorize_curve:
+                self.ar.ctrls.colorShape(nose.integrated['ctrlList'][0], "yellow")
+                self.ar.ctrls.colorShape(nose.integrated['lCtrls'][0], "red")
+                self.ar.ctrls.colorShape(nose.integrated['rCtrls'][0], "blue")
+        
+        
+    def nose_head(self, nose, head):
+        if self.ar.maker.hook[nose.guide_base]['fatherModule'] == self.ar.data.head_name:
+            upperCtrl  = head.integrated['upperCtrlList'][0]
+            upperJawCtrl = head.integrated['upperJawCtrlList'][0]
+            if not upperJawCtrl == upperCtrl:
+                ctrlGrp = nose.integrated['ctrlHookGrpList'][0]
+                mainCtrl = nose.integrated['mainCtrlList'][0]
+                cmds.addAttr(mainCtrl, longName="spaceSwitch", attributeType="enum", en="Upper Jaw:Upper Head", keyable=True)
+                revNode = cmds.createNode("reverse", name="Nose_SpaceSwitch_Rev")
+                pac = cmds.parentConstraint(upperJawCtrl, upperCtrl, ctrlGrp, maintainOffset=True, name=ctrlGrp+"_PaC")[0]
+                cmds.connectAttr(mainCtrl+".spaceSwitch", pac+"."+upperCtrl+"W1", force=True)
+                cmds.connectAttr(mainCtrl+".spaceSwitch", revNode+".inputX", force=True)
+                cmds.connectAttr(revNode+".outputX", pac+"."+upperJawCtrl+"W0", force=True)
+                self.to_ids.extend([pac, revNode])
+
+
+    def chain_options(self, chain):
+        # worldRef of chain controlled by optionCtrl:
+        worldRefList      = chain.integrated['worldRefList']
+        worldRefShapeList = chain.integrated['worldRefShapeList']
+        for w, worldRef in enumerate(worldRefList):
+            # do actions in order to make chain be controlled by optionCtrl:
+            floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
+            for f, floatAttr in enumerate(floatAttrList):
+                if f != len(floatAttrList):
+                    if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttr):
+                        currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
+                        cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                    cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+            if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
+                cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+            cmds.connectAttr(self.ar.maker.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
+            cmds.delete(worldRefShapeList[w])
+            worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
+            # remove dpControl attribute
+            self.ar.customAttr.removeAttr("dpControl", [worldRef])

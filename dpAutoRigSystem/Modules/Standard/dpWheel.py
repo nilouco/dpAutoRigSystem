@@ -37,18 +37,18 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="geo", dataType='string')
-        cmds.addAttr(self.moduleGrp, longName="startFrame", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName="showControls", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="steering", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".showControls", 1)
-        cmds.setAttr(self.moduleGrp+".steering", 0)
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="geo", dataType='string')
+        cmds.addAttr(self.guide_base, longName="startFrame", attributeType='long', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="showControls", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="steering", attributeType='bool')
+        cmds.setAttr(self.guide_base+".showControls", 1)
+        cmds.setAttr(self.guide_base+".steering", 0)
         
         self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
         self.jGuideCenter = cmds.joint(name=self.guideName+"_JGuideCenter", radius=0.001)
         cmds.setAttr(self.jGuideCenter+".template", 1)
-        cmds.parent(self.jGuideCenter, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuideCenter, self.guide_base, relative=True)
         
         self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.guideName+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
         self.ar.ctrls.colorShape([self.cvFrontLoc], "blue")
@@ -58,7 +58,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.jGuideFront = cmds.joint(name=self.guideName+"_JGuideFront", radius=0.001)
         cmds.setAttr(self.jGuideFront+".template", 1)
         cmds.transformLimits(self.cvFrontLoc, translationX=(1, 1), enableTranslationX=(True, False))
-        radiusCtrl = self.moduleGrp+"_RadiusCtrl"
+        radiusCtrl = self.guide_base+"_RadiusCtrl"
         cvFrontLocPosNode = cmds.createNode("plusMinusAverage", name=self.cvFrontLoc+"_Pos_PMA")
         cmds.setAttr(cvFrontLocPosNode+".input1D[0]", -0.5)
         cmds.connectAttr(radiusCtrl+".translateX", cvFrontLocPosNode+".input1D[1]")
@@ -71,7 +71,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.jGuideInside = cmds.joint(name=self.guideName+"_JGuideInside", radius=0.001)
         cmds.setAttr(self.jGuideInside+".template", 1)
         cmds.transformLimits(self.cvInsideLoc, tz=(0.01, 1), etz=(True, False))
-        inverseRadius = cmds.createNode("multiplyDivide", name=self.moduleGrp+"_Radius_Inv_MD")
+        inverseRadius = cmds.createNode("multiplyDivide", name=self.guide_base+"_Radius_Inv_MD")
         cmds.setAttr(inverseRadius+".input2X", -1)
         cmds.connectAttr(radiusCtrl+".translateX", inverseRadius+".input1X")
         cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
@@ -86,7 +86,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.connectAttr(inverseRadius+".outputX", self.cvOutsideLoc+".translateY")
         self.ar.ctrls.setLockHide([self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        cmds.parent(self.cvCenterLoc, self.moduleGrp)
+        cmds.parent(self.cvCenterLoc, self.guide_base)
         cmds.parent(self.jGuideFront, self.jGuideInside, self.jGuideOutside, self.jGuideCenter)
         cmds.parentConstraint(self.cvCenterLoc, self.jGuideCenter, maintainOffset=False, name=self.jGuideCenter+"_PaC")
         cmds.parentConstraint(self.cvFrontLoc, self.jGuideFront, maintainOffset=False, name=self.jGuideFront+"_PaC")
@@ -97,37 +97,37 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     
     
     def changeStartFrame(self, *args):
-        """ Update moduleGrp startFrame attribute from UI.
+        """ Update main startFrame attribute from UI.
         """
         newStartFrameValue = cmds.intField(self.startFrameIF, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".startFrame", newStartFrameValue)
+        cmds.setAttr(self.guide_base+".startFrame", newStartFrameValue)
     
     
     def changeSteering(self, *args):
-        """ Update moduleGrp steering attribute from UI.
+        """ Update main steering attribute from UI.
         """
         newSterringValue = cmds.checkBox(self.steeringCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".steering", newSterringValue)
+        cmds.setAttr(self.guide_base+".steering", newSterringValue)
         
         
     def changeShowControls(self, *args):
-        """ Update moduleGrp showControls attribute from UI.
+        """ Update main showControls attribute from UI.
         """
         newShowControlsValue = cmds.checkBox(self.showControlsCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".showControls", newShowControlsValue)
+        cmds.setAttr(self.guide_base+".showControls", newShowControlsValue)
     
     
     def changeGeo(self, *args):
-        """ Update moduleGrp geo attribute from UI textField.
+        """ Update main geo attribute from UI textField.
         """
         newGeoValue = cmds.textField(self.geoTF, query=True, text=True)
-        cmds.setAttr(self.moduleGrp+".geo", newGeoValue, type='string')
+        cmds.setAttr(self.guide_base+".geo", newGeoValue, type='string')
     
         
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # declare lists to store names and attributes:
             self.mainCtrlList, self.wheelCtrlList, self.steeringGrpList, self.ctrlHookGrpList = [], [], [], []
             # run for all sides
@@ -204,7 +204,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.parentConstraint(self.mainCtrl, self.mainJoint, maintainOffset=False, name=self.mainJoint+"_PaC")
                 cmds.scaleConstraint(self.mainCtrl, self.mainJoint, maintainOffset=True, name=self.mainJoint+"_ScC")
                 cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.mainEndJoint, maintainOffset=False))
-                if s == 1 and cmds.getAttr(self.moduleGrp+".flip") == 1:
+                if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
                     cmds.move(self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 else:
                     cmds.move(-self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
@@ -218,7 +218,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 # fixing flip mirror:
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
                         for zeroOutGrp in zeroGrpList:
                             cmds.setAttr(zeroOutGrp+".scaleX", -1)
                             cmds.setAttr(zeroOutGrp+".scaleY", -1)
@@ -253,9 +253,9 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c093_tryKeepUndo'], attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
                 
                 # get stored values by user:
-                startFrameValue = cmds.getAttr(self.moduleGrp+".startFrame")
-                steeringValue = cmds.getAttr(self.moduleGrp+".steering")
-                showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
+                startFrameValue = cmds.getAttr(self.guide_base+".startFrame")
+                steeringValue = cmds.getAttr(self.guide_base+".steering")
+                showControlsValue = cmds.getAttr(self.guide_base+".showControls")
                 cmds.setAttr(self.wheelCtrl+"."+self.ar.data.lang['c068_startFrame'], startFrameValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.ar.data.lang['c070_steering'], steeringValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.ar.data.lang['c021_showControls'], showControlsValue, channelBox=True)
@@ -263,7 +263,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.ctrls.setDefaultValue(self.wheelCtrl, self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 1)
                 cmds.setAttr(self.wheelCtrl+"."+self.ar.data.lang['c093_tryKeepUndo'], 1, channelBox=True)
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
                         cmds.setAttr(self.wheelCtrl+"."+self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 0)
                         self.ar.ctrls.setDefaultValue(self.wheelCtrl, self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 0)
                 # set default values:
@@ -315,7 +315,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.ctrls.setLockHide([self.frontLoc, self.wheelAutoGrpLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 
                 # deformers:
-                self.loadedGeo = cmds.getAttr(self.moduleGrp+".geo")
+                self.loadedGeo = cmds.getAttr(self.guide_base+".geo")
                 
                 # geometry holder:
                 self.geoHolder = cmds.polyCube(name=side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_Geo", constructionHistory=False)[0]
@@ -368,7 +368,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(cmds.parentConstraint(middleClusterList[1], defCtrlGrpList[1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(lowerClusterList[1], defCtrlGrpList[2], maintainOffset=False))
                 if s == 1: #fix right side controllers upper/lower flipping - workaround
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
                         self.utils.unlockAttr([self.cvCenterLoc])
                         cmds.parent(self.cvCenterLoc, world=True)
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[1], maintainOffset=False))
@@ -377,8 +377,8 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, defCtrlGrp, maintainOffset=False))
                 outsideDist = cmds.getAttr(self.cvOutsideLoc+".tz")
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
-                        cmds.parent(self.cvCenterLoc, self.moduleGrp)
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
+                        cmds.parent(self.cvCenterLoc, self.guide_base)
                         outsideDist = -outsideDist
                 cmds.move(outsideDist, defCtrlGrp, moveZ=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 self.ar.ctrls.directConnect(upperDefCtrl, upperClusterList[1])
@@ -401,31 +401,29 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, latticeList[1], latticeList[2], self.geoHolder], self.utils.ignoreTransformIOAttr)
                 
-                self.toIDList.extend([receptSteeringMD, inverseSteeringMD, steeringInvCnd, expNode, self.geoHolder, scNode, side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_BP"])
+                self.to_ids.extend([receptSteeringMD, inverseSteeringMD, steeringInvCnd, expNode, self.geoHolder, scNode, side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_BP"])
                 for idList in [latticeList, upperClusterList, middleClusterList, lowerClusterList]:
-                    self.toIDList.extend(idList)
+                    self.to_ids.extend(idList)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     
     
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "mainCtrlList"    : self.mainCtrlList,
-                                                "wheelCtrlList"   : self.wheelCtrlList,
-                                                "steeringGrpList" : self.steeringGrpList,
-                                                "ctrlHookGrpList" : self.ctrlHookGrpList,
-                                              }
+        self.integrated = {
+                                        "mainCtrlList"    : self.mainCtrlList,
+                                        "wheelCtrlList"   : self.wheelCtrlList,
+                                        "steeringGrpList" : self.steeringGrpList,
+                                        "ctrlHookGrpList" : self.ctrlHookGrpList,
                                     }
 
 

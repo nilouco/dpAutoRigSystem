@@ -123,6 +123,7 @@ class Start(object):
 
     def load_components(self):
         self.maker = maker.Maker(self)
+        self.composer = maker.Composer(self)
         self.utils = dpUtils.Utils(self)
         self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager(self)

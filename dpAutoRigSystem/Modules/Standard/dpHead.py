@@ -49,21 +49,21 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="deformer", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="facial", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
+        cmds.setAttr(self.guide_base+".nJoints", 1)
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="deformer", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="facial", attributeType='bool')
         for attr in self.facialAttrList:
-            cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName="connectUserType", attributeType='long', defaultValue=0) #bs
-        cmds.addAttr(self.moduleGrp, longName=JAW, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName=CHIN, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName=LIPS, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+            cmds.addAttr(self.guide_base, longName=attr, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="connectUserType", attributeType='long', defaultValue=0) #bs
+        cmds.addAttr(self.guide_base, longName=JAW, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=CHIN, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=LIPS, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
         
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
@@ -106,7 +106,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         jGuideList = [self.jGuideNeck0, self.jGuideHead, self.jGuideUpperJaw, self.jGuideUpperHead, self.jGuideJaw, self.jGuideChin, self.jGuideChew, self.jGuideUpperLip, self.jGuideLowerLip]
         for jGuide in jGuideList:
             cmds.setAttr(jGuide+".template", 1)
-        cmds.parent(self.jGuideNeck0, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuideNeck0, self.guide_base, relative=True)
         # create cvEnd:
         cmds.select(self.jGuideChew)
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
@@ -131,8 +131,8 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # transform cvLocs in order to put as a good head guide:
-        cmds.setAttr(self.moduleGrp+".rotateX", -90)
-        cmds.setAttr(self.moduleGrp+".rotateY", 90)
+        cmds.setAttr(self.guide_base+".rotateX", -90)
+        cmds.setAttr(self.guide_base+".rotateY", 90)
         cmds.setAttr(self.cvNeckLoc+".rotateZ", 90)
         cmds.makeIdentity(self.cvNeckLoc, rotate=True, apply=False)
         cmds.setAttr(self.cvHeadLoc+".translateY", 2)
@@ -202,7 +202,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         for facialLoc in [self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvDeformerCenterLoc]:
             cmds.setAttr(facialLoc+".visibility", 0)
         # make parenting between cvLocs:
-        cmds.parent(self.cvNeckLoc, self.moduleGrp)
+        cmds.parent(self.cvNeckLoc, self.guide_base)
         cmds.parent(self.cvHeadLoc, self.cvNeckLoc)
         cmds.parent(self.cvUpperJawLoc, self.cvJawLoc, self.cvHeadLoc)
         cmds.parent(self.cvChinLoc, self.cvJawLoc)
@@ -249,7 +249,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         else:
             self.enteredNJoints = enteredNJoints
         # get the number of joints existing:
-        self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+        self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
         # start analisys the difference between values:
         if self.enteredNJoints != self.currentNJoints:
             # verify if the nJoints is greather or less than the current
@@ -290,24 +290,24 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             for n in range(1, self.enteredNJoints):
                 # translate the locators to the calculated position:
                 cmds.setAttr(self.guideName+"_Neck"+str(n)+".translateY", distBt)
-            cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+            cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
             dpBaseLayout.BaseLayout.createPreviewMirror(self)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
     
 
     def changeDeformer(self, deformerValue, *args):
         """ Set the attribute value for deformer and show or hide guide locators.
         """
         #deformerValue = cmds.checkBox(self.deformerCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".deformer", deformerValue)
+        cmds.setAttr(self.guide_base+".deformer", deformerValue)
         cmds.setAttr(self.cvDeformerCenterLoc+".visibility", deformerValue)
 
 
     def changeFacial(self, value, *args):
         """ Enable or disable the Facial Controls UI.
-            Set the moduleGrp facial value as well.
+            Set the main facial value as well.
         """
         collapsed = False
         if not value:
@@ -316,19 +316,19 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             cmds.frameLayout(self.facialCtrlFrameLayout, edit=True, collapse=collapsed, enable=value)
         except:
             pass #maybe it's just a call from a procedural integrated module script
-        cmds.setAttr(self.moduleGrp+".facial", value)
+        cmds.setAttr(self.guide_base+".facial", value)
         self.redeclareVariables(self.guideName)
         for item in list(self.facialLocDic.keys()):
             cmds.setAttr(self.facialLocDic[item]+".visibility", False)
             if value:
-                cmds.setAttr(self.facialLocDic[item]+".visibility", cmds.getAttr(self.moduleGrp+"."+item))
+                cmds.setAttr(self.facialLocDic[item]+".visibility", cmds.getAttr(self.guide_base+"."+item))
 
 
     def changeFacialElement(self, uiCB, attr, *args):
         """ Activate or disactivate the facial elements by them UI checkbox value.
         """
         cbValue = cmds.checkBox(uiCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+"."+attr, cbValue)
+        cmds.setAttr(self.guide_base+"."+attr, cbValue)
         cmds.setAttr(self.facialLocDic[attr]+".visibility", cbValue)
 
 
@@ -352,10 +352,10 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.changeChin(value)
         cmds.checkBox(self.lipsCB, edit=True, value=value, enable=value)
         cmds.checkBox(self.chinCB, edit=True, value=value, enable=value)
-        cmds.setAttr(self.moduleGrp+"."+JAW, value)
+        cmds.setAttr(self.guide_base+"."+JAW, value)
         self.setChangeFacial(value)
         self.utils.parentChildrenGuideTo(self.cvJawLoc, self.cvHeadLoc)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
         
 
     def changeChin(self, value, *args):
@@ -363,10 +363,10 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             Affects: Chew, LoweLip.
         """
         cmds.setAttr(self.cvChinLoc+".visibility", value)
-        cmds.setAttr(self.moduleGrp+"."+CHIN, value)
+        cmds.setAttr(self.guide_base+"."+CHIN, value)
         self.setChangeFacial(value)
         self.utils.parentChildrenGuideTo(self.cvChinLoc, self.cvJawLoc)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
         
 
     def changeLips(self, value, *args):
@@ -379,13 +379,13 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.cvLowerLipLoc+".visibility", value)
         cmds.setAttr(self.jGuideJaw+".visibility", value)
         cmds.setAttr(self.jGuideUpperJaw+".visibility", value)
-        cmds.setAttr(self.moduleGrp+"."+LIPS, value)
+        cmds.setAttr(self.guide_base+"."+LIPS, value)
         self.setChangeFacial(value)
         self.utils.parentChildrenGuideTo(self.cvLCornerLipLoc, self.cvHeadLoc)
         self.utils.parentChildrenGuideTo(self.cvRCornerLipLoc, self.cvHeadLoc)
         self.utils.parentChildrenGuideTo(self.cvUpperLipLoc, self.cvHeadLoc)
         self.utils.parentChildrenGuideTo(self.cvLowerLipLoc, self.cvJawLoc)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
         
 
     def changeUpperHead(self, value, *args):
@@ -395,14 +395,14 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.jGuideUpperJaw+".visibility", value)
         cmds.checkBox(self.deformerCB, edit=True, enable=value)
         cmds.text(self.deformerTxt, edit=True, enable=value)
-        cmds.setAttr(self.moduleGrp+"."+UPPERHEAD, value)
+        cmds.setAttr(self.guide_base+"."+UPPERHEAD, value)
         self.setChangeFacial(value)
         if not value:
             self.changeDeformer(value)
             cmds.checkBox(self.deformerCB, edit=True, value=False)
         self.utils.parentChildrenGuideTo(self.cvUpperJawLoc, self.cvHeadLoc)
         self.utils.parentChildrenGuideTo(self.cvUpperHeadLoc, self.cvHeadLoc)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
         
 
     def setupJawMove(self, attrCtrl, openCloseID, positiveRotation=True, axis="Y", intAttrID="c049_intensity", invertRot=False, createOutput=False, fixValue=0.01, *args):
@@ -457,7 +457,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         jawStartMD = cmds.createNode('multiplyDivide', name=jawStartMDName)
         jawIntPMA = cmds.createNode('plusMinusAverage', name=jawIntPMAName)
         jawIntCnd = cmds.createNode('condition', name=jawIntCndName)
-        self.toIDList.extend([jawCalibrateMD, jawUnitFixMD, jawIntMD, jawStartMD, jawIntPMA, jawIntCnd])
+        self.to_ids.extend([jawCalibrateMD, jawUnitFixMD, jawIntMD, jawStartMD, jawIntPMA, jawIntCnd])
         
         # set attributes to move jaw group when open or close:
         cmds.setAttr(jawIntPMA+".operation", 2) #substract
@@ -488,7 +488,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             invetRotMDName = attrBaseName+self.ar.data.lang[openCloseID]+self.ar.data.lang[intAttrID].capitalize()+"_"+axis+"_InvertRot_MD"
             invetRotPMA = cmds.createNode('plusMinusAverage', name=invetRotPMAName)
             invetRotMD = cmds.createNode('multiplyDivide', name=invetRotMDName)
-            self.toIDList.extend([invetRotPMA, invetRotMD])
+            self.to_ids.extend([invetRotPMA, invetRotMD])
             cmds.setAttr(invetRotPMA+".operation", 2) #substract
             cmds.setAttr(invetRotMD+".input2X", -1)
             cmds.setAttr(jawIntCnd+".colorIfFalseG", 0)
@@ -504,7 +504,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.addAttr(self.jawCtrl, longName=calibOutputAttrName, attributeType='float', defaultValue=1)
                 cmds.addAttr(self.jawCtrl, longName=outputAttrName, attributeType='float', defaultValue=1)
             jawOutputRmV = cmds.createNode('remapValue', name=jawOutputRmVName)
-            self.toIDList.append(jawOutputRmV)
+            self.to_ids.append(jawOutputRmV)
             cmds.connectAttr(self.jawCtrl+".rotateX", jawOutputRmV+".inputValue", force=True)
             cmds.connectAttr(self.jawCtrl+"."+calibOutputAttrName, jawOutputRmV+".inputMax", force=True)
             cmds.connectAttr(jawOutputRmV+".outValue", self.jawCtrl+"."+outputAttrName, force=True)
@@ -572,11 +572,11 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.jGuideUpperJaw = side+middle+guide+"_JGuideUpperJaw"
         
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
-            style = cmds.getAttr(self.moduleGrp+".style")
+        if cmds.objExists(self.guide_base):
+            style = cmds.getAttr(self.guide_base+".style")
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
@@ -621,7 +621,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 # connect facial controllers to blendShape node or tweakers:
                 self.connectUserType = self.bsType
-                userType = cmds.getAttr(self.moduleGrp+".connectUserType")
+                userType = cmds.getAttr(self.guide_base+".connectUserType")
                 if userType == 1:
                     self.connectUserType = self.jointsType
 
@@ -629,10 +629,10 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
 
                 # get items to be created
-                hasJaw = cmds.getAttr(self.moduleGrp+"."+JAW)
-                hasChin = cmds.getAttr(self.moduleGrp+"."+CHIN)
-                hasLips = cmds.getAttr(self.moduleGrp+"."+LIPS)
-                hasUpperHead = cmds.getAttr(self.moduleGrp+"."+UPPERHEAD)
+                hasJaw = cmds.getAttr(self.guide_base+"."+JAW)
+                hasChin = cmds.getAttr(self.guide_base+"."+CHIN)
+                hasLips = cmds.getAttr(self.guide_base+"."+LIPS)
+                hasUpperHead = cmds.getAttr(self.guide_base+"."+UPPERHEAD)
 
                 # creating controllers:
                 for n in range(0, self.nJoints):
@@ -723,30 +723,30 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 
                 # facial controls
                 facialCtrlList = []
-                if cmds.getAttr(self.moduleGrp+".facial"):
-                    if cmds.getAttr(self.moduleGrp+".facialBrow"):
+                if cmds.getAttr(self.guide_base+".facial"):
+                    if cmds.getAttr(self.guide_base+".facialBrow"):
                         self.lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "red", True, False)
                         self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "blue", True, False)
                         facialCtrlList.extend([self.lBrowCtrl, self.rBrowCtrl])
-                    if cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                    if cmds.getAttr(self.guide_base+".facialEyelid"):
                         if self.connectUserType == self.bsType:
                             self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
                             self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
                             facialCtrlList.extend([self.lEyelidCtrl, self.rEyelidCtrl])
-                    if cmds.getAttr(self.moduleGrp+".facialMouth"):
+                    if cmds.getAttr(self.guide_base+".facialMouth"):
                         self.lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "red", True, True)
                         self.rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "blue", True, True)
                         facialCtrlList.extend([self.lMouthCtrl, self.rMouthCtrl])
-                    if cmds.getAttr(self.moduleGrp+".facialLips"):
+                    if cmds.getAttr(self.guide_base+".facialLips"):
                         self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(side, None, self.ar.data.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, "yellow", True, True)
                         facialCtrlList.append(self.lipsCtrl)
-                    if cmds.getAttr(self.moduleGrp+".facialSneer"):
+                    if cmds.getAttr(self.guide_base+".facialSneer"):
                         self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(side, None, self.ar.data.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True)
                         facialCtrlList.append(self.sneerCtrl)
-                    if cmds.getAttr(self.moduleGrp+".facialGrimace"):
+                    if cmds.getAttr(self.guide_base+".facialGrimace"):
                         self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(side, None, self.ar.data.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True, True)
                         facialCtrlList.append(self.grimaceCtrl)
-                    if cmds.getAttr(self.moduleGrp+".facialFace"):
+                    if cmds.getAttr(self.guide_base+".facialFace"):
                         self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(side, None, self.ar.data.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, "cyan", False, False)
                         facialCtrlList.append(self.faceCtrl)
 
@@ -827,26 +827,26 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
                     self.utils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
                 # facial origined from
-                if cmds.getAttr(self.moduleGrp+".facial"):
-                    if cmds.getAttr(self.moduleGrp+".facialBrow"):
-                        if cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                if cmds.getAttr(self.guide_base+".facial"):
+                    if cmds.getAttr(self.guide_base+".facialBrow"):
+                        if cmds.getAttr(self.guide_base+".facialEyelid"):
                             cmds.setAttr(self.upperHeadCtrl+".originedFrom", self.cvUpperHeadLoc+";"+self.cvBrowLoc+";"+self.cvEyelidLoc, type="string")
                         else:
                             cmds.setAttr(self.upperHeadCtrl+".originedFrom", self.cvUpperHeadLoc+";"+self.cvBrowLoc, type="string")
-                    elif cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                    elif cmds.getAttr(self.guide_base+".facialEyelid"):
                         cmds.setAttr(self.upperHeadCtrl+".originedFrom", self.cvUpperHeadLoc+";"+self.cvEyelidLoc, type="string")
-                    if cmds.getAttr(self.moduleGrp+".facialMouth"):
-                        if cmds.getAttr(self.moduleGrp+".facialLips"):
+                    if cmds.getAttr(self.guide_base+".facialMouth"):
+                        if cmds.getAttr(self.guide_base+".facialLips"):
                             cmds.setAttr(self.upperJawCtrl+".originedFrom", self.cvUpperJawLoc+";"+self.cvMouthLoc+";"+self.cvLipsLoc, type="string")
                         else:
                             cmds.setAttr(self.upperJawCtrl+".originedFrom", self.cvUpperJawLoc+";"+self.cvMouthLoc, type="string")
-                    elif cmds.getAttr(self.moduleGrp+".facialLips"):
+                    elif cmds.getAttr(self.guide_base+".facialLips"):
                         cmds.setAttr(self.upperJawCtrl+".originedFrom", self.cvUpperJawLoc+";"+self.cvLipsLoc, type="string")
-                    if cmds.getAttr(self.moduleGrp+".facialSneer"):
+                    if cmds.getAttr(self.guide_base+".facialSneer"):
                         cmds.setAttr(self.upperLipCtrl+".originedFrom", self.cvUpperLipLoc+";"+self.cvSneerLoc, type="string")
-                    if cmds.getAttr(self.moduleGrp+".facialGrimace"):
+                    if cmds.getAttr(self.guide_base+".facialGrimace"):
                         cmds.setAttr(self.lowerLipCtrl+".originedFrom", self.cvLowerLipLoc+";"+self.cvGrimaceLoc, type="string")
-                    if cmds.getAttr(self.moduleGrp+".facialFace"):
+                    if cmds.getAttr(self.guide_base+".facialFace"):
                         cmds.setAttr(self.headSubCtrl+".originedFrom", self.cvHeadLoc+";"+self.cvFaceLoc, type="string")
                 
                 # temporary parentConstraints:
@@ -963,7 +963,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.ar.data.lang['c032_follow'].capitalize()+"_Rev")
                 cmds.connectAttr(self.headCtrl+'.'+self.ar.data.lang['c032_follow'], self.headRevNode+".inputX", force=True)
                 cmds.connectAttr(self.headRevNode+'.outputX', headRotateParentConst+"."+self.worldRef+"W1", force=True)
-                self.toIDList.extend([self.headRevNode])
+                self.to_ids.extend([self.headRevNode])
                 
                 # setup neck autoRotate:
                 for n in range(0, self.nJoints):
@@ -974,7 +974,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.addAttr(self.neckCtrlList[n], longName=self.ar.data.lang['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=self.autoRotateCalc(n), keyable=True)
                     neckARMDName = self.ar.data.lang['c047_autoRotate'][0].capitalize()+self.ar.data.lang['c047_autoRotate'][1:]
                     neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_MD")
-                    self.toIDList.append(neckARMD)
+                    self.to_ids.append(neckARMD)
                     cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
                     cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
                     cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)
@@ -985,7 +985,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     if style == 2: #quadruped
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
                         quadrupedRotYZFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YZ_Fix_MD")
-                        self.toIDList.append(quadrupedRotYZFixMD)
+                        self.to_ids.append(quadrupedRotYZFixMD)
                         cmds.connectAttr(neckARMD+".outputY", quadrupedRotYZFixMD+".input1X", force=True)
                         cmds.setAttr(quadrupedRotYZFixMD+".input2X", -1)
                         cmds.connectAttr(quadrupedRotYZFixMD+".outputX", self.neckOrientGrp+".rotateZ", force=True)
@@ -1003,7 +1003,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.jawCtrl+"."+self.ar.data.lang['c032_follow'], jawFollowRev+".inputX", force=True)
                     cmds.connectAttr(jawFollowRev+".outputX", jawParentConst+"."+self.worldRef+"W1", force=True)
                     cmds.scaleConstraint(self.headSubCtrl, zeroJaw, maintainOffset=True, name=zeroJaw+"_ScC")[0]
-                    self.toIDList.extend([jawFollowRev])
+                    self.to_ids.extend([jawFollowRev])
                 
                     # setup jaw move:
                     # jaw open:
@@ -1062,7 +1062,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+secoundDriver+"W1", force=True)
                     cmds.scaleConstraint(secoundDriver, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScC")[0]
                     
-                    self.toIDList.extend([upperLipRev, self.lLipRevNode, self.rLipRevNode])
+                    self.to_ids.extend([upperLipRev, self.lLipRevNode, self.rLipRevNode])
 
                 # articulation joint:
                 if self.addArticJoint:
@@ -1122,36 +1122,36 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
                 
                 # facial controls hierarchy
-                if cmds.getAttr(self.moduleGrp+".facial"):
-                    if cmds.getAttr(self.moduleGrp+".facialBrow"):
+                if cmds.getAttr(self.guide_base+".facial"):
+                    if cmds.getAttr(self.guide_base+".facialBrow"):
                         cmds.parent(lBrowCtrlGrp, rBrowCtrlGrp, self.upperHeadCtrl)
                         cmds.delete(cmds.parentConstraint(self.cvBrowLoc, lBrowCtrlGrp, maintainOffset=False))
                         cmds.delete(cmds.parentConstraint(self.cvBrowLoc, rBrowCtrlGrp, maintainOffset=False))
                         cmds.setAttr(rBrowCtrlGrp+".translateX", (-1*cmds.getAttr(rBrowCtrlGrp+".translateX")))
                         cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
-                    if cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                    if cmds.getAttr(self.guide_base+".facialEyelid"):
                         if self.connectUserType == self.bsType:
                             cmds.parent(lEyelidCtrlGrp, rEyelidCtrlGrp, self.upperHeadCtrl)
                             cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, lEyelidCtrlGrp, maintainOffset=False))
                             cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, rEyelidCtrlGrp, maintainOffset=False))
                             cmds.setAttr(rEyelidCtrlGrp+".translateX", (-1*cmds.getAttr(rEyelidCtrlGrp+".translateX")))
-                    if cmds.getAttr(self.moduleGrp+".facialMouth"):
+                    if cmds.getAttr(self.guide_base+".facialMouth"):
                         cmds.parent(lMouthCtrlGrp, rMouthCtrlGrp, self.upperJawCtrl)
                         cmds.delete(cmds.parentConstraint(self.cvMouthLoc, lMouthCtrlGrp, maintainOffset=False))
                         cmds.delete(cmds.parentConstraint(self.cvMouthLoc, rMouthCtrlGrp, maintainOffset=False))
                         cmds.setAttr(rMouthCtrlGrp+".translateX", (-1*cmds.getAttr(rMouthCtrlGrp+".translateX")))
                         cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
-                    if cmds.getAttr(self.moduleGrp+".facialLips"):
+                    if cmds.getAttr(self.guide_base+".facialLips"):
                         cmds.parent(lipsCtrlGrp, self.upperJawCtrl)
                         cmds.delete(cmds.parentConstraint(self.cvLipsLoc, lipsCtrlGrp, maintainOffset=False))
-                    if cmds.getAttr(self.moduleGrp+".facialSneer"):
+                    if cmds.getAttr(self.guide_base+".facialSneer"):
                         cmds.parent(sneerCtrlGrp, self.upperJawCtrl)
                         cmds.delete(cmds.parentConstraint(self.cvSneerLoc, sneerCtrlGrp, maintainOffset=False))
-                    if cmds.getAttr(self.moduleGrp+".facialGrimace"):
+                    if cmds.getAttr(self.guide_base+".facialGrimace"):
                         cmds.parent(grimaceCtrlGrp, self.chinCtrl)
                         cmds.delete(cmds.parentConstraint(self.cvGrimaceLoc, grimaceCtrlGrp, maintainOffset=False))
                         cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
-                    if cmds.getAttr(self.moduleGrp+".facialFace"):
+                    if cmds.getAttr(self.guide_base+".facialFace"):
                         cmds.parent(faceCtrlGrp, self.headSubCtrl)
                         cmds.delete(cmds.parentConstraint(self.cvFaceLoc, faceCtrlGrp, maintainOffset=False))
                 
@@ -1187,7 +1187,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
                 
                 # head deformer
-                if cmds.getAttr(self.moduleGrp+".deformer") and hasUpperHead:
+                if cmds.getAttr(self.guide_base+".deformer") and hasUpperHead:
                     headDefCtrlList = [self.upperJawCtrl, self.upperHeadCtrl]
                     if hasJaw:
                         headDefCtrlList.append(self.jawCtrl)
@@ -1217,20 +1217,20 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
                 
             # connect to facial controllers to blendShapes or facial joints
-            if cmds.getAttr(self.moduleGrp+".facial"):
+            if cmds.getAttr(self.guide_base+".facial"):
                 if self.connectUserType == self.bsType:
                     self.ar.config.get_instance_info("dpFacialConnection", [self.ar.data.tools_folder]).dpConnectToBlendShape()
                 else:
                     self.ar.config.get_instance_info("dpFacialConnection", [self.ar.data.tools_folder]).dpConnectToJoints()
 
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     
 
     def createFaceMinMaxSN(self, fCtrl, *args):
@@ -1323,7 +1323,7 @@ for net in cmds.ls(type="network"):
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleY", force=True)
             if invertZ: # grimace hack to invert front and back values from Z axis
                 invZMD = cmds.createNode("multiplyDivide", name=ctrlName+"_InvZ_MD")
-                self.toIDList.append(invZMD)
+                self.to_ids.append(invZMD)
                 cmds.setAttr(invZMD+".input2Z", -1)
                 cmds.connectAttr(fCtrl+".scaleFactor", invZMD+".input1Z", force=True)
                 cmds.connectAttr(invZMD+".outputZ", fCtrlGrp+".scaleZ", force=True)
@@ -1340,7 +1340,7 @@ for net in cmds.ls(type="network"):
                         facialAttrList.append(ctrlAttr)
                         clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                         # TODO: to be decommented by 2026-12-24
-                        #self.toIDList.append(clp)
+                        #self.to_ids.append(clp)
                         if directConnection:
                             if not "minValue" in cmds.listAttr(fCtrl):
                                 for c, clampAttr in enumerate(["minValue", "maxValue"]):
@@ -1360,7 +1360,7 @@ for net in cmds.ls(type="network"):
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
                             intensityMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Intensity_MD")
-                            self.toIDList.extend([calibrateMD, invMD, intensityMD])
+                            self.to_ids.extend([calibrateMD, invMD, intensityMD])
                             if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
@@ -1382,7 +1382,7 @@ for net in cmds.ls(type="network"):
                                     calibrationList.append(self.calibrateName+"TZ")
                             if addTranslateY: #useful for Sneer and Grimace
                                 integrateTYPMA = cmds.createNode("plusMinusAverage", name=ctrlName+"_"+attr+"_TY_PMA")
-                                self.toIDList.append(integrateTYPMA)
+                                self.to_ids.append(integrateTYPMA)
                                 cmds.connectAttr(calibrateMD+".outputX", integrateTYPMA+".input1D[0]", force=True)
                                 if not "Front" in attr:
                                     cmds.connectAttr(fCtrl+".translateY", integrateTYPMA+".input1D[1]", force=True)
@@ -1432,7 +1432,7 @@ for net in cmds.ls(type="network"):
             Resuming it's just divide 1 by the calibrate value.
         """
         hyperboleTLimitMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_MD")
-        self.toIDList.append(hyperboleTLimitMD)
+        self.to_ids.append(hyperboleTLimitMD)
         cmds.setAttr(hyperboleTLimitMD+".input1X", 1)
         cmds.setAttr(hyperboleTLimitMD+".operation", 2)
         cmds.connectAttr(fCtrl+"."+self.calibrateName+"T"+axis, hyperboleTLimitMD+".input2X", force=True)
@@ -1441,7 +1441,7 @@ for net in cmds.ls(type="network"):
             cmds.transformLimits(fCtrl, translationY=(0, 1))
         else:
             hyperboleInvMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_Inv_MD")
-            self.toIDList.append(hyperboleInvMD)
+            self.to_ids.append(hyperboleInvMD)
             cmds.setAttr(hyperboleInvMD+".input2X", -1)
             cmds.connectAttr(hyperboleTLimitMD+".outputX", hyperboleInvMD+".input1X", force=True)
             cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
@@ -1454,22 +1454,22 @@ for net in cmds.ls(type="network"):
         typeSelectedRadioButton = cmds.radioCollection(self.facialTypeRC, query=True, select=True)
         self.connectUserType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
         if self.connectUserType == self.bsType:
-            cmds.setAttr(self.moduleGrp+".connectUserType", 0)
+            cmds.setAttr(self.guide_base+".connectUserType", 0)
         elif self.connectUserType == self.jointsType:
-            cmds.setAttr(self.moduleGrp+".connectUserType", 1)
+            cmds.setAttr(self.guide_base+".connectUserType", 1)
     
     
     def getDeformedByList(self, s, *args):
         """ Returns the defomedBy list for this Head module based in the integrated hook dictionary.
         """
         guideList, resultList = [], []
-        hookDic = self.ar.utils.hook()
-        for item in hookDic.keys():
-            if self.guideName in hookDic[item]['fatherGuide']:
+        hook = self.ar.utils.get_hook()
+        for item in hook.keys():
+            if self.guideName in hook[item]['fatherGuide']:
                 if not item in guideList:
                     guideList.append(item.split(":")[0])
-                    if hookDic[item]['childrenList']:
-                        for child in hookDic[item]['childrenList']:
+                    if hook[item]['childrenList']:
+                        for child in hook[item]['childrenList']:
                             if not child in guideList:
                                 guideList.append(child.split(":")[0])
         if guideList:
@@ -1491,16 +1491,14 @@ for net in cmds.ls(type="network"):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "worldRefList"         : self.worldRefList,
-                                                "upperCtrlList"        : self.upperCtrlList,
-                                                "ctrlList"             : self.aCtrls,
-                                                "InnerCtrls"           : self.aInnerCtrls,
-                                                "lCtrls"               : self.aLCtrls,
-                                                "rCtrls"               : self.aRCtrls,
-                                                "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
-                                                "upperJawCtrlList"     : self.upperJawCtrlList,
-                                                "facialCtrlGrpList"    : self.facialCtrlGrpList
-                                              }
+        self.integrated = {
+                                        "worldRefList"         : self.worldRefList,
+                                        "upperCtrlList"        : self.upperCtrlList,
+                                        "ctrlList"             : self.aCtrls,
+                                        "InnerCtrls"           : self.aInnerCtrls,
+                                        "lCtrls"               : self.aLCtrls,
+                                        "rCtrls"               : self.aRCtrls,
+                                        "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
+                                        "upperJawCtrlList"     : self.upperJawCtrlList,
+                                        "facialCtrlGrpList"    : self.facialCtrlGrpList
                                     }

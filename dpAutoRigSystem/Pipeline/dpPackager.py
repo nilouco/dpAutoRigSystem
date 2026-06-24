@@ -303,7 +303,7 @@ class Packager(object):
                 #if self.ar.dev:
                 reload(dpCallback)
                 self.callback = dpCallback.Callback()
-            return self.callback.main(data)
+            return self.callback.guide_base(data)
         except:
             pass
 

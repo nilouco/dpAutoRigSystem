@@ -33,18 +33,18 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
-        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
+        cmds.setAttr(self.guide_base+".nJoints", 1)
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuide1, self.guide_base, relative=True)
         
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -54,7 +54,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc, self.guide_base)
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
@@ -75,7 +75,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         else:
             self.enteredNJoints = enteredNJoints
         # get the number of joints existing:
-        self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+        self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
         # start analisys the difference between values:
         if self.enteredNJoints != self.currentNJoints:
             # unparent temporarely the Ends:
@@ -130,12 +130,12 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             if pTempParent:
                 cmds.delete(pTempParent)
 
-            cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+            cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             self.changeMainCtrlsNumber(0)
             # re-build the preview mirror:
             dpBaseLayout.BaseLayout.createPreviewMirror(self)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
 
 
     def getJointLocList(self, guideBase, *args):
@@ -201,7 +201,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             Each guide will point to the next guide using Radius_Ctrl position as a Object Rotation Up Vector.
         """
         # re-declaring guides names:
-        self.guideBase = self.moduleGrp
+        self.guideBase = self.guide_base
         self.radiusGuide = self.guideName + "_Base_RadiusCtrl"
         self.cvEndJoint = self.guideName + "_JointEnd"
         # Check if the guideBase exists:
@@ -220,10 +220,10 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.reOrientBT = cmds.button(label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent="flipLayout")
 
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             # run for all sides
@@ -258,7 +258,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(self.jntCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        if cmds.getAttr(self.guide_base+".flip") == 1:
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleX", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
@@ -304,11 +304,11 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     

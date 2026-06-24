@@ -23,7 +23,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["WIKI"] = WIKI
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         # declare variable
-        self.integratedActionsDic = {}
+        self.integrated = {}
         self.cvJointLoc = None
         self.shapeSizeCH = None
         self.currentNJoints = 3
@@ -49,19 +49,19 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5, d=1, guide=True)
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc, self.guide_base)
         # Edit GUIDE:
-        cmds.setAttr(self.moduleGrp+".rx", -90)
-        cmds.setAttr(self.moduleGrp+".ry", -90)
-        cmds.setAttr(self.moduleGrp+"_RadiusCtrl.tx", 4)
+        cmds.setAttr(self.guide_base+".rx", -90)
+        cmds.setAttr(self.guide_base+".ry", -90)
+        cmds.setAttr(self.guide_base+"_RadiusCtrl.tx", 4)
         self.changeJointNumber(3)
         # include nodes into net
         self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
@@ -81,7 +81,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.enteredNJoints = enteredNJoints
         if self.enteredNJoints >= 3:
             # get the number of joints existing:
-            self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+            self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
             # start analisys the difference between values:
             if self.enteredNJoints != self.currentNJoints:
                 self.cvEndJoint = self.guideName+"_JointEnd"
@@ -129,21 +129,21 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.setAttr(self.parentConst+".Guide_JointLoc1W0", 1-nParentValue)
                         cmds.setAttr(self.parentConst+".Guide_JointEndW1", nParentValue)
                         self.ar.ctrls.setLockHide([self.guideName+"_JointLoc"+ str(n)], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                # actualise the nJoints in the moduleGrp:
-                cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+                # actualise the nJoints in the main:
+                cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 # re-build the preview mirror:
                 dpBaseLayout.BaseLayout.createPreviewMirror(self)
-            cmds.select(self.moduleGrp)
+            cmds.select(self.guide_base)
         else:
             self.changeJointNumber(3)
 
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
-            style = cmds.getAttr(self.moduleGrp+".style")
+        if cmds.objExists(self.guide_base):
+            style = cmds.getAttr(self.guide_base+".style")
             # naming main controls:
             hipsName  = self.ar.data.lang['c100_bottom']
             chestName = self.ar.data.lang['c099_top']
@@ -311,7 +311,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 upClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(self.nJoints)+":"+str(self.nJoints+1)+"]", name=side+self.userGuideName+'_Up_Cls')
                 downCluster = downClusterList[1]
                 upCluster = upClusterList[1]
-                self.toIDList.extend([downClusterList[0], upClusterList[0]])
+                self.to_ids.extend([downClusterList[0], upClusterList[0]])
                 # get positions of joints from ribbon nurbs plane:
                 startRbnJointPos = cmds.xform(side+self.userGuideName+"_01_Jnt", query=True, worldSpace=True, translation=True)
                 endRbnJointPos = cmds.xform(side+self.userGuideName+"_%02d_Jnt"%(self.nJoints), query=True, worldSpace=True, translation=True)
@@ -419,7 +419,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.middleFkCtrlZero = self.utils.zeroOut([self.middleFkCtrl])[0]
                     middleClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(n+1)+"]", name=side+self.userGuideName+'_Middle_Cls')
                     middleCluster = middleClusterList[1]
-                    self.toIDList.append(middleClusterList[0])
+                    self.to_ids.append(middleClusterList[0])
                     middleLocPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(n), query=True, worldSpace=True, translation=True)
                     tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
                     cmds.delete(tempDel)
@@ -446,7 +446,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     jointFather = cmds.listRelatives(self.aRbnJointList[n], allParents=True)[0]
                     intRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_Rev")
                     middleIntBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_"+self.ar.data.lang['c029_middle']+str(n)+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_BC")
-                    self.toIDList.extend([intRevNode, middleIntBC])
+                    self.to_ids.extend([intRevNode, middleIntBC])
                     middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_PaC")[0]
                     cmds.connectAttr(self.middleFkCtrl+"."+self.ar.data.lang['c049_intensity'], middleIntBC+".color1R", force=True)
                     cmds.connectAttr(self.middleCtrl+"."+self.ar.data.lang['c049_intensity'], middleIntBC+".color2R", force=True)
@@ -463,7 +463,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.middleCtrlGrpPC = cmds.parentConstraint(self.middleCtrlZero, self.middleFkCtrl, self.middleCtrlGrp, maintainOffset=True, name=self.middleCtrlGrp+"_IkFkBlend_PaC")[0]
                     if n == 1:
                         self.revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
-                        self.toIDList.append(self.revNode)
+                        self.to_ids.append(self.revNode)
                         cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.revNode+".inputX", force=True)
                     # connecting ikFkBlend using the reverse node:
                     cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.middleCtrlGrpPC+"."+self.middleFkCtrl+"W1", force=True)
@@ -501,16 +501,16 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([middleOrigGrp], self.utils.ignoreTransformIOAttr)
-                self.toIDList.extend([middleScaleYMD, arcLen, rbnMD, rbnBlendColors, rbnCond, rbnVVMD])
+                self.to_ids.extend([middleScaleYMD, arcLen, rbnMD, rbnBlendColors, rbnCond, rbnVVMD])
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
 
 
     def addParentTagInfo(self, *args):
@@ -544,18 +544,16 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-            "module": {
-                "hipsAList": self.aHipsAList,
-                "tipList": self.tipList,
-                "volumeVariationAttrList": self.aVolVariationAttrList,
-                "ActiveVolumeVariationAttrList": self.aActVolVariationAttrList,
-                "MasterScaleVolumeVariationAttrList": self.aMScaleVolVariationAttrList,
-                "IkFkBlendAttrList": self.aIkFkBlendAttrList,
-                "InnerCtrls": self.aInnerCtrls,
-                "OuterCtrls": self.aOuterCtrls,
-                "jointList": self.aRbnJointList,
-                "scalableGrp": self.aClusterGrp,
-                "shapeVisAttrList": self.shapeVisAttrList
-            }
-        }
+        self.integrated = {
+                                        "hipsAList": self.aHipsAList,
+                                        "tipList": self.tipList,
+                                        "volumeVariationAttrList": self.aVolVariationAttrList,
+                                        "ActiveVolumeVariationAttrList": self.aActVolVariationAttrList,
+                                        "MasterScaleVolumeVariationAttrList": self.aMScaleVolVariationAttrList,
+                                        "IkFkBlendAttrList": self.aIkFkBlendAttrList,
+                                        "InnerCtrls": self.aInnerCtrls,
+                                        "OuterCtrls": self.aOuterCtrls,
+                                        "jointList": self.aRbnJointList,
+                                        "scalableGrp": self.aClusterGrp,
+                                        "shapeVisAttrList": self.shapeVisAttrList
+                                    }

@@ -81,7 +81,7 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
         if dialogName == None:
             return
         # defining variables
-        self.toIDList = []
+        self.to_ids = []
         self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
         self.headCtrl = ctrl
         deformerName = self.addDeformerInName(dialogName, True)
@@ -273,7 +273,7 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
                 # create and connect cluster
                 namePos = bottomCtrlName.replace(self.ar.data.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
-                self.toIDList.extend(subClusterList)
+                self.to_ids.extend(subClusterList)
                 cmds.parent(self.ar.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
                 subCtrl = self.ar.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0), parentTag=arrowCtrl)
@@ -400,7 +400,7 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
 
             # serialize network node
             self.net = cmds.createNode("network", name=netName)
-            self.toIDList.append(self.net)
+            self.to_ids.append(self.net)
             # add
             cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool", defaultValue=1)
             cmds.addAttr(self.net, longName="dpHeadDeformerNet", attributeType="bool", defaultValue=1)
@@ -430,10 +430,10 @@ class HeadDeformer(dpBaseLibrary.BaseLibrary):
             # add ignoreTranformIO attribute
             self.ar.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, arrowCtrlGrp], self.ar.utils.ignoreTransformIOAttr)
             # add dpID attributes
-            self.toIDList.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
+            self.to_ids.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
             for deformerList in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:
-                self.toIDList.extend(deformerList)
-            self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+                self.to_ids.extend(deformerList)
+            self.ar.customAttr.addAttr(0, self.to_ids, descendents=True) #dpID
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:

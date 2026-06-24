@@ -34,13 +34,13 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="nostril", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".nostril", 1)
-        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
+        cmds.setAttr(self.guide_base+".nJoints", 1)
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nostril", attributeType='bool')
+        cmds.setAttr(self.guide_base+".nostril", 1)
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
         # create cvJointLoc and cvLocators:
         self.cvTopLoc      = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_cvTopLoc1", r=0.3, d=1, guide=True)
         self.cvMiddleLoc   = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_cvMiddleLoc", r=0.2, d=1, guide=True)
@@ -61,7 +61,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.jGuideNostril = cmds.joint(name=self.guideName+"jGuideNostril", radius=0.001)
         cmds.select(self.jGuideMiddle)
         self.jGuideBottom = cmds.joint(name=self.guideName+"jGuideBottom", radius=0.001)
-        cmds.parent(self.jGuideTop1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuideTop1, self.guide_base, relative=True)
         # set jointGuides as templates:
         jGuideList = [self.jGuideTop1, self.jGuideMiddle, self.jGuideTip, self.jGuideEnd, self.jGuideSide, self.jGuideNostril, self.jGuideBottom, self.cvRSideLoc, self.cvRNostrilLoc]
         for jGuide in jGuideList:
@@ -93,7 +93,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.cvBottomLoc+".translateY", -0.9)
         cmds.setAttr(self.cvBottomLoc+".translateZ", 0.6)
         # make parenting between cvLocs:
-        cmds.parent(self.cvTopLoc, self.moduleGrp)
+        cmds.parent(self.cvTopLoc, self.guide_base)
         cmds.parent(self.cvMiddleLoc, self.cvTopLoc, relative=False)
         cmds.parent(self.cvTipLoc, self.cvMiddleLoc, relative=False)
         cmds.parent(self.cvEndJoint, self.cvTipLoc, relative=True)
@@ -154,7 +154,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         else:
             self.enteredNJoints = enteredNJoints
         # get the number of joints existing:
-        self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+        self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
         # start analisys the difference between values:
         if self.enteredNJoints != self.currentNJoints:
             # verify if the nJoints is greather or less than the current
@@ -191,26 +191,26 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(self.guideName+"_JGuideTop"+str(self.enteredNJoints+1))
                 for j in range(self.enteredNJoints+1, self.currentNJoints+1):
                     self.removeAttrFromGuideNet(["cvTopLoc"+str(j)])
-            cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+            cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
             dpBaseLayout.BaseLayout.createPreviewMirror(self)
-        cmds.select(self.moduleGrp)
+        cmds.select(self.guide_base)
     
 
     def changeNostril(self, *args):
         """ Set the attribute value for nostril.
         """
         nostrilValue = cmds.checkBox(self.nostrilCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".nostril", nostrilValue)
+        cmds.setAttr(self.guide_base+".nostril", nostrilValue)
         cmds.setAttr(self.cvLNostrilLoc+".visibility", nostrilValue)
         cmds.setAttr(self.cvRNostrilLoc+".visibility", nostrilValue)
     
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
@@ -453,7 +453,7 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
@@ -465,12 +465,10 @@ class Nose(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "ctrlList"        : self.aCtrls,
-                                                "lCtrls"          : self.aLCtrls,
-                                                "rCtrls"          : self.aRCtrls,
-                                                "ctrlHookGrpList" : self.ctrlHookGrpList,
-                                                "mainCtrlList"    : self.mainCtrlList
-                                              }
+        self.integrated = {
+                                        "ctrlList"        : self.aCtrls,
+                                        "lCtrls"          : self.aLCtrls,
+                                        "rCtrls"          : self.aRCtrls,
+                                        "ctrlHookGrpList" : self.ctrlHookGrpList,
+                                        "mainCtrlList"    : self.mainCtrlList
                                     }

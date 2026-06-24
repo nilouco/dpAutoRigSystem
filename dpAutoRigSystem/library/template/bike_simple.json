@@ -1,7 +1,7 @@
 {
     "dpGuide_000_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",
@@ -109,7 +109,7 @@
     },
     "dpGuide_001_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",
@@ -217,7 +217,7 @@
     },
     "dpGuide_002_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",
@@ -325,7 +325,7 @@
     },
     "dpGuide_003_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "CenterLoc",
@@ -460,7 +460,7 @@
     },
     "dpGuide_004_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",
@@ -568,7 +568,7 @@
     },
     "dpGuide_005_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",
@@ -676,7 +676,7 @@
     },
     "dpGuide_006_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "CenterLoc",
@@ -811,7 +811,7 @@
     },
     "dpGuide_007_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "CenterLoc",
@@ -946,7 +946,7 @@
     },
     "dpGuide_008_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",

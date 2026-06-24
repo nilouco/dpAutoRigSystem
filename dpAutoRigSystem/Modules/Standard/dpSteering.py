@@ -32,12 +32,12 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuide1, self.guide_base, relative=True)
         
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -47,21 +47,21 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc, self.guide_base)
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
         
-        cmds.setAttr(self.moduleGrp+".translateY", 3)
-        cmds.setAttr(self.moduleGrp+".rotateX", 45)
+        cmds.setAttr(self.guide_base+".translateY", 3)
+        cmds.setAttr(self.guide_base+".rotateX", 45)
         # include nodes into net
         self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
     
     
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # declare lists to store names and attributes:
             self.steeringCtrlList = []
             # run for all sides
@@ -98,7 +98,7 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.ctrls.setLockHide([self.steeringCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleX", -1)
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleZ", -1)
@@ -114,7 +114,7 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Unit_MD")
                 self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rotate_MD")
                 self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_MD")
-                self.toIDList.extend([self.steeringUnitMD, self.steeringInvertMD, self.steeringMD])
+                self.to_ids.extend([self.steeringUnitMD, self.steeringInvertMD, self.steeringMD])
                 cmds.setAttr(self.steeringInvertMD+".input2X", 0.1)
                 cmds.setAttr(self.steeringUnitMD+".input2X", -1)
                 cmds.transformLimits(self.steeringCtrl, enableRotationZ=(1, 1))
@@ -146,21 +146,19 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     
     
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "steeringCtrlList"   : self.steeringCtrlList,
-                                              }
+        self.integrated = {
+                                        "steeringCtrlList"   : self.steeringCtrlList,
                                     }

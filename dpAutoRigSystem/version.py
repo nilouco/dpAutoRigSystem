@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 """Package declaring dpAutoRigSystem version: Major.Minor.Patch"""
 
-__version__: str = "5.02.00"
+__version__: str = "5.02.01"
 _update_log: str = "Refactory."

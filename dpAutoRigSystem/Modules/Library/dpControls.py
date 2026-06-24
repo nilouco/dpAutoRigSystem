@@ -200,14 +200,14 @@ class ControlClass(object):
                 cmds.setAttr(item+".overrideColorB", color[2])
                 if instance:
                     cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
-                    if not instance.moduleGrp in cmds.ls(selection=True):
+                    if not instance.guide_base in cmds.ls(selection=True):
                         cmds.button(instance.selectButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
                 if instance:
                     cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
-                    if not instance.moduleGrp in cmds.ls(selection=True):
+                    if not instance.guide_base in cmds.ls(selection=True):
                         cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
 
 
@@ -262,8 +262,8 @@ class ControlClass(object):
         """
         currentRGBList = []
         for attr in ['R', 'G', 'B']:
-            if "guideColor"+attr in cmds.listAttr(instance.moduleGrp):
-                currentRGBList.append(cmds.getAttr(instance.moduleGrp+".guideColor"+attr))
+            if "guideColor"+attr in cmds.listAttr(instance.guide_base):
+                currentRGBList.append(cmds.getAttr(instance.guide_base+".guideColor"+attr))
             else:
                 break
         return currentRGBList
@@ -293,8 +293,8 @@ class ControlClass(object):
         """ Show a little window to choose the color of the button and the override the guide.
             From the old dpColorOverride extra tool. Thanks!
         """
-        currentRBGColor = self.getCurrentRGBColor(instance.moduleGrp)
-        currentRBGOutlinerColor = self.getCurrentRGBColor(instance.moduleGrp, True)
+        currentRBGColor = self.getCurrentRGBColor(instance.guide_base)
+        currentRBGOutlinerColor = self.getCurrentRGBColor(instance.guide_base, True)
         self.ar.utils.closeUI(self.ar.data.color_override_win_name)
         # creating colorOverride Window:
         colorOverride_winWidth  = 170
@@ -306,16 +306,16 @@ class ControlClass(object):
         colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20), parent=colorTabLayout)
         # creating buttons
         for colorIndex, colorValues in enumerate(self.colorList):
-            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [instance.moduleGrp], colorIndex, instance=instance), parent=colorIndexLayout)
+            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [instance.guide_base], colorIndex, instance=instance), parent=colorIndexLayout)
         # RGB layout:
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorRGBLayout)
-        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [instance.moduleGrp], 'colorRGBSlider', instance), parent=colorRGBLayout)
+        self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGColor, changeCommand=partial(self.setColorRGBByUI, [instance.guide_base], 'colorRGBSlider', instance), parent=colorRGBLayout)
         cmds.button("removeOverrideColorBT", label=self.ar.data.lang['i046_remove'], command=self.removeColor, parent=colorRGBLayout)
         # Outliner layout:
         colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
-        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [instance.moduleGrp], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
+        self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=currentRBGOutlinerColor, changeCommand=partial(self.setColorOutlinerByUI, [instance.guide_base], 'colorOutlinerSlider'), parent=colorOutlinerLayout)
         cmds.button("removeOutlinerColorBT", label=self.ar.data.lang['i046_remove'], command=self.removeColor, parent=colorOutlinerLayout)
         # renaming tabLayouts:
         cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))
@@ -1111,10 +1111,10 @@ class ControlClass(object):
     def connectShapeSize(self, clusterHandle, *args):
         """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
         """
-        moduleGrp = clusterHandle[:clusterHandle.rfind("Guide_")+6]+"Base" #hack to get moduleGrp name by string TODO: change to find by instance
-        cmds.connectAttr(moduleGrp+".shapeSize", clusterHandle+".scaleX", force=True)
-        cmds.connectAttr(moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
-        cmds.connectAttr(moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
+        main = clusterHandle[:clusterHandle.rfind("Guide_")+6]+"Base" #hack to get main name by string TODO: change to find by instance
+        cmds.connectAttr(main+".shapeSize", clusterHandle+".scaleX", force=True)
+        cmds.connectAttr(main+".shapeSize", clusterHandle+".scaleY", force=True)
+        cmds.connectAttr(main+".shapeSize", clusterHandle+".scaleZ", force=True)
         # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
         cmds.parent(clusterHandle, self.ar.data.temp_grp)
 
@@ -1525,7 +1525,7 @@ class ControlClass(object):
             Connect setup nodes and add calibration attributes to it.
             Returns the corrective controller and its highest zero out group.
         """
-        toIDList = []
+        to_ids = []
         calibrateAttrList = ["T", "R", "S"]
         calibrateAxisList = ["X", "Y", "Z"]
         toCalibrationList = []
@@ -1544,7 +1544,7 @@ class ControlClass(object):
             for axis in calibrateAxisList:
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
                 intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
-                toIDList.extend([remapV, intensityMD])
+                to_ids.extend([remapV, intensityMD])
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
                 cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
                 cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
@@ -1553,7 +1553,7 @@ class ControlClass(object):
                 # add calibrate attributes:
                 if attr == "S":
                     scaleClp = cmds.createNode("clamp", name=jcrName.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
-                    toIDList.append(scaleClp)
+                    to_ids.append(scaleClp)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
                     cmds.setAttr(remapV+".outputMin", 1)
                     cmds.setAttr(scaleClp+".minR", 1)
@@ -1563,7 +1563,7 @@ class ControlClass(object):
                 else:
                     invertMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_MD"))
                     invertCnd = cmds.createNode("condition", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_Cnd"))
-                    toIDList.extend([invertMD, invertCnd])
+                    to_ids.extend([invertMD, invertCnd])
                     cmds.setAttr(invertCnd+".secondTerm", 1)
                     cmds.setAttr(invertCnd+".colorIfTrueR", -1)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
@@ -1574,7 +1574,7 @@ class ControlClass(object):
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
-        self.ar.customAttr.addAttr(0, toIDList) #dpID
+        self.ar.customAttr.addAttr(0, to_ids) #dpID
         self.setStringAttrFromList(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
 

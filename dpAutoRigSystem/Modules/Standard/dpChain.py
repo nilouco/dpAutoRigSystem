@@ -37,7 +37,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseLayout.BaseLayout.basicModuleLayout(self)
         # Custom MODULE LAYOUT:
         # verify if we are creating or re-loading this module instance:
-        firstTime = cmds.getAttr(self.moduleGrp+'.nJoints')
+        firstTime = cmds.getAttr(self.guide_base+'.nJoints')
         if firstTime == 1:
             try:
                 cmds.intField(self.nJointsIF, edit=True, value=5, minValue=5)
@@ -49,19 +49,19 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="dynamic", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nMain", 1)
-        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
+        cmds.setAttr(self.guide_base+".nJoints", 1)
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="dynamic", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nMain", minValue=1, attributeType='long')
+        cmds.setAttr(self.guide_base+".nMain", 1)
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuide1, self.guide_base, relative=True)
         
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -71,7 +71,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc, self.guide_base)
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
@@ -93,7 +93,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.enteredNJoints = enteredNJoints
         if self.enteredNJoints >= 5:
             # get the number of joints existing:
-            self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+            self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
             # start analisys the difference between values:
             if self.enteredNJoints != self.currentNJoints:
                 # unparent temporarely the Ends:
@@ -148,12 +148,12 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 if pTempParent:
                     cmds.delete(pTempParent)
 
-                cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+                cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 self.changeMainCtrlsNumber(0)
                 # re-build the preview mirror:
                 dpBaseLayout.BaseLayout.createPreviewMirror(self)
-            cmds.select(self.moduleGrp)
+            cmds.select(self.guide_base)
         else:
             self.changeJointNumber(5)
 
@@ -188,7 +188,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
             cmds.connectAttr(ikCtrl+"."+self.ar.data.lang['c033_autoOrient'], aimRev+".inputX", force=True)
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
-            self.toIDList.append(aimRev)
+            self.to_ids.append(aimRev)
 
 
     def clearRenameJointChain(self, jntList, fromName, toName, clear=True, *args):
@@ -250,7 +250,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # setup new blend joints
         self.utils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef, False)
         dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
-        self.toIDList.append(dynStretchBC)
+        self.to_ids.append(dynStretchBC)
         cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
         cmds.connectAttr(dynJntList[0]+".scaleY", dynStretchBC+".color1G", force=True)
         cmds.connectAttr(dynJntList[0]+".scaleZ", dynStretchBC+".color1B", force=True)
@@ -305,10 +305,10 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.select(clear=True)
 
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # dynamic:
             self.addDynamic = self.getModuleAttr("dynamic")
             # run for all sides
@@ -378,7 +378,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.base)
                     else:
                         self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_"))
-                    self.toIDList.extend(cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC"))
+                    self.to_ids.extend(cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC"))
                     
                     if n > 0:
                         cmds.parent(self.fkZeroGrpList[n], self.fkCtrlList[n - 1])
@@ -455,7 +455,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ikClusterList = []
                 for p, i in zip(["0:1", "2", "3", "4", "5:6"], range(0,5)):
                     clusterList = cmds.cluster(self.ikSplineCurve+".cv["+p+"]", name=side+self.userGuideName+"_Ik_"+str(i)+"_Cls") #[Deform, Handle]
-                    self.toIDList.append(clusterList[0]) #Deformer
+                    self.to_ids.append(clusterList[0]) #Deformer
                     self.ikClusterList.append(clusterList[1]) #Handle
                 # ik cluster positions:
                 firstIkJointPos = cmds.xform(self.ikJointList[0], query=True, worldSpace=True, rotatePivot=True)
@@ -698,16 +698,16 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(self.base, side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
-                self.toIDList.extend([curveInfoNode, ikNormalizeMD, globalStretchBC, stretchableBC, stretchBC, ikStretchRevNode, vvBC, vvCond, vvMD, vvScaleCompensateMD, vvClp, fkLastScaleCompensateMD, ikLastScaleCompensateMD, lastScaleBC])
+                self.to_ids.extend([curveInfoNode, ikNormalizeMD, globalStretchBC, stretchableBC, stretchBC, ikStretchRevNode, vvBC, vvCond, vvMD, vvScaleCompensateMD, vvClp, fkLastScaleCompensateMD, ikLastScaleCompensateMD, lastScaleBC])
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     
 
     def fixMirrorFlipping(self, item, s, value=-1, axis=None, *args):
@@ -730,9 +730,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-            "module": {
-                "worldRefList": self.worldRefList,
-                "worldRefShapeList": self.worldRefShapeList,
-            }
-        }
+        self.integrated = {
+                                        "worldRefList": self.worldRefList,
+                                        "worldRefShapeList": self.worldRefShapeList,
+                                    }

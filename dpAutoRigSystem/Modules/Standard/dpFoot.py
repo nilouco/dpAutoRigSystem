@@ -69,7 +69,7 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.jGuideRFD+".template", 1)
         cmds.setAttr(self.jGuideRFE+".template", 1)
         cmds.setAttr(self.jGuideRFF+".template", 1)
-        cmds.parent(self.jGuideFoot, self.jGuideRFA, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuideFoot, self.jGuideRFA, self.guide_base, relative=True)
         # create cvEnd:
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvRFFLoc)
@@ -78,7 +78,7 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.parent(self.jGuideEnd, self.jGuideRFF)
         # make parents between cvLocs:
-        cmds.parent(self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.moduleGrp)
+        cmds.parent(self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.guide_base)
         cmds.parent(self.cvRFFLoc, self.cvFootLoc)
         # connect cvLocs in jointGuides:
         self.ar.ctrls.directConnect(self.cvFootLoc, self.jGuideFoot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
@@ -116,8 +116,8 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.cvRFDLoc+".translateX", -3.5)
         cmds.setAttr(self.cvRFDLoc+".rotateX", 90)
         cmds.setAttr(self.cvRFDLoc+".rotateZ", -90)
-        cmds.setAttr(self.moduleGrp+".rotateX", -90)
-        cmds.setAttr(self.moduleGrp+".rotateY", 90)
+        cmds.setAttr(self.guide_base+".rotateX", -90)
+        cmds.setAttr(self.guide_base+".rotateY", 90)
         # include nodes into net
         self.addNodeToGuideNet([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.cvEndJoint], ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
 
@@ -127,10 +127,10 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.parentConstraint(self.cvRFFLoc, cvRFEOffsetGrp, maintainOffset=True, skipTranslate="y", name=cvRFEOffsetGrp+"_PaC")
         
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # run for all sides
             for s, side in enumerate(self.sideList):
                 # redeclaring variables:
@@ -406,7 +406,7 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(footPlantInvMD+".input2X", -1)
                     cmds.connectAttr(footPlantCnd+".outColorR", footPlantInvMD+".input1X", force=True)
                     cmds.connectAttr(footPlantInvMD+".outputX", self.footCtrlZeroList[1]+".rotateX", force=True)
-                    self.toIDList.append(footPlantInvMD)
+                    self.to_ids.append(footPlantInvMD)
                 
                 # create follow attribute to footBall control to space switch to middle control space:
                 cmds.addAttr(self.RFFCtrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
@@ -447,33 +447,31 @@ class Foot(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp], self.utils.ignoreTransformIOAttr)
-                self.toIDList.extend([sideClamp, sideMD, footHeelClp, footPMA, footSR, footPlantClp, footPlantCnd, anglePlantPMA, anglePlantMD, anglePlantRmV, anglePlantCnd, footBallRevNode, mdNode])
+                self.to_ids.extend([sideClamp, sideMD, footHeelClp, footPMA, footSR, footPlantClp, footPlantCnd, anglePlantPMA, anglePlantMD, anglePlantRmV, anglePlantCnd, footBallRevNode, mdNode])
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
 
 
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-            "module": {
-                "revFootCtrlList": self.footCtrlList,
-                "revFootCtrlGrpList": self.revFootCtrlGrpFinalList,
-                "revFootCtrlShapeList": self.revFootCtrlShapeList,
-                "toLimbIkHandleGrpList": self.toLimbIkHandleGrpList,
-                "parentConstList": self.parentConstList,
-                "scaleConstList": self.scaleConstList,
-                "footJntList": self.footJntList,
-                "ballRFList": self.ballRFList,
-                "reverseFootAttrList": self.reverseFootAttrList,
-                "scalableGrp": self.aScalableGrp,
-            }
-        }
+        self.integrated = {
+                                        "revFootCtrlList": self.footCtrlList,
+                                        "revFootCtrlGrpList": self.revFootCtrlGrpFinalList,
+                                        "revFootCtrlShapeList": self.revFootCtrlShapeList,
+                                        "toLimbIkHandleGrpList": self.toLimbIkHandleGrpList,
+                                        "parentConstList": self.parentConstList,
+                                        "scaleConstList": self.scaleConstList,
+                                        "footJntList": self.footJntList,
+                                        "ballRFList": self.ballRFList,
+                                        "reverseFootAttrList": self.reverseFootAttrList,
+                                        "scalableGrp": self.aScalableGrp,
+                                    }

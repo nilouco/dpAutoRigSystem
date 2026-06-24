@@ -38,7 +38,7 @@ class RibbonClass(object):
         self.limbVVAttr       = self.ar.data.lang['m019_limb'].lower()+"_"+self.ar.data.lang['c031_volumeVariation']
         self.limbMinVVAttr    = self.ar.data.lang['m019_limb'].lower()+"Min_"+self.ar.data.lang['c031_volumeVariation']
         self.limbLengthAttr   = self.ar.data.lang['c113_length']
-        self.toIDList = []
+        self.to_ids = []
 
         cornerName = self.ar.data.lang['c007_leg_corner']
         if arm:
@@ -308,7 +308,7 @@ class RibbonClass(object):
             cornerAutoRotateRev = cmds.createNode("reverse", name=prefix+myName+"_"+cornerName+"_AutoRotate_Rev")
             cornerAutoRotateInvPinMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Pin_Inv_MD"))
             cornerAutoRotateInvMidMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Mid_Inv_MD"))
-            self.toIDList.extend([cornerAutoRotateMD, cornerAutoRotateMM, cornerAutoRotateDM, cornerAutoRotateQtE, cornerAutoRotateRev, cornerAutoRotateInvPinMD, cornerAutoRotateInvMidMD])
+            self.to_ids.extend([cornerAutoRotateMD, cornerAutoRotateMM, cornerAutoRotateDM, cornerAutoRotateQtE, cornerAutoRotateRev, cornerAutoRotateInvPinMD, cornerAutoRotateInvMidMD])
             idx = 2
             if oriBLoc:
                 idx = 3
@@ -367,7 +367,7 @@ class RibbonClass(object):
                 cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downBLimb['twistAutoRotMD']+".input2X", force=True)
 
         self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
 
         # result lists to return them:
         extraCtrlList = upLimb['extraCtrlList']
@@ -403,7 +403,7 @@ class RibbonClass(object):
             Returns the group zeroOut and the control curve.
         """
         grp = None
-        curve = self.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.moduleGrp)
+        curve = self.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.guide_base)
         self.ar.ctrls.setLockHide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=myName+'_Grp')
@@ -696,7 +696,7 @@ class RibbonClass(object):
         cmds.rename(curveFromSurfaceIso, ribbon+"_CurveFromSurface_Iso")
         rbScaleMD = cmds.createNode("multiplyDivide", name=ribbon+"_ScaleCompensate_MD")
         rbNormalizeMD = cmds.createNode("multiplyDivide", name=ribbon+"_Normalize_MD")
-        self.toIDList.extend([curveInfoNode, rbScaleMD, rbNormalizeMD, ribbon+"_CurveFromSurface_Iso"])
+        self.to_ids.extend([curveInfoNode, rbScaleMD, rbNormalizeMD, ribbon+"_CurveFromSurface_Iso"])
         cmds.setAttr(rbNormalizeMD+".operation", 2)
         cmds.connectAttr(curveInfoNode+".arcLength", rbNormalizeMD+".input2X", force=True)
         cmds.connectAttr(rbScaleMD+".outputX", rbNormalizeMD+".input1X", force=True)
@@ -716,7 +716,7 @@ class RibbonClass(object):
             
             # create extra control
             extraName = jnt[:-4] #removed _Jnt suffix
-            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.limbInstance.moduleGrp, parentTag=self.limbInstance.getParentToTag(extraCtrlList))
+            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.limbInstance.guide_base, parentTag=self.limbInstance.getParentToTag(extraCtrlList))
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
@@ -733,7 +733,7 @@ class RibbonClass(object):
             rbAddScalePMA = cmds.createNode("plusMinusAverage", name=extraName+"_AddScale_PMA")
             rbScaleClp = cmds.createNode("clamp", name=extraName+"_Scale_Clp")
             rbBlendCB = cmds.createNode("blendColors", name=extraName+"_BC")
-            self.toIDList.extend([rbProportionMD, rbIntensityMD, rbLengthMD, rbAddScalePMA, rbScaleClp, rbBlendCB])
+            self.to_ids.extend([rbProportionMD, rbIntensityMD, rbLengthMD, rbAddScalePMA, rbScaleClp, rbBlendCB])
             cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
             cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
             cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
@@ -772,7 +772,7 @@ class RibbonClass(object):
                         self.utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
-                        addCtrl = self.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.limbInstance.moduleGrp)
+                        addCtrl = self.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.limbInstance.guide_base)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = self.utils.zeroOut([addCtrl])[0]
                         cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))
@@ -795,7 +795,7 @@ class RibbonClass(object):
                 rbLengthMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Length_MD"))
                 rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
                 rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
-                self.toIDList.extend([rbProportionMD, rbIntensityMD, rbAddScalePMA, rbLengthMD, rbScaleClp, rbBlendCB])
+                self.to_ids.extend([rbProportionMD, rbIntensityMD, rbAddScalePMA, rbLengthMD, rbScaleClp, rbBlendCB])
                 cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
                 cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
                 cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
@@ -824,7 +824,7 @@ class RibbonClass(object):
         skinClusterNode = cmds.skinCluster(drv_Jnt[0:3], ribbonShape, tsb=True, mi=2, dr=1, n=name+"_SC")[0]
         bindPose = cmds.listConnections(skinClusterNode+".bindPose", destination=False, source=True)
         cmds.rename(bindPose, name+"_BP")
-        self.toIDList.extend([skinClusterNode, name+"_BP"])
+        self.to_ids.extend([skinClusterNode, name+"_BP"])
         
         #skin presets for the ribbon (that's amazing!)
         if not horizontal:
@@ -924,7 +924,7 @@ class RibbonClass(object):
             cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocTwistBoneGrp+".scalePivot", bttm_LocTwistBoneGrp+".rotatePivot", absolute=True)
             twistBoneMD = cmds.createNode("multiplyDivide", name=upCtrl+"_TwistBone_MD")
             invertTwistBoneMD = cmds.createNode("multiplyDivide", name=upCtrl+"_InvertTwistBone_MD")
-            self.toIDList.extend([twistBoneMD, invertTwistBoneMD])
+            self.to_ids.extend([twistBoneMD, invertTwistBoneMD])
             cmds.setAttr(invertTwistBoneMD+".input2Z", -1)
             cmds.connectAttr(upCtrl+".autoTwistBone", twistBoneMD+".input1Z", force=True)
             cmds.connectAttr(twistBoneMD+".outputZ", invertTwistBoneMD+".input1Z", force=True)
@@ -942,7 +942,7 @@ class RibbonClass(object):
             twistBoneInvMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
             twistBoneCnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
             twistAutoRotMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_AutoRotate_MD")
-            self.toIDList.extend([twistBonePMA, twistBoneInvMD, twistBoneInvMD, twistBoneCnd, twistAutoRotMD])
+            self.to_ids.extend([twistBonePMA, twistBoneInvMD, twistBoneInvMD, twistBoneCnd, twistAutoRotMD])
             cmds.setAttr(twistBoneCnd+".colorIfTrueR", -1)
             cmds.setAttr(twistBoneCnd+".secondTerm", 1)
             cmds.connectAttr(twistBonePMA+".output1D", twistBoneInvMD+".input1X", force=True)
@@ -1091,7 +1091,7 @@ class RibbonClass(object):
         """
         worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, elbowctrlZero1, mo=True, name=elbowctrlZero1+"_PaC")[0]
         pinRev = cmds.createNode('reverse', name=elbowctrlCtrl+"_Pin_Rev")
-        self.toIDList.append(pinRev)
+        self.to_ids.append(pinRev)
         cmds.connectAttr(elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
         cmds.connectAttr(elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
         cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)

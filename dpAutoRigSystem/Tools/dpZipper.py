@@ -213,7 +213,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
         maxPos = cmds.xform(curveName+".cv["+str(curveLength-1)+"]", query=True, worldSpace=True, translation=True)[self.curveAxis]
         if minPos > maxPos:
             cmds.reverseCurve(curveName, constructionHistory=True, replaceOriginal=True)
-            self.toIDList.append(cmds.rename(cmds.listConnections(curveName+".create")[0], self.ar.utils.extractSuffix(curveName)+"_"+self.curveDirection+"_RevC"))
+            self.to_ids.append(cmds.rename(cmds.listConnections(curveName+".create")[0], self.ar.utils.extractSuffix(curveName)+"_"+self.curveDirection+"_RevC"))
     
     
     def dpGenerateMiddleCurve(self, origCurve, *args):
@@ -221,7 +221,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
         """
         self.middleCurve = cmds.duplicate(origCurve, name=self.zipperName+"_"+self.ar.data.lang['c029_middle']+"_Crv")[0]
         averageCurveNode = cmds.createNode('avgCurves', name=self.zipperName+"_"+self.ar.data.lang['c029_middle']+"_AvgC")
-        self.toIDList.append(averageCurveNode)
+        self.to_ids.append(averageCurveNode)
         cmds.setAttr(averageCurveNode+".automaticWeight", 0)
         cmds.connectAttr(self.firstCurve+".worldSpace", averageCurveNode+".inputCurve1", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace", averageCurveNode+".inputCurve2", force=True)
@@ -262,7 +262,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
         self.ar.ctrls.setStringAttrFromList(self.zipperCtrl, [autoCalibrateMinAttr, autoCalibrateMaxAttr])
         
         self.ctrlGrp = cmds.group(self.zipperCtrl, name=self.zipperName+"_Control_Grp")
-        self.toIDList.append(self.ctrlGrp)
+        self.to_ids.append(self.ctrlGrp)
         
         # create blend curves and connect create input from first and second curves:
         self.firstBlendCurve = cmds.duplicate(self.firstCurve, name=self.ar.utils.extractSuffix(self.firstCurve)+"_Blend_Crv")[0]
@@ -378,8 +378,8 @@ class Zipper(dpBaseLibrary.BaseLibrary):
                 if c == 0:
                     cmds.connectAttr(zipperClp+".outputR", self.firstBS+".inputTarget[0].inputTargetGroup[0].targetWeights["+str(i)+"]")
                     cmds.connectAttr(zipperClp+".outputR", self.secondBS+".inputTarget[0].inputTargetGroup[0].targetWeights["+str(i)+"]")
-                self.toIDList.extend([crescentSR, decrescentSR, zipperPMA, autoSR, zipperClp])
-        self.toIDList.extend([self.firstBS, self.secondBS, firstMoP, secondMoP, autoOnOffMD, autoMaxCalibrateMD, rigScaleMD, rigScaleAutoMD, hyperboleScaleMD, autoMainSR])
+                self.to_ids.extend([crescentSR, decrescentSR, zipperPMA, autoSR, zipperClp])
+        self.to_ids.extend([self.firstBS, self.secondBS, firstMoP, secondMoP, autoOnOffMD, autoMaxCalibrateMD, rigScaleMD, rigScaleAutoMD, hyperboleScaleMD, autoMainSR])
     
 
     def dpParentZipperCtrl(self, rigScaleAttr="rigScale", *args):
@@ -413,7 +413,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
         # rename geometries:
         self.origModel = cmds.rename(self.origModel, self.ar.utils.extractSuffix(self.origModel)+"_Orig_Geo")
         self.deformMesh = cmds.rename(self.deformMesh, self.ar.utils.extractSuffix(oldMeshName)+"_Def_Mesh")
-        self.toIDList.extend([self.origModel, self.deformMesh])
+        self.to_ids.extend([self.origModel, self.deformMesh])
         cmds.setAttr(self.origModel+".visibility", 0)
         # parent if need:
         supportGrp = self.ar.utils.getNodeByMessage("supportGrp")
@@ -442,7 +442,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
         cmds.connectAttr(self.secondCurve+".worldSpace[0]", secondWireDef+".baseWire[1]", force=True)
         cmds.connectAttr(self.firstBlendCurve+".worldSpace[0]", firstWireDef+".deformedWire[0]", force=True)
         cmds.connectAttr(self.secondBlendCurve+".worldSpace[0]", secondWireDef+".deformedWire[1]", force=True)
-        self.toIDList.extend([firstWireDef, secondWireDef])
+        self.to_ids.extend([firstWireDef, secondWireDef])
     
     
     def dpSetControllerPosition(self, curveName, *args):
@@ -462,7 +462,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
         zipperCurvesGrp = cmds.group(self.firstCurve, self.secondCurve, self.middleCurve, self.firstBlendCurve, self.secondBlendCurve, name=self.zipperName+"_Curves_Grp")
         zipperDistanceGrp = cmds.group(self.firstLoc, self.secondLoc, self.distDimTransform, name=self.zipperName+"_Distance_Grp")
         zipperDataGrp = cmds.group(zipperCurvesGrp, zipperDistanceGrp, name=self.zipperName+"_Data_Grp")
-        self.toIDList.append(zipperDataGrp)
+        self.to_ids.append(zipperDataGrp)
         if self.goodToDPAR:
             staticGrp = self.ar.utils.getNodeByMessage("staticGrp")
             if staticGrp:
@@ -478,7 +478,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
             self.dpGetGoodToDPAR()
             if self.firstCurve and self.secondCurve:
                 if self.origModel:
-                    self.toIDList = []
+                    self.to_ids = []
                     self.oldAddDoubleLinearList = cmds.ls(selection=False, type="addDoubleLinear")
                     self.dpGetCurveDirection()
                     self.dpSetCurveDirection(self.firstCurve)
@@ -496,7 +496,7 @@ class Zipper(dpBaseLibrary.BaseLibrary):
 
 
                     self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="addDoubleLinear"))-set(self.oldAddDoubleLinearList)), "addDoubleLinear", "_ADL")
-                    self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+                    self.ar.customAttr.addAttr(0, self.to_ids, descendents=True) #dpID
                     cmds.select(self.zipperCtrl)
                     print(self.ar.data.lang['m174_createdZipper'])
                 else:

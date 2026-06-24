@@ -39,7 +39,7 @@ class BaseLayout(object):
             self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
             # create basic module UI:
             self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
-            self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
+            self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.guide_base+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
             cmds.iconTextButton(image=self.ar.data.icon['plusInfo'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
             self.reCreateEditSelectedModuleLayout(self)
     
@@ -66,7 +66,7 @@ class BaseLayout(object):
                             isGeometry = True
         if isGeometry:
             cmds.textField(self.geoTF, edit=True, text=selList[0])
-            cmds.setAttr(self.moduleGrp+".geo", selList[0], type='string')
+            cmds.setAttr(self.guide_base+".geo", selList[0], type='string')
     
     
     def reCreateEditSelectedModuleLayout(self, bSelect=True, *args):
@@ -78,34 +78,34 @@ class BaseLayout(object):
         if self.verifyGuideModuleIntegrity():
             # select the module to be re-build the selectedLayout:
             if bSelect:
-                cmds.select(self.moduleGrp)
+                cmds.select(self.guide_base)
             self.clearSelectedModuleLayout(self)
             try:
                 # check if attributes existing:
-                self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
-                self.aimDirectionAttrExists = cmds.objExists(self.moduleGrp+".aimDirection")
-                self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
-                self.indirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
-                self.eyelidExists = cmds.objExists(self.moduleGrp+".eyelid")
-                self.degreeExists = cmds.objExists(self.moduleGrp+".degree")
-                self.geoExists = cmds.objExists(self.moduleGrp+".geo")
-                self.startFrameExists = cmds.objExists(self.moduleGrp+".startFrame")
-                self.steeringExists = cmds.objExists(self.moduleGrp+".steering")
-                self.fatherBExists = cmds.objExists(self.moduleGrp+".fatherB")
-                self.articulationExists = cmds.objExists(self.moduleGrp+".articulation")
-                self.nostrilExists = cmds.objExists(self.moduleGrp+".nostril")
-                self.correctiveExists = cmds.objExists(self.moduleGrp+".corrective")
-                self.nMainCtrlAttrExists = cmds.objExists(self.moduleGrp+".mainControls")
-                self.dynamicExists = cmds.objExists(self.moduleGrp+".dynamic")
-                self.deformerExists = cmds.objExists(self.moduleGrp+".deformer")
-                self.facialExists = cmds.objExists(self.moduleGrp+".facial")
-                self.deformedByExists = cmds.objExists(self.moduleGrp+".deformedBy")
-                self.jawExists = cmds.objExists(self.moduleGrp+".jaw")
-                self.styleExists = cmds.objExists(self.moduleGrp+".style")
+                self.nJointsAttrExists = cmds.objExists(self.guide_base+".nJoints")
+                self.aimDirectionAttrExists = cmds.objExists(self.guide_base+".aimDirection")
+                self.flipAttrExists = cmds.objExists(self.guide_base+".flip")
+                self.indirectSkinAttrExists = cmds.objExists(self.guide_base+".indirectSkin")
+                self.eyelidExists = cmds.objExists(self.guide_base+".eyelid")
+                self.degreeExists = cmds.objExists(self.guide_base+".degree")
+                self.geoExists = cmds.objExists(self.guide_base+".geo")
+                self.startFrameExists = cmds.objExists(self.guide_base+".startFrame")
+                self.steeringExists = cmds.objExists(self.guide_base+".steering")
+                self.fatherBExists = cmds.objExists(self.guide_base+".fatherB")
+                self.articulationExists = cmds.objExists(self.guide_base+".articulation")
+                self.nostrilExists = cmds.objExists(self.guide_base+".nostril")
+                self.correctiveExists = cmds.objExists(self.guide_base+".corrective")
+                self.nMainCtrlAttrExists = cmds.objExists(self.guide_base+".mainControls")
+                self.dynamicExists = cmds.objExists(self.guide_base+".dynamic")
+                self.deformerExists = cmds.objExists(self.guide_base+".deformer")
+                self.facialExists = cmds.objExists(self.guide_base+".facial")
+                self.deformedByExists = cmds.objExists(self.guide_base+".deformedBy")
+                self.jawExists = cmds.objExists(self.guide_base+".jaw")
+                self.styleExists = cmds.objExists(self.guide_base+".style")
                 
                 # UI
                 # edit label of frame layout:
-                guideName = cmds.getAttr(self.moduleGrp+".customName")
+                guideName = cmds.getAttr(self.guide_base+".customName")
                 if not guideName:
                     guideName = self.userGuideName
                 cmds.frameLayout("rig_edit_selected_module_fl", edit=True, collapse=self.ar.data.collapse_edit_sel_mod, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module']+" :  "+self.ar.data.lang[self.title]+" - "+guideName)
@@ -115,7 +115,7 @@ class BaseLayout(object):
                 # re-create segment layout:
                 self.segDelColumn = cmds.rowLayout('segDelColumn', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                 if self.nJointsAttrExists:
-                    self.nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
+                    self.nJointsAttr = cmds.getAttr(self.guide_base+".nJoints")
                     if self.nJointsAttr > 0:
                         self.nSegmentsText = cmds.text(label=self.ar.data.lang['m003_segments'], parent=self.segDelColumn)
                         self.nJointsIF = cmds.intField(value=self.nJointsAttr, minValue=1, changeCommand=partial(self.changeJointNumber, 0), parent=self.segDelColumn)
@@ -137,7 +137,7 @@ class BaseLayout(object):
                 for item in mirrorMenuItemList:
                     cmds.menuItem(label=item, parent=self.mirrorMenu)
                 # verify if there are a list of mirrorNames to menuOption:
-                currentMirrorNameList = cmds.getAttr(self.moduleGrp+".mirrorNameList")
+                currentMirrorNameList = cmds.getAttr(self.guide_base+".mirrorNameList")
                 if currentMirrorNameList:
                     menuNameItemList = str(currentMirrorNameList).split(';')
                 else:
@@ -155,25 +155,25 @@ class BaseLayout(object):
                     if item != "":
                         cmds.menuItem(label=item, parent=self.mirrorNameMenu)
                         menuNameItemText += item + ";"
-                cmds.setAttr(self.moduleGrp+".mirrorNameList", menuNameItemText, type='string')
+                cmds.setAttr(self.guide_base+".mirrorNameList", menuNameItemText, type='string')
                 # verify if it is the first time to creation this instance or re-loading an existing guide:
-                firstTime = cmds.getAttr(self.moduleGrp+".mirrorAxis")
+                firstTime = cmds.getAttr(self.guide_base+".mirrorAxis")
                 if firstTime == "" or firstTime == None:
                     # set initial values to guide base:
-                    cmds.setAttr(self.moduleGrp+".mirrorAxis", mirrorMenuItemList[0], type='string')
-                    cmds.setAttr(self.moduleGrp+".mirrorName", menuNameItemList[0], type='string')
+                    cmds.setAttr(self.guide_base+".mirrorAxis", mirrorMenuItemList[0], type='string')
+                    cmds.setAttr(self.guide_base+".mirrorName", menuNameItemList[0], type='string')
                 else:
                     # get initial values from guide base:
-                    initialMirror = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-                    initialMirrorName = cmds.getAttr(self.moduleGrp+".mirrorName")
+                    initialMirror = cmds.getAttr(self.guide_base+".mirrorAxis")
+                    initialMirrorName = cmds.getAttr(self.guide_base+".mirrorName")
                     # set layout with theses values:
                     cmds.optionMenu(self.mirrorMenu, edit=True, value=initialMirror)
                     cmds.optionMenu(self.mirrorNameMenu, edit=True, value=initialMirrorName)
                     # verify if there is a mirror in a father maybe:
-                    self.fatherMirrorExists = self.checkFatherMirror()
+                    self.fatherMirrorExists = self.check_father_mirror()
                     
                 # create Rig button:
-                self.rigButton = cmds.button(label="Rig", command=self.rigModule, backgroundColor=(1.0, 1.0, 0.7), parent=self.doubleRigColumn)
+                self.rigButton = cmds.button(label="Rig", command=self.rig_me, backgroundColor=(1.0, 1.0, 0.7), parent=self.doubleRigColumn)
                 
                 # aim direction for eye look at:
                 if self.aimDirectionAttrExists:
@@ -182,7 +182,7 @@ class BaseLayout(object):
                     self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.aimDirectionLayout)
                     for item in self.aimMenuItemList:
                         cmds.menuItem(label=item, parent=self.aimMenu)
-                    currentAimDirection = cmds.getAttr(self.moduleGrp+".aimDirection")
+                    currentAimDirection = cmds.getAttr(self.guide_base+".aimDirection")
                     # set layout with the current value:
                     cmds.optionMenu(self.aimMenu, edit=True, value=self.aimMenuItemList[currentAimDirection])
                 
@@ -190,7 +190,7 @@ class BaseLayout(object):
                 if self.flipAttrExists:
                     self.flipLayout = cmds.rowLayout('flipLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(" ", parent=self.flipLayout)
-                    flipValue = cmds.getAttr(self.moduleGrp+".flip")
+                    flipValue = cmds.getAttr(self.guide_base+".flip")
                     self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.flipLayout)
                     if self.fatherMirrorExists:
                         if self.fatherFlipExists:
@@ -200,16 +200,16 @@ class BaseLayout(object):
                 if self.indirectSkinAttrExists:
                     self.indirectSkinLayout = cmds.rowLayout('indirectSkinLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(" ", parent=self.indirectSkinLayout)
-                    indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
+                    indirectSkinValue = cmds.getAttr(self.guide_base+".indirectSkin")
                     self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.indirectSkinLayout)
                     cmds.text(" ", parent=self.indirectSkinLayout)
-                    holderValue = cmds.getAttr(self.moduleGrp+".holder")
+                    holderValue = cmds.getAttr(self.guide_base+".holder")
                     self.holderCB = cmds.checkBox(label=self.ar.data.lang['c046_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
                     self.sdkLocatorLayout = cmds.rowLayout('sdkLocatorLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(" ", parent=self.sdkLocatorLayout)
                     cmds.text(" ", parent=self.sdkLocatorLayout)
                     cmds.text(" ", parent=self.sdkLocatorLayout)
-                    sdkLocatorValue = cmds.getAttr(self.moduleGrp+".sdkLocator")
+                    sdkLocatorValue = cmds.getAttr(self.guide_base+".sdkLocator")
                     self.sdkLocatorCB = cmds.checkBox(label="SDK Locator", value=sdkLocatorValue, enable=False, changeCommand=self.changeSDKLocator, parent=self.sdkLocatorLayout)
                     self.changeIndirectSkin()
                     
@@ -217,18 +217,18 @@ class BaseLayout(object):
                 if self.eyelidExists:
                     self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="rig_selected_module_cl")
                     cmds.text(" ", parent=self.eyelidLayout)
-                    self.eyelidCB = cmds.checkBox(label=self.ar.data.lang['i079_eyelid'], value=cmds.getAttr(self.moduleGrp+".eyelid"), changeCommand=self.changeEyelid, parent=self.eyelidLayout)
-                    self.lidPivotCB = cmds.checkBox(label=self.ar.data.lang['i283_pivot'], value=cmds.getAttr(self.moduleGrp+".lidPivot"), changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
-                    self.specCB = cmds.checkBox(label=self.ar.data.lang['i184_specular'], value=cmds.getAttr(self.moduleGrp+".specular"), changeCommand=self.changeSpecular, parent=self.eyelidLayout)
-                    self.irisCB = cmds.checkBox(label=self.ar.data.lang['i080_iris'], value=cmds.getAttr(self.moduleGrp+".iris"), changeCommand=self.changeIris, parent=self.eyelidLayout)
-                    self.pupilCB = cmds.checkBox(label=self.ar.data.lang['i081_pupil'], value=cmds.getAttr(self.moduleGrp+".pupil"), changeCommand=self.changePupil, parent=self.eyelidLayout)
+                    self.eyelidCB = cmds.checkBox(label=self.ar.data.lang['i079_eyelid'], value=cmds.getAttr(self.guide_base+".eyelid"), changeCommand=self.changeEyelid, parent=self.eyelidLayout)
+                    self.lidPivotCB = cmds.checkBox(label=self.ar.data.lang['i283_pivot'], value=cmds.getAttr(self.guide_base+".lidPivot"), changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
+                    self.specCB = cmds.checkBox(label=self.ar.data.lang['i184_specular'], value=cmds.getAttr(self.guide_base+".specular"), changeCommand=self.changeSpecular, parent=self.eyelidLayout)
+                    self.irisCB = cmds.checkBox(label=self.ar.data.lang['i080_iris'], value=cmds.getAttr(self.guide_base+".iris"), changeCommand=self.changeIris, parent=self.eyelidLayout)
+                    self.pupilCB = cmds.checkBox(label=self.ar.data.lang['i081_pupil'], value=cmds.getAttr(self.guide_base+".pupil"), changeCommand=self.changePupil, parent=self.eyelidLayout)
                 
                 # create geometry layout:
                 if self.geoExists:
                     self.geoColumn = cmds.rowLayout('geoColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="rig_selected_module_cl" )
                     cmds.button(label=self.ar.data.lang["m146_geo"]+" >", command=self.loadGeo, parent=self.geoColumn)
                     self.geoTF = cmds.textField('geoTF', text='', enable=True, changeCommand=self.changeGeo, parent=self.geoColumn)
-                    currentGeo = cmds.getAttr(self.moduleGrp+".geo")
+                    currentGeo = cmds.getAttr(self.guide_base+".geo")
                     if currentGeo:
                         cmds.textField(self.geoTF, edit=True, text=currentGeo, parent=self.geoColumn)
                 
@@ -237,7 +237,7 @@ class BaseLayout(object):
                     self.startFrameColumn = cmds.rowLayout('startFrameColumn', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(self.ar.data.lang["i169_startFrame"], parent=self.startFrameColumn)
                     self.startFrameIF = cmds.intField('startFrameIF', value=1, changeCommand=self.changeStartFrame, parent=self.startFrameColumn)
-                    currentStartFrame = cmds.getAttr(self.moduleGrp+".startFrame")
+                    currentStartFrame = cmds.getAttr(self.guide_base+".startFrame")
                     if currentStartFrame:
                         cmds.intField(self.startFrameIF, edit=True, value=currentStartFrame, parent=self.startFrameColumn)
                 
@@ -247,9 +247,9 @@ class BaseLayout(object):
                         self.wheelLayout = self.startFrameColumn
                     else:
                         self.wheelLayout = cmds.rowLayout('wheelLayout', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
-                    steeringValue = cmds.getAttr(self.moduleGrp+".steering")
+                    steeringValue = cmds.getAttr(self.guide_base+".steering")
                     self.steeringCB = cmds.checkBox(label=self.ar.data.lang['m158_steering'], value=steeringValue, changeCommand=self.changeSteering, parent=self.wheelLayout)
-                    showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
+                    showControlsValue = cmds.getAttr(self.guide_base+".showControls")
                     self.showControlsCB = cmds.checkBox(label=self.ar.data.lang['i170_showControls'], value=showControlsValue, changeCommand=self.changeShowControls, parent=self.wheelLayout)
                 
                 # create fatherB layout:
@@ -257,7 +257,7 @@ class BaseLayout(object):
                     self.fatherBColumn = cmds.rowLayout('fatherBColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="rig_selected_module_cl" )
                     cmds.button(label=self.ar.data.lang["m160_fatherB"]+" >", command=self.loadFatherB, parent=self.fatherBColumn)
                     self.fatherBTF = cmds.textField('fatherBTF', text='', enable=True, changeCommand=self.changeFatherB, parent=self.fatherBColumn)
-                    currentFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
+                    currentFatherB = cmds.getAttr(self.guide_base+".fatherB")
                     if currentFatherB:
                         cmds.textField(self.fatherBTF, edit=True, text=currentFatherB, parent=self.fatherBColumn)
                 
@@ -265,10 +265,10 @@ class BaseLayout(object):
                 if self.jawExists:
                     self.headItemsLayout = cmds.rowLayout('headItemsLayout', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent="rig_selected_module_cl")
                     cmds.text(" ", parent=self.headItemsLayout)
-                    self.jawCB = cmds.checkBox(label=self.ar.data.lang['c025_jaw'], value=cmds.getAttr(self.moduleGrp+".jaw"), changeCommand=self.changeJaw, parent=self.headItemsLayout)
-                    self.chinCB = cmds.checkBox(label=self.ar.data.lang['c026_chin'], value=cmds.getAttr(self.moduleGrp+".chin"), changeCommand=self.changeChin, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
-                    self.lipsCB = cmds.checkBox(label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(self.moduleGrp+".lips"), changeCommand=self.changeLips, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
-                    self.upperHeadCB = cmds.checkBox(label=self.ar.data.lang['c044_upper']+" "+self.ar.data.lang['c024_head'], value=cmds.getAttr(self.moduleGrp+".upperHead"), changeCommand=self.changeUpperHead, parent=self.headItemsLayout)
+                    self.jawCB = cmds.checkBox(label=self.ar.data.lang['c025_jaw'], value=cmds.getAttr(self.guide_base+".jaw"), changeCommand=self.changeJaw, parent=self.headItemsLayout)
+                    self.chinCB = cmds.checkBox(label=self.ar.data.lang['c026_chin'], value=cmds.getAttr(self.guide_base+".chin"), changeCommand=self.changeChin, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
+                    self.lipsCB = cmds.checkBox(label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(self.guide_base+".lips"), changeCommand=self.changeLips, enable=cmds.checkBox(self.jawCB, query=True, value=True), parent=self.headItemsLayout)
+                    self.upperHeadCB = cmds.checkBox(label=self.ar.data.lang['c044_upper']+" "+self.ar.data.lang['c024_head'], value=cmds.getAttr(self.guide_base+".upperHead"), changeCommand=self.changeUpperHead, parent=self.headItemsLayout)
                 
                 # create degree layout:
                 if self.degreeExists:
@@ -278,7 +278,7 @@ class BaseLayout(object):
                     self.degreeMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
                     for item in self.degreeMenuItemList:
                         cmds.menuItem(label=item, parent=self.degreeMenu)
-                    currentDegree = cmds.getAttr(self.moduleGrp+".degree")
+                    currentDegree = cmds.getAttr(self.guide_base+".degree")
                     # set layout with the current value:
                     if currentDegree == 0:
                         cmds.optionMenu(self.degreeMenu, edit=True, value='0 - Preset')
@@ -291,23 +291,23 @@ class BaseLayout(object):
                 if self.articulationExists:
                     self.articLayout = cmds.rowLayout('articLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(self.ar.data.lang['m173_articulation'], parent=self.articLayout)
-                    articValue = cmds.getAttr(self.moduleGrp+".articulation")
+                    articValue = cmds.getAttr(self.guide_base+".articulation")
                     self.articCB = cmds.checkBox(label="", value=articValue, changeCommand=self.changeArticulation, parent=self.articLayout)
                 
                 # create nostril:
                 if self.nostrilExists:
                     cmds.text(" ", parent=self.articLayout)
-                    nostrilValue = cmds.getAttr(self.moduleGrp+".nostril")
+                    nostrilValue = cmds.getAttr(self.guide_base+".nostril")
                     self.nostrilCB = cmds.checkBox(label=self.ar.data.lang['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
 
                 # create corrective layout:
                 if self.correctiveExists:
                     self.correctiveLayout = cmds.rowLayout('correctiveLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     self.correctiveTxt = cmds.text(self.ar.data.lang['c124_corrective'].capitalize(), parent=self.correctiveLayout)
-                    correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
+                    correctiveValue = cmds.getAttr(self.guide_base+".corrective")
                     self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
                     if self.articulationExists:
-                        articulationValue = cmds.getAttr(self.moduleGrp+".articulation")
+                        articulationValue = cmds.getAttr(self.guide_base+".articulation")
                         cmds.text(self.correctiveTxt, edit=True, enable=articulationValue)
                         cmds.checkBox(self.correctiveCB, edit=True, enable=articulationValue)
 
@@ -315,7 +315,7 @@ class BaseLayout(object):
                 if self.dynamicExists:
                     self.dynamicLayout = cmds.rowLayout('dynamicLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     cmds.text(self.ar.data.lang['m097_dynamic'], parent=self.dynamicLayout)
-                    dynamicValue = cmds.getAttr(self.moduleGrp+".dynamic")
+                    dynamicValue = cmds.getAttr(self.guide_base+".dynamic")
                     self.dynamicCB = cmds.checkBox(label="", value=dynamicValue, changeCommand=self.changeDynamic, parent=self.dynamicLayout)
 
                 # create main controllers layout:
@@ -323,15 +323,15 @@ class BaseLayout(object):
                     if self.nMainCtrlAttrExists:
                         if self.nJointsAttr > 0:
                             self.mainCtrlColumn = cmds.rowLayout('mainCtrlColumn', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="rig_selected_module_cl" )
-                            hasMain = cmds.getAttr(self.moduleGrp+".mainControls")
-                            nMainCtrlAttr = cmds.getAttr(self.moduleGrp+".nMain")
+                            hasMain = cmds.getAttr(self.guide_base+".mainControls")
+                            nMainCtrlAttr = cmds.getAttr(self.guide_base+".nMain")
                             if self.nJointsAttr > 1:
                                 self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=hasMain, parent=self.mainCtrlColumn)
                             else:
                                 self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
-                                cmds.setAttr(self.moduleGrp+".mainControls", 0)
+                                cmds.setAttr(self.guide_base+".mainControls", 0)
                 
                 if self.styleExists:
                     self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
@@ -341,23 +341,23 @@ class BaseLayout(object):
                     for item in styleMenuItemList:
                         cmds.menuItem(label=item, parent=self.styleMenu)
                     # read from guide attribute the current value to style:
-                    currentStyle = cmds.getAttr(self.moduleGrp+".style")
+                    currentStyle = cmds.getAttr(self.guide_base+".style")
                     cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle+1))
 
                 if self.deformerExists:
-                    deformerEnableValue = cmds.getAttr(self.moduleGrp+".upperHead")
+                    deformerEnableValue = cmds.getAttr(self.guide_base+".upperHead")
                     self.deformerLayout = cmds.rowLayout('deformerLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     self.deformerTxt = cmds.text(self.ar.data.lang['c097_deformer'].capitalize(), enable=deformerEnableValue, parent=self.deformerLayout)
-                    self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.moduleGrp+".deformer"), changeCommand=self.changeDeformer, enable=deformerEnableValue, parent=self.deformerLayout)
+                    self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.guide_base+".deformer"), changeCommand=self.changeDeformer, enable=deformerEnableValue, parent=self.deformerLayout)
                 
                 # create head facial controllers layout:
                 if self.facialExists:
                     facialEnableValue = True
-                    if not cmds.getAttr(self.moduleGrp+".jaw") or not cmds.getAttr(self.moduleGrp+".chin") or not cmds.getAttr(self.moduleGrp+".lips") or not cmds.getAttr(self.moduleGrp+".upperHead"):
+                    if not cmds.getAttr(self.guide_base+".jaw") or not cmds.getAttr(self.guide_base+".chin") or not cmds.getAttr(self.guide_base+".lips") or not cmds.getAttr(self.guide_base+".upperHead"):
                         facialEnableValue=False
                     self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
                     self.facialTxt = cmds.text(self.ar.data.lang['c059_facial'].capitalize(), enable=facialEnableValue, parent=self.facialLayout)
-                    facialValue = cmds.getAttr(self.moduleGrp+".facial")
+                    facialValue = cmds.getAttr(self.guide_base+".facial")
                     self.facialCB = cmds.checkBox('facialCB', label="", value=facialValue, changeCommand=self.changeFacial, enable=facialEnableValue, parent=self.facialLayout)
                     collapsed = False
                     if not facialValue:
@@ -366,23 +366,23 @@ class BaseLayout(object):
                     self.facialCtrlFrameLayout = cmds.frameLayout('facialCtrlFrameLayout', label=self.ar.data.lang['m139_facialCtrlsAttr'], collapsable=True, collapse=collapsed, enable=facialValue, parent="rig_selected_module_cl")
                     facialCBLayout = cmds.rowColumnLayout('facialCBLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.facialCtrlFrameLayout)
                     # facial element checkboxes
-                    self.facialBrowCB = cmds.checkBox('facialBrowCB', label=self.ar.data.lang["c060_brow"], value=cmds.getAttr(self.moduleGrp+".facialBrow"), changeCommand=partial(self.changeFacialElement, "facialBrowCB", "facialBrow"), parent=facialCBLayout)
+                    self.facialBrowCB = cmds.checkBox('facialBrowCB', label=self.ar.data.lang["c060_brow"], value=cmds.getAttr(self.guide_base+".facialBrow"), changeCommand=partial(self.changeFacialElement, "facialBrowCB", "facialBrow"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.browTgtList), parent=facialCBLayout)
-                    self.facialEyelidCB = cmds.checkBox('facialEyelidCB', label=self.ar.data.lang["c042_eyelid"], value=cmds.getAttr(self.moduleGrp+".facialEyelid"), changeCommand=partial(self.changeFacialElement, "facialEyelidCB", "facialEyelid"), parent=facialCBLayout)
+                    self.facialEyelidCB = cmds.checkBox('facialEyelidCB', label=self.ar.data.lang["c042_eyelid"], value=cmds.getAttr(self.guide_base+".facialEyelid"), changeCommand=partial(self.changeFacialElement, "facialEyelidCB", "facialEyelid"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.eyelidTgtList[2:]), parent=facialCBLayout)
-                    self.facialMouthCB = cmds.checkBox('facialMouthCB', label=self.ar.data.lang["c061_mouth"], value=cmds.getAttr(self.moduleGrp+".facialMouth"), changeCommand=partial(self.changeFacialElement, "facialMouthCB", "facialMouth"), parent=facialCBLayout)
+                    self.facialMouthCB = cmds.checkBox('facialMouthCB', label=self.ar.data.lang["c061_mouth"], value=cmds.getAttr(self.guide_base+".facialMouth"), changeCommand=partial(self.changeFacialElement, "facialMouthCB", "facialMouth"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.mouthTgtList), parent=facialCBLayout)
-                    self.facialLipsCB = cmds.checkBox('facialLipsCB', label=self.ar.data.lang["c062_lips"], value=cmds.getAttr(self.moduleGrp+".facialLips"), changeCommand=partial(self.changeFacialElement, "facialLipsCB", "facialLips"), parent=facialCBLayout)
+                    self.facialLipsCB = cmds.checkBox('facialLipsCB', label=self.ar.data.lang["c062_lips"], value=cmds.getAttr(self.guide_base+".facialLips"), changeCommand=partial(self.changeFacialElement, "facialLipsCB", "facialLips"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.lipsTgtList), parent=facialCBLayout)
-                    self.facialSneerCB = cmds.checkBox('facialSneerCB', label=self.ar.data.lang["c063_sneer"], value=cmds.getAttr(self.moduleGrp+".facialSneer"), changeCommand=partial(self.changeFacialElement, "facialSneerCB", "facialSneer"), parent=facialCBLayout)
+                    self.facialSneerCB = cmds.checkBox('facialSneerCB', label=self.ar.data.lang["c063_sneer"], value=cmds.getAttr(self.guide_base+".facialSneer"), changeCommand=partial(self.changeFacialElement, "facialSneerCB", "facialSneer"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.sneerTgtList[:2]+self.sneerTgtList[4:]), parent=facialCBLayout)
-                    self.facialGrimaceCB = cmds.checkBox('facialGrimaceCB', label=self.ar.data.lang["c064_grimace"], value=cmds.getAttr(self.moduleGrp+".facialGrimace"), changeCommand=partial(self.changeFacialElement, "facialGrimaceCB", "facialGrimace"), parent=facialCBLayout)
+                    self.facialGrimaceCB = cmds.checkBox('facialGrimaceCB', label=self.ar.data.lang["c064_grimace"], value=cmds.getAttr(self.guide_base+".facialGrimace"), changeCommand=partial(self.changeFacialElement, "facialGrimaceCB", "facialGrimace"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.grimaceTgtList[:2]+self.grimaceTgtList[4:]), parent=facialCBLayout)
-                    self.facialFaceCB = cmds.checkBox('facialFaceCB', label=self.ar.data.lang["c065_face"], value=cmds.getAttr(self.moduleGrp+".facialFace"), changeCommand=partial(self.changeFacialElement, "facialFaceCB", "facialFace"), parent=facialCBLayout)
+                    self.facialFaceCB = cmds.checkBox('facialFaceCB', label=self.ar.data.lang["c065_face"], value=cmds.getAttr(self.guide_base+".facialFace"), changeCommand=partial(self.changeFacialElement, "facialFaceCB", "facialFace"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.faceTgtList), parent=facialCBLayout)
                     cmds.separator(style='none', height=5, parent=facialCBLayout)
                     self.facialTypeLayout = cmds.columnLayout('facialTypeLayout', parent=self.facialCtrlFrameLayout)
-                    userType = cmds.getAttr(self.moduleGrp+".connectUserType")
+                    userType = cmds.getAttr(self.guide_base+".connectUserType")
                     self.facialTypeRC = cmds.radioCollection('facialTypeRC', parent=self.facialTypeLayout)
                     bs = cmds.radioButton(label=self.ar.data.lang['m170_blendShapes']+" - "+self.ar.data.lang['i185_animation']+": #_Recept_BS", annotation=self.bsType, onCommand=self.dpChangeType)
                     jnt = cmds.radioButton(label=self.ar.data.lang['i181_facialJoint']+" - "+self.ar.data.lang['i186_gaming'], annotation=self.jointsType, onCommand=self.dpChangeType)
@@ -397,7 +397,7 @@ class BaseLayout(object):
                     self.deformedByMenuItemList = ['0 - None', '1 - Head Deformer', '2 - Jaw Deformer', '3 - Head and Jaw Deformers']
                     for item in self.deformedByMenuItemList:
                         cmds.menuItem(label=item, parent=self.deformedByMenu)
-                    currentDeformedByValue = cmds.getAttr(self.moduleGrp+".deformedBy")
+                    currentDeformedByValue = cmds.getAttr(self.guide_base+".deformedBy")
                     # set layout with the current value:
                     if currentDeformedByValue == 1:
                         cmds.optionMenu(self.deformedByMenu, edit=True, value='1 - Head Deformer')
@@ -420,27 +420,27 @@ class BaseLayout(object):
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            self.annotation = self.moduleGrp+"_Ant"
+            self.annotation = self.guide_base+"_Ant"
             cmds.setAttr(self.annotation+'.visibility', value)
-            cmds.setAttr(self.moduleGrp+'.displayAnnotation', value)
+            cmds.setAttr(self.guide_base+'.displayAnnotation', value)
     
     
-    def checkFatherMirror(self, *args):
+    def check_father_mirror(self, *args):
         """ Check all fathers and verify if there are mirror applied to father.
             Then, stop mirror for this guide or continue creating its mirror.
             Return "stopIt" if there's a father guide mirror.
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            mirroredGuideFather = self.utils.mirroredGuideFather(self.moduleGrp)
+            mirroredGuideFather = self.utils.mirroredGuideFather(self.guide_base)
             if mirroredGuideFather:
-                cmds.setAttr(self.moduleGrp+".mirrorEnable", 0)
+                cmds.setAttr(self.guide_base+".mirrorEnable", 0)
                 # get initial values from father guide base:
                 fatherMirror = cmds.getAttr(mirroredGuideFather+".mirrorAxis")
                 fatherMirrorName = cmds.getAttr(mirroredGuideFather+".mirrorName")
                 # set values to guide base:
-                cmds.setAttr(self.moduleGrp+".mirrorAxis", fatherMirror, type='string')
-                cmds.setAttr(self.moduleGrp+".mirrorName", fatherMirrorName, type='string')
+                cmds.setAttr(self.guide_base+".mirrorAxis", fatherMirror, type='string')
+                cmds.setAttr(self.guide_base+".mirrorName", fatherMirrorName, type='string')
                 # set layout as theses values:
                 try:
                     cmds.optionMenu(self.mirrorMenu, edit=True, value=fatherMirror, enable=False)
@@ -451,8 +451,8 @@ class BaseLayout(object):
                 self.fatherFlipExists = cmds.objExists(mirroredGuideFather+".flip")
                 if self.fatherFlipExists:
                     fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
-                    if cmds.objExists(self.moduleGrp+".flip"):
-                        cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
+                    if cmds.objExists(self.guide_base+".flip"):
+                        cmds.setAttr(self.guide_base+".flip", fatherFlip)
                 self.createPreviewMirror()
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
@@ -462,13 +462,13 @@ class BaseLayout(object):
         """ Set the attribute value for flip.
         """
         #flipValue = cmds.checkBox(self.flipCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".flip", flipValue)
+        cmds.setAttr(self.guide_base+".flip", flipValue)
     
     
     def changeShapeSize(self, *args):
         """ Set the attribute value for shapeSize.
         """
-        cmds.setAttr(self.moduleGrp+".shapeSize", cmds.floatSliderGrp(self.shapeSizeFSG, query=True, value=True))
+        cmds.setAttr(self.guide_base+".shapeSize", cmds.floatSliderGrp(self.shapeSizeFSG, query=True, value=True))
     
     
     def changeRadiusSize(self, *args):
@@ -478,41 +478,41 @@ class BaseLayout(object):
         
 
     def changeMirror(self, item, *args):
-        """ This function receives the mirror menu item and set it as a string in the guide base (moduleGrp).
+        """ This function receives the mirror menu item and set it as a string in the guide base (main).
             Also, call the builder of the preview mirror (for the viewport).
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             # check if the father guide is in X=0 in order to permit mirror:
-            stopMirrorOperation = self.checkFatherMirror()
+            stopMirrorOperation = self.check_father_mirror()
             if not stopMirrorOperation:
                 # loading Maya matrix node (for mirror porpuses)
                 loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
-                    cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')
+                    cmds.setAttr(self.guide_base+".mirrorAxis", self.mirrorAxis, type='string')
                     self.createPreviewMirror()
     
     
     def changeMirrorName(self, item, *args):
-        """ This function receives the mirror menu name item and set it as a string in the guide base (moduleGrp).
+        """ This function receives the mirror menu name item and set it as a string in the guide base (main).
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            cmds.setAttr(self.moduleGrp+".mirrorName", item, type='string')
+            cmds.setAttr(self.guide_base+".mirrorName", item, type='string')
     
     
     def changeArticulation(self, articulationValue, *args):
         """ Set the attribute value for articulation.
         """
         #articulationValue = cmds.checkBox(self.articCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".articulation", articulationValue)
+        cmds.setAttr(self.guide_base+".articulation", articulationValue)
         try:
             cmds.text(self.correctiveTxt, edit=True, enable=articulationValue)
             cmds.checkBox(self.correctiveCB, edit=True, enable=articulationValue)
             if not articulationValue:
                 cmds.checkBox(self.correctiveCB, edit=True, value=articulationValue)
-                cmds.setAttr(self.moduleGrp+".corrective", articulationValue)
+                cmds.setAttr(self.guide_base+".corrective", articulationValue)
         except:
             pass
 
@@ -521,25 +521,25 @@ class BaseLayout(object):
         """ Set the attribute value for corrective.
         """
         #correctiveValue = cmds.checkBox(self.correctiveCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".corrective", correctiveValue)
+        cmds.setAttr(self.guide_base+".corrective", correctiveValue)
     
     
     def changeDegree(self, item, *args):
-        """ This function receives the degree menu name item string and set it as a int in the guide base (moduleGrp).
+        """ This function receives the degree menu name item string and set it as a int in the guide base (main).
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             if item == '3 - Cubic':
-                cmds.setAttr(self.moduleGrp+".degree", 3)
+                cmds.setAttr(self.guide_base+".degree", 3)
             else:
-                cmds.setAttr(self.moduleGrp+".degree", 1)
+                cmds.setAttr(self.guide_base+".degree", 1)
     
 
     def changeDynamic(self, dynamicValue, *args):
         """ Set the attribute value for dynamic.
         """
         #dynamicValue = cmds.checkBox(self.dynamicCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".dynamic", dynamicValue)
+        cmds.setAttr(self.guide_base+".dynamic", dynamicValue)
 
     
     def createPreviewMirror(self, *args):
@@ -548,7 +548,7 @@ class BaseLayout(object):
         """
         selList = cmds.ls(selection=True)
         # re-declaring guideMirror and previewMirror groups:
-        self.previewMirrorGrpName = self.moduleGrp[:self.moduleGrp.find(":")]+'_MirrorGrp'
+        self.previewMirrorGrpName = self.guide_base[:self.guide_base.find(":")]+'_MirrorGrp'
         if cmds.objExists(self.previewMirrorGrpName):
             cmds.delete(self.previewMirrorGrpName)
         
@@ -556,9 +556,9 @@ class BaseLayout(object):
         self.utils.clearNodeGrp(self.ar.data.guide_mirror_grp, 'guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
-        guideChildrenList = self.utils.getGuideChildrenList(self.moduleGrp)
+        guideChildrenList = self.utils.getGuideChildrenList(self.guide_base)
         
-        self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
+        self.mirrorAxis = cmds.getAttr(self.guide_base+".mirrorAxis")
         if self.mirrorAxis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
                 hidden = not self.ar.data.display_temp_grp #invert to apply
@@ -581,17 +581,17 @@ class BaseLayout(object):
                         # set child guide as not mirrorable:
                         cmds.setAttr(guideChild+".mirrorEnable", 0)
                         # get initial values from father guide base:
-                        fatherMirrorName = cmds.getAttr(self.moduleGrp+".mirrorName")
+                        fatherMirrorName = cmds.getAttr(self.guide_base+".mirrorName")
                         # set values to guide base:
                         cmds.setAttr(guideChild+".mirrorAxis", self.mirrorAxis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
                         for moduleInstance in self.ar.data.standard_instances:
-                            if cmds.objExists(moduleInstance.moduleGrp):
-                                if cmds.getAttr(moduleInstance.moduleGrp+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
+                            if cmds.objExists(moduleInstance.guide_base):
+                                if cmds.getAttr(moduleInstance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
                                     moduleInstance.createPreviewMirror()
                 
                 # duplicating the moduleGuide
-                duplicated = cmds.duplicate(self.moduleGrp, returnRootsOnly=True)[0]
+                duplicated = cmds.duplicate(self.guide_base, returnRootsOnly=True)[0]
                 duplicatedList = cmds.listRelatives(duplicated, allDescendents=True, fullPath=True)
                 # renaming  and reShaping all its children nodes:
                 if duplicatedList:
@@ -602,8 +602,8 @@ class BaseLayout(object):
                             else:
                                 if cmds.objectType(dup) == 'transform' or cmds.objectType(dup) == 'joint':
                                     # rename duplicated node:
-                                    dupRenamed = cmds.rename(dup, self.moduleGrp[:self.moduleGrp.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
-                                    originalGuide = self.moduleGrp[:self.moduleGrp.find(":")+1]+dup[dup.rfind("|")+1:]
+                                    dupRenamed = cmds.rename(dup, self.guide_base[:self.guide_base.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
+                                    originalGuide = self.guide_base[:self.guide_base.find(":")+1]+dup[dup.rfind("|")+1:]
                                     # unlock and unhide all attributes and connect original guide node transformations to the mirror guide node:
                                     for attr in self.ar.data.transform_attrs:
                                         cmds.setAttr(dupRenamed+"."+attr, lock=False, keyable=True)
@@ -622,7 +622,7 @@ class BaseLayout(object):
                                             cmds.delete(newSphere[0]) #transform
                                             szMD = cmds.createNode("multiplyDivide", name=dupRenamed+"_MD")
                                             szClp = cmds.createNode("clamp", name=dupRenamed+"_Clp")
-                                            cmds.connectAttr(self.moduleGrp+".shapeSize", szMD+".input1X", force=True)
+                                            cmds.connectAttr(self.guide_base+".shapeSize", szMD+".input1X", force=True)
                                             cmds.connectAttr(szMD+".outputX", szClp+".inputR", force=True)
                                             cmds.connectAttr(szClp+".outputR", newSphere[1]+".radius", force=True)
                                             cmds.setAttr(szMD+".input2X", 0.1)
@@ -633,7 +633,7 @@ class BaseLayout(object):
                                     cmds.delete(dup)
                 
                 # renaming the previewMirrorGuide:
-                self.previewMirrorGuide = cmds.rename(duplicated, self.moduleGrp.replace(":", "_")+'_Mirror')
+                self.previewMirrorGuide = cmds.rename(duplicated, self.guide_base.replace(":", "_")+'_Mirror')
                 cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
                 cmds.delete(cmds.listRelatives(self.previewMirrorGuide, shapes=True, type="nurbsCurve"))
                 self.utils.unlockAttr([self.previewMirrorGuide])
@@ -648,7 +648,7 @@ class BaseLayout(object):
                 
                 # create a decomposeMatrix node in order to get the worldSpace transformations (like using xform):
                 decomposeMatrix = cmds.createNode('decomposeMatrix', name=self.previewMirrorGuide+"_dm")
-                cmds.connectAttr(self.moduleGrp+'.worldMatrix', decomposeMatrix+'.inputMatrix', force=True)
+                cmds.connectAttr(self.guide_base+'.worldMatrix', decomposeMatrix+'.inputMatrix', force=True)
                 
                 # connect original guide base decomposeMatrix node output transformations to the mirror guide base node:
                 axisList = ["X", "Y", "Z"]
@@ -684,11 +684,11 @@ class BaseLayout(object):
 
 
     def changeDeformedBy(self, item, *args):
-        """ This function receives the deformedBy menu name item and set it as a integer value in the guide base (moduleGrp).
+        """ This function receives the deformedBy menu name item and set it as a integer value in the guide base (main).
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            cmds.setAttr(self.moduleGrp+".deformedBy", int(item[0]))
+            cmds.setAttr(self.guide_base+".deformedBy", int(item[0]))
 
 
     def plusInfoWin(self, instance=None, *args):
@@ -717,7 +717,7 @@ class BaseLayout(object):
                 guideInstanceList.insert(0, instance)
         for guideInstance in guideInstanceList:
             guideName = guideInstance.guideNamespace.split("__")[-1]
-            customName = cmds.getAttr(guideInstance.moduleGrp+".customName")
+            customName = cmds.getAttr(guideInstance.guide_base+".customName")
             if not customName:
                 customName = ""
             # creating text layout:
@@ -726,11 +726,11 @@ class BaseLayout(object):
             cmds.text(label=guideName, align='left', parent=headerRCL)
             cmds.text(label=customName, align='left', font='boldLabelFont', parent=headerRCL)
             cmds.separator(style='none', height=10, parent=plusSL)
-            guideInstance.annotationCheckBox = cmds.checkBox(label=guideInstance.ar.data.lang['m014_annotation'], annotation=guideInstance.ar.data.lang['m014_annotation'], value=cmds.getAttr(guideInstance.moduleGrp+'.displayAnnotation'), onCommand=partial(guideInstance.displayAnnotation, 1), offCommand=partial(guideInstance.displayAnnotation, 0), parent=plusSL)
+            guideInstance.annotationCheckBox = cmds.checkBox(label=guideInstance.ar.data.lang['m014_annotation'], annotation=guideInstance.ar.data.lang['m014_annotation'], value=cmds.getAttr(guideInstance.guide_base+'.displayAnnotation'), onCommand=partial(guideInstance.displayAnnotation, 1), offCommand=partial(guideInstance.displayAnnotation, 0), parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
             guideInstance.radiusSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['c067_radius'].capitalize(), field=True, width=widthSize, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.radiusCtrl+".translateX"), changeCommand=guideInstance.changeRadiusSize, dragCommand=guideInstance.changeRadiusSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
-            guideInstance.shapeSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['m067_shape']+" "+guideInstance.ar.data.lang['i115_size'], width=widthSize, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.moduleGrp+'.shapeSize'), changeCommand=guideInstance.changeShapeSize, dragCommand=guideInstance.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
+            guideInstance.shapeSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['m067_shape']+" "+guideInstance.ar.data.lang['i115_size'], width=widthSize, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.guide_base+'.shapeSize'), changeCommand=guideInstance.changeShapeSize, dragCommand=guideInstance.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=10, parent=plusSL)
             currentRGBGuideColor = guideInstance.ar.ctrls.getGuideRGBColorList(guideInstance)
             guideInstance.colorButton = cmds.button(label=guideInstance.ar.data.lang['m013_color'], annotation=guideInstance.ar.data.lang['m013_color'], width=widthSize, align="center", command=partial(guideInstance.ar.ctrls.colorizeUI, guideInstance), backgroundColor=currentRGBGuideColor, parent=plusSL)

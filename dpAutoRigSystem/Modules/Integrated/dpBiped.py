@@ -181,7 +181,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                 cmds.setAttr(foot.cvFootLoc+".translateZ", 1.5)
                 # parent foot guide to leg ankle guide:
                 cmds.parent(foot_guide, limb.cvExtremLoc, absolute=True)
-                foot.checkFatherMirror()
+                foot.check_father_mirror()
                 cmds.refresh()
                 
                 # working with ARM system:
@@ -411,7 +411,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe1 guide to foot middle guide:
                     cmds.parent(toe_1_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName)
@@ -434,7 +434,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe2 guide to foot middle guide:
                     cmds.parent(toe_2_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName)
@@ -457,7 +457,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe3 guide to foot middle guide:
                     cmds.parent(toe_3_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
 
                     self.ar.utils.setProgress(doingName+toeName)
@@ -480,7 +480,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe4 guide to foot middle guide:
                     cmds.parent(toe_4_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName)
@@ -503,7 +503,7 @@ class Biped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe5 guide to foot middle guide:
                     cmds.parent(toe_5_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     # working with Breath system:

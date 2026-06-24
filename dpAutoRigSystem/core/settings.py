@@ -335,6 +335,12 @@ class Configuration(object):
                     return key
             return keys[0]
         return self.ar.data.template_default
+    
+
+    def get_father_instance(self, name):
+        for item in self.ar.maker.guides_to_rig:
+            if item.guide_base == name:
+                return item
 
 
 class Option(object):
@@ -346,8 +352,8 @@ class Option(object):
         self.set_option_var(self.ar.data.degree_option_var, value)
         self.ar.data.degree_option = int(value[-1])
         for module_instance in self.ar.data.standard_instances:
-            if "degree" in cmds.listAttr(module_instance.moduleGrp):
-                cmds.setAttr(module_instance.moduleGrp+".degree", self.ar.data.degree_option)
+            if "degree" in cmds.listAttr(module_instance.guide_base):
+                cmds.setAttr(module_instance.guide_base+".degree", self.ar.data.degree_option)
 
 
     def check_use_default_render_layer(self):

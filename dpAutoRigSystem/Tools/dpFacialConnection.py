@@ -331,7 +331,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
     def dpConnectToJoints(self, ctrlList=None, *args):
         """ Connect the facial controllers attributes to the stored facial tweakers data.
         """
-        self.toIDList, resultList = [], []
+        self.to_ids, resultList = [], []
         # redefining Tweaks variables to get the tweaks name list
         self.dpInitTweaksVariables()
         # get joint target list
@@ -387,7 +387,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
                                                             self.RmVNumber = self.RmVNumber+1
                                                         print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
                                                         resultList.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
-                    self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+                    self.ar.customAttr.addAttr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and resultList:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
         self.ar.utils.closeUI('dpFacialConnectionWindow')
@@ -430,7 +430,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
         """
         fromNodeName = self.ar.utils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
-        self.toIDList.append(remap)
+        self.to_ids.append(remap)
         outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
         if not cmds.objExists(fromNode+"."+outMaxAttr):
             cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
@@ -438,7 +438,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
             if not cmds.objExists(fromNode+".sizeFactor"):
                 cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
             md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
-            self.toIDList.append(md)
+            self.to_ids.append(md)
             cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
             cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
             cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
@@ -460,7 +460,7 @@ class FacialConnection(dpBaseLibrary.BaseLibrary):
                 else:
                     connectedAttr = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=True)[0]
                 pma = cmds.createNode("plusMinusAverage", name=jntTarget+"_"+toAttr.upper()+"_PMA")
-                self.toIDList.append(pma)
+                self.to_ids.append(pma)
                 cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
                 cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
                 cmds.connectAttr(pma+".output1D", jntTarget+"."+toAttr, force=True)

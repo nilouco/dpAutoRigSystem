@@ -34,30 +34,30 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     
     
     def getHasIndirectSkin(self):
-        return cmds.getAttr(self.moduleGrp + ".indirectSkin")
+        return cmds.getAttr(self.guide_base + ".indirectSkin")
     
     
     def getHasHolder(self):
-        return cmds.getAttr(self.moduleGrp + ".holder")
+        return cmds.getAttr(self.guide_base + ".holder")
         
     
     def getHasSDKLocator(self):
-        return cmds.getAttr(self.moduleGrp + ".sdkLocator")
+        return cmds.getAttr(self.guide_base + ".sdkLocator")
     
     
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="indirectSkin", attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName='holder', attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName='sdkLocator', attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="indirectSkin", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='holder', attributeType='bool')
+        cmds.addAttr(self.guide_base, longName='sdkLocator', attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuide1, self.guide_base, relative=True)
         
         self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -67,7 +67,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc, self.guide_base)
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
@@ -81,9 +81,9 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Set the attribute value for indirectSkin.
         """
         indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
+        cmds.setAttr(self.guide_base+".indirectSkin", indSkinValue)
         if indSkinValue == 0:
-            cmds.setAttr(self.moduleGrp+".holder", 0)
+            cmds.setAttr(self.guide_base+".holder", 0)
             cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
             cmds.checkBox(self.sdkLocatorCB, edit=True, enable=False)
         else:
@@ -94,19 +94,19 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def changeHolder(self, *args):
         """ Set the attribute value for holder.
         """
-        cmds.setAttr(self.moduleGrp+".holder", cmds.checkBox(self.holderCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".holder", cmds.checkBox(self.holderCB, query=True, value=True))
     
     
     def changeSDKLocator(self, *args):
         """ Set the attribute value for sdkLocator.
         """
-        cmds.setAttr(self.moduleGrp+".sdkLocator", cmds.checkBox(self.sdkLocatorCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".sdkLocator", cmds.checkBox(self.sdkLocatorCB, query=True, value=True))
     
     
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # run for all sides
             for s, side in enumerate(self.sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
@@ -152,7 +152,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
                 # fixing flip mirror:
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
                         cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
@@ -172,7 +172,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr, force=True)
                     # fix mirror issue: Maya 2026 release bug
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        if cmds.getAttr(self.guide_base+".flip") == 1:
                             invMD = cmds.createNode("multiplyDivide", name=jxtName.replace("_Jxt", "_Inv_MD"))
                             for sAxis in ["X", "Y", "Z"]:
                                 cmds.setAttr(invMD+".input2"+sAxis, -1)
@@ -200,7 +200,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                                 cmds.delete(cmds.parentConstraint(self.singleCtrl, sdkLocGrp, maintainOffset=False))
                                 cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
                                 sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
-                                self.toIDList.append(sdkLocMD)
+                                self.to_ids.append(sdkLocMD)
                                 cmds.addAttr(sdkLoc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
                                 cmds.addAttr(sdkLoc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
                                 cmds.addAttr(sdkLoc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
@@ -246,23 +246,21 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     
     
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "mainJisList"   : self.mainJisList,
-                                                "staticGrpList" : self.aStaticGrpList,
-                                                "ctrlGrpList"   : self.aCtrlGrpList,
-                                              }
+        self.integrated = {
+                                        "mainJisList"   : self.mainJisList,
+                                        "staticGrpList" : self.aStaticGrpList,
+                                        "ctrlGrpList"   : self.aCtrlGrpList,
                                     }

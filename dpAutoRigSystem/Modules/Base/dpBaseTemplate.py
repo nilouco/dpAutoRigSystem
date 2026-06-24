@@ -40,6 +40,7 @@ class BaseTemplate(dpBaseLibrary.BaseLibrary):
         guide_io.setupGuideBaseParenting(template_data)
         self.ar.utils.setProgress(endIt=True)
         self.ar.ui_manager.refresh_ui()
+        cmds.select(clear=True)
         print(self.ar.data.lang["m089_createdTemplate"]+self.name)
 
 

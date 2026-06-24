@@ -509,7 +509,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
                 invTGrp = cmds.group(nodeName, name=nodeName+"_InvT_Grp")
                 cmds.xform(invTGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]))
                 tMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvT_MD", skipSelect=True)
-                self.toIDList.append(tMD)
+                self.to_ids.append(tMD)
                 cmds.setAttr(tMD+'.input2X', -1)
                 cmds.setAttr(tMD+'.input2Y', -1)
                 cmds.setAttr(tMD+'.input2Z', -1)
@@ -520,7 +520,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
                 invRGrp = cmds.group(nodeName, name=nodeName+"_InvR_Grp")
                 cmds.xform(invRGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]), rotateOrder="zyx")
                 rMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvR_MD", skipSelect=True)
-                self.toIDList.append(rMD)
+                self.to_ids.append(rMD)
                 cmds.setAttr(rMD+'.input2X', -1)
                 cmds.setAttr(rMD+'.input2Y', -1)
                 cmds.setAttr(rMD+'.input2Z', -1)
@@ -535,7 +535,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
             Returns the created network node list. 
         """
         # declaring variables
-        self.toIDList = []
+        self.to_ids = []
         self.originedGeo = geoToAttach
         self.shapeToAttachList = None
         self.shapeToAttach = None
@@ -554,7 +554,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
         if not cmds.objExists(rivetGrpName):
             createdRivetGrp = True
             self.rivetGrp = cmds.group(name=rivetGrpName, empty=True)
-            self.toIDList.append(self.rivetGrp)
+            self.to_ids.append(self.rivetGrp)
             for attr in self.ar.data.transform_attrs[:-1]:
                 cmds.setAttr(self.rivetGrp+"."+attr, lock=True, keyable=False, channelBox=False)
             cmds.addAttr(self.rivetGrp, longName="dpRivetGrp", attributeType='bool')
@@ -679,7 +679,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
                 # closest point on mesh node:
                 self.cpNode = cmds.createNode("closestPointOnSurface", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
                 cmds.connectAttr(dupShape+".local", self.cpNode+".inputSurface", force=True)
-            self.toIDList.append(self.cpNode)
+            self.to_ids.append(self.cpNode)
                 
             # working with follicles and attaches
             for r, rivet in enumerate(self.rivetList):
@@ -687,7 +687,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)
-                    self.toIDList.append(rivet)
+                    self.to_ids.append(rivet)
                     cmds.xform(rivet, worldSpace=True, rotatePivot=(rivetPos[0], rivetPos[1], rivetPos[2]))
                 
                 # move temp tranform to rivet location:
@@ -733,7 +733,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
             
                 # serialize network node
                 self.net = cmds.createNode("network", name=rivet+"_Net")
-                self.toIDList.append(self.net)
+                self.to_ids.append(self.net)
                 self.netList.append(self.net)
                 # add
                 cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool", defaultValue=1)
@@ -792,7 +792,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
         self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
-        self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids, descendents=True) #dpID
         cmds.select(clear=True)
         return self.netList
     
@@ -1000,7 +1000,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
         morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
         componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
         componentMatchNode = cmds.rename(componentMatchNode, toRivetName+"_CpM")
-        self.toIDList.extend([morphGeo, morphNode, componentMatchNode])
+        self.to_ids.extend([morphGeo, morphNode, componentMatchNode])
         # Parent in supportGrp
         self.parentToTransform([morphGeo], self.ar.utils.getNodeByMessage("supportGrp"))
         return morphGeo, morphNode
@@ -1025,7 +1025,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
         self.ar.ctrls.setLockHide([baseShape], self.ar.data.transform_attrs[:-1], True, False, True)
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
-        self.toIDList.extend([wrapGeo, wrapNode, baseShape])
+        self.to_ids.extend([wrapGeo, wrapNode, baseShape])
         # Parent in supportGrp
         self.parentToTransform([wrapGeo, baseShape], self.ar.utils.getNodeByMessage("supportGrp"))
         return wrapGeo, wrapNode

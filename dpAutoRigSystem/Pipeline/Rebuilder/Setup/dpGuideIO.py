@@ -126,10 +126,10 @@ class GuideIO(dpBaseAction.ActionStartClass):
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
-                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
+                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".guide_base")[0]+".moduleInstanceInfo")
                     for moduleInstance in self.ar.data.standard_instances:
                         if str(moduleInstance) == moduleInstanceInfoString:
-                            moduleInstance.serializeGuide(False) #serialize it without build it
+                            moduleInstance.serialize_guide(False) #serialize it without build it
                 toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
             elif "dpHeadDeformerNet" in cmds.listAttr(net):
                 if not cmds.listConnections(net+".guideNet", source=True, destination=False):
@@ -185,7 +185,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         for item in list(self.netDic["GuideData"]):
             new_item = self.get_new_name(item)
             if cmds.objExists(new_item):
-                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #moduleGrp
+                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
                     for baseAttr in list(self.netDic["GuideData"][item]):
                         if baseAttr == "customName":
                             custom_name = self.netDic["GuideData"][item]["customName"]
@@ -254,7 +254,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                 for item in list(netDic["GuideData"]):
                     new_item = self.get_new_name(item)
                     if cmds.objExists(new_item):
-                        if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #moduleGrp
+                        if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
                             fatherNodeData = netDic["GuideData"][item]['FatherNode']
                             if fatherNodeData:
                                 new_father = self.get_new_name(fatherNodeData)
@@ -293,8 +293,14 @@ class GuideIO(dpBaseAction.ActionStartClass):
                             if not net_custom_name is None:
                                 for item in net_data[module_type].keys():
                                     if net_data[module_type][item] == net_custom_name:
-                                        toInitializeGuide = False
-                                        break
+                                        # open dialog to confirm repeated net name:
+                                        yes_text = self.ar.data.lang['i071_yes']
+                                        no_text = self.ar.data.lang['i072_no']
+                                        result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
+                                                                    button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
+                                        if result == yes_text:
+                                            toInitializeGuide = False
+                                            break
                 if toInitializeGuide:
                     try:
                         self.netDic = guideDic[net]
@@ -313,7 +319,6 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False
-
         return wellImported
 
 
@@ -345,4 +350,6 @@ class GuideIO(dpBaseAction.ActionStartClass):
     
 
     def get_net_custom_name(self, net):
-        return cmds.getAttr(f"{cmds.listConnections(f'{net}.linkedNode', source=True, destination=False)[0]}.customName")
+        if cmds.getAttr(f"{net}.rawGuide"):
+            return cmds.getAttr(f"{cmds.listConnections(f'{net}.linkedNode', source=True, destination=False)[0]}.customName")
+        return cmds.getAttr(f"{net}.guideName")

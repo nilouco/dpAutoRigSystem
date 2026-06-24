@@ -30,7 +30,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
         # Receive the guides list from hook function
-        self.guidesDictionary = self.ar.utils.hook()
+        self.guidesDictionary = self.ar.utils.get_hook()
         # List that will hold all new guides instances
         self.newGuidesInstanceList = []
         # Dictionary where the keys are the guides that will be used and don't need update
@@ -143,7 +143,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
     
 
     def getNewGuideInstance(self, newGuideName):
-        newGuidesNamesList = list(map(lambda moduleInstance : moduleInstance.moduleGrp, self.newGuidesInstanceList))
+        newGuidesNamesList = list(map(lambda moduleInstance : moduleInstance.guide_base, self.newGuidesInstanceList))
         currentGuideInstanceIdx = newGuidesNamesList.index(newGuideName)
         return self.newGuidesInstanceList[currentGuideInstanceIdx]
     
@@ -337,8 +337,8 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
     def getGuidesToUpdateData(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
         """
-        modulesToBeRiggedList = self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)
-        instancedModulesStrList = list(map(str, modulesToBeRiggedList))
+        guides_to_rig = self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)
+        instancedModulesStrList = list(map(str, guides_to_rig))
         for baseGuide in self.guidesDictionary:
             guideVersion = cmds.getAttr(baseGuide+'.dpARVersion', silent=True)
             if guideVersion != self.ar.data.version:
@@ -348,7 +348,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
                 guideAttrList = self.listKeyUserAttr(baseGuide)
                 # Create de attributes dictionary for each baseGuide
                 self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
-                self.updateData[baseGuide]['instance'] = modulesToBeRiggedList[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
+                self.updateData[baseGuide]['instance'] = guides_to_rig[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
                 self.updateData[baseGuide]['children'] = {}
                 self.updateData[baseGuide]['parent'] = self.getGuideParent(baseGuide)
                 childrenList = self.listChildren(baseGuide)
@@ -368,7 +368,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
             currentNewGuide.editGuideModuleName(guideName)
-            self.updateData[guide]['newGuide'] = currentNewGuide.moduleGrp
+            self.updateData[guide]['newGuide'] = currentNewGuide.guide_base
             self.newGuidesInstanceList.append(currentNewGuide)
             if self.ar.data.ui_state:
                 cmds.refresh()
@@ -378,7 +378,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
         for guide in self.updateData:
             currentCustomName = self.updateData[guide]['attributes']['customName']
             if currentCustomName == '' or currentCustomName == None:
-                self.updateData[guide]['instance'].editGuideModuleName(self.updateData[guide]['instance'].moduleGrp.split(':')[0]+'_OLD')
+                self.updateData[guide]['instance'].editGuideModuleName(self.updateData[guide]['instance'].guide_base.split(':')[0]+'_OLD')
             else:
                 self.updateData[guide]['instance'].editGuideModuleName(currentCustomName+'_OLD')
 

@@ -50,7 +50,7 @@ class RigItIO(dpBaseAction.ActionStartClass):
             else: #import
                 try:
                     self.ar.rebuilding = True
-                    self.ar.rigAll()
+                    self.ar.rig_all()
                 except Exception as e:
                     self.notWorkedWellIO(str(e))
         else:

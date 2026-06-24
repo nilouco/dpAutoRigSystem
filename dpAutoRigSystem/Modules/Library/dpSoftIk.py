@@ -43,7 +43,7 @@ class SoftIkClass(object):
             Just a general function edited from Nick Miller code.
             Returns the softIk calibrate multiplyDivide node to receive the Option_Ctrl.rigScale output.
         """
-        self.toIDList = []
+        self.to_ids = []
         softIkCalibValue = 0.02*cmds.getAttr(distBetween+".distance")
         # add the dSoft and softIk attributes on the controller:
         cmds.addAttr(ctrlName, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
@@ -67,7 +67,7 @@ class SoftIkClass(object):
         lenghtOutputMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Output_MD")
         softIkRigScaleMD = cmds.createNode("multiplyDivide", name=userName+"_SoftIk_RigScale_MD")
         softIkRigScaleClp = cmds.createNode("clamp", name=userName+"_SoftIk_RigScale_Clp")
-        self.toIDList.extend([self.calibrateMD, softRmV, daMD, xMinusDaPMA, negateXMinusMD, divByDSoftMD, powEMD, oneMinusPowEPMD, timesDSoftMD, plusDAPMA, daCnd, distDiffPMA, lengthStartMD, lenghtOutputMD, softIkRigScaleMD, softIkRigScaleClp])
+        self.to_ids.extend([self.calibrateMD, softRmV, daMD, xMinusDaPMA, negateXMinusMD, divByDSoftMD, powEMD, oneMinusPowEPMD, timesDSoftMD, plusDAPMA, daCnd, distDiffPMA, lengthStartMD, lenghtOutputMD, softIkRigScaleMD, softIkRigScaleClp])
         
         # set default values and operations:
         cmds.setAttr(powEMD+".input1X", 2.718281828)
@@ -124,7 +124,7 @@ class SoftIkClass(object):
             softRatioMD = cmds.createNode("multiplyDivide", name=userName+"_Soft_Ratio_MD")
             disableFkStretchMD = cmds.createNode("multiplyDivide", name=userName+"_DisableFkStretch_MD")
             stretchBC = cmds.createNode("blendColors", name=userName+"_Stretch_BC")
-            self.toIDList.extend([softRatioMD, disableFkStretchMD, stretchBC])
+            self.to_ids.extend([softRatioMD, disableFkStretchMD, stretchBC])
             cmds.setAttr(softRatioMD+".operation", 2) #divide
             cmds.setAttr(stretchBC+".color2R", 1)
             cmds.connectAttr(ctrlName+".stretchable", disableFkStretchMD+".input1X", force=True)
@@ -144,5 +144,5 @@ class SoftIkClass(object):
                     cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1
         
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
         return self.calibrateMD

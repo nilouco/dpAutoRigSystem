@@ -43,7 +43,7 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
         
         
     def build_tool(self, *args):
-        self.toIDList = []
+        self.to_ids = []
         handCtrlList = []
         
         # find nodes
@@ -64,7 +64,7 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
                                     if not cmds.objExists(fingerGrp):
                                         fingerGrp = cmds.group(side+finger+"_"+str(n).zfill(2)+"_Ctrl", name=side+finger+"_%02d_Pose_Grp"%(n))
                                         cmds.xform(fingerGrp, rotatePivot=cmds.xform(side+finger+"_"+str(n).zfill(2)+"_Ctrl", query=True, rotatePivot=True, worldSpace=True), worldSpace=True)
-                                        self.toIDList.append(fingerGrp)
+                                        self.to_ids.append(fingerGrp)
                                     # Curl
                                     cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.curlName, driverValue=-1, value=-90)
                                     cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.curlName, driverValue=0, value=0)
@@ -112,8 +112,8 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
                     newDrivenKeyList = currentDrivenKeyList
                     if self.oldDrivenKeyList:
                         newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))
-                    self.toIDList.extend(newDrivenKeyList)
-                    self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+                    self.to_ids.extend(newDrivenKeyList)
+                    self.ar.customAttr.addAttr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state: #verbose
                         cmds.select(handCtrlList)
                         self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)

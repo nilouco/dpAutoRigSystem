@@ -217,7 +217,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 cmds.setAttr(foot.cvRFFLoc+".translateZ", 1)
                 # parent back foot guide to back leg ankle guide:
                 cmds.parent(back_foot_guide, limb.cvExtremLoc, absolute=True)
-                foot.checkFatherMirror()
+                foot.check_father_mirror()
                 cmds.refresh()
 
                 if user_choice == complete:
@@ -242,7 +242,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe1 guide to foot middle guide:
                     cmds.parent(back_toe_1_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName+backName)
@@ -265,7 +265,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe2 guide to foot middle guide:
                     cmds.parent(back_toe_2_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName+backName)
@@ -288,7 +288,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe3 guide to foot middle guide:
                     cmds.parent(back_toe_3_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName+backName)
@@ -311,7 +311,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe4 guide to foot middle guide:
                     cmds.parent(back_toe_4_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                 
                 # working with FRONT LEG (A) system:
@@ -370,7 +370,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                 cmds.setAttr(foot.cvRFFLoc+".translateZ", 1)
                 # parent front foot guide to front leg ankle guide:
                 cmds.parent(front_foot_guide, limb.cvExtremLoc, absolute=True)
-                foot.checkFatherMirror()
+                foot.check_father_mirror()
                 cmds.refresh()
                 
                 if user_choice == complete:
@@ -395,7 +395,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe1 guide to foot middle guide:
                     cmds.parent(front_toe_1_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName+frontName)
@@ -418,7 +418,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe2 guide to foot middle guide:
                     cmds.parent(front_toe_2_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
                     
                     self.ar.utils.setProgress(doingName+toeName+frontName)
@@ -441,7 +441,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe31 guide to foot middle guide:
                     cmds.parent(front_toe_3_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
 
                     self.ar.utils.setProgress(doingName+toeName+frontName)
@@ -464,7 +464,7 @@ class Quadruped(dpBaseLibrary.BaseLibrary):
                     fkline.displayAnnotation(0)
                     # parent toe4 guide to foot middle guide:
                     cmds.parent(front_toe_4_guide, foot.cvRFFLoc, absolute=True)
-                    fkline.checkFatherMirror()
+                    fkline.check_father_mirror()
                     cmds.refresh()
 
 

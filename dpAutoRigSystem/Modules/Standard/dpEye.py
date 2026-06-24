@@ -40,29 +40,29 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
         # adding extra attributes
-        cmds.addAttr(self.moduleGrp, longName="aimDirection", attributeType='enum', enumName="+X:-X:+Y:-Y:+Z:-Z")
-        cmds.setAttr(self.moduleGrp+".aimDirection", 4)
-        cmds.addAttr(self.moduleGrp, longName="aimDirectionName", dataType='string')
-        cmds.setAttr(self.moduleGrp+".aimDirectionName", "Z", type="string")
-        cmds.addAttr(self.moduleGrp, longName="aimDirectionPositive", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".aimDirectionPositive", 1)
-        cmds.addAttr(self.moduleGrp, longName=EYELID, attributeType='bool')
-        cmds.setAttr(self.moduleGrp+"."+EYELID, 1)
-        cmds.addAttr(self.moduleGrp, longName=IRIS, attributeType='bool')
-        cmds.setAttr(self.moduleGrp+"."+IRIS, 1)
-        cmds.addAttr(self.moduleGrp, longName=PUPIL, attributeType='bool')
-        cmds.setAttr(self.moduleGrp+"."+PUPIL, 1)
-        cmds.addAttr(self.moduleGrp, longName=SPEC, attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName=PIVOT, attributeType='bool')
-        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
-        cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="aimDirection", attributeType='enum', enumName="+X:-X:+Y:-Y:+Z:-Z")
+        cmds.setAttr(self.guide_base+".aimDirection", 4)
+        cmds.addAttr(self.guide_base, longName="aimDirectionName", dataType='string')
+        cmds.setAttr(self.guide_base+".aimDirectionName", "Z", type="string")
+        cmds.addAttr(self.guide_base, longName="aimDirectionPositive", attributeType='bool')
+        cmds.setAttr(self.guide_base+".aimDirectionPositive", 1)
+        cmds.addAttr(self.guide_base, longName=EYELID, attributeType='bool')
+        cmds.setAttr(self.guide_base+"."+EYELID, 1)
+        cmds.addAttr(self.guide_base, longName=IRIS, attributeType='bool')
+        cmds.setAttr(self.guide_base+"."+IRIS, 1)
+        cmds.addAttr(self.guide_base, longName=PUPIL, attributeType='bool')
+        cmds.setAttr(self.guide_base+"."+PUPIL, 1)
+        cmds.addAttr(self.guide_base, longName=SPEC, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName=PIVOT, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
         # main joint (center of eye globe)
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuide1, self.guide_base, relative=True)
         # eyelid
         self.jEyelid = cmds.joint(name=self.guideName+"_JEyelid", radius=0.001)
         # end joints (to aim)
@@ -72,7 +72,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.cvUpLocGuide = cmds.spaceLocator(name=self.cvEndJoint+"_UpLoc")[0]
         self.cvEndJointZero = cmds.group(self.cvEndJoint, self.cvUpLocGuide, name=self.cvEndJoint+"_Grp")
         self.cvEndBackRotGrp = cmds.group(self.cvEndJointZero, name=self.cvEndJointZero+"_Back_Grp")
-        cmds.parent(self.cvEndBackRotGrp, self.moduleGrp)
+        cmds.parent(self.cvEndBackRotGrp, self.guide_base)
         cmds.setAttr(self.cvEndJoint+".tz", 13)
         cmds.setAttr(self.cvUpLocGuide+".ty", 13)
         cmds.setAttr(self.cvUpLocGuide+".visibility", 0)
@@ -115,7 +115,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.setAttr(self.cvSpecularLoc+".tz", 1)
         cmds.setAttr(self.cvSpecularLoc+".visibility", 0)
         # hierarchy mounting
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc, self.guide_base)
         cmds.parent(self.jUpperEyelid, self.jLowerEyelid, self.jEyelid)
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_PaC")
@@ -139,7 +139,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # getting value:
         currentEyelidValue = cmds.checkBox(self.eyelidCB, query=True, value=True)
         # setting values:
-        cmds.setAttr(self.moduleGrp+".eyelid", currentEyelidValue)
+        cmds.setAttr(self.guide_base+".eyelid", currentEyelidValue)
         cmds.setAttr(self.cvUpperEyelidLoc+".visibility", currentEyelidValue)
         cmds.setAttr(self.cvLowerEyelidLoc+".visibility", currentEyelidValue)
         cmds.setAttr(self.jEyelid+".visibility", currentEyelidValue)
@@ -153,7 +153,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Set the attribute value for specular.
         """
         self.cvSpecularLoc = self.guideName+"_SpecularLoc"
-        cmds.setAttr(self.moduleGrp+".specular", cmds.checkBox(self.specCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".specular", cmds.checkBox(self.specCB, query=True, value=True))
         cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox(self.specCB, query=True, value=False))
 
 
@@ -161,7 +161,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Set the attribute value for eyelid center pivot.
         """
         self.cvLidPivotLoc = self.guideName+"_LidPivotLoc"
-        cmds.setAttr(self.moduleGrp+".lidPivot", cmds.checkBox(self.lidPivotCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".lidPivot", cmds.checkBox(self.lidPivotCB, query=True, value=True))
         cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", cmds.checkBox(self.lidPivotCB, query=True, value=False))
 
 
@@ -169,7 +169,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Set the attribute value for iris.
         """
         self.cvIrisLoc = self.guideName+"_IrisLoc"
-        cmds.setAttr(self.moduleGrp+".iris", cmds.checkBox(self.irisCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".iris", cmds.checkBox(self.irisCB, query=True, value=True))
         cmds.setAttr(self.cvIrisLoc+".visibility", cmds.checkBox(self.irisCB, query=True, value=True))
         
     
@@ -177,7 +177,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         """ Set the attribute value for pupil.
         """
         self.cvPupilLoc = self.guideName+"_PupilLoc"
-        cmds.setAttr(self.moduleGrp+".pupil", cmds.checkBox(self.pupilCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".pupil", cmds.checkBox(self.pupilCB, query=True, value=True))
         cmds.setAttr(self.cvPupilLoc+".visibility", cmds.checkBox(self.pupilCB, query=True, value=True))
         
     
@@ -190,11 +190,11 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.jGuideEnd = self.guideName+"_JGuideEnd"
             self.cvEndJointZero = self.guideName+"_JointEnd_Grp"
             # setting attributes:
-            cmds.setAttr(self.moduleGrp+".aimDirection", self.aimMenuItemList.index(item))
-            cmds.setAttr(self.moduleGrp+".aimDirectionName", item[1], type='string')
-            cmds.setAttr(self.moduleGrp+".aimDirectionPositive", 0)
+            cmds.setAttr(self.guide_base+".aimDirection", self.aimMenuItemList.index(item))
+            cmds.setAttr(self.guide_base+".aimDirectionName", item[1], type='string')
+            cmds.setAttr(self.guide_base+".aimDirectionPositive", 0)
             if item[0] == "+":
-                cmds.setAttr(self.moduleGrp+".aimDirectionPositive", 1)
+                cmds.setAttr(self.guide_base+".aimDirectionPositive", 1)
             # changing module aim guides:
             cmds.setAttr(self.cvEndJointZero+".rotateX", 0)
             cmds.setAttr(self.cvEndJointZero+".rotateY", 0)
@@ -296,7 +296,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         eyelidFixMiddleTZMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_MiddleTZ_MD")
         eyelidFixMiddleScaleClp = cmds.createNode('clamp', name=baseName+"_Fix_Middle_Clp")
         eyelidFollowRev = cmds.createNode('reverse', name=baseName+"_Follow_Rev")
-        self.toIDList.extend([eyelidIntensityMD, eyelidInvertMD, eyelidInvertXCnd, eyelidInvertYCnd, eyelidInvertYMiddleCnd, eyelidInvertFixMiddleCnd, eyelidPresetMD, eyelidMiddleMD, eyelidMiddleCnd, eyelidFixMD,
+        self.to_ids.extend([eyelidIntensityMD, eyelidInvertMD, eyelidInvertXCnd, eyelidInvertYCnd, eyelidInvertYMiddleCnd, eyelidInvertFixMiddleCnd, eyelidPresetMD, eyelidMiddleMD, eyelidMiddleCnd, eyelidFixMD,
                               eyelidFixPMA, eyelidFixModulusXCnd, eyelidFixModulusYMiddleCnd, eyelidFixModulusYCnd, eyelidFixNegativeMD, eyelidReduceOpenMiddleMD, eyelidInvertOpenMiddleMD, eyelidFixInvertOpenMiddleMD,
                               eyelidFixMiddleMD, eyelidFixMiddleTZMD, eyelidFixMiddleScaleClp, eyelidFollowRev])
         # seting up the node attributes:
@@ -462,16 +462,16 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.parent(ctrlZero[0], self.baseEyeCtrl)
         # fixing flip mirror:
         if s == 1:
-            if cmds.getAttr(self.moduleGrp+".flip") == 1:
-                if not "X" == cmds.getAttr(self.moduleGrp+".aimDirectionName"):
+            if cmds.getAttr(self.guide_base+".flip") == 1:
+                if not "X" == cmds.getAttr(self.guide_base+".aimDirectionName"):
                     cmds.setAttr(ctrlZero[0]+".scaleX", -1)
                 else:
                     cmds.setAttr(ctrlZero[0]+".scaleX", 1)
-                if not "Y" == cmds.getAttr(self.moduleGrp+".aimDirectionName"):
+                if not "Y" == cmds.getAttr(self.guide_base+".aimDirectionName"):
                     cmds.setAttr(ctrlZero[0]+".scaleY", -1)
                 else:
                     cmds.setAttr(ctrlZero[0]+".scaleY", 1)
-                if not "Z" == cmds.getAttr(self.moduleGrp+".aimDirectionName"):
+                if not "Z" == cmds.getAttr(self.guide_base+".aimDirectionName"):
                     cmds.setAttr(ctrlZero[0]+".scaleZ", -1)
                 else:
                     cmds.setAttr(ctrlZero[0]+".scaleZ", 1)
@@ -484,10 +484,10 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         return ctrl
     
     
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # create lists to export:
             self.eyeScaleGrpList, self.irisCtrlList, self.pupilCtrlList = [], [], []
             self.hasIris = False
@@ -503,7 +503,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.eyeGrp = cmds.group(self.eyeCtrl, name=self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Grp")
             self.utils.zeroOut([self.eyeCtrl])
             self.upLocGrp = cmds.group(name=self.userGuideName+"_UpLoc_Grp", empty=True)
-            self.toIDList.append(self.upLocGrp)
+            self.to_ids.append(self.upLocGrp)
             # run for all sides:
             for s, side in enumerate(self.sideList):
                 cmds.select(clear=True)
@@ -540,7 +540,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 eyeZeroOffsetGrp = cmds.listRelatives(eyeZeroList[1], children=True)[0]
                 # fixing flip mirror:
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    if cmds.getAttr(self.guide_base+".flip") == 1:
                         cmds.setAttr(eyeZeroList[0]+".scaleX", -1)
                         cmds.setAttr(eyeZeroList[0]+".scaleY", -1)
                         cmds.setAttr(eyeZeroList[0]+".scaleZ", -1)                        
@@ -642,7 +642,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.addAttr(self.eyeSpecCtrl, longName=self.ar.data.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
                     followSPC = cmds.parentConstraint(self.fkEyeSubCtrl, self.baseEyeCtrl, eyeSpecZeroGrp, maintainOffset=True, name=eyeSpecZeroGrp+"_PaC")[0]
                     eyeSpecFollowRev = cmds.createNode('reverse', name=side+self.userGuideName+"_Spec_Follow_Rev")
-                    self.toIDList.append(eyeSpecFollowRev)
+                    self.to_ids.append(eyeSpecFollowRev)
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.ar.data.lang['c032_follow'], followSPC+"."+self.fkEyeSubCtrl+"W0", force=True)
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.ar.data.lang['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
                     cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
@@ -659,7 +659,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.scaleConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=True, name=self.eyeSpecScaleJnt+"_ScC")
                     # fixing flip mirror:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                        if cmds.getAttr(self.guide_base+".flip") == 0:
                             cmds.xform(self.eyeSpecScaleZeroGrp, translation=noWSLEyeSpecScaleZeroGrpData["translation"], worldSpace=False)
                         else:
                             translationList, tempList = [], []
@@ -699,7 +699,7 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         if self.addCorrective:
                             cmds.setAttr(self.lowerEyelidCtrl.replace("_Ctrl", "_00_Net")+".inputEnd", self.cValue)
                     else: #right
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                        if cmds.getAttr(self.guide_base+".flip") == 0:
                             cmds.setAttr(self.upperEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
                             cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
                             cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
@@ -740,28 +740,26 @@ class Eye(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.utils.addCustomAttr([self.eyeGrp, self.upLocGrp, self.lUpGrpLoc, self.eyeScaleGrp], self.utils.ignoreTransformIOAttr)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids, descendents=True) #dpID
         
         
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-                                    "module": {
-                                                "eyeCtrl"     : self.eyeCtrl,
-                                                "eyeGrp"      : self.eyeGrp,
-                                                "upLocGrp"    : self.upLocGrp,
-                                                "eyeScaleGrp" : self.eyeScaleGrpList,
-                                                "irisCtrl"    : self.irisCtrlList,
-                                                "pupilCtrl"   : self.pupilCtrlList,
-                                                "hasIris"     : self.hasIris,
-                                                "hasPupil"    : self.hasPupil,
-                                              }
+        self.integrated = {
+                                        "eyeCtrl"     : self.eyeCtrl,
+                                        "eyeGrp"      : self.eyeGrp,
+                                        "upLocGrp"    : self.upLocGrp,
+                                        "eyeScaleGrp" : self.eyeScaleGrpList,
+                                        "irisCtrl"    : self.irisCtrlList,
+                                        "pupilCtrl"   : self.pupilCtrlList,
+                                        "hasIris"     : self.hasIris,
+                                        "hasPupil"    : self.hasPupil,
                                     }

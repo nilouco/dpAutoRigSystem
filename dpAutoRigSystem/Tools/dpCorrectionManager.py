@@ -395,7 +395,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                 nodeList = cmds.ls(selection=True, flatten=True)
             if nodeList:
                 if len(nodeList) == 2:
-                    self.toIDList = []
+                    self.to_ids = []
                     origNode = nodeList[0]
                     actionNode = nodeList[1]
                     cmds.undoInfo(openChunk=True)
@@ -475,7 +475,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                     # create corrective, interpolation and rigScale nodes:
                     correctiveMD = cmds.createNode("multiplyDivide", name=correctionName+"_Corrective_MD")
                     interpolationPMA = cmds.createNode("plusMinusAverage", name=correctionName+"_Interpolation_PMA")
-                    self.toIDList.extend([self.net, correctiveMD, interpolationPMA])
+                    self.to_ids.extend([self.net, correctiveMD, interpolationPMA])
                     cmds.connectAttr(correctiveMD+".message", self.net+".correctiveMD", force=True)
                     cmds.connectAttr(interpolationPMA+".message", self.net+".interpolationPMA", force=True)
                     cmds.connectAttr(self.net+".corrective", correctiveMD+".input2X", force=True)
@@ -496,7 +496,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                         overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
                         inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
                         outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
-                        self.toIDList.extend([extractAngleMM, extractAngleDM, extractAngleQtE, extractAngleMD, angleUnitConversionMD, angleAxisChc, smallerThanOneCnd, overZeroCnd, inputRmV, outputSR])
+                        self.to_ids.extend([extractAngleMM, extractAngleDM, extractAngleQtE, extractAngleMD, angleUnitConversionMD, angleAxisChc, smallerThanOneCnd, overZeroCnd, inputRmV, outputSR])
                         cmds.setAttr(extractAngleMD+".operation", 2)
                         cmds.setAttr(smallerThanOneCnd+".operation", 5) #less or equal
                         cmds.setAttr(smallerThanOneCnd+".secondTerm", 1)
@@ -565,7 +565,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                         distanceAllCnd = cmds.createNode("condition", name=correctionName+"_ExtractDistance_Cnd")
                         distanceAxisXCnd = cmds.createNode("condition", name=correctionName+"_ExtractDistance_AxisX_Cnd")
                         distanceAxisYZCnd = cmds.createNode("condition", name=correctionName+"_ExtractDistance_AxisYZ_Cnd")
-                        self.toIDList.extend([distanceScaleMD, outputRmV, distBet, distanceAxisExtractPMA, distanceAllCnd, distanceAxisXCnd, distanceAxisYZCnd])
+                        self.to_ids.extend([distanceScaleMD, outputRmV, distBet, distanceAxisExtractPMA, distanceAllCnd, distanceAxisXCnd, distanceAxisYZCnd])
                         # connect locators source position values to extract distance from them
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionX", distBet+".point1X")
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionY", distBet+".point1Y")
@@ -620,7 +620,7 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                         cmds.connectAttr(distanceAxisXCnd+".message", self.net+".distanceAxisXCnd", force=True)
                         cmds.connectAttr(distanceAxisYZCnd+".message", self.net+".distanceAxisYZCnd", force=True)
                     
-                    self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+                    self.ar.customAttr.addAttr(0, self.to_ids) #dpID
                     self.ar.customAttr.addAttr(0, [self.correctionManagerDataGrp], descendents=True) #dpID
                     # update UI                    
                     if self.ar.data.ui_state:

@@ -1,7 +1,7 @@
 {
     "dpGuide_000_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc2",
@@ -155,7 +155,7 @@
     },
     "dpGuide_001_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Neck0",
@@ -788,7 +788,7 @@
     },
     "dpGuide_002_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",
@@ -1053,7 +1053,7 @@
     },
     "dpGuide_003_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Before",
@@ -1281,7 +1281,7 @@
     },
     "dpGuide_004_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Foot",
@@ -1551,7 +1551,7 @@
     },
     "dpGuide_005_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Before",
@@ -1779,7 +1779,7 @@
     },
     "dpGuide_006_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "Foot",
@@ -2049,7 +2049,7 @@
     },
     "dpGuide_007_Net": {
         "BeforeData": [
-            "moduleGrp",
+            "main",
             "radiusCtrl",
             "annotation",
             "JointLoc1",

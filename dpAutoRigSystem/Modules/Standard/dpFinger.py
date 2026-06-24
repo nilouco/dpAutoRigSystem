@@ -33,15 +33,15 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def createGuide(self, *args):
         dpBaseStandard.BaseStandard.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
-        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 1)
-        cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.setAttr(self.guide_base+".articulation", 1)
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
 
         self.cvJointLoc1 = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        cmds.parent(self.jGuide1, self.guide_base, relative=True)
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc2", r=0.25, d=1, guide=True)
         cmds.parent(self.cvJointLoc, self.cvJointLoc1, relative=True)
         cmds.setAttr(self.cvJointLoc+".translateZ", 1)
@@ -60,7 +60,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
-        cmds.parent(self.cvJointLoc1, self.moduleGrp)
+        cmds.parent(self.cvJointLoc1, self.guide_base)
         cmds.parent(self.jGuideEnd, self.jGuide1)
         self.ar.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
@@ -74,12 +74,12 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.cvBaseJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc0", r=0.2, d=1, guide=True)
         cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
         cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
-        cmds.parent(self.cvBaseJoint, self.moduleGrp)
+        cmds.parent(self.cvBaseJoint, self.guide_base)
         self.addNodeToGuideNet([self.cvBaseJoint], ["JointLoc0"])
 
         # transform cvLocs in order to put as a good finger guide:
-        cmds.setAttr(self.moduleGrp+".rotateX", 90)
-        cmds.setAttr(self.moduleGrp+".rotateZ", 90)
+        cmds.setAttr(self.guide_base+".rotateX", 90)
+        cmds.setAttr(self.guide_base+".rotateZ", 90)
 
 
     def changeJointNumber(self, enteredNJoints, *args):
@@ -96,7 +96,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             self.enteredNJoints = enteredNJoints
         if self.enteredNJoints >= 2:
             # get the number of joints existing:
-            self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+            self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
             # start analisys the difference between values:
             if self.enteredNJoints != self.currentNJoints:
                 # unparent temporarely the Ends:
@@ -140,12 +140,12 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.parent(self.cvEndJoint, self.cvJointLoc)
                 cmds.setAttr(self.cvEndJoint+".tz", 1.3)
                 cmds.parent(self.jGuideEnd, self.jGuide)
-                # actualise the nJoints in the moduleGrp:
-                cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+                # actualise the nJoints in the main:
+                cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 # re-build the preview mirror:
                 dpBaseLayout.BaseLayout.createPreviewMirror(self)
-            cmds.select(self.moduleGrp)
+            cmds.select(self.guide_base)
         else:
             self.changeJointNumber(2)
 
@@ -160,10 +160,10 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         return presetList, invertList
 
 
-    def rigModule(self, *args):
-        dpBaseStandard.BaseStandard.rigModule(self)
+    def rig_me(self, *args):
+        dpBaseStandard.BaseStandard.rig_me(self)
         # verify if the guide exists:
-        if cmds.objExists(self.moduleGrp):
+        if cmds.objExists(self.guide_base):
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             self.addCorrective = self.getModuleAttr("corrective")
@@ -214,14 +214,14 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         if not cmds.objExists(self.fingerCtrl+'.ikFkBlend'):
                             cmds.addAttr(self.fingerCtrl, longName="ikFkBlend", attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                             self.ikFkRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_ikFk_Rev")
-                            self.toIDList.append(self.ikFkRevNode)
+                            self.to_ids.append(self.ikFkRevNode)
                             cmds.connectAttr(self.fingerCtrl+".ikFkBlend", self.ikFkRevNode+".inputX", force=True)
                         if not cmds.objExists(self.fingerCtrl+'.scaleCompensate'):
                             cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=False)
                             cmds.setAttr(self.fingerCtrl+".scaleCompensate", channelBox=True)
                             scaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_%02d_ScaleCompensate_MD"%(n))
                             self.scaleCompensateCond = cmds.createNode("condition", name=side+self.userGuideName+"_%02d_ScaleCompensate_Cnd"%(n))
-                            self.toIDList.extend([scaleCompensateMD, self.scaleCompensateCond])
+                            self.to_ids.extend([scaleCompensateMD, self.scaleCompensateCond])
                             cmds.connectAttr(self.fingerCtrl+".scaleCompensate", scaleCompensateMD+".input1X", force=True)
                             cmds.connectAttr(self.ikFkRevNode+".outputX", scaleCompensateMD+".input2X", force=True)
                             cmds.connectAttr(scaleCompensateMD+".outputX", self.scaleCompensateCond+".firstTerm", force=True)
@@ -448,7 +448,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.setAttr(self.stretchCond+".secondTerm", 1)
                 cmds.setAttr(self.stretchCond+".operation", 2)
                 cmds.connectAttr(stretchScaleMD+".outputX", self.stretchCond+".colorIfTrueR", force=True)
-                self.toIDList.extend([stretchNormMD, ikStretchZUniformScaleMD, stretchScaleMD, self.stretchCond])
+                self.to_ids.extend([stretchNormMD, ikStretchZUniformScaleMD, stretchScaleMD, self.stretchCond])
 
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
@@ -462,7 +462,7 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
                         cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkParentConst+"."+ikJoint+"W0", force=True)
                         scaleBC = cmds.createNode("blendColors", name=skinJoint+"_BC")
-                        self.toIDList.append(scaleBC)
+                        self.to_ids.append(scaleBC)
                         cmds.connectAttr(fkJoint+".scaleX", scaleBC+".color1R", force=True)
                         cmds.connectAttr(fkJoint+".scaleY", scaleBC+".color1G", force=True)
                         cmds.connectAttr(fkJoint+".scaleZ", scaleBC+".color1B", force=True)
@@ -505,23 +505,21 @@ class Finger(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
-            self.serializeGuide()
+            self.serialize_guide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.toIDList) #dpID
+        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
 
 
     def integratingInfo(self, *args):
         dpBaseStandard.BaseStandard.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integratedActionsDic = {
-            "module": {
-                "scalableGrpList": self.scalableGrpList,
-                "ikCtrlZeroList": self.ikCtrlZeroList,
-                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
-            }
-        }
+        self.integrated = {
+                                        "scalableGrpList": self.scalableGrpList,
+                                        "ikCtrlZeroList": self.ikCtrlZeroList,
+                                        "correctiveCtrlGrpList": self.correctiveCtrlGrpList
+                                    }

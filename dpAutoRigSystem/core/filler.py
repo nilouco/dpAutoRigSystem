@@ -283,7 +283,7 @@ class UIFiller(object):
             It uses a recursive method to remove imported of imported guides.
         """
         imported_namespaces = []
-        current_custom_names = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances)))
+        current_custom_names = list(map(lambda guideModule : cmds.getAttr(guideModule.guide_base+".customName"), self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)))
         cmds.namespace(setNamespace=':')
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaces:
@@ -331,10 +331,10 @@ class UIFiller(object):
         """
         if not self.ar.data.standard_instances:
             self.fill_created_guides()
-        for item in self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances):
+        for item in self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances):
             if not item.guideNet:
                 item.createGuideNetwork()
-                print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.moduleGrp)
+                print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.guide_base)
 
 
     def check_guide_versions(self, *args):
@@ -342,8 +342,8 @@ class UIFiller(object):
         """
         if not self.ar.data.standard_instances:
             self.fill_created_guides()
-        for item in self.ar.utils.getModulesToBeRigged(self.ar.data.standard_instances):
-            if not self.ar.data.version == cmds.getAttr(item.moduleGrp+'.dpARVersion'):
+        for item in self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances):
+            if not self.ar.data.version == cmds.getAttr(item.guide_base+'.dpARVersion'):
                 self.check_guide_nets()
                 self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
                 break

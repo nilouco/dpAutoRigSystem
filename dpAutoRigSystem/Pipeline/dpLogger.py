@@ -57,28 +57,21 @@ class Logger(object):
         logText = self.lang['i014_logStart'] + '\n'
         logText += str( time.asctime( time.localtime(time.time()) ) ) + '\n\n'
         # get the number of riggedModules:
-        nRiggedModule = len(self.ar.maker.riggedModuleDic)
+        nRiggedModule = len(self.ar.maker.guides_to_rig)
         # pass for rigged module to add informations in logText:
         if nRiggedModule != 0:
+            success = 'i016_success'
             if nRiggedModule == 1:
-                logText += str(nRiggedModule).zfill(3) + ' ' + self.lang['i015_success'] + ':\n\n'
-                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang['i015_success'] + ', thanks!\n')
-            else:
-                logText += str(nRiggedModule).zfill(3) + ' ' + self.lang['i016_success'] + ':\n\n'
-                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang['i016_success'] + ', thanks!\n')
-            riggedGuideModuleList = []
-            for riggedGuideModule in self.ar.maker.riggedModuleDic:
-                riggedGuideModuleList.append(riggedGuideModule)
-            riggedGuideModuleList.sort()
-            for riggedGuideModule in riggedGuideModuleList:
-                moduleCustomName= self.ar.maker.riggedModuleDic[riggedGuideModule]
-                if moduleCustomName == None:
-                    logText += riggedGuideModule + '\n'
-                else:
-                    logText += riggedGuideModule + " as " + moduleCustomName + '\n'
+                success = 'i015_success'
+            logText += str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ':\n\n'
+            print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ', thanks!\n')
+            for item in self.ar.maker.guides_to_rig:
+                logText += item.guideNamespace
+                if item.customName:
+                    logText += " as " + item.customName
+                logText += '\n'
         else:
             logText += self.lang['i017_nothing'] + '\n'
         logText += '\n' + self.lang['i018_thanks']
-        
         # creating a info window to show the log:
         self.infoWin('i019_log', None, logText, 'center', 250, min((350, 150+(nRiggedModule*13))))
