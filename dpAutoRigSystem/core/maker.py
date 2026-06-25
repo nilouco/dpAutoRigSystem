@@ -11,7 +11,6 @@ class Maker(object):
         self.ar = ar
 
 
-
     def create_raw_guide(self, module, *args):
         #
         # TODO: review after rename modules without dp
@@ -23,10 +22,10 @@ class Maker(object):
         return [mod, mod.build_raw_guide()]
 
 
+    # ...
     #
     # TODO: it isn't used yet.
     #
-
     def set_new_guide(self, module, name, t=(0, 0, 0), r=(0, 0, 0), s=(1, 1, 1), size=1, radius=2, end=1.3, mirror=None, flip=1, deformed=0, indSkin=0, annot=1, annot_pos=None, parent=None, progress=True):
         """ Creates a new standard guide, set the given values and returns a list with the imported module and the created guide.
         """
@@ -67,6 +66,9 @@ class Maker(object):
         if parent:
             cmds.parent(guide, parent, absolute=True)
         return [mod, guide]
+    #
+    #
+    # ...
 
 
     def create_template(self, name=None, *args):
@@ -531,21 +533,22 @@ class Maker(object):
 
     def colorize_curves(self):
         # colorize all controller in yellow as a base if not find the pattern
-        ground_ctrls = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
-        left_pattern = re.compile(f"{self.ar.data.lang['p002_left']}_.*._Ctrl")
-        right_pattern = re.compile(f"{self.ar.data.lang['p003_right']}_.*._Ctrl")
-        for ctrl in self.ar.ctrls.getControlList():
-            shapes = cmds.listRelatives(ctrl, children=True, allDescendents=True, fullPath=True, type="shape")
-            if shapes:
-                if not cmds.getAttr(shapes[0]+".overrideEnabled"):
-                    if (left_pattern.match(ctrl)):
-                        self.ar.ctrls.colorShape([ctrl], "red")
-                    elif (right_pattern.match(ctrl)):
-                        self.ar.ctrls.colorShape([ctrl], "blue")
-                    elif (ctrl in ground_ctrls):
-                        self.ar.ctrls.colorShape([ctrl], "black")
-                    else:
-                        self.ar.ctrls.colorShape([ctrl], "yellow")
+        if self.ar.data.colorize_curve:
+            ground_ctrls = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
+            left_pattern = re.compile(f"{self.ar.data.lang['p002_left']}_.*._Ctrl")
+            right_pattern = re.compile(f"{self.ar.data.lang['p003_right']}_.*._Ctrl")
+            for ctrl in self.ar.ctrls.getControlList():
+                shapes = cmds.listRelatives(ctrl, children=True, allDescendents=True, fullPath=True, type="shape")
+                if shapes:
+                    if not cmds.getAttr(shapes[0]+".overrideEnabled"):
+                        if (left_pattern.match(ctrl)):
+                            self.ar.ctrls.colorShape([ctrl], "red")
+                        elif (right_pattern.match(ctrl)):
+                            self.ar.ctrls.colorShape([ctrl], "blue")
+                        elif (ctrl in ground_ctrls):
+                            self.ar.ctrls.colorShape([ctrl], "black")
+                        else:
+                            self.ar.ctrls.colorShape([ctrl], "yellow")
 
 
     def get_mirror_names(self, item):
@@ -615,8 +618,151 @@ class Maker(object):
             for corrective_grp in item.integrated['correctiveCtrlGrpList']:
                 cmds.connectAttr(f"{self.optionCtrl}.{self.ar.data.lang['c124_corrective']}Ctrls", f"{corrective_grp}.visibility", force=True)
 
-
     
+    def set_rigged_types(self):
+        # actualise the number of rigged guides by type
+        for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
+            cmds.setAttr(f"{self.masterGrp}.{guideType}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"dp{cmds.getAttr(n+'.moduleType')}" == guideType]))
+
+
+    def set_parent_tag(self):
+        missingParentTagCtrlList = [c for c in self.ar.ctrls.getControlList("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
+        holderCtrlList = self.ar.ctrls.getControlList("dpHolder")
+        allCtrlList = self.ar.ctrls.getControlList()
+        allCtrlList.extend(holderCtrlList)
+        guideSourceDic = {}
+        for ctrl in allCtrlList:
+            if "guideSource" in cmds.listAttr(ctrl):
+                guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
+        for pTagCtrl in missingParentTagCtrlList:
+            if not pTagCtrl == self.globalCtrl:
+                if "controlID" in cmds.listAttr(pTagCtrl):
+                    if not cmds.getAttr(pTagCtrl+".controlID") == "id_092_Correctives":
+                        if "guideSource" in cmds.listAttr(pTagCtrl):
+                            guideSource = cmds.getAttr(pTagCtrl+".guideSource")
+                            guideBase = guideSource.split(":")[0]+":Guide_Base"
+                            parentNode = self.hook[guideBase]['parentNode']
+                            fatherGuide = self.hook[guideBase]['fatherGuide']
+                            if parentNode:
+                                if not parentNode in guideSourceDic.keys():
+                                    parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                if not parentNode in guideSourceDic.keys():
+                                    continue
+                                foundCtrl = guideSourceDic[parentNode]
+                                if foundCtrl in holderCtrlList: #holder
+                                    guideSource = cmds.getAttr(foundCtrl+".guideSource")
+                                    guideBase = guideSource.split(":")[0]+":Guide_Base"
+                                    parentNode = self.hook[guideBase]['parentNode']
+                                    fatherGuide = self.hook[guideBase]['fatherGuide']
+                                    parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
+                                    if not parentNode in guideSourceDic.keys():
+                                        continue
+                                    foundCtrl = guideSourceDic[parentNode]
+                                if not self.hook[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                    mirrorNameList = self.hook[fatherGuide]['guideMirrorName']
+                                    if pTagCtrl.startswith(mirrorNameList[0]):
+                                        if not foundCtrl.startswith(mirrorNameList[0]):
+                                            foundCtrl = mirrorNameList[0]+foundCtrl[2:]
+                                    else:
+                                        if not foundCtrl.startswith(mirrorNameList[1]):
+                                            foundCtrl = mirrorNameList[1]+foundCtrl[2:]
+                                if cmds.objExists(foundCtrl):
+                                    cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
+                            else:
+                                cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
+
+
+    def set_option_ctrl_attrs(self):
+        # Add usefull attributes for the animators
+        if self.ar.data.supplementary_attr:
+            # defining attribute name strings:
+            generalAttr = self.ar.data.lang['c066_general']
+            vvAttr = self.ar.data.lang['c031_volumeVariation']
+            spineAttr = self.ar.data.lang['m011_spine'].lower()
+            limbAttr = self.ar.data.lang['m019_limb'].lower()
+            armAttr = self.ar.data.lang['m028_arm']
+            legAttr = self.ar.data.lang['m030_leg']
+            frontAttr = self.ar.data.lang['c056_front']
+            backAttr = self.ar.data.lang['c057_back']
+            leftAttr = self.ar.data.lang['p002_left'].lower()
+            rightAttr = self.ar.data.lang['p003_right'].lower()
+            tweaksAttr = self.ar.data.lang['m081_tweaks'].lower()
+            facialAttr = self.ar.data.lang['c059_facial'].lower()
+            
+            if not cmds.objExists(self.optionCtrl+"."+generalAttr):
+                cmds.addAttr(self.optionCtrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
+                cmds.setAttr(self.optionCtrl+"."+generalAttr, lock=True)
+            
+            # Only create if a VolumeVariation attribute is found
+            if not cmds.objExists(self.optionCtrl+"."+vvAttr):
+                if cmds.listAttr(self.optionCtrl, string="*"+vvAttr+"*"):
+                    cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
+                    cmds.setAttr(self.optionCtrl+"."+vvAttr, lock=True)
+            
+            # Only create if an IkFk attribute is found
+            if not cmds.objExists(self.optionCtrl+".ikFkBlend"):
+                if cmds.listAttr(self.optionCtrl, string="*ikFk*"):
+                    cmds.addAttr(self.optionCtrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
+                    cmds.setAttr(self.optionCtrl+".ikFkBlend", lock=True)
+            
+            if cmds.objExists(self.optionCtrl+".ikFkSnap"):
+                cmds.setAttr(self.optionCtrl+".ikFkSnap", keyable=False, channelBox=True)
+            
+            if not cmds.objExists(self.optionCtrl+".display"):
+                cmds.addAttr(self.optionCtrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
+                cmds.setAttr(self.optionCtrl+".display", lock=True)
+            
+            if not cmds.objExists(self.optionCtrl+".mesh"):
+                cmds.addAttr(self.optionCtrl, longName="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
+                cmds.connectAttr(self.optionCtrl+".mesh", self.renderGrp+".visibility", force=True)
+            
+            if not cmds.objExists(self.optionCtrl+".proxy"):
+                cmds.addAttr(self.optionCtrl, longName="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                cmds.connectAttr(self.optionCtrl+".proxy", self.proxyGrp+".visibility", force=True)
+            
+            if not cmds.objExists(self.optionCtrl+".controllers"):
+                cmds.addAttr(self.optionCtrl, longName="controllers", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                cmds.connectAttr(self.optionCtrl+".controllers", self.ctrlsVisGrp+".visibility", force=True)
+                cmds.setAttr(self.optionCtrl+".controllers", channelBox=True)
+
+            if not cmds.objExists(self.optionCtrl+".rootPivot"):
+                cmds.addAttr(self.optionCtrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                cmds.connectAttr(self.optionCtrl+".rootPivot", self.rootPivotCtrlGrp+".visibility", force=True)
+                cmds.setAttr(self.optionCtrl+".rootPivot", channelBox=True)
+
+            # try to organize Option_Ctrl attributes:
+            # get current user defined attributes:
+            currentAttrList = cmds.listAttr(self.optionCtrl, userDefined=True)
+            # clean up "_ikFkBlend" atributes:
+            if currentAttrList:
+                for cAttr in currentAttrList:
+                    if cAttr.endswith("_ikFkBlend"):
+                        if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_ikFkBlend")]):
+                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
+            # clean up "VolumeVariation" attributes:
+            if currentAttrList:
+                for cAttr in currentAttrList:
+                    if cAttr.endswith("_"+vvAttr):
+                        if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_"+vvAttr)]):
+                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
+                        
+            # list desirable Option_Ctrl attributes order:
+            desiredAttrList = [generalAttr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', vvAttr,
+            spineAttr+'Active', spineAttr, spineAttr+'001Active', spineAttr+'001', spineAttr+'002Active', spineAttr+'002',
+            limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', 'ikFkSnap', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'001Fk', spineAttr+'002Fk', 
+            leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
+            armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk", armAttr.lower()+"Fk", legAttr.lower()+"Fk", leftAttr+armAttr.lower()+"Fk", rightAttr+armAttr.lower()+"Fk",
+            leftAttr+legAttr+"Fk", rightAttr+legAttr+"Fk", leftAttr+legAttr+frontAttr+"Fk", rightAttr+legAttr+frontAttr+"Fk", leftAttr+legAttr+backAttr+"Fk", rightAttr+legAttr+backAttr+"Fk",
+            armAttr+'Fk1', legAttr+'Fk1', leftAttr+armAttr+'Fk1', rightAttr+armAttr+'Fk1', leftAttr+legAttr+'Fk1', rightAttr+legAttr+'Fk1',
+            leftAttr+legAttr+frontAttr+'Fk1', rightAttr+legAttr+frontAttr+'Fk1', leftAttr+legAttr+backAttr+'Fk1', rightAttr+legAttr+backAttr+'Fk1',
+            'tailFk', 'tailDyn', 'tail1Fk', 'tail1Dyn', 'tailFk1', 'tailDyn1', leftAttr+'TailFk', leftAttr+'TailFk1', rightAttr+'TailFk', rightAttr+'TailFk1', leftAttr+'TailDyn', leftAttr+'TailDyn1', rightAttr+'TailDyn', rightAttr+'TailDyn1',
+            'hairFk', 'hairDyn', 'hair1Fk', 'hair1Dyn', 'hairFk1', 'hairDyn1', leftAttr+'HairFk', leftAttr+'HairFk1', rightAttr+'HairFk', rightAttr+'HairFk1', leftAttr+'HairDyn', leftAttr+'HairDyn1', rightAttr+'HairDyn', rightAttr+'HairDyn1',
+            'dpAR_000Fk', 'dpAR_000Dyn', 'dpAR_001Fk', 'dpAR_001Dyn', 'dpAR_002Fk', 'dpAR_002Dyn', 
+            'dpAR_000Fk1', 'dpAR_000Dyn1', leftAttr+'dpAR_000Fk', leftAttr+'dpAR_000Fk1', rightAttr+'dpAR_000Fk', rightAttr+'dpAR_000Fk1', leftAttr+'dpAR_000Dyn', leftAttr+'dpAR_000Dyn1', rightAttr+'dpAR_000Dyn', rightAttr+'dpAR_000Dyn1',
+            'dpAR_001Fk1', 'dpAR_001Dyn1', leftAttr+'dpAR_001Fk', leftAttr+'dpAR_001Fk1', rightAttr+'dpAR_001Fk', rightAttr+'dpAR_001Fk1', leftAttr+'dpAR_001Dyn', leftAttr+'dpAR_001Dyn1', rightAttr+'dpAR_001Dyn', rightAttr+'dpAR_001Dyn1',
+            'display', 'mesh', 'proxy', 'controllers', 'bends', 'extraBends', facialAttr, tweaksAttr, 'correctiveCtrls']
+            # call method to reorder Option_Ctrl attributes:
+            self.reorderAttributes([self.optionCtrl], desiredAttrList)
 
 
     #maker
@@ -624,21 +770,18 @@ class Maker(object):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the generating process.
         """
+        self.detectedBug = False
+        self.bugMessage = self.ar.data.lang['b000_bugGeneral']
         self.hook = self.ar.utils.get_hook()
         self.before_rig_all()
         self.refresh_before_build()
-
-        # verify if there are instances of modules (guides) to rig in the scene:
         self.guides_to_rig = self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)
         if self.guides_to_rig:
             self.ar.utils.setProgress(max=len(self.guides_to_rig), addOne=False, addNumber=False)
             if not self.check_good_guide_version(self.guides_to_rig):
                 return
-            
             if self.ar.data.integrate_all:
                 self.createBaseRigNode()
-
-            # regenerate mirror information for all guides:
             self.ar.utils.clear_guide_mirror_grp()
             for item in self.guides_to_rig:
                 item.check_father_mirror()
@@ -647,228 +790,36 @@ class Maker(object):
                     self.ar.utils.setProgress('Rigging: '+str(item.customName))
                 else:
                     self.ar.utils.setProgress('Rigging: '+str(item.guideNamespace))
-                
                 item.rig_me() #rig it :)
-            
             # integrating modules together:
             if self.ar.data.integrate_all:
                 self.ar.utils.setProgress('Rigging: '+self.ar.data.lang['i010_integrateCB'])
-                
-                # prepare to show a dialog box if it finds a bug:
-                self.detectedBug = False
-                self.bugMessage = self.ar.data.lang['b000_bugGeneral']
-                
-                if self.ar.data.colorize_curve:
-                    self.colorize_curves()
-                
-                # get all parent info from rigged modules:
+                self.colorize_curves()
                 self.originedFromDic = self.ar.utils.getOriginedFromDic()
                 self.organize_hierarchy()
-                
-                # working with specific cases:
                 for item in self.guides_to_rig:
                     father = self.ar.config.get_father_instance(self.hook[item.guide_base]['fatherGuide'])
                     self.set_option_ctrl_corrective(item)
                     self.ar.composer.comp_rigged(item, father)
-
-
-
-
-
-
-
-#
-#
-# WIP ...
-#
-#
-
-                # actualise the number of rigged guides by type
-                for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-                    typeCounter = 0
-                    guideNetList = cmds.ls(selection=False, type="network")
-                    for net in guideNetList:
-                        if cmds.objExists(net+'.module_type'):
-                            dpARType = 'dp'+(cmds.getAttr(net+'.module_type'))
-                            if dpARType == guideType:
-                                typeCounter = typeCounter + 1
-                    if typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count'):
-                        cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
-                
-                # parentTag
-                missingParentTagCtrlList = [c for c in self.ar.ctrls.getControlList("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
-                holderCtrlList = self.ar.ctrls.getControlList("dpHolder")
-                allCtrlList = self.ar.ctrls.getControlList()
-                allCtrlList.extend(holderCtrlList)
-                guideSourceDic = {}
-                for ctrl in allCtrlList:
-                    if "guideSource" in cmds.listAttr(ctrl):
-                        guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
-                for pTagCtrl in missingParentTagCtrlList:
-                    if not pTagCtrl == self.globalCtrl:
-                        if "controlID" in cmds.listAttr(pTagCtrl):
-                            if not cmds.getAttr(pTagCtrl+".controlID") == "id_092_Correctives":
-                                if "guideSource" in cmds.listAttr(pTagCtrl):
-                                    guideSource = cmds.getAttr(pTagCtrl+".guideSource")
-                                    guideBase = guideSource.split(":")[0]+":Guide_Base"
-                                    parentNode = self.hook[guideBase]['parentNode']
-                                    fatherGuide = self.hook[guideBase]['fatherGuide']
-                                    if parentNode:
-                                        if not parentNode in guideSourceDic.keys():
-                                            parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
-                                        if not parentNode in guideSourceDic.keys():
-                                            continue
-                                        foundCtrl = guideSourceDic[parentNode]
-                                        if foundCtrl in holderCtrlList: #holder
-                                            guideSource = cmds.getAttr(foundCtrl+".guideSource")
-                                            guideBase = guideSource.split(":")[0]+":Guide_Base"
-                                            parentNode = self.hook[guideBase]['parentNode']
-                                            fatherGuide = self.hook[guideBase]['fatherGuide']
-                                            parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
-                                            if not parentNode in guideSourceDic.keys():
-                                                continue
-                                            foundCtrl = guideSourceDic[parentNode]
-                                        if not self.hook[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
-                                            mirrorNameList = self.hook[fatherGuide]['guideMirrorName']
-                                            if pTagCtrl.startswith(mirrorNameList[0]):
-                                                if not foundCtrl.startswith(mirrorNameList[0]):
-                                                    foundCtrl = mirrorNameList[0]+foundCtrl[2:]
-                                            else:
-                                                if not foundCtrl.startswith(mirrorNameList[1]):
-                                                    foundCtrl = mirrorNameList[1]+foundCtrl[2:]
-                                        if cmds.objExists(foundCtrl):
-                                            cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
-                                    else:
-                                        cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
-
-
-            # Add usefull attributes for the animators
-            if self.ar.data.integrate_all and self.ar.data.supplementary_attr:
-                # defining attribute name strings:
-                generalAttr = self.ar.data.lang['c066_general']
-                vvAttr = self.ar.data.lang['c031_volumeVariation']
-                spineAttr = self.ar.data.lang['m011_spine'].lower()
-                limbAttr = self.ar.data.lang['m019_limb'].lower()
-                armAttr = self.ar.data.lang['m028_arm']
-                legAttr = self.ar.data.lang['m030_leg']
-                frontAttr = self.ar.data.lang['c056_front']
-                backAttr = self.ar.data.lang['c057_back']
-                leftAttr = self.ar.data.lang['p002_left'].lower()
-                rightAttr = self.ar.data.lang['p003_right'].lower()
-                tweaksAttr = self.ar.data.lang['m081_tweaks'].lower()
-                facialAttr = self.ar.data.lang['c059_facial'].lower()
-                
-                if not cmds.objExists(self.optionCtrl+"."+generalAttr):
-                    cmds.addAttr(self.optionCtrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
-                    cmds.setAttr(self.optionCtrl+"."+generalAttr, lock=True)
-                
-                # Only create if a VolumeVariation attribute is found
-                if not cmds.objExists(self.optionCtrl+"."+vvAttr):
-                    if cmds.listAttr(self.optionCtrl, string="*"+vvAttr+"*"):
-                        cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
-                        cmds.setAttr(self.optionCtrl+"."+vvAttr, lock=True)
-                
-                # Only create if an IkFk attribute is found
-                if not cmds.objExists(self.optionCtrl+".ikFkBlend"):
-                    if cmds.listAttr(self.optionCtrl, string="*ikFk*"):
-                        cmds.addAttr(self.optionCtrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
-                        cmds.setAttr(self.optionCtrl+".ikFkBlend", lock=True)
-                
-                if cmds.objExists(self.optionCtrl+".ikFkSnap"):
-                    cmds.setAttr(self.optionCtrl+".ikFkSnap", keyable=False, channelBox=True)
-                
-                if not cmds.objExists(self.optionCtrl+".display"):
-                    cmds.addAttr(self.optionCtrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
-                    cmds.setAttr(self.optionCtrl+".display", lock=True)
-                
-                if not cmds.objExists(self.optionCtrl+".mesh"):
-                    cmds.addAttr(self.optionCtrl, longName="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
-                    cmds.connectAttr(self.optionCtrl+".mesh", self.renderGrp+".visibility", force=True)
-                
-                if not cmds.objExists(self.optionCtrl+".proxy"):
-                    cmds.addAttr(self.optionCtrl, longName="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                    cmds.connectAttr(self.optionCtrl+".proxy", self.proxyGrp+".visibility", force=True)
-                
-                if not cmds.objExists(self.optionCtrl+".controllers"):
-                    cmds.addAttr(self.optionCtrl, longName="controllers", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                    cmds.connectAttr(self.optionCtrl+".controllers", self.ctrlsVisGrp+".visibility", force=True)
-                    cmds.setAttr(self.optionCtrl+".controllers", channelBox=True)
-
-                if not cmds.objExists(self.optionCtrl+".rootPivot"):
-                    cmds.addAttr(self.optionCtrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                    cmds.connectAttr(self.optionCtrl+".rootPivot", self.rootPivotCtrlGrp+".visibility", force=True)
-                    cmds.setAttr(self.optionCtrl+".rootPivot", channelBox=True)
-
-                # try to organize Option_Ctrl attributes:
-                # get current user defined attributes:
-                currentAttrList = cmds.listAttr(self.optionCtrl, userDefined=True)
-                # clean up "_ikFkBlend" atributes:
-                if currentAttrList:
-                    for cAttr in currentAttrList:
-                        if cAttr.endswith("_ikFkBlend"):
-                            if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_ikFkBlend")]):
-                                cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
-                # clean up "VolumeVariation" attributes:
-                if currentAttrList:
-                    for cAttr in currentAttrList:
-                        if cAttr.endswith("_"+vvAttr):
-                            if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_"+vvAttr)]):
-                                cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
-                            
-                # list desirable Option_Ctrl attributes order:
-                desiredAttrList = [generalAttr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', vvAttr,
-                spineAttr+'Active', spineAttr, spineAttr+'001Active', spineAttr+'001', spineAttr+'002Active', spineAttr+'002',
-                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', 'ikFkSnap', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'001Fk', spineAttr+'002Fk', 
-                leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
-                armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk", armAttr.lower()+"Fk", legAttr.lower()+"Fk", leftAttr+armAttr.lower()+"Fk", rightAttr+armAttr.lower()+"Fk",
-                leftAttr+legAttr+"Fk", rightAttr+legAttr+"Fk", leftAttr+legAttr+frontAttr+"Fk", rightAttr+legAttr+frontAttr+"Fk", leftAttr+legAttr+backAttr+"Fk", rightAttr+legAttr+backAttr+"Fk",
-                armAttr+'Fk1', legAttr+'Fk1', leftAttr+armAttr+'Fk1', rightAttr+armAttr+'Fk1', leftAttr+legAttr+'Fk1', rightAttr+legAttr+'Fk1',
-                leftAttr+legAttr+frontAttr+'Fk1', rightAttr+legAttr+frontAttr+'Fk1', leftAttr+legAttr+backAttr+'Fk1', rightAttr+legAttr+backAttr+'Fk1',
-                'tailFk', 'tailDyn', 'tail1Fk', 'tail1Dyn', 'tailFk1', 'tailDyn1', leftAttr+'TailFk', leftAttr+'TailFk1', rightAttr+'TailFk', rightAttr+'TailFk1', leftAttr+'TailDyn', leftAttr+'TailDyn1', rightAttr+'TailDyn', rightAttr+'TailDyn1',
-                'hairFk', 'hairDyn', 'hair1Fk', 'hair1Dyn', 'hairFk1', 'hairDyn1', leftAttr+'HairFk', leftAttr+'HairFk1', rightAttr+'HairFk', rightAttr+'HairFk1', leftAttr+'HairDyn', leftAttr+'HairDyn1', rightAttr+'HairDyn', rightAttr+'HairDyn1',
-                'dpAR_000Fk', 'dpAR_000Dyn', 'dpAR_001Fk', 'dpAR_001Dyn', 'dpAR_002Fk', 'dpAR_002Dyn', 
-                'dpAR_000Fk1', 'dpAR_000Dyn1', leftAttr+'dpAR_000Fk', leftAttr+'dpAR_000Fk1', rightAttr+'dpAR_000Fk', rightAttr+'dpAR_000Fk1', leftAttr+'dpAR_000Dyn', leftAttr+'dpAR_000Dyn1', rightAttr+'dpAR_000Dyn', rightAttr+'dpAR_000Dyn1',
-                'dpAR_001Fk1', 'dpAR_001Dyn1', leftAttr+'dpAR_001Fk', leftAttr+'dpAR_001Fk1', rightAttr+'dpAR_001Fk', rightAttr+'dpAR_001Fk1', leftAttr+'dpAR_001Dyn', leftAttr+'dpAR_001Dyn1', rightAttr+'dpAR_001Dyn', rightAttr+'dpAR_001Dyn1',
-                'display', 'mesh', 'proxy', 'controllers', 'bends', 'extraBends', facialAttr, tweaksAttr, 'correctiveCtrls']
-                # call method to reorder Option_Ctrl attributes:
-                self.reorderAttributes([self.optionCtrl], desiredAttrList)
-                
-            #Try add hand follow (space switch attribute) on bipeds:
-            
-            #self.initExtraModule("dpLimbSpaceSwitch", self.ar.data.tools_folder)
-            #self.ar.config.get_instance_info("dpLimbSpaceSwitch", [self.ar.data.tools_folder]).build_tool()
-            
+                self.set_rigged_types()
+                self.set_parent_tag()
+            self.set_option_ctrl_attrs()
             self.ar.config.get_instance_info("dpLimbSpaceSwitch", [self.ar.data.tools_folder]).build_tool()
-            # add fingers hand pose:
-            
-            #self.initExtraModule("dpFingerHandPose", self.ar.data.tools_folder)#, hidden=True)
-            #self.ar.config.get_instance_info("dpLimbSpaceSwitch", [self.ar.data.tools_folder]).build_tool()
-            
             self.ar.config.get_instance_info("dpFingerHandPose", [self.ar.data.tools_folder]).build_tool()
-            #self.ar.utils.closeUI("dpInfoWindow")
-
             # show dialogBox if detected a bug:
-            if self.ar.data.integrate_all:
-                if self.detectedBug:
-                    print("\n\n")
-                    print(self.bugMessage)
-                    cmds.confirmDialog(title=self.ar.data.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
-
+            if self.detectedBug:
+                print("\n\n")
+                print(self.bugMessage)
+                cmds.confirmDialog(title=self.ar.data.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
         self.ar.utils.clear_guide_mirror_grp()
-        
-        # reload the jointSkinList:
         self.ar.filler.populate_joints()
         if not self.ar.data.rebuilding:
             self.ar.ui_manager.refresh_ui()
-            # call log window:
             self.ar.logger.logWin()
-            # close progress window
             self.ar.utils.setProgress(endIt=True)
-        
         cmds.select(clear=True)
 
 
-        
 
 class Composer(object):
     def __init__(self, ar):
@@ -905,7 +856,6 @@ class Composer(object):
             self.nose_head(item, father)
         elif item.name == self.ar.data.chain_name:
             self.chain_options(item)
-
         if self.to_ids:
             self.ar.customAttr.addAttr(0, list(set(self.to_ids)), descendents=True)
 

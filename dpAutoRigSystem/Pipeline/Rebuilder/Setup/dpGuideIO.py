@@ -237,6 +237,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
         for item in list(self.netDic["GuideData"]):
             if item in self.netDic["GuideData"].keys():
                 new_item = self.get_new_name(item)
+                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
+                    cmds.parent(new_item, world=True)
                 for attr in list(self.netDic["GuideData"][item]):
                     if attr in self.ar.data.transform_attrs:
                         if not cmds.getAttr(new_item+"."+attr, lock=True): #unlocked attribute
@@ -267,6 +269,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         """ Import guide info and initialize guide setting it attribute values.
         """
         wellImported = True
+        toInitializeGuide = True
         self.correlations = {}
         self.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
         if self.ar.data.ui_state:
@@ -277,7 +280,6 @@ class GuideIO(dpBaseAction.ActionStartClass):
                 if guideDic[net]["moduleType"] == self.dpHeadDeformer.headDeformerName:
                     wellImported = self.importHeadDeformer(guideDic[net])
             else:
-                toInitializeGuide = True
                 if rebuilding:
                     if cmds.objExists(net):
                         if cmds.getAttr(net+".rawGuide"):
@@ -288,19 +290,20 @@ class GuideIO(dpBaseAction.ActionStartClass):
                 else: #problably template
                     net_data = self.get_nets_info()
                     for module_type in net_data.keys():
-                        if module_type == guideDic[net]["ModuleType"]:
-                            net_custom_name = guideDic[net]["GuideData"][f"{module_type}__dpAR_{guideDic[net]['GuideNumber']}:Guide_Base"]["customName"]
-                            if not net_custom_name is None:
-                                for item in net_data[module_type].keys():
-                                    if net_data[module_type][item] == net_custom_name:
-                                        # open dialog to confirm repeated net name:
-                                        yes_text = self.ar.data.lang['i071_yes']
-                                        no_text = self.ar.data.lang['i072_no']
-                                        result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
-                                                                    button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
-                                        if result == yes_text:
-                                            toInitializeGuide = False
-                                            break
+                        if toInitializeGuide:
+                            if module_type == guideDic[net]["ModuleType"]:
+                                net_custom_name = guideDic[net]["GuideData"][f"{module_type}__dpAR_{guideDic[net]['GuideNumber']}:Guide_Base"]["customName"]
+                                if not net_custom_name is None:
+                                    for item in net_data[module_type].keys():
+                                        if net_data[module_type][item] == net_custom_name:
+                                            # open dialog to confirm repeated net name:
+                                            yes_text = self.ar.data.lang['i071_yes']
+                                            no_text = self.ar.data.lang['i072_no']
+                                            result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
+                                                                        button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
+                                            if result == yes_text:
+                                                toInitializeGuide = False
+                                                break
                 if toInitializeGuide:
                     try:
                         self.netDic = guideDic[net]
@@ -319,6 +322,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False
+
         return wellImported
 
 

@@ -170,13 +170,11 @@ class MainUI(object):
         cmds.iconTextButton("rig_tri_collapse_guides_itb", image=self.ar.data.icon['triDown'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, "rig_tri_collapse_guides_itb", 0), width=17, height=17, style='iconOnly', align='right', parent='rig_header_rcl')
         # middle left
         cmds.scrollLayout("rig_guides_start_sl", width=160, parent='rigging_tab')
-        cmds.text('rig_standard_txt', label=self.ar.data.lang['i030_standard'], font="obliqueLabelFont", align='left', parent='rig_guides_start_sl')
-        cmds.columnLayout("rig_guides_standard_cl", adjustableColumn=True, width=140, rowSpacing=3, parent='rig_guides_start_sl')
-        # -> rig_guides_standard_cl it will be populated here by guides of standard library...
-        cmds.separator(style='doubleDash', height=10, width=140, parent='rig_guides_start_sl')
-        cmds.text('rig_integrated_txt', label=self.ar.data.lang['v001_template'], font="obliqueLabelFont", align='left', parent='rig_guides_start_sl')
-        cmds.columnLayout("rig_guides_template_cl", adjustableColumn=True, width=140, rowSpacing=3, parent='rig_guides_start_sl')
-        # -> rig_guides_template_cl it will be populated here by guides of integrated templates read from json...
+        cmds.frameLayout("rig_guides_standard_fl", label=self.ar.data.lang['i030_standard'], collapsable=True, collapse=False, parent='rig_guides_start_sl')
+        # -> rig_guides_standard_fl it will be populated here by guides of standard library...
+        cmds.separator(style='none', height=10, width=140, parent='rig_guides_start_sl')
+        cmds.frameLayout("rig_guides_template_fl", label=self.ar.data.lang['v001_template'], collapsable=True, collapse=False, parent='rig_guides_start_sl')
+        # -> rig_guides_template_fl it will be populated here by guides of integrated templates read from json...
         # middle right
         cmds.scrollLayout("rig_guides_inst_sl", width=120, parent='rigging_tab')
         cmds.columnLayout("rig_guides_inst_cl", adjustableColumn=True, width=120, parent='rig_guides_inst_sl')

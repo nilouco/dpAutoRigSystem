@@ -20,11 +20,11 @@ class UIFiller(object):
         template_base_names = []
         # rigging
         for item in self.ar.data.lib[self.ar.data.standard_folder]["instances"]:
-            self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_cl")
+            self.populate_library(item, self.ar.data.standard_folder, "rig_guides_standard_fl")
         # templates
         for item in self.ar.data.lib[self.ar.data.template_folder]["instances"]:
             if not item.base_name in template_base_names:
-                self.populate_library(item, self.ar.data.template_folder, "rig_guides_template_cl")
+                self.populate_library(item, self.ar.data.template_folder, "rig_guides_template_fl")
                 template_base_names.append(item.base_name)
         # controllers
         for item in self.ar.data.lib[self.ar.data.curve_simple_folder]["instances"]:
