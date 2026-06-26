@@ -886,7 +886,7 @@ class Pipeliner(object):
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=thisType, force=True)
             self.utils.closeUI("dpSaveVersionWindow")
-            self.ar.rebuilding = False
+            self.ar.data.rebuilding = False
             self.refreshAssetData()
 
 
@@ -988,7 +988,7 @@ class Pipeliner(object):
                         if not savedScene:
                             savedScene = self.userSaveThisScene(False)
                         if savedScene:
-                            self.ar.rebuilding = False
+                            self.ar.data.rebuilding = False
                             cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
                             cmds.workspace(directory=assetFolder)
                             self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
@@ -1167,7 +1167,7 @@ class Pipeliner(object):
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
                 self.utils.closeUI("dpNewAssetWindow")
-                self.ar.rebuilding = False
+                self.ar.data.rebuilding = False
                 self.refreshAssetData()
             else:
                 cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i349_alreadyExistsAsset'], button="Ok")

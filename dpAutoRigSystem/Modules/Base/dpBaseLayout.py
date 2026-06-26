@@ -585,7 +585,7 @@ class BaseLayout(object):
                         # set values to guide base:
                         cmds.setAttr(guideChild+".mirrorAxis", self.mirrorAxis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
-                        for moduleInstance in self.ar.data.standard_instances:
+                        for moduleInstance in self.ar.data.guide_instances:
                             if cmds.objExists(moduleInstance.guide_base):
                                 if cmds.getAttr(moduleInstance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
                                     moduleInstance.createPreviewMirror()

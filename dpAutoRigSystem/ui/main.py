@@ -157,7 +157,7 @@ class MainUI(object):
         self.create_tools_layout()
         self.create_validator_layout()
         self.create_rebuilder_layout()
-            
+
 
     def create_rigging_layout(self):
         cmds.formLayout('rigging_tab', numberOfDivisions=100, parent='main_tab')
@@ -170,10 +170,10 @@ class MainUI(object):
         cmds.iconTextButton("rig_tri_collapse_guides_itb", image=self.ar.data.icon['triDown'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, "rig_tri_collapse_guides_itb", 0), width=17, height=17, style='iconOnly', align='right', parent='rig_header_rcl')
         # middle left
         cmds.scrollLayout("rig_guides_start_sl", width=160, parent='rigging_tab')
-        cmds.frameLayout("rig_guides_standard_fl", label=self.ar.data.lang['i030_standard'], collapsable=True, collapse=False, parent='rig_guides_start_sl')
+        cmds.frameLayout("rig_guides_standard_fl", label=self.ar.data.lang['i030_standard'], width=140, collapsable=True, collapse=False, parent='rig_guides_start_sl')
         # -> rig_guides_standard_fl it will be populated here by guides of standard library...
-        cmds.separator(style='none', height=10, width=140, parent='rig_guides_start_sl')
-        cmds.frameLayout("rig_guides_template_fl", label=self.ar.data.lang['v001_template'], collapsable=True, collapse=False, parent='rig_guides_start_sl')
+        cmds.separator(style='none', height=10, width=120, parent='rig_guides_start_sl')
+        cmds.frameLayout("rig_guides_template_fl", label=self.ar.data.lang['v001_template'], width=140, collapsable=True, collapse=False, parent='rig_guides_start_sl')
         # -> rig_guides_template_fl it will be populated here by guides of integrated templates read from json...
         # middle right
         cmds.scrollLayout("rig_guides_inst_sl", width=120, parent='rigging_tab')

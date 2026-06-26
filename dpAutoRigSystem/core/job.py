@@ -15,22 +15,20 @@ class Job(object):
         #
         
         """ Create scriptJobs to read:
-            - NewSceneOpened
+            - uiDeleted
+            - SceneOpened
+            - deleteAll = new scene
             - SceneSaved
-            - deleteAll = new scene (disable to don't reset the asset context when running a new scene for the first module)
             - SelectionChanged
             - WorkspaceChanged = not documented
         """
-        
-        print("WIP = starting script jobs...")
-
         cmds.scriptJob(uiDeleted=('dpAutoRigSystemWC', partial(self.ar.ui_manager.set_ui_state, False)))
         cmds.scriptJob(event=('SceneOpened', partial(self.ar.ui_manager.refresh_ui, clearSel=True)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-        #cmds.scriptJob(event=('deleteAll', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        cmds.scriptJob(event=('NewSceneOpened', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
+        cmds.scriptJob(event=('deleteAll', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        #cmds.scriptJob(event=('NewSceneOpened', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.ar.ui_manager.refresh_ui, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('workspaceChanged', self.ar.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-        self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='language_menu', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+        self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
         self.ar.ctrls.startCorrectiveEditMode()
         self.selected_guide()
 
@@ -48,7 +46,7 @@ class Job(object):
             updatedGuideNodeList = []
             needUpdateSelect = False
             for selectedItem in selectedList:
-                if cmds.objExists(selectedItem+"."+self.ar.data.guide_base_attr) and cmds.getAttr(selectedItem+"."+self.ar.data.guide_base_attr) == 1:
+                if self.ar.data.guide_base_attr in cmds.listAttr(selectedItem) and cmds.getAttr(selectedItem+"."+self.ar.data.guide_base_attr) == 1:
                     if not ":" in selectedItem[selectedItem.rfind("|"):]:
                         newGuide = self.ar.maker.setup_duplicated_guide(selectedItem)
                         updatedGuideNodeList.append(newGuide)
@@ -59,7 +57,7 @@ class Job(object):
                 self.ar.ui_manager.refresh_ui()
                 cmds.select(updatedGuideNodeList)
         # update UI
-        for m, moduleInstance in enumerate(self.ar.data.standard_instances):
+        for m, moduleInstance in enumerate(self.ar.data.guide_instances):
             if cmds.objExists(moduleInstance.guide_base):
                 if moduleInstance.selectButton:
                     currentColorList = self.ar.ctrls.getGuideRGBColorList(moduleInstance)
@@ -73,14 +71,13 @@ class Job(object):
                                 self.selectedModuleInstanceList.append(moduleInstance)
         # delete module layout:
         if not selectedGuideNodeList:
-            try:
-                cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module'])
-                cmds.deleteUI("rig_selected_module_cl")
-            except:
-                pass
+            if self.ar.data.ui_state:
+                if cmds.frameLayout("rig_edit_selected_module_fl", query=True, exists=True):
+                    cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module'])
+                if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
+                    cmds.deleteUI("rig_selected_module_cl")
         # re-create module layout:
         if self.selectedModuleInstanceList:
             self.selectedModuleInstanceList[-1].reCreateEditSelectedModuleLayout(bSelect=False)
         # call reload the geometries in skin UI:
         self.ar.filler.populate_geometries()
-

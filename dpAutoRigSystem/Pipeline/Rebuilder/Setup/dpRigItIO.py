@@ -49,7 +49,7 @@ class RigItIO(dpBaseAction.ActionStartClass):
                 self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
                 try:
-                    self.ar.rebuilding = True
+                    self.ar.data.rebuilding = True
                     self.ar.rig_all()
                 except Exception as e:
                     self.notWorkedWellIO(str(e))

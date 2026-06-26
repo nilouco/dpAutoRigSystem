@@ -128,10 +128,9 @@ class Data:
     
     to_ids: list = field(default_factory=list)
     
-    created_guides: list = field(default_factory=list)
-#    lib_modules: list = field(default_factory=list)
     lib_instances: list = field(default_factory=list)
-    standard_instances: list = field(default_factory=list)
+    guide_instances: list = field(default_factory=list)
+#    standard_instances: list = field(default_factory=list)
 #    template_instances: list = field(default_factory=list)
 #    curve_simple_instances: list = field(default_factory=list)
 #    curve_combined_instances: list = field(default_factory=list)

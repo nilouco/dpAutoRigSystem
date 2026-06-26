@@ -71,7 +71,7 @@ class UIManager(object):
                     item.updateActionButtons(color=False)
             try:
                 self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.ar.job.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True)
-            except:
+            except: #due duplicate guides
                 self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.ar.job.selected_guide), parent='main_menu_bar', replacePrevious=False, killWithScene=False, compressUndo=True)
             if savedScene:
                 cmds.select(clear=True)
@@ -95,7 +95,7 @@ class UIManager(object):
 
     def update_guide_footer(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
         if not quantity:
-            quantity = len(self.ar.data.created_guides)
+            quantity = len(self.ar.data.guide_instances)
         if self.ar.data.ui_state:
             cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
 
@@ -163,7 +163,7 @@ class UIManager(object):
         collapse_value = True
         icon = self.ar.data.icon['triRight']
         if layout == 0: #guide modules
-            modules = self.ar.data.standard_instances
+            modules = self.ar.data.guide_instances
             if self.ar.data.modules_collapse_status:
                 collapse_value = False
                 icon = self.ar.data.icon['triDown']
@@ -295,3 +295,4 @@ class UIManager(object):
         return actionResultData, False, 0
 
 
+#    def refresh_current_instances(self):

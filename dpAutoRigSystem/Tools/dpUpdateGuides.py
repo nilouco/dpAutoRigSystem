@@ -337,7 +337,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
     def getGuidesToUpdateData(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
         """
-        guides_to_rig = self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)
+        guides_to_rig = self.ar.utils.get_guides_to_rig()
         instancedModulesStrList = list(map(str, guides_to_rig))
         for baseGuide in self.guidesDictionary:
             guideVersion = cmds.getAttr(baseGuide+'.dpARVersion', silent=True)

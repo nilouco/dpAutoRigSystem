@@ -52,7 +52,7 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
             if self.firstMode: #export
                 self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
-                self.ar.rebuilding = True
+                self.ar.data.rebuilding = True
                 try:
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)

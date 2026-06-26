@@ -351,7 +351,7 @@ class Option(object):
     def change_degree(self, value, *args):
         self.set_option_var(self.ar.data.degree_option_var, value)
         self.ar.data.degree_option = int(value[-1])
-        for module_instance in self.ar.data.standard_instances:
+        for module_instance in self.ar.data.guide_instances:
             if "degree" in cmds.listAttr(module_instance.guide_base):
                 cmds.setAttr(module_instance.guide_base+".degree", self.ar.data.degree_option)
 

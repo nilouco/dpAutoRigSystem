@@ -121,7 +121,7 @@ class ActionStartClass(object):
         """ Update button background colors if using UI.
         """
         if self.ar.data.ui_state:
-            if cmds.button(self.firstBT, exists=True):
+            if self.firstBT and cmds.button(self.firstBT, exists=True):
                 if running:
                     if self.firstMode: #verify/export
                         cmds.button(self.firstBT, edit=True, backgroundColor=RUNNING_COLOR)

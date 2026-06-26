@@ -603,7 +603,7 @@ class Utils(object):
         return allParentsList
 
 
-    def get_guides_to_rig(self, instanceList):
+    def get_guides_to_rig(self):
         """ Get all valid loaded modules to be rigged (They are valid instances with namespaces in the scene, then they are not deleted).
             Currently named as rawGuide instances.
             Return a list of modules to be rigged.
@@ -611,7 +611,7 @@ class Utils(object):
         guides_to_rig = []
         headModuleList = []
         allNamespaceList = cmds.namespaceInfo(listNamespace=True)
-        for guideModule in instanceList:
+        for guideModule in self.ar.data.guide_instances:
             # verify integrity of the guideModule:
             if guideModule.verifyGuideModuleIntegrity():
                 guideNamespaceName = guideModule.guideNamespace

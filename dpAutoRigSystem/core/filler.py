@@ -108,9 +108,12 @@ class UIFiller(object):
     def fill_created_guides(self):
         """ Read all guide modules loaded in the scene and re-create the elements in the module_layout.
         """
+        if self.ar.data.guide_instances:
+            for item in self.ar.data.guide_instances:
+                 del item #garbage collector
         # create a new list in order to store all created guide modules in the scene and its userSpecNames:
-        self.ar.data.created_guides = []
-        self.ar.data.standard_instances = []
+        self.ar.data.guide_instances = []
+        current_guides = []
         # list all namespaces:
         cmds.namespace(setNamespace=":")
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True)
@@ -130,24 +133,22 @@ class UIFiller(object):
                     # check if there is this module guide base in the scene:
                     curGuideName = valid_module_names[index]+"__"+userSpecName+":"+self.ar.data.guide_base_name
                     if cmds.objExists(curGuideName):
-                        self.ar.data.created_guides.append([valid_modules[index], userSpecName, curGuideName])
+                        current_guides.append([valid_modules[index], userSpecName, curGuideName])
                     else:
                         cmds.namespace(moveNamespace=(n, ':'), force=True)
                         cmds.namespace(removeNamespace=n, deleteNamespaceContent=True, force=True)
         
         # if exists any guide module in the scene, recreate its instance as objectClass:
-        if self.ar.data.created_guides:
-            sorted_guides = sorted(self.ar.data.created_guides, key=lambda userSpecName: userSpecName[1])
+        if current_guides:
+            sorted_guides = sorted(current_guides, key=lambda userSpecName: userSpecName[1])
             # load again the modules:
             for module in sorted_guides:
                 mod = self.ar.lib.initialize_library(module[0], self.ar.data.standard_folder)[0]
-                self.ar.data.standard_instances.append(mod)
+                self.ar.data.guide_instances.append(mod)
                 mod.get_namespace_for_it(module[1])
-                if self.ar.data.ui_state:
-                    mod.load_raw_guide(mod.userGuideName)
-
+                mod.load_raw_guide(mod.userGuideName)
                 # reload pinGuide scriptJob:
-                self.ar.ctrls.startPinGuide(module[2])
+                self.ar.ctrls.startPinGuide(mod.guide_base)
 
 
     def populate_joints(self, *args):
@@ -283,7 +284,7 @@ class UIFiller(object):
             It uses a recursive method to remove imported of imported guides.
         """
         imported_namespaces = []
-        current_custom_names = list(map(lambda guideModule : cmds.getAttr(guideModule.guide_base+".customName"), self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)))
+        current_custom_names = list(map(lambda guideModule : cmds.getAttr(guideModule.guide_base+".customName"), self.ar.utils.get_guides_to_rig()))
         cmds.namespace(setNamespace=':')
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaces:
@@ -329,9 +330,7 @@ class UIFiller(object):
     def check_guide_nets(self, *args):
         """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
         """
-        if not self.ar.data.standard_instances:
-            self.fill_created_guides()
-        for item in self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances):
+        for item in self.ar.utils.get_guides_to_rig():
             if not item.guideNet:
                 item.createGuideNetwork()
                 print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.guide_base)
@@ -340,9 +339,7 @@ class UIFiller(object):
     def check_guide_versions(self, *args):
         """ Verify if there are guides with different version of the current dpAutoRig version.
         """
-        if not self.ar.data.standard_instances:
-            self.fill_created_guides()
-        for item in self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances):
+        for item in self.ar.utils.get_guides_to_rig():
             if not self.ar.data.version == cmds.getAttr(item.guide_base+'.dpARVersion'):
                 self.check_guide_nets()
                 self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()

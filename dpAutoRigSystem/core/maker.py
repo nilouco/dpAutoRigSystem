@@ -127,8 +127,8 @@ class Maker(object):
         #newGuideInstance = eval('self.initGuide("'+thatModuleName+'")')#, "'+moduleDir+'")')
         #newGuideName = cmds.ls(selection=True)[0]
 
-        newGuideInstance = self.ar.lib.initialize_library(thatModuleName, self.ar.data.standard_folder)[0]
-        newGuideName = newGuideInstance.build_raw_guide()
+        newGuideInstance, newGuideName = self.create_raw_guide(thatModuleName, self.ar.data.standard_folder)
+#        newGuideName = newGuideInstance.build_raw_guide()
 #        print("newGuideInstance, newGuideName =", newGuideInstance, newGuideName)
         newGuideNamespace = cmds.getAttr(newGuideName+"."+self.ar.data.module_namespace_attr)
         
@@ -337,8 +337,10 @@ class Maker(object):
         # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if self.ar.utils.getAllGrp():
             if self.masterGrp == self.ar.data.prefix+self.ar.data.master_name:
+                print("before")
                 cmds.parent(self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
                 cmds.parent(self.supportGrp, self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
+                print("after")
         cmds.select(clear=True)
 
         # Hide FX groups
@@ -509,6 +511,7 @@ class Maker(object):
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.ar.data.rebuilding:
+#            self.ar.ui_manager.clear_guide_layout()
             self.ar.filler.fill_created_guides()
         else:
             self.ar.ui_manager.refresh_ui()
@@ -516,7 +519,7 @@ class Maker(object):
 
     def check_good_guide_version(self, guides_to_rig):
         # check guide versions to be sure we are building with the same dpAutoRigSystem version:
-        for item in self.guides_to_rig:
+        for item in guides_to_rig:
             guide_version = cmds.getAttr(f"{item.guide_base}.dpARVersion")
             if not guide_version == self.ar.data.version:
                 yes_text = self.ar.data.lang['i071_yes']
@@ -775,7 +778,7 @@ class Maker(object):
         self.hook = self.ar.utils.get_hook()
         self.before_rig_all()
         self.refresh_before_build()
-        self.guides_to_rig = self.ar.utils.get_guides_to_rig(self.ar.data.standard_instances)
+        self.guides_to_rig = self.ar.utils.get_guides_to_rig()
         if self.guides_to_rig:
             self.ar.utils.setProgress(max=len(self.guides_to_rig), addOne=False, addNumber=False)
             if not self.check_good_guide_version(self.guides_to_rig):

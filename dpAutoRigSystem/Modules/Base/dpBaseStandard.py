@@ -40,6 +40,8 @@ class BaseStandard(object):
         self.serialized = False
         self.sideList = [""]
         self.axisList = ["X", "Y", "Z"]
+        self.guideNet = None
+        #self.customName = ""
         
 
     def get_namespace_for_it(self, userGuideName=None):
@@ -178,8 +180,8 @@ class BaseStandard(object):
         self.createWorldSize()
         # prepare guide to serialization
         self.createGuideNetwork()
-        self.ar.data.created_guides.append([self.name, self.userGuideName, self.guide_base])
-#        print("self.ar.data.created_guides =", self.ar.data.created_guides)
+        self.ar.data.guide_instances.append(self)#[self.name, self.userGuideName, self.guide_base])
+#        print("self.ar.data.guide_instances =", self.ar.data.guide_instances)
 #        print("valid =", self.name, self.userGuideName, self.guide_base)
         if self.ar.data.ui_state:
             self.ar.ui_manager.update_guide_footer()
@@ -197,7 +199,7 @@ class BaseStandard(object):
         """
         # conditionals to be elegible as a rigged guide module:
         if cmds.objExists(self.guide_base):
-            if cmds.objExists(self.guide_base+'.guideBase'):
+            if 'guideBase' in cmds.listAttr(self.guide_base):
                 if cmds.getAttr(self.guide_base+'.guideBase') == 1:
                     return True
                 else:
@@ -243,23 +245,23 @@ class BaseStandard(object):
             # cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])
         
         # clear module from instance list (clean dpUI list):
-#        delIndex = self.ar.data.standard_instances.index(self)
-#        self.ar.data.standard_instances.pop(delIndex)
-        #if [self.name, self.userGuideName, self.guide_base] in self.ar.data.created_guides:
-        #delIndex = self.ar.data.created_guides.index([self.name, self.userGuideName, self.guide_base])
+#        delIndex = 
+#        self.ar.data.standard_instances.pop(self.ar.data.standard_instances.index(self))
+        #if [self.name, self.userGuideName, self.guide_base] in self.ar.data.guide_instances:
+        #delIndex = self.ar.data.guide_instances.index([self.name, self.userGuideName, self.guide_base])
         #if delIndex:
-        #    self.ar.data.created_guides.pop(delIndex)
+        #    self.ar.data.guide_instances.pop(delIndex)
         #else:
         #    print("NNNNNNOOOOO, ", delIndex)
         #    print("YES removing it...")
-        #    self.ar.data.created_guides.remove([self.name, self.userGuideName, self.guide_base])
+        #    self.ar.data.guide_instances.remove([self.name, self.userGuideName, self.guide_base])
         #    print("Good removed it...")
         #
         #
         # TODO: call refresh UI here?
         #
         #
-        #print("created_guides after  =", self.ar.data.created_guides)
+        #print("created_guides after  =", self.ar.data.guide_instances)
     
 
     def duplicateModule(self, *args):
@@ -748,7 +750,7 @@ class BaseStandard(object):
                         attrDic[attr] = attrConnectList[0]
                 else:
                     attrDic[attr] = cmds.getAttr(node+"."+attr)
-            if cmds.objExists(node+".guideBase") and cmds.getAttr(node+".guideBase") == 1:
+            if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1:
                 if fatherList:
                     cmds.parent(node, fatherList[0])
             return attrDic
@@ -758,7 +760,8 @@ class BaseStandard(object):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
         self.ar.ctrls.unPinGuide(force=True)
-        self.customName = cmds.getAttr(self.guide_base+".customName")
+        if cmds.objExists(self.guide_base):
+            self.customName = cmds.getAttr(self.guide_base+".customName") or ""
         if not self.serialized:
             afterDataDic, guideDic = {}, {}
             beforeList = self.getBeforeList()
