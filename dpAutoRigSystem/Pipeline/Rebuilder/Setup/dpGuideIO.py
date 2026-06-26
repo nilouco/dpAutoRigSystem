@@ -126,7 +126,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
-                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".guide_base")[0]+".moduleInstanceInfo")
+                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".linkedNode")[0]+".moduleInstanceInfo")
                     for moduleInstance in self.ar.data.guide_instances:
                         if str(moduleInstance) == moduleInstanceInfoString:
                             moduleInstance.serialize_guide(False) #serialize it without build it

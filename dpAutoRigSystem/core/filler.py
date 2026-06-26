@@ -95,9 +95,10 @@ class UIFiller(object):
                 # rebuilders
                 if folder in self.rebuilder_folders:
                     item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
-                    item.updateActionButtons(color=False)
             # info icon
             cmds.iconTextButton(item.name+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
+            if folder in self.rebuilder_folders:
+                item.updateActionButtons(color=False) #add latest exported data button
 
 
     def load_pipeline_validator_preset(self):

@@ -95,7 +95,7 @@ class ParentingIO(dpBaseAction.ActionStartClass):
         """
         if not transformList:
             transformList = cmds.ls(selection=False, long=True, type="transform")
-        filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.ar.data.lang[self.title])
+        filteredList = self.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filteredList = self.reorderList(filteredList)
         return {"Parent" : filteredList}
 

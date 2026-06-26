@@ -12,7 +12,7 @@ class Logger(object):
         """
         # defining variables:
         self.ar = ar
-        self.verbose = verbose
+        self.ar.data.verbose = verbose
         self.lang = ar.data.lang
         self.utils = ar.utils
         

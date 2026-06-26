@@ -8,12 +8,11 @@ DP_PUBLISHER_VERSION = 1.12
 
 
 class Publisher(object):
-    def __init__(self, ar, ui=True, verbose=True):
+    def __init__(self, ar):
         """ Initialize the module class loading variables.
         """
         # defining variables:
         self.ar = ar
-        self.verbose = verbose
         self.publisherName = self.ar.data.lang['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
@@ -58,7 +57,7 @@ class Publisher(object):
             publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
             cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
-            cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, True, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
             cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly

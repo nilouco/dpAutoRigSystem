@@ -26,7 +26,7 @@ class ControlClass(object):
         self.loadVariables()
         if self.ar.dev:
             reload(dpResetPose)
-        self.resetPose = dpResetPose.ResetPose(self.ar, ui=False, verbose=False)
+        self.resetPose = dpResetPose.ResetPose(self.ar)
 
 
     def loadVariables(self, *args):

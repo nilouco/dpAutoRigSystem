@@ -87,7 +87,7 @@ class EmptyTransformCleaner(dpBaseAction.ActionStartClass):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
-        filteredList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.ar.data.lang[self.title])
+        filteredList = self.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filteredList = self.reorderList(filteredList)
         emptyTransforms = []
         for transform in filteredList:

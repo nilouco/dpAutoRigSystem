@@ -17,7 +17,7 @@ DP_ACTIONSTARTCLASS_VERSION = 2.09
 
 
 class ActionStartClass(object):
-    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, ui=True, verbose=True):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, verbose=True):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -92,6 +92,9 @@ class ActionStartClass(object):
     def cleanUpToStart(self, *args):
         """ Just redeclare variables and close openned window to run the code properly.
         """
+        print(f"\n----------\n{self.ar.data.lang['c110_start']} rigging: {self.getTitle()}")
+        if self.verbose:
+            self.utils.setProgress(self.getTitle()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
         # redeclare variables
         self.checkedObjList = []
         self.foundIssueList = []
@@ -103,9 +106,7 @@ class ActionStartClass(object):
             cmds.deleteUI('dpInfoWindow', window=True)
         self.updateButtonColors(True) #running
         cmds.refresh()
-        if self.verbose:
-            titleText = self.getTitle()
-            self.utils.setProgress(titleText+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
+
 
 
     def resetButtonColors(self, *args):
@@ -173,10 +174,10 @@ class ActionStartClass(object):
         buttonLabel = self.getLatestExportedData()
         buttonCommand = self.ar.packager.openFolder
         buttonArgument = self.ioPath
-        if cmds.iconTextButton(self.title+"_itb", query=True, exists=True):
+        if cmds.iconTextButton(self.name+"_itb", query=True, exists=True):
             #functools.partial(<bound method Logger.infoWin of <dpAutoRigSystem.Pipeline.dpLogger.Logger object at 0x00000259E390BD10>>, 'r003_modelIO', 'r004_modelIODesc', None, 'center', 305, 250, wiki='10-‐-Rebuilder#-model')
-            thisWiki = str(cmds.iconTextButton(self.title+"_itb", query=True, command=True)).split("wiki='")[1][:-2]
-            cmds.iconTextButton(self.title+"_itb", edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument], wiki=thisWiki))
+            thisWiki = str(cmds.iconTextButton(self.name+"_itb", query=True, command=True)).split("wiki='")[1][:-2]
+            cmds.iconTextButton(self.name+"_itb", edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument], wiki=thisWiki))
 
 
     def getLatestExportedData(self, *args):
@@ -429,6 +430,7 @@ class ActionStartClass(object):
 
 
     def endProgress(self, *args):
+        print(f"{self.ar.data.lang['m184_end']} {self.getTitle()}\n----------")
         if self.verbose:
             self.utils.setProgress(endIt=True)
 

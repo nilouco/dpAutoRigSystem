@@ -28,7 +28,6 @@ class RivetIO(dpBaseAction.ActionStartClass):
         if self.ar.dev:
             reload(dpRivet)
         self.dpRivet = dpRivet.Rivet(self.ar)
-        self.dpRivet.ui = False
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_rivetIO"
         self.startName = "dpRivet"
@@ -97,7 +96,7 @@ class RivetIO(dpBaseAction.ActionStartClass):
         self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
         i = 0
         for n, net in enumerate(netList):
-            if self.verbose:
+            if self.ar.data.verbose:
                 self.utils.setProgress(self.ar.data.lang[self.title])
             # mount a dic
             if cmds.objExists(net+".rivetData"):
@@ -123,9 +122,12 @@ class RivetIO(dpBaseAction.ActionStartClass):
             try:
                 netDic = rivetDic[net]
                 self.utils.setProgress(self.ar.data.lang[self.title]+': '+netDic['geoToAttach'])
+                old_ui_state = self.ar.data.ui_state
+                self.ar.data.ui_state = False
                 # recreate rivet:
                 self.dpRivet.deformerToUse = netDic['deformerToUse']
                 rivetList = self.dpRivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['itemList'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
+                self.ar.data.ui_state = old_ui_state
                 if not rivetList:
                     wellImported = False
                     self.notWorkedWellIO(net+": "+self.ar.data.lang['r032_notImportedData'])

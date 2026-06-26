@@ -10,10 +10,6 @@ class Job(object):
 
 
     def start_jobs(self):
-        #
-        # TODO: test all script jobs
-        #
-        
         """ Create scriptJobs to read:
             - uiDeleted
             - SceneOpened

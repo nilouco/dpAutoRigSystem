@@ -54,7 +54,7 @@ class ModelIO(dpBaseAction.ActionStartClass):
                             if objList:
                                 meshList = objList
                             else:
-                                meshList = self.utils.filterTransformList(self.getModelToExportList(), verbose=self.verbose, title=self.ar.data.lang[self.title])
+                                meshList = self.utils.filterTransformList(self.getModelToExportList(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
                             if meshList:
                                 self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
                                 constraintDataDic = self.removeConstraints(meshList)

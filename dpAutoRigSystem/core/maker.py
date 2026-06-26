@@ -250,8 +250,10 @@ class Maker(object):
 
     def createBaseRigNode(self):
         localTime = str(time.asctime(time.localtime(time.time())))
+        createdNew = False
         self.masterGrp = self.ar.utils.getAllGrp()
         if not self.masterGrp:
+            createdNew = True
             if cmds.objExists(self.ar.data.master_name):
                 # rename existing All_Grp node without connections as All_Grp_Old
                 cmds.rename(self.ar.data.master_name, self.ar.data.master_name+"_Old")
@@ -329,18 +331,17 @@ class Maker(object):
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.ar.data.prefix+"Scalable_Grp")
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.ar.data.prefix+"BlendShapes_Grp")
         self.wipGrp         = self.getBaseGrp("wipGrp", self.ar.data.prefix+"WIP_Grp")
-        # set outliner color
-        self.ar.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True) #blue
-        self.ar.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
-        self.ar.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True) #orange
+        if createdNew:
+            # set outliner color
+            self.ar.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True) #blue
+            self.ar.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
+            self.ar.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True) #orange
 
-        # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
-        if self.ar.utils.getAllGrp():
-            if self.masterGrp == self.ar.data.prefix+self.ar.data.master_name:
-                print("before")
-                cmds.parent(self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-                cmds.parent(self.supportGrp, self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
-                print("after")
+            # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
+            if self.ar.utils.getAllGrp():
+                if self.masterGrp == self.ar.data.prefix+self.ar.data.master_name:
+                    cmds.parent(self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
+                    cmds.parent(self.supportGrp, self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
         cmds.select(clear=True)
 
         # Hide FX groups
@@ -406,42 +407,42 @@ class Maker(object):
             cmds.parent(self.ctrlsVisGrp, self.rootCtrl)
         else:
             self.rigScaleMD = self.ar.data.prefix+'RigScale_MD'
+        if createdNew:
+            # parent Tag
+            if "parentTag" in cmds.listAttr(self.globalCtrl):
+                cmds.connectAttr(self.globalCtrl+".message", self.masterCtrl+".parentTag", force=True)
+                cmds.connectAttr(self.masterCtrl+".message", self.rootCtrl+".parentTag", force=True)
+                cmds.connectAttr(self.rootCtrl+".message", self.optionCtrl+".parentTag", force=True)
+                cmds.connectAttr(self.rootCtrl+".message", self.rootPivotCtrl+".parentTag", force=True)
 
-        # parent Tag
-        if "parentTag" in cmds.listAttr(self.globalCtrl):
-            cmds.connectAttr(self.globalCtrl+".message", self.masterCtrl+".parentTag", force=True)
-            cmds.connectAttr(self.masterCtrl+".message", self.rootCtrl+".parentTag", force=True)
-            cmds.connectAttr(self.rootCtrl+".message", self.optionCtrl+".parentTag", force=True)
-            cmds.connectAttr(self.rootCtrl+".message", self.rootPivotCtrl+".parentTag", force=True)
+            # set lock and hide attributes
+            self.ar.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
+            self.ar.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
+            self.ar.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
 
-        # set lock and hide attributes
-        self.ar.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-        self.ar.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
-        self.ar.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+            # root pivot controller setup
+            if needConnectPivotAttr:
+                for axis in ["X", "Y", "Z"]:
+                    cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
+                    cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
 
-        # root pivot controller setup
-        if needConnectPivotAttr:
-            for axis in ["X", "Y", "Z"]:
-                cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
-                cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
+            cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
+            cmds.select(clear=True)
 
-        cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
-        cmds.select(clear=True)
-
-        #Base joint
-        self.baseRootJnt = self.ar.data.prefix+"BaseRoot_Jnt"
-        self.baseRootJntGrp = self.ar.data.prefix+"BaseRoot_Joint_Grp"
-        if not cmds.objExists(self.baseRootJnt):
-            self.baseRootJnt = cmds.createNode("joint", name=self.ar.data.prefix+"BaseRoot_Jnt")
-            if not cmds.objExists(self.baseRootJntGrp):
-                self.baseRootJntGrp = cmds.createNode("transform", name=self.ar.data.prefix+"BaseRoot_Joint_Grp")
-            cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
-            cmds.parent(self.baseRootJntGrp, self.scalableGrp)
-            cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
-            cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
-            self.ar.customAttr.addAttr(0, [self.baseRootJntGrp], descendents=True) #dpID
-            cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
-            self.ar.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            #Base joint
+            self.baseRootJnt = self.ar.data.prefix+"BaseRoot_Jnt"
+            self.baseRootJntGrp = self.ar.data.prefix+"BaseRoot_Joint_Grp"
+            if not cmds.objExists(self.baseRootJnt):
+                self.baseRootJnt = cmds.createNode("joint", name=self.ar.data.prefix+"BaseRoot_Jnt")
+                if not cmds.objExists(self.baseRootJntGrp):
+                    self.baseRootJntGrp = cmds.createNode("transform", name=self.ar.data.prefix+"BaseRoot_Joint_Grp")
+                cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
+                cmds.parent(self.baseRootJntGrp, self.scalableGrp)
+                cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
+                cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
+                self.ar.customAttr.addAttr(0, [self.baseRootJntGrp], descendents=True) #dpID
+                cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
+                self.ar.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
     
 
     def changeRootToCtrlsVisConstraint(self, *args):
@@ -487,18 +488,6 @@ class Maker(object):
                 self.ar.utils.closeUI(dpRAttr.winName)
     
 
-
-
-
-    #
-    #
-    # WIP
-    #
-    # bring rig_all to here..
-    #
-    #
-
-
     def before_rig_all(self):
         print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
@@ -510,10 +499,10 @@ class Maker(object):
     def refresh_before_build(self):
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
-        if self.ar.data.rebuilding:
+        if not self.ar.data.rebuilding:
 #            self.ar.ui_manager.clear_guide_layout()
-            self.ar.filler.fill_created_guides()
-        else:
+            #self.ar.filler.fill_created_guides()
+        #else:
             self.ar.ui_manager.refresh_ui()
 
 
@@ -773,12 +762,15 @@ class Maker(object):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the generating process.
         """
+        print("self.pipeData['assetName'] 111 =", self.ar.pipeliner.pipeData['assetName'])
         self.detectedBug = False
         self.bugMessage = self.ar.data.lang['b000_bugGeneral']
         self.hook = self.ar.utils.get_hook()
         self.before_rig_all()
         self.refresh_before_build()
+        print("self.pipeData['assetName'] 2222 =", self.ar.pipeliner.pipeData['assetName'])
         self.guides_to_rig = self.ar.utils.get_guides_to_rig()
+        print("self.pipeData['assetName'] 2B =", self.ar.pipeliner.pipeData['assetName'])
         if self.guides_to_rig:
             self.ar.utils.setProgress(max=len(self.guides_to_rig), addOne=False, addNumber=False)
             if not self.check_good_guide_version(self.guides_to_rig):
@@ -786,6 +778,7 @@ class Maker(object):
             if self.ar.data.integrate_all:
                 self.createBaseRigNode()
             self.ar.utils.clear_guide_mirror_grp()
+            print("self.pipeData['assetName'] 2C =", self.ar.pipeliner.pipeData['assetName'])
             for item in self.guides_to_rig:
                 item.check_father_mirror()
                 item.serialize_guide()
@@ -793,8 +786,11 @@ class Maker(object):
                     self.ar.utils.setProgress('Rigging: '+str(item.customName))
                 else:
                     self.ar.utils.setProgress('Rigging: '+str(item.guideNamespace))
+                print("self.pipeData['assetName'] 2D =", self.ar.pipeliner.pipeData['assetName'])
                 item.rig_me() #rig it :)
+                print("self.pipeData['assetName'] 2E =", self.ar.pipeliner.pipeData['assetName'])
             # integrating modules together:
+            print("self.pipeData['assetName'] 333 =", self.ar.pipeliner.pipeData['assetName'])
             if self.ar.data.integrate_all:
                 self.ar.utils.setProgress('Rigging: '+self.ar.data.lang['i010_integrateCB'])
                 self.colorize_curves()
@@ -814,6 +810,7 @@ class Maker(object):
                 print("\n\n")
                 print(self.bugMessage)
                 cmds.confirmDialog(title=self.ar.data.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
+        print("self.pipeData['assetName'] 444 =", self.ar.pipeliner.pipeData['assetName'])
         self.ar.utils.clear_guide_mirror_grp()
         self.ar.filler.populate_joints()
         if not self.ar.data.rebuilding:
