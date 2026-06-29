@@ -44,7 +44,7 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
         """
         # starting
         self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.cleanUpToStart(True)
         
         # ---
         # --- rebuilder code --- beginning
@@ -52,7 +52,6 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
             if self.firstMode: #export
                 self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
-                self.ar.data.rebuilding = True
                 try:
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
@@ -67,6 +66,6 @@ class NewSceneIO(dpBaseAction.ActionStartClass):
         # finishing
         self.updateActionButtons()
         self.reportLog()
-        self.endProgress()
+        self.endProgress(True)
         self.refreshView()
         return self.dataLogDic

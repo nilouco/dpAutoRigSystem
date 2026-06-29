@@ -48,7 +48,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         """
         # starting
         self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.cleanUpToStart(True)
         
         # ---
         # --- rebuilder code --- beginning
@@ -107,7 +107,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
         # finishing
         self.updateActionButtons()
         self.reportLog()
-        self.endProgress()
+        self.endProgress(True)
         self.refreshView()
         if self.ar.data.ui_state:
             self.ar.ui_manager.clear_guide_layout()

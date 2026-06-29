@@ -43,7 +43,7 @@ class BlendShapeIO(dpBaseAction.ActionStartClass):
         """
         # starting
         self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.cleanUpToStart(True)
         
         # ---
         # --- rebuilder code --- beginning

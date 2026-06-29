@@ -40,7 +40,7 @@ class RigItIO(dpBaseAction.ActionStartClass):
         """
         # starting
         self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.cleanUpToStart(True)
         
         # ---
         # --- rebuilder code --- beginning
@@ -49,7 +49,6 @@ class RigItIO(dpBaseAction.ActionStartClass):
                 self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
                 try:
-                    self.ar.data.rebuilding = True
                     self.ar.maker.rig_all()
                 except Exception as e:
                     self.notWorkedWellIO(str(e))
@@ -61,6 +60,6 @@ class RigItIO(dpBaseAction.ActionStartClass):
         # finishing
         self.updateActionButtons()
         self.reportLog()
-        self.endProgress()
+        self.endProgress(True)
         self.refreshView()
         return self.dataLogDic

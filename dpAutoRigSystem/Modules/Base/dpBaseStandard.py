@@ -239,7 +239,8 @@ class BaseStandard(object):
             # self.ar.ui_manager.clear_guide_layout()
             # self.ar.filler.fill_created_guides()
             # self.ar.ui_manager.update_guide_footer()
-        self.ar.ui_manager.refresh_ui()
+        if not self.ar.data.rebuilding:
+            self.ar.ui_manager.refresh_ui()
 
             # self.currentText = cmds.text("footerRiggingText", query=True, label=True)
             # cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])

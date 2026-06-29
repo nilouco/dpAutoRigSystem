@@ -79,7 +79,7 @@ class UIManager(object):
                     cmds.select(selected)
             if clearSel:
                 cmds.select(clear=True)
-            self.ar.data.rebuilding = False
+#            self.ar.data.rebuilding = False
 
 
     def clear_guide_layout(self):
@@ -295,4 +295,4 @@ class UIManager(object):
         return actionResultData, False, 0
 
 
-#    def refresh_current_instances(self):
+

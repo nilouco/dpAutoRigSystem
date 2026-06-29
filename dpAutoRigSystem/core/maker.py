@@ -762,15 +762,12 @@ class Maker(object):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the generating process.
         """
-        print("self.pipeData['assetName'] 111 =", self.ar.pipeliner.pipeData['assetName'])
         self.detectedBug = False
         self.bugMessage = self.ar.data.lang['b000_bugGeneral']
         self.hook = self.ar.utils.get_hook()
         self.before_rig_all()
         self.refresh_before_build()
-        print("self.pipeData['assetName'] 2222 =", self.ar.pipeliner.pipeData['assetName'])
         self.guides_to_rig = self.ar.utils.get_guides_to_rig()
-        print("self.pipeData['assetName'] 2B =", self.ar.pipeliner.pipeData['assetName'])
         if self.guides_to_rig:
             self.ar.utils.setProgress(max=len(self.guides_to_rig), addOne=False, addNumber=False)
             if not self.check_good_guide_version(self.guides_to_rig):
@@ -778,7 +775,6 @@ class Maker(object):
             if self.ar.data.integrate_all:
                 self.createBaseRigNode()
             self.ar.utils.clear_guide_mirror_grp()
-            print("self.pipeData['assetName'] 2C =", self.ar.pipeliner.pipeData['assetName'])
             for item in self.guides_to_rig:
                 item.check_father_mirror()
                 item.serialize_guide()
@@ -786,11 +782,8 @@ class Maker(object):
                     self.ar.utils.setProgress('Rigging: '+str(item.customName))
                 else:
                     self.ar.utils.setProgress('Rigging: '+str(item.guideNamespace))
-                print("self.pipeData['assetName'] 2D =", self.ar.pipeliner.pipeData['assetName'])
                 item.rig_me() #rig it :)
-                print("self.pipeData['assetName'] 2E =", self.ar.pipeliner.pipeData['assetName'])
             # integrating modules together:
-            print("self.pipeData['assetName'] 333 =", self.ar.pipeliner.pipeData['assetName'])
             if self.ar.data.integrate_all:
                 self.ar.utils.setProgress('Rigging: '+self.ar.data.lang['i010_integrateCB'])
                 self.colorize_curves()
@@ -810,7 +803,6 @@ class Maker(object):
                 print("\n\n")
                 print(self.bugMessage)
                 cmds.confirmDialog(title=self.ar.data.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
-        print("self.pipeData['assetName'] 444 =", self.ar.pipeliner.pipeData['assetName'])
         self.ar.utils.clear_guide_mirror_grp()
         self.ar.filler.populate_joints()
         if not self.ar.data.rebuilding:

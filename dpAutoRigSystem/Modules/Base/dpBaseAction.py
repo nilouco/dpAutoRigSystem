@@ -89,13 +89,14 @@ class ActionStartClass(object):
                 cmds.button(self.secondBT, edit=True, enable=value)
 
 
-    def cleanUpToStart(self, *args):
+    def cleanUpToStart(self, rebuilding=False, *args):
         """ Just redeclare variables and close openned window to run the code properly.
         """
         print(f"\n----------\n{self.ar.data.lang['c110_start']} rigging: {self.getTitle()}")
         if self.verbose:
             self.utils.setProgress(self.getTitle()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
         # redeclare variables
+        self.ar.data.rebuilding = rebuilding
         self.checkedObjList = []
         self.foundIssueList = []
         self.resultOkList = []
@@ -106,7 +107,6 @@ class ActionStartClass(object):
             cmds.deleteUI('dpInfoWindow', window=True)
         self.updateButtonColors(True) #running
         cmds.refresh()
-
 
 
     def resetButtonColors(self, *args):
@@ -429,10 +429,14 @@ class ActionStartClass(object):
         return dic
 
 
-    def endProgress(self, *args):
-        print(f"{self.ar.data.lang['m184_end']} {self.getTitle()}\n----------")
+    def endProgress(self, update_guides=False, *args):
+        print(f"{self.ar.data.lang['m184_end']}: {self.getTitle()}\n----------")
         if self.verbose:
             self.utils.setProgress(endIt=True)
+        if update_guides:
+            self.ar.ui_manager.clear_guide_layout()
+            self.ar.filler.fill_created_guides()
+        self.ar.data.rebuiling = False
 
 
     def exportDicToJsonFile(self, dic, *args):

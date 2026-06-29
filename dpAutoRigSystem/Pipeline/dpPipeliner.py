@@ -907,7 +907,6 @@ class Pipeliner(object):
                 cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.ar.data.lang['i305_none'])
                 if self.ar.data.verbose:
                     print(self.ar.data.lang['r027_noAssetContext'])
-                    print("aqui mesmo...")
             except:
                 pass
 
@@ -916,9 +915,7 @@ class Pipeliner(object):
         """ Returns True if there's an asset context to work the rebuilding or False if not.
         """
         hasAssetContext = False
-#        print("self.pipeData =", self.pipeData)
         if self.pipeData:
-            print("self.pipeData['assetName'] =", self.pipeData['assetName'])
             if self.pipeData['assetName']:
                 if not self.pipeData['assetName'] == "None":
                     hasAssetContext = True
