@@ -560,7 +560,7 @@ class BaseStandard(object):
         if scalableList:
             cmds.parent(scalableList, self.toScalableHookGrp)
         self.ar.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
-        # add hook attributes to be read when rigging integrated modules:
+        # add hook attributes to be read when rigging composed modules:
         self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
         self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
         self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
@@ -581,10 +581,10 @@ class BaseStandard(object):
         cmds.lockNode(self.guideNet, lock=True)
 
     
-    def integratingInfo(self, *args):
+    def composingInfo(self, *args):
         """ This method just create this dictionary in order to build information of module integration.
         """
-        self.integrated = {}
+        self.composed = {}
     
 
     def createGuideNetwork(self, number=None, *args):

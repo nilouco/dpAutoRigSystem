@@ -1225,7 +1225,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
 
             # finalize this rig:
             self.serialize_guide()
-            self.integratingInfo()
+            self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
@@ -1487,11 +1487,11 @@ for net in cmds.ls(type="network"):
         return resultList
 
 
-    def integratingInfo(self, *args):
-        dpBaseStandard.BaseStandard.integratingInfo(self)
+    def composingInfo(self, *args):
+        dpBaseStandard.BaseStandard.composingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integrated = {
+        self.composed = {
                                         "worldRefList"         : self.worldRefList,
                                         "upperCtrlList"        : self.upperCtrlList,
                                         "ctrlList"             : self.aCtrls,

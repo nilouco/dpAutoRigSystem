@@ -22,8 +22,9 @@ class Data:
     colorize_curve_option_var: str = "dpAutoRigLastColorizeCurve"
     supplementary_attr_option_var: str = "dpAutoRigLastSupplementaryAttr"
     display_joint_option_var: str = "dpAutoRigLastDisplayJoint"
+    display_sub_shape_option_var: str = "dpAutoRigLastDisplaySubShape"
     display_temp_grp_option_var: str = "dpAutoRigLastDisplayTempGrp"
-    integrate_all_option_var: str = "dpAutoRigLastIntegrateAll"
+    compose_all_option_var: str = "dpAutoRigLastComposeAll"
     default_render_layer_option_var: str = "dpAutoRigLastDefaultRenderLayer"
 
     check_update_option_var: str = "dpAutoRigAutoCheckUpdate"
@@ -60,16 +61,13 @@ class Data:
     language_folder: str = "Languages"
     pipeline_folder: str = "Pipeline"
     standard_folder: str = "Modules.Standard"
-    integrated_folder: str = "Modules.Integrated"
     template_folder: str = "library.template"
     curve_simple_folder: str = "Modules.Curves.Simple"
     curve_combined_folder: str = "Modules.Curves.Combined"
     curve_preset_folder: str = "Modules.Curves.Presets"
-#    validator_folder: str = "Pipeline.Validator"
     checkin_folder: str = "Pipeline.Validator.CheckIn"
     checkout_folder: str = "Pipeline.Validator.CheckOut"
     validator_preset_folder: str = "Pipeline.Validator.Presets"
-#    rebuilder_folder: str = "Pipeline.Rebuilder"
     start_folder: str = "Pipeline.Rebuilder.Start"
     source_folder: str = "Pipeline.Rebuilder.Source"
     setup_folder: str = "Pipeline.Rebuilder.Setup"
@@ -112,9 +110,10 @@ class Data:
     degree_option: int = 0
     colorize_curve: int = 1
     display_joint: int = 1
-    supplementary_attr: int = 1
+    display_sub_shape: int = 1
     display_temp_grp: int = 0
-    integrate_all: int = 1
+    supplementary_attr: int = 1
+    compose_all: int = 1
     default_render_layer: int = 1
     agree_terms: int = 1
     auto_check_update: int = 1
@@ -130,20 +129,6 @@ class Data:
     
     lib_instances: list = field(default_factory=list)
     guide_instances: list = field(default_factory=list)
-#    standard_instances: list = field(default_factory=list)
-#    template_instances: list = field(default_factory=list)
-#    curve_simple_instances: list = field(default_factory=list)
-#    curve_combined_instances: list = field(default_factory=list)
-#    tools_instances: list = field(default_factory=list)
-#    checkin_instances: list = field(default_factory=list)
-#    checkout_instances: list = field(default_factory=list)
-#    checkaddon_instances: list = field(default_factory=list)
-#    checkfinishing_instances: list = field(default_factory=list)
-#    rebuilder_instances: list = field(default_factory=list)
-#    source_instances: list = field(default_factory=list)
-#    setup_instances: list = field(default_factory=list)
-#    deforming_instances: list = field(default_factory=list)
-#    custom_instances: list = field(default_factory=list)
 
     lib: dict = field(default_factory=dict)
     lang: dict = field(default_factory=dict)

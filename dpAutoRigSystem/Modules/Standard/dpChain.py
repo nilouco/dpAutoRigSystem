@@ -369,7 +369,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # hide visibility attribute:
                     cmds.setAttr(self.fkCtrl+'.visibility', keyable=False)
 
-                    # creating the originedFrom attributes (in order to permit integrated parents in the future):
+                    # creating the originedFrom attributes (in order to permit composed parents in the future):
                     origGrp = cmds.group(empty=True, name=side+self.userGuideName+"_%02d_OrigFrom_Grp"%n)
                     self.origFromList.append(origGrp)
                     if n == 0:
@@ -702,7 +702,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.integratingInfo()
+            self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
@@ -726,11 +726,11 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     cmds.setAttr(item+".scale"+axis, value)
 
 
-    def integratingInfo(self, *args):
-        dpBaseStandard.BaseStandard.integratingInfo(self)
+    def composingInfo(self, *args):
+        dpBaseStandard.BaseStandard.composingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integrated = {
+        self.composed = {
                                         "worldRefList": self.worldRefList,
                                         "worldRefShapeList": self.worldRefShapeList,
                                     }

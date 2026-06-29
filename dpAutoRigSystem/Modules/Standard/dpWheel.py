@@ -407,7 +407,7 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.integratingInfo()
+            self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
@@ -415,11 +415,11 @@ class Wheel(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         self.ar.customAttr.addAttr(0, self.to_ids) #dpID
     
     
-    def integratingInfo(self, *args):
-        dpBaseStandard.BaseStandard.integratingInfo(self)
+    def composingInfo(self, *args):
+        dpBaseStandard.BaseStandard.composingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integrated = {
+        self.composed = {
                                         "mainCtrlList"    : self.mainCtrlList,
                                         "wheelCtrlList"   : self.wheelCtrlList,
                                         "steeringGrpList" : self.steeringGrpList,

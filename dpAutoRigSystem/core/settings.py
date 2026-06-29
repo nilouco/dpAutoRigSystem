@@ -24,7 +24,6 @@ class Configuration(object):
 
         self.lib_folders = [
                             self.ar.data.standard_folder,
-                            self.ar.data.integrated_folder,
                             self.ar.data.curve_simple_folder,
                             self.ar.data.curve_combined_folder,
                             self.ar.data.checkin_folder,
@@ -108,19 +107,21 @@ class Configuration(object):
     def load_menu_options(self):
         values = []
         for item, option_var in zip([
-                                        self.ar.data.colorize_curve, 
+                                        self.ar.data.colorize_curve,
                                         self.ar.data.supplementary_attr,
                                         self.ar.data.display_joint,
-                                        self.ar.data.display_temp_grp, 
-                                        self.ar.data.integrate_all, 
-                                        self.ar.data.default_render_layer 
+                                        self.ar.data.display_sub_shape,
+                                        self.ar.data.display_temp_grp,
+                                        self.ar.data.compose_all,
+                                        self.ar.data.default_render_layer
                                    ], 
                                    [
                                         self.ar.data.colorize_curve_option_var,
                                         self.ar.data.supplementary_attr_option_var,
                                         self.ar.data.display_joint_option_var,
+                                        self.ar.data.display_sub_shape_option_var,
                                         self.ar.data.display_temp_grp_option_var,
-                                        self.ar.data.integrate_all_option_var,
+                                        self.ar.data.compose_all_option_var,
                                         self.ar.data.default_render_layer_option_var
                                    ]):
             values.append(self.check_last_option_var(
@@ -132,9 +133,10 @@ class Configuration(object):
         self.ar.data.colorize_curve = values[0]
         self.ar.data.supplementary_attr = values[1]
         self.ar.data.display_joint = values[2]
-        self.ar.data.display_temp_grp = values[3]
-        self.ar.data.integrate_all = values[4]
-        self.ar.data.default_render_layer = values[5]
+        self.ar.data.display_sub_shape = values[3]
+        self.ar.data.display_temp_grp = values[4]
+        self.ar.data.compose_all = values[5]
+        self.ar.data.default_render_layer = values[6]
 
 
     def load_agree_terms(self):
@@ -389,6 +391,11 @@ class Option(object):
         self.ar.data.display_joint = value
         self.set_option_var(self.ar.data.display_joint_option_var, value, False)
 
+    
+    def set_display_sub_shape(self, value):
+        self.ar.data.display_sub_shape = value
+        self.set_option_var(self.ar.data.display_sub_shape_option_var, value, False)
+
 
     def set_display_temp_grp(self, value):
         """ Change display hidden guide groups in the Outliner:
@@ -405,9 +412,9 @@ class Option(object):
         self.set_option_var(self.ar.data.display_temp_grp_option_var, value, False)
 
 
-    def set_integrate_all(self, value):
-        self.ar.data.integrate_all = value
-        self.set_option_var(self.ar.data.integrate_all_option_var, value, False)
+    def set_compose_all(self, value):
+        self.ar.data.compose_all = value
+        self.set_option_var(self.ar.data.compose_all_option_var, value, False)
 
 
     def set_default_render_layer(self, value):
@@ -464,8 +471,9 @@ class Option(object):
         self.set_colorize_curve(1)
         self.set_supplementary_attr(1)
         self.set_display_joint(1)
+        self.set_display_sub_shape(1)
         self.set_display_temp_grp(0)
-        self.set_integrate_all(1)
+        self.set_compose_all(1)
         self.set_default_render_layer(1)
         self.reset_prefix()
         self.set_agree_terms_cond(1)

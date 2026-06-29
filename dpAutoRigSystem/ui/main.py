@@ -88,8 +88,9 @@ class MainUI(object):
         cmds.menuItem("opt_colorize_curve_mi", label=self.ar.data.lang['i065_colorizeCtrl'], checkBox=self.ar.data.colorize_curve, command=self.ar.opt.set_colorize_curve, parent="options_mi")
         cmds.menuItem("opt_supplementary_attr_mi", label=self.ar.data.lang['i066_addAttr'], checkBox=self.ar.data.supplementary_attr, command=self.ar.opt.set_supplementary_attr, parent="options_mi")
         cmds.menuItem("opt_display_joint_mi", label=self.ar.data.lang['i009_displayJointsCB'], checkBox=self.ar.data.display_joint, command=self.ar.opt.set_display_joint, parent="options_mi")
+        cmds.menuItem("opt_display_sub_shape_mi", label=self.ar.data.lang['i031_displaySubShapeCB'], checkBox=self.ar.data.display_sub_shape, command=self.ar.opt.set_display_sub_shape, parent="options_mi")
         cmds.menuItem("opt_display_temp_grp_mi", label=self.ar.data.lang['i183_hideGuideGrp'], checkBox=self.ar.data.display_temp_grp, command=self.ar.opt.set_display_temp_grp, parent="options_mi")
-        cmds.menuItem("opt_integrate_module_mi", label=self.ar.data.lang['i010_integrateCB'], checkBox=self.ar.data.integrate_all, command=self.ar.opt.set_integrate_all, parent="options_mi")
+        cmds.menuItem("opt_integrate_module_mi", label=self.ar.data.lang['i010_composeCB'], checkBox=self.ar.data.compose_all, command=self.ar.opt.set_compose_all, parent="options_mi")
         cmds.menuItem("opt_default_render_layer_mi", label=self.ar.data.lang['i004_defaultRL'], checkBox=self.ar.data.default_render_layer, command=self.ar.opt.set_default_render_layer, parent="options_mi")
         cmds.menuItem("opt_prefix_mi", label=f"{self.ar.data.lang['i272_set']} {self.ar.data.lang['i144_prefix']}", command=self.ar.opt.set_prefix, parent="settings_menu")
         cmds.menuItem("opt_reset_options_mi", label=self.ar.data.lang['i271_reset'], command=self.ar.opt.reset_options_to_default, parent="settings_menu")
@@ -174,7 +175,7 @@ class MainUI(object):
         # -> rig_guides_standard_fl it will be populated here by guides of standard library...
         cmds.separator(style='none', height=10, width=120, parent='rig_guides_start_sl')
         cmds.frameLayout("rig_guides_template_fl", label=self.ar.data.lang['v001_template'], width=140, collapsable=True, collapse=False, parent='rig_guides_start_sl')
-        # -> rig_guides_template_fl it will be populated here by guides of integrated templates read from json...
+        # -> rig_guides_template_fl it will be populated here by guides of composed templates read from json...
         # middle right
         cmds.scrollLayout("rig_guides_inst_sl", width=120, parent='rigging_tab')
         cmds.columnLayout("rig_guides_inst_cl", adjustableColumn=True, width=120, parent='rig_guides_inst_sl')

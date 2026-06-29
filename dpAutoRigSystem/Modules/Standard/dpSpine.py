@@ -23,7 +23,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         kwargs["WIKI"] = WIKI
         dpBaseStandard.BaseStandard.__init__(self, *args, **kwargs)
         # declare variable
-        self.integrated = {}
+        self.composed = {}
         self.cvJointLoc = None
         self.shapeSizeCH = None
         self.currentNJoints = 3
@@ -505,7 +505,7 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.integratingInfo()
+            self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
@@ -540,11 +540,11 @@ class Spine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             cmds.connectAttr(fromNode+".size"+axis, toNode+".scale"+axis, force=True)
 
 
-    def integratingInfo(self, *args):
-        dpBaseStandard.BaseStandard.integratingInfo(self)
+    def composingInfo(self, *args):
+        dpBaseStandard.BaseStandard.composingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
-        self.integrated = {
+        self.composed = {
                                         "hipsAList": self.aHipsAList,
                                         "tipList": self.tipList,
                                         "volumeVariationAttrList": self.aVolVariationAttrList,

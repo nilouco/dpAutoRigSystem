@@ -1674,6 +1674,8 @@ class ControlClass(object):
         if subShapeList:
             for subShapeNode in subShapeList:
                 cmds.connectAttr(ctrl+".subControlDisplay", subShapeNode+".visibility", force=True)
+        if self.ar.data.display_sub_shape:
+            cmds.setAttr(ctrl+".subControlDisplay", 1)
 
 
     def mirrorShape(self, nodeName=False, fromPrefix=False, toPrefix=False, axis=False, *args):
@@ -1873,4 +1875,5 @@ class ControlClass(object):
         cmds.setAttr(ctrl+".directionDisplay", channelBox=True)
         directionShapeList = cmds.listRelatives(ctrl, shapes=True)
         cmds.connectAttr(ctrl+".directionDisplay", directionShapeList[-1]+".visibility")
-  
+        if self.ar.data.display_sub_shape:
+            cmds.setAttr(ctrl+".directionDisplay", 1)
