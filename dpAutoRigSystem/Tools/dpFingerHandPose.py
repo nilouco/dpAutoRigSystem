@@ -116,4 +116,5 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
                     self.ar.customAttr.addAttr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state: #verbose
                         cmds.select(handCtrlList)
-                        self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)
+                        if not self.ar.data.rebuilding:
+                            self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)

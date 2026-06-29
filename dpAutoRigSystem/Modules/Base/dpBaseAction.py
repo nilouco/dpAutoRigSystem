@@ -436,7 +436,7 @@ class ActionStartClass(object):
         if update_guides:
             self.ar.ui_manager.clear_guide_layout()
             self.ar.filler.fill_created_guides()
-        self.ar.data.rebuiling = False
+        self.ar.data.rebuilding = False
 
 
     def exportDicToJsonFile(self, dic, *args):
