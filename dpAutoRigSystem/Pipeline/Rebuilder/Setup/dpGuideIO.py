@@ -238,7 +238,8 @@ class GuideIO(dpBaseAction.ActionStartClass):
             if item in self.netDic["GuideData"].keys():
                 new_item = self.get_new_name(item)
                 if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
-                    cmds.parent(new_item, world=True)
+                    if cmds.listRelatives(new_item, parent=True):
+                        cmds.parent(new_item, world=True)
                 for attr in list(self.netDic["GuideData"][item]):
                     if attr in self.ar.data.transform_attrs:
                         if not cmds.getAttr(new_item+"."+attr, lock=True): #unlocked attribute

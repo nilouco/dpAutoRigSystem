@@ -30,18 +30,14 @@ class BaseStandard(object):
         self.utils = ar.utils
         if self.ar.dev:
             reload(dpCorrectionManager)
-        # setting dpControls:
-#        self.ar.ctrls.guide_base
         # starting correctionManager:
         self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar)
         self.correctionManager.ui = False
-        
         self.raw = True
         self.serialized = False
         self.sideList = [""]
         self.axisList = ["X", "Y", "Z"]
         self.guideNet = None
-        #self.customName = ""
         
 
     def get_namespace_for_it(self, userGuideName=None):
@@ -49,8 +45,6 @@ class BaseStandard(object):
         if not self.userGuideName:
             self.userGuideName = self.ar.data.base_name+str(self.ar.utils.findLastNumber())
         self.rigType = "biped"
-#        print("ORIGINAL = userGUideName --===", self.userGuideName)
-        
         # defining namespace:
         self.guideNamespace = self.name+"__"+self.userGuideName
         # defining guideNamespace:
@@ -69,10 +63,8 @@ class BaseStandard(object):
         #
         # WIP TODO: get new userGuideName by findLastNumber in utils
         #
-#        print("self.userGuideName before =", self.userGuideName)
-#        print("userGuideName =", userGuideName)
+
         self.get_namespace_for_it(userGuideName)
-#        print("self.userGuideName after =", self.userGuideName)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -84,8 +76,6 @@ class BaseStandard(object):
     
 
     def load_raw_guide(self, userGuideName=None):
-
-#        print("loading here // userGuideName ==", userGuideName)
         if userGuideName:
             self.userGuideName = userGuideName
         if self.ar.data.ui_state:
@@ -113,7 +103,7 @@ class BaseStandard(object):
         if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
             self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
             self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
-        # here we have just the column layouts to be populated by modules.
+        # rig_guides_inst_cl -> here we have just the column layouts to be populated by modules.
     
     
     def createGuide(self, *args):
@@ -140,11 +130,6 @@ class BaseStandard(object):
         cmds.setAttr(self.guide_base+".mirrorName", self.ar.data.lang['p002_left']+' --> '+self.ar.data.lang['p003_right'], type='string')
         cmds.setAttr(self.guide_base+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
-
-        # print("self =", self)
-        # print("self.name =", self.name)
-        #print("guide)info =", self.ar.config.get_instance_info(self.name, self.ar.data.standard_folder, "imported"))
-        # info = self.ar.data.lib
 
         cmds.setAttr(self.guide_base+".guideObjectInfo", self.ar.config.get_instance_info(self.name, [self.ar.data.standard_folder], "imported"), type='string')
         cmds.setAttr(self.guide_base+".rigType", self.rigType, type='string')
@@ -180,9 +165,7 @@ class BaseStandard(object):
         self.createWorldSize()
         # prepare guide to serialization
         self.createGuideNetwork()
-        self.ar.data.guide_instances.append(self)#[self.name, self.userGuideName, self.guide_base])
-#        print("self.ar.data.guide_instances =", self.ar.data.guide_instances)
-#        print("valid =", self.name, self.userGuideName, self.guide_base)
+        self.ar.data.guide_instances.append(self)
         if self.ar.data.ui_state:
             self.ar.ui_manager.update_guide_footer()
     
@@ -214,55 +197,19 @@ class BaseStandard(object):
     def deleteModule(self, *args):
         """ Delete the Guide, ModuleLayout and Namespace.
         """
-        # delete mirror preview:
-        #try:
-        #    cmds.delete(self.guide_base[:self.guide_base.find(":")]+"_MirrorGrp")
-        #except:
-        #    pass
         for item in [self.guide_base[:self.guide_base.find(":")]+"_MirrorGrp",
                      self.guide_base+"_WorldSize_Ref"]:
             if cmds.objExists(item):
                 cmds.delete(item)
-        
         # delete the guide module:
         self.utils.clearNodeGrp(self.guide_base, 'guideBase', unparent=True)
-        # clear default 'dpAR_GuideMirror_Grp':
-        self.utils.clearNodeGrp()
-        
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
             cmds.namespace(moveNamespace=(self.guideNamespace, ':'), force=True)
             cmds.namespace(removeNamespace=self.guideNamespace, force=True)
-        
-        #if self.ar.data.ui_state:
-            # self.ar.ui_manager.clear_guide_layout()
-            # self.ar.filler.fill_created_guides()
-            # self.ar.ui_manager.update_guide_footer()
         if not self.ar.data.rebuilding:
             self.ar.ui_manager.refresh_ui()
-
-            # self.currentText = cmds.text("footerRiggingText", query=True, label=True)
-            # cmds.text("footerRiggingText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.ar.data.lang['i005_footerRigging'])
-        
-        # clear module from instance list (clean dpUI list):
-#        delIndex = 
-#        self.ar.data.standard_instances.pop(self.ar.data.standard_instances.index(self))
-        #if [self.name, self.userGuideName, self.guide_base] in self.ar.data.guide_instances:
-        #delIndex = self.ar.data.guide_instances.index([self.name, self.userGuideName, self.guide_base])
-        #if delIndex:
-        #    self.ar.data.guide_instances.pop(delIndex)
-        #else:
-        #    print("NNNNNNOOOOO, ", delIndex)
-        #    print("YES removing it...")
-        #    self.ar.data.guide_instances.remove([self.name, self.userGuideName, self.guide_base])
-        #    print("Good removed it...")
-        #
-        #
-        # TODO: call refresh UI here?
-        #
-        #
-        #print("created_guides after  =", self.ar.data.guide_instances)
     
 
     def duplicateModule(self, *args):

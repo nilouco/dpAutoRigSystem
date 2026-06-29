@@ -553,6 +553,11 @@ class Utils(object):
             cmds.delete(nodeGrpName)
 
 
+    def clear_guide_mirror_grp(self):
+        if cmds.objExists(self.ar.data.guide_mirror_grp):
+            cmds.delete(self.ar.data.guide_mirror_grp)
+            
+
     def getGuideChildrenList(self, nodeName):
         """ This function verify if there are guide children of the passed nodeName.
             It will return the guideChildrenList if it exists.
@@ -1597,8 +1602,3 @@ class Utils(object):
         if custom_name:
             return custom_name
         return name
-
-
-    def clear_guide_mirror_grp(self):
-        if cmds.objExists(self.ar.data.guide_mirror_grp):
-            cmds.delete(self.ar.data.guide_mirror_grp)

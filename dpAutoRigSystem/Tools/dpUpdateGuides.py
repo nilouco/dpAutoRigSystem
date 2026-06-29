@@ -494,10 +494,8 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
     def doDelete(self, *args):
         self.ar.utils.closeUI('updateSummary')
         for guide in self.updateData:
-            try:
+            if cmds.listRelatives(guide, parent=True):
                 cmds.parent(guide, world=True)
-            except Exception as e:
-                print(e)
         try:
             cmds.delete(*self.updateData.keys())
         except:

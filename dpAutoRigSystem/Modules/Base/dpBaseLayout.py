@@ -551,13 +551,8 @@ class BaseLayout(object):
         self.previewMirrorGrpName = self.guide_base[:self.guide_base.find(":")]+'_MirrorGrp'
         if cmds.objExists(self.previewMirrorGrpName):
             cmds.delete(self.previewMirrorGrpName)
-        
-        # verify if there is not any guide module in the ar.guideMirrorGrp and then delete it:
-        self.utils.clearNodeGrp(self.ar.data.guide_mirror_grp, 'guideBaseMirror', unparent=False)
-        
         # get children, verifying if there are children guides:
         guideChildrenList = self.utils.getGuideChildrenList(self.guide_base)
-        
         self.mirrorAxis = cmds.getAttr(self.guide_base+".mirrorAxis")
         if self.mirrorAxis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
@@ -665,7 +660,7 @@ class BaseLayout(object):
                 
                 # create previewMirror group:
                 self.previewMirrorGrp = cmds.group(name=self.previewMirrorGrpName, empty=True)
-                cmds.parent( self.previewMirrorGuide, self.previewMirrorGrpName, absolute=True )
+                cmds.parent(self.previewMirrorGuide, self.previewMirrorGrpName, absolute=True)
                 # parent the previewMirror group to the guideMirror group:
                 cmds.parent(self.previewMirrorGrp, self.ar.data.guide_mirror_grp, relative=True)
                 

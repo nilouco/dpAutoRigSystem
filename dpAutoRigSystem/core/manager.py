@@ -33,18 +33,6 @@ class UIManager(object):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
-        
-        #
-        # WIP
-        #
-        #
-        # TODO: delete main frame layout and call the loadUI again?
-        #       or just clear filled layouts and fill them again?
-        #
-        # TODO: check all validators active checkboxes?
-        #
-
-#            def refreshMainUI(self, savedScene=False, resetButtons=True, clearSel=False, *args):
         if self.ar.data.ui_state:
             if savedScene:
                 selected = cmds.ls(selection=True)
@@ -79,7 +67,6 @@ class UIManager(object):
                     cmds.select(selected)
             if clearSel:
                 cmds.select(clear=True)
-#            self.ar.data.rebuilding = False
 
 
     def clear_guide_layout(self):
@@ -123,7 +110,6 @@ class UIManager(object):
                 cmds.text('skin_footer_txt', edit=True, label=str(n_selected_joints)+" "+self.ar.data.lang['i025_joints']+" "+str(n_selected_geoms)+" "+self.ar.data.lang['i024_geometries'])
             else:
                 cmds.text('skin_footer_txt', edit=True, label=self.ar.data.lang['i029_skinNothing'])
-        
 
 
     def delete_exist_window(self, *args):
@@ -293,6 +279,3 @@ class UIManager(object):
                 print(self.ar.data.lang['i201_saveScene'])
         self.ar.utils.setProgress(endIt=True)
         return actionResultData, False, 0
-
-
-

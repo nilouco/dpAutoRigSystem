@@ -489,7 +489,8 @@ class Maker(object):
     
 
     def before_rig_all(self):
-        print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
+        if not self.ar.data.rebuilding:
+            print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
         self.ar.utils.setProgress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
         self.ar.utils.closeUI(self.ar.data.plus_info_win_name)
@@ -500,9 +501,6 @@ class Maker(object):
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if not self.ar.data.rebuilding:
-#            self.ar.ui_manager.clear_guide_layout()
-            #self.ar.filler.fill_created_guides()
-        #else:
             self.ar.ui_manager.refresh_ui()
 
 

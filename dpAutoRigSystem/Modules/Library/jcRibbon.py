@@ -456,7 +456,7 @@ class RibbonClass(object):
         aux_Jnt = []
         ribbon = ''
         extraCtrlList = []
-
+        
         #create a nurbsPlane based in the choose orientation option
         if horizontal:
             ribbon = cmds.nurbsPlane(ax=axis, w=numJoints, lr=(1/float(numJoints)), d=3, u=numJoints, v=1, ch=0, name=name+'_Plane')[0]
@@ -818,7 +818,6 @@ class RibbonClass(object):
         locatorsGrp = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')
         skinJntGrp = cmds.group(rb_Jnt, n=name+'_Jnt_Grp')
         finalSystemGrp = cmds.group(ribbon, locatorsGrp, skinJntGrp, n=name+'_RibbonSystem_Grp')
-        
         #do the controller joints skin and the ribbon
         ribbonShape = cmds.listRelatives(ribbon, shapes=True)
         skinClusterNode = cmds.skinCluster(drv_Jnt[0:3], ribbonShape, tsb=True, mi=2, dr=1, n=name+"_SC")[0]
@@ -829,61 +828,61 @@ class RibbonClass(object):
         #skin presets for the ribbon (that's amazing!)
         if not horizontal:
             if numJoints == 3:
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][5]', tv=(drv_Jnt[2], 1))
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][4]', tv=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][3]', tv=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][2]', tv=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][1]', tv=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][0]', tv=(drv_Jnt[0], 1))
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][5]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][4]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][3]', transformValue=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][2]', transformValue=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][1]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][0]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
 
             elif numJoints == 5:
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][7]', tv=(drv_Jnt[2], 1))
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][6]', tv=[(drv_Jnt[2], 0.80), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][5]', tv=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][4]', tv=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][3]', tv=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][2]', tv=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][1]', tv=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][0]', tv=(drv_Jnt[0], 1))
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][7]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][6]', transformValue=[(drv_Jnt[2], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][5]', transformValue=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][4]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][3]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][2]', transformValue=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][1]', transformValue=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][0]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
             elif numJoints == 7:
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][9]', tv=(drv_Jnt[2], 1))
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][8]', tv=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][7]', tv=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][6]', tv=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][5]', tv=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][4]', tv=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][3]', tv=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][2]', tv=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][1]', tv=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0:1][0]', tv=(drv_Jnt[0], 1))
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][9]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][8]', transformValue=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][7]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][6]', transformValue=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][5]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][4]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][3]', transformValue=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][2]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][1]', transformValue=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0:1][0]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
         else:
             if numJoints == 3:
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[5][0:1]', tv=(drv_Jnt[2], 1))
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[4][0:1]', tv=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[3][0:1]', tv=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[2][0:1]', tv=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[1][0:1]', tv=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0][0:1]', tv=(drv_Jnt[0], 1))
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[5][0:1]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[4][0:1]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[3][0:1]', transformValue=[(drv_Jnt[2], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[2][0:1]', transformValue=[(drv_Jnt[0], 0.2), (drv_Jnt[1], 0.8)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[1][0:1]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0][0:1]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
             elif numJoints == 5:
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[7][0:1]', tv=(drv_Jnt[2], 1))
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[6][0:1]', tv=[(drv_Jnt[2], 0.80), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[5][0:1]', tv=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[4][0:1]', tv=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[3][0:1]', tv=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[2][0:1]', tv=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[1][0:1]', tv=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0][0:1]', tv=(drv_Jnt[0], 1))
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[7][0:1]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[6][0:1]', transformValue=[(drv_Jnt[2], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[5][0:1]', transformValue=[(drv_Jnt[2], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[4][0:1]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[3][0:1]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[2][0:1]', transformValue=[(drv_Jnt[0], 0.5), (drv_Jnt[1], 0.5)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[1][0:1]', transformValue=[(drv_Jnt[0], 0.8), (drv_Jnt[1], 0.2)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0][0:1]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
             elif numJoints == 7:
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[9][0:1]', tv=(drv_Jnt[2], 1))
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[8][0:1]', tv=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[7][0:1]', tv=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[6][0:1]', tv=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[5][0:1]', tv=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[4][0:1]', tv=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[3][0:1]', tv=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[2][0:1]', tv=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[1][0:1]', tv=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
-                cmds.skinPercent(skinClusterNode, ribbon + '.cv[0][0:1]', tv=(drv_Jnt[0], 1))
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[9][0:1]', transformValue=[(drv_Jnt[2], 0.99), (drv_Jnt[1], 0.01)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[8][0:1]', transformValue=[(drv_Jnt[2], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[7][0:1]', transformValue=[(drv_Jnt[2], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[6][0:1]', transformValue=[(drv_Jnt[2], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[5][0:1]', transformValue=[(drv_Jnt[2], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[4][0:1]', transformValue=[(drv_Jnt[0], 0.25), (drv_Jnt[1], 0.75)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[3][0:1]', transformValue=[(drv_Jnt[0], 0.35), (drv_Jnt[1], 0.65)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[2][0:1]', transformValue=[(drv_Jnt[0], 0.6), (drv_Jnt[1], 0.4)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[1][0:1]', transformValue=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
+                cmds.skinPercent(skinClusterNode, ribbon+'.cv[0][0:1]', transformValue=[(drv_Jnt[0], 0.99), (drv_Jnt[1], 0.01)])
         constr = []
         if guides:
             top = guides[0]
@@ -896,7 +895,6 @@ class RibbonClass(object):
             constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PoC"))
             # this is an important constraint to avoid Ribbon flipping and follow correctely the hierarchy:
             cmds.parentConstraint(top, locatorsGrp, maintainOffset=True, name=locatorsGrp+"_PaC")
-            
         #fix loc_Grp scale
         if guides:
             from math import sqrt, pow
@@ -913,7 +911,7 @@ class RibbonClass(object):
             cmds.setAttr(locatorsGrp+'.s', scale, scale, scale)
         
             cmds.delete(auxLoc1, auxLoc2)
-        
+
         # baseTwist:
         if not upCtrl == None:
             bttm_LocGrp = cmds.group(bttm_Loc[2], name=bttm_Loc[2]+"_Grp")
