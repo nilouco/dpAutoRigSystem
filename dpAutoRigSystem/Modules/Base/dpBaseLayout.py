@@ -48,12 +48,12 @@ class BaseLayout(object):
         """ Add mouse middle click functions.
         """
         selection = cmds.ls(selection=True)
-        if modifiers == 0: #middle click
+        if modifiers == 0: #middle mouse drag
             selection = [self.guide_base]
-        elif modifiers == 1: #middle click + shift
+        elif modifiers == 1: #middle mouse drag + shift
             if not self.guide_base in selection:
                 selection.append(self.guide_base)
-        elif modifiers == 2: #middle click + control
+        elif modifiers == 2: #middle drag + control
             if self.guide_base in selection:
                 selection.remove(self.guide_base)
         cmds.select(selection)

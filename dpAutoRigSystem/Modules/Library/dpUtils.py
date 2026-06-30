@@ -550,6 +550,7 @@ class Utils(object):
                                 cmds.parent(child, fatherList[0])
                             else:
                                 cmds.parent(child, world=True)
+            cmds.lockNode(nodeGrpName, lock=False)
             cmds.delete(nodeGrpName)
 
 

@@ -57,10 +57,7 @@ class UIManager(object):
                 self.ar.pipeliner.refreshAssetData()
                 for item in self.ar.config.get_rebuilder_instances():
                     item.updateActionButtons(color=False)
-            try:
-                self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.ar.job.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True)
-            except: #due duplicate guides
-                self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.ar.job.selected_guide), parent='main_menu_bar', replacePrevious=False, killWithScene=False, compressUndo=True)
+            self.ar.job.selection_change()
             if savedScene:
                 cmds.select(clear=True)
                 if selected:

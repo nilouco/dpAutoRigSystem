@@ -59,7 +59,7 @@ class ExitEditMode(dpBaseAction.ActionStartClass):
                             else: #fix
                                 try:
                                     # delete the corrective script job
-                                    self.ar.ctrls.deleteOldJobs(item)
+                                    self.ar.job.delete_old_job(item)
                                     # remove color override
                                     shapeList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
                                     if shapeList:

@@ -46,6 +46,7 @@ class MainUI(object):
         self.ar.ui_manager.refresh_ui()
         self.ar.agree.load_terms_cond()
         self.ar.updater.load_update()
+        self.ar.job.garbage_collector()
         self.ar.job.start_jobs()
         self.ar.opening.close_opening_ui()
         cmds.select(startSelList)

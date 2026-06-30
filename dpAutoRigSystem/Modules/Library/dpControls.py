@@ -1145,7 +1145,7 @@ class ControlClass(object):
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                     cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
-                #self.deleteOldJobs(ctrlName)
+                self.ar.job.delete_old_job(ctrlName)
                 cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=False, compressUndo=True)
                 self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
 
@@ -1588,21 +1588,13 @@ class ControlClass(object):
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
 
 
-    def deleteOldJobs(self, ctrlName, *args):
-        """ Try to find an existing script job already running for this corrective controller and kill it.
-        """
-        jobList = cmds.scriptJob(listJobs=True)
-        if jobList:
-            for job in jobList:
-                if ctrlName in job:
-                    jobNumber = int(job[:job.find(":")])
-                    cmds.scriptJob(kill=jobNumber, force=True)
+    
 
 
     def createCorrectiveMode(self, ctrlName, *args):
         """ Create a scriptJob to read this attribute change.
         """
-        self.deleteOldJobs(ctrlName)
+        self.ar.job.delete_old_job(ctrlName)
         cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=False, compressUndo=True)
         if cmds.getAttr(ctrlName+".editMode"):
             self.colorShape([ctrlName], 'bonina', rgb=True)

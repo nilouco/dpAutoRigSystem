@@ -9,6 +9,18 @@ class Job(object):
         self.ar = ar
 
 
+    def garbage_collector(self):
+        self.delete_old_job("dpAutoRigSystem")
+
+
+    def delete_old_job(self, item, *args):
+        """ Try to find an existing script job already running for this item name and kill it.
+        """
+        for job in cmds.scriptJob(listJobs=True):
+            if item in job:
+                cmds.scriptJob(kill=int(job[:job.find(":")]), force=True)
+
+
     def start_jobs(self):
         """ Create scriptJobs to read:
             - uiDeleted
@@ -24,9 +36,20 @@ class Job(object):
         #cmds.scriptJob(event=('NewSceneOpened', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.ar.ui_manager.refresh_ui, savedScene=True, resetButtons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('workspaceChanged', self.ar.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-        self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
         self.ar.ctrls.startCorrectiveEditMode()
+        self.selection_change()
         self.selected_guide()
+
+
+    def selection_change(self):
+        old_job_id = self.ar.data.select_change_job_id
+        try:
+            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+        except: #due duplicate guides
+            self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='main_menu_bar', replacePrevious=False, killWithScene=False, compressUndo=True)
+        if not old_job_id == 0:
+            if cmds.scriptJob(exists=old_job_id):
+                cmds.scriptJob(kill=old_job_id, force=True)
 
 
     def selected_guide(self):
