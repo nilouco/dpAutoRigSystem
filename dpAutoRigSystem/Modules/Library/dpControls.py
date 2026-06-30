@@ -539,7 +539,7 @@ class ControlClass(object):
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
             if corrective:
                 self.addCorrectiveAttrs(curve)
-                self.startCorrectiveEditMode([curve])
+                self.ar.job.start_corrective_edit_mode([curve])
             if not headDef == 0:
                 self.addDefInfluenceAttrs(curve, headDef)
             if guideSource:
@@ -703,7 +703,7 @@ class ControlClass(object):
         cmds.setAttr(circle+"0Shape.lineWidth", 2)
         cmds.select(clear=True)
         # pinGuide:
-        self.createPinGuide(circle)
+        self.ar.job.create_pin_guide(circle)
         return [circle, radiusCtrl]
 
 
@@ -1131,125 +1131,7 @@ class ControlClass(object):
         self.shapeSizeSetup(ctrlName)
         # pinGuide:
         if pin:
-            self.createPinGuide(ctrlName)
-
-
-    def createPinGuide(self, ctrlName, *args):
-        """ Add pinGuide attribute if it doesn't exist yet.
-            Create a scriptJob to read this attribute change.
-        """
-        if not ctrlName.endswith("_JointEnd"):
-            if not ctrlName.endswith("_RadiusCtrl"):
-                if not "pinGuide" in cmds.listAttr(ctrlName):
-                    cmds.addAttr(ctrlName, longName="pinGuide", attributeType="bool")
-                    cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
-                    cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
-                    cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
-                self.ar.job.delete_old_job(ctrlName)
-                cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=False, compressUndo=True)
-                self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
-
-
-    def setPinnedGuideColor(self, ctrlName, status, color="red", *args):
-        """ Set the color override for pinned guide shapes.
-        """
-        cmds.setAttr(ctrlName+".overrideEnabled", status)
-        cmds.setAttr(ctrlName+".overrideColor", self.dic_colors[color])
-        shapeList = cmds.listRelatives(ctrlName, children=True, fullPath=False, shapes=True)
-        if shapeList:
-            for shapeNode in shapeList:
-                if status:
-                    cmds.setAttr(shapeNode+".overrideEnabled", 0)
-                else:
-                    cmds.setAttr(shapeNode+".overrideEnabled", 1)
-
-
-    def jobPinGuide(self, ctrlName, *args):
-        """ Pin temporally the guide by scriptJob.
-        """
-        if "pinGuide" in cmds.listAttr(ctrlName):
-            # extracting namespace... need to find an ellegant way using message or stored attribute instead:
-            nameSpaceName = None
-            cmds.namespace(set=":")
-            if ":" in ctrlName:
-                if "|" in ctrlName:
-                    nameSpaceName = ctrlName[ctrlName.rfind("|")+1:ctrlName.rfind(":")]
-                else:
-                    nameSpaceName = ctrlName[:ctrlName.rfind(":")]
-            # work with locked attributes
-            pinValue = cmds.getAttr(ctrlName+".pinGuide")
-            pcName = ctrlName+"_PinGuide_PaC"
-            if pinValue:
-                if cmds.objExists(self.ar.data.temp_grp):
-                    if not cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True):
-                        self.storeLockedList(ctrlName)
-                        if nameSpaceName:
-                            cmds.namespace(set=nameSpaceName)
-                        for attr in self.ar.data.transform_attrs:
-                            cmds.setAttr(ctrlName+"."+attr, lock=False)
-                        pc = cmds.parentConstraint(self.ar.data.temp_grp, ctrlName, maintainOffset=True, name=pcName)[0]
-                        cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
-                        for attr in self.ar.data.transform_attrs:
-                            cmds.setAttr(ctrlName+"."+attr, lock=True)
-            else:
-                pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
-                if pcNodeList:
-                    cmds.delete(pcNodeList[0])
-                    for attr in self.ar.data.transform_attrs:
-                        cmds.setAttr(ctrlName+"."+attr, lock=False)
-                    self.restoreLockedList(ctrlName)
-            self.setPinnedGuideColor(ctrlName, pinValue)
-            cmds.namespace(set=":")
-
-
-    def startPinGuide(self, guideBase, *args):
-        """ Reload pinGuide job for already created guide.
-        """
-        if cmds.objExists(guideBase):
-            childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")
-            if childrenList:
-                for childNode in childrenList:
-                    if "pinGuide" in cmds.listAttr(childNode):
-                        self.createPinGuide(childNode)
-            if "pinGuide" in cmds.listAttr(guideBase):
-                self.createPinGuide(guideBase)
-
-
-    def unPinGuide(self, guideList=None, force=False, *args):
-        """ Remove pinGuide setup.
-            We expect to have the scriptJob running here to clean-up the pin setup, or just force it to run.
-        """
-        if not guideList:
-            guideList = [guide for guide in cmds.ls(selection=False, type="transform") if "pinGuide" in cmds.listAttr(guide)]
-        if guideList:
-            for guide in guideList:
-                cmds.setAttr(guide+".pinGuide", 0)
-                if force:
-                    self.jobPinGuide(guide)
-
-
-    def storeLockedList(self, ctrlName, *args):
-        """ Store a string of a list of found locked attributes.
-        """
-        lockedAttrStr = ""
-        if not "lockedList" in cmds.listAttr(ctrlName):
-            cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
-        lockedAttrList = cmds.listAttr(ctrlName, locked=True)
-        if lockedAttrList:
-            lockedAttrStr = ';'.join(str(e) for e in lockedAttrList)
-        cmds.setAttr(ctrlName+".lockedList", lockedAttrStr, type="string")
-
-
-    def restoreLockedList(self, ctrlName, *args):
-        """ Lock again the stored attributes.
-        """
-        if "lockedList" in cmds.listAttr(ctrlName):
-            lockedAttr = cmds.getAttr(ctrlName+".lockedList")
-            if lockedAttr:
-                lockedAttrList = lockedAttr.split(";")
-                if lockedAttrList:
-                    for attr in lockedAttrList:
-                        cmds.setAttr(ctrlName+"."+attr, lock=True)
+            self.ar.job.create_pin_guide(ctrlName)
 
 
     def importCalibration(self, *args):
@@ -1586,65 +1468,6 @@ class ControlClass(object):
         # create an attribute to be used as editMode by module:
         cmds.addAttr(ctrlName, longName="editMode", attributeType="bool", keyable=False)
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
-
-
-    
-
-
-    def createCorrectiveMode(self, ctrlName, *args):
-        """ Create a scriptJob to read this attribute change.
-        """
-        self.ar.job.delete_old_job(ctrlName)
-        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=False, compressUndo=True)
-        if cmds.getAttr(ctrlName+".editMode"):
-            self.colorShape([ctrlName], 'bonina', rgb=True)
-
-
-    def jobCorrectiveEditMode(self, ctrlName, *args):
-        """ Edit mode to corrective control by scriptJob.
-        """
-        if "editMode" in cmds.listAttr(ctrlName):
-            editModeValue = cmds.getAttr(ctrlName+".editMode")
-            if editModeValue:
-                self.colorShape([ctrlName], 'bonina', rgb=True)
-            else:
-                shapeList = cmds.listRelatives(ctrlName, shapes=True, children=True, fullPath=True)
-                if shapeList:
-                    for shapeNode in shapeList:
-                        cmds.setAttr(shapeNode+".overrideRGBColors", 0)
-                self.setCorrectiveCalibration(ctrlName)
-
-
-    def startCorrectiveEditMode(self, objList=None, *args):
-        """ Reload editMode job for existing corrective controllers.
-        """
-        if not objList:
-            objList = cmds.ls(selection=False, type="transform")
-        if objList:
-            for node in objList:
-                if "editMode" in cmds.listAttr(node):
-                    self.createCorrectiveMode(node)
-
-
-    def setCorrectiveCalibration(self, ctrlName, *args):
-        """ Remove corrective controller editMode setup.
-            Calculate the results of transformations to set the calibration attributes.
-        """
-        calibrateAttrList = ["T", "R", "S"]
-        calibrateAxisList = ["X", "Y", "Z"]
-        if cmds.objExists(ctrlName):
-            dupTemp = cmds.duplicate(ctrlName, name=ctrlName+"_TEMP")[0]
-            cmds.parent(dupTemp, ctrlName+"_Zero_1_Grp")
-            for attr in calibrateAttrList:
-                for axis in calibrateAxisList:
-                    newValue = cmds.getAttr(dupTemp+"."+attr.lower()+axis.lower())
-                    if attr == "S":
-                        cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 1) #scale
-                    else:
-                        cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 0) #translate, rotate
-                    cmds.setAttr(ctrlName+".calibrate"+attr+axis, newValue)
-            cmds.delete(dupTemp)
-            cmds.select(ctrlName)
 
 
     def displayRotateOrderAttr(self, ctrlList, *args):

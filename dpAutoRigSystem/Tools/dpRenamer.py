@@ -44,7 +44,7 @@ class Renamer(dpBaseLibrary.BaseLibrary):
         # call main function
         if self.ar.data.ui_state:
             self.renamerUI()
-            cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+            self.ar.job.refresh_preview_win(self.refreshPreview, 'dpRenamerWin')
     
     
     def closeRenamerUI(self, *args):

@@ -149,7 +149,7 @@ class UIFiller(object):
                 mod.get_namespace_for_it(module[1])
                 mod.load_raw_guide(mod.userGuideName)
                 # reload pinGuide scriptJob:
-                self.ar.ctrls.startPinGuide(mod.guide_base)
+                self.ar.job.start_pin_guide(mod.guide_base)
 
 
     def populate_joints(self, *args):

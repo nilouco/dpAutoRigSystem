@@ -509,7 +509,7 @@ class BaseStandard(object):
                 pass
 
             # unPinGuides before Rig them:
-            self.ar.ctrls.unPinGuide([self.guide_base], force=True)
+            self.ar.job.unpin_guide([self.guide_base], force=True)
             
             # RIG:
             self.ar.opt.check_use_default_render_layer()
@@ -707,7 +707,7 @@ class BaseStandard(object):
     def serialize_guide(self, buildIt=True, *args):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
-        self.ar.ctrls.unPinGuide(force=True)
+        self.ar.job.unpin_guide(force=True)
         if cmds.objExists(self.guide_base):
             self.customName = cmds.getAttr(self.guide_base+".customName") or ""
         if not self.serialized:

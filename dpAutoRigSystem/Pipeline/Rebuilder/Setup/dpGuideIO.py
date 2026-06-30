@@ -65,7 +65,7 @@ class GuideIO(dpBaseAction.ActionStartClass):
                             netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                             netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
                         if netList:
-                            self.ar.ctrls.unPinGuide(force=True)
+                            self.ar.job.unpin_guide(force=True)
                             self.exportDicToJsonFile(self.getGuideDataDic(netList))
                         else:
                             self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])

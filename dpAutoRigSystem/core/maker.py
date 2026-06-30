@@ -76,7 +76,7 @@ class Maker(object):
         nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
         nets.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
         if nets:
-            self.ar.ctrls.unPinGuide(force=True)
+            self.ar.job.unpin_guide(force=True)
             guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
             guides_data = guide_io.getGuideDataDic(nets)
             if not name:

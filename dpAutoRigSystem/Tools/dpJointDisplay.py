@@ -43,7 +43,7 @@ class JointDisplay(dpBaseLibrary.BaseLibrary):
         if self.ar.data.ui_state:
             self.dpJointDisplayUI()
             self.refreshLists()
-            cmds.scriptJob(event=('SelectionChanged', self.refreshLists), parent='dpJointDisplayWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+            self.ar.job.refresh_preview_win(self.refreshLists, 'dpJointDisplayWindow')
 
 
     def dpJointDisplayUI(self, *args):
