@@ -38,12 +38,28 @@ class BaseLayout(object):
             # BASIC MODULE LAYOUT:
             self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
             # create basic module UI:
-            self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
+            self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=self.selectButtonCallback, parent=self.basicColumn)
             self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.guide_base+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
             cmds.iconTextButton(image=self.ar.data.icon['plusInfo'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
             self.reCreateEditSelectedModuleLayout(self)
     
+
+    def selectButtonCallback(self, dragControl, x, y, modifiers):
+        """ Add mouse middle click functions.
+        """
+        selection = cmds.ls(selection=True)
+        if modifiers == 0: #middle click
+            selection = [self.guide_base]
+        elif modifiers == 1: #middle click + shift
+            if not self.guide_base in selection:
+                selection.append(self.guide_base)
+        elif modifiers == 2: #middle click + control
+            if self.guide_base in selection:
+                selection.remove(self.guide_base)
+        cmds.select(selection)
+        cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
     
+
     def clearSelectedModuleLayout(self, *args):
         """ Clear the selected module layout, because the module was rigged, deleted or unselected maybe.
         """
