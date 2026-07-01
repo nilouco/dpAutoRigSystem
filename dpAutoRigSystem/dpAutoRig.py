@@ -150,3 +150,9 @@ class Start(object):
 
     def ui(self):
         self.main_ui.create_ui()
+
+
+    def showUI(self):
+        # keep old v5 compatibility
+        print("\n\n-----\ndpTeam test auto reload here... showUI workaround\n----\n\n")
+        self.ui_manager.reload_ui()
