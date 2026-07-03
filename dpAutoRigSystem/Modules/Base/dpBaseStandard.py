@@ -209,7 +209,7 @@ class BaseStandard(object):
             cmds.namespace(moveNamespace=(self.guideNamespace, ':'), force=True)
             cmds.namespace(removeNamespace=self.guideNamespace, force=True)
         if not self.ar.data.rebuilding:
-            self.ar.ui_manager.refresh_ui()
+            self.ar.ui_manager.refresh_ui(clearSel=True)
     
 
     def duplicateModule(self, *args):
