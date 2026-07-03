@@ -527,18 +527,15 @@ class BaseStandard(object):
             childrenList = cmds.listRelatives(self.guide_base, allDescendents=True, type='transform')
             if childrenList:
                 for child in childrenList:
-                    if cmds.objExists(child+".guideBase") and cmds.getAttr(child+".guideBase") == 1:
+                    if "guideBase" in cmds.listAttr(child) and cmds.getAttr(child+".guideBase") == 1:
                         cmds.parent(child, world=True)
             
             # just edit customName and prefix:
             if self.customName != "" and self.customName != " " and self.customName != "_" and self.customName != None:
-                allTransformList = cmds.ls(selection=False, type="transform")
-                if allTransformList:
-                    for transform in allTransformList:
-                        if cmds.objExists(transform+".dpAR_name"):
-                            currentName = cmds.getAttr(transform+".dpAR_name")
-                            if currentName == self.customName:
-                                self.customName = self.customName + "1"
+                names = [n for n in cmds.ls(selection=False, type="transform") if "dpAR_name" in cmds.listAttr(n)]
+                for item in names:
+                   if self.customName == cmds.getAttr(item+".dpAR_name"):
+                       self.customName = self.customName + "1"
                 self.userGuideName = self.customName
 
             if self.ar.data.prefix:
