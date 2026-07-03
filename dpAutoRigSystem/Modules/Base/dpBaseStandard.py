@@ -612,10 +612,6 @@ class BaseStandard(object):
             cmds.addAttr(self.guide_base, longName="net", attributeType="message")
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.guide_base+".net", force=True)
-        # optionCtrl = self.utils.getNodeByMessage("optionCtrl")
-        # if optionCtrl:
-        #     cmds.connectAttr(optionCtrl+".message", self.guideNet+".linkedNode", force=True)
-        # else:
         cmds.connectAttr(self.guide_base+".message", self.guideNet+".linkedNode", force=True)
         self.addNodeToGuideNet([self.guide_base, self.radiusCtrl, self.annotation], ["main", "radiusCtrl", "annotation"])
 

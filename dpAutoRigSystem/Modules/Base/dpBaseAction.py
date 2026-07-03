@@ -92,7 +92,7 @@ class ActionStartClass(object):
     def cleanUpToStart(self, rebuilding=False, *args):
         """ Just redeclare variables and close openned window to run the code properly.
         """
-        print(f"\n----------\n{self.ar.data.lang['c110_start']} rigging: {self.getTitle()}")
+        print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.getTitle()} IO")
         if self.verbose:
             self.utils.setProgress(self.getTitle()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
         # redeclare variables
@@ -430,7 +430,7 @@ class ActionStartClass(object):
 
 
     def endProgress(self, update_guides=False, *args):
-        print(f"{self.ar.data.lang['m184_end']}: {self.getTitle()}\n----------")
+        print(f"{self.ar.data.lang['m184_end']}: {self.getTitle()} IO\n----------")
         if self.verbose:
             self.utils.setProgress(endIt=True)
         if update_guides:

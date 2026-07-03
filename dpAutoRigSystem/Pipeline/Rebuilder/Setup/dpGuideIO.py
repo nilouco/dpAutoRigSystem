@@ -79,8 +79,9 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         if guideDic:
                             wellImported = False
                             try:
-                                wellImported = self.importGuide(guideDic)
-                                self.setupGuideBaseParenting(guideDic)
+                                guide_data = self.parse_repeated_nets(guideDic)
+                                wellImported = self.importGuide(guide_data)
+                                self.setupGuideBaseParenting(guide_data)
                             except Exception as e:
                                 if not wellImported: #guide initialization issue
                                     self.notWorkedWellIO(self.ar.data.lang['m195_couldNotBeSet']+": "+str(e))
@@ -266,11 +267,26 @@ class GuideIO(dpBaseAction.ActionStartClass):
                                         cmds.parent(new_item, new_father)
 
 
+    def parse_repeated_nets(self, guideDic):
+        if len(self.ar.utils.getNetworkNodeByAttr("dpGuideNet")):
+            last_number = int(self.ar.utils.findLastNumber())
+            for n in reversed(range(0, len(guideDic))):
+                old_net_number = str(guideDic[list(guideDic.keys())[n]]['GuideNumber']).zfill(3)
+                new_net_number = str(last_number+n).zfill(3)
+                new_net_name = f"dpGuide_{new_net_number}_Net"
+                guideDic = ast.literal_eval(str(guideDic).replace(f"__dpAR_{old_net_number}", f"__dpAR_{new_net_number}"))
+                guideDic[new_net_name] = guideDic.pop(list(guideDic.keys())[n])
+                guideDic[new_net_name]['GuideNumber'] = new_net_number
+            guideDic = dict(sorted(guideDic.items()))
+        return guideDic
+
+
     def importGuide(self, guideDic, rebuilding=True, *args):
         """ Import guide info and initialize guide setting it attribute values.
         """
         wellImported = True
         toInitializeGuide = True
+        ask_again = True
         self.correlations = {}
         self.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
         if self.ar.data.ui_state:
@@ -297,14 +313,18 @@ class GuideIO(dpBaseAction.ActionStartClass):
                                 if not net_custom_name is None:
                                     for item in net_data[module_type].keys():
                                         if net_data[module_type][item] == net_custom_name:
-                                            # open dialog to confirm repeated net name:
-                                            yes_text = self.ar.data.lang['i071_yes']
-                                            no_text = self.ar.data.lang['i072_no']
-                                            result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
-                                                                        button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
-                                            if result == yes_text:
-                                                toInitializeGuide = False
-                                                break
+                                            if ask_again:
+                                                # open dialog to confirm repeated net name:
+                                                yes_text = self.ar.data.lang['i071_yes']
+                                                no_text = self.ar.data.lang['i072_no']
+                                                result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
+                                                                            button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
+                                                if result == yes_text: #skip them
+                                                    toInitializeGuide = False
+                                                    break
+                                                else:
+                                                    ask_again = False
+                                                    break
                 if toInitializeGuide:
                     try:
                         self.netDic = guideDic[net]
@@ -323,7 +343,6 @@ class GuideIO(dpBaseAction.ActionStartClass):
                         break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False
-
         return wellImported
 
 

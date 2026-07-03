@@ -210,7 +210,7 @@ class Utils(object):
         else:
             numberList = []
             for node in nodeList:
-                if cmds.objExists(node+"."+attr):
+                if attr in cmds.listAttr(node):
                     numberList.append(int(cmds.getAttr(node+"."+attr)))
             if not numberList:
                 return str(0).zfill(pad)
@@ -257,8 +257,8 @@ class Utils(object):
             else:
                 #if re.search("\s", enteredText[:len(enteredText)-1]): #has space
                 enteredText = enteredText.replace(" ", "_")
-                while re.search("\W", enteredText): #special character
-                    span = re.search("\W", enteredText).span()[0]
+                while re.search(r"\W", enteredText): #special character
+                    span = re.search(r"\W", enteredText).span()[0]
                     enteredText = enteredText[:span]+"_"+enteredText[span+1:]
                 if not len(enteredText) < prefixMax:
                     enteredText = enteredText[:prefixMax]
