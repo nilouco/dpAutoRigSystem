@@ -699,7 +699,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
                 self.to_ids.extend([curveInfoNode, ikNormalizeMD, globalStretchBC, stretchableBC, stretchBC, ikStretchRevNode, vvBC, vvCond, vvMD, vvScaleCompensateMD, vvClp, fkLastScaleCompensateMD, ikLastScaleCompensateMD, lastScaleBC])
-                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composingInfo()
@@ -707,7 +707,7 @@ class Chain(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
 
     def fixMirrorFlipping(self, item, s, value=-1, axis=None, *args):

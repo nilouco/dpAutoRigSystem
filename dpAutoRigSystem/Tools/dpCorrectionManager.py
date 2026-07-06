@@ -118,12 +118,12 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                 if connectedNodeList:
                     childrenList = cmds.listRelatives(connectedNodeList[0], children=True, allDescendents=True)
                     cmds.rename(connectedNodeList[0], connectedNodeList[0].replace(oldName, name))
-                    self.ar.customAttr.updateID([connectedNodeList[0].replace(oldName, name)])
+                    self.ar.custom_attr.updateID([connectedNodeList[0].replace(oldName, name)])
                     if childrenList:
                         for children in childrenList:
                             try:
                                 cmds.rename(children, children.replace(oldName, name))
-                                self.ar.customAttr.updateID([children.replace(oldName, name)])
+                                self.ar.custom_attr.updateID([children.replace(oldName, name)])
                             except:
                                 pass
 
@@ -620,8 +620,8 @@ class CorrectionManager(dpBaseLibrary.BaseLibrary):
                         cmds.connectAttr(distanceAxisXCnd+".message", self.net+".distanceAxisXCnd", force=True)
                         cmds.connectAttr(distanceAxisYZCnd+".message", self.net+".distanceAxisYZCnd", force=True)
                     
-                    self.ar.customAttr.addAttr(0, self.to_ids) #dpID
-                    self.ar.customAttr.addAttr(0, [self.correctionManagerDataGrp], descendents=True) #dpID
+                    self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+                    self.ar.custom_attr.addAttr(0, [self.correctionManagerDataGrp], descendents=True) #dpID
                     # update UI                    
                     if self.ar.data.ui_state:
                         self.populateNetUI()

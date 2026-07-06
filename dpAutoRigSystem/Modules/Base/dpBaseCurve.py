@@ -97,7 +97,7 @@ class BaseCurve(object):
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
         self.ctrls.renameShape([cvCurve])
         self.ctrls.displayRotateOrderAttr([cvCurve])
-        self.ar.customAttr.addAttr(0, [cvCurve]) #dpID
+        self.ar.custom_attr.addAttr(0, [cvCurve]) #dpID
         return cvCurve
     
     

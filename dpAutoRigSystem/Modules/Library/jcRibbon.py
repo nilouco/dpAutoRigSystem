@@ -367,7 +367,7 @@ class RibbonClass(object):
                 cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downBLimb['twistAutoRotMD']+".input2X", force=True)
 
         self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
 
         # result lists to return them:
         extraCtrlList = upLimb['extraCtrlList']

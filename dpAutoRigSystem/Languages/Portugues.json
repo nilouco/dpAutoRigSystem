@@ -202,7 +202,7 @@
     "i030_standard"             : "Standard",
     "i031_displaySubShapeCB"    : "Mostrar os sub shapes de controles após o rigging.",
     "i032_meshConnection"       : "Conexão de Mesh",
-    "i033_notMasterGrp"         : "Não encontrado masterGrp. Por favor, selecione o Master_Ctrl para encontrar um.",
+    "i033_"         : "",
     "i034_notSelHeadDef"        : "Selecione objetos para criar o Head Deformer, normalmente usamos as vértices da mesh final.",
     "i035_transfData"           : "Transferido dados de vértices",
     "i036_from"                 : "de",

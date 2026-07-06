@@ -202,7 +202,7 @@
     "i030_standard"             : "Standard",
     "i031_displaySubShapeCB"    : "Montrer les sub shapes de controleurs après le rigging.",
     "i032_meshConnection"       : "Connexion de Mesh",
-    "i033_notMasterGrp"         : "masterGrp n'a pas trouvé. Selectione le Master_Ctrl pour trouver un, s'il vous plait.",
+    "i033_"         : "",
     "i034_notSelHeadDef"        : "Selectione des objets pour céer le Deformeur de Tête, d'habitude on l'utilise des vertices de la tête dans la mesh finale.",
     "i035_transfData"           : "Transferé la donnée de vertices",
     "i036_from"                 : "de",

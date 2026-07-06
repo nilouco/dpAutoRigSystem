@@ -129,7 +129,7 @@ class Start(object):
         self.packager = dpPackager.Packager(self)
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
-        self.customAttr = dpCustomAttr.CustomAttr(self)
+        self.custom_attr = dpCustomAttr.CustomAttr(self)
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
         self.translator = dpTranslator.Translator(self)
@@ -154,5 +154,6 @@ class Start(object):
 
     def showUI(self):
         # keep old v5 compatibility
-        print("\n\n-----\ndpTeam test auto reload here... showUI workaround\n----\n\n")
+        if self.dev:
+            print("\n\n-----\ndpAutoRigSystem: showUI workaround - v5 compatibility\n----\n\n")
         self.ui_manager.reload_ui()

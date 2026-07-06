@@ -22,7 +22,7 @@ class Maker(object):
         return [mod, mod.build_raw_guide()]
 
 
-    # ...
+    # .............................................................................. start here --- unused yet / or delete it
     #
     # TODO: it isn't used yet.
     #
@@ -68,7 +68,7 @@ class Maker(object):
         return [mod, guide]
     #
     #
-    # ...
+    # .............................................................................. end here --- unused yet / or delete it
 
 
     def create_template(self, name=None, *args):
@@ -92,397 +92,404 @@ class Maker(object):
             print(self.ar.data.lang["e000_guideNotFound"])
 
 
-    def setup_duplicated_guide(self, selectedItem, *args):
+    def setup_duplicated_guide(self, selected_item, *args):
         """ This method will create a new module instance for a duplicated guide found.
-            Returns a guideBase for a new module instance.
+            Returns a guide_base for a new module instance.
         """
         # Duplicating a module guide
         print(self.ar.data.lang['i067_duplicating'])
         self.ar.utils.setProgress("dpAutoRigSystem", self.ar.data.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
         # declaring variables
-        nSegmentsAttr = "nJoints"
-        customNameAttr = "customName"
-        mirrorAxisAttr = "mirrorAxis"
-        dispAnnotAttr = "displayAnnotation"
-        netAttr = "net"
+        segments_attr = "nJoints"
+        custom_name_attr = "customName"
+        mirror_axis_attr = "mirrorAxis"
+        display_annotation_attr = "displayAnnotation"
+        net_attr = "net"
 
         # unparenting
-        parentList = cmds.listRelatives(selectedItem, parent=True)
-        if parentList:
-            cmds.parent(selectedItem, world=True)
-            selectedItem = selectedItem[selectedItem.rfind("|"):]
+        parents = cmds.listRelatives(selected_item, parent=True)
+        if parents:
+            cmds.parent(selected_item, world=True)
+            selected_item = selected_item[selected_item.rfind("|"):]
 
         # getting duplicated item values
-        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+self.ar.data.module_namespace_attr)
-        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+self.ar.data.module_instance_info_attr)
+        module_namespace_value = cmds.getAttr(selected_item+"."+self.ar.data.module_namespace_attr)
+        module_instance_info_value = cmds.getAttr(selected_item+"."+self.ar.data.module_instance_info_attr)
         # generating naming values
-        origGuideName = moduleNamespaceValue+":"+self.ar.data.guide_base_name
-        thatClassName = moduleNamespaceValue.partition("__")[0]
-        thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
-        thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
-        moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
-        moduleDir = moduleDir[moduleDir.find(".")+1:]
+        that_class_name = module_namespace_value.partition("__")[0]
+        that_module_name = module_instance_info_value[:module_instance_info_value.rfind(that_class_name)-1]
+        that_module_name = that_module_name[that_module_name.rfind(".")+1:]
+        module_folder = module_instance_info_value[:module_instance_info_value.rfind(that_module_name)-1]
+        module_folder = module_folder[module_folder.find(".")+1:]
         self.ar.utils.setProgress(self.ar.data.lang['i067_duplicating'])
         # initializing a new module instance
-        #newGuideInstance = eval('self.initGuide("'+thatModuleName+'")')#, "'+moduleDir+'")')
-        #newGuideName = cmds.ls(selection=True)[0]
-
-        newGuideInstance, newGuideName = self.create_raw_guide(thatModuleName, self.ar.data.standard_folder)
-#        newGuideName = newGuideInstance.build_raw_guide()
-#        print("newGuideInstance, newGuideName =", newGuideInstance, newGuideName)
-        newGuideNamespace = cmds.getAttr(newGuideName+"."+self.ar.data.module_namespace_attr)
-        
-        # reset radius as original
-        origRadius = cmds.getAttr(moduleNamespaceValue+":"+self.ar.data.guide_base_name+"_RadiusCtrl.translateX")
-        cmds.setAttr(newGuideName+"_RadiusCtrl.translateX", origRadius)
-        
+        new_guide_instance, new_guide_name = self.create_raw_guide(that_module_name, self.ar.data.standard_folder)
+        new_guide_namespace = cmds.getAttr(new_guide_name+"."+self.ar.data.module_namespace_attr)
+                
         # getting a good attribute list
-        toSetAttrList = cmds.listAttr(selectedItem)
-        currentAttrList = toSetAttrList.copy()
-        guideBaseAttrIdx = toSetAttrList.index(self.ar.data.guide_base_attr)
-        toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
-        toSetAttrList.remove(self.ar.data.guide_base_attr)
-        toSetAttrList.remove(self.ar.data.module_namespace_attr)
-        toSetAttrList.remove(customNameAttr)
-        toSetAttrList.remove(mirrorAxisAttr)
+        to_set_attrs = cmds.listAttr(selected_item)
+        current_attrs = to_set_attrs.copy()
+        to_set_attrs = to_set_attrs[to_set_attrs.index(self.ar.data.guide_base_attr):]
+        to_set_attrs.remove(self.ar.data.guide_base_attr)
+        to_set_attrs.remove(self.ar.data.module_namespace_attr)
+        to_set_attrs.remove(custom_name_attr)
+        to_set_attrs.remove(mirror_axis_attr)
         # check for special attributes
-        if nSegmentsAttr in currentAttrList:
-            toSetAttrList.remove(nSegmentsAttr)
-            nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue > 0:
-                newGuideInstance.changeJointNumber(nJointsValue)
+        if segments_attr in current_attrs:
+            to_set_attrs.remove(segments_attr)
+            segments_value = cmds.getAttr(selected_item+'.'+segments_attr)
+            if segments_value > 0:
+                new_guide_instance.changeJointNumber(segments_value)
         self.ar.utils.setProgress(self.ar.data.lang['i067_duplicating'])
-        if customNameAttr in currentAttrList:
-            customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
-            if customNameValue != "" and customNameValue != None:
-                newGuideInstance.editGuideModuleName(customNameValue)
+        if custom_name_attr in current_attrs:
+            custom_name_value = cmds.getAttr(selected_item+'.'+custom_name_attr)
+            if custom_name_value != "" and custom_name_value != None:
+                new_guide_instance.editGuideModuleName(custom_name_value)
         self.ar.utils.setProgress(self.ar.data.lang['i067_duplicating'])
-        if mirrorAxisAttr in currentAttrList:
-            mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
-            if mirroirAxisValue != "off":
-                newGuideInstance.changeMirror(mirroirAxisValue)
-        if dispAnnotAttr in currentAttrList:
-            toSetAttrList.remove(dispAnnotAttr)
-            currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
-            newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
-        if netAttr in currentAttrList:
-            toSetAttrList.remove(netAttr)
+        if mirror_axis_attr in current_attrs:
+            mirror_axis_value = cmds.getAttr(selected_item+'.'+mirror_axis_attr)
+            if mirror_axis_value != "off":
+                new_guide_instance.changeMirror(mirror_axis_value)
+        if display_annotation_attr in current_attrs:
+            to_set_attrs.remove(display_annotation_attr)
+            new_guide_instance.displayAnnotation(cmds.getAttr(selected_item+'.'+display_annotation_attr))
+        if net_attr in current_attrs:
+            to_set_attrs.remove(net_attr)
         
         # TODO: change to unify style and type attributes        
-        if "type" in currentAttrList:
-            typeValue = cmds.getAttr(selectedItem+'.type')
-            newGuideInstance.changeType(typeValue)
-        if "style" in currentAttrList:
-            styleValue = cmds.getAttr(selectedItem+'.style')
-            newGuideInstance.changeStyle(styleValue)
+        if "type" in current_attrs:
+            typeValue = cmds.getAttr(selected_item+'.type')
+            new_guide_instance.changeType(typeValue)
+        if "style" in current_attrs:
+            styleValue = cmds.getAttr(selected_item+'.style')
+            new_guide_instance.changeStyle(styleValue)
         
         # get and set transformations
-        childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
-        if childrenList:
-            for child in childrenList:
+        children = cmds.listRelatives(selected_item, children=True, allDescendents=True, fullPath=True, type="transform")
+        if children:
+            for child in children:
                 if not "|Guide_Base|Guide_Base" in child:
-                    newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
-                    for transfAttr in self.ar.data.transform_attrs:
+                    newChild = new_guide_namespace+":"+child[child.rfind("|")+1:]
+                    for transform_attr in self.ar.data.transform_attrs:
                         try:
-                            isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
-                            cmds.setAttr(newChild+"."+transfAttr, lock=False)
-                            cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
-                            if isLocked:
-                                cmds.setAttr(newChild+"."+transfAttr, lock=True)
+                            is_locked = cmds.getAttr(child+"."+transform_attr, lock=True)
+                            cmds.setAttr(newChild+"."+transform_attr, lock=False)
+                            cmds.setAttr(newChild+"."+transform_attr, cmds.getAttr(child+"."+transform_attr))
+                            if is_locked:
+                                cmds.setAttr(newChild+"."+transform_attr, lock=True)
                         except:
                             pass
-        
         # set transformation for Guide_Base
-        for transfAttr in self.ar.data.transform_attrs:
-            cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
+        for transform_attr in self.ar.data.transform_attrs:
+            cmds.setAttr(new_guide_name+"."+transform_attr, cmds.getAttr(selected_item+"."+transform_attr))
         
         # setting new guide attributes
-        for toSetAttr in toSetAttrList:
+        for to_set_attr in to_set_attrs:
             try:
-                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr))
+                cmds.setAttr(new_guide_name+"."+to_set_attr, cmds.getAttr(selected_item+"."+to_set_attr))
             except:
-                if cmds.getAttr(selectedItem+"."+toSetAttr):
-                    cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
+                if cmds.getAttr(selected_item+"."+to_set_attr):
+                    cmds.setAttr(new_guide_name+"."+to_set_attr, cmds.getAttr(selected_item+"."+to_set_attr), type="string")
+        cmds.setAttr(new_guide_name+"_RadiusCtrl.translateX", cmds.getAttr(module_namespace_value+":"+self.ar.data.guide_base_name+"_RadiusCtrl.translateX"))
         
         # parenting correctly
-        if parentList:
-            cmds.parent(newGuideName, parentList[0])
+        if parents:
+            cmds.parent(new_guide_name, parents[0])
 
-        cmds.delete(selectedItem)
-        print(self.ar.data.lang['r006_wellDone']+" "+newGuideName)
+        cmds.delete(selected_item)
+        print(self.ar.data.lang['r006_wellDone']+" "+new_guide_name)
         self.ar.utils.setProgress(endIt=True)
-        return newGuideName
+        return new_guide_name
     
 
-    def getBaseGrp(self, sAttrName, sGrpName, oldList=None):
-        if not cmds.objExists(sGrpName):
-            needCreateIt = True
-            if oldList:
-                if cmds.objExists(oldList[1]):
-                    sAttrName = oldList[0]
-                    sGrpName = oldList[1]
-                    needCreateIt = False
-            if needCreateIt:
-                cmds.createNode("transform", name=sGrpName)
-        if not sAttrName in cmds.listAttr(self.masterGrp):
-            cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
-        if not cmds.listConnections(self.masterGrp+"."+sAttrName, destination=False, source=True):
-            cmds.connectAttr(sGrpName+".message", self.masterGrp+"."+sAttrName, force=True)
-        self.ar.customAttr.addAttr(0, [sGrpName]) #dpID
-        return sGrpName
+    def get_base_group(self, attr, item, olds=None):
+        if not cmds.objExists(item):
+            need_create_it = True
+            if olds:
+                if cmds.objExists(olds[1]):
+                    attr = olds[0]
+                    item = olds[1]
+                    need_create_it = False
+            if need_create_it:
+                cmds.createNode("transform", name=item)
+        if not attr in cmds.listAttr(self.all_grp):
+            cmds.addAttr(self.all_grp, longName=attr, attributeType="message")
+        if not cmds.listConnections(self.all_grp+"."+attr, destination=False, source=True):
+            cmds.connectAttr(item+".message", self.all_grp+"."+attr, force=True)
+        self.ar.custom_attr.addAttr(0, [item]) #dpID
+        return item
     
 
-    def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree=1):
-        nCtrl = sCtrlName
-        self.ctrlCreated = False
-        if not sAttrName in cmds.listAttr(self.masterGrp):
-            cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
-        if not cmds.objExists(sCtrlName):
-            if (sCtrlName != (self.ar.data.prefix+"Option_Ctrl")):
-                nCtrl = self.ar.ctrls.cvControl(sCtrlType, sCtrlName, r=fRadius, d=iDegree, dir="+X")
+    def get_base_controller(self, ctrl_type, attr, item, radius, degree=1):
+        self.ctrl_was_created = False
+        if not attr in cmds.listAttr(self.all_grp):
+            cmds.addAttr(self.all_grp, longName=attr, attributeType="message")
+        if not cmds.objExists(item):
+            if (item != (self.ar.data.prefix+"Option_Ctrl")):
+                item = self.ar.ctrls.cvControl(ctrl_type, item, r=radius, d=degree, dir="+X")
             else:
-                nCtrl = self.ar.ctrls.cvCharacter(sCtrlType, sCtrlName, r=(fRadius*0.2))
-            cmds.setAttr(nCtrl+".rotateOrder", 3)
-            cmds.connectAttr(sCtrlName+".message", self.masterGrp+"."+sAttrName, force=True)
-            self.ctrlCreated = True
-        return nCtrl
+                item = self.ar.ctrls.cvCharacter(ctrl_type, item, r=(radius*0.2))
+            cmds.setAttr(item+".rotateOrder", 3)
+            cmds.connectAttr(item+".message", self.all_grp+"."+attr, force=True)
+            self.ctrl_was_created = True
+        return item
     
 
-    def createBaseRigNode(self):
-        localTime = str(time.asctime(time.localtime(time.time())))
-        createdNew = False
-        self.masterGrp = self.ar.utils.getAllGrp()
-        if not self.masterGrp:
-            createdNew = True
-            if cmds.objExists(self.ar.data.master_name):
-                # rename existing All_Grp node without connections as All_Grp_Old
-                cmds.rename(self.ar.data.master_name, self.ar.data.master_name+"_Old")
-            #Create Master Grp
-            self.masterGrp = cmds.createNode("transform", name=self.ar.data.prefix+self.ar.data.master_name)
-            self.ar.customAttr.addAttr(0, [self.masterGrp]) #dpID
-            # adding All_Grp attributes
-            cmds.addAttr(self.masterGrp, longName=self.ar.data.master_attr, attributeType="bool")
-            cmds.addAttr(self.masterGrp, longName="dpAutoRigSystem", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="date", dataType="string")
-            # system:
-            cmds.addAttr(self.masterGrp, longName="maya", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="system", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="language", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="preset", dataType="string")
-            # author:
-            cmds.addAttr(self.masterGrp, longName="author", dataType="string")
-            # rig info to be updated:
-            cmds.addAttr(self.masterGrp, longName="geometryList", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="controlList", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="prefix", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="name", dataType="string")
-            # setting All_Grp data
-            cmds.setAttr(self.masterGrp+"."+self.ar.data.master_attr, True)
-            cmds.setAttr(self.masterGrp+".dpAutoRigSystem", self.ar.data.github_url, type="string")
-            cmds.setAttr(self.masterGrp+".date", localTime, type="string")
-            cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
-            cmds.setAttr(self.masterGrp+".system", self.ar.data.version, type="string")
-            cmds.setAttr(self.masterGrp+".language", self.ar.data.lang["_preset"], type="string")
-            #
-            # TODO WIP (self.presetName)
-            #
-            #cmds.setAttr(self.masterGrp+".preset", self.presetName, type="string")
-            #
-            #
-            #
-            cmds.setAttr(self.masterGrp+".preset", "WIP_PRESET_NAME_HERE", type="string")
-            cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
-            cmds.setAttr(self.masterGrp+".prefix", self.ar.data.prefix, type="string")
-            cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
-            # add date data log:
-            cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
-            # add pipeline data:
-            cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="assetName", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="comment", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
-            # set data
-            cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
-            cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
-            # module counts:
-            for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-                cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
-            # set outliner color
-            self.ar.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True) #white
+    def create_all_grp(self):
+        if cmds.objExists(self.ar.data.master_name):
+            # rename existing All_Grp node without connections as All_Grp_Old
+            cmds.rename(self.ar.data.master_name, self.ar.data.master_name+"_Old")
+        #Create Master Grp
+        self.all_grp = cmds.createNode("transform", name=self.ar.data.prefix+self.ar.data.master_name)
+        self.ar.custom_attr.addAttr(0, [self.all_grp]) #dpID
+        # adding All_Grp attributes
+        cmds.addAttr(self.all_grp, longName=self.ar.data.master_attr, attributeType="bool")
+        cmds.addAttr(self.all_grp, longName="dpAutoRigSystem", dataType="string")
+        cmds.addAttr(self.all_grp, longName="date", dataType="string")
+        # system:
+        cmds.addAttr(self.all_grp, longName="maya", dataType="string")
+        cmds.addAttr(self.all_grp, longName="system", dataType="string")
+        cmds.addAttr(self.all_grp, longName="language", dataType="string")
+        cmds.addAttr(self.all_grp, longName="preset", dataType="string")
+        # author:
+        cmds.addAttr(self.all_grp, longName="author", dataType="string")
+        # rig info to be updated:
+        cmds.addAttr(self.all_grp, longName="geometryList", dataType="string")
+        cmds.addAttr(self.all_grp, longName="controlList", dataType="string")
+        cmds.addAttr(self.all_grp, longName="prefix", dataType="string")
+        cmds.addAttr(self.all_grp, longName="name", dataType="string")
+        # setting All_Grp data
+        cmds.setAttr(self.all_grp+"."+self.ar.data.master_attr, True)
+        cmds.setAttr(self.all_grp+".dpAutoRigSystem", self.ar.data.github_url, type="string")
+        cmds.setAttr(self.all_grp+".date", str(time.asctime(time.localtime(time.time()))), type="string")
+        cmds.setAttr(self.all_grp+".maya", cmds.about(version=True), type="string")
+        cmds.setAttr(self.all_grp+".system", self.ar.data.version, type="string")
+        cmds.setAttr(self.all_grp+".language", self.ar.data.lang["_preset"], type="string")
+        cmds.setAttr(self.all_grp+".preset", self.ar.data.curve_preset["_preset"], type="string")
+        cmds.setAttr(self.all_grp+".author", getpass.getuser(), type="string")
+        cmds.setAttr(self.all_grp+".prefix", self.ar.data.prefix, type="string")
+        cmds.setAttr(self.all_grp+".name", self.all_grp, type="string")
+        # add date data log:
+        cmds.addAttr(self.all_grp, longName="lastModification", dataType="string")
+        # add pipeline data:
+        cmds.addAttr(self.all_grp, longName="firstGuidesFile", dataType="string")
+        cmds.addAttr(self.all_grp, longName="lastGuidesFile", dataType="string")
+        cmds.addAttr(self.all_grp, longName="publishedFromFile", dataType="string")
+        cmds.addAttr(self.all_grp, longName="assetName", dataType="string")
+        cmds.addAttr(self.all_grp, longName="comment", dataType="string")
+        cmds.addAttr(self.all_grp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
+        # set data
+        cmds.setAttr(self.all_grp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
+        cmds.setAttr(self.all_grp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
+        # module counts:
+        for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
+            cmds.addAttr(self.all_grp, longName=guideType+"Count", attributeType="long", defaultValue=0)
+        # set outliner color
+        self.ar.ctrls.colorShape([self.all_grp], [1, 1, 1], outliner=True) #white
 
-        # update data
-        cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
+
+    def update_all_grp_attrs(self):
+        cmds.setAttr(self.all_grp+".lastModification", str(time.asctime(time.localtime(time.time()))), type="string")
         # setting pipeline data
-        if not cmds.objExists(self.masterGrp+".lastGuidesFile"):
-            cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
-        cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
+        if not cmds.objExists(self.all_grp+".lastGuidesFile"):
+            cmds.addAttr(self.all_grp, longName="lastGuidesFile", dataType="string")
+        cmds.setAttr(self.all_grp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
-        # Get or create all the needed group
-        self.supportGrp     = self.getBaseGrp("supportGrp", self.ar.data.prefix+"Support_Grp", ["modelsGrp", self.ar.data.prefix+"Model_Grp"]) #just to make compatibility with old rigs
-        self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.ar.data.prefix+"Ctrls_Grp")
-        self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.ar.data.prefix+"Ctrls_Visibility_Grp")
-        self.dataGrp        = self.getBaseGrp("dataGrp", self.ar.data.prefix+"Data_Grp")
-        self.renderGrp      = self.getBaseGrp("renderGrp", self.ar.data.prefix+"Render_Grp")
-        self.proxyGrp       = self.getBaseGrp("proxyGrp", self.ar.data.prefix+"Proxy_Grp")
-        self.fxGrp          = self.getBaseGrp("fxGrp", self.ar.data.prefix+"FX_Grp")
-        self.staticGrp      = self.getBaseGrp("staticGrp", self.ar.data.prefix+"Static_Grp")
-        self.scalableGrp    = self.getBaseGrp("scalableGrp", self.ar.data.prefix+"Scalable_Grp")
-        self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.ar.data.prefix+"BlendShapes_Grp")
-        self.wipGrp         = self.getBaseGrp("wipGrp", self.ar.data.prefix+"WIP_Grp")
-        if createdNew:
-            # set outliner color
-            self.ar.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True) #blue
-            self.ar.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
-            self.ar.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True) #orange
 
-            # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
-            if self.ar.utils.getAllGrp():
-                if self.masterGrp == self.ar.data.prefix+self.ar.data.master_name:
-                    cmds.parent(self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-                    cmds.parent(self.supportGrp, self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
+    def set_outliner_color(self):
+        self.ar.ctrls.colorShape([self.ctrls_grp], [0, 0.65, 1], outliner=True) #blue
+        self.ar.ctrls.colorShape([self.data_grp], [1, 1, 0], outliner=True) #yellow
+        self.ar.ctrls.colorShape([self.render_grp], [1, 0.45, 0], outliner=True) #orange
+
+
+    def set_all_grp_hierarchy(self):
+        # Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
+        if self.all_grp == self.ar.data.prefix+self.ar.data.master_name:
+            cmds.parent(self.ctrls_grp, self.data_grp, self.render_grp, self.proxy_grp, self.fx_grp, self.all_grp)
+            cmds.parent(self.support_grp, self.static_grp, self.scalable_grp, self.blendshapes_grp, self.wip_grp, self.data_grp)
+
+
+    def set_all_grp_attributes(self):
+        if not cmds.listConnections(self.fx_grp+".visibility", destination=False, source=True):
+            cmds.setAttr(self.fx_grp+".visibility", 0)
+        to_lock_hide_attrs = [  self.all_grp,
+                                self.support_grp,
+                                self.ctrls_grp,
+                                self.render_grp,
+                                self.data_grp,
+                                self.proxy_grp,
+                                self.fx_grp,
+                                self.static_grp,
+                                self.ctrls_vis_grp]
+        self.ar.ctrls.setLockHide(to_lock_hide_attrs, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+
+
+    def set_parent_root_ctrl_pivot(self):
+        self.root_pivot_ctrl_grp = self.ar.utils.zeroOut([self.root_pivot_ctrl])[0]
+        cmds.parent(self.root_pivot_ctrl_grp, self.root_ctrl)
+        self.change_root_to_ctrls_vis_constraint()
+
+
+    def set_ground_shapes(self):
+        self.ar.ctrls.createGroundDirectionShape(self.global_ctrl, 2, 15, 1)
+        self.ar.ctrls.createGroundDirectionShape(self.master_ctrl, 1, 11, 0)
+        self.ar.ctrls.createGroundDirectionShape(self.root_ctrl, 1, 8, 0)
+
+
+    def set_option_ctrl_rig_scale(self):
+        cmds.makeIdentity(self.option_ctrl, apply=True)
+        self.option_ctrl_grp = self.ar.utils.zeroOut([self.option_ctrl], notTransformIO=False)[0]
+        cmds.setAttr(self.option_ctrl_grp+".translateX", self.ar.ctrls.dpCheckLinearUnit(10))
+        # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
+        self.rig_scale_md = cmds.createNode("multiplyDivide", name=self.ar.data.prefix+'RigScale_MD')
+        self.ar.custom_attr.addAttr(0, [self.rig_scale_md]) #dpID
+        cmds.addAttr(self.rig_scale_md, longName="dpRigScale", attributeType="bool", defaultValue=True)
+        cmds.addAttr(self.option_ctrl, longName="dpRigScaleNode", attributeType="message")
+        cmds.addAttr(self.option_ctrl, longName="rigScaleOutput", attributeType="float", defaultValue=1)
+        cmds.connectAttr(self.rig_scale_md+".message", self.option_ctrl+".dpRigScaleNode", force=True)
+        cmds.connectAttr(self.option_ctrl+".rigScale", self.rig_scale_md+".input1X", force=True)
+        cmds.connectAttr(self.option_ctrl+".rigScaleMultiplier", self.rig_scale_md+".input2X", force=True)
+        cmds.connectAttr(self.rig_scale_md+".outputX", self.option_ctrl+".rigScaleOutput", force=True)
+        cmds.connectAttr(self.rig_scale_md+".outputX", self.master_ctrl+".scaleX", force=True)
+        cmds.connectAttr(self.rig_scale_md+".outputX", self.master_ctrl+".scaleY", force=True)
+        cmds.connectAttr(self.rig_scale_md+".outputX", self.master_ctrl+".scaleZ", force=True)
+        self.ar.ctrls.setLockHide([self.master_ctrl], ['sx', 'sy', 'sz'])
+        self.ar.ctrls.setLockHide([self.option_ctrl], ['rigScaleOutput'])
+        self.ar.ctrls.setNonKeyable([self.option_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        self.ar.ctrls.setStringAttrFromList(self.option_ctrl, ['rigScaleMultiplier'])
+
+
+    def mount_ground_ctrls_hierarchy(self):
+        cmds.parent(self.root_ctrl, self.master_ctrl)
+        cmds.parent(self.master_ctrl, self.global_ctrl)
+        cmds.parent(self.global_ctrl, self.ctrls_grp)
+        cmds.parent(self.option_ctrl_grp, self.root_ctrl)
+        cmds.parent(self.ctrls_vis_grp, self.root_ctrl)
+
+
+    def set_ground_ctrls_parent_tag(self):
+        if "parentTag" in cmds.listAttr(self.global_ctrl):
+            cmds.connectAttr(self.global_ctrl+".message", self.master_ctrl+".parentTag", force=True)
+            cmds.connectAttr(self.master_ctrl+".message", self.root_ctrl+".parentTag", force=True)
+            cmds.connectAttr(self.root_ctrl+".message", self.option_ctrl+".parentTag", force=True)
+            cmds.connectAttr(self.root_ctrl+".message", self.root_pivot_ctrl+".parentTag", force=True)
+
+
+    def set_ground_ctrls_lock_hide_attr(self):
+        self.ar.ctrls.setLockHide([self.scalable_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
+        self.ar.ctrls.setLockHide([self.root_ctrl, self.global_ctrl], ['sx', 'sy', 'sz', 'v'])
+        self.ar.ctrls.setLockHide([self.root_pivot_ctrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+
+
+    def set_root_pivot_attr(self):
+        for axis in ["X", "Y", "Z"]:
+            cmds.connectAttr(self.root_pivot_ctrl+".translate"+axis, self.root_ctrl+".rotatePivot"+axis, force=True)
+            cmds.connectAttr(self.root_pivot_ctrl+".translate"+axis, self.root_ctrl+".scalePivot"+axis, force=True)
+
+
+    def set_base_joint(self):
         cmds.select(clear=True)
+        self.base_root_jnt = self.ar.data.prefix+"BaseRoot_Jnt"
+        self.base_root_jnt_grp = self.ar.data.prefix+"BaseRoot_Joint_Grp"
+        if not cmds.objExists(self.base_root_jnt):
+            self.base_root_jnt = cmds.createNode("joint", name=self.ar.data.prefix+"BaseRoot_Jnt")
+            if not cmds.objExists(self.base_root_jnt_grp):
+                self.base_root_jnt_grp = cmds.createNode("transform", name=self.ar.data.prefix+"BaseRoot_Joint_Grp")
+            cmds.parent(self.base_root_jnt, self.base_root_jnt_grp)
+            cmds.parent(self.base_root_jnt_grp, self.scalable_grp)
+            cmds.parentConstraint(self.root_ctrl, self.base_root_jnt_grp, maintainOffset=True, name=self.base_root_jnt_grp+"_PaC")
+            cmds.scaleConstraint(self.root_ctrl, self.base_root_jnt_grp, maintainOffset=True, name=self.base_root_jnt_grp+"_ScC")
+            self.ar.custom_attr.addAttr(0, [self.base_root_jnt_grp], descendents=True) #dpID
+            cmds.setAttr(self.base_root_jnt_grp+".visibility", 0)
+            self.ar.ctrls.setLockHide([self.base_root_jnt, self.base_root_jnt_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
 
-        # Hide FX groups
-        try:
-            cmds.setAttr(self.fxGrp+".visibility", 0)
-        except:
-            pass
 
-        # Lock and Hide attributes
-        aToLock = [self.masterGrp,
-                   self.supportGrp,
-                   self.ctrlsGrp,
-                   self.renderGrp,
-                   self.dataGrp,
-                   self.proxyGrp,
-                   self.fxGrp,
-                   self.staticGrp,
-                   self.ctrlsVisGrp]
-        self.ar.ctrls.setLockHide(aToLock, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+    def create_base_rig_node(self):
+        base_was_created = False
+        self.all_grp = self.ar.utils.getAllGrp()
+        if not self.all_grp:
+            base_was_created = True
+            self.create_all_grp()
+        self.update_all_grp_attrs()
+
+        # Get or create all the needed groups
+        self.support_grp = self.get_base_group("supportGrp", self.ar.data.prefix+"Support_Grp", ["modelsGrp", self.ar.data.prefix+"Model_Grp"]) #just to make compatibility with old rigs
+        self.ctrls_grp = self.get_base_group("ctrlsGrp", self.ar.data.prefix+"Ctrls_Grp")
+        self.ctrls_vis_grp = self.get_base_group("ctrlsVisibilityGrp", self.ar.data.prefix+"Ctrls_Visibility_Grp")
+        self.data_grp = self.get_base_group("dataGrp", self.ar.data.prefix+"Data_Grp")
+        self.render_grp = self.get_base_group("renderGrp", self.ar.data.prefix+"Render_Grp")
+        self.proxy_grp = self.get_base_group("proxyGrp", self.ar.data.prefix+"Proxy_Grp")
+        self.fx_grp = self.get_base_group("fxGrp", self.ar.data.prefix+"FX_Grp")
+        self.static_grp = self.get_base_group("staticGrp", self.ar.data.prefix+"Static_Grp")
+        self.scalable_grp = self.get_base_group("scalableGrp", self.ar.data.prefix+"Scalable_Grp")
+        self.blendshapes_grp = self.get_base_group("blendShapesGrp", self.ar.data.prefix+"BlendShapes_Grp")
+        self.wip_grp = self.get_base_group("wipGrp", self.ar.data.prefix+"WIP_Grp")
+        
+        if base_was_created:
+            self.set_outliner_color()
+            self.set_all_grp_hierarchy()
+        self.set_all_grp_attributes()
 
         # Controllers Setup
-        fMasterRadius = self.ar.ctrls.dpCheckLinearUnit(10)
-        self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.ar.data.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
-        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.ar.data.prefix+"Global_Ctrl", self.ar.ctrls.dpCheckLinearUnit(13))
-        # Create root control
-        self.rootCtrl = self.getBaseCtrl("id_005_Root", "rootCtrl", self.ar.data.prefix+"Root_Ctrl", self.ar.ctrls.dpCheckLinearUnit(8))
-        self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.ar.data.prefix+"Root_Pivot_Ctrl", self.ar.ctrls.dpCheckLinearUnit(1), iDegree=3)
-        needConnectPivotAttr = False
-        if (self.ctrlCreated):
-            needConnectPivotAttr = True
-            self.rootPivotCtrlGrp = self.ar.utils.zeroOut([self.rootPivotCtrl])[0]
-            cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
-            self.changeRootToCtrlsVisConstraint()
-            self.ar.ctrls.createGroundDirectionShape(self.globalCtrl, 2, 15, 1)
-            self.ar.ctrls.createGroundDirectionShape(self.masterCtrl, 1, 11, 0)
-            self.ar.ctrls.createGroundDirectionShape(self.rootCtrl, 1, 8, 0)
-        self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.ar.data.prefix+"Option_Ctrl", self.ar.ctrls.dpCheckLinearUnit(16))
-        if (self.ctrlCreated):
-            cmds.makeIdentity(self.optionCtrl, apply=True)
-            self.optionCtrlGrp = self.ar.utils.zeroOut([self.optionCtrl], notTransformIO=False)[0]
-            cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
-            # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
-            self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.ar.data.prefix+'RigScale_MD')
-            self.ar.customAttr.addAttr(0, [self.rigScaleMD]) #dpID
-            cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool", defaultValue=True)
-            cmds.addAttr(self.optionCtrl, longName="dpRigScaleNode", attributeType="message")
-            cmds.addAttr(self.optionCtrl, longName="rigScaleOutput", attributeType="float", defaultValue=1)
-            cmds.connectAttr(self.rigScaleMD+".message", self.optionCtrl+".dpRigScaleNode", force=True)
-            cmds.connectAttr(self.optionCtrl+".rigScale", self.rigScaleMD+".input1X", force=True)
-            cmds.connectAttr(self.optionCtrl+".rigScaleMultiplier", self.rigScaleMD+".input2X", force=True)
-            cmds.connectAttr(self.rigScaleMD+".outputX", self.optionCtrl+".rigScaleOutput", force=True)
-            cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleX", force=True)
-            cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleY", force=True)
-            cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleZ", force=True)
-            self.ar.ctrls.setLockHide([self.masterCtrl], ['sx', 'sy', 'sz'])
-            self.ar.ctrls.setLockHide([self.optionCtrl], ['rigScaleOutput'])
-            self.ar.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-            self.ar.ctrls.setStringAttrFromList(self.optionCtrl, ['rigScaleMultiplier'])
-            cmds.parent(self.rootCtrl, self.masterCtrl)
-            cmds.parent(self.masterCtrl, self.globalCtrl)
-            cmds.parent(self.globalCtrl, self.ctrlsGrp)
-            cmds.parent(self.optionCtrlGrp, self.rootCtrl)
-            cmds.parent(self.ctrlsVisGrp, self.rootCtrl)
+        self.master_ctrl = self.get_base_controller("id_004_Master", "masterCtrl", self.ar.data.prefix+"Master_Ctrl", self.ar.ctrls.dpCheckLinearUnit(10), degree=3)
+        self.global_ctrl = self.get_base_controller("id_003_Global", "globalCtrl", self.ar.data.prefix+"Global_Ctrl", self.ar.ctrls.dpCheckLinearUnit(13))
+        self.root_ctrl = self.get_base_controller("id_005_Root", "rootCtrl", self.ar.data.prefix+"Root_Ctrl", self.ar.ctrls.dpCheckLinearUnit(8))
+        self.root_pivot_ctrl = self.get_base_controller("id_099_RootPivot", "rootPivotCtrl", self.ar.data.prefix+"Root_Pivot_Ctrl", self.ar.ctrls.dpCheckLinearUnit(1), degree=3)
+        need_connect_root_pivot_attr = False
+        if self.ctrl_was_created:
+            need_connect_root_pivot_attr = True
+            self.set_parent_root_ctrl_pivot()
+            self.set_ground_shapes()
+        self.option_ctrl = self.get_base_controller("id_006_Option", "optionCtrl", self.ar.data.prefix+"Option_Ctrl", self.ar.ctrls.dpCheckLinearUnit(16))
+        if self.ctrl_was_created:
+            self.set_option_ctrl_rig_scale()
+            self.mount_ground_ctrls_hierarchy()
         else:
-            self.rigScaleMD = self.ar.data.prefix+'RigScale_MD'
-        if createdNew:
-            # parent Tag
-            if "parentTag" in cmds.listAttr(self.globalCtrl):
-                cmds.connectAttr(self.globalCtrl+".message", self.masterCtrl+".parentTag", force=True)
-                cmds.connectAttr(self.masterCtrl+".message", self.rootCtrl+".parentTag", force=True)
-                cmds.connectAttr(self.rootCtrl+".message", self.optionCtrl+".parentTag", force=True)
-                cmds.connectAttr(self.rootCtrl+".message", self.rootPivotCtrl+".parentTag", force=True)
-
-            # set lock and hide attributes
-            self.ar.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-            self.ar.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
-            self.ar.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
-
-            # root pivot controller setup
-            if needConnectPivotAttr:
-                for axis in ["X", "Y", "Z"]:
-                    cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
-                    cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
-
-            cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
-            cmds.select(clear=True)
-
-            #Base joint
-            self.baseRootJnt = self.ar.data.prefix+"BaseRoot_Jnt"
-            self.baseRootJntGrp = self.ar.data.prefix+"BaseRoot_Joint_Grp"
-            if not cmds.objExists(self.baseRootJnt):
-                self.baseRootJnt = cmds.createNode("joint", name=self.ar.data.prefix+"BaseRoot_Jnt")
-                if not cmds.objExists(self.baseRootJntGrp):
-                    self.baseRootJntGrp = cmds.createNode("transform", name=self.ar.data.prefix+"BaseRoot_Joint_Grp")
-                cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
-                cmds.parent(self.baseRootJntGrp, self.scalableGrp)
-                cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
-                cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
-                self.ar.customAttr.addAttr(0, [self.baseRootJntGrp], descendents=True) #dpID
-                cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
-                self.ar.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.rig_scale_md = self.ar.data.prefix+'RigScale_MD'
+        if base_was_created:
+            self.set_ground_ctrls_parent_tag()
+            self.set_ground_ctrls_lock_hide_attr()
+            if need_connect_root_pivot_attr:
+                self.set_root_pivot_attr()
+            cmds.setAttr(self.master_ctrl+".visibility", keyable=False)
+            self.set_base_joint()
     
 
-    def changeRootToCtrlsVisConstraint(self, *args):
+    def change_root_to_ctrls_vis_constraint(self, *args):
         """ Just recreate the Root_Ctrl output connections to a constraint, now using the ctrlsVisibilityGrp as source node instead.
             It keeps the dpAR compatibility to old rigs.
         """
-        changeAttrList = ["rotateOrder", "translate", "rotate", "scale", "parentMatrix[0]", "rotatePivot", "rotatePivotTranslate"]
-        for attr in changeAttrList:
-            pacList = cmds.listConnections(self.rootCtrl+"."+attr, destination=True, source=False, plugs=True)
-            if pacList:
-                for pac in pacList:
-                    cmds.connectAttr(self.ctrlsVisGrp+"."+attr, pac, force=True)
+        change_attrs = ["rotateOrder", "translate", "rotate", "scale", "parentMatrix[0]", "rotatePivot", "rotatePivotTranslate"]
+        for attr in change_attrs:
+            pacs = cmds.listConnections(self.root_ctrl+"."+attr, destination=True, source=False, plugs=True)
+            if pacs:
+                for pac in pacs:
+                    cmds.connectAttr(self.ctrls_vis_grp+"."+attr, pac, force=True)
 
 
-    def reorderAttributes(self, objList, attrList, verbose=True, *args):
+    def reorder_option_attributes(self, items, attrs, verbose=True, *args):
         """ Reorder Attributes of a given objectList following the desiredAttribute list.
             Useful for organize the Option_Ctrl attributes, for example.
         """
-        if objList and attrList:
-            for obj in objList:
+        if items and attrs:
+            for obj in items:
                 # load dpReorderAttribute:
-                #dpRAttr = dpReorderAttr.ReorderAttr(self)
                 dpRAttr = self.ar.config.get_instance_info("dpReorderAttr", [self.ar.data.tools_folder])
-                #dpRAttr.build_tool()
 
                 if verbose and not self.ar.data.rebuilding:
-                    self.ar.utils.setProgress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrs), addOne=False, addNumber=False)
                 delta = 0
-                for i, desAttr in enumerate(attrList):
+                for i, attr in enumerate(attrs):
                     if verbose:
                         self.ar.utils.setProgress('Reordering Attributes: '+obj)
                     # get current user defined attributes:
-                    currentAttrList = cmds.listAttr(obj, userDefined=True)
-                    if desAttr in currentAttrList:
-                        cAttrIndex = currentAttrList.index(desAttr)
-                        maxRange = cAttrIndex+1-i+delta
+                    current_attrs = cmds.listAttr(obj, userDefined=True)
+                    if attr in current_attrs:
+                        maxRange = current_attrs.index(attr)+1-i+delta
                         for n in range(1, maxRange):
-                            dpRAttr.dpMoveAttr(1, [obj], [desAttr])
+                            dpRAttr.dpMoveAttr(1, [obj], [attr])
                     else:
-                        delta = delta+1
+                        delta += 1
                 if verbose and not self.ar.data.rebuilding:
                     self.ar.utils.setProgress(endIt=True)
                 self.ar.utils.closeUI(dpRAttr.winName)
@@ -524,7 +531,7 @@ class Maker(object):
     def colorize_curves(self):
         # colorize all controller in yellow as a base if not find the pattern
         if self.ar.data.colorize_curve:
-            ground_ctrls = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
+            ground_ctrls = [self.global_ctrl, self.root_ctrl, self.option_ctrl]
             left_pattern = re.compile(f"{self.ar.data.lang['p002_left']}_.*._Ctrl")
             right_pattern = re.compile(f"{self.ar.data.lang['p003_right']}_.*._Ctrl")
             for ctrl in self.ar.ctrls.getControlList():
@@ -583,11 +590,11 @@ class Maker(object):
                     # parent module control to just a node in the scene:
                     cmds.parent(self.ctrl_hook_grp, self.hook[item.guide_base]['parentNode'])
                 else:
-                    # parent module control to default masterGrp:
-                    cmds.parent(self.ctrl_hook_grp, self.ctrlsVisGrp)
+                    # parent module control to default all_grp:
+                    cmds.parent(self.ctrl_hook_grp, self.ctrls_vis_grp)
                 # put static and scalable groups in dataGrp:
-                cmds.parent(self.static_hook_grp, self.staticGrp)
-                cmds.parent(self.scalable_hook_grp, self.scalableGrp)
+                cmds.parent(self.static_hook_grp, self.static_grp)
+                cmds.parent(self.scalable_hook_grp, self.scalable_grp)
                 # finish hookGrps:
                 cmds.setAttr(f"{self.static_hook_grp}.staticHook", 0)
                 cmds.setAttr(f"{self.scalable_hook_grp}.scalableHook", 0)
@@ -602,64 +609,64 @@ class Maker(object):
     def set_option_ctrl_corrective(self, item):
         # display corrective controls by an Option_Ctrl attribute:
         if "correctiveCtrlGrpList" in item.composed.keys():
-            if not f"{self.ar.data.lang['c124_corrective']}Ctrls" in cmds.listAttr(self.optionCtrl):
-                cmds.addAttr(self.optionCtrl, longName=f"{self.ar.data.lang['c124_corrective']}Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                cmds.setAttr(f"{self.optionCtrl}.{self.ar.data.lang['c124_corrective']}Ctrls", channelBox=True)
+            if not f"{self.ar.data.lang['c124_corrective']}Ctrls" in cmds.listAttr(self.option_ctrl):
+                cmds.addAttr(self.option_ctrl, longName=f"{self.ar.data.lang['c124_corrective']}Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                cmds.setAttr(f"{self.option_ctrl}.{self.ar.data.lang['c124_corrective']}Ctrls", channelBox=True)
             for corrective_grp in item.composed['correctiveCtrlGrpList']:
-                cmds.connectAttr(f"{self.optionCtrl}.{self.ar.data.lang['c124_corrective']}Ctrls", f"{corrective_grp}.visibility", force=True)
+                cmds.connectAttr(f"{self.option_ctrl}.{self.ar.data.lang['c124_corrective']}Ctrls", f"{corrective_grp}.visibility", force=True)
 
     
     def set_rigged_types(self):
         # actualise the number of rigged guides by type
         for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-            cmds.setAttr(f"{self.masterGrp}.{guideType}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"dp{cmds.getAttr(n+'.moduleType')}" == guideType]))
+            cmds.setAttr(f"{self.all_grp}.{guideType}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"dp{cmds.getAttr(n+'.moduleType')}" == guideType]))
 
 
     def set_parent_tag(self):
-        missingParentTagCtrlList = [c for c in self.ar.ctrls.getControlList("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]
-        holderCtrlList = self.ar.ctrls.getControlList("dpHolder")
-        allCtrlList = self.ar.ctrls.getControlList()
-        allCtrlList.extend(holderCtrlList)
-        guideSourceDic = {}
-        for ctrl in allCtrlList:
+        guide_source_data = {}
+        holder_ctrls = self.ar.ctrls.getControlList("dpHolder")
+        ctrls = self.ar.ctrls.getControlList()
+        ctrls.extend(holder_ctrls)
+        for ctrl in ctrls:
             if "guideSource" in cmds.listAttr(ctrl):
-                guideSourceDic[cmds.getAttr(ctrl+".guideSource")] = ctrl
-        for pTagCtrl in missingParentTagCtrlList:
-            if not pTagCtrl == self.globalCtrl:
-                if "controlID" in cmds.listAttr(pTagCtrl):
-                    if not cmds.getAttr(pTagCtrl+".controlID") == "id_092_Correctives":
-                        if "guideSource" in cmds.listAttr(pTagCtrl):
-                            guideSource = cmds.getAttr(pTagCtrl+".guideSource")
-                            guideBase = guideSource.split(":")[0]+":Guide_Base"
-                            parentNode = self.hook[guideBase]['parentNode']
-                            fatherGuide = self.hook[guideBase]['fatherGuide']
-                            if parentNode:
-                                if not parentNode in guideSourceDic.keys():
-                                    parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
-                                if not parentNode in guideSourceDic.keys():
+                guide_source_data[cmds.getAttr(ctrl+".guideSource")] = ctrl
+        # missing parentTag controllers:
+        for p_tag_ctrl in [c for c in self.ar.ctrls.getControlList("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]:
+            if not p_tag_ctrl == self.global_ctrl:
+                if "controlID" in cmds.listAttr(p_tag_ctrl):
+                    if not cmds.getAttr(p_tag_ctrl+".controlID") == "id_092_Correctives":
+                        if "guideSource" in cmds.listAttr(p_tag_ctrl):
+                            guide_source = cmds.getAttr(p_tag_ctrl+".guideSource")
+                            guide_base = guide_source.split(":")[0]+":Guide_Base"
+                            parent_node = self.hook[guide_base]['parentNode']
+                            father_guide = self.hook[guide_base]['fatherGuide']
+                            if parent_node:
+                                if not parent_node in guide_source_data.keys():
+                                    parent_node = self.ar.utils.replaceItemSuffix(parent_node, guide_source_data)
+                                if not parent_node in guide_source_data.keys():
                                     continue
-                                foundCtrl = guideSourceDic[parentNode]
-                                if foundCtrl in holderCtrlList: #holder
-                                    guideSource = cmds.getAttr(foundCtrl+".guideSource")
-                                    guideBase = guideSource.split(":")[0]+":Guide_Base"
-                                    parentNode = self.hook[guideBase]['parentNode']
-                                    fatherGuide = self.hook[guideBase]['fatherGuide']
-                                    parentNode = self.ar.utils.replaceItemSuffix(parentNode, guideSourceDic)
-                                    if not parentNode in guideSourceDic.keys():
+                                found_ctrl = guide_source_data[parent_node]
+                                if found_ctrl in holder_ctrls: #holder
+                                    guide_source = cmds.getAttr(found_ctrl+".guideSource")
+                                    guide_base = guide_source.split(":")[0]+":Guide_Base"
+                                    parent_node = self.hook[guide_base]['parentNode']
+                                    father_guide = self.hook[guide_base]['fatherGuide']
+                                    parent_node = self.ar.utils.replaceItemSuffix(parent_node, guide_source_data)
+                                    if not parent_node in guide_source_data.keys():
                                         continue
-                                    foundCtrl = guideSourceDic[parentNode]
-                                if not self.hook[fatherGuide]['guideMirrorAxis'] == "off": #father guide has mirror
-                                    mirrorNameList = self.hook[fatherGuide]['guideMirrorName']
-                                    if pTagCtrl.startswith(mirrorNameList[0]):
-                                        if not foundCtrl.startswith(mirrorNameList[0]):
-                                            foundCtrl = mirrorNameList[0]+foundCtrl[2:]
+                                    found_ctrl = guide_source_data[parent_node]
+                                if not self.hook[father_guide]['guideMirrorAxis'] == "off": #father guide has mirror
+                                    mirror_names = self.hook[father_guide]['guideMirrorName']
+                                    if p_tag_ctrl.startswith(mirror_names[0]):
+                                        if not found_ctrl.startswith(mirror_names[0]):
+                                            found_ctrl = mirror_names[0]+found_ctrl[2:]
                                     else:
-                                        if not foundCtrl.startswith(mirrorNameList[1]):
-                                            foundCtrl = mirrorNameList[1]+foundCtrl[2:]
-                                if cmds.objExists(foundCtrl):
-                                    cmds.connectAttr(foundCtrl+".message", pTagCtrl+".parentTag", force=True)
+                                        if not found_ctrl.startswith(mirror_names[1]):
+                                            found_ctrl = mirror_names[1]+found_ctrl[2:]
+                                if cmds.objExists(found_ctrl):
+                                    cmds.connectAttr(found_ctrl+".message", p_tag_ctrl+".parentTag", force=True)
                             else:
-                                cmds.connectAttr(self.rootCtrl+".message", pTagCtrl+".parentTag", force=True)
+                                cmds.connectAttr(self.root_ctrl+".message", p_tag_ctrl+".parentTag", force=True)
 
 
     def set_option_ctrl_attrs(self):
@@ -679,62 +686,62 @@ class Maker(object):
             tweaksAttr = self.ar.data.lang['m081_tweaks'].lower()
             facialAttr = self.ar.data.lang['c059_facial'].lower()
             
-            if not cmds.objExists(self.optionCtrl+"."+generalAttr):
-                cmds.addAttr(self.optionCtrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
-                cmds.setAttr(self.optionCtrl+"."+generalAttr, lock=True)
+            if not cmds.objExists(self.option_ctrl+"."+generalAttr):
+                cmds.addAttr(self.option_ctrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
+                cmds.setAttr(self.option_ctrl+"."+generalAttr, lock=True)
             
             # Only create if a VolumeVariation attribute is found
-            if not cmds.objExists(self.optionCtrl+"."+vvAttr):
-                if cmds.listAttr(self.optionCtrl, string="*"+vvAttr+"*"):
-                    cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
-                    cmds.setAttr(self.optionCtrl+"."+vvAttr, lock=True)
+            if not cmds.objExists(self.option_ctrl+"."+vvAttr):
+                if cmds.listAttr(self.option_ctrl, string="*"+vvAttr+"*"):
+                    cmds.addAttr(self.option_ctrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
+                    cmds.setAttr(self.option_ctrl+"."+vvAttr, lock=True)
             
             # Only create if an IkFk attribute is found
-            if not cmds.objExists(self.optionCtrl+".ikFkBlend"):
-                if cmds.listAttr(self.optionCtrl, string="*ikFk*"):
-                    cmds.addAttr(self.optionCtrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
-                    cmds.setAttr(self.optionCtrl+".ikFkBlend", lock=True)
+            if not cmds.objExists(self.option_ctrl+".ikFkBlend"):
+                if cmds.listAttr(self.option_ctrl, string="*ikFk*"):
+                    cmds.addAttr(self.option_ctrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
+                    cmds.setAttr(self.option_ctrl+".ikFkBlend", lock=True)
             
-            if cmds.objExists(self.optionCtrl+".ikFkSnap"):
-                cmds.setAttr(self.optionCtrl+".ikFkSnap", keyable=False, channelBox=True)
+            if cmds.objExists(self.option_ctrl+".ikFkSnap"):
+                cmds.setAttr(self.option_ctrl+".ikFkSnap", keyable=False, channelBox=True)
             
-            if not cmds.objExists(self.optionCtrl+".display"):
-                cmds.addAttr(self.optionCtrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
-                cmds.setAttr(self.optionCtrl+".display", lock=True)
+            if not cmds.objExists(self.option_ctrl+".display"):
+                cmds.addAttr(self.option_ctrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
+                cmds.setAttr(self.option_ctrl+".display", lock=True)
             
-            if not cmds.objExists(self.optionCtrl+".mesh"):
-                cmds.addAttr(self.optionCtrl, longName="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
-                cmds.connectAttr(self.optionCtrl+".mesh", self.renderGrp+".visibility", force=True)
+            if not cmds.objExists(self.option_ctrl+".mesh"):
+                cmds.addAttr(self.option_ctrl, longName="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
+                cmds.connectAttr(self.option_ctrl+".mesh", self.render_grp+".visibility", force=True)
             
-            if not cmds.objExists(self.optionCtrl+".proxy"):
-                cmds.addAttr(self.optionCtrl, longName="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                cmds.connectAttr(self.optionCtrl+".proxy", self.proxyGrp+".visibility", force=True)
+            if not cmds.objExists(self.option_ctrl+".proxy"):
+                cmds.addAttr(self.option_ctrl, longName="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                cmds.connectAttr(self.option_ctrl+".proxy", self.proxy_grp+".visibility", force=True)
             
-            if not cmds.objExists(self.optionCtrl+".controllers"):
-                cmds.addAttr(self.optionCtrl, longName="controllers", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                cmds.connectAttr(self.optionCtrl+".controllers", self.ctrlsVisGrp+".visibility", force=True)
-                cmds.setAttr(self.optionCtrl+".controllers", channelBox=True)
+            if not cmds.objExists(self.option_ctrl+".controllers"):
+                cmds.addAttr(self.option_ctrl, longName="controllers", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                cmds.connectAttr(self.option_ctrl+".controllers", self.ctrls_vis_grp+".visibility", force=True)
+                cmds.setAttr(self.option_ctrl+".controllers", channelBox=True)
 
-            if not cmds.objExists(self.optionCtrl+".rootPivot"):
-                cmds.addAttr(self.optionCtrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                cmds.connectAttr(self.optionCtrl+".rootPivot", self.rootPivotCtrlGrp+".visibility", force=True)
-                cmds.setAttr(self.optionCtrl+".rootPivot", channelBox=True)
+            if not cmds.objExists(self.option_ctrl+".rootPivot"):
+                cmds.addAttr(self.option_ctrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                cmds.connectAttr(self.option_ctrl+".rootPivot", self.root_pivot_ctrl_grp+".visibility", force=True)
+                cmds.setAttr(self.option_ctrl+".rootPivot", channelBox=True)
 
             # try to organize Option_Ctrl attributes:
             # get current user defined attributes:
-            currentAttrList = cmds.listAttr(self.optionCtrl, userDefined=True)
+            current_attrs = cmds.listAttr(self.option_ctrl, userDefined=True)
             # clean up "_ikFkBlend" atributes:
-            if currentAttrList:
-                for cAttr in currentAttrList:
+            if current_attrs:
+                for cAttr in current_attrs:
                     if cAttr.endswith("_ikFkBlend"):
-                        if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_ikFkBlend")]):
-                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
+                        if not cmds.objExists(self.option_ctrl+"."+cAttr[:cAttr.find("_ikFkBlend")]):
+                            cmds.renameAttr(self.option_ctrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
             # clean up "VolumeVariation" attributes:
-            if currentAttrList:
-                for cAttr in currentAttrList:
+            if current_attrs:
+                for cAttr in current_attrs:
                     if cAttr.endswith("_"+vvAttr):
-                        if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_"+vvAttr)]):
-                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
+                        if not cmds.objExists(self.option_ctrl+"."+cAttr[:cAttr.find("_"+vvAttr)]):
+                            cmds.renameAttr(self.option_ctrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
                         
             # list desirable Option_Ctrl attributes order:
             desiredAttrList = [generalAttr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', vvAttr,
@@ -752,7 +759,7 @@ class Maker(object):
             'dpAR_001Fk1', 'dpAR_001Dyn1', leftAttr+'dpAR_001Fk', leftAttr+'dpAR_001Fk1', rightAttr+'dpAR_001Fk', rightAttr+'dpAR_001Fk1', leftAttr+'dpAR_001Dyn', leftAttr+'dpAR_001Dyn1', rightAttr+'dpAR_001Dyn', rightAttr+'dpAR_001Dyn1',
             'display', 'mesh', 'proxy', 'controllers', 'bends', 'extraBends', facialAttr, tweaksAttr, 'correctiveCtrls']
             # call method to reorder Option_Ctrl attributes:
-            self.reorderAttributes([self.optionCtrl], desiredAttrList)
+            self.reorder_option_attributes([self.option_ctrl], desiredAttrList)
 
 
     #maker
@@ -771,7 +778,7 @@ class Maker(object):
             if not self.check_good_guide_version(self.guides_to_rig):
                 return
             if self.ar.data.compose_all:
-                self.createBaseRigNode()
+                self.create_base_rig_node()
             self.ar.utils.clear_guide_mirror_grp()
             for item in self.guides_to_rig:
                 item.check_father_mirror()
@@ -847,7 +854,7 @@ class Composer(object):
         elif item.name == self.ar.data.chain_name:
             self.chain_options(item)
         if self.to_ids:
-            self.ar.customAttr.addAttr(0, list(set(self.to_ids)), descendents=True)
+            self.ar.custom_attr.addAttr(0, list(set(self.to_ids)), descendents=True)
 
 
     def foot_limb(self, foot, limb):
@@ -940,7 +947,7 @@ class Composer(object):
                                             cmds.delete(actionLocGrp+"_PaC")
                                             self.to_ids.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
                     scalableGrp = foot.composed["scalableGrp"][s]
-                    self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
+                    self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, scalableGrp, name=scalableGrp+"_ScC"))
                     # hide this controller shape
                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                     # add attributes and connect from ikCtrl to revFootCtrl:
@@ -972,8 +979,8 @@ class Composer(object):
                                         if "Fk_ikFkBlendRevOutputX" in wrAttr:
                                             cmds.connectAttr(worldRef+"."+wrAttr, ikCtrl+'.'+attr, force=True)
                     revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
-                    self.ar.customAttr.removeAttr("dpControl", [revFootCtrlOld])
-                    self.ar.customAttr.updateID([revFootCtrlOld])
+                    self.ar.custom_attr.removeAttr("dpControl", [revFootCtrlOld])
+                    self.ar.custom_attr.updateID([revFootCtrlOld])
 
 
     def limb_options(self, limb):
@@ -991,38 +998,38 @@ class Composer(object):
             floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
             for f, floatAttr in enumerate(floatAttrList):
                 if f != len(floatAttrList):
-                    if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttr):
+                    if not cmds.objExists(self.ar.maker.option_ctrl+'.'+floatAttr):
                         currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
                         if floatAttr == lvvAttr:
-                            cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
+                            cmds.addAttr(self.ar.maker.option_ctrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
                             # TODO fix or remove Limb manual volume variation attribute
-                            cmds.setAttr(self.ar.maker.optionCtrl+"."+floatAttr, channelBox=False, keyable=False)
+                            cmds.setAttr(self.ar.maker.option_ctrl+"."+floatAttr, channelBox=False, keyable=False)
                         else:
-                            cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
-                    cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
-            if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
-                cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
-                cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
-            cmds.connectAttr(self.ar.maker.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
+                            cmds.addAttr(self.ar.maker.option_ctrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                    cmds.connectAttr(self.ar.maker.option_ctrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+            if not cmds.objExists(self.ar.maker.option_ctrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                cmds.addAttr(self.ar.maker.option_ctrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
+                cmds.connectAttr(self.ar.maker.option_ctrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+            cmds.connectAttr(self.ar.maker.master_ctrl+".scaleX", worldRef+".scaleX", force=True)
             bendAttrList = ["bends", "extraBends"]
             for bendAttr in bendAttrList:
-                if cmds.objExists(self.ar.maker.optionCtrl+"."+bendAttr):
-                    cmds.setAttr(self.ar.maker.optionCtrl+"."+bendAttr, keyable=False, channelBox=True)
+                if cmds.objExists(self.ar.maker.option_ctrl+"."+bendAttr):
+                    cmds.setAttr(self.ar.maker.option_ctrl+"."+bendAttr, keyable=False, channelBox=True)
             # connect Option_Ctrl RigScale_MD output to the radiusScale:
-            if cmds.objExists(self.ar.maker.rigScaleMD+".dpRigScale") and cmds.getAttr(self.ar.maker.rigScaleMD+".dpRigScale") == True:
-                cmds.connectAttr(self.ar.maker.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
+            if cmds.objExists(self.ar.maker.rig_scale_md+".dpRigScale") and cmds.getAttr(self.ar.maker.rig_scale_md+".dpRigScale") == True:
+                cmds.connectAttr(self.ar.maker.rig_scale_md+".outputX", softIkCalibList[w]+".input2X", force=True)
 
             cmds.delete(worldRefShapeList[w])
             worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
-            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
 
             # remove dpControl attribute
-            self.ar.customAttr.removeAttr("dpControl", [worldRef])
+            self.ar.custom_attr.removeAttr("dpControl", [worldRef])
             self.to_ids.append(worldRef)
 
             # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
-            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))
-            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.master_ctrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC"))
 
 
     def limb_spine(self, limb, spine):
@@ -1030,7 +1037,7 @@ class Composer(object):
             # parenting correctly the ikCtrlZero to spineModule:
             for s, side in enumerate(self.ar.maker.get_mirror_names(limb)):
                 scalableGrp = limb.composed["scalableGrp"][s]
-                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
+                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, scalableGrp, name=scalableGrp+"_ScC"))
 
                 if self.ar.maker.hook[limb.guide_base]['fatherModule'] == self.ar.data.spine_name:
                     # getting limb data:
@@ -1045,11 +1052,11 @@ class Composer(object):
                     hipsA  = spine.composed['hipsAList'][0]
                     tipCtrl = spine.composed['tipList'][0]
 
-                    cmds.parent(ikCtrlZero, self.ar.maker.ctrlsVisGrp, absolute=True)
+                    cmds.parent(ikCtrlZero, self.ar.maker.ctrls_vis_grp, absolute=True)
                     # verifying what part will be used, the hips or chest:
                     if limbTypeName == self.ar.data.leg_name:
                         # do task actions in order to compose the limb of leg type to rootCtrl:
-                        cmds.parent(ikPoleVectorCtrlZero, self.ar.maker.ctrlsVisGrp, absolute=True)
+                        cmds.parent(ikPoleVectorCtrlZero, self.ar.maker.ctrls_vis_grp, absolute=True)
                     else:
                         # do task actions in order to compose the limb and spine (ikCtrl):
                         self.to_ids.extend(cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC"))
@@ -1064,13 +1071,13 @@ class Composer(object):
                             quadFrontLeg = limb.composed['quadFrontLegList'][s]
                             ikCtrl       = limb.composed['ikCtrlList'][s]
                             # if quadruped, create a parent contraint from tipCtrl to front leg:
-                            quadChestParentConst = cmds.parentConstraint(self.ar.maker.rootCtrl, tipCtrl, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
+                            quadChestParentConst = cmds.parentConstraint(self.ar.maker.root_ctrl, tipCtrl, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
                             revNode = cmds.createNode('reverse', name=quadFrontLeg+"_Rev")
                             self.to_ids.extend([quadChestParentConst, revNode])
                             cmds.addAttr(ikCtrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                             cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+tipCtrl+"W1", force=True)
                             cmds.connectAttr(ikCtrl+".followChestA", revNode+".inputX", force=True)
-                            cmds.connectAttr(revNode+".outputX", quadChestParentConst+"."+self.ar.maker.rootCtrl+"W0", force=True)
+                            cmds.connectAttr(revNode+".outputX", quadChestParentConst+"."+self.ar.maker.root_ctrl+"W0", force=True)
 
 
     def limb_spring_solver(self, limb):
@@ -1080,7 +1087,7 @@ class Composer(object):
         if fixIkSpringSolverGrp:
             cmds.parent(fixIkSpringSolverGrp, self.ar.maker.scalableGrp, absolute=True)
             for nFix in fixIkSpringSolverGrp:
-                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, nFix, name=nFix+"_ScC"))
+                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, nFix, name=nFix+"_ScC"))
 
 
     def spine_options(self, spine):
@@ -1094,24 +1101,24 @@ class Composer(object):
             ikFkBlendAttr = spine.composed['IkFkBlendAttrList'][s]
             clusterGrp = spine.composed["scalableGrp"][s]
             shapeVisAttrList = spine.composed["shapeVisAttrList"]
-            self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, clusterGrp, name=clusterGrp+"_ScC"))
-            cmds.addAttr(self.ar.maker.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
-            cmds.connectAttr(self.ar.maker.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
+            self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, clusterGrp, name=clusterGrp+"_ScC"))
+            cmds.addAttr(self.ar.maker.option_ctrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
+            cmds.connectAttr(self.ar.maker.option_ctrl+'.'+vvAttr, hipsA+'.'+vvAttr)
             cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
-            cmds.addAttr(self.ar.maker.optionCtrl, longName=actVVAttr, attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
-            cmds.connectAttr(self.ar.maker.optionCtrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
+            cmds.addAttr(self.ar.maker.option_ctrl, longName=actVVAttr, attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+            cmds.connectAttr(self.ar.maker.option_ctrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
             cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
-            cmds.connectAttr(self.ar.maker.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
+            cmds.connectAttr(self.ar.maker.master_ctrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
             cmds.setAttr(hipsA+'.'+mScaleVVAttr, keyable=False)
-            cmds.addAttr(self.ar.maker.optionCtrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
-            cmds.connectAttr(self.ar.maker.optionCtrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
+            cmds.addAttr(self.ar.maker.option_ctrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+            cmds.connectAttr(self.ar.maker.option_ctrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
             cmds.setAttr(hipsA+'.'+ikFkBlendAttr, keyable=False)
             if shapeVisAttrList:
                 for shapeVisAttr in shapeVisAttrList:
-                    if not cmds.objExists(self.ar.maker.optionCtrl+"."+shapeVisAttr):
-                        cmds.addAttr(self.ar.maker.optionCtrl, longName=shapeVisAttr, attributeType="long", min=0, max=1, defaultValue=0, keyable=False)
-                        cmds.setAttr(self.ar.maker.optionCtrl+'.'+shapeVisAttr, channelBox=True)
-                        cmds.connectAttr(self.ar.maker.optionCtrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
+                    if not cmds.objExists(self.ar.maker.option_ctrl+"."+shapeVisAttr):
+                        cmds.addAttr(self.ar.maker.option_ctrl, longName=shapeVisAttr, attributeType="long", min=0, max=1, defaultValue=0, keyable=False)
+                        cmds.setAttr(self.ar.maker.option_ctrl+'.'+shapeVisAttr, channelBox=True)
+                        cmds.connectAttr(self.ar.maker.option_ctrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
                         cmds.setAttr(hipsA+'.'+shapeVisAttr, keyable=False)
             if self.ar.data.colorize_curve:
                 self.ar.ctrls.colorShape(spine.composed['InnerCtrls'][s], "cyan")
@@ -1124,7 +1131,7 @@ class Composer(object):
         for s, side in enumerate(self.ar.maker.get_mirror_names(head)):
             # connect the masterCtrl to head group using a orientConstraint:
             worldRef = head.composed['worldRefList'][s]
-            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
             if self.ar.data.colorize_curve:
                 if head.composed['ctrlList']:
                     self.ar.ctrls.colorShape(head.composed['ctrlList'][s], "yellow")
@@ -1135,11 +1142,11 @@ class Composer(object):
                 if head.composed['rCtrls']:
                     self.ar.ctrls.colorShape(head.composed['rCtrls'][s], "blue")
         if self.facialCtrlGrpList:
-            if not cmds.objExists(self.ar.maker.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower()):
-                cmds.addAttr(self.ar.maker.optionCtrl, longName=self.ar.data.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                cmds.setAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower(), channelBox=True)
+            if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['c059_facial'].lower()):
+                cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                cmds.setAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['c059_facial'].lower(), channelBox=True)
             for facialCtrlGrp in self.facialCtrlGrpList:
-                cmds.connectAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
+                cmds.connectAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['c059_facial'].lower(), facialCtrlGrp+".visibility", force=True)
 
 
     def eye_head(self, eye, head):
@@ -1147,16 +1154,16 @@ class Composer(object):
         eyeCtrl = eye.composed['eyeCtrl']
         eyeGrp = eye.composed['eyeGrp']
         upLocGrp = eye.composed['upLocGrp']
-        cmds.parent(eyeGrp, self.ar.maker.ctrlsVisGrp, relative=False)
+        cmds.parent(eyeGrp, self.ar.maker.ctrls_vis_grp, relative=False)
         # get head module:
         if self.ar.maker.hook[eye.guide_base]['fatherModule'] == self.ar.data.head_name:
             # getting head data:
             upperCtrl  = head.composed['upperCtrlList'][0]
-            headParentConst = cmds.parentConstraint(self.ar.maker.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
+            headParentConst = cmds.parentConstraint(self.ar.maker.root_ctrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
             eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
             self.to_ids.extend([headParentConst, eyeRevNode])
             cmds.connectAttr(eyeCtrl+'.'+self.ar.data.lang['c032_follow'], eyeRevNode+".inputX", force=True)
-            cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.ar.maker.rootCtrl+"W0", force=True)
+            cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.ar.maker.root_ctrl+"W0", force=True)
             cmds.connectAttr(eyeCtrl+'.'+self.ar.data.lang['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
             cmds.parent(upLocGrp, upperCtrl, relative=False)
             cmds.setAttr(upLocGrp+".visibility", 0)
@@ -1182,9 +1189,9 @@ class Composer(object):
         for s, side in enumerate(self.ar.maker.get_mirror_names(finger)):
             ikCtrlZero = finger.composed['ikCtrlZeroList'][s]
             scalableGrp = finger.composed['scalableGrpList'][s]
-            self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
+            self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, scalableGrp, name=scalableGrp+"_ScC"))
             # correct ikCtrl parent to root ctrl:
-            cmds.parent(ikCtrlZero, self.ar.maker.ctrlsVisGrp, relative=True)
+            cmds.parent(ikCtrlZero, self.ar.maker.ctrls_vis_grp, relative=True)
 
 
     def finger_limb(self, finger, limb):
@@ -1204,12 +1211,12 @@ class Composer(object):
 
     def single_options(self, single):
         # connect Option_Ctrl display attribute to the visibility:
-        if not cmds.objExists(self.ar.maker.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower()):
-            cmds.addAttr(self.ar.maker.optionCtrl, longName=self.ar.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-            cmds.setAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower(), channelBox=True)
+        if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower()):
+            cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+            cmds.setAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower(), channelBox=True)
         for s, side in enumerate(self.ar.maker.get_mirror_names(single)):
             ctrlGrp = single.composed["ctrlGrpList"][s]
-            cmds.connectAttr(self.ar.maker.optionCtrl+"."+self.ar.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
+            cmds.connectAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
 
 
     def single_single(self, single, father):
@@ -1234,8 +1241,8 @@ class Composer(object):
         for s, side in enumerate(self.ar.maker.get_mirror_names(wheel)):
             wheelCtrl = wheel.composed["wheelCtrlList"][s]
             # connect Option_Ctrl RigScale_MD output to the radiusScale:
-            if cmds.objExists(self.ar.maker.rigScaleMD+".dpRigScale") and cmds.getAttr(self.ar.maker.rigScaleMD+".dpRigScale") == True:
-                cmds.connectAttr(self.ar.maker.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
+            if cmds.objExists(self.ar.maker.rig_scale_md+".dpRigScale") and cmds.getAttr(self.ar.maker.rig_scale_md+".dpRigScale") == True:
+                cmds.connectAttr(self.ar.maker.rig_scale_md+".outputX", wheelCtrl+".radiusScale", force=True)
         
 
     def wheel_steering(self, wheel, steering):
@@ -1252,7 +1259,7 @@ class Composer(object):
                 cmds.connectAttr(steeringCtrl+'.'+self.ar.data.lang['c070_steering'], wheelCtrl+'.'+self.ar.data.lang['i037_to']+self.ar.data.lang['c070_steering'].capitalize(), force=True)
                 # reparent wheel module:
                 wheelHookCtrlGrp = wheel.composed['ctrlHookGrpList'][s]
-                cmds.parent(wheelHookCtrlGrp, self.ar.maker.ctrlsVisGrp)
+                cmds.parent(wheelHookCtrlGrp, self.ar.maker.ctrls_vis_grp)
 
 
     def suspension_wheel(self, suspension, wheel):
@@ -1339,16 +1346,16 @@ class Composer(object):
             floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
             for f, floatAttr in enumerate(floatAttrList):
                 if f != len(floatAttrList):
-                    if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttr):
+                    if not cmds.objExists(self.ar.maker.option_ctrl+'.'+floatAttr):
                         currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
-                        cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
-                    cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
-            if not cmds.objExists(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
-                cmds.addAttr(self.ar.maker.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
-                cmds.connectAttr(self.ar.maker.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
-            cmds.connectAttr(self.ar.maker.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
+                        cmds.addAttr(self.ar.maker.option_ctrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                    cmds.connectAttr(self.ar.maker.option_ctrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+            if not cmds.objExists(self.ar.maker.option_ctrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                cmds.addAttr(self.ar.maker.option_ctrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
+                cmds.connectAttr(self.ar.maker.option_ctrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+            cmds.connectAttr(self.ar.maker.master_ctrl+".scaleX", worldRef+".scaleX", force=True)
             cmds.delete(worldRefShapeList[w])
             worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
-            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
+            self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
             # remove dpControl attribute
-            self.ar.customAttr.removeAttr("dpControl", [worldRef])
+            self.ar.custom_attr.removeAttr("dpControl", [worldRef])

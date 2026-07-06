@@ -176,7 +176,7 @@ class AttributeIO(dpBaseAction.ActionStartClass):
                         wellImportedList.append(item)
                         # TODO: should we set the attribute value here?
                 # reorder attr
-                self.ar.maker.reorderAttributes([item], attrDic[item]["order"], False)
+                self.ar.maker.reorder_option_attributes([item], attrDic[item]["order"], False)
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:

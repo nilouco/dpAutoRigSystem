@@ -302,7 +302,7 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.hookSetup(side, [self.ctrlZeroGrp], [self.skinJointList[0]])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composingInfo()
@@ -310,5 +310,5 @@ class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     

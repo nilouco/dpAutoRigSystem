@@ -91,7 +91,7 @@ class Isolate(dpBaseLibrary.BaseLibrary):
         cmds.addAttr(nodeList[2], longName=attrName, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
         # create reverse node
         reverseNode = cmds.createNode('reverse', name=nodeList[2]+"_"+attrName.capitalize()+"_Rev")
-        self.ar.customAttr.addAttr(0, [pConst, reverseNode]) #dpID
+        self.ar.custom_attr.addAttr(0, [pConst, reverseNode]) #dpID
         # do isolate connections
         cmds.connectAttr(nodeList[2]+"."+attrName, pConst+"."+nodeList[0]+"W0", force=True)
         cmds.connectAttr(nodeList[2]+"."+attrName, reverseNode+".inputX", force=True)

@@ -349,20 +349,18 @@ class Option(object):
     def __init__(self, ar):
         self.ar = ar
 
-    
-    def change_degree(self, value, *args):
-        self.set_option_var(self.ar.data.degree_option_var, value)
-        self.ar.data.degree_option = int(value[-1])
-        for module_instance in self.ar.data.guide_instances:
-            if "degree" in cmds.listAttr(module_instance.guide_base):
-                cmds.setAttr(module_instance.guide_base+".degree", self.ar.data.degree_option)
+
+    def set_verbose(self, value):
+        """ Set the dev verbose variable.
+        """
+        self.ar.data.verbose = value
 
 
     def check_use_default_render_layer(self):
         if self.ar.data.default_render_layer:
             self.set_default_render_layer(True)
 
-
+    
     def set_option_var(self, opt_var, value, string=True):
         cmds.optionVar(remove=opt_var)
         if string:
@@ -371,10 +369,23 @@ class Option(object):
             cmds.optionVar(intValue=(opt_var, value))
 
 
-    def set_verbose(self, value):
-        """ Set the dev verbose variable.
-        """
-        self.ar.data.verbose = value
+    def change_degree(self, value, *args):
+        self.set_option_var(self.ar.data.degree_option_var, value)
+        self.ar.data.degree_option = int(value[-1])
+        for module_instance in self.ar.data.guide_instances:
+            if "degree" in cmds.listAttr(module_instance.guide_base):
+                cmds.setAttr(module_instance.guide_base+".degree", self.ar.data.degree_option)
+
+
+    def change_validator_preset(self, value, *args):
+        self.set_option_var(self.ar.data.validator_option_var, value, True)
+        self.ar.data.validator_preset = self.ar.data.validator_preset_data[value]
+        self.ar.lib.set_validator_preset()
+
+
+    def set_curve_preset(self, value, *args):
+        self.ar.data.curve_preset = self.ar.data.curve_preset_data[value]
+        self.set_option_var(self.ar.data.curve_option_var, value, True)
 
 
     def set_colorize_curve(self, value):

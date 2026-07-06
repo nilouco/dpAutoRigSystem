@@ -113,7 +113,7 @@ class FingerHandPose(dpBaseLibrary.BaseLibrary):
                     if self.oldDrivenKeyList:
                         newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))
                     self.to_ids.extend(newDrivenKeyList)
-                    self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+                    self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state: #verbose
                         cmds.select(handCtrlList)
                         if not self.ar.data.rebuilding:

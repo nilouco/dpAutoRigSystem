@@ -144,7 +144,7 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.hookSetup(side, [zeroOutCtrlGrpList[1]], [side+self.userGuideName+"_1_Jnt"])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composingInfo()
@@ -152,7 +152,7 @@ class Steering(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
     
     def composingInfo(self, *args):

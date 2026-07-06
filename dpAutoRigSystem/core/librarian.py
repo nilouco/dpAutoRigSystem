@@ -152,9 +152,6 @@ class Lib(object):
 
     
     def set_validator_preset(self):
-        check_instances = self.ar.config.get_validator_instances()
-        if check_instances:
-            for validator_name in self.ar.data.validator_preset:
-                for validator_instance in check_instances:
-                    if validator_name == validator_instance.name:
-                        validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
+        for validator_instance in self.ar.config.get_validator_instances():
+            if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]].keys():
+                validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])

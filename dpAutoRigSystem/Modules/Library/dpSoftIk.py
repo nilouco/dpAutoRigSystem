@@ -144,5 +144,5 @@ class SoftIkClass(object):
                     cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1
         
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
         return self.calibrateMD

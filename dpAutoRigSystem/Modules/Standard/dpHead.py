@@ -1214,7 +1214,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     self.utils.addCustomAttr([self.lLipGrp, self.rLipGrp], self.utils.ignoreTransformIOAttr)
                 if self.correctiveCtrlGrpList:
                     self.utils.addCustomAttr(self.correctiveCtrlGrpList, self.utils.ignoreTransformIOAttr)
-                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
                 
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.guide_base+".facial"):
@@ -1230,7 +1230,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
 
     def createFaceMinMaxSN(self, fCtrl, *args):
@@ -1273,7 +1273,7 @@ for net in cmds.ls(type="network"):
         cmds.connectAttr(fCtrl+".message", self.guideNet+".faceCtrl", force=True)
         cmds.connectAttr(self.guideNet+".message", fCtrl+".guideNet", force=True)
         sn = cmds.scriptNode(name=self.guideNet.replace("Net", 'MinMax_SN'), sourceType='python', scriptType=2, beforeScript=minMaxCode)
-        self.ar.customAttr.addAttr(0, [sn]) #dpID
+        self.ar.custom_attr.addAttr(0, [sn]) #dpID
         cmds.addAttr(sn, longName="guideNet", attributeType="message")
         cmds.connectAttr(sn+".message", self.guideNet+".minMaxScriptNode", force=True)
         cmds.connectAttr(self.guideNet+".message", sn+".guideNet", force=True)

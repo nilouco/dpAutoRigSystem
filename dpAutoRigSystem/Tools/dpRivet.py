@@ -792,7 +792,7 @@ class Rivet(dpBaseLibrary.BaseLibrary):
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
         self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
-        self.ar.customAttr.addAttr(0, self.to_ids, descendents=True) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids, descendents=True) #dpID
         cmds.select(clear=True)
         return self.netList
     

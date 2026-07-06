@@ -183,7 +183,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
                         self.utils.removeUserDefinedAttr(self.singleCtrl, True)
                         #cmds.addAttr(self.singleCtrl, longName="dpHolder", attributeType="bool", defaultValue=1)
-                        #self.ar.customAttr.addAttr("custom", [self.singleCtrl], "dpHolder")
+                        #self.ar.custom_attr.addAttr("custom", [self.singleCtrl], "dpHolder")
                         self.utils.addCustomAttr([self.singleCtrl], "dpHolder")
                         self.ar.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
@@ -244,7 +244,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                 self.aCtrlGrpList.append(self.toCtrlHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composingInfo()
@@ -252,7 +252,7 @@ class Single(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.ar.customAttr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
     
     def composingInfo(self, *args):

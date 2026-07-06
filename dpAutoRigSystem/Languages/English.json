@@ -202,7 +202,7 @@
     "i030_standard"             : "Standard",
     "i031_displaySubShapeCB"    : "Display controllers sub shapes after rigging.",
     "i032_meshConnection"       : "Mesh Connection",
-    "i033_notMasterGrp"         : "Not found masterGrp. Please select a Master_Ctrl to find one.",
+    "i033_"         : "",
     "i034_notSelHeadDef"        : "Select objects to create Head Deformer, usually we create in the final head model vertices.",
     "i035_transfData"           : "Transferred vertices data",
     "i036_from"                 : "from",

@@ -81,9 +81,9 @@ class MainUI(object):
     def create_settings_menu(self):
         cmds.menu('settings_menu', label='Settings', parent='main_menu_bar')
         self.create_radio_menu("language", "settings_menu", self.ar.data.lang["_preset"], self.ar.data.lang_preset_data, self.ar.data.language_option_var)
-        self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_preset["_preset"], self.ar.data.validator_preset_data, self.ar.data.validator_option_var, refresh=True)
-        self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"], self.ar.data.curve_preset_data, self.ar.data.curve_option_var, refresh=True)
-        self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {d:0 for d in self.ar.data.degrees}, self.ar.data.degree_option_var, degree=True)
+        self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_preset["_preset"], self.ar.data.validator_preset_data, self.ar.data.validator_option_var)
+        self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"], self.ar.data.curve_preset_data, self.ar.data.curve_option_var)
+        self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {d:0 for d in self.ar.data.degrees}, self.ar.data.degree_option_var)
         # options
         cmds.menuItem("options_mi", label=self.ar.data.lang['i002_options'], subMenu=True, parent="settings_menu")
         cmds.menuItem("opt_colorize_curve_mi", label=self.ar.data.lang['i065_colorizeCtrl'], checkBox=self.ar.data.colorize_curve, command=self.ar.opt.set_colorize_curve, parent="options_mi")
@@ -134,17 +134,19 @@ class MainUI(object):
         cmds.menuItem('check_guide_versions_mi', label="Guide versions", command=self.ar.filler.check_guide_versions, parent='check_guides_mi')
 
 
-    def create_radio_menu(self, name, parent_menu, current, data, option_var=None, degree=False, refresh=False):
+    def create_radio_menu(self, name, parent_menu, current, data, option_var=None):
         menu_name = f"{name}_menu"
         collection_name = f"{name}_rbc"
         cmds.menuItem(menu_name, label=name.capitalize().replace("_", " "), parent=parent_menu, subMenu=True)
         cmds.radioMenuItemCollection(collection_name)
         for item in data.keys():
-            if degree:
+            if name == 'curve_degree': 
                 cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_degree, item), parent=menu_name)
-            elif refresh:
-                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=self.ar.ui_manager.refresh_ui, parent=menu_name)
-            else:
+            elif name == 'validator_preset':
+                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_validator_preset, item), parent=menu_name)
+            elif name == 'curve_preset':
+                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.opt.set_curve_preset, item), parent=menu_name)
+            else: #language
                 cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.ui_manager.reload_ui, option_var, item), parent=menu_name)
         cmds.menuItem(f"{current}_mi", edit=True, radioButton=True, collection=collection_name)
 

@@ -246,5 +246,5 @@ class TargetMirror(dpBaseLibrary.BaseLibrary):
                             if clearUndo:
                                 mel.eval("flushUndo;")
                 self.ar.utils.setProgress(endIt=True)
-                self.ar.customAttr.addAttr(0, self.to_ids, descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, self.to_ids, descendents=True) #dpID
             cmds.select(clear=True)
