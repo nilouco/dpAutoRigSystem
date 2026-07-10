@@ -56,7 +56,7 @@ class Data:
     plus_info_win_name: str = "dpPlusInfoWindow"
     color_override_win_name: str = "dpColorOverrideWindow"
     
-    icons_folder: str = "Icons"
+    icons_folder: str = "icons"
     tools_folder: str = "Tools"
     language_folder: str = "Languages"
     pipeline_folder: str = "Pipeline"

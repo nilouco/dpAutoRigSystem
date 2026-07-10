@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ...Tools import dpCorrectionManager
+from ...Tools import correction_manager
 from importlib import reload
 
 
@@ -9,7 +9,7 @@ DP_BASESTANDARD_VERSION = 2.13
 
 
 class BaseStandard(object):
-    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, *args):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -17,7 +17,7 @@ class BaseStandard(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        self.icon = ICON
+        #self.icon = ICON
         self.wiki = WIKI
         
         self.get_namespace_for_it()
@@ -29,9 +29,9 @@ class BaseStandard(object):
         # utils
         self.utils = ar.utils
         if self.ar.dev:
-            reload(dpCorrectionManager)
+            reload(correction_manager)
         # starting correctionManager:
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.ar)
+        self.correctionManager = correction_manager.CorrectionManager(self.ar)
         self.correctionManager.ui = False
         self.raw = True
         self.serialized = False

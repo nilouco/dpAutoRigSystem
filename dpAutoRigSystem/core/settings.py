@@ -158,10 +158,7 @@ class Configuration(object):
     
 
     def load_icons(self):
-        # TODO: review the 3: after renamed all images without the "dp_" prefix
-        self.ar.data.icon = {i[3:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
-        
-        #print(self.ar.data.icon)
+        self.ar.data.icon = {i[:-4]: self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder+"/"+i for i in os.listdir(self.ar.data.dp_auto_rig_path+"/"+self.ar.data.icons_folder) if i.endswith(".png")}
 
 
     def check_option_data(self, name, default, folder):

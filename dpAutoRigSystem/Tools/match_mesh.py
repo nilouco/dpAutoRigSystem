@@ -1,0 +1,168 @@
+# importing libraries:
+from maya import cmds
+from maya import mel
+from maya import OpenMaya
+from ..Modules.Base import dpBaseLibrary
+from importlib import reload
+
+# global variables to this module:
+CLASS_NAME = "MatchMesh"
+TITLE = "m049_matchMesh"
+DESCRIPTION = "m050_matchMeshDesc"
+#ICON = "/Icons/dp_matchMesh.png"
+WIKI = "06-‐-Tools#-match-mesh"
+
+DP_MATCHMESH_VERSION = 3.02
+
+
+class MatchMesh(dpBaseLibrary.BaseLibrary):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        #kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        dpBaseLibrary.BaseLibrary.__init__(self, *args, **kwargs)
+        if self.ar.dev:
+            reload(dpBaseLibrary)
+
+
+    def build_tool(self, *args):
+        # call main function
+        self.dpMatchMesh()
+    
+
+    def dpMatchMesh(self):
+        """ Get selection and transfere vertices information.
+        """
+        # declaring variables
+        fromTransformDic, toTransformDic = {}, {}
+        # get a list of selected items
+        selList = cmds.ls(selection=True)
+        
+        if(len(selList) <= 1):
+            cmds.warning(self.ar.data.lang['i040_notMatchSel'])
+        else:
+            # declaring current variables
+            fromFather = None
+            fromTransform = selList.copy()[0]
+            toTransform = selList.copy()[1]
+            fromMesh = selList.copy()[0]
+            toMesh = selList.copy()[1]
+            gotMeshes = True
+            
+            # getting transforms
+            if cmds.objectType(selList[0]) != "transform":
+                parentList = cmds.listRelatives(selList[0], allParents=True, type="transform")
+                if parentList:
+                    fromTransform = parentList[0]
+            if cmds.objectType(selList[1]) != "transform":
+                parentList = cmds.listRelatives(selList[1], allParents=True, type="transform")
+                if parentList:
+                    toTransform = parentList
+            
+            # getting fromTransform father
+            fromFatherList = cmds.listRelatives(fromTransform, allParents=True, type="transform")
+            if fromFatherList:
+                fromFather = fromFatherList[0]
+
+            # getting meshes
+            if cmds.objectType(selList[0]) != "mesh":
+                childrenList = cmds.listRelatives(selList[0], children=True, type="mesh")
+                if childrenList:
+                    fromMesh = childrenList[0]
+                else:
+                    gotMeshes = False
+            if cmds.objectType(selList[1]) != "mesh":
+                childrenList = cmds.listRelatives(selList[1], children=True, type="mesh")
+                if childrenList:
+                    toMesh = childrenList[0]
+                else:
+                    gotMeshes = False
+            
+            if gotMeshes:
+                # storing transformation data
+                for attr in self.ar.data.transform_attrs[:-1]:
+                    fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
+                    toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
+
+                # get list of mesh vertices proccess
+                # selecting meshes
+                cmds.select([fromMesh, toMesh])
+                meshList = OpenMaya.MSelectionList()
+                OpenMaya.MGlobal.getActiveSelectionList(meshList)
+                
+                # declaring from and to objects, dagPaths and vertice lists
+                fromObject = OpenMaya.MObject()
+                fromDagPath = OpenMaya.MDagPath()
+                toObject = OpenMaya.MObject()
+                toDagPath = OpenMaya.MDagPath()
+                fromVerticeList = OpenMaya.MPointArray()
+                toVerticeList = OpenMaya.MPointArray()
+                
+                # getting dagPaths
+                meshList.getDagPath(0, fromDagPath, fromObject)
+                meshList.getDagPath(1, toDagPath, toObject)
+                # getting open maya API mesh
+                fromMeshFn = OpenMaya.MFnMesh(fromDagPath)
+                toMeshFn = OpenMaya.MFnMesh(toDagPath)
+                
+                # verify the same number of vertices
+                if fromMeshFn.numVertices() == toMeshFn.numVertices():
+                    
+                    # put fromTransform in the same location then toTransform
+                    if fromFather != None:
+                        cmds.parent(fromTransform, world=True)
+                    for attr in self.ar.data.transform_attrs[:-1]:
+                        cmds.setAttr(fromTransform+"."+attr, lock=False)
+                        cmds.setAttr(toTransform+"."+attr, lock=False)
+                        if "scale" in attr:
+                            cmds.setAttr(fromTransform+"."+attr, 1)
+                            cmds.setAttr(toTransform+"."+attr, 1)
+                        else:
+                            cmds.setAttr(fromTransform+"."+attr, 0)
+                            cmds.setAttr(toTransform+"."+attr, 0)
+                    tempToDeleteA = cmds.parentConstraint(fromTransform, toTransform, maintainOffset=False)
+                    tempToDeleteB = cmds.scaleConstraint(fromTransform, toTransform, maintainOffset=False)
+                    cmds.delete(tempToDeleteA, tempToDeleteB)
+                    # getting vertices as points
+                    fromMeshFn.getPoints(fromVerticeList)
+                    toMeshFn.getPoints(toVerticeList)
+                    
+                    # progress window
+                    self.ar.utils.setProgress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
+                    cancelled = False
+                    
+                    # transfer vetex position from FROM mesh to TO mesh selected
+                    for i in range(0, fromVerticeList.length()):
+                        # check if the dialog has been cancelled
+                        if cmds.progressWindow(query=True, isCancelled=True):
+                            cancelled = True
+                            break
+                        self.ar.utils.setProgress(self.ar.data.lang['i035_transfData'])
+                        
+                        # transfer data
+                        cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
+                    
+                    self.ar.utils.setProgress(endIt=True)
+
+                    if fromFather != None:
+                        cmds.parent(fromTransform, fromFather)
+                    # restore transformation data
+                    for attr in self.ar.data.transform_attrs[:-1]:
+                        cmds.setAttr(fromTransform+"."+attr, fromTransformDic[attr])
+                        cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
+
+                    if not cancelled:
+                        cmds.select(selList)
+                        if self.ar.data.ui_state:
+                            self.ar.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
+                        print(self.ar.data.lang['i035_transfData'], self.ar.data.lang['i036_from'].upper(), ":", fromMesh, ",", self.ar.data.lang['i037_to'].upper(), ":", toMesh)
+                    else:
+                        print(self.ar.data.lang['i038_canceled'])
+                else:
+                    mel.eval("warning \""+self.ar.data.lang['i039_notMatchDif']+"\";")
+                cmds.select(selList)
+            else:
+                mel.eval("warning \""+self.ar.data.lang['i040_notMatchSel']+"\";")

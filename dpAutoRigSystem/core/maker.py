@@ -15,8 +15,8 @@ class Maker(object):
         #
         # TODO: review after rename modules without dp
         #
-        if not module.startswith("dp"):
-            module = "dp"+module
+#        if not module.startswith("dp"):
+#            module = "dp"+module
 
         mod = self.ar.lib.initialize_library(module, self.ar.data.standard_folder)[0]
         return [mod, mod.build_raw_guide()]
@@ -283,7 +283,7 @@ class Maker(object):
         cmds.setAttr(self.all_grp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
         # module counts:
         for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-            cmds.addAttr(self.all_grp, longName=guideType+"Count", attributeType="long", defaultValue=0)
+            cmds.addAttr(self.all_grp, longName="dp"+guideType.capitalize()+"Count", attributeType="long", defaultValue=0)
         # set outliner color
         self.ar.ctrls.colorShape([self.all_grp], [1, 1, 1], outliner=True) #white
 
@@ -523,7 +523,7 @@ class Maker(object):
                 if user_choose == not_text:
                     return False
                 elif user_choose == update_guides_text:
-                    self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
+                    self.ar.config.get_instance_info("update_guides", [self.ar.data.tools_folder]).build_tool()
                     return False
         return True
 
@@ -617,9 +617,9 @@ class Maker(object):
 
     
     def set_rigged_types(self):
-        # actualise the number of rigged guides by type
+        # actualise the number of rigged standard guides by type
         for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-            cmds.setAttr(f"{self.all_grp}.{guideType}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"dp{cmds.getAttr(n+'.moduleType')}" == guideType]))
+            cmds.setAttr(f"{self.all_grp}.dp{guideType.capitalize()}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"{cmds.getAttr(n+'.moduleType')}" == guideType.capitalize()]))
 
 
     def set_parent_tag(self):
@@ -683,7 +683,7 @@ class Maker(object):
             backAttr = self.ar.data.lang['c057_back']
             leftAttr = self.ar.data.lang['p002_left'].lower()
             rightAttr = self.ar.data.lang['p003_right'].lower()
-            tweaksAttr = self.ar.data.lang['m081_tweaks'].lower()
+            tweaksAttr = self.ar.data.lang['m081_tweakers'].lower()
             facialAttr = self.ar.data.lang['c059_facial'].lower()
             
             if not cmds.objExists(self.option_ctrl+"."+generalAttr):
@@ -1211,12 +1211,12 @@ class Composer(object):
 
     def single_options(self, single):
         # connect Option_Ctrl display attribute to the visibility:
-        if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower()):
-            cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-            cmds.setAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower(), channelBox=True)
+        if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweakers'].lower()):
+            cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['m081_tweakers'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+            cmds.setAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweakers'].lower(), channelBox=True)
         for s, side in enumerate(self.ar.maker.get_mirror_names(single)):
             ctrlGrp = single.composed["ctrlGrpList"][s]
-            cmds.connectAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
+            cmds.connectAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweakers'].lower(), ctrlGrp+".visibility", force=True)
 
 
     def single_single(self, single, father):

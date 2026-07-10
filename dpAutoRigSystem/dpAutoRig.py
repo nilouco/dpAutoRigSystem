@@ -31,8 +31,8 @@ from .Modules.Library import dpSkinning
 from .Modules.Base import dpBaseStandard
 from .Modules.Base import dpBaseLayout
 from .Modules.Base import dpBaseCurve
-from .Tools import dpUpdateGuides
-from .Tools import dpCustomAttr
+from .Tools import update_guides
+from .Tools import custom_attr
 from .Languages.Translator import dpTranslator
 from .Pipeline import dpPipeliner
 from .Pipeline import dpPublisher
@@ -84,8 +84,8 @@ class Start(object):
             reload(dpBaseStandard)
             reload(dpBaseLayout)
             reload(dpBaseCurve)
-            reload(dpUpdateGuides)
-            reload(dpCustomAttr)
+            reload(update_guides)
+            reload(custom_attr)
             reload(dpTranslator)
             reload(dpPipeliner)
             reload(dpPublisher)
@@ -129,7 +129,7 @@ class Start(object):
         self.packager = dpPackager.Packager(self)
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
-        self.custom_attr = dpCustomAttr.CustomAttr(self)
+        self.custom_attr = custom_attr.CustomAttr(self)
         self.skin = dpSkinning.Skinning(self)
         self.logger = dpLogger.Logger(self)
         self.translator = dpTranslator.Translator(self)

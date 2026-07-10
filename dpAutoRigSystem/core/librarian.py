@@ -98,7 +98,7 @@ class Lib(object):
             if "_" in item:
                 base_name = item.split("_")[0]
             name = self.ar.config.get_template_name(base_name)
-            lib = dpBaseTemplate.BaseTemplate(self.ar, item, name, "v002_templateDesc", item, f"03-‐-Guides#-{base_name}")
+            lib = dpBaseTemplate.BaseTemplate(self.ar, item, name, "v002_templateDesc", f"03-‐-Guides#-{base_name}")
             lib.template_data = content[item]
             lib.base_name = base_name
             libs.append(lib)
@@ -108,7 +108,7 @@ class Lib(object):
     def initialize_library(self, module, folder, path=None):
         """ Returns the started instance and the imported module objects.
         """
-        imported_module = self.import_library(module, folder, path)
+        imported_module = self.import_library(module.lower(), folder, path)
         if imported_module:
             return [self.create_instance(imported_module), imported_module]
 

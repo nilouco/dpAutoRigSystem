@@ -17,7 +17,7 @@ DP_ACTIONSTARTCLASS_VERSION = 2.09
 
 
 class ActionStartClass(object):
-    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI, verbose=True):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, verbose=True):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -27,7 +27,7 @@ class ActionStartClass(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        self.icon = ICON
+        #self.icon = ICON
         self.wiki = WIKI
         self.verbose = verbose
         self.active = True

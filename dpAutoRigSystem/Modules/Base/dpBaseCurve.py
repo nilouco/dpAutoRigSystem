@@ -6,7 +6,7 @@ DP_BASECURVE_VERSION = 2.04
 
 
 class BaseCurve(object):
-    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI):
+    def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -14,7 +14,7 @@ class BaseCurve(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        self.icon = ICON
+        #self.icon = ICON
         self.wiki = WIKI
         self.cvName = None
         self.cvAction = None

@@ -1,5 +1,5 @@
-dpModelIO
-dpCheckinIO
-dpSupportNodeIO
-dpBlendShapeIO
-dpShaderIO
+model_io
+checkin_io
+support_node_io
+blendshape_io
+shader_io

@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ...Pipeline.Validator.CheckOut import dpResetPose
+from ...Pipeline.Validator.CheckOut import reset_pose
 from functools import partial
 from importlib import reload
 import os
@@ -25,8 +25,8 @@ class ControlClass(object):
         self.utils = ar.utils
         self.loadVariables()
         if self.ar.dev:
-            reload(dpResetPose)
-        self.resetPose = dpResetPose.ResetPose(self.ar)
+            reload(reset_pose)
+        self.resetPose = reset_pose.ResetPose(self.ar)
 
 
     def loadVariables(self, *args):

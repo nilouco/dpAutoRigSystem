@@ -6,7 +6,7 @@ DP_BASELAYOUT_VERSION = 2.09
 
 
 class BaseLayout(object):
-    def __init__(self, ar, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON, WIKI):
+    def __init__(self, ar, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, WIKI):
         """ Initialize the layout class.
         """
         # defining variables:
@@ -14,7 +14,7 @@ class BaseLayout(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        self.icon = ICON
+        #self.icon = ICON
         self.wiki = WIKI
         self.userGuideName = userGuideName
         self.utils = ar.utils
@@ -40,7 +40,7 @@ class BaseLayout(object):
             # create basic module UI:
             self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=self.selectButtonCallback, parent=self.basicColumn)
             self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.guide_base+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
-            cmds.iconTextButton(image=self.ar.data.icon['plusInfo'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
+            cmds.iconTextButton(image=self.ar.data.icon['plus_info'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
             self.reCreateEditSelectedModuleLayout(self)
     
 

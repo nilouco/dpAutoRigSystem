@@ -171,7 +171,7 @@ class MainUI(object):
         # top right
         cmds.rowColumnLayout('rig_header_rcl', numberOfColumns=2, adjustableColumn=1, columnWidth=(120, 50), parent='rigging_tab')
         cmds.text('rig_modules_txt', label=self.ar.data.lang['i001_modules'], font="boldLabelFont", width=150, align='center', parent='rig_header_rcl')
-        cmds.iconTextButton("rig_tri_collapse_guides_itb", image=self.ar.data.icon['triDown'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, "rig_tri_collapse_guides_itb", 0), width=17, height=17, style='iconOnly', align='right', parent='rig_header_rcl')
+        cmds.iconTextButton("rig_tri_collapse_guides_itb", image=self.ar.data.icon['tri_down'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, "rig_tri_collapse_guides_itb", 0), width=17, height=17, style='iconOnly', align='right', parent='rig_header_rcl')
         # middle left
         cmds.scrollLayout("rig_guides_start_sl", width=160, parent='rigging_tab')
         cmds.frameLayout("rig_guides_standard_fl", label=self.ar.data.lang['i030_standard'], width=140, collapsable=True, collapse=False, parent='rig_guides_start_sl')
@@ -445,7 +445,7 @@ class MainUI(object):
         # processes
         cmds.rowColumnLayout('processes_rcl', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, "left"), (2, "right")], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, "both", 10), (2, "right", 10)], parent="rebuilder_tab")
         cmds.text('processes_io_txt', label=self.ar.data.lang['i292_processes'].upper()+" IO", font="boldLabelFont", parent="processes_rcl")
-        cmds.iconTextButton("rebuilder_tri_collapse_itb", image=self.ar.data.icon['triRight'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, "rebuilder_tri_collapse_itb", 1), width=17, height=17, style='iconOnly', align='right', parent="processes_rcl")
+        cmds.iconTextButton("rebuilder_tri_collapse_itb", image=self.ar.data.icon['tri_right'], annotation=self.ar.data.lang['i348_triangleIconAnn'], command=partial(self.ar.ui_manager.collapse_all_fl, "rebuilder_tri_collapse_itb", 1), width=17, height=17, style='iconOnly', align='right', parent="processes_rcl")
         cmds.scrollLayout("rebuilder_main_sl", parent="rebuilder_tab")
         cmds.columnLayout("rebuilder_cl", adjustableColumn=True, rowSpacing=3, parent="rebuilder_main_sl")
         # -> rebuilder_cl it will be filled futher...

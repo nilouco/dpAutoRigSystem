@@ -94,7 +94,7 @@ class UIFiller(object):
                         item.title = item.customName
                 # rebuilders
                 if folder in self.rebuilder_folders:
-                    item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['xDelete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
+                    item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['x_delete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
             # info icon
             cmds.iconTextButton(item.name+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
             if folder in self.rebuilder_folders:
@@ -343,5 +343,5 @@ class UIFiller(object):
         for item in self.ar.utils.get_guides_to_rig():
             if not self.ar.data.version == cmds.getAttr(item.guide_base+'.dpARVersion'):
                 self.check_guide_nets()
-                self.ar.config.get_instance_info("dpUpdateGuides", [self.ar.data.tools_folder]).build_tool()
+                self.ar.config.get_instance_info("update_guides", [self.ar.data.tools_folder]).build_tool()
                 break

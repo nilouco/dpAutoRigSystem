@@ -144,18 +144,18 @@ class UIManager(object):
             1 = rebuilder processes frame layouts
         """
         collapse_value = True
-        icon = self.ar.data.icon['triRight']
+        icon = self.ar.data.icon['tri_right']
         if layout == 0: #guide modules
             modules = self.ar.data.guide_instances
             if self.ar.data.modules_collapse_status:
                 collapse_value = False
-                icon = self.ar.data.icon['triDown']
+                icon = self.ar.data.icon['tri_down']
             self.ar.data.modules_collapse_status = collapse_value
         else: #rebuilder processes
             modules = self.ar.data.rebuilder_layouts
             if self.ar.data.rebuilders_collapse_status:
                 collapse_value = False
-                icon = self.ar.data.icon['triDown']
+                icon = self.ar.data.icon['tri_down']
             self.ar.data.rebuilders_collapse_status = collapse_value
         if modules:
             for item in modules:
@@ -166,10 +166,13 @@ class UIManager(object):
         cmds.iconTextButton(iconTB, edit=True, image=icon)
 
 
-    def get_icon_name(self, item, alternative="addOn"):
-        icon_name = "AR"
+    def get_icon_name(self, item, alternative="add_on"):
+        icon_name = "ar"
         if hasattr(item, "name"):
-            icon_name = item.name[0].lower()+item.name[1:]
+            if item.name in self.ar.data.icon.keys():
+                icon_name = item.name
+            else:
+                icon_name = self.ar.utils.to_snake_case(item.name)
         if not icon_name in self.ar.data.icon.keys():
             if icon_name.split("_")[0] in self.ar.data.icon.keys():
                 icon_name = icon_name.split("_")[0]

@@ -155,33 +155,23 @@ class Utils(object):
             If find a dpOrderList.txt file it will order the list for priority proporses.
             Return a list of all module names (without the given extension).
         """
-        base_classes = ["dpBaseStandard", "dpBaseLayout", "dpBaseCurve", "dpBaseAction", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
         folder = folder.replace(".", "/")
-        files = self.findAllFiles(path, folder, ext)
-        modules = []
-        for file in files:
-            # ensure base class are skipped
-            if not file in base_classes:
-                modules.append(file)
-        # check order list
-        if modules:
-            texts = self.findAllFiles(path, folder, "txt")
-            if texts:
-                for text in texts:
-                    if self.dpOrderList in text:
-                        desiredOrderList = []
-                        dupList = modules
-                        modules = []
-                        with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
-                            for line in filename.readlines():
-                                desiredOrderList.append(line.strip())
-                        if desiredOrderList:
-                            for item in desiredOrderList:
-                                if item in dupList:
-                                    modules.append(item)
-                                    dupList.remove(item)
-                        if dupList:
-                            modules.extend(dupList)
+        modules = self.findAllFiles(path, folder, ext)
+        for text in self.findAllFiles(path, folder, "txt"):
+            if self.dpOrderList in text:
+                desiredOrderList = []
+                dupList = modules.copy()
+                modules = []
+                with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
+                    for line in filename.readlines():
+                        desiredOrderList.append(line.strip())
+                if desiredOrderList:
+                    for item in desiredOrderList:
+                        if item in dupList:
+                            modules.append(item)
+                            dupList.remove(item)
+                if dupList:
+                    modules.extend(dupList)
         return modules
 
 
@@ -237,7 +227,7 @@ class Utils(object):
         # try check if there is a masterGrp and get its counter:
         allGrp = self.getAllGrp()
         if allGrp:
-            guideTypeCount = cmds.getAttr(allGrp+'.dp'+className+'Count')
+            guideTypeCount = cmds.getAttr(allGrp+'.dp'+className+'Count') #v5
         if guideTypeCount > len(numberList):
             return guideTypeCount
         else:
@@ -1606,3 +1596,10 @@ class Utils(object):
         if custom_name:
             return custom_name
         return name
+
+    def to_snake_case(self, text):
+        # Inserts an underscore before any capital letter followed by a lowercase letter
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', text)
+        # Inserts an underscore before any capital letter if preceded by a lowercase letter or number
+        s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1)
+        return s2.lower()
