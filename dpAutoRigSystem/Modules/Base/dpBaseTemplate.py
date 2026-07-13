@@ -35,7 +35,7 @@ class BaseTemplate(dpBaseLibrary.BaseLibrary):
                 if user_choice == self.ar.data.lang['i132_cancel']:
                     return
                 template_data = self.ar.data.lib[self.ar.data.template_folder]["content"][f"{base_name}_{user_choice.lower()}"]
-        guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
+        guide_io = self.ar.config.get_instance("GuideIO", [self.ar.data.setup_folder])
         guide_data = guide_io.parse_repeated_nets(template_data)
         guide_io.importGuide(guide_data, False)
         guide_io.setupGuideBaseParenting(guide_data)

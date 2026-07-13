@@ -77,7 +77,7 @@ class Maker(object):
         nets.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
         if nets:
             self.ar.job.unpin_guide(force=True)
-            guide_io = self.ar.config.get_instance("dpGuideIO", [self.ar.data.setup_folder])
+            guide_io = self.ar.config.get_instance("GuideIO", [self.ar.data.setup_folder])
             guides_data = guide_io.getGuideDataDic(nets)
             if not name:
                 if self.ar.data.ui_state:
@@ -474,7 +474,7 @@ class Maker(object):
         if items and attrs:
             for obj in items:
                 # load dpReorderAttribute:
-                dpRAttr = self.ar.config.get_instance_info("dpReorderAttr", [self.ar.data.tools_folder])
+                dpRAttr = self.ar.config.get_instance("ReorderAttr", [self.ar.data.tools_folder])
 
                 if verbose and not self.ar.data.rebuilding:
                     self.ar.utils.setProgress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrs), addOne=False, addNumber=False)
@@ -523,7 +523,7 @@ class Maker(object):
                 if user_choose == not_text:
                     return False
                 elif user_choose == update_guides_text:
-                    self.ar.config.get_instance_info("update_guides", [self.ar.data.tools_folder]).build_tool()
+                    self.ar.config.get_instance("UpdateGuides", [self.ar.data.tools_folder]).build_tool()
                     return False
         return True
 
@@ -801,8 +801,8 @@ class Maker(object):
                 self.set_rigged_types()
                 self.set_parent_tag()
             self.set_option_ctrl_attrs()
-            self.ar.config.get_instance_info("dpLimbSpaceSwitch", [self.ar.data.tools_folder]).build_tool()
-            self.ar.config.get_instance_info("dpFingerHandPose", [self.ar.data.tools_folder]).build_tool()
+            self.ar.config.get_instance("LimbSpaceSwitch", [self.ar.data.tools_folder]).build_tool()
+            self.ar.config.get_instance("FingerHandPose", [self.ar.data.tools_folder]).build_tool()
             # show dialogBox if detected a bug:
             if self.detectedBug:
                 print("\n\n")

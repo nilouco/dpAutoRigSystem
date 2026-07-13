@@ -812,7 +812,7 @@ class MotionCapture(dpBaseLibrary.BaseLibrary):
     def resetDefaultPose(self, *args):
         """ Back rig to default pose calling the ResetPose validator.
         """
-        reset_pose = self.ar.config.get_instance_info("ResetPose", [self.ar.data.checkout_folder])
+        reset_pose = self.ar.config.get_instance("ResetPose", [self.ar.data.checkout_folder])
         reset_pose.verbose = False
         reset_pose.runAction(False) #fix
         reset_pose.endProgress()

@@ -131,7 +131,7 @@ class BaseStandard(object):
         cmds.setAttr(self.guide_base+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
 
-        cmds.setAttr(self.guide_base+".guideObjectInfo", self.ar.config.get_instance_info(self.name, [self.ar.data.standard_folder], "imported"), type='string')
+        cmds.setAttr(self.guide_base+".guideObjectInfo", self.ar.config.get_instance(self.name, [self.ar.data.standard_folder], "imported"), type='string')
         cmds.setAttr(self.guide_base+".rigType", self.rigType, type='string')
         cmds.setAttr(self.guide_base+".dpARVersion", self.ar.data.version, type='string')
         

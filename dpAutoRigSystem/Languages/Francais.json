@@ -533,8 +533,8 @@
     "i363_addedFingerHandPose"  : "C'était ajouté des attributs de Pose de Doigts de la Main avec succès.\nMerci.",
     "i364_repeatedNetName"      : "Il y a des noms de guides en double.\nVoulez-vous les ignorer?",
 
-    "m001_fk"                : "Fk",
-    "m002_fkDesc"            : "Description du module Fk:\n\nCe module crée une chaîne de joints\navec le nombre de joints désiré.\n\nLorsque riggés, les contrôles seront FK (forward kinematics),\nik (inverse kinematics) ou dynamiques.\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
+    "m001_fkLine"                : "Fk",
+    "m002_fkLineDesc"            : "Description du module Fk:\n\nCe module crée une chaîne de joints\navec le nombre de joints désiré.\n\nLorsque riggés, les contrôles seront FK (forward kinematics),\nik (inverse kinematics) ou dynamiques.\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
     "m003_segments"              : "Segments",
     "m004_select"                : "Sélectionnez",
     "m005_delete"                : "Supprimez",

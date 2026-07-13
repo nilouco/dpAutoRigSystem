@@ -1198,7 +1198,7 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
 
-                    hdNet = self.ar.config.get_instance_info("head_deformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet, ui=False)
+                    hdNet = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet, ui=False)
 
                     self.addNodeToGuideNet([hdNet], ["hdNet"])
                     cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
@@ -1218,9 +1218,9 @@ class Head(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.guide_base+".facial"):
                 if self.connectUserType == self.bsType:
-                    self.ar.config.get_instance_info("dpFacialConnection", [self.ar.data.tools_folder]).dpConnectToBlendShape()
+                    self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).dpConnectToBlendShape()
                 else:
-                    self.ar.config.get_instance_info("dpFacialConnection", [self.ar.data.tools_folder]).dpConnectToJoints()
+                    self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).dpConnectToJoints()
 
             # finalize this rig:
             self.serialize_guide()

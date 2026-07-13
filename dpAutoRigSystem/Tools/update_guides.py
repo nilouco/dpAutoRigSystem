@@ -363,7 +363,7 @@ class UpdateGuides(dpBaseLibrary.BaseLibrary):
 
     def createNewGuides(self):
         for guide in self.updateData:
-            currentNewGuide = self.ar.config.get_instance_info("dp"+self.updateData[guide]['name'], [self.ar.data.standard_folder])
+            currentNewGuide = self.ar.config.get_instance(self.updateData[guide]['name'], [self.ar.data.standard_folder])
             currentNewGuide.build_raw_guide()
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']

@@ -22,7 +22,7 @@ class Smile(dpBaseCurve.BaseCurve):
         kwargs["WIKI"] = None
         dpBaseCurve.BaseCurve.__init__(self, *args, **kwargs)
         # dependence module list:
-        self.check_modules = ['dpCircle', 'dpCurvedCircleUp']
+        self.check_modules = ['Circle', 'CurvedCircleUp']
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
@@ -30,7 +30,7 @@ class Smile(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        missing_modules = self.ar.ui_manager.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
+        missing_modules = self.ar.lib.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
         if not missing_modules:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -43,8 +43,8 @@ class Smile(dpBaseCurve.BaseCurve):
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
-        circle = self.ar.config.get_instance_info("dpCircle", [self.ar.data.curve_simple_folder])
-        mouth = self.ar.config.get_instance_info("dpCurvedCircleUp", [self.ar.data.curve_simple_folder])
+        circle = self.ar.config.get_instance("Circle", [self.ar.data.curve_simple_folder])
+        mouth = self.ar.config.get_instance("CurvedCircleUp", [self.ar.data.curve_simple_folder])
         curve1 = circle.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circle.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)
         curve3 = circle.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)

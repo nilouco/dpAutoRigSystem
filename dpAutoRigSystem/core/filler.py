@@ -343,5 +343,5 @@ class UIFiller(object):
         for item in self.ar.utils.get_guides_to_rig():
             if not self.ar.data.version == cmds.getAttr(item.guide_base+'.dpARVersion'):
                 self.check_guide_nets()
-                self.ar.config.get_instance_info("update_guides", [self.ar.data.tools_folder]).build_tool()
+                self.ar.config.get_instance("UpdateGuides", [self.ar.data.tools_folder]).build_tool()
                 break

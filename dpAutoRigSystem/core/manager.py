@@ -211,13 +211,6 @@ class UIManager(object):
                 item.resetButtonColors()
 
 
-    def check_missing_modules(self, folder, check_modules):
-        """ Verifies if the modules exists in the given folder.
-            Returns a list of missing modules or []
-        """
-        return [m for m in check_modules if not m in self.ar.utils.findAllModules(self.ar.data.dp_auto_rig_path, folder.replace(".", "/"))]
-
-
     def changeActiveAllModules(self, items, value, *args):
         """ Set all module instances active attribute as True or False.
             Used by validators and rebuilders.

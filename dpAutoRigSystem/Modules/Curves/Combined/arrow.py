@@ -25,7 +25,7 @@ class Arrow(dpBaseCurve.BaseCurve):
         if self.ar.dev:
             reload(dpBaseCurve)
         # dependence module list:
-        self.check_modules = ['dpArrowFlat']
+        self.check_modules = ['ArrowFlat']
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
@@ -33,7 +33,7 @@ class Arrow(dpBaseCurve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        missing_modules = self.ar.ui_manager.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
+        missing_modules = self.ar.lib.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
         if not missing_modules:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
@@ -45,7 +45,7 @@ class Arrow(dpBaseCurve.BaseCurve):
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
-        arrow_flat = self.ar.config.get_instance_info("dpArrowFlat", [self.ar.data.curve_simple_folder])
+        arrow_flat = self.ar.config.get_instance("ArrowFlat", [self.ar.data.curve_simple_folder])
         # creating curve shapes:
         curve1 = arrow_flat.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = arrow_flat.cvMain(False, cvID, cvName, cvSize, cvDegree)

@@ -497,26 +497,6 @@ class ControlClass(object):
         return ctrlModule
 
 
-    def getControlInstance(self, instanceName, *args):
-        """ Find the loaded control instance by name.
-            Return the instance found.
-        """
-
-        # if self.ar.data.control_instances:
-        #     for instance in self.ar.data.control_instances:
-        #         if instance.name == instanceName:
-        #             return instance
-
-        # WIP
-        # TODO: change to call directly the settings
-        #
-        #print("instanceName 000 =", instanceName)
-        return self.ar.config.get_instance_info(instanceName, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
-
-
-
-
-
     def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, parentTag=None, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
@@ -533,7 +513,7 @@ class ControlClass(object):
             if d == 0:
                 d = 1
         # get control instance:
-        controlInstance = self.getControlInstance(ctrlModule)
+        controlInstance = self.ar.config.get_instance(ctrlModule, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
         if controlInstance:
             # create curve
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
@@ -566,7 +546,7 @@ class ControlClass(object):
     def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", pin=True, *args):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
-        curveInstance = self.getControlInstance(cvType)
+        curveInstance = self.ar.config.get_instance(cvType, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
         curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
             self.addGuideAttrs(curve, color, pin)

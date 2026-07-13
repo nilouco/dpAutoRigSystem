@@ -47,7 +47,7 @@ class Lib(object):
 
 
     def start_modules_by_folder(self, folder, path=None):
-        libs, imported_modules = [], []
+        libs, imported_modules, class_names = [], [], []
         if not path:
             path = self.ar.data.dp_auto_rig_path
         if not self.ar.data.loaded_path:
@@ -63,6 +63,7 @@ class Lib(object):
                 self.ar.data.lib_instances.append(lib_instance)
                 libs.append(lib_instance)
                 imported_modules.append(imported_module)
+                class_names.append(lib_instance.name)
         
             # avoid print again the same message:
             if folder == "":
@@ -70,8 +71,9 @@ class Lib(object):
             if not folder in self.ar.data.lib.keys():
                 self.ar.data.lib[folder] = { 
                                             "modules" : modules,
-                                            "instances": libs,
-                                            "imported" : imported_modules
+                                            "instances" : libs,
+                                            "imported" : imported_modules,
+                                            "names" : class_names
                                             }
                 if self.ar.data.verbose:
                     print(folder+" : "+str(modules))
@@ -126,7 +128,7 @@ class Lib(object):
             if self.ar.dev:
                 reload(imported_module)
         except Exception as e:
-            errorString = self.ar.data.lang['e017_loadingExtension']+" "+module+" : "+str(e.args)
+            errorString = self.ar.data.lang['e017_loadingExtension']+" "+module+" : "+str(e)
             mel.eval('warning \"'+errorString+'\";')
             return
         return imported_module
@@ -155,3 +157,10 @@ class Lib(object):
         for validator_instance in self.ar.config.get_validator_instances():
             if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]].keys():
                 validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
+
+
+    def check_missing_modules(self, folder, check_modules):
+        """ Verifies if the modules is loaded.
+            Returns a list of missing modules or []
+        """
+        return [m for m in check_modules if not m in self.ar.data.lib[folder]["names"]]

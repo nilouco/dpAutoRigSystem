@@ -4,16 +4,16 @@ from ..Base import dpBaseStandard
 from ..Base import dpBaseLayout
 
 # global variables to this module:
-CLASS_NAME = "Fk"
-TITLE = "m001_fk"
-DESCRIPTION = "m002_fkDesc"
+CLASS_NAME = "FkLine"
+TITLE = "m001_fkLine"
+DESCRIPTION = "m002_fkLineDesc"
 #ICON = "/Icons/dp_fkLine.png"
-WIKI = "03-‐-Guides#-fk"
+WIKI = "03-‐-Guides#-fk-line"
 
 DP_FKLINE_VERSION = 2.08
 
 
-class Fk(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
+class FkLine(dpBaseStandard.BaseStandard, dpBaseLayout.BaseLayout):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME

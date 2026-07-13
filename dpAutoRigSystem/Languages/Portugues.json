@@ -533,8 +533,8 @@
     "i363_addedFingerHandPose"  : "Adicionado atributos de Pose de Dedos da Mão com sucesso.\nObrigado.",
     "i364_repeatedNetName"      : "Existem nomes de guias repetidos.\nVocê quer ignora-los?",
 
-    "m001_fk"                : "Fk",
-    "m002_fkDesc"            : "Descrição do Módulo Fk:\n\nEsse módulo cria uma cadeia de joints\ncom o número de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é útil para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
+    "m001_fkLine"                : "Fk",
+    "m002_fkLineDesc"            : "Descrição do Módulo Fk:\n\nEsse módulo cria uma cadeia de joints\ncom o número de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é útil para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
     "m003_segments"              : "Segmentos",
     "m004_select"                : "Selecionar",
     "m005_delete"                : "Apagar",

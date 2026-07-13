@@ -284,18 +284,6 @@ class Configuration(object):
             print("start_path = ", start_path)
             print("end_path = ", end_path)
             return self.ar.utils.findAllModules(start_path, end_path)
-        
-
-    def get_instance_info(self, name, folders, info="instances"):
-        # TODO Temporary renaming before refacotry files renaming is done:
-        if name.startswith("dp"):
-            name = name[2:] #removes initial dp string
-        
-        for folder in folders:
-            if folder in self.ar.data.lib.keys():
-                for i, item in enumerate(self.ar.data.lib[folder]["instances"]):
-                    if name == item.name:
-                        return self.ar.data.lib[folder][info][i]
                     
 
     def get_validator_instances(self):
@@ -316,14 +304,14 @@ class Configuration(object):
         return rebuilders
 
 
-    def get_instance(self, name, folders=None):
+    def get_instance(self, name, folders=None, info="instances"):
         if not folders:
             folders = self.lib_folders
         for folder in folders:
-            if folder in list(self.ar.data.lib.keys()):
-                for i, item in enumerate(self.ar.data.lib[folder]["modules"]):
-                    if item == name:
-                        return self.ar.data.lib[folder]["instances"][i]
+            if folder in self.ar.data.lib.keys():
+                for i, item in enumerate(self.ar.data.lib[folder]["names"]):
+                    if name == item:
+                        return self.ar.data.lib[folder][info][i]
 
 
     def get_template_name(self, name):
