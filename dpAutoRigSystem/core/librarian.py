@@ -3,7 +3,7 @@ import os
 import sys
 from maya import mel
 from importlib import reload
-from ..Modules.Base import dpBaseTemplate
+from ..library.base import template
 
 
 
@@ -11,7 +11,7 @@ class Lib(object):
     def __init__(self, ar):
         self.ar = ar
         if self.ar.dev:
-            reload(dpBaseTemplate)
+            reload(template)
 
 
     def start_library(self):
@@ -100,7 +100,7 @@ class Lib(object):
             if "_" in item:
                 base_name = item.split("_")[0]
             name = self.ar.config.get_template_name(base_name)
-            lib = dpBaseTemplate.BaseTemplate(self.ar, item, name, "v002_templateDesc", f"03-‐-Guides#-{base_name}")
+            lib = template.BaseTemplate(self.ar, item, name, "v002_templateDesc", f"03-‐-Guides#-{base_name}")
             lib.template_data = content[item]
             lib.base_name = base_name
             libs.append(lib)
@@ -128,7 +128,7 @@ class Lib(object):
             if self.ar.dev:
                 reload(imported_module)
         except Exception as e:
-            errorString = self.ar.data.lang['e017_loadingExtension']+" "+module+" : "+str(e)
+            errorString = self.ar.data.lang['e017_loadingExtension']+" "+str(module).replace("\"", "")+" : "+str(e)
             mel.eval('warning \"'+errorString+'\";')
             return
         return imported_module

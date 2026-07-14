@@ -282,8 +282,8 @@ class Maker(object):
         cmds.setAttr(self.all_grp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
         cmds.setAttr(self.all_grp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
         # module counts:
-        for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-            cmds.addAttr(self.all_grp, longName="dp"+guideType.capitalize()+"Count", attributeType="long", defaultValue=0)
+        for class_name in self.ar.data.lib[self.ar.data.standard_folder]["names"]:
+            cmds.addAttr(self.all_grp, longName="dp"+class_name+"Count", attributeType="long", defaultValue=0)
         # set outliner color
         self.ar.ctrls.colorShape([self.all_grp], [1, 1, 1], outliner=True) #white
 
@@ -618,8 +618,8 @@ class Maker(object):
     
     def set_rigged_types(self):
         # actualise the number of rigged standard guides by type
-        for guideType in self.ar.data.lib[self.ar.data.standard_folder]["modules"]:
-            cmds.setAttr(f"{self.all_grp}.dp{guideType.capitalize()}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"{cmds.getAttr(n+'.moduleType')}" == guideType.capitalize()]))
+        for class_name in self.ar.data.lib[self.ar.data.standard_folder]["names"]:
+            cmds.setAttr(f"{self.all_grp}.dp{class_name}Count", len([n for n in self.ar.utils.getNetworkNodeByAttr("dpGuideNet") if f"{cmds.getAttr(n+'.moduleType')}" == class_name]))
 
 
     def set_parent_tag(self):
@@ -783,6 +783,7 @@ class Maker(object):
             for item in self.guides_to_rig:
                 item.check_father_mirror()
                 item.serialize_guide()
+            for item in self.guides_to_rig: #it needs another loop to serialize guides parenting before rig them
                 if item.customName:
                     self.ar.utils.setProgress('Rigging: '+str(item.customName))
                 else:

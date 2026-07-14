@@ -80,9 +80,9 @@ class MainUI(object):
 
     def create_settings_menu(self):
         cmds.menu('settings_menu', label='Settings', parent='main_menu_bar')
-        self.create_radio_menu("language", "settings_menu", self.ar.data.lang["_preset"], self.ar.data.lang_preset_data, self.ar.data.language_option_var)
-        self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_preset["_preset"], self.ar.data.validator_preset_data, self.ar.data.validator_option_var)
-        self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"], self.ar.data.curve_preset_data, self.ar.data.curve_option_var)
+        self.create_radio_menu("language", "settings_menu", self.ar.data.lang["_preset"].lower(), self.ar.data.lang_preset_data, self.ar.data.language_option_var)
+        self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_preset["_preset"].lower(), self.ar.data.validator_preset_data, self.ar.data.validator_option_var)
+        self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"].lower(), self.ar.data.curve_preset_data, self.ar.data.curve_option_var)
         self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {d:0 for d in self.ar.data.degrees}, self.ar.data.degree_option_var)
         # options
         cmds.menuItem("options_mi", label=self.ar.data.lang['i002_options'], subMenu=True, parent="settings_menu")
@@ -103,7 +103,7 @@ class MainUI(object):
         cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.dpTranslatorMain, parent='create_menu')
         cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.config.open_pipeliner, parent='create_menu')
         cmds.menuItem('create_curve_preset_mi', label='Curve Preset', command=partial(self.ar.config.create_preset, "curve", self.ar.data.curve_preset_folder, True), parent='create_menu')
-        cmds.menuItem('create_validator_preset_mi', label='Validator Preset', command=partial(self.ar.config.create_preset, "validator", self.ar.data.validator_preset_folder, False), parent='create_menu')
+        cmds.menuItem('create_validator_preset_mi', label='Validator Preset', command=partial(self.ar.config.create_preset, "validator", self.ar.data.validate_preset_folder, False), parent='create_menu')
 
 
     def create_window_menu(self):
@@ -141,14 +141,17 @@ class MainUI(object):
         cmds.radioMenuItemCollection(collection_name)
         for item in data.keys():
             if name == 'curve_degree': 
-                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_degree, item), parent=menu_name)
+                cmds.menuItem(f"{item}_mi", label=item.capitalize().replace("_", " "), radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_degree, item), parent=menu_name)
             elif name == 'validator_preset':
-                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_validator_preset, item), parent=menu_name)
+                cmds.menuItem(f"{item}_mi", label=item.capitalize().replace("_", " "), radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_validator_preset, item), parent=menu_name)
             elif name == 'curve_preset':
-                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.opt.set_curve_preset, item), parent=menu_name)
+                cmds.menuItem(f"{item}_mi", label=item.capitalize().replace("_", " "), radioButton=False, collection=collection_name, command=partial(self.ar.opt.set_curve_preset, item), parent=menu_name)
             else: #language
-                cmds.menuItem(f"{item}_mi", label=item, radioButton=False, collection=collection_name, command=partial(self.ar.ui_manager.reload_ui, option_var, item), parent=menu_name)
-        cmds.menuItem(f"{current}_mi", edit=True, radioButton=True, collection=collection_name)
+                cmds.menuItem(f"{item}_mi", label=item.capitalize().replace("_", " "), radioButton=False, collection=collection_name, command=partial(self.ar.ui_manager.reload_ui, option_var, item), parent=menu_name)
+        if cmds.menuItem(f"{current}_mi", exists=True):
+            cmds.menuItem(f"{current}_mi", edit=True, radioButton=True, collection=collection_name)
+        else:
+            raise ValueError(f"Not found {current} menu.")
 
 
     def create_layout(self):

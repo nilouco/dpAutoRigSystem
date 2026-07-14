@@ -83,7 +83,7 @@ class Configuration(object):
         self.ar.data.validator_preset, self.ar.data.validator_preset_data = self.check_option_data(
                                                                                                     self.ar.data.validator_option_var,
                                                                                                     self.ar.data.validator_default,
-                                                                                                    self.ar.data.validator_preset_folder
+                                                                                                    self.ar.data.validate_preset_folder
                                                                                                     )
         
 
@@ -224,7 +224,9 @@ class Configuration(object):
         result_value = cmds.optionVar(query=name)
         # if the last value in the system was different of json files, set it to preferable or to the first value in the list also:
         if not result_value in founds:
-            if preferable in founds:
+            if result_value.lower() in founds:
+                result_value = result_value.lower()
+            elif preferable in founds:
                 result_value = preferable
             else:
                 result_value = result_value[0]
@@ -315,7 +317,7 @@ class Configuration(object):
 
 
     def get_template_name(self, name):
-        keys = self.ar.utils.get_keys_by_value(self.ar.data.lang_preset_data["English"], name.capitalize())
+        keys = self.ar.utils.get_keys_by_value(self.ar.data.lang_preset_data[self.ar.data.language_default], name.capitalize())
         if keys:
             for key in keys:
                 if key.startswith("m") or key.startswith("i"):

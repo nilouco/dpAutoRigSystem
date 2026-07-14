@@ -25,19 +25,19 @@ DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem rel
 
 # Import libraries
 from importlib import reload
-from .Modules.Library import dpUtils
-from .Modules.Library import dpControls
-from .Modules.Library import dpSkinning
-from .Modules.Base import dpBaseStandard
-from .Modules.Base import dpBaseLayout
-from .Modules.Base import dpBaseCurve
-from .Tools import update_guides
-from .Tools import custom_attr
-from .Languages.Translator import dpTranslator
-from .Pipeline import dpPipeliner
-from .Pipeline import dpPublisher
-from .Pipeline import dpPackager
-from .Pipeline import dpLogger
+from .library.util import dpUtils
+from .library.util import dpControls
+from .library.util import dpSkinning
+from .library.base import standard
+from .library.base import layout
+from .library.base import curve
+from .library.tool import update_guides
+from .library.tool import custom_attr
+from .library.language.Translator import dpTranslator
+from .library.pipeline import dpPipeliner
+from .library.pipeline import dpPublisher
+from .library.pipeline import dpPackager
+from .library.pipeline import dpLogger
 from .core import settings
 from .core import variables
 from .core import loading
@@ -81,9 +81,9 @@ class Start(object):
             reload(dpUtils)
             reload(dpControls)
             reload(dpSkinning)
-            reload(dpBaseStandard)
-            reload(dpBaseLayout)
-            reload(dpBaseCurve)
+            reload(standard)
+            reload(layout)
+            reload(curve)
             reload(update_guides)
             reload(custom_attr)
             reload(dpTranslator)

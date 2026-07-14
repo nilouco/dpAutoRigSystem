@@ -1,0 +1,120 @@
+# importing libraries:
+from maya import cmds
+from ....library.base import action
+
+# global variables to this module:
+CLASS_NAME = "EmptyTransform"
+TITLE = "v138_emptyTransform"
+DESCRIPTION = "v139_emptyTransformDesc"
+#ICON = "/Icons/dp_emptyTransform.png"
+WIKI = "07-‐-Validator#-empty-transform-cleaner"
+
+DP_EMPTYTRANSFORMCLEANER_VERSION = 1.02
+
+
+class EmptyTransform(action.ActionStartClass):
+    def __init__(self, *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        #kwargs["ICON"] = ICON
+        kwargs["WIKI"] = WIKI
+        self.version = DP_EMPTYTRANSFORMCLEANER_VERSION
+        action.ActionStartClass.__init__(self, *args, **kwargs)
+    
+
+    def runAction(self, firstMode=True, objList=None, *args):
+        """ Main method to process this validator instructions.
+            It's in verify mode by default.
+            If firstMode parameter is False, it'll run in fix mode.
+            Returns dataLog with the validation result as:
+                - checkedObjList = node list of checked items
+                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
+                - resultOkList = True if well done, False if we got an error
+                - messageList = reported text
+        """
+        # starting
+        self.firstMode = firstMode
+        self.cleanUpToStart()
+        
+        # ---
+        # --- validator code --- beginning
+        if not cmds.file(query=True, reference=True):
+            if objList:
+                toCheckList = objList
+            else:
+                toCheckList = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
+            if toCheckList:
+                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                emptyTransformList = self.filterEmptyTransformList(toCheckList)
+                emptyTransformList.extend(self.filterEmptyTransformList(self.getIgnoreConnected(), True))
+                # conditional to check here
+                if emptyTransformList:
+                    for item in emptyTransformList:
+                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.checkedObjList.append(self.utils.getShortName(item, False))
+                        self.foundIssueList.append(True)
+                        if self.firstMode:
+                            self.resultOkList.append(False)
+                        else: #fix
+                            try:
+                                if "dpKeepIt" in cmds.listAttr(item) and cmds.getAttr(item+".dpKeepIt") == True:
+                                    pass
+                                else:
+                                    cmds.lockNode(item, lock=False)
+                                    cmds.delete(item)
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
+            else:
+                self.notFoundNodes()
+        else:
+            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+        # --- validator code --- end
+        # ---
+
+        # finishing
+        self.updateActionButtons()
+        self.reportLog()
+        self.endProgress()
+        return self.dataLogDic
+    
+    
+    def filterEmptyTransformList(self, transformList=None, connected=False, *args):
+        """ Filter the transform list to remove those without children or connections.
+            Returns a list of transforms that are empty.
+        """
+        filteredList = self.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filteredList = self.reorderList(filteredList)
+        emptyTransforms = []
+        for transform in filteredList:
+            if connected:
+                hasConnection = False
+            else:
+                hasConnection = cmds.listConnections(transform)
+                if hasConnection:
+                    nodeGraphList = cmds.listConnections(transform, type="nodeGraphEditorInfo") or []
+                    hasConnection = set(hasConnection)-set(nodeGraphList)
+            if not hasConnection:
+                childrenList = cmds.listRelatives(transform, children=True, fullPath=True)
+                if not childrenList:
+                    emptyTransforms.append(transform)
+                elif len(list(set(childrenList).intersection(emptyTransforms))) == len(childrenList):
+                    emptyTransforms.append(transform)
+        return emptyTransforms
+    
+
+    def getIgnoreConnected(self, *args):
+        """ Ignore dpAr default nodes
+        """
+        ignoredList = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
+        nodeList = []
+        for item in ignoredList:
+            gotNode = self.utils.getNodeByMessage(item)
+            if gotNode:
+                nodeList.append(gotNode)
+        return nodeList
+    
