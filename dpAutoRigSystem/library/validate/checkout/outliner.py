@@ -41,7 +41,7 @@ class Outliner(action.ActionStartClass):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            hiddenList = [self.ar.data.temp_grp, self.ar.guideMirrorGrp]
+            hiddenList = [self.ar.data.temp_grp, self.ar.data.guide_mirror_grp]
             
             
             #TODO = get node by attribute (dpTemp)

@@ -165,11 +165,11 @@ class Updater(object):
                 self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"))
                 self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.template_folder.replace(".", "/"))
 
-                # keep dpPipelineInfo data
-                if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/")+"/dpPipelineSettings.json"):
-                    shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace(".", "/")+"/dpPipelineSettings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/"))
-                if os.path.exists(dest_folder+"/dpPipelineInfo.json"):
-                    shutil.copy2(os.path.join(dest_folder, "dpPipelineInfo.json"), temp_folder)
+                # keep pipeline_info data
+                if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"):
+                    shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/"))
+                if os.path.exists(dest_folder+"/pipeline_info.json"):
+                    shutil.copy2(os.path.join(dest_folder, "pipeline_info.json"), temp_folder)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for each_folder in next(os.walk(dest_folder))[1]:

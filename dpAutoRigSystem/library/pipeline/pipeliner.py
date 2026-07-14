@@ -20,13 +20,13 @@ class Pipeliner(object):
         # define variables
         self.ar = ar
         self.utils = ar.utils
-        self.settingsFile = "dpPipelineSettings.json"
-        self.defaultInfoFile = "dpPipelineInfo.json"
+        self.settingsFile = "pipeline_settings.json"
+        self.defaultInfoFile = "pipeline_info.json"
         self.infoFile = self.defaultInfoFile
-        self.webhookFile = "dpWebhook.json"
-        self.hookFile = "dpHook.json"
-        self.callbackFile = "dpPublishCallback.py"
-        self.customAssetNameFile = "dpCustomAssetName.json"
+        self.webhookFile = "webhook.json"
+        self.hookFile = "hook.json"
+        self.callbackFile = "publish_callback.py"
+        self.customAssetNameFile = "custom_asset_name.json"
         self.pipeData = {}
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
@@ -148,7 +148,7 @@ class Pipeliner(object):
 
 
     def getCustomAssetNameInfo(self, assetName, *args):
-        """ Returns the path content of the dpCustomAssetName json file if it exists.
+        """ Returns the path content of the custom_asset_name json file if it exists.
             Otherwise returns the given assetName.
         """
         if assetName:
@@ -186,7 +186,7 @@ class Pipeliner(object):
         "s_guideIO"          : self.ar.data.dp_data+"/dpGuide",
         "s_rivetIO"          : self.ar.data.dp_data+"/dpRivet",
         "s_parentingIO"      : self.ar.data.dp_data+"/dpParenting",
-        "s_skinningIO"       : self.ar.data.dp_data+"/dpSkinning",
+        "s_skinningIO"       : self.ar.data.dp_data+"/skinning",
         "s_deformationIO"    : self.ar.data.dp_data+"/dpDeformation",
         "s_componentTagIO"   : self.ar.data.dp_data+"/dpComponentTag",
         "s_inputOrderIO"     : self.ar.data.dp_data+"/dpInputOrder",

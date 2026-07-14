@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from functools import partial
-from ..util import dpControls
+from ..util import controllers
 from ..base import base
 from importlib import reload
 
@@ -26,9 +26,9 @@ class CopyPasteAttr(base.BaseLibrary):
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(base)
-            reload(dpControls)
+            reload(controllers)
 
-#        self.ar.ctrls = dpControls.ControlClass(self.ar)
+#        self.ar.ctrls = controllers.ControlClass(self.ar)
 
 
     def build_tool(self, *args):

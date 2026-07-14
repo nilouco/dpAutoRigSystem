@@ -2,9 +2,9 @@
 from maya import cmds
 from ..base import standard
 from ..base import layout
-from ...library.util import dpSoftIk
-from ...library.util import dpIkFkSnap
-from ...library.util import jcRibbon
+from ...library.util import soft_ik
+from ...library.util import ik_fk_snap
+from ...library.util import ribbon
 from ..tool import correction_manager
 from functools import partial
 from importlib import reload
@@ -34,18 +34,18 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         self.loadVariables()
         if self.ar.dev:
             self.reloadModules()
-        self.softIk = dpSoftIk.SoftIkClass(self.ar)
+        self.softIk = soft_ik.SoftIkClass(self.ar)
         self.correctionManager = correction_manager.CorrectionManager(self.ar)
-        self.ribbon = jcRibbon.RibbonClass(self.ar, self)
+        self.ribbon = ribbon.Ribbon(self.ar, self)
         self.correctionManager.ui = False
         
         
     def reloadModules(self, *args):
         """ DEV reloading modules.
         """ 
-        reload(dpSoftIk)
-        reload(dpIkFkSnap)
-        reload(jcRibbon)
+        reload(soft_ik)
+        reload(ik_fk_snap)
+        reload(ribbon)
         reload(correction_manager)
 
 
@@ -111,7 +111,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(ctrl+".followAttrName", attr, type="string")
 
 
-    # @dpUtils.profiler
+    # @utils.profiler
     def createGuide(self, *args):
         standard.BaseStandard.createGuide(self)
         # Custom GUIDE:
@@ -2032,7 +2032,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
                 
                 # ikFkSnap
-                dpIkFkSnap.IkFkSnapClass(self.ar, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], dpDev=self.ar.dev)
+                ik_fk_snap.IkFkSnapClass(self.ar, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], dpDev=self.ar.dev)
                 
                 # calibration attribute:
                 if self.limbTypeName == self.armName:

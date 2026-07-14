@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from ....library.base import action
-from ....library.util import dpWeights
+from ....library.util import weights
 from importlib import reload
 
 # global variables to this module:
@@ -28,8 +28,8 @@ class ComponentTagIO(action.ActionStartClass):
         self.ioDir = "s_componentTagIO"
         self.startName = "dpComponentTag"
         if self.ar.dev:
-            reload(dpWeights)
-        self.defWeights = dpWeights.Weights(self.ar)
+            reload(weights)
+        self.defWeights = weights.Weights(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

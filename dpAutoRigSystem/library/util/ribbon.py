@@ -19,7 +19,7 @@ from maya import cmds
 DP_RIBBONCLASS_VERSION = 2.11
 
 
-class RibbonClass(object):
+class Ribbon(object):
     def __init__(self, ar, *args):
         # defining variables:
         self.ar = ar

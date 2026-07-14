@@ -553,7 +553,7 @@ class ControlClass(object):
         return curve
 
 
-    #@dpUtils.profiler
+    #@utils.profiler
     def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, pin=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
@@ -1067,7 +1067,7 @@ class ControlClass(object):
         return newRadius
         
 
-    #@dpUtils.profiler
+    #@utils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
         """
@@ -1546,7 +1546,7 @@ class ControlClass(object):
 
 
     def getSelectedControls(self, *args):
-        """ Return the intersection of all dpControls in the scene and the selected items.
+        """ Return the intersection of all controllers in the scene and the selected items.
         """
         return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))
 

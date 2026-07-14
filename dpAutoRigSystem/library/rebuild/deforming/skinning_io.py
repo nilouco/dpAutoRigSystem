@@ -25,7 +25,7 @@ class SkinningIO(action.ActionStartClass):
         action.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_skinningIO"
-        self.startName = "dpSkinning"
+        self.startName = "skinning"
         self.importRefName = "dpSkinningIO_Import"
     
 

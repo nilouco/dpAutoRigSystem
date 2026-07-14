@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from functools import partial
 from . import rivet
-from ..util import dpControls
+from ..util import controllers
 from ..base import base
 from importlib import reload
 
@@ -32,9 +32,9 @@ class CorrectionManager(base.BaseLibrary):
         if self.ar.dev:
             reload(base)
             reload(rivet)
-            reload(dpControls)
+            reload(controllers)
 
-#        self.ar.ctrls = dpControls.ControlClass(self.ar)
+#        self.ar.ctrls = controllers.ControlClass(self.ar)
 
         self.correctionManagerName = self.ar.data.lang['m068_correctionManager']
         self.angleName = ANGLE

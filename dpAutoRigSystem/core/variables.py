@@ -66,6 +66,7 @@ class Data:
     curve_simple_folder: str = "library.curve.simple"
     curve_combined_folder: str = "library.curve.combined"
     curve_preset_folder: str = "library.preset.curve"
+    facial_preset_folder: str = "library.preset.facial"
     checkin_folder: str = "library.validate.checkin"
     checkout_folder: str = "library.validate.checkout"
     validate_preset_folder: str = "library.preset.validate"

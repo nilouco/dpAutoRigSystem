@@ -2,7 +2,7 @@
 from maya import cmds
 from maya import mel
 from ....library.base import action
-from ....library.util import dpWeights
+from ....library.util import weights
 from importlib import reload
 
 # global variables to this module:
@@ -29,8 +29,8 @@ class DeformationIO(action.ActionStartClass):
         self.ioDir = "s_deformationIO"
         self.startName = "dpDeformation"
         if self.ar.dev:
-            reload(dpWeights)
-        self.defWeights = dpWeights.Weights(self.ar)
+            reload(weights)
+        self.defWeights = weights.Weights(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

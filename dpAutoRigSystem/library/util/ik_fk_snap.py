@@ -297,7 +297,7 @@ class IkFkSnapClass(object):
 
     ###
     # ---------------------------------
-    # Code from dpUtils
+    # Code from utils
     ###
 
     def utilsDistanceVectors(serlf, u, v, *args):

@@ -297,7 +297,7 @@ class Packager(object):
            sys.path.append(callbackPath)
         try:
             if not self.callback:
-                #import dpPublishCallback
+                #import publish_callback
                 dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
                 #if self.ar.dev:
                 reload(dpCallback)
@@ -319,4 +319,4 @@ class Packager(object):
                 subprocess.Popen(['xdg-open', path])
         #
         #TODO
-        # Move it to dpUtils?
+        # Move it to utils?

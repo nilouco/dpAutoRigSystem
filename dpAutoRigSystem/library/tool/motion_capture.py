@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..util import dpIkFkSnap
+from ..util import ik_fk_snap
 from ..base import base
 from importlib import reload
 
@@ -27,7 +27,7 @@ class MotionCapture(base.BaseLibrary):
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:
             reload(base)
-            reload(dpIkFkSnap)
+            reload(ik_fk_snap)
         self.autoRotateAttrList = [self.ar.data.lang['c047_autoRotate'], self.ar.data.lang['c032_follow']]
         self.hikCharacterAttr = "Character"
         
@@ -540,7 +540,7 @@ class MotionCapture(base.BaseLibrary):
                 ikExtremSubCtrl = cmds.listConnections(net+".ikExtremSubCtrl")[0]
                 ikJointList = cmds.listConnections(net+".ikJointList")
                 # make an ikFkSnap instance without create another network node.
-                ikFkSnapInst = dpIkFkSnap.IkFkSnapClass(self.ar, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], creation=False)
+                ikFkSnapInst = ik_fk_snap.IkFkSnapClass(self.ar, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], creation=False)
                 # snap from Fk to Ik (that means move ik to fk position)                
                 ikFkSnapInst.snapFkToIk()
                 del ikFkSnapInst

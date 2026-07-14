@@ -1301,7 +1301,7 @@ for net in cmds.ls(type="network"):
         if cmds.objExists(fCtrlName):
             return None, None
         else:
-            # create control calling dpControls function:
+            # create control calling controllers function:
             fCtrl = self.ar.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector, parentTag=self.headSubCtrl)
             # add head or jaw influence attribute
             if headDefInfluence:

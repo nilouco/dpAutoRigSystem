@@ -683,7 +683,7 @@ class Maker(object):
             backAttr = self.ar.data.lang['c057_back']
             leftAttr = self.ar.data.lang['p002_left'].lower()
             rightAttr = self.ar.data.lang['p003_right'].lower()
-            tweaksAttr = self.ar.data.lang['m081_tweakers'].lower()
+            tweaksAttr = self.ar.data.lang['m081_tweaks'].lower()
             facialAttr = self.ar.data.lang['c059_facial'].lower()
             
             if not cmds.objExists(self.option_ctrl+"."+generalAttr):
@@ -1212,12 +1212,12 @@ class Composer(object):
 
     def single_options(self, single):
         # connect Option_Ctrl display attribute to the visibility:
-        if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweakers'].lower()):
-            cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['m081_tweakers'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-            cmds.setAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweakers'].lower(), channelBox=True)
+        if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower()):
+            cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+            cmds.setAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower(), channelBox=True)
         for s, side in enumerate(self.ar.maker.get_mirror_names(single)):
             ctrlGrp = single.composed["ctrlGrpList"][s]
-            cmds.connectAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweakers'].lower(), ctrlGrp+".visibility", force=True)
+            cmds.connectAttr(self.ar.maker.option_ctrl+"."+self.ar.data.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
 
 
     def single_single(self, single, father):

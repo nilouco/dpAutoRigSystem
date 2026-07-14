@@ -25,19 +25,19 @@ DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem rel
 
 # Import libraries
 from importlib import reload
-from .library.util import dpUtils
-from .library.util import dpControls
-from .library.util import dpSkinning
+from .library.util import utils
+from .library.util import controllers
+from .library.util import skinning
 from .library.base import standard
 from .library.base import layout
 from .library.base import curve
 from .library.tool import update_guides
 from .library.tool import custom_attr
-from .library.language.Translator import dpTranslator
-from .library.pipeline import dpPipeliner
-from .library.pipeline import dpPublisher
-from .library.pipeline import dpPackager
-from .library.pipeline import dpLogger
+from .library.language import translator
+from .library.pipeline import pipeliner
+from .library.pipeline import publisher
+from .library.pipeline import packager
+from .library.pipeline import logger
 from .core import settings
 from .core import variables
 from .core import loading
@@ -78,19 +78,19 @@ class Start(object):
         """ 
         if self.dev:
             print("Dev mode = True")
-            reload(dpUtils)
-            reload(dpControls)
-            reload(dpSkinning)
+            reload(utils)
+            reload(controllers)
+            reload(skinning)
             reload(standard)
             reload(layout)
             reload(curve)
             reload(update_guides)
             reload(custom_attr)
-            reload(dpTranslator)
-            reload(dpPipeliner)
-            reload(dpPublisher)
-            reload(dpPackager)
-            reload(dpLogger)
+            reload(translator)
+            reload(pipeliner)
+            reload(publisher)
+            reload(packager)
+            reload(logger)
             reload(settings)
             reload(variables)
             reload(loading)
@@ -124,15 +124,15 @@ class Start(object):
     def load_components(self):
         self.maker = maker.Maker(self)
         self.composer = maker.Composer(self)
-        self.utils = dpUtils.Utils(self)
-        self.pipeliner = dpPipeliner.Pipeliner(self)
-        self.packager = dpPackager.Packager(self)
-        self.ctrls = dpControls.ControlClass(self)
-        self.publisher = dpPublisher.Publisher(self)
+        self.utils = utils.Utils(self)
+        self.pipeliner = pipeliner.Pipeliner(self)
+        self.packager = packager.Packager(self)
+        self.ctrls = controllers.ControlClass(self)
+        self.publisher = publisher.Publisher(self)
         self.custom_attr = custom_attr.CustomAttr(self)
-        self.skin = dpSkinning.Skinning(self)
-        self.logger = dpLogger.Logger(self)
-        self.translator = dpTranslator.Translator(self)
+        self.skin = skinning.Skinning(self)
+        self.logger = logger.Logger(self)
+        self.translator = translator.Translator(self)
 
 
     def load_library(self):

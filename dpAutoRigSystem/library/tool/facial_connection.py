@@ -14,10 +14,9 @@ WIKI = "06-‐-Tools#-facial-connection"
 
 MIDDLE = "Middle"
 SIDED = "Sided"
-PRESETS = "Presets"
-FACIALPRESET = "FacialJoints"
+FACIALPRESET = "joints"
 
-DP_FACIALCONNECTION_VERSION = 2.00
+DP_FACIALCONNECTION_VERSION = 3.00
 
 
 class FacialConnection(base.BaseLibrary):
@@ -52,7 +51,7 @@ class FacialConnection(base.BaseLibrary):
     def dpInitTweaksVariables(self, *args):
         # part names:
         mainName = self.ar.data.lang['c058_main']
-        tweaksName = self.ar.data.lang['m081_tweakers']
+        tweaksName = self.ar.data.lang['m081_tweaks']
         middleName = self.ar.data.lang['c029_middle']
         eyebrowName = self.ar.data.lang['c041_eyebrow']
         cornerName = self.ar.data.lang['c043_corner']
@@ -102,9 +101,12 @@ class FacialConnection(base.BaseLibrary):
             Return the presetContent
         """
         # load json file:
-        path = os.path.dirname(__file__)
-        jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
-        presetContent = self.ar.pipeliner.getJsonContent(jsonPath+FACIALPRESET+".json")
+        founds, datas = self.ar.config.get_json_file_content(self.ar.data.facial_preset_folder)
+        if founds and datas:
+            for found in founds:
+                if found == FACIALPRESET:
+                    presetContent = datas[found]
+                    break
         if presetContent:
             # rebuild dictionary using object variables:
             for storedAttr in list(presetContent):

@@ -1,24 +1,24 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from . import dpWeights
+from . import weights
 from importlib import reload
 
 DP_SKINNING_VERSION = 1.10
 
 
-class Skinning(dpWeights.Weights):
+class Skinning(weights.Weights):
     def __init__(self, ar, *args, **kwargs):
         """ Initialize the class.
         """
         if ar.dev:
-            reload(dpWeights)
-        dpWeights.Weights.__init__(self, ar, *args, **kwargs)
+            reload(weights)
+        weights.Weights.__init__(self, ar, *args, **kwargs)
         # defining variables:
         self.skinInfoAttrList = ['skinningMethod', 'maintainMaxInfluences', 'maxInfluences']
         self.jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']
         self.ignoreSkinningAttr = "dpDoNotSkinIt"
-        self.ioStartName = "dpSkinning"
+        self.ioStartName = "skinning"
         
 
     def validateGeoList(self, geoList, mode=None, *args):

@@ -27,7 +27,7 @@ class Utils(object):
         """
         # define variables
         self.ar = ar
-        self.dpOrderList = "dpOrderList"
+        self.order = "_order"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
         self.progress = False
         self.dpID = self.ar.data.dp_id
@@ -152,13 +152,13 @@ class Utils(object):
 
     def findAllModules(self, path, folder, ext="py"):
         """ Find all modules in the directory.
-            If find a dpOrderList.txt file it will order the list for priority proporses.
+            If find an _order*.txt file it will order the list for priority proporses.
             Return a list of all module names (without the given extension).
         """
         folder = folder.replace(".", "/")
         modules = self.findAllFiles(path, folder, ext)
         for text in self.findAllFiles(path, folder, "txt"):
-            if self.dpOrderList in text:
+            if text.startswith(self.order):
                 desiredOrderList = []
                 dupList = modules.copy()
                 modules = []

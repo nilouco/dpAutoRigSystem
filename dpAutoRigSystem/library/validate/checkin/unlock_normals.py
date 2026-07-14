@@ -2,7 +2,7 @@
 from maya import cmds
 from maya import OpenMaya
 from ....library.base import action
-from ....library.util import zeSoftHardEdges
+from ....library.util import soft_hard_edges
 from importlib import reload
 
 
@@ -27,8 +27,8 @@ class UnlockNormals(action.ActionStartClass):
         self.version = DP_UNLOCKNORMALS_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)
         if self.ar.dev:
-            reload(zeSoftHardEdges)
-        self.softHardEdges = zeSoftHardEdges.ConvertNormals(self.ar)
+            reload(soft_hard_edges)
+        self.softHardEdges = soft_hard_edges.ConvertNormals(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

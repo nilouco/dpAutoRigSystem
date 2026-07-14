@@ -334,7 +334,7 @@ class OneSkeleton(base.BaseLibrary):
 
         tail = self.ar.data.lang['m039_tail']
         
-        tweaks = self.ar.data.lang['m081_tweakers']
+        tweaks = self.ar.data.lang['m081_tweaks']
         eyebrow = self.ar.data.lang['c041_eyebrow']
         squint = self.ar.data.lang['c054_squint']
         cheek = self.ar.data.lang['c055_cheek']
@@ -1201,7 +1201,7 @@ class OneSkeleton(base.BaseLibrary):
         ear = self.ar.data.lang['m040_ear']
         eye = self.ar.data.lang['c036_eye']
 
-        tweaks = self.ar.data.lang['m081_tweakers']
+        tweaks = self.ar.data.lang['m081_tweaks']
         eyebrow = self.ar.data.lang['c041_eyebrow']
         squint = self.ar.data.lang['c054_squint']
         cheek = self.ar.data.lang['c055_cheek']
