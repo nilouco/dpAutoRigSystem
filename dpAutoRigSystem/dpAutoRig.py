@@ -8,6 +8,13 @@ DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem rel
 # Import libraries
 from maya import cmds
 from maya import mel
+import os
+import io
+import sys
+import stat
+import shutil
+import zipfile
+import urllib.request
 
 
 class Start(object):
@@ -47,39 +54,77 @@ class Start(object):
                                     dismissString=no_text
                                     )
         if result == yes_text:
-            #
-            # WIP
-            #
-            print("WIP.......")
-            repair = Repair()
-            repair.delete_old_files()
-            repair.reinstall()
-            #repair.replace_shelf_button()
-            repair.finish()
+            self.repair_it()
+            
+            
+    def repair_it(self):
+        repair = Repair()
+        repair.delete_old_files()
+        repair.reinstall()
+        repair.replace_shelf_button()
+        repair.finish()
+
 
 
 class Repair(object):
     def __init__(self, *args):
         print("\n----------\ndpAutoRigSystem: start repairing old version...")
+        self.ar_name = "dpAutoRigSystem"
+        self.new_code = "import dpAutoRigSystem\nfrom dpAutoRigSystem.core import main\nar = main.Start()\nar.ui()"
+        self.path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace("\\", "/")
+
+
+    def remove_readonly(self, func, path, excinfo):
+        """Clear the read-only bit and retry the cleanup."""
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
 
 
     def delete_old_files(self):
+        # remove all old live files and folders for this current version, that means delete myself, OMG!
         print("Deleting old files...")
-        # ATTENTION to don't delete before backup me!
-
+        for each_file in next(os.walk(self.path))[2]:
+            os.remove(self.path+"/"+each_file)
+        for each_folder in next(os.walk(self.path))[1]:
+            if not "-"+self.ar_name+"-" in each_folder:
+                try:
+                    shutil.rmtree(self.path+"/"+each_folder, onexc=self.remove_readonly)
+                except:
+                    shutil.rmtree(self.path+"/"+each_folder, onerror=self.remove_readonly) #for Python 3.11 and older
         print("Successfully deleted all old files.")
 
 
     def reinstall(self):
         print("Reinstalling...")
-
-        new_version = "6"
+        #
+        # TODO change URL to master after 
+        #
+        #url = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
+        url = "https://github.com/nilouco/dpAutoRigSystem/zipball/699-dev-mode-reload/"
+        
+        remote_source = urllib.request.urlopen(url)
+        ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
+        zip_names = ar_zip.namelist()
+        for file_name in zip_names:
+            if f"/{self.ar_name}/" in file_name:
+                ar_zip.extract(file_name, self.path)
+        ar_zip.close()
+        temp_folder = f"{self.path}/{zip_names[0]}{self.ar_name}"
+        for source_folder, folders, files in os.walk(temp_folder):       
+            dest_path = source_folder.replace(temp_folder, self.path, 1).replace("\\", "/")
+            if not os.path.exists(dest_path):
+                os.makedirs(dest_path)
+            for ar_file in files:
+                source_file = os.path.join(source_folder, ar_file).replace("\\", "/")
+                shutil.copy2(source_file, dest_path)
+        shutil.rmtree(f"{self.path}/{zip_names[0]}")
+        from . import version
+        new_version = version.__version__
         print(f"Successfully reinstalled to the latest version {new_version}")
 
 
     def replace_shelf_button(self):
         print("Replacing shelf button...")
-        new_code = "import dpAutoRigSystem\nfrom dpAutoRigSystem.core import main\nar = main.Start()\nar.ui()"
         new_icon = "/icons/ar.png"
         top_shelf = mel.eval('$tmpGL = $gShelfTopLevel')
         current_shelf = cmds.tabLayout(top_shelf, query=True, selectTab=True)
@@ -93,7 +138,7 @@ class Repair(object):
                                         btn, 
                                         edit=True, 
                                         image=new_image,
-                                        command=new_code, 
+                                        command=self.new_code, 
                                         sourceType="python"
                                     )
                     print(f"Successfully updated code for shelf button: {btn}")
@@ -103,4 +148,5 @@ class Repair(object):
 
 
     def finish(self):
-        print("Successfully updated dpAutoRigSystem: end repairing old version.\n----------")
+        print("Successfully updated dpAutoRigSystem: end repairing old version. Thanks!\n----------")
+        cmds.evalDeferred(self.new_code, lowestPriority=True)
