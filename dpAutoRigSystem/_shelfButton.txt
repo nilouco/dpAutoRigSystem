@@ -1,4 +1,0 @@
-import dpAutoRigSystem
-from dpAutoRigSystem import dpAutoRig
-ar = dpAutoRig.Start()
-ar.ui()

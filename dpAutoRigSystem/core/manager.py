@@ -14,7 +14,7 @@ class UIManager(object):
         """
         if opt_var and item:
             self.ar.opt.set_option_var(opt_var, item)
-        cmds.evalDeferred("ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
+        cmds.evalDeferred("ar = main.Start("+str(self.ar.dev)+", intro=False); ar.ui();", lowestPriority=True)
 
     
     def reload_dev_mode_ui(self, *args):
@@ -24,9 +24,9 @@ class UIManager(object):
         if cmds.menuItem('dev_mode_mi', query=True, exists=True):
             value = cmds.menuItem('dev_mode_mi', query=True, checkBox=True)
         if value:
-            cmds.evalDeferred("from importlib import reload; reload(dpAutoRigSystem); ar = dpAutoRig.Start(dev=True, intro=False); ar.ui();", lowestPriority=True)
+            cmds.evalDeferred("from importlib import reload; reload(dpAutoRigSystem); ar = main.Start(dev=True, intro=False); ar.ui();", lowestPriority=True)
         else:
-            cmds.evalDeferred("ar = dpAutoRig.Start(); ar.ui();", lowestPriority=True)
+            cmds.evalDeferred("ar = main.Start(); ar.ui();", lowestPriority=True)
 
 
     def refresh_ui(self, savedScene=False, resetButtons=True, clearSel=False):

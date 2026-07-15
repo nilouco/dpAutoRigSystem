@@ -1,159 +1,106 @@
 #!/usr/bin/env python3
 
-###################################################################
-#
-#    dpAutoRigSystem Free Open Source Python Script for Maya
-#
-#    author:  Danilo Pinheiro
-#
-#    contact: nilouco@gmail.com
-#             https://nilouco.blogspot.com
-#
-#    GitHub, Wiki:
-#             https://github.com/nilouco/dpAutoRigSystem
-#
-#    Dev Sheet, Collaborators, Logs:
-#             https://docs.google.com/spreadsheets/d/154HoO-bLApA7CKpIJ1bDwSxRF146Kyo2etmHDUJGdiw
-#
-###################################################################
-
-
 DPAR_VERSION_5 = "6.00.00"
-# to make old dpAR version compatible to receive this update message - it can be deleted in the future
+# to make old dpAR version compatible to receive this update message
 DPAR_UPDATELOG = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 5, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 
 # Import libraries
-from importlib import reload
-from .library.util import utils
-from .library.util import controllers
-from .library.util import skinning
-from .library.base import standard
-from .library.base import layout
-from .library.base import curve
-from .library.tool import update_guides
-from .library.tool import custom_attr
-from .library.language import translator
-from .library.pipeline import pipeliner
-from .library.pipeline import publisher
-from .library.pipeline import packager
-from .library.pipeline import logger
-from .core import settings
-from .core import variables
-from .core import loading
-from .core import manager
-from .core import librarian
-from .core import filler
-from .core import updater
-from .core import maker
-from .core import job
-from .ui import main
-from .ui import update
-from .ui import donate
-from . import version
+from maya import cmds
+from maya import mel
 
 
 class Start(object):
-    def __init__(self, dev:bool=False, intro:bool=True):
-        self.dev: bool = dev
-        self.load_opening(intro)
-        self.reload_modules()
-        self.load_variables()
-        self.load_settings()
-        self.load_components()
-        self.load_library()
-        self.load_ui()
-
-
-    def load_opening(self, intro=True):
-        """ Just create a Loading window in order to show user that it's working to open the dpAutoRigSystem.
-        """
-        self.opening = loading.Opening()
-        if intro:
-            self.opening.create_opening_ui(6) #version 6
-    
-    
-    def reload_modules(self):
-        """ Dev reloading modules.
-        """ 
-        if self.dev:
-            print("Dev mode = True")
-            reload(utils)
-            reload(controllers)
-            reload(skinning)
-            reload(standard)
-            reload(layout)
-            reload(curve)
-            reload(update_guides)
-            reload(custom_attr)
-            reload(translator)
-            reload(pipeliner)
-            reload(publisher)
-            reload(packager)
-            reload(logger)
-            reload(settings)
-            reload(variables)
-            reload(loading)
-            reload(manager)
-            reload(librarian)
-            reload(filler)
-            reload(updater)
-            reload(maker)
-            reload(job)
-            reload(version)
-            # ui
-            reload(main)
-            reload(update)
-            reload(donate)
-            print("Reloaded imported modules")
-    
-    
-    def load_variables(self):
-        self.data = variables.Data()
-
-
-    def load_settings(self):
-        self.version = version
-        self.config = settings.Configuration(self)
-        self.opt = settings.Option(self)
-        self.agree = settings.Agreement(self)
-        self.updater = updater.Updater(self)
-        self.job = job.Job(self)
-
-
-    def load_components(self):
-        self.maker = maker.Maker(self)
-        self.composer = maker.Composer(self)
-        self.utils = utils.Utils(self)
-        self.pipeliner = pipeliner.Pipeliner(self)
-        self.packager = packager.Packager(self)
-        self.ctrls = controllers.ControlClass(self)
-        self.publisher = publisher.Publisher(self)
-        self.custom_attr = custom_attr.CustomAttr(self)
-        self.skin = skinning.Skinning(self)
-        self.logger = logger.Logger(self)
-        self.translator = translator.Translator(self)
-
-
-    def load_library(self):
-        self.lib = librarian.Lib(self)
-        self.filler = filler.UIFiller(self)
-        self.lib.start_library()
-
-
-    def load_ui(self):
-        self.ui_manager = manager.UIManager(self)
-        self.main_ui = main.MainUI(self)
-        self.update_ui = update.UpdateUI(self)
-        self.donate = donate.DonateUI(self)
+    def __init__(self, *args):
+        # keep old v5 compatibility
+        mel.eval(f"warning \"{DPAR_UPDATELOG.replace('\n', ' ')}\";")
 
 
     def ui(self):
-        self.main_ui.create_ui()
+        self.inform_the_user()
 
 
     def showUI(self):
-        # keep old v5 compatibility
-        if self.dev:
-            print("\n\n-----\ndpAutoRigSystem: showUI workaround - v5 compatibility\n----\n\n")
-        self.ui_manager.reload_ui()
+        self.inform_the_user()
+
+
+    def inform_the_user(self):
+        """ Notify the user about the new version update.
+        """
+        # open dialog to confirm repair it
+        yes_text = "Yes"
+        no_text = "No"
+        result = cmds.confirmDialog(
+                                    title='Old version', 
+                                    message='This is an old dpAutoRigSystem version.\n' \
+                                            'You should remove it and install a new one.\n\n' \
+                                            'The safest way to update it is to reinstall it manually:\n' \
+                                            '1 - delete the dpAutoRigSystem folder\n' \
+                                            '2 - download the files from GitHub\n' \
+                                            '3 - save a new dpAutoRigSystem folder without override the old\n' \
+                                            '4 - recreate the Maya shelf button\n\n' \
+                                            'Otherwise, we can try to do it by pressing the "Yes" button.\n' \
+                                            'Do you want to try to repair it automatically?', 
+                                    button=[yes_text, no_text], 
+                                    defaultButton=yes_text, 
+                                    cancelButton=no_text, 
+                                    dismissString=no_text
+                                    )
+        if result == yes_text:
+            #
+            # WIP
+            #
+            print("WIP.......")
+            repair = Repair()
+            repair.delete_old_files()
+            repair.reinstall()
+            #repair.replace_shelf_button()
+            repair.finish()
+
+
+class Repair(object):
+    def __init__(self, *args):
+        print("\n----------\ndpAutoRigSystem: start repairing old version...")
+
+
+    def delete_old_files(self):
+        print("Deleting old files...")
+        # ATTENTION to don't delete before backup me!
+
+        print("Successfully deleted all old files.")
+
+
+    def reinstall(self):
+        print("Reinstalling...")
+
+        new_version = "6"
+        print(f"Successfully reinstalled to the latest version {new_version}")
+
+
+    def replace_shelf_button(self):
+        print("Replacing shelf button...")
+        new_code = "import dpAutoRigSystem\nfrom dpAutoRigSystem.core import main\nar = main.Start()\nar.ui()"
+        new_icon = "/icons/ar.png"
+        top_shelf = mel.eval('$tmpGL = $gShelfTopLevel')
+        current_shelf = cmds.tabLayout(top_shelf, query=True, selectTab=True)
+        all_buttons = cmds.shelfLayout(current_shelf, query=True, childArray=True) or []
+        if all_buttons:
+            for btn in all_buttons:
+                if "dpAutoRigSystem" in cmds.shelfButton(btn, query=True, command=True):
+                    old_image = cmds.shelfButton(btn, query=True, image=True)
+                    new_image = f"{old_image[:old_image.rfind('dpAutoRigSystem')+15]}{new_icon}"
+                    cmds.shelfButton(
+                                        btn, 
+                                        edit=True, 
+                                        image=new_image,
+                                        command=new_code, 
+                                        sourceType="python"
+                                    )
+                    print(f"Successfully updated code for shelf button: {btn}")
+                    break
+        else:
+            print("Not found dpAutoRigSystem shelf button.")
+
+
+    def finish(self):
+        print("Successfully updated dpAutoRigSystem: end repairing old version.\n----------")

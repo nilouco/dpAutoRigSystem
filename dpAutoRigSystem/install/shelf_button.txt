@@ -1,0 +1,4 @@
+import dpAutoRigSystem
+from dpAutoRigSystem.core import main
+ar = main.Start()
+ar.ui()

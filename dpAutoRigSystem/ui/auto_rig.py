@@ -19,7 +19,7 @@ class MainUI(object):
         labelText += " - "+self.ar.data.version
         if self.ar.dev:
             labelText += " ~ dev"
-        uiCallScript = "import dpAutoRigSystem; from dpAutoRigSystem import dpAutoRig; ar = dpAutoRig.Start("+str(self.ar.dev)+", intro=False); ar.main_ui.show_ui();"
+        uiCallScript = "import dpAutoRigSystem; from dpAutoRigSystem.core import main; ar = main.Start("+str(self.ar.dev)+", intro=False); ar.auto_rig_ui.show_ui();"
         cmds.workspaceControl(
                                 self.ar.data.workspace_control_name, 
                                 retain=False,
@@ -118,7 +118,7 @@ class MainUI(object):
         cmds.menuItem('about_mi"', label='About', command=partial(self.ar.logger.infoWin, 'm015_about', 'i006_aboutDesc', self.ar.data.version, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('author_mi', label='Author', command=partial(self.ar.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('collaborators_mi', label='Collaborators', command=partial(self.ar.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.ar.data.lang['_collaborators'], 'center', 305, 250), parent='help_menu')
-        cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donate.create_ui), parent='help_menu')
+        cmds.menuItem('donate_mi', label='Donate', command=partial(self.ar.donate_ui.create_ui), parent='help_menu')
         cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
         cmds.menuItem('update_mi', label='Update', command=partial(self.ar.updater.check_for_update, True), parent='help_menu')
