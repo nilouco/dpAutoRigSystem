@@ -148,5 +148,5 @@ class Repair(object):
 
 
     def finish(self):
-        print("Successfully updated dpAutoRigSystem: end repairing old version. Thanks!\n----------")
+        print("Successfully updated dpAutoRigSystem: end repairing old version. Thanks!\n----------\n\n")
         cmds.evalDeferred(self.new_code, lowestPriority=True)

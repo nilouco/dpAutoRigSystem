@@ -36,6 +36,7 @@ class Configuration(object):
                             ]
         self.today = str(datetime.datetime.now().date())
         self.load_path()
+        self.clear_old_starter()
         self.load_version()
         self.load_language()
         self.load_validator_preset()
@@ -60,6 +61,13 @@ class Configuration(object):
         #else:
         #    self.ar.data.dp_auto_rig_path = correct_path[correct_path.find("/")-2:]
     
+
+    def clear_old_starter(self):
+        if not self.ar.dev:
+            old_starter = f"{self.ar.data.dp_auto_rig_path}/dpAutoRig.py"
+            if os.path.isfile(old_starter):
+                os.remove(old_starter)
+
 
     def load_version(self):
         self.ar.data.version = self.ar.version.__version__
