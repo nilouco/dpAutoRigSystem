@@ -17,6 +17,7 @@ class Updater(object):
         self.installer = maya_installer.MayaInstaller()
         self.installer.define_paths()
 
+
     def load_update(self):
         if self.ar.data.ui_state and not self.ar.dev:
             if cmds.optionVar(exists=self.ar.data.check_update_option_var):
@@ -27,7 +28,6 @@ class Updater(object):
                 self.ar.opt.set_option_var(self.ar.data.check_update_option_var, 1, False)
                 self.check_for_update()
             self.ar.opt.set_option_var(self.ar.data.check_update_last_option_var, self.ar.config.today)
-
 
 
     def check_for_update(self, *args):
@@ -209,7 +209,10 @@ class Updater(object):
             except Exception as e:
                 # report fail update installation:
                 print(self.ar.data.lang["i141_error"]+": "+str(e))
-                self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i097_sorry']+'\n\n'+str(e), 'center', 205, 270)
+                button_label = 'Download'
+                button_command = self.ar.utils.visitWebSite
+                button_argument = self.ar.data.master_url
+                self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i097_sorry']+'\n\n'+str(e), 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             self.ar.utils.setProgress(endIt=True)
         else:
             print(self.ar.data.lang['i038_canceled'])
