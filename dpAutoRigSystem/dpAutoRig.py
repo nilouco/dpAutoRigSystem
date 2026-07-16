@@ -58,10 +58,13 @@ class Start(object):
             
             
     def repair_it(self):
+        from .install import maya_installer
+        installer = maya_installer.MayaInstaller()
         repair = Repair()
+        # call methods to repair this installation
         repair.delete_old_files()
         repair.reinstall()
-        repair.replace_shelf_button()
+        installer.create_shelf_button()
         repair.finish()
 
 
@@ -123,30 +126,6 @@ class Repair(object):
         print(f"Successfully reinstalled to the latest version {new_version}")
 
 
-    def replace_shelf_button(self):
-        print("Replacing shelf button...")
-        new_icon = "/icons/ar.png"
-        top_shelf = mel.eval('$tmpGL = $gShelfTopLevel')
-        current_shelf = cmds.tabLayout(top_shelf, query=True, selectTab=True)
-        all_buttons = cmds.shelfLayout(current_shelf, query=True, childArray=True) or []
-        if all_buttons:
-            for btn in all_buttons:
-                if "dpAutoRigSystem" in cmds.shelfButton(btn, query=True, command=True):
-                    old_image = cmds.shelfButton(btn, query=True, image=True)
-                    new_image = f"{old_image[:old_image.rfind('dpAutoRigSystem')+15]}{new_icon}"
-                    cmds.shelfButton(
-                                        btn, 
-                                        edit=True, 
-                                        image=new_image,
-                                        command=self.new_code, 
-                                        sourceType="python"
-                                    )
-                    print(f"Successfully updated code for shelf button: {btn}")
-                    break
-        else:
-            print("Not found dpAutoRigSystem shelf button.")
-
-
     def finish(self):
-        print("Successfully updated dpAutoRigSystem: end repairing old version. Thanks!\n----------\n\n")
+        print("Successfully updated dpAutoRigSystem: end repairing old version. Thanks!\n----------\n")
         cmds.evalDeferred(self.new_code, lowestPriority=True)
