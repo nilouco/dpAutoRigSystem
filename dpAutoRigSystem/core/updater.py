@@ -5,6 +5,7 @@ import zipfile
 import urllib.request
 from io import TextIOWrapper
 from maya import cmds
+from ..install import maya_installer
 
 
 class Updater(object):
@@ -13,7 +14,8 @@ class Updater(object):
         self.version_start_length = 20 #__version__: str = "
         self.version_end_length = -2 #"
         self.download_extension = "zip"
-
+        self.installer = maya_installer.MayaInstaller()
+        self.installer.define_paths()
 
     def load_update(self):
         if self.ar.data.ui_state and not self.ar.dev:
@@ -140,72 +142,74 @@ class Updater(object):
             dest_folder = self.ar.data.dp_auto_rig_path
             self.ar.utils.setProgress('Installing: 0%', self.ar.data.lang['i098_installing'])
             
-            #try:
-            # get remote file from url:
-            remote_source = urllib.request.urlopen(url)
-            self.ar.utils.setProgress('Installing')
-            
-            # read the downloaded Zip file stored in the RAM memory:
-            ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
-            self.ar.utils.setProgress('Installing')
-
-            # list Zip file contents in order to extract them in a temporarily folder:
-            zip_names = ar_zip.namelist()
-            for file_name in zip_names:
-                if ar_name in file_name:
-                    ar_zip.extract(file_name, dest_folder)
-            ar_zip.close()
-            self.ar.utils.setProgress('Installing')
-            
-            # declare temporarily folder:
-            temp_folder = dest_folder+"/"+zip_names[0]+ar_name
-            
-            # store custom presets in order to avoid overwrite them when installing the update:
-            self.keep_files_when_update(dest_folder+"/"+self.ar.data.language_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.language_folder.replace(".", "/"))
-            self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"))
-            self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.template_folder.replace(".", "/"))
-            
-            # keep pipeline_info data
-            if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"):
-                shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/"))
-            if os.path.exists(dest_folder+"/pipeline_info.json"):
-                shutil.copy2(os.path.join(dest_folder, "pipeline_info.json"), temp_folder)
-            # remove all old live files and folders for this current version, that means delete myself, OMG!
-            for each_folder in next(os.walk(dest_folder))[1]:
-                if not "-"+ar_name+"-" in each_folder:
-                    shutil.rmtree(dest_folder+"/"+each_folder, ignore_errors=True)
-            for each_file in next(os.walk(dest_folder))[2]:
-                os.remove(dest_folder+"/"+each_file)
-            # pass in all files to copy them (doing the simple installation):
-            for source_folder, folders, files in os.walk(temp_folder):       
-                # declare destination directory:
-                dest_path = source_folder.replace(temp_folder, dest_folder, 1).replace("\\", "/")
+            try:
+                # get remote file from url:
+                remote_source = urllib.request.urlopen(url)
                 self.ar.utils.setProgress('Installing')
-                # make sure we have all folders needed, otherwise, create them in the dest_path directory:
-                self.create_folder(dest_path)
-                for ar_file in files:
-                    source_file = os.path.join(source_folder, ar_file).replace("\\", "/")
-                    dest_file = os.path.join(dest_path, ar_file).replace("\\", "/")
-                    # if the file exists (we expect that yes) then delete it:
-                    self.ar.utils.deleteFile(dest_file)
-                    # copy the ar_file:
-                    shutil.copy2(source_file, dest_path)
+                
+                # read the downloaded Zip file stored in the RAM memory:
+                ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
+                self.ar.utils.setProgress('Installing')
+
+                # list Zip file contents in order to extract them in a temporarily folder:
+                zip_names = ar_zip.namelist()
+                for file_name in zip_names:
+                    if ar_name in file_name:
+                        ar_zip.extract(file_name, dest_folder)
+                ar_zip.close()
+                self.ar.utils.setProgress('Installing')
+                
+                # declare temporarily folder:
+                temp_folder = dest_folder+"/"+zip_names[0]+ar_name
+                
+                # store custom presets in order to avoid overwrite them when installing the update:
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.language_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.language_folder.replace(".", "/"))
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.curve_preset_folder.replace(".", "/"))
+                self.keep_files_when_update(dest_folder+"/"+self.ar.data.template_folder.replace(".", "/"), temp_folder+"/"+self.ar.data.template_folder.replace(".", "/"))
+                
+                # keep pipeline_info data
+                if os.path.exists(dest_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"):
+                    shutil.copy2(os.path.join(dest_folder, self.ar.data.pipeline_folder.replace(".", "/")+"/pipeline_settings.json"), temp_folder+"/"+self.ar.data.pipeline_folder.replace(".", "/"))
+                if os.path.exists(dest_folder+"/pipeline_info.json"):
+                    shutil.copy2(os.path.join(dest_folder, "pipeline_info.json"), temp_folder)
+                # remove all old live files and folders for this current version, that means delete myself, OMG!
+                for each_folder in next(os.walk(dest_folder))[1]:
+                    if not "-"+ar_name+"-" in each_folder:
+                        shutil.rmtree(dest_folder+"/"+each_folder, ignore_errors=True)
+                for each_file in next(os.walk(dest_folder))[2]:
+                    os.remove(dest_folder+"/"+each_file)
+                # pass in all files to copy them (doing the simple installation):
+                for source_folder, folders, files in os.walk(temp_folder):       
+                    # declare destination directory:
+                    dest_path = source_folder.replace(temp_folder, dest_folder, 1).replace("\\", "/")
                     self.ar.utils.setProgress('Installing')
-            
-            # delete the temporarily folder used to download and install the update:
-            shutil.rmtree(dest_folder+"/"+zip_names[0])
-            # quit UI in order to force user to refresh dpAutoRigSystem creating a new instance:
-            self.ar.ui_manager.delete_exist_window()
-            
-            # report finished update installation:
-            button_label = self.ar.data.lang['c110_start']
-            button_command = self.ar.ui_manager.reload_ui
-            button_argument = None
-            self.ar.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i173_reloadScript']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
-            # except Exception as e:
-            #     # report fail update installation:
-            #     print(self.ar.data.lang["i141_error"]+": "+str(e))
-            #     self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i097_sorry']+'\n\n'+str(e), 'center', 205, 270)
+                    # make sure we have all folders needed, otherwise, create them in the dest_path directory:
+                    self.create_folder(dest_path)
+                    for ar_file in files:
+                        source_file = os.path.join(source_folder, ar_file).replace("\\", "/")
+                        dest_file = os.path.join(dest_path, ar_file).replace("\\", "/")
+                        # if the file exists (we expect that yes) then delete it:
+                        self.ar.utils.deleteFile(dest_file)
+                        # copy the ar_file:
+                        shutil.copy2(source_file, dest_path)
+                        self.ar.utils.setProgress('Installing')
+                
+                # delete the temporarily folder used to download and install the update:
+                shutil.rmtree(dest_folder+"/"+zip_names[0])
+                # quit UI in order to force user to refresh dpAutoRigSystem creating a new instance:
+                self.ar.ui_manager.delete_exist_window()
+                
+                self.installer.create_shelf_button()
+
+                # report finished update installation:
+                button_label = self.ar.data.lang['c110_start']
+                button_command = self.ar.ui_manager.reload_ui
+                button_argument = None
+                self.ar.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i173_reloadScript']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
+            except Exception as e:
+                # report fail update installation:
+                print(self.ar.data.lang["i141_error"]+": "+str(e))
+                self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i097_sorry']+'\n\n'+str(e), 'center', 205, 270)
             self.ar.utils.setProgress(endIt=True)
         else:
             print(self.ar.data.lang['i038_canceled'])

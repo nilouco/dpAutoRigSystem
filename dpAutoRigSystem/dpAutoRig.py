@@ -11,7 +11,6 @@ from maya import mel
 import os
 import io
 import sys
-import stat
 import shutil
 import zipfile
 import urllib.request
@@ -62,10 +61,10 @@ class Start(object):
         installer = maya_installer.MayaInstaller()
         repair = Repair()
         # call methods to repair this installation
-        repair.delete_old_files()
+        installer.delete_old_files()
         repair.reinstall()
         installer.create_shelf_button()
-        repair.finish()
+        installer.finish()
 
 
 
@@ -73,28 +72,7 @@ class Repair(object):
     def __init__(self, *args):
         print("\n----------\ndpAutoRigSystem: start repairing old version...")
         self.ar_name = "dpAutoRigSystem"
-        self.new_code = "import dpAutoRigSystem\nfrom dpAutoRigSystem.core import main\nar = main.Start()\nar.ui()"
         self.path = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename))).replace("\\", "/")
-
-
-    def remove_readonly(self, func, path, excinfo):
-        """Clear the read-only bit and retry the cleanup."""
-        os.chmod(path, stat.S_IWRITE)
-        func(path)
-
-
-    def delete_old_files(self):
-        # remove all old live files and folders for this current version, that means delete myself, OMG!
-        print("Deleting old files...")
-        for each_file in next(os.walk(self.path))[2]:
-            os.remove(self.path+"/"+each_file)
-        for each_folder in next(os.walk(self.path))[1]:
-            if not "-"+self.ar_name+"-" in each_folder:
-                try:
-                    shutil.rmtree(self.path+"/"+each_folder, onexc=self.remove_readonly)
-                except:
-                    shutil.rmtree(self.path+"/"+each_folder, onerror=self.remove_readonly) #for Python 3.11 and older
-        print("Successfully deleted all old files.")
 
 
     def reinstall(self):
@@ -124,8 +102,3 @@ class Repair(object):
         from . import version
         new_version = version.__version__
         print(f"Successfully reinstalled to the latest version {new_version}")
-
-
-    def finish(self):
-        print("Successfully updated dpAutoRigSystem: end repairing old version. Thanks!\n----------\n")
-        cmds.evalDeferred(self.new_code, lowestPriority=True)
