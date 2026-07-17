@@ -11,12 +11,8 @@ DP_ARROWFLAT_VERSION = 1.04
 
 
 class ArrowFlat(curve.BaseCurve):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = None
-        curve.BaseCurve.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
         if self.ar.dev:
             reload(curve)
     

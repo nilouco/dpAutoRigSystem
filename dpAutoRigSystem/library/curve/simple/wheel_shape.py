@@ -9,12 +9,8 @@ DESCRIPTION = "m099_cvControlDesc"
 DP_WHEELSHAPE_VERSION = 1.02
 
 class WheelShape(curve.BaseCurve):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = None
-        curve.BaseCurve.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):

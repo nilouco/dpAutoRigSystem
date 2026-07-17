@@ -12,14 +12,9 @@ DP_DODECAGRAM_VERSION = 1.05
 
 
 class Dodecagram(curve.BaseCurve):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = None
-        curve.BaseCurve.__init__(self, *args, **kwargs)
-        # dependence module list:
-        self.check_modules = ['Circle']
+    def __init__(self, ar):
+        curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
+        self.dependences = ['Circle']
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
@@ -27,11 +22,10 @@ class Dodecagram(curve.BaseCurve):
             Return the result: new control curve or the destination list depending of action.
         """
         # check modules integrity:
-        missing_modules = self.ar.lib.check_missing_modules(self.ar.data.curve_simple_folder, self.check_modules)
+        missing_modules = self.ar.lib.check_missing_modules(self.ar.data.curve_simple_folder, self.dependences)
         if not missing_modules:
             # call combine function:
             return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
-            
         else:
             # error checking modules in the folder:
             mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')
