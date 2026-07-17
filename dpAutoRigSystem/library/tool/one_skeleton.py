@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "OneSkeleton"
 TITLE = "m254_oneSkeleton"
 DESCRIPTION = "m255_oneSkeletonDesc"
-#ICON = "/Icons/dp_oneSkeleton.png"
 WIKI = "06-‐-Tools#-one-skeleton"
 
 DP_ONESKELETON_VERSION = 1.03
@@ -17,11 +16,9 @@ DP_ONESKELETON_VERSION = 1.03
 
 class OneSkeleton(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

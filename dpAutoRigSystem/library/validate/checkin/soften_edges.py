@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "SoftenEdges"
 TITLE = "v088_softenEdges"
 DESCRIPTION = "v089_softenEdgesDesc"
-#ICON = "/Icons/dp_softenEdges.png"
 WIKI = "07-‐-Validator#-soften-edges"
 
 DP_SOFTENEDGES_VERSION = 1.03
@@ -14,11 +13,9 @@ DP_SOFTENEDGES_VERSION = 1.03
 
 class SoftenEdges(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_SOFTENEDGES_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

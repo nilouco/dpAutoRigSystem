@@ -5,18 +5,15 @@ from ...base import curve
 CLASS_NAME = "Plus"
 TITLE = "m131_plus"
 DESCRIPTION = "m099_cvControlDesc"
-#ICON = "/Icons/dp_plus.png"
 
 DP_PLUS_VERSION = 1.03
 
 
 class Plus(curve.BaseCurve):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = None
         curve.BaseCurve.__init__(self, *args, **kwargs)
     

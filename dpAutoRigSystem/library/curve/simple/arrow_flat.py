@@ -6,18 +6,15 @@ from importlib import reload
 CLASS_NAME = "ArrowFlat"
 TITLE = "m112_arrowFlat"
 DESCRIPTION = "m099_cvControlDesc"
-#ICON = "/Icons/dp_arrowFlat.png"
 
 DP_ARROWFLAT_VERSION = 1.04
 
 
 class ArrowFlat(curve.BaseCurve):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = None
         curve.BaseCurve.__init__(self, *args, **kwargs)
         if self.ar.dev:

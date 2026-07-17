@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Keyframe"
 TITLE = "v040_keyframe"
 DESCRIPTION = "v041_keyframeDesc"
-#ICON = "/Icons/dp_keyframe.png"
 WIKI = "07-‐-Validator#-keyframe-cleaner"
 
 DP_KEYFRAMECLEANER_VERSION = 1.03
@@ -14,11 +13,9 @@ DP_KEYFRAMECLEANER_VERSION = 1.03
 
 class Keyframe(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_KEYFRAMECLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

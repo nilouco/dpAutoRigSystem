@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "UnusedDeformer"
 TITLE = "v148_unusedDeformer"
 DESCRIPTION = "v149_unusedDeformerDesc"
-#ICON = "/Icons/dp_unusedDeformer.png"
 WIKI = "07-‐-Validator#-unused-deformer-cleaner"
 
 DP_UNUSEDDEFORMERCLEANER_VERSION = 1.00
@@ -14,11 +13,9 @@ DP_UNUSEDDEFORMERCLEANER_VERSION = 1.00
 
 class UnusedDeformer(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_UNUSEDDEFORMERCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

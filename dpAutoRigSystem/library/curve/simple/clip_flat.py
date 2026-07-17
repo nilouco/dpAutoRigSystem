@@ -5,18 +5,15 @@ from ...base import curve
 CLASS_NAME = "ClipFlat"
 TITLE = "m107_clipFlat"
 DESCRIPTION = "m099_cvControlDesc"
-#ICON = "/Icons/dp_clipFlat.png"
 
 DP_CLIPFLAT_VERSION = 1.03
 
 
 class ClipFlat(curve.BaseCurve):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = None
         curve.BaseCurve.__init__(self, *args, **kwargs)
     

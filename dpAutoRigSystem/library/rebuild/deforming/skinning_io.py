@@ -7,7 +7,6 @@ import os
 CLASS_NAME = "SkinningIO"
 TITLE = "r016_skinningIO"
 DESCRIPTION = "r017_skinningIODesc"
-#ICON = "/Icons/dp_skinningIO.png"
 WIKI = "10-‐-Rebuilder#-skinning"
 
 DP_SKINNINGIO_VERSION = 1.01
@@ -15,11 +14,9 @@ DP_SKINNINGIO_VERSION = 1.01
 
 class SkinningIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_SKINNINGIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

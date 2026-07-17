@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Proxy"
 TITLE = "m230_proxy"
 DESCRIPTION = "m231_proxyDesc"
-#ICON = "/Icons/dp_proxyCreator.png"
 WIKI = "07-‐-Validator#-proxy-creator"
 
 PROXIED = "dpProxied"
@@ -17,11 +16,9 @@ DP_PROXYCREATOR_VERSION = 1.07
 
 class Proxy(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_PROXYCREATOR_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

@@ -15,7 +15,6 @@ import math
 CLASS_NAME = "Limb"
 TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
-#ICON = "/Icons/dp_limb.png"
 WIKI = "03-‐-Guides#-limb"
 
 DP_LIMB_VERSION = 3.13
@@ -26,7 +25,6 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.armName = "Arm"
         self.legName = "Leg"

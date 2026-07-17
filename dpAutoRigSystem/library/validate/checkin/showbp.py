@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Showbp"
 TITLE = "v050_showBP"
 DESCRIPTION = "v051_showBPDesc"
-#ICON = "/Icons/dp_showBPCleaner.png"
 WIKI = "07-‐-Validator#-showbp-cleaner"
 
 DP_SHOWBPCLEANER_VERSION = 1.03
@@ -14,11 +13,9 @@ DP_SHOWBPCLEANER_VERSION = 1.03
 
 class Showbp(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_SHOWBPCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

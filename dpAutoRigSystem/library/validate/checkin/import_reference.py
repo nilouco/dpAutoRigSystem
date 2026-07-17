@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ImportReference"
 TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
-#ICON = "/Icons/dp_importReference.png"
 WIKI = "07-‐-Validator#-import-referenced-file"
 
 DP_IMPORTREFERENCE_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_IMPORTREFERENCE_VERSION = 1.04
 
 class ImportReference(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_IMPORTREFERENCE_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

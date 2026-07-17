@@ -8,7 +8,6 @@ import os
 CLASS_NAME = "Vaccine"
 TITLE = "v052_vaccine"
 DESCRIPTION = "v053_vaccineDesc"
-#ICON = "/Icons/dp_vaccine.png"
 WIKI = "07-‐-Validator#-vaccine-cleaner"
 
 DP_VACCINECLEANER_VERSION = 1.04
@@ -16,11 +15,9 @@ DP_VACCINECLEANER_VERSION = 1.04
 
 class Vaccine(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_VACCINECLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

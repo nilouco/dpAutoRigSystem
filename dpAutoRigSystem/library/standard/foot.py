@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Foot"
 TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
-#ICON = "/Icons/dp_foot.png"
 WIKI = "03-‐-Guides#-foot"
 
 DP_FOOT_VERSION = 2.08
@@ -15,11 +14,9 @@ DP_FOOT_VERSION = 2.08
 
 class Foot(standard.BaseStandard, layout.BaseLayout):
     def __init__(self, *args, **kwargs):
-        # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
         # declare variables

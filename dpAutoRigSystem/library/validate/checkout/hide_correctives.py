@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "HideCorrectives"
 TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
-#ICON = "/Icons/dp_hideCorrectives.png"
 WIKI = "07-‐-Validator#-hide-correctives"
 
 DP_HIDECORRECTIVES_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_HIDECORRECTIVES_VERSION = 1.04
 
 class HideCorrectives(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_HIDECORRECTIVES_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

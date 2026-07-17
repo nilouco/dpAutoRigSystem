@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Suspension"
 TITLE = "m153_suspension"
 DESCRIPTION = "m154_suspensionDesc"
-#ICON = "/Icons/dp_suspension.png"
 WIKI = "03-‐-Guides#-suspension"
 
 DP_SUSPENSION_VERSION = 2.04
@@ -15,11 +14,9 @@ DP_SUSPENSION_VERSION = 2.04
 
 class Suspension(standard.BaseStandard, layout.BaseLayout):
     def __init__(self,  *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
     

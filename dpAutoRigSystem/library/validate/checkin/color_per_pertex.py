@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ColorPerVertex"
 TITLE = "v117_colorPerVertex"
 DESCRIPTION = "v118_colorPerVertexDesc"
-#ICON = "/Icons/dp_colorPerVertex.png"
 WIKI = "07-‐-Validator#-colorpervertex-cleaner"
 
 DP_COLORPERVERTEX_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_COLORPERVERTEX_VERSION = 1.01
 
 class ColorPerVertex(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_COLORPERVERTEX_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "MatchMesh"
 TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
-#ICON = "/Icons/dp_matchMesh.png"
 WIKI = "06-‐-Tools#-match-mesh"
 
 DP_MATCHMESH_VERSION = 3.02
@@ -17,11 +16,9 @@ DP_MATCHMESH_VERSION = 3.02
 
 class MatchMesh(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

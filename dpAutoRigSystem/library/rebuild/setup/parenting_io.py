@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ParentingIO"
 TITLE = "r019_parentingIO"
 DESCRIPTION = "r020_parentingIODesc"
-#ICON = "/Icons/dp_parentingIO.png"
 WIKI = "10-‐-Rebuilder#-parenting"
 
 DP_PARENTINGIO_VERSION = 1.03
@@ -14,11 +13,9 @@ DP_PARENTINGIO_VERSION = 1.03
 
 class ParentingIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_PARENTINGIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

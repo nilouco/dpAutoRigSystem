@@ -5,18 +5,15 @@ from ...base import curve
 CLASS_NAME = "RoundUp"
 TITLE = "m130_roundUp"
 DESCRIPTION = "m099_cvControlDesc"
-#ICON = "/Icons/dp_roundUp.png"
 
 DP_ROUNDUP_VERSION = 1.03
 
 
 class RoundUp(curve.BaseCurve):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = None
         curve.BaseCurve.__init__(self, *args, **kwargs)
     

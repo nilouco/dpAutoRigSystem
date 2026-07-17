@@ -9,7 +9,6 @@ import ast
 CLASS_NAME = "GuideIO"
 TITLE = "r012_guideIO"
 DESCRIPTION = "r013_guideIODesc"
-#ICON = "/Icons/dp_guideIO.png"
 WIKI = "10-‐-Rebuilder#-guide"
 
 MODULES = "Modules.Standard"
@@ -19,11 +18,9 @@ DP_GUIDEIO_VERSION = 1.05
 
 class GuideIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_GUIDEIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

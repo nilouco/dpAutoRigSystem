@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "ReorderAttr"
 TITLE = "m087_reorderAttr"
 DESCRIPTION = "m088_reoderAttrDesc"
-#ICON = "/Icons/dp_reorderAttr.png"
 WIKI = "06-‐-Tools#-reorder-attributes"
 
 DP_REORDERATTR_VERSION = 1.04
@@ -17,11 +16,9 @@ DP_REORDERATTR_VERSION = 1.04
 
 class ReorderAttr(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

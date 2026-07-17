@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "DisplayLayers"
 TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
-#ICON = "/Icons/dp_displayLyr.png"
 WIKI = "07-‐-Validator#-display-layers"
 
 DP_DISPLAYLAYERS_VERSION = 1.06
@@ -14,11 +13,9 @@ DP_DISPLAYLAYERS_VERSION = 1.06
 
 class DisplayLayers(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_DISPLAYLAYERS_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

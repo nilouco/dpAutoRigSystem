@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "IntermediateObject"
 TITLE = "v142_intermediateObject"
 DESCRIPTION = "v143_intermediateObjectDesc"
-#ICON = "/Icons/dp_intermediateObject.png"
 WIKI = "07-‐-Validator#-intermediate-object"
 
 DP_INTERMEDIATEOBJECT_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_INTERMEDIATEOBJECT_VERSION = 1.01
 
 class IntermediateObject(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_INTERMEDIATEOBJECT_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "TargetMirror"
 TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
-#ICON = "/Icons/dp_targetMirror.png"
 WIKI = "06-‐-Tools#-target-mirror"
 
 DP_TARGETMIRROR_VERSION = 2.07

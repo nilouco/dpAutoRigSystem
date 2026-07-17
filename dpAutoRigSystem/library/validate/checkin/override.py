@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = 'Override'
 TITLE = 'v090_override'
 DESCRIPTION = 'v091_overrideDesc'
-#ICON = '/Icons/dp_override.png'
 WIKI = "07-‐-Validator#-override-cleaner"
 
 DP_OVERRIDECLEANER_VERSION = 1.04

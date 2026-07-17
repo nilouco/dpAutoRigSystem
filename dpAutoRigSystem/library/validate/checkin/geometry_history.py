@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "GeometryHistory"
 TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
-#ICON = "/Icons/dp_geometryHistory.png"
 WIKI = "07-‐-Validator#-geometry-history"
 
 DP_GEOMETRYHISTORY_VERSION = 1.06
@@ -14,11 +13,9 @@ DP_GEOMETRYHISTORY_VERSION = 1.06
 
 class GeometryHistory(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_GEOMETRYHISTORY_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

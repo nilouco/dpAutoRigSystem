@@ -5,7 +5,6 @@ from ....library.base import action
 CLASS_NAME = "CheckinIO"
 TITLE = "r021_checkinIO"
 DESCRIPTION = "r022_checkinIODesc"
-#ICON = "/Icons/dp_checkinIO.png"
 WIKI = "10-‐-Rebuilder#-checkin"
 
 DP_CHECKINIO_VERSION = 1.02
@@ -13,11 +12,9 @@ DP_CHECKINIO_VERSION = 1.02
 
 class CheckinIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_CHECKINIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

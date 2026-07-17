@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "DrivenKeyIO"
 TITLE = "r052_drivenKeyIO"
 DESCRIPTION = "r053_drivenKeyIODesc"
-#ICON = "/Icons/dp_drivenKeyIO.png"
 WIKI = "10-‐-Rebuilder#-driven-key"
 
 DP_DRIVENKEYIO_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_DRIVENKEYIO_VERSION = 1.01
 
 class DrivenKeyIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_DRIVENKEYIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

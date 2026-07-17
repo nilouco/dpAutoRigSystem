@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "UnknownNodes"
 TITLE = "v058_unknownNodes"
 DESCRIPTION = "v059_unknownNodesDesc"
-#ICON = "/Icons/dp_unknownNodes.png"
 WIKI = "07-‐-Validator#-unknown-nodes-cleaner"
 
 DP_UNKNOWNNODESCLEANER_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_UNKNOWNNODESCLEANER_VERSION = 1.04
 
 class UnknownNodes(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_UNKNOWNNODESCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

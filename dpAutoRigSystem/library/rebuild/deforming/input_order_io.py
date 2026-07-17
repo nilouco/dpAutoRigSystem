@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "InputOrderIO"
 TITLE = "r035_inputOrderIO"
 DESCRIPTION = "r036_inputOrderIODesc"
-#ICON = "/Icons/dp_inputOrderIO.png"
 WIKI = "10-‐-Rebuilder#-input-order"
 
 DP_INPUTORDERIO_VERSION = 1.02
@@ -14,11 +13,9 @@ DP_INPUTORDERIO_VERSION = 1.02
 
 class InputOrderIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_INPUTORDERIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

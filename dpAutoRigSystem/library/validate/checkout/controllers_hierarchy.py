@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ControllersHierarchy"
 TITLE = "v060_controllersHierarchy"
 DESCRIPTION = "v061_controllerssHierarchyDesc"
-#ICON = "/Icons/dp_controlsHierarchy.png"
 WIKI = "07-‐-Validator#-controls-hierarchy"
 
 DP_CONTROLSHIERARCHY_VERSION = 1.08
@@ -14,11 +13,9 @@ DP_CONTROLSHIERARCHY_VERSION = 1.08
 
 class ControllersHierarchy(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_CONTROLSHIERARCHY_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

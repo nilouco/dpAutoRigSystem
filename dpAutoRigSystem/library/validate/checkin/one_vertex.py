@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "OneVertex"
 TITLE = "v132_oneVertex"
 DESCRIPTION = "v133_oneVertexDesc"
-#ICON = "/Icons/dp_oneVertex.png"
 WIKI = "07-‐-Validator#-one-vertex"
 
 DP_ONEVERTEX_VERSION = 2.01
@@ -15,11 +14,9 @@ DP_ONEVERTEX_VERSION = 2.01
 
 class OneVertex(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_ONEVERTEX_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

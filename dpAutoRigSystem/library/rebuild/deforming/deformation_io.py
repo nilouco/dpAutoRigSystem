@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "DeformationIO"
 TITLE = "r033_deformationIO"
 DESCRIPTION = "r034_deformationIODesc"
-#ICON = "/Icons/dp_deformationIO.png"
 WIKI = "10-‐-Rebuilder#-deformation"
 
 DP_DEFORMATIONIO_VERSION = 1.03
@@ -17,11 +16,9 @@ DP_DEFORMATIONIO_VERSION = 1.03
 
 class DeformationIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_DEFORMATIONIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

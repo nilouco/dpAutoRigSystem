@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ResetPose"
 TITLE = "v032_resetPose"
 DESCRIPTION = "v033_resetPoseDesc"
-#ICON = "/Icons/dp_resetPose.png"
 WIKI = "07-‐-Validator#-reset-pose"
 
 TO_IGNORE = ["rotateOrder", "pinGuide", "editMode"]
@@ -30,11 +29,9 @@ DP_RESETPOSE_VERSION = 1.05
 
 class ResetPose(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_RESETPOSE_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "BlendshapeTarget"
 TITLE = "v012_blendshapeTarget"
 DESCRIPTION = "v013_blendshapeTargetDesc"
-#ICON = "/Icons/dp_targetCleaner.png"
 WIKI = "07-‐-Validator#-blendshape-target-cleaner"
 
 DPKEEPITATTR = "dpKeepIt"
@@ -16,11 +15,9 @@ DP_TARGETCLEANER_VERSION = 1.10
 
 class BlendshapeTarget(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_TARGETCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

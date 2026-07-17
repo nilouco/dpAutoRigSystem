@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "OffsetMatrixIO"
 TITLE = "r061_offsetMatrixIO"
 DESCRIPTION = "r062_offsetMatrixIODesc"
-#ICON = "/Icons/dp_offsetMatrixIO.png"
 WIKI = "10-‐-Rebuilder#-offset-matrix"
 
 DP_OFFSETMATRIXIO_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_OFFSETMATRIXIO_VERSION = 1.01
 
 class OffsetMatrixIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_OFFSETMATRIXIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

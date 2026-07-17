@@ -8,7 +8,6 @@ from importlib import reload
 CLASS_NAME = "PrintSelection"
 TITLE = "m053_printSel"
 DESCRIPTION = "m054_printSelDesc"
-#ICON = "/Icons/dp_printSelection.png"
 WIKI = "06-‐-Tools#-print-selection"
 
 DP_PRINTSELECTION_VERSION = 2.01
@@ -16,11 +15,9 @@ DP_PRINTSELECTION_VERSION = 2.01
 
 class PrintSelection(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

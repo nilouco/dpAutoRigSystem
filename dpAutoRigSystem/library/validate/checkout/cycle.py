@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Cycle"
 TITLE = "v105_cycle"
 DESCRIPTION = "v106_cycleDesc"
-#ICON = "/Icons/dp_cycleChecker.png"
 WIKI = "07-‐-Validator#-cycle-checker"
 
 DP_CYCLECHECKER_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_CYCLECHECKER_VERSION = 1.01
 
 class Cycle(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_CYCLECHECKER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

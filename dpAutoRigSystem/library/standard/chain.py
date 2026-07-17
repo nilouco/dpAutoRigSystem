@@ -10,7 +10,6 @@ from importlib import reload
 CLASS_NAME = "Chain"
 TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
-#ICON = "/Icons/dp_chain.png"
 WIKI = "03-‐-Guides#-chain"
 
 DP_CHAIN_VERSION = 2.09
@@ -22,7 +21,6 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
         if self.ar.dev:

@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "RemainingVertex"
 TITLE = "v134_remainingVertex"
 DESCRIPTION = "v135_remainingVertexDesc"
-#ICON = "/Icons/dp_remainingVertex.png"
 WIKI = "07-‐-Validator#-remaining-vertex-cleaner"
 
 DP_REMAININGVERTEXCLEANER_VERSION = 1.01
@@ -15,11 +14,9 @@ DP_REMAININGVERTEXCLEANER_VERSION = 1.01
 
 class RemainingVertex(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_REMAININGVERTEXCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

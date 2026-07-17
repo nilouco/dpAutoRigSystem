@@ -8,7 +8,6 @@ from importlib import reload
 CLASS_NAME = "ComponentTagIO"
 TITLE = "r048_componentTagIO"
 DESCRIPTION = "r049_componentTagIODesc"
-#ICON = "/Icons/dp_componentTagIO.png"
 WIKI = "10-‐-Rebuilder#-componenttag"
 
 DP_COMPONENTTAGIO_VERSION = 1.01
@@ -16,11 +15,9 @@ DP_COMPONENTTAGIO_VERSION = 1.01
 
 class ComponentTagIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_COMPONENTTAGIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

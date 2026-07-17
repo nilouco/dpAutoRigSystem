@@ -27,7 +27,6 @@ class ActionStartClass(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        #self.icon = ICON
         self.wiki = WIKI
         self.verbose = verbose
         self.active = True

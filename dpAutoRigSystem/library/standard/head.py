@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Head"
 TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
-#ICON = "/Icons/dp_head.png"
 WIKI = "03-‐-Guides#-head"
 
 JAW = "jaw"
@@ -20,11 +19,9 @@ DP_HEAD_VERSION = 3.09
 
 class Head(standard.BaseStandard, layout.BaseLayout):
     def __init__(self,  *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.facialAttrList = ["facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
         standard.BaseStandard.__init__(self, *args, **kwargs)

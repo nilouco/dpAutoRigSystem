@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Finger"
 TITLE = "m007_finger"
 DESCRIPTION = "m008_fingerDesc"
-#ICON = "/Icons/dp_finger.png"
 WIKI = "03-‐-Guides#-finger"
 
 DP_FINGER_VERSION = 2.05
@@ -15,11 +14,9 @@ DP_FINGER_VERSION = 2.05
 
 class Finger(standard.BaseStandard, layout.BaseLayout):
     def __init__(self, *args, **kwargs):
-        # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
         self.correctiveCtrlGrpList = []

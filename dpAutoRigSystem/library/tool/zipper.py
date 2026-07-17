@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "Zipper"
 TITLE = "m061_zipper"
 DESCRIPTION = "m062_zipperDesc"
-#ICON = "/Icons/dp_zipper.png"
 WIKI = "06-‐-Tools#-zipper"
 
 ZIPPER_ATTR = "dpZipper"
@@ -20,11 +19,9 @@ DP_ZIPPER_VERSION = 2.21
 
 class Zipper(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

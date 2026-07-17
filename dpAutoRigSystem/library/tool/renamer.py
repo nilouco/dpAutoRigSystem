@@ -8,7 +8,6 @@ from importlib import reload
 CLASS_NAME = "Renamer"
 TITLE = "m214_renamer"
 DESCRIPTION = "m215_renamerDesc"
-#ICON = "/Icons/dp_renamer.png"
 WIKI = "06-‐-Tools#-renamer"
 
 DP_RENAMER_VERSION = 1.02
@@ -16,11 +15,9 @@ DP_RENAMER_VERSION = 1.02
 
 class Renamer(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

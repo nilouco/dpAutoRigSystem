@@ -8,7 +8,6 @@ from importlib import reload
 CLASS_NAME = "HeadDeformer"
 TITLE = "m051_headDef"
 DESCRIPTION = "m052_headDefDesc"
-#ICON = "/Icons/dp_headDeformer.png"
 WIKI = "06-‐-Tools#-head-deformer"
 
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
@@ -19,11 +18,9 @@ DP_HEADDEFORMER_VERSION = 4.05
 
 class HeadDeformer(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Eye"
 TITLE = "m063_eye"
 DESCRIPTION = "m064_eyeDesc"
-#ICON = "/Icons/dp_eye.png"
 WIKI = "03-‐-Guides#-eye"
 
 EYELID = "eyelid"
@@ -21,11 +20,9 @@ DP_EYE_VERSION = 2.08
 
 class Eye(standard.BaseStandard, layout.BaseLayout):
     def __init__(self,  *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
         self.cValue = 70

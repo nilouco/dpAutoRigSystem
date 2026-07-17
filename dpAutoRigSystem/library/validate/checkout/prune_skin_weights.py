@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "PruneSkinWeights"
 TITLE = "v103_pruneSkinWeights"
 DESCRIPTION = "v104_pruneSkinWeightsDesc"
-#ICON = "/Icons/dp_pruneSkinWeights.png"
 WIKI = "07-‐-Validator#-prune-skin-weights"
 
 DP_PRUNESKINWEIGHTS_VERSION = 1.02
@@ -15,11 +14,9 @@ DP_PRUNESKINWEIGHTS_VERSION = 1.02
 
 class PruneSkinWeights(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_PRUNESKINWEIGHTS_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

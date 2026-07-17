@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Steering"
 TITLE = "m158_steering"
 DESCRIPTION = "m159_steeringDesc"
-#ICON = "/Icons/dp_steering.png"
 WIKI = "03-‐-Guides#-steering"
 
 DP_STEERING_VERSION = 2.04
@@ -15,11 +14,9 @@ DP_STEERING_VERSION = 2.04
 
 class Steering(standard.BaseStandard, layout.BaseLayout):
     def __init__(self,  *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
     

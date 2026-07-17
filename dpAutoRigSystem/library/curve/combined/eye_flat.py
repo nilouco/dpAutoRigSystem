@@ -7,18 +7,15 @@ from ...base import curve
 CLASS_NAME = "EyeFlat"
 TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
-#ICON = "/Icons/dp_eyeFlat.png"
 
 DP_EYEFLAT_VERSION = 1.03
 
 
 class EyeFlat(curve.BaseCurve):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = None
         curve.BaseCurve.__init__(self, *args, **kwargs)
         # dependence module list:

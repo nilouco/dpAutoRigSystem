@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "BlendshapeIO"
 TITLE = "r030_blendShapeIO"
 DESCRIPTION = "r031_blendShapeIODesc"
-#ICON = "/Icons/dp_blendShapeIO.png"
 WIKI = "10-‐-Rebuilder#-blendshape"
 
 DP_BLENDSHAPEIO_VERSION = 1.03
@@ -15,11 +14,9 @@ DP_BLENDSHAPEIO_VERSION = 1.03
 
 class BlendshapeIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_BLENDSHAPEIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

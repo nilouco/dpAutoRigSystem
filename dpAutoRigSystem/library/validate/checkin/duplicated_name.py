@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "DuplicatedName"
 TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
-#ICON = "/Icons/dp_duplicatedName.png"
 WIKI = "07-‐-Validator#-duplicated-name"
 
 DP_DUPLICATEDNAME_VERSION = 1.05
@@ -15,11 +14,9 @@ DP_DUPLICATEDNAME_VERSION = 1.05
 
 class DuplicatedName(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_DUPLICATEDNAME_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

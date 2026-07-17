@@ -11,7 +11,6 @@ from importlib import reload
 CLASS_NAME = "CorrectionManager"
 TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
-#ICON = "/Icons/dp_correctionManager.png"
 WIKI = "06-‐-Tools#-correction-manager"
 
 ANGLE = "Angle"
@@ -22,11 +21,9 @@ DP_CORRECTIONMANAGER_VERSION = 2.14
 
 class CorrectionManager(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

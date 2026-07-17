@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "TransformationIO"
 TITLE = "r037_transformationIO"
 DESCRIPTION = "r038_transformationIODesc"
-#ICON = "/Icons/dp_transformationIO.png"
 WIKI = "10-‐-Rebuilder#-transformation"
 
 DP_TRANSFORMATIONIO_VERSION = 1.02
@@ -14,11 +13,9 @@ DP_TRANSFORMATIONIO_VERSION = 1.02
 
 class TransformationIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_TRANSFORMATIONIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

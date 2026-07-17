@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = 'UnlockAttributes'
 TITLE = 'v092_unlockAttributes'
 DESCRIPTION = 'v093_unlockAttributesDesc'
-#ICON = '/Icons/dp_unlockAttributes.png'
 WIKI = "07-‐-Validator#-unlock-attributes"
 
 DP_UNLOCKATTRIBUTES_VERSION = 1.03

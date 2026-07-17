@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "NonManifold"
 TITLE = "v101_nonManifold"
 DESCRIPTION = "v102_nonManifoldDesc"
-#ICON = "/Icons/dp_nonManifold.png"
 WIKI = "07-‐-Validator#-nonmanifold-cleaner"
 
 DP_NONMANIFOLDCLEANER_VERSION = 1.01
@@ -15,11 +14,9 @@ DP_NONMANIFOLDCLEANER_VERSION = 1.01
 
 class NonManifold(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_NONMANIFOLDCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

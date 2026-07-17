@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ControllerTag"
 TITLE = "v073_controllerTag"
 DESCRIPTION = "v074_controllerTagDesc"
-#ICON = "/Icons/dp_controllerTag.png"
 WIKI = "07-‐-Validator#-controller-tag"
 
 DP_CONTROLLERTAG_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_CONTROLLERTAG_VERSION = 1.04
 
 class ControllerTag(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_CONTROLLERTAG_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

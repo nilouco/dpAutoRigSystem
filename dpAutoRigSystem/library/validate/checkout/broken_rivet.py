@@ -11,7 +11,6 @@ from importlib import reload
 CLASS_NAME = "BrokenRivet"
 TITLE = "v126_brokenRivet"
 DESCRIPTION = "v127_brokenRivetDesc"
-#ICON = "/Icons/dp_brokenRivet.png"
 WIKI = "07-‐-Validator#-broken-rivets"
 
 DP_BROKENRIVET_VERSION = 1.01
@@ -19,11 +18,9 @@ DP_BROKENRIVET_VERSION = 1.01
 
 class BrokenRivet(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_BROKENRIVET_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

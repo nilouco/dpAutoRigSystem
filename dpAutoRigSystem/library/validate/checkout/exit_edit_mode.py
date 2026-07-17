@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ExitEditMode"
 TITLE = "v034_exitEditMode"
 DESCRIPTION = "v035_exitEditModeDesc"
-#ICON = "/Icons/dp_exitEditMode.png"
 WIKI = "07-‐-Validator#-exit-edit-mode"
 
 DP_EXITEDITMODE_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_EXITEDITMODE_VERSION = 1.04
 
 class ExitEditMode(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_EXITEDITMODE_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

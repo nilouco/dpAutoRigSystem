@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Ngskintools"
 TITLE = "v026_ngskintools"
 DESCRIPTION = "v027_ngskintoolsDesc"
-#ICON = "/Icons/dp_ngskintools.png"
 WIKI = "07-‐-Validator#-ngskintools-cleaner"
 
 DP_NGSKINTOOLSCLEANER_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_NGSKINTOOLSCLEANER_VERSION = 1.04
 
 class Ngskintools(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_NGSKINTOOLSCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

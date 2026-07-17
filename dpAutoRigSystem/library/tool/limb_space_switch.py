@@ -7,7 +7,6 @@ from importlib import reload
 CLASS_NAME = "LimbSpaceSwitch"
 TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
-#ICON = "/Icons/dp_limbSpaceSwitch.png"
 WIKI = "06-‐-Tools#-limb-space-switch"
 
 DP_LIMBSPACESWITCH_VERSION = 2.06
@@ -15,11 +14,9 @@ DP_LIMBSPACESWITCH_VERSION = 2.06
 
 class LimbSpaceSwitch(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "TweakNode"
 TITLE = "v130_tweakNode"
 DESCRIPTION = "v131_tweakNodeDesc"
-#ICON = "/Icons/dp_tweakNode.png"
 WIKI = "07-‐-Validator#-tweak-node-cleaner"
 
 DP_TWEAKNODECLEANER_VERSION = 1.02
@@ -14,11 +13,9 @@ DP_TWEAKNODECLEANER_VERSION = 1.02
 
 class TweakNode(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_TWEAKNODECLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

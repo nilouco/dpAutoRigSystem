@@ -10,7 +10,6 @@ from importlib import reload
 CLASS_NAME = "UnlockNormals"
 TITLE = "v078_unlockNormals"
 DESCRIPTION = "v079_unlockNormalsDesc"
-#ICON = "/Icons/dp_unlockNormals.png"
 WIKI = "07-‐-Validator#-unlock-normals"
 
 DP_UNLOCKNORMALS_VERSION = 2.00
@@ -18,11 +17,9 @@ DP_UNLOCKNORMALS_VERSION = 2.00
 
 class UnlockNormals(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_UNLOCKNORMALS_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

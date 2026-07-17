@@ -8,7 +8,6 @@ from ....library.base import action
 CLASS_NAME = "LaminaFace"
 TITLE = "v124_laminaFace"
 DESCRIPTION = "v125_laminaFaceDesc"
-#ICON = "/Icons/dp_laminaFace.png"
 WIKI = "07-‐-Validator#-lamina-face-cleaner"
 
 DP_LAMINAFACECLEANER_VERSION = 1.03
@@ -16,11 +15,9 @@ DP_LAMINAFACECLEANER_VERSION = 1.03
 
 class LaminaFace(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_LAMINAFACECLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

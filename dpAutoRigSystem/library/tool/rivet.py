@@ -29,7 +29,6 @@ from importlib import reload
 CLASS_NAME = "Rivet"
 TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
-#ICON = "/Icons/dp_rivet.png"
 WIKI = "06-‐-Tools#-rivet"
 
 RIVET_GRP = "Rivet_Grp"
@@ -41,11 +40,9 @@ DP_RIVET_VERSION = 2.10
 
 class Rivet(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

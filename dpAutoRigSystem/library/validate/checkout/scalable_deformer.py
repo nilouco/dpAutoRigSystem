@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "ScalableDeformer"
 TITLE = "v109_scalableDeformer"
 DESCRIPTION = "v110_scalableDeformerDesc"
-#ICON = "/Icons/dp_scalableDeformerChecker.png"
 WIKI = "07-‐-Validator#-scalable-deformer-checker"
 
 DP_SCALABLEDEFORMERCHECKER_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_SCALABLEDEFORMERCHECKER_VERSION = 1.01
 
 class ScalableDeformer(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_SCALABLEDEFORMERCHECKER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

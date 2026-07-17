@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Namespace"
 TITLE = "v038_namespace"
 DESCRIPTION = "v039_namespaceDesc"
-#ICON = "/Icons/dp_namespace.png"
 WIKI = "07-‐-Validator#-namespace-cleaner"
 
 DP_NAMESPACECLEANER_VERSION = 1.03
@@ -14,11 +13,9 @@ DP_NAMESPACECLEANER_VERSION = 1.03
 
 class Namespace(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_NAMESPACECLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

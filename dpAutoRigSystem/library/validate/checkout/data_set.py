@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "DataSet"
 TITLE = "v144_dataSet"
 DESCRIPTION = "v145_dataSetDesc"
-#ICON = "/Icons/dp_dataSet.png"
 WIKI = "07-‐-Validator#-data_grp-set-cleaner"
 
 DP_DATASETCLEANER_VERSION = 1.00
@@ -14,11 +13,9 @@ DP_DATASETCLEANER_VERSION = 1.00
 
 class DataSet(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_DATASETCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

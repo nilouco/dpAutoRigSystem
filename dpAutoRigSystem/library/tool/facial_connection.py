@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "FacialConnection"
 TITLE = "m085_facialConnection"
 DESCRIPTION = "m086_facialConnectionDesc"
-#ICON = "/Icons/dp_facialConnection.png"
 WIKI = "06-‐-Tools#-facial-connection"
 
 MIDDLE = "Middle"
@@ -21,11 +20,9 @@ DP_FACIALCONNECTION_VERSION = 3.00
 
 class FacialConnection(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

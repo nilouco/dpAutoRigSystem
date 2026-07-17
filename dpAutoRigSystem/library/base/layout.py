@@ -14,7 +14,6 @@ class BaseLayout(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        #self.icon = ICON
         self.wiki = WIKI
         self.userGuideName = userGuideName
         self.utils = ar.utils

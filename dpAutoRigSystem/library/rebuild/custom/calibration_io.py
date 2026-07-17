@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "CalibrationIO"
 TITLE = "r041_calibrationIO"
 DESCRIPTION = "r042_calibrationIODesc"
-#ICON = "/Icons/dp_calibrationIO.png"
 WIKI = "10-‐-Rebuilder#-calibration"
 
 DP_CALIBRATIONIO_VERSION = 1.01
@@ -14,11 +13,9 @@ DP_CALIBRATIONIO_VERSION = 1.01
 
 class CalibrationIO(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_CALIBRATIONIO_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

@@ -14,7 +14,6 @@ class BaseCurve(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        #self.icon = ICON
         self.wiki = WIKI
         self.cvName = None
         self.cvAction = None

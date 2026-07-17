@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "EmptyTransform"
 TITLE = "v138_emptyTransform"
 DESCRIPTION = "v139_emptyTransformDesc"
-#ICON = "/Icons/dp_emptyTransform.png"
 WIKI = "07-‐-Validator#-empty-transform-cleaner"
 
 DP_EMPTYTRANSFORMCLEANER_VERSION = 1.02
@@ -14,11 +13,9 @@ DP_EMPTYTRANSFORMCLEANER_VERSION = 1.02
 
 class EmptyTransform(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_EMPTYTRANSFORMCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

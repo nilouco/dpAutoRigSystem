@@ -7,7 +7,6 @@ from ....library.base import action
 CLASS_NAME = "NonQuadFace"
 TITLE = "v119_nonQuadFace"
 DESCRIPTION = "v120_nonQuadFaceDesc"
-#ICON = "/Icons/dp_nonQuadFace.png"
 WIKI = "07-‐-Validator#-non-quad-face"
 
 DP_NONQUADFACE_VERSION = 1.01
@@ -15,11 +14,9 @@ DP_NONQUADFACE_VERSION = 1.01
 
 class NonQuadFace(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_NONQUADFACE_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

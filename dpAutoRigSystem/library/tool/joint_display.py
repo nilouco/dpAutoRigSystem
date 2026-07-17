@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "JointDisplay"
 TITLE = "m233_jointDisplay"
 DESCRIPTION = "m234_jointDisplayDesc"
-#ICON = "/Icons/dp_jointDisplay.png"
 WIKI = "06-‐-Tools#-joint-display"
 
 DP_JOINTDISPLAY_VERSION = 1.01
@@ -17,11 +16,9 @@ DP_JOINTDISPLAY_VERSION = 1.01
 
 class JointDisplay(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

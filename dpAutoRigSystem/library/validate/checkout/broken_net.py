@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "BrokenNet"
 TITLE = "v046_brokenNet"
 DESCRIPTION = "v047_brokenNetDesc"
-#ICON = "/Icons/dp_brokenNet.png"
 WIKI = "07-‐-Validator#-broken-network-cleaner"
 
 DP_BROKENNETCLEANER_VERSION = 1.05
@@ -14,11 +13,9 @@ DP_BROKENNETCLEANER_VERSION = 1.05
 
 class BrokenNet(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_BROKENNETCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

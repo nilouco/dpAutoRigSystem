@@ -9,7 +9,6 @@ from importlib import reload
 CLASS_NAME = "CopyPasteAttr"
 TITLE = "m135_copyPasteAttr"
 DESCRIPTION = "m136_copyPasteAttrDesc"
-#ICON = "/Icons/dp_copyPasteAttr.png"
 WIKI = "06-‐-Tools#-copy-paste-attribute"
 
 DP_COPYPASTEATTR_VERSION = 2.04
@@ -17,11 +16,9 @@ DP_COPYPASTEATTR_VERSION = 2.04
 
 class CopyPasteAttr(base.BaseLibrary):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         base.BaseLibrary.__init__(self, *args, **kwargs)
         if self.ar.dev:

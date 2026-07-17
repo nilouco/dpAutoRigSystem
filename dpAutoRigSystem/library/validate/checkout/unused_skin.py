@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "UnusedSkin"
 TITLE = "v082_unusedSkin"
 DESCRIPTION = "v083_unusedSkinDesc"
-#ICON = "/Icons/dp_unusedSkin.png"
 WIKI = "07-‐-Validator#-unused-skin-cleaner"
 
 DP_UNUSEDSKINCLEANER_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_UNUSEDSKINCLEANER_VERSION = 1.04
 
 class UnusedSkin(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_UNUSEDSKINCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)

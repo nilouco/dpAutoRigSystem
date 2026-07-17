@@ -17,7 +17,6 @@ class BaseStandard(object):
         self.name = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        #self.icon = ICON
         self.wiki = WIKI
         
         self.get_namespace_for_it()

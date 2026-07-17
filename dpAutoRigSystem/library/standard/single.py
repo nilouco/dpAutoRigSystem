@@ -7,7 +7,6 @@ from ..base import layout
 CLASS_NAME = "Single"
 TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
-#ICON = "/Icons/dp_single.png"
 WIKI = "03-‐-Guides#-single"
 
 DP_SINGLE_VERSION = 2.07
@@ -15,11 +14,9 @@ DP_SINGLE_VERSION = 2.07
 
 class Single(standard.BaseStandard, layout.BaseLayout):
     def __init__(self,  *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         standard.BaseStandard.__init__(self, *args, **kwargs)
         # returned data from the dictionary

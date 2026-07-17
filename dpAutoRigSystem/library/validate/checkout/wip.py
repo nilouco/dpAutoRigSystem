@@ -6,7 +6,6 @@ from ....library.base import action
 CLASS_NAME = "Wip"
 TITLE = "v009_wip"
 DESCRIPTION = "v010_wipDesc"
-#ICON = "/Icons/dp_wip.png"
 WIKI = "07-‐-Validator#-wip-cleaner"
 
 DP_WIPCLEANER_VERSION = 1.04
@@ -14,11 +13,9 @@ DP_WIPCLEANER_VERSION = 1.04
 
 class Wip(action.ActionStartClass):
     def __init__(self, *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
-        #kwargs["ICON"] = ICON
         kwargs["WIKI"] = WIKI
         self.version = DP_WIPCLEANER_VERSION
         action.ActionStartClass.__init__(self, *args, **kwargs)
