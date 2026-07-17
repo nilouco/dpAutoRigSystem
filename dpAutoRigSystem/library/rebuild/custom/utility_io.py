@@ -41,14 +41,14 @@ class UtilityIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     utilityList = None
                     if objList:
                         utilityList = objList
                     else:
-                        utilityList = cmds.ls(selection=False, type=self.utils.utilityTypeList)
+                        utilityList = cmds.ls(selection=False, type=self.ar.utils.utilityTypeList)
                     if self.firstMode: #export
                         if utilityList:
                             self.exportDicToJsonFile(self.getUtilityDataDic(utilityList))
@@ -82,29 +82,29 @@ class UtilityIO(action.ActionStartClass):
             Returns the dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
         for item in utilityList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.ar.utils.validateID(item):
                 # getting attributes values
                 nodeType = cmds.objectType(item)
                 dic[item] = {"attributes" : {},
                                 "type"       : nodeType,
                                 "name"       : item
                             }
-                for attr in self.utils.typeAttrDic[nodeType]:
+                for attr in self.ar.utils.typeAttrDic[nodeType]:
                     if cmds.attributeQuery(attr, node=item, exists=True):
                         dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                 # compound attributes
-                if nodeType in self.utils.typeMultiAttrDic.keys():
-                    for multiAttr in self.utils.typeMultiAttrDic[nodeType].keys():
+                if nodeType in self.ar.utils.typeMultiAttrDic.keys():
+                    for multiAttr in self.ar.utils.typeMultiAttrDic[nodeType].keys():
                         indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
                         if indexList:
                             dot = ""
                             attrList = [""]
-                            if self.utils.typeMultiAttrDic[nodeType][multiAttr]:
+                            if self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]:
                                 dot = "."
-                                attrList = self.utils.typeMultiAttrDic[nodeType][multiAttr]
+                                attrList = self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]
                             for i in indexList:
                                 for attr in attrList:
                                     attrName = multiAttr+"["+str(i)+"]"+dot+attr
@@ -119,12 +119,12 @@ class UtilityIO(action.ActionStartClass):
         """ Import utility nodes from exported dictionary.
             Create missing utility nodes and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(utilityDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(utilityDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in utilityDic.keys():
             existingNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # create utility node if it needs
             if not cmds.objExists(item):
                 cmds.createNode(utilityDic[item]["type"], name=utilityDic[item]["name"])

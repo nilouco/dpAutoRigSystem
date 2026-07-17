@@ -48,7 +48,7 @@ class BlendshapeTarget(action.ActionStartClass):
                 if meshList:
                     toCheckList = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # get exception list to keep nodes in the scene
                 deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
                 exceptionList = self.keepGrp(["supportGrp", "renderGrp", "proxyGrp"])
@@ -57,7 +57,7 @@ class BlendshapeTarget(action.ActionStartClass):
                         if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                             if not item in exceptionList:
                                 exceptionList.append(item)
-                        elif self.utils.getSuffixNumberList(item)[1].endswith("Base"):
+                        elif self.ar.utils.getSuffixNumberList(item)[1].endswith("Base"):
                             exceptionList.append(item)
                         else:
                             try:
@@ -79,7 +79,7 @@ class BlendshapeTarget(action.ActionStartClass):
                                             
                 # run validation tasks
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         self.checkedObjList.append(item)
                         if not item in exceptionList:
@@ -122,7 +122,7 @@ class BlendshapeTarget(action.ActionStartClass):
         resultList = []
         if grpList:
             for item in grpList:
-                nodeGrp = self.utils.getNodeByMessage(item)
+                nodeGrp = self.ar.utils.getNodeByMessage(item)
                 if nodeGrp:
                     nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
                     if nodeList:

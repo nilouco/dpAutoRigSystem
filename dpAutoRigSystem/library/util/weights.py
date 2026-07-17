@@ -11,7 +11,6 @@ class Weights(object):
         """
         # defining variables:
         self.ar = ar
-        self.utils = ar.utils
         self.typeAttrDic = {
                             "cluster"         : [None, "envelope", "relative", "angleInterpolation"],
                             "deltaMush"       : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],

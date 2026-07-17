@@ -41,7 +41,7 @@ class TransformationIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
@@ -80,12 +80,12 @@ class TransformationIO(action.ActionStartClass):
     def getTransformDataDic(self, itemList, *args):
         """ Return the transform data info to export.
         """
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         # define dictionary to export
         transformDic = {}
-        itemList = self.utils.filterTransformList(itemList, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        itemList = self.ar.utils.filterTransformList(itemList, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             useThisTransform = True
             if cmds.objExists(item+".dpNotTransformIO"):
                 if cmds.getAttr(item+".dpNotTransformIO") == 1:
@@ -160,11 +160,11 @@ class TransformationIO(action.ActionStartClass):
     def importTransformation(self, transformDic, *args):
         """ Import transfomation data from given dictionary.
         """
-        self.utils.setProgress(max=len(transformDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(transformDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in transformDic.keys():
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             notFoundNodesList = []
             # check transform
             #if not cmds.objExists(item):

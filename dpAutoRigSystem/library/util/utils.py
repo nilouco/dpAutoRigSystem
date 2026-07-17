@@ -1390,7 +1390,7 @@ class Utils(object):
                 isInterruptable = if we can interrupt the process or not. False by default.
 
             Example:
-                self.utils.setProgress(messageName, titleName, 20, addOne=False)
+                self.ar.utils.setProgress(messageName, titleName, 20, addOne=False)
                 self.ar.utils.setProgress(doingName+': '+backWheelName)
 
             Returns the progress: 

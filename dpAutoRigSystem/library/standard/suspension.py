@@ -13,12 +13,8 @@ DP_SUSPENSION_VERSION = 2.04
 
 
 class Suspension(standard.BaseStandard, layout.BaseLayout):
-    def __init__(self,  *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        standard.BaseStandard.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
     def createModuleLayout(self, *args):
@@ -92,18 +88,18 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
-                self.dist = self.utils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
+                self.dist = self.ar.utils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
                 self.jointList, self.mainCtrlList, self.ctrlZeroList, self.ctrlList, self.aimLocList, self.upLocList = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.userGuideName+"_"+letter+"_1_Jnt", scaleCompensate=False)
                     endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
-                    self.utils.addJointEndAttr([endJoint])
+                    self.ar.utils.addJointEndAttr([endJoint])
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:
-                    self.utils.setJointLabel(jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+letter)
+                    self.ar.utils.setJointLabel(jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+letter)
                     self.jointList.append(jnt)
                     
                     # create a control:
@@ -118,16 +114,16 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                     cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScC")
                     self.ctrlList.append(ctrl)
                     # zeroOut controls:
-                    zeroOutCtrlGrp = self.utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
+                    zeroOutCtrlGrp = self.ar.utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
                     self.mainCtrlList.append(zeroOutCtrlGrp[0])
                     self.ctrlZeroList.append(zeroOutCtrlGrp[1])
                     cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
-                        self.utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
+                        self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
                         cmds.delete(cmds.parentConstraint(self.cvALoc, zeroOutCtrlGrp[0], maintainOffset=False))
                     else:
-                        self.utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
+                        self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
                         cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
                         # integrating data:
                         self.suspensionBCtrlGrpList.append(zeroOutCtrlGrp[0])

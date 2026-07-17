@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from . import base
 from ..tool import correction_manager
 from importlib import reload
 
@@ -8,17 +9,14 @@ from importlib import reload
 DP_BASESTANDARD_VERSION = 2.13
 
 
-class BaseStandard(object):
+class BaseStandard(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, *args):
-        """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
+        """ Initialize the rigging standard module class.
         """
-        # defining variables:
-        self.ar = ar
-        self.name = CLASS_NAME
-        self.title = TITLE
-        self.description = DESCRIPTION
-        self.wiki = WIKI
-        
+        base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        if self.ar.dev:
+            reload(base)
+            reload(correction_manager)
         self.get_namespace_for_it()
         # WIP TODO: redefine them here?
         #
@@ -26,9 +24,7 @@ class BaseStandard(object):
 
 
         # utils
-        self.utils = ar.utils
-        if self.ar.dev:
-            reload(correction_manager)
+#        if self.ar.dev:
         # starting correctionManager:
         self.correctionManager = correction_manager.CorrectionManager(self.ar)
         self.correctionManager.ui = False
@@ -82,7 +78,7 @@ class BaseStandard(object):
             self.createModuleLayout()
         # update module instance info:
         self.updateModuleInstanceInfo()
-        self.guideNet = self.utils.getNodeByMessage("net", self.guide_base)
+        self.guideNet = self.ar.utils.getNodeByMessage("net", self.guide_base)
         if self.guideNet:
             self.raw = cmds.getAttr(self.guideNet+".rawGuide")
 
@@ -201,7 +197,7 @@ class BaseStandard(object):
             if cmds.objExists(item):
                 cmds.delete(item)
         # delete the guide module:
-        self.utils.clearNodeGrp(self.guide_base, 'guideBase', unparent=True)
+        self.ar.utils.clearNodeGrp(self.guide_base, 'guideBase', unparent=True)
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
@@ -232,7 +228,7 @@ class BaseStandard(object):
                     self.enteredText = ""
             self.enteredText = self.enteredText.replace(" ", "_")
             # call utils to return the normalized text:
-            self.customName = self.utils.normalizeText(self.enteredText, prefixMax=30)
+            self.customName = self.ar.utils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:
@@ -243,13 +239,13 @@ class BaseStandard(object):
                 self.userGuideName = self.guideNamespace.split("__")[-1]
             else:
                 baseName = self.customName
-                suffixNumberList = self.utils.getSuffixNumberList(self.customName)
+                suffixNumberList = self.ar.utils.getSuffixNumberList(self.customName)
                 if suffixNumberList[1]:
                     baseName = suffixNumberList[1]
                 dpAR_nameList = []
                 nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
                 for net in nets:
-                    if baseName == self.utils.getSuffixNumberList(cmds.getAttr(net+".guideName"))[1]:
+                    if baseName == self.ar.utils.getSuffixNumberList(cmds.getAttr(net+".guideName"))[1]:
                         dpAR_nameList.append(cmds.getAttr(net+".guideName"))
                 if dpAR_nameList:
                     if self.customName in dpAR_nameList:
@@ -331,7 +327,7 @@ class BaseStandard(object):
                     else:
                         s = sDefault
                     # add joint label, create controller, zeroOut
-                    self.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, labelName+"_"+str(m))
+                    self.ar.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, labelName+"_"+str(m))
                     jcrCtrl, jcrGrp = self.ar.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
@@ -489,7 +485,7 @@ class BaseStandard(object):
             # joint labelling:
             self.jointLabelAdd = 0
         # store the number of this guide by module type
-        self.dpAR_count = self.utils.findModuleLastNumber(self.name, "moduleType", True)
+        self.dpAR_count = self.ar.utils.findModuleLastNumber(self.name, "moduleType", True)
 
 
     def rig_me(self, *args):
@@ -515,7 +511,7 @@ class BaseStandard(object):
             
             # get the radius value to controls:
             if cmds.objExists(self.radiusCtrl):
-                self.ctrlRadius = self.utils.getCtrlRadius(self.radiusCtrl)
+                self.ctrlRadius = self.ar.utils.getCtrlRadius(self.radiusCtrl)
             else:
                 self.ctrlRadius = 1
                 
@@ -557,9 +553,9 @@ class BaseStandard(object):
             cmds.parent(scalableList, self.toScalableHookGrp)
         self.ar.custom_attr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
         # add hook attributes to be read when rigging composed modules:
-        self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-        self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-        self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+        self.ar.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+        self.ar.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+        self.ar.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
         cmds.lockNode(self.guideNet, lock=False)
         # add module type counter value
         if not 'dpAR_count' in cmds.listAttr(self.guideNet):
@@ -589,7 +585,7 @@ class BaseStandard(object):
         if number:
             guideNumber = number
         else:
-            guideNumber = self.utils.findLastNumber()
+            guideNumber = self.ar.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
         self.dpID = self.ar.custom_attr.addAttr(0, [self.guideNet])[0] #dpID
         for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
@@ -729,7 +725,7 @@ class BaseStandard(object):
                     self.serialized = True
         else: #update linked node to avoid cleanup this network if it's broken
             cmds.lockNode(self.guideNet, lock=False)
-            optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+            optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
             if optionCtrl:
                 cmds.connectAttr(optionCtrl+".message", self.guideNet+".linkedNode", force=True)
             else:
@@ -746,7 +742,7 @@ class BaseStandard(object):
             if self.oldUnitConversionList:
                 unitConversionList = list(set(unitConversionList)-set(self.oldUnitConversionList))
             if unitConversionList:
-                self.utils.nodeRenamingTreatment(unitConversionList)
+                self.ar.utils.nodeRenamingTreatment(unitConversionList)
 
 
     def createWorldSize(self, *args):

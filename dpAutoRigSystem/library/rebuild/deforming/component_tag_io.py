@@ -46,7 +46,7 @@ class ComponentTagIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     nodeList = None

@@ -42,7 +42,7 @@ class OffsetMatrixIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     nodeList = None
@@ -84,9 +84,9 @@ class OffsetMatrixIO(action.ActionStartClass):
             Returns a dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 inPlugList = cmds.listConnections(item+"."+self.offsetMatrixAttr, source=True, destination=False, plugs=True)
                 if inPlugList:
@@ -99,12 +99,12 @@ class OffsetMatrixIO(action.ActionStartClass):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.utils.setProgress(max=len(connectDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(connectDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in connectDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 omAttr = item+"."+self.offsetMatrixAttr
                 if not cmds.listConnections(omAttr, plugs=True, source=True, destination=False):

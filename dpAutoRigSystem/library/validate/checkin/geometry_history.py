@@ -37,8 +37,8 @@ class GeometryHistory(action.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        if not self.utils.getAllGrp():
-            if not self.utils.getNetworkNodeByAttr("dpGuideNet"):
+        if not self.ar.utils.getAllGrp():
+            if not self.ar.utils.getNetworkNodeByAttr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
                     ignoreTypeList = ["tweak", "file", "place2dTexture"]
                     if objList:
@@ -61,9 +61,9 @@ class GeometryHistory(action.ActionStartClass):
                         # Get shortName to better reading in display log
                         geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
                     if geoToCleanList:
-                        self.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
                         for geo in geoToCleanList:
-                            self.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):
                                 self.checkedObjList.append(geo)
                                 self.foundIssueList.append(True)

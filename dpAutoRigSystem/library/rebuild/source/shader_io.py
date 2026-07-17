@@ -42,7 +42,7 @@ class ShaderIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     self.customAttrList = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
@@ -101,9 +101,9 @@ class ShaderIO(action.ActionStartClass):
         """ Return shader data dictionary to export.
         """
         shaderDic = {}
-        self.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
         for shader in shaderList:
-            self.utils.setProgress(self.ar.data.lang[self.title]+": "+shader)
+            self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+shader)
             fileNode = None
             texture = None
             color = None

@@ -41,9 +41,9 @@ class ModelIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 # load alembic plugin
-                if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
+                if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
                     self.ioPath = self.getIOPath(self.ioDir)
                     if self.ioPath:
                         if self.firstMode: #export
@@ -51,9 +51,9 @@ class ModelIO(action.ActionStartClass):
                             if objList:
                                 meshList = objList
                             else:
-                                meshList = self.utils.filterTransformList(self.getModelToExportList(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+                                meshList = self.ar.utils.filterTransformList(self.getModelToExportList(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
                             if meshList:
-                                self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
+                                self.ar.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
                                 constraintDataDic = self.removeConstraints(meshList)
                                 self.exportAlembicFile(meshList)
                                 if constraintDataDic:

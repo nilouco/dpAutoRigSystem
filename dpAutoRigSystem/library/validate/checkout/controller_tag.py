@@ -43,9 +43,9 @@ class ControllerTag(action.ActionStartClass):
             else:
                 toCheckList = self.ar.ctrls.getControlList()
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if not "controlID" in cmds.listAttr(item):
                         continue
                     if not cmds.getAttr(item+".controlID") == "id_092_Correctives":

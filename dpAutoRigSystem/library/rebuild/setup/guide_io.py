@@ -50,7 +50,7 @@ class GuideIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     self.ar.ui_manager.refresh_ui()
@@ -59,8 +59,8 @@ class GuideIO(action.ActionStartClass):
                         if objList:
                             netList = objList
                         else:
-                            netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
-                            netList.extend(self.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
+                            netList = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
+                            netList.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
                         if netList:
                             self.ar.job.unpin_guide(force=True)
                             self.exportDicToJsonFile(self.getGuideDataDic(netList))
@@ -117,9 +117,9 @@ class GuideIO(action.ActionStartClass):
         """ Return a dictionary of the guide data to export it.
         """
         toExportDataDic = {}
-        self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
         for net in netList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # mount a dic with all data 
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
@@ -285,7 +285,7 @@ class GuideIO(action.ActionStartClass):
         toInitializeGuide = True
         ask_again = True
         self.correlations = {}
-        self.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = True
             self.ar.filler.fill_created_guides()
@@ -325,7 +325,7 @@ class GuideIO(action.ActionStartClass):
                 if toInitializeGuide:
                     try:
                         self.netDic = guideDic[net]
-                        self.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library(self.netDic['ModuleType'], self.ar.data.standard_folder)[0]
                         self.correlations[f"{self.netDic['ModuleType']}__dpAR_{self.netDic['GuideNumber']}"] = self.instance.guideNamespace

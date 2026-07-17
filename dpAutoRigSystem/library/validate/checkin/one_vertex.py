@@ -38,15 +38,15 @@ class OneVertex(action.ActionStartClass):
         
         # ---
         # --- validator code --- beginning
-        if not self.utils.getAllGrp():
-            if not self.utils.getNetworkNodeByAttr("dpGuideNet"):
+        if not self.ar.utils.getAllGrp():
+            if not self.ar.utils.getNetworkNodeByAttr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
                     if objList:
                         toCheckList = cmds.ls(objList, type="mesh")
                     else:
                         toCheckList = cmds.ls(selection=False, type="mesh")
                     if toCheckList:
-                        self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                         oneVertexList = self.checkNonManifoldVertex(toCheckList)
                         # conditional to check here
                         if oneVertexList:

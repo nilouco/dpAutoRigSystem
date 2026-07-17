@@ -51,8 +51,8 @@ class UnusedNode(action.ActionStartClass):
                     usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
                     # conditional to check here
                     if not len(allMatList) == len(usedMatList):
-                        self.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
                         self.checkedObjList.append(str(", ".join(issueMatList)))
                         self.foundIssueList.append(True)

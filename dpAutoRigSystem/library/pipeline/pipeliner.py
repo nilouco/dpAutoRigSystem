@@ -19,7 +19,6 @@ class Pipeliner(object):
         """
         # define variables
         self.ar = ar
-        self.utils = ar.utils
         self.settingsFile = "pipeline_settings.json"
         self.defaultInfoFile = "pipeline_info.json"
         self.infoFile = self.defaultInfoFile
@@ -417,7 +416,7 @@ class Pipeliner(object):
     def mainUI(self, ar=None, loadedFileInfo=False, *args):
         """ Open an UI to load, set and save the pipeline info.
         """
-        self.utils.closeUI('dpPipelinerWindow')
+        self.ar.utils.closeUI('dpPipelinerWindow')
         self.getPipelineData(loadedFileInfo)
         # window
         if ar:
@@ -642,7 +641,7 @@ class Pipeliner(object):
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         if closeUI:
-            self.utils.closeUI('dpPipelinerWindow')
+            self.ar.utils.closeUI('dpPipelinerWindow')
 
 
     def mountPackagePath(self, *args):
@@ -702,7 +701,7 @@ class Pipeliner(object):
                     else:
                         wh = self.pipeData['h001_publishing']
                     if wh:
-                        self.pipeData['publishedWebhook'] = self.utils.mountWH(self.ar.data.discord_url, wh)
+                        self.pipeData['publishedWebhook'] = self.ar.utils.mountWH(self.ar.data.discord_url, wh)
             # callback
             if not self.pipeData['s_callback']:
                 callback = os.path.join(self.pipeData['path'], self.callbackFile)
@@ -855,7 +854,7 @@ class Pipeliner(object):
             saveVersion_winHeight = 220
             saveVersion_align     = "left"
             # window:
-            self.utils.closeUI("dpSaveVersionWindow")
+            self.ar.utils.closeUI("dpSaveVersionWindow")
             dpSaveVersionWin = cmds.window('dpSaveVersionWindow', title=saveVersion_title, iconName='dpInfo', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
             # creating text layout:
             saveVersionColumnLayout = cmds.columnLayout('saveVersionColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpSaveVersionWin)
@@ -885,7 +884,7 @@ class Pipeliner(object):
                 thisType = "mayaBinary"
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=thisType, force=True)
-            self.utils.closeUI("dpSaveVersionWindow")
+            self.ar.utils.closeUI("dpSaveVersionWindow")
             self.ar.data.rebuilding = False
             self.refreshAssetData()
 
@@ -984,7 +983,7 @@ class Pipeliner(object):
                     latestFile = self.getLatestFile(assetFolder)
                     # Open maya scene
                     if latestFile:
-                        savedScene = self.utils.checkSavedScene()
+                        savedScene = self.ar.utils.checkSavedScene()
                         if not savedScene:
                             savedScene = self.userSaveThisScene(False)
                         if savedScene:
@@ -1017,7 +1016,7 @@ class Pipeliner(object):
         select_winWidth = 240
         select_winHeight = 285
         select_align = "center"
-        self.utils.closeUI("dpSelectAssetWindow")
+        self.ar.utils.closeUI("dpSelectAssetWindow")
         dpSelectAssetWin = cmds.window('dpSelectAssetWindow', title=selectAsset_title, iconName='dpInfo', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         selectColumnLayout = cmds.columnLayout('selectColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetWin)
@@ -1035,7 +1034,7 @@ class Pipeliner(object):
         selectedAssetItemList = cmds.textScrollList(self.selectAssetTSL, query=True, selectItem=True)
         if selectedAssetItemList:
             self.loadAsset(path, selectedAssetItemList[0], mode)
-            self.utils.closeUI("dpSelectAssetWindow")
+            self.ar.utils.closeUI("dpSelectAssetWindow")
 
 
     def selectAssetCheckBoxUI(self, assetList, path, mode, *args):
@@ -1046,7 +1045,7 @@ class Pipeliner(object):
         selectCB_winWidth = 240
         selectCB_winHeight = 285
         selectCB_align = "center"
-        self.utils.closeUI("dpSelectAssetCBWindow")
+        self.ar.utils.closeUI("dpSelectAssetCBWindow")
         dpSelectAssetCBWin = cmds.window('dpSelectAssetCBWindow', title=selectAssetCB_title, iconName='dpInfo', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating layout:
         selectBatchLayout = cmds.columnLayout('selectBatchLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetCBWin)
@@ -1133,7 +1132,7 @@ class Pipeliner(object):
         self.newAsset_winHeight = 220
         self.newAsset_align     = "left"
         # creating New Asset Window:
-        self.utils.closeUI("dpNewAssetWindow")
+        self.ar.utils.closeUI("dpNewAssetWindow")
         dpNewAssetWin = cmds.window('dpNewAssetWindow', title=self.newAsset_title, iconName='dpInfo', widthHeight=(self.newAsset_winWidth, self.newAsset_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpNewAssetWin)
@@ -1166,7 +1165,7 @@ class Pipeliner(object):
                 cmds.file(rename=self.newAssetFile)
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
-                self.utils.closeUI("dpNewAssetWindow")
+                self.ar.utils.closeUI("dpNewAssetWindow")
                 self.ar.data.rebuilding = False
                 self.refreshAssetData()
             else:
@@ -1218,7 +1217,7 @@ class Pipeliner(object):
         self.replaceDPData_winHeight = 330+(len(self.existDataList)*16)
         self.replaceDPData_align     = "left"
         # creating replace dpData Window:
-        self.utils.closeUI("dpReplaceDPDataWindow")
+        self.ar.utils.closeUI("dpReplaceDPDataWindow")
         dpReplaceDPDataWindow = cmds.window('dpReplaceDPDataWindow', title=self.replaceDPData_title, iconName='dpInfo', widthHeight=(self.replaceDPData_winWidth, self.replaceDPData_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         replaceDataColumnLayout = cmds.columnLayout('replaceDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
@@ -1260,7 +1259,7 @@ class Pipeliner(object):
                 self.dpDataToReplaceList.append(item)
         if self.dpDataToReplaceList:
             self.runReplaceData()
-            self.utils.closeUI("dpReplaceDPDataWindow")
+            self.ar.utils.closeUI("dpReplaceDPDataWindow")
         
 
     def runReplaceData(self, path=None, toReplaceList=None, *args):

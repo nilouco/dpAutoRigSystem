@@ -104,7 +104,7 @@ class Skinning(weights.Weights):
                             except:
                                 notSkinnedList.append(joint)
                     else: # None = create a new skinCluster node
-                        baseName = self.utils.extractSuffix(geomSkin)
+                        baseName = self.ar.utils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
@@ -128,13 +128,13 @@ class Skinning(weights.Weights):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
-        self.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinationList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinationList), addOne=False, addNumber=False)
         for sourceItem in sourceList:
-            self.utils.setProgress("Skinning: ")
+            self.ar.utils.setProgress("Skinning: ")
             if oneSource:
                 for item in destinationList:
                     self.runCopySkin(sourceItem, item, byUVs)
-                self.utils.setProgress(endIt=True)
+                self.ar.utils.setProgress(endIt=True)
                 return
             else:
                 if not sourceItem in ranList:
@@ -149,7 +149,7 @@ class Skinning(weights.Weights):
                                 ranList.append(item)
                                 break
                     ranList.append(sourceItem)
-        self.utils.setProgress(endIt=True)
+        self.ar.utils.setProgress(endIt=True)
 
 
     def runCopySkin(self, sourceItem, destinationItem, byUVs=False, *args):
@@ -161,7 +161,7 @@ class Skinning(weights.Weights):
         sourceDefList = self.checkExistingDeformerNode(sourceItem)[2]
         if sourceDefList:
             # get correct naming
-            skinClusterName = self.utils.extractSuffix(destinationItem)
+            skinClusterName = self.ar.utils.extractSuffix(destinationItem)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
             # clean-up current destination skinCluster
@@ -318,10 +318,10 @@ class Skinning(weights.Weights):
     def getSkinWeightData(self, itemList, *args):
         """ Return the the skinCluster weights data of the given item list.
         """
-        self.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
         skinWeightsDic = {}
         for item in itemList:
-            self.utils.setProgress('SkinningIO: '+item)
+            self.ar.utils.setProgress('SkinningIO: '+item)
             skinWeightsDic[item] = {}
             # get skinCluster nodes for the given item
             skinClusterInfoList = self.checkExistingDeformerNode(item)
@@ -386,11 +386,11 @@ class Skinning(weights.Weights):
     def importSkinWeightsFromFile(self, itemList, path, filename, verbose=True, *args):
         """ Import the skinCluster weights of the given item in the given path and filename.
         """
-        self.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
         skinWeightDic = self.ar.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
             for item in itemList:
-                self.utils.setProgress("SkinningIO: "+item)
+                self.ar.utils.setProgress("SkinningIO: "+item)
                 if cmds.objExists(item):
                     for skinClusterName in skinWeightDic[item].keys():
                         self.updateOrCreateSkinCluster(item, skinClusterName, skinWeightDic)
@@ -408,7 +408,7 @@ class Skinning(weights.Weights):
                             if "skinRelativeSpaceMode" in skinWeightDic[item][skinClusterName].keys():
                                 cmds.setAttr(skinClusterName+".relativeSpaceMode", skinWeightDic[item][skinClusterName]["skinRelativeSpaceMode"])
         if verbose:
-            self.utils.setProgress(endIt=True)
+            self.ar.utils.setProgress(endIt=True)
 
 
     def ioSkinWeightsByUI(self, export=True, *args):
@@ -433,7 +433,7 @@ class Skinning(weights.Weights):
                         self.ar.pipeliner.saveJsonFile(skinClusterDic, filename)
                     else:
                         self.importSkinWeightsFromFile([item], path[0], self.ioStartName+"_"+self.getIOFileName(item)+".json")
-        self.utils.setProgress(endIt=True)
+        self.ar.utils.setProgress(endIt=True)
 
     
     def getSkinnedJointList(self, skinClusterList=None, *args):

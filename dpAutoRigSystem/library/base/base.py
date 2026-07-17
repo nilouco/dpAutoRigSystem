@@ -1,8 +1,7 @@
 class BaseLibrary(object):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI):
-        """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
+        """ Declare the base variables.
         """
-        # defining variables:
         self.ar = ar
         self.name = CLASS_NAME
         self.title = TITLE

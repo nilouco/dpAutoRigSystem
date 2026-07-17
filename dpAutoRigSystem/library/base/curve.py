@@ -1,20 +1,19 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from . import base
+from importlib import reload
 
 DP_BASECURVE_VERSION = 2.04
 
 
-class BaseCurve(object):
+class BaseCurve(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI):
-        """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
+        """ Initialize the curve module base class.
         """
-        # defining variables:
-        self.ar = ar
-        self.name = CLASS_NAME
-        self.title = TITLE
-        self.description = DESCRIPTION
-        self.wiki = WIKI
+        base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        if self.ar.dev:
+            reload(base)
         self.cvName = None
         self.cvAction = None
         self.cvDegree = None
@@ -25,8 +24,6 @@ class BaseCurve(object):
         self.cvKnotList = None
         self.cvPeriodic = None
         self.suffix = "Ctrl"
-        self.utils = ar.utils
-        self.ctrls = ar.ctrls
     
     
     def getControlUIValues(self, cvName='', *args):
@@ -94,8 +91,8 @@ class BaseCurve(object):
         """
         cvCurve = cmds.curve(name=cvName, point=cvPointList, degree=cvDegree, knot=cvKnot, periodic=cvPeriodic)
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
-        self.ctrls.renameShape([cvCurve])
-        self.ctrls.displayRotateOrderAttr([cvCurve])
+        self.ar.ctrls.renameShape([cvCurve])
+        self.ar.ctrls.displayRotateOrderAttr([cvCurve])
         self.ar.custom_attr.addAttr(0, [cvCurve]) #dpID
         return cvCurve
     
@@ -106,7 +103,7 @@ class BaseCurve(object):
         cmds.makeIdentity(curves[0], translate=True, rotate=True, scale=True, apply=True)
         for item in curves[1:]:
             cmds.makeIdentity(item, translate=True, rotate=True, scale=True, apply=True)
-            self.ctrls.transferShape(True, False, item, [curves[0]])
+            self.ar.ctrls.transferShape(True, False, item, [curves[0]])
         cmds.setAttr(curves[0]+".className", self.name, type="string")
         return curves[0]
 
@@ -147,9 +144,9 @@ class BaseCurve(object):
         else:
             if destinationList:
                 if self.cvAction == 2: #add shape
-                    self.ctrls.transferShape(True, False, self.cvCurve, destinationList, True)
+                    self.ar.ctrls.transferShape(True, False, self.cvCurve, destinationList, True)
                 elif self.cvAction == 3: #replace shapes
-                    self.ctrls.transferShape(True, True, self.cvCurve, destinationList, True)
+                    self.ar.ctrls.transferShape(True, True, self.cvCurve, destinationList, True)
             else:
                 cmds.delete(self.cvCurve)
                 mel.eval("warning \""+self.ar.data.lang['e011_notSelShape']+"\";")
@@ -163,7 +160,7 @@ class BaseCurve(object):
         # getting current selection:
         destinationList = cmds.ls(selection=True, type="transform")
         # check if the given name is good or add a sequencial number on it:
-        self.cvName = self.utils.validateName(cvName, self.suffix)
+        self.cvName = self.ar.utils.validateName(cvName, self.suffix)
         self.cvID = cvID
         self.cvSize = cvSize
         self.cvDegree = cvDegree

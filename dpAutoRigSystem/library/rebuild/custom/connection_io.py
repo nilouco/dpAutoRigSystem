@@ -41,7 +41,7 @@ class ConnectionIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     ctrlList = None
@@ -52,7 +52,7 @@ class ConnectionIO(action.ActionStartClass):
                     if ctrlList:
                         if self.firstMode: #export
                             toExportDataDic = self.getConnectionDataDic(ctrlList)
-                            toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.utils.utilityTypeList))) #utilityNodes without dpID
+                            toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.ar.utils.utilityTypeList))) #utilityNodes without dpID
                             self.exportDicToJsonFile(toExportDataDic)
                         else: #import
                             connectDic = self.importLatestJsonFile(self.getExportedList())
@@ -84,9 +84,9 @@ class ConnectionIO(action.ActionStartClass):
             Returns a dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 attrList = self.ar.data.transform_attrs.copy()
                 userDefList = cmds.listAttr(item, userDefined=True)
@@ -158,12 +158,12 @@ class ConnectionIO(action.ActionStartClass):
         """ Return the connection data from given utility nodes list.
         """
         dic = {}
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
-                    for attrDic, multi in zip([self.utils.typeAttrDic, self.utils.typeOutAttrDic, self.utils.typeMultiAttrDic, self.utils.typeOutMultiAttrDic], [False, False, True, True]):
+                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.ar.utils.validateID(item):
+                    for attrDic, multi in zip([self.ar.utils.typeAttrDic, self.ar.utils.typeOutAttrDic, self.ar.utils.typeMultiAttrDic, self.ar.utils.typeOutMultiAttrDic], [False, False, True, True]):
                         gotDic = self.getAttrConnections(item, attrDic, multi)
                         if gotDic:
                             if not item in dic.keys():
@@ -187,12 +187,12 @@ class ConnectionIO(action.ActionStartClass):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.utils.setProgress(max=len(connectDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(connectDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in connectDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 # check connections
                 for attr in connectDic[item].keys():

@@ -44,7 +44,7 @@ class NonQuadFace(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type="mesh")
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
                 polyObjList, trisObjList, trisList, polyList = [], [], [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
@@ -59,7 +59,7 @@ class NonQuadFace(action.ActionStartClass):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in toCheckList
                         for obj in toCheckList:
-                            self.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 iterPolys = OpenMaya.MItMeshPolygon(shapeNode)
                                 # Iterate through polys on current mesh

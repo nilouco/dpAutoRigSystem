@@ -1,22 +1,20 @@
 # importing libraries:
 from maya import cmds
 from functools import partial
+from . import base
+from importlib import reload
 
 DP_BASELAYOUT_VERSION = 2.09
 
 
-class BaseLayout(object):
+class BaseLayout(base.BaseLibrary):
     def __init__(self, ar, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, WIKI):
-        """ Initialize the layout class.
+        """ Initialize the module layout base class.
         """
-        # defining variables:
-        self.ar = ar
-        self.name = CLASS_NAME
-        self.title = TITLE
-        self.description = DESCRIPTION
-        self.wiki = WIKI
+        base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        if self.ar.dev:
+            reload(base)
         self.userGuideName = userGuideName
-        self.utils = ar.utils
     
     
     def basicModuleLayout(self, *args):
@@ -447,7 +445,7 @@ class BaseLayout(object):
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            mirroredGuideFather = self.utils.mirroredGuideFather(self.guide_base)
+            mirroredGuideFather = self.ar.utils.mirroredGuideFather(self.guide_base)
             if mirroredGuideFather:
                 cmds.setAttr(self.guide_base+".mirrorEnable", 0)
                 # get initial values from father guide base:
@@ -502,7 +500,7 @@ class BaseLayout(object):
             stopMirrorOperation = self.check_father_mirror()
             if not stopMirrorOperation:
                 # loading Maya matrix node (for mirror porpuses)
-                loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
                     cmds.setAttr(self.guide_base+".mirrorAxis", self.mirrorAxis, type='string')
@@ -567,7 +565,7 @@ class BaseLayout(object):
         if cmds.objExists(self.previewMirrorGrpName):
             cmds.delete(self.previewMirrorGrpName)
         # get children, verifying if there are children guides:
-        guideChildrenList = self.utils.getGuideChildrenList(self.guide_base)
+        guideChildrenList = self.ar.utils.getGuideChildrenList(self.guide_base)
         self.mirrorAxis = cmds.getAttr(self.guide_base+".mirrorAxis")
         if self.mirrorAxis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
@@ -622,7 +620,7 @@ class BaseLayout(object):
                                     # rebuild the shape as a nurbsSphere:
                                     if cmds.objectType(dupRenamed) == 'transform':
                                         # make this previewMirrorGuide as not skinable from dpAR_UI:
-                                        self.utils.addCustomAttr([dupRenamed], self.ar.skin.ignoreSkinningAttr)
+                                        self.ar.utils.addCustomAttr([dupRenamed], self.ar.skin.ignoreSkinningAttr)
                                         childrenShapeList = cmds.listRelatives(dupRenamed, shapes=True, children=True)
                                         if childrenShapeList:
                                             cmds.delete(childrenShapeList)
@@ -646,7 +644,7 @@ class BaseLayout(object):
                 self.previewMirrorGuide = cmds.rename(duplicated, self.guide_base.replace(":", "_")+'_Mirror')
                 cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
                 cmds.delete(cmds.listRelatives(self.previewMirrorGuide, shapes=True, type="nurbsCurve"))
-                self.utils.unlockAttr([self.previewMirrorGuide])
+                self.ar.utils.unlockAttr([self.previewMirrorGuide])
                 
                 # clean up old module attributes in order to avoid numbering issue:
                 if cmds.objExists(self.previewMirrorGuide+".customName"):

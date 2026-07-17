@@ -46,19 +46,19 @@ class ParentedGeometry(action.ActionStartClass):
                 meshParentList = self.getMeshTransformList(toCheckList)
                 if meshParentList:
                     meshParentList = self.reorderList(meshParentList)
-                    self.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
                     # avoid reporting the same item multiple times
                     for mesh in meshParentList:
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         # check if exists to avoid missing nodes
                         if cmds.objExists(mesh):
                             allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
                             # get all descendents and check if it's different than its parent
-                            childrenList = self.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
+                            childrenList = self.ar.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
                             if childrenList:
                                 for item in childrenList:
-                                    if not self.utils.getShortName(item, False) in self.checkedObjList:
-                                        self.checkedObjList.append(self.utils.getShortName(item, False)) # get only the last part of the path
+                                    if not self.ar.utils.getShortName(item, False) in self.checkedObjList:
+                                        self.checkedObjList.append(self.ar.utils.getShortName(item, False)) # get only the last part of the path
                                         self.foundIssueList.append(True)
                                     if self.firstMode:
                                         self.resultOkList.append(False)

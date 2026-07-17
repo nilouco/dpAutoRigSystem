@@ -44,7 +44,7 @@ class DuplicatedName(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(dag=True, long=True)
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # Dictionary {shortName: [Full paths]}
                 names = defaultdict(list)
                 for obj in toCheckList:
@@ -54,7 +54,7 @@ class DuplicatedName(action.ActionStartClass):
                 duplicates = {k:v for k,v in names.items() if len(v) > 1}
                 if duplicates:
                     for name, paths in duplicates.items():
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         # found issue here
                         self.checkedObjList.append(name)
                         self.foundIssueList.append(True)

@@ -43,9 +43,9 @@ class BrokenNet(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type='network')
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"): #correctionManater
                         if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):

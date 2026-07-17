@@ -13,12 +13,8 @@ DP_FKLINE_VERSION = 2.08
 
 
 class FkLine(standard.BaseStandard, layout.BaseLayout):
-    def __init__(self,  *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        standard.BaseStandard.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.currentNJoints = 1
     
     
@@ -105,7 +101,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                 self.cvEndJoint = self.guideName+"_JointEnd"
                 self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
                 # re-parent the children guides:
-                childrenGuideBellowList = self.utils.getGuideChildrenList(self.cvJointLoc)
+                childrenGuideBellowList = self.ar.utils.getGuideChildrenList(self.cvJointLoc)
                 if childrenGuideBellowList:
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvJointLoc)
@@ -140,7 +136,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
         """
         if cmds.objExists(guideBase):
             childrenList = cmds.listRelatives(guideBase, allDescendents=True, type="transform")
-            upVectorObject = self.utils.createLocatorInItemPosition(self.radiusGuide)  # using locator to avoid cycle error
+            upVectorObject = self.ar.utils.createLocatorInItemPosition(self.radiusGuide)  # using locator to avoid cycle error
             jointLocList = []
             for child in childrenList:
                 # Check if the child is a joint locator, with nJoint attribute
@@ -178,7 +174,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                 # If the backGuide is the guideBase, align the jointLoc1 to the guideBase
                 if backGuide == guideBase:
                     nJoint2 = cmds.listRelatives(jointLoc, children=True, type="transform")[0]
-                    posTempLoc = self.utils.createLocatorInItemPosition(nJoint2)
+                    posTempLoc = self.ar.utils.createLocatorInItemPosition(nJoint2)
                     # Aim guideBase and jointLoc to nJoint2
                     self.aimFunction(nJoint2, guideBase, upVectorObject)
                     # Parenting nJoint to world and reset jointLoc position
@@ -241,13 +237,13 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.ar.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
                     self.jntCtrl = self.ar.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.guideName+"_JointLoc"+str(n+1), parentTag=self.getParentToTag(self.fkCtrlList))
                     self.fkCtrlList.append(self.jntCtrl)
                     # zeroOut controls:
-                    self.zeroOutCtrlGrp = self.utils.zeroOut([self.jntCtrl])[0]
+                    self.zeroOutCtrlGrp = self.ar.utils.zeroOut([self.jntCtrl])[0]
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.guide, self.zeroOutCtrlGrp, maintainOffset=False))
@@ -263,12 +259,12 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                     cmds.setAttr(self.jntCtrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(self.jntCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
-                        self.utils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
+                        self.ar.utils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
                         self.ctrlZeroGrp = self.zeroOutCtrlGrp
                     elif n == self.nJoints-1:
-                        self.utils.originedFrom(objName=self.jntCtrl, attrString=self.guide+";"+self.cvEndJoint)
+                        self.ar.utils.originedFrom(objName=self.jntCtrl, attrString=self.guide+";"+self.cvEndJoint)
                     else:
-                        self.utils.originedFrom(objName=self.jntCtrl, attrString=self.guide)
+                        self.ar.utils.originedFrom(objName=self.jntCtrl, attrString=self.guide)
                     # grouping:
                     if n > 0:
                         # parent joints as a simple chain (line)
@@ -283,14 +279,14 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                     # add articulationJoint:
                     if n > 0:
                         if self.addArticJoint:
-                            artJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.utils.setJointLabel(artJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            artJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            self.ar.utils.setJointLabel(artJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     # end chain:
                     if n == self.nJoints-1:
                         # create end joint:
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                        self.utils.addJointEndAttr([self.endJoint])
+                        self.ar.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # work with main fk controllers
                 if cmds.getAttr(self.base+".mainControls"):

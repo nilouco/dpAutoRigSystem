@@ -45,7 +45,7 @@ class AttributeIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     itemList = None
@@ -89,7 +89,7 @@ class AttributeIO(action.ActionStartClass):
         """
         dic = {}
         itemList = objList.copy()
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for node in objList:
             meshList = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
             if meshList:
@@ -98,7 +98,7 @@ class AttributeIO(action.ActionStartClass):
         itemList = list(set(itemList))
         itemList.sort()
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             attrList = cmds.listAttr(item, userDefined=True)
             if attrList:
                 dic[item] = {"attributes" : {},
@@ -130,12 +130,12 @@ class AttributeIO(action.ActionStartClass):
         """ Import attributes from exported dictionary.
             Add missing attributes and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in attrDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")

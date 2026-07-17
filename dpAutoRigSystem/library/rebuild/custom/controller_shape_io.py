@@ -41,7 +41,7 @@ class ControllerShapeIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     ctrlList = None
@@ -50,11 +50,11 @@ class ControllerShapeIO(action.ActionStartClass):
                     else:
                         ctrlList = self.ar.ctrls.getControlList()
                     if ctrlList:
-                        self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
                         if self.firstMode: #export
                             try:
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".ma"
+                                self.ar.pipeliner.makeDirIfNotExists(self.ioPath)
+                                ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.ar.pipeliner.pipeData['currentFileName']+".ma"
                                 self.ar.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
                                 self.wellDoneIO(ctrlFileName)
                             except Exception as e:

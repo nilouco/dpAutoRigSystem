@@ -41,7 +41,7 @@ class ParentingIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
@@ -51,7 +51,7 @@ class ParentingIO(action.ActionStartClass):
                         else:
                             transformList = cmds.ls(selection=False, long=True, type="transform")
                         if transformList:
-                            self.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
+                            self.ar.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
                             # define data to export
                             parentDic = self.getParentingDataDic(transformList)
                             parentDic.update(self.getBrokenIDDataDic())
@@ -92,7 +92,7 @@ class ParentingIO(action.ActionStartClass):
         """
         if not transformList:
             transformList = cmds.ls(selection=False, long=True, type="transform")
-        filteredList = self.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filteredList = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filteredList = self.reorderList(filteredList)
         return {"Parent" : filteredList}
 
@@ -112,10 +112,10 @@ class ParentingIO(action.ActionStartClass):
             Return True if there are broken nodes.
         """
         if "BrokenID" in parentDic.keys():
-            self.utils.setProgress(max=len(parentDic["BrokenID"]), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(parentDic["BrokenID"]), addOne=False, addNumber=False)
             for nodeType in parentDic["BrokenID"].keys():
                 if nodeType == "transform":
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     for item in parentDic["BrokenID"][nodeType].keys():
                         if not cmds.objExists(item):
                             if not self.checkIsFromModeling(parentDic, nodeType, item):
@@ -131,7 +131,7 @@ class ParentingIO(action.ActionStartClass):
         """ Import parenting data and put the nodes as the correct hierarchy if needed.
         """
         if not self.getParentingDataDic()["Parent"] == parentDic["Parent"]:
-            self.utils.setProgress(max=len(parentDic["Parent"]), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(parentDic["Parent"]), addOne=False, addNumber=False)
             # define lists to check result
             wellImportedList = []
             parentIssueList = []
@@ -139,7 +139,7 @@ class ParentingIO(action.ActionStartClass):
             modelChangedList = []
             # check parenting shaders
             for item in parentDic["Parent"]:
-                self.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 if not cmds.objExists(item):
                     parentIssueList.append(item)
                     shortItem = item[item.rfind("|")+1:]

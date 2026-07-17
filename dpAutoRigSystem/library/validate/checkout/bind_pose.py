@@ -44,10 +44,10 @@ class BindPose(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type="dagPose") #bindPose nodes
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # conditional to check here
                 if len(toCheckList) > 1:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     self.checkedObjList.append(", ".join(toCheckList))
                     self.foundIssueList.append(True)
                     if self.firstMode:

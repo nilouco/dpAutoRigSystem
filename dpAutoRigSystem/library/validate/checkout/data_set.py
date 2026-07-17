@@ -41,16 +41,16 @@ class DataSet(action.ActionStartClass):
             if objList:
                 dataGrp = objList[0]
             else:
-                dataGrp = self.utils.getNodeByMessage("dataGrp")
+                dataGrp = self.ar.utils.getNodeByMessage("dataGrp")
                 if not dataGrp:
                     if cmds.objExists("Data_Grp"):
                         dataGrp = "Data_Grp"
             if dataGrp:
                 toCheckList = cmds.listRelatives(dataGrp, children=True, allDescendents=True)
                 if toCheckList:
-                    self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                     for item in toCheckList:
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         plugList = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
                         if plugList:
                             for plug in plugList:

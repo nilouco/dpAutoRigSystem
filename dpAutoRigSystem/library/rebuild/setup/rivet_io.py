@@ -47,7 +47,7 @@ class RivetIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
@@ -55,7 +55,7 @@ class RivetIO(action.ActionStartClass):
                         if objList:
                             netList = objList
                         else:
-                            netList = self.utils.getNetworkNodeByAttr("dpRivetNet")
+                            netList = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
                         if netList:
                             self.exportDicToJsonFile(self.getRivetDataDic(netList))
                         else:
@@ -90,11 +90,11 @@ class RivetIO(action.ActionStartClass):
             Returns the dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
         i = 0
         for n, net in enumerate(netList):
             if self.ar.data.verbose:
-                self.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # mount a dic
             if cmds.objExists(net+".rivetData"):
                 data = json.loads(cmds.getAttr(net+".rivetData"))
@@ -114,11 +114,11 @@ class RivetIO(action.ActionStartClass):
         """ Import rivet data creating new instances with exported attribute values.
         """
         wellImported = True
-        self.utils.setProgress(max=len(rivetDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(rivetDic.keys()), addOne=False, addNumber=False)
         for net in rivetDic.keys():
             try:
                 netDic = rivetDic[net]
-                self.utils.setProgress(self.ar.data.lang[self.title]+': '+netDic['geoToAttach'])
+                self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+netDic['geoToAttach'])
                 old_ui_state = self.ar.data.ui_state
                 self.ar.data.ui_state = False
                 # recreate rivet:

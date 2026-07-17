@@ -47,9 +47,9 @@ class Outliner(action.ActionStartClass):
             if not objList:
                 objList = cmds.ls(selection=False, type="transform")
             if objList:
-                self.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
                 for item in hiddenList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if item in objList:
                         self.checkedObjList.append(item)
                         if cmds.objExists(item):

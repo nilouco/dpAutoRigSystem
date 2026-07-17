@@ -43,9 +43,9 @@ class TweakNode(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type='tweak') #tweakNodes
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # check for edited control shape
                     if not self.checkEditedControlPoints(item):
                         self.checkedObjList.append(item)

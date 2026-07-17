@@ -41,7 +41,7 @@ class InputOrderIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
@@ -81,9 +81,9 @@ class InputOrderIO(action.ActionStartClass):
         """ Return the deformer order data dictionary to export.
         """
         orderDic = {}
-        self.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
         for item in deformedList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             orderDic[item] = self.ar.skin.getOrderList(item)
         return orderDic
     
@@ -91,11 +91,11 @@ class InputOrderIO(action.ActionStartClass):
     def importInputOrder(self, orderDic, *args):
         """ Import the input order data from given dictionary.
         """
-        self.utils.setProgress(max=len(orderDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(orderDic.keys()), addOne=False, addNumber=False)
         wellImported = True
         toImportList, notFoundMeshList, = [], []
         for item in orderDic.keys():
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 toImportList.append(item)
             else:

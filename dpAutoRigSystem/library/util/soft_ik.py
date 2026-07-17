@@ -35,7 +35,6 @@ class SoftIkClass(object):
     def __init__(self, ar, *args):
         # defining variables:
         self.ar = ar
-        self.ctrls = ar.ctrls
 
 
     def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, axis="Z", *args):
@@ -117,7 +116,7 @@ class SoftIkClass(object):
         cmds.connectAttr(worldRef+".scaleX", softIkRigScaleMD+".input2X", force=True)
         cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
 
-        self.ctrls.setLockHide([ctrlName], ["softDistance"])
+        self.ar.ctrls.setLockHide([ctrlName], ["softDistance"])
 
         # if stretch exists, we need to do this...
         if stretch:

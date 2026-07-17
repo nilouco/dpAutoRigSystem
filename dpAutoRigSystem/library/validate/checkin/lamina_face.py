@@ -45,7 +45,7 @@ class LaminaFace(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type="mesh")
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
                 laminaObjList, laminaFaceList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
@@ -60,7 +60,7 @@ class LaminaFace(action.ActionStartClass):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in toCheckList
                         for obj in toCheckList:
-                            self.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 # get faces
                                 faceIter   = OpenMaya.MItMeshPolygon(shapeNode)

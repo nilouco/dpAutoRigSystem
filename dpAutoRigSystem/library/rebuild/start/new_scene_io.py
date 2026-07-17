@@ -45,14 +45,14 @@ class NewSceneIO(action.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
+        if self.ar.pipeliner.checkAssetContext():
             if self.firstMode: #export
                 self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import
                 try:
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
-                    self.wellDoneIO(self.pipeliner.pipeData["assetName"])
+                    self.wellDoneIO(self.ar.pipeliner.pipeData["assetName"])
                 except Exception as e:
                     self.notWorkedWellIO(str(e))
         else:

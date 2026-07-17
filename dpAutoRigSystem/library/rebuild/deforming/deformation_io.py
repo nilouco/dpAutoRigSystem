@@ -47,7 +47,7 @@ class DeformationIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
@@ -98,12 +98,12 @@ class DeformationIO(action.ActionStartClass):
     def getDeformerDataDic(self, inputDeformerList, *args):
         """ Return the deformer data dictionary to export.
         """
-        self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
         # Declaring the data dictionary to export it
         deformerDic = {}
         # run for all deformer types to get info
         for deformerType in self.defWeights.typeAttrDic.keys():
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             deformerList = cmds.ls(selection=False, type=deformerType)
             if deformerList:
                 for deformerNode in deformerList:
@@ -185,7 +185,7 @@ class DeformationIO(action.ActionStartClass):
                     if wrapBaseShape:
                         cmds.connectAttr(wrapBaseShape+".worldMesh[0]", newDefNode+".basePoints[0]", force=True)
                         cmds.delete(newWrapBaseNode)
-                    supportGrp = self.utils.getNodeByMessage("supportGrp")
+                    supportGrp = self.ar.utils.getNodeByMessage("supportGrp")
                     if supportGrp:
                         parentNodeList = []
                         if wrapBaseShape:
@@ -265,9 +265,9 @@ class DeformationIO(action.ActionStartClass):
                 else:
                     notFoundMeshList.append(deformerNode)
         if toImportList:
-            self.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
             for deformerNode in toImportList:
-                self.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 try:
                     wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
                 except Exception as e:

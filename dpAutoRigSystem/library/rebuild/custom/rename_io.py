@@ -41,7 +41,7 @@ class RenameIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     itemList = None
@@ -82,9 +82,9 @@ class RenameIO(action.ActionStartClass):
             Returns the dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 dic[item] = cmds.getAttr(item+"."+self.dpID)
         return dic
@@ -94,16 +94,16 @@ class RenameIO(action.ActionStartClass):
         """ Import data from exported dictionary.
             Check if nodes exist in the scene, otherwise try to find in the dpID if it was probably renamed.
         """
-        self.utils.setProgress(max=len(nodeIDDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(nodeIDDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         notFoundNodesList = []
         maybeList = []
         for item in nodeIDDic.keys():
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # check item
             if not cmds.objExists(item):
-                oldIDList = self.utils.getDecomposedIDList(nodeIDDic[item])
+                oldIDList = self.ar.utils.getDecomposedIDList(nodeIDDic[item])
                 if oldIDList:
                     if cmds.objExists(oldIDList[1]):
                         cmds.rename(oldIDList[1], item)

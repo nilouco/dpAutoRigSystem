@@ -77,10 +77,10 @@ class RemapvalueToSetrange(action.ActionStartClass):
                     remapValueToChangeList.append(item)
                 # conditional to check here
                 if remapValueToChangeList:
-                    self.utils.setProgress(max=len(remapValueToChangeList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(remapValueToChangeList), addOne=False, addNumber=False)
                     wellDone = True
                     for remapValueNode in remapValueToChangeList:
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         self.foundIssueList.append(True)
                         if self.firstMode:
                             self.checkedObjList.append(remapValueNode)

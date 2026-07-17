@@ -42,13 +42,13 @@ class Wip(action.ActionStartClass):
             if objList:
                 wipGrp = objList
             else:
-                wipGrp = self.utils.getNodeByMessage("wipGrp")
+                wipGrp = self.ar.utils.getNodeByMessage("wipGrp")
                 if not wipGrp:
                     if cmds.objExists("WIP_Grp"):
                         wipGrp = "WIP_Grp"
             if wipGrp:
-                self.utils.setProgress(max=len(wipGrp), addOne=False, addNumber=False)
-                self.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.setProgress(max=len(wipGrp), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 self.checkedObjList.append(wipGrp)
                 wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
                 if wipChildrenList:

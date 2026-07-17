@@ -43,9 +43,9 @@ class UnusedSkin(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type="skinCluster")
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional 1 to check here if there's an influenced node, otherwise delete the unused skinCluster
                     meshList = cmds.skinCluster(item, query=True, geometry=True)
                     if meshList:

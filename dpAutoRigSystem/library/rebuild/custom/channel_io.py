@@ -41,7 +41,7 @@ class ChannelIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     itemList = None
@@ -82,9 +82,9 @@ class ChannelIO(action.ActionStartClass):
             Returns the dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
         for item in itemList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 dic[item] = {}
                 for attr in self.ar.data.transform_attrs:
@@ -100,12 +100,12 @@ class ChannelIO(action.ActionStartClass):
         """ Import tranform attributes states from exported dictionary.
             Just set them as locked, hidden, non keyable or not.
         """
-        self.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in attrDic.keys():
             notFoundNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")

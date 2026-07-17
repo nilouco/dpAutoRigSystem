@@ -16,14 +16,13 @@ DP_SOFTHARDEDGES_VERSION = 1.00
 
 class ConvertNormals(object):
     def __init__(self, ar):
-        self.utils = ar.utils
         self.version = DP_SOFTHARDEDGES_VERSION
 
 
     def getHardEdges(self, item):
         """ Return a list of hard edges if exists.
         """
-        m_path = self.utils.getMDagPathbyName(item)
+        m_path = self.ar.utils.getMDagPathbyName(item)
         m_hardEdges = []
         m_itEdgeIt = OpenMaya.MItMeshEdge(m_path) 
         self.m_fnMesh = OpenMaya.MFnMesh(m_path)
@@ -43,7 +42,7 @@ class ConvertNormals(object):
     def setSoftHard(self, item):
         """ It checks the edge state (soft/hard) and set it after unlock normals.
         """
-        m_path = self.utils.getMDagPathbyName(item)
+        m_path = self.ar.utils.getMDagPathbyName(item)
         m_hardEdges = self.getHardEdges(item)
         # select and set Hard Edges 
         m_aMember = ''

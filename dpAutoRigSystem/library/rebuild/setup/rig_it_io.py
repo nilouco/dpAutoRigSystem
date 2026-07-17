@@ -41,7 +41,7 @@ class RigItIO(action.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.pipeliner.checkAssetContext():
+        if self.ar.pipeliner.checkAssetContext():
             if self.firstMode: #export
                 self.wellDoneIO(self.ar.data.lang['v007_allOk'])
             else: #import

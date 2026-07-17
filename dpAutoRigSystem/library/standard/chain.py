@@ -16,13 +16,8 @@ DP_CHAIN_VERSION = 2.09
 
 
 class Chain(standard.BaseStandard, layout.BaseLayout):
-    def __init__(self,  *args, **kwargs):
-        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        standard.BaseStandard.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(standard)
             reload(layout)
@@ -125,7 +120,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     self.cvEndJoint = self.guideName+"_JointEnd"
                     self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
                     # re-parent the children guides:
-                    childrenGuideBellowList = self.utils.getGuideChildrenList(self.cvJointLoc)
+                    childrenGuideBellowList = self.ar.utils.getGuideChildrenList(self.cvJointLoc)
                     if childrenGuideBellowList:
                         for childGuide in childrenGuideBellowList:
                             cmds.parent(childGuide, self.cvJointLoc)
@@ -236,18 +231,18 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
         dynJntList = self.clearRenameJointChain(dynJntList, "_Fk", "_Dyn")
         dynJntList.insert(0, firstDynJnt)
         self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
-        self.utils.addJointEndAttr([self.skinJointList[-1]])
+        self.ar.utils.addJointEndAttr([self.skinJointList[-1]])
         cmds.rename(self.skinJointList[-1], dynName+"_IkFk_"+self.ar.data.joint_end_attr)
-        self.utils.removeUserDefinedAttr(self.skinJointList[:-1])
+        self.ar.utils.removeUserDefinedAttr(self.skinJointList[:-1])
         newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
         cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
         newSkinJntList = [dynName+"_00_Jnt"]
         newSkinJntList.extend(sorted(cmds.listRelatives(dynName+"_00_Jnt", children=True, allDescendents=True)))
-        self.utils.clearJointLabel(self.skinJointList)
+        self.ar.utils.clearJointLabel(self.skinJointList)
         cmds.setAttr(self.skinJointList[0]+".visibility", 0)
         
         # setup new blend joints
-        self.utils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef, False)
+        self.ar.utils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef, False)
         dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
         self.to_ids.append(dynStretchBC)
         cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
@@ -285,7 +280,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
             if cmds.objExists("hairSystem1OutputCurves"):
                 cmds.rename("hairSystem1OutputCurves", "dpHairSystemOutputCurves")
             # parent nodes
-            fxGrp = self.utils.getNodeByMessage("fxGrp")
+            fxGrp = self.ar.utils.getNodeByMessage("fxGrp")
             if fxGrp:
                 cmds.parent("dpNucleus", "dpHairSystem", "dpHairSystemOutputCurves", fxGrp)
                 self.ar.ctrls.colorShape([fxGrp], [0.9, 0.6, 1], outliner=True)
@@ -312,7 +307,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
             self.addDynamic = self.getModuleAttr("dynamic")
             # run for all sides
             for s, side in enumerate(self.sideList):
-                attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
+                attrNameLower = self.ar.utils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
@@ -333,7 +328,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                         newJoint = cmds.joint(name=side+self.userGuideName+"_%02d"%n+suffix)
                         self.wipList.append(newJoint)
                     jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSuffixList[t], radius=0.5)
-                    self.utils.addJointEndAttr([jEndJnt])
+                    self.ar.utils.addJointEndAttr([jEndJnt])
                     self.wipList.append(jEndJnt)
                     self.chainDic[suffix] = self.wipList
                 # getting jointLists:
@@ -348,7 +343,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
                         cmds.addAttr(skinJoint, longName='dpAR_joint', attributeType='float', keyable=False)
-                        self.utils.setJointLabel(skinJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%o)
+                        self.ar.utils.setJointLabel(skinJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%o)
 
                 self.fkCtrlList, self.fkZeroGrpList, self.origFromList = [], [], []
                 for n in range(0, self.nJoints):
@@ -363,7 +358,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     cmds.delete(cmds.parentConstraint(self.guide, self.fkJointList[n], maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.guide, self.fkCtrl, maintainOffset=False))
                     # zeroOut controls:
-                    self.zeroOutCtrlGrp = self.utils.zeroOut([self.fkCtrl])[0]
+                    self.zeroOutCtrlGrp = self.ar.utils.zeroOut([self.fkCtrl])[0]
                     self.fkZeroGrpList.append(self.zeroOutCtrlGrp)
                     # hide visibility attribute:
                     cmds.setAttr(self.fkCtrl+'.visibility', keyable=False)
@@ -372,11 +367,11 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     origGrp = cmds.group(empty=True, name=side+self.userGuideName+"_%02d_OrigFrom_Grp"%n)
                     self.origFromList.append(origGrp)
                     if n == 0:
-                        self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.cvEndJoint+";"+self.radiusGuide)
+                        self.ar.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.cvEndJoint+";"+self.radiusGuide)
                     elif n == (self.nJoints-1):
-                        self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.base)
+                        self.ar.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.base)
                     else:
-                        self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_"))
+                        self.ar.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_"))
                     self.to_ids.extend(cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC"))
                     
                     if n > 0:
@@ -395,7 +390,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     if s == 1:
                         if self.getModuleAttr("flip"):
                             cmds.setAttr(self.toParentExtremCtrl+".translateZ", -self.ctrlRadius)
-                    self.utils.zeroOut([self.toParentExtremCtrl])
+                    self.ar.utils.zeroOut([self.toParentExtremCtrl])
                     self.ar.ctrls.setLockHide([self.toParentExtremCtrl], ['v'])
 
                 # invert scale for right side before:
@@ -442,7 +437,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                 self.worldRefShapeList.append(self.worldRefShape)
 
                 # create constraint in order to blend ikFk:
-                self.utils.createJointBlend(self.ikJointList, self.fkJointList, self.skinJointList, "Fk_ikFkBlend", attrNameLower, self.worldRef)
+                self.ar.utils.createJointBlend(self.ikJointList, self.fkJointList, self.skinJointList, "Fk_ikFkBlend", attrNameLower, self.worldRef)
 
                 # ik spline:
                 self.ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
@@ -463,7 +458,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                 cmds.xform(self.ikClusterList[-1], worldSpace=True, rotatePivot=endIkJointPos)
                 # ik cluster group:
                 self.ikClusterGrp = cmds.group(self.ikClusterList, name=side+self.userGuideName+"_Ik_Cluster_Grp")
-                optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+                optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
                 if optionCtrl:
                     for axis in ['X', 'Y', 'Z']:
                         cmds.connectAttr(optionCtrl+".rigScaleOutput", self.ikClusterGrp+".scale"+axis)
@@ -475,7 +470,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     if c == 0: #first
                         self.ikCtrlMain = self.ar.ctrls.cvControl("id_086_ChainIkMain", ctrlName=side+self.userGuideName+"_Ik_Main_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_Base")
                         cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
-                        ikCtrlMainZero = self.utils.zeroOut([self.ikCtrlMain])[0]
+                        ikCtrlMainZero = self.ar.utils.zeroOut([self.ikCtrlMain])[0]
                         cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
                         
                         # orienting controls
@@ -490,8 +485,8 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                         self.fixMirrorFlipping(ikCtrlMainZero, s, -1)
 
                         # loading Maya matrix node
-                        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                        loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+                        loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                         if loadedQuatNode and loadedMatrixPlugin:
                             # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
                             ikMainLoc = cmds.spaceLocator(name=side+self.userGuideName+"_Ik_Main_Loc")[0]
@@ -502,7 +497,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                             cmds.delete(cmds.parentConstraint(self.ikCtrlMain, ikMainLocGrp, maintainOffset=False, skipTranslate=("x", "y", "z")))
                             self.ar.ctrls.setLockHide([ikMainLocGrp], ['rx', 'ry', 'rz'], l=True, k=True)
                             cmds.parentConstraint(self.ikCtrlMain, ikMainLoc, maintainOffset=False, skipTranslate=("x", "y", "z"), name=ikMainLoc+"_PaC")
-                            mainTwistMatrixMD = self.utils.twistBoneMatrix(ikMainLocGrp, ikMainLoc, "ikCtrlMain_TwistMatrix")
+                            mainTwistMatrixMD = self.ar.utils.twistBoneMatrix(ikMainLocGrp, ikMainLoc, "ikCtrlMain_TwistMatrix")
                             cmds.setAttr(mainTwistMatrixMD+".input1Z", 1)
                             if s == 1:
                                 cmds.setAttr(mainTwistMatrixMD+".input1Z", -1)
@@ -512,7 +507,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     ikCtrl = self.ar.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc"+str(c), parentTag=self.getParentToTag(self.ikCtrlList, self.ikCtrlMain))
                     self.ikCtrlList.append(ikCtrl)
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
-                    ikCtrlZero = self.utils.zeroOut([ikCtrl])[0]
+                    ikCtrlZero = self.ar.utils.zeroOut([ikCtrl])[0]
                     self.ikCtrlZeroList.append(ikCtrlZero)
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
                     cmds.rotate(0, 0, 0, ikCtrlZero)
@@ -526,7 +521,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                         self.ikCtrlLast = self.ar.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.ar.data.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointEnd", parentTag=self.ikCtrlList[-1])
                         self.ar.ctrls.colorShape([self.ikCtrlLast], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
-                        ikCtrlLastZero = self.utils.zeroOut([self.ikCtrlLast])[0]
+                        ikCtrlLastZero = self.ar.utils.zeroOut([self.ikCtrlLast])[0]
                         cmds.parent(ikCtrlLastZero, self.ikCtrlMain)
                         self.ar.ctrls.setLockHide([self.ikCtrlLast], ["v"])
                         cmds.orientConstraint(self.ikCtrlLast, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
@@ -551,7 +546,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                         self.ikCtrlFirst = self.ar.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.ar.data.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_Base", parentTag=self.ikCtrlMain)
                         self.ar.ctrls.colorShape([self.ikCtrlFirst], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlFirst, maintainOffset=False))
-                        ikCtrlFirstZero = self.utils.zeroOut([self.ikCtrlFirst])[0]
+                        ikCtrlFirstZero = self.ar.utils.zeroOut([self.ikCtrlFirst])[0]
                         cmds.parent(ikCtrlFirstZero, self.ikCtrlMain)
                         self.ar.ctrls.setLockHide([self.ikCtrlFirst], ["v"])
                         cmds.connectAttr(self.ikCtrlFirst+".scaleX", self.ikJointList[0]+".scaleX", force=True)
@@ -695,8 +690,8 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                     cmds.xform(self.toCtrlHookGrp, pivots=cmds.xform(self.ikCtrlMain, worldSpace=True, rotatePivot=True, query=True))
                 # delete duplicated group for side (mirror):
                 cmds.delete(self.base, side+self.userGuideName+'_'+self.mirrorGrp)
-                self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
-                self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
+                self.ar.utils.addCustomAttr(self.origFromList, self.ar.utils.ignoreTransformIOAttr)
+                self.ar.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.ar.utils.ignoreTransformIOAttr)
                 self.to_ids.extend([curveInfoNode, ikNormalizeMD, globalStretchBC, stretchableBC, stretchBC, ikStretchRevNode, vvBC, vvCond, vvMD, vvScaleCompensateMD, vvClp, fkLastScaleCompensateMD, ikLastScaleCompensateMD, lastScaleBC])
                 self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:

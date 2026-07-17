@@ -151,7 +151,7 @@ class DisplayLayers(action.ActionStartClass):
         """
         existsGrpList, allShapesList = [], []
         meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
+        renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
         if renderGrp:
             existsGrpList.append(renderGrp)
         for grp in meshGrpList:
@@ -178,9 +178,9 @@ class DisplayLayers(action.ActionStartClass):
             If it's not a list it will append the obj and run the main function.
         """
         if itemList:
-            self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
             for i, item in enumerate(itemList):
-                self.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 if self.firstMode:
                     self.resultOkList.append(False)
                     self.checkedObjList.append(item)

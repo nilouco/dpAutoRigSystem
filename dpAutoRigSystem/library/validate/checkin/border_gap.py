@@ -47,7 +47,7 @@ class BorderGap(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type="mesh")
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # declare resulted lists
                 gapList, gapObjList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
@@ -62,7 +62,7 @@ class BorderGap(action.ActionStartClass):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in toCheckList
                         for obj in toCheckList:
-                            self.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 iterPolys = OpenMaya.MItMeshEdge(shapeNode)
                                 # Iterate through polys on current mesh

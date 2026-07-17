@@ -41,7 +41,7 @@ class CalibrationIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     ctrlList = None
@@ -82,9 +82,9 @@ class CalibrationIO(action.ActionStartClass):
             Returns the dictionary to export.
         """
         dic = {}
-        self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
         for ctrl in ctrlList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             calibrationList = self.ar.ctrls.getListFromStringAttr(ctrl)
             if calibrationList:
                 dic[ctrl] = {}
@@ -96,11 +96,11 @@ class CalibrationIO(action.ActionStartClass):
     def importCalibrationData(self, calibrationDic, *args):
         """ Import the calibration setup from the given calibration data dictionary.
         """
-        self.utils.setProgress(max=len(calibrationDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(calibrationDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in calibrationDic.keys():
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             notFoundNodesList = []
             # check transformations
             if not cmds.objExists(item):

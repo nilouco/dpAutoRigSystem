@@ -50,10 +50,10 @@ class UnusedDeformer(action.ActionStartClass):
                 toCheckList = deformerList.copy()
                 toCheckList.extend(intermedList.copy())
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 if deformerList:
                     for defNode in deformerList:
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         hasTags = False
                         indicesList = cmds.getAttr(defNode+".input", multiIndices=True)
                         if indicesList:
@@ -72,7 +72,7 @@ class UnusedDeformer(action.ActionStartClass):
                                     unusedList.append(defNode)
                 if intermedList:
                     for intermedObj in intermedList:
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         outputList = cmds.listConnections(intermedObj, source=False, destination=True, plugs=True)
                         if not outputList:
                             unusedList.append(intermedObj)

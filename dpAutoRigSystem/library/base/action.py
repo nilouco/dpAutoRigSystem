@@ -1,10 +1,12 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from . import base
 from functools import partial
 import os
 import getpass
 import shutil
+from importlib import reload
 
 # global variables to this module:
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
@@ -16,18 +18,14 @@ RUNNING_COLOR = (1.0, 1.0, 1.0)
 DP_ACTIONSTARTCLASS_VERSION = 2.09
 
 
-class ActionStartClass(object):
+class ActionStartClass(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, verbose=True):
-        """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
+        """ Initialize the module class for validating and rebuilding.
         """
         # defining variables:
-        self.ar = ar
-        self.utils = ar.utils
-        self.pipeliner = ar.pipeliner
-        self.name = CLASS_NAME
-        self.title = TITLE
-        self.description = DESCRIPTION
-        self.wiki = WIKI
+        base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        if self.ar.dev:
+            reload(base)
         self.verbose = verbose
         self.active = True
         self.actionCB = None
@@ -93,7 +91,7 @@ class ActionStartClass(object):
         """
         print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.getTitle()} IO")
         if self.verbose:
-            self.utils.setProgress(self.getTitle()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.getTitle()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
         # redeclare variables
         self.ar.data.rebuilding = rebuilding
         self.checkedObjList = []
@@ -245,7 +243,7 @@ class ActionStartClass(object):
         # dataLog
         self.dataLogDic["log"] = self.ar.data.lang[self.actionType]
         self.dataLogDic["user"] = getpass.getuser()
-        self.dataLogDic["time"] = self.pipeliner.getToday(True)
+        self.dataLogDic["time"] = self.ar.pipeliner.getToday(True)
         self.dataLogDic["dpARVersion"] = self.ar.data.version
         self.dataLogDic["module"] = self.name
         self.dataLogDic["version"] = self.version
@@ -260,7 +258,7 @@ class ActionStartClass(object):
         if self.verbose:
             self.ar.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.ar.data.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n\n"+logText)
-            if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+            if not self.ar.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
 
     
@@ -304,8 +302,8 @@ class ActionStartClass(object):
     def getIOPath(self, ioDir, *args):
         """ Returns the IO path for the current scene.
         """
-        if "assetPath" in self.pipeliner.pipeData.keys() and ioDir:
-            return self.pipeliner.pipeData['assetPath']+"/"+self.pipeliner.pipeData[ioDir]
+        if "assetPath" in self.ar.pipeliner.pipeData.keys() and ioDir:
+            return self.ar.pipeliner.pipeData['assetPath']+"/"+self.ar.pipeliner.pipeData[ioDir]
 
 
     def getExportedList(self, objList=None, subFolder="", askHasData=False, getAny=False, *args):
@@ -330,7 +328,7 @@ class ActionStartClass(object):
             if exportedList:
                 if subFolder or getAny:
                     return exportedList
-                assetName = self.pipeliner.pipeData["assetName"]
+                assetName = self.ar.pipeliner.pipeData["assetName"]
                 for item in exportedList:
                     if assetName in item:
                         resultList.append(item)
@@ -411,13 +409,13 @@ class ActionStartClass(object):
         if not toCheckList:
             toCheckList = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
         if toCheckList:
-            self.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
-            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-            filteredList = self.utils.filterTransformList(toCheckList, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+            filteredList = self.ar.utils.filterTransformList(toCheckList, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
             if filteredList:
                 for item in filteredList:
                     shortName = item[item.rfind("|")+1:]
-                    if not self.utils.validateID(shortName):
+                    if not self.ar.utils.validateID(shortName):
                         itemType = cmds.objectType(item)
                         if not itemType in dic["BrokenID"].keys():
                             dic["BrokenID"][itemType] = {}
@@ -431,7 +429,7 @@ class ActionStartClass(object):
     def endProgress(self, update_guides=False, *args):
         print(f"{self.ar.data.lang['m184_end']}: {self.getTitle()} IO\n----------")
         if self.verbose:
-            self.utils.setProgress(endIt=True)
+            self.ar.utils.setProgress(endIt=True)
         if update_guides:
             self.ar.ui_manager.clear_guide_layout()
             self.ar.filler.fill_created_guides()
@@ -444,9 +442,9 @@ class ActionStartClass(object):
         if dic:
             try:
                 # export json file
-                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                self.pipeliner.saveJsonFile(dic, jsonName)
+                self.ar.pipeliner.makeDirIfNotExists(self.ioPath)
+                jsonName = self.ioPath+"/"+self.startName+"_"+self.ar.pipeliner.pipeData['currentFileName']+".json"
+                self.ar.pipeliner.saveJsonFile(dic, jsonName)
                 self.wellDoneIO(jsonName)
             except Exception as e:
                 self.notWorkedWellIO(jsonName+": "+str(e))
@@ -464,10 +462,10 @@ class ActionStartClass(object):
             if not startName:
                 startName = self.startName
             if not fileName:
-                fileName = self.pipeliner.pipeData['currentFileName']
+                fileName = self.ar.pipeliner.pipeData['currentFileName']
             nodeStateDic = self.changeNodeState(itemList, state=1) #has no effect
             # export alembic
-            self.pipeliner.makeDirIfNotExists(path)
+            self.ar.pipeliner.makeDirIfNotExists(path)
             ioItems = ' -root '.join(itemList)
             attrStr = ""
             if attr:
@@ -475,7 +473,7 @@ class ActionStartClass(object):
                 if curve:
                     itemList.extend(cmds.listRelatives(itemList, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
                 for mesh in itemList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     userDefAttrList = cmds.listAttr(mesh, userDefined=True)
                     if userDefAttrList:
                         for userDefAttr in userDefAttrList:
@@ -494,7 +492,7 @@ class ActionStartClass(object):
         """
         self.latestDataFile = None
         if exportedList:
-            self.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
             try:
                 # import alembic
                 exportedList.sort()
@@ -518,7 +516,7 @@ class ActionStartClass(object):
                 path = self.ioPath
             exportedList.sort()
             self.latestDataFile = exportedList[-1]
-            return self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+            return self.ar.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
         else:
             self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
 
@@ -574,7 +572,7 @@ class ActionStartClass(object):
         """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
         """
         meshList, tempList = [], []
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
+        renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
         if renderGrp:
             meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
             if meshList:
@@ -635,9 +633,9 @@ class ActionStartClass(object):
         #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
         #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
         #            }
-        self.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
         for const in constraintList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.dpID, node=const, exists=True):
                 # getting attributes if they exists
                 dic[const] = {"attributes" : {},
@@ -680,12 +678,12 @@ class ActionStartClass(object):
         """ Import constraints from exported dictionary.
             Create missing constraints and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(constDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(constDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in constDic.keys():
             existingNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # create constraint node if it needs
             if not cmds.objExists(item):
                 constType = constDic[item]["type"]

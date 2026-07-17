@@ -80,6 +80,8 @@ class UIManager(object):
     def update_guide_footer(self, text_name="rig_footer_txt",  message_id="i005_footerRigging", quantity=0):
         if not quantity:
             quantity = len(self.ar.data.guide_instances)
+            if quantity == 0:
+                quantity = 'Zero'
         if self.ar.data.ui_state:
             cmds.text(text_name, edit=True, label=str(quantity)+" "+self.ar.data.lang[message_id])
 

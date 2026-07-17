@@ -43,7 +43,7 @@ class JointEnd(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type="joint")
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 # list joint ends
                 jEndList = [j for j in toCheckList if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
                 jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
@@ -54,7 +54,7 @@ class JointEnd(action.ActionStartClass):
                     if jEndList:
                         jEndList.sort()
                         for item in jEndList:
-                            self.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             self.checkedObjList.append(item)
                             self.foundIssueList.append(True)
                             if self.firstMode:

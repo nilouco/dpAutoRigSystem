@@ -18,12 +18,8 @@ DP_WHEEL_VERSION = 2.07
 
 
 class Wheel(standard.BaseStandard, layout.BaseLayout):
-    def __init__(self,  *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        standard.BaseStandard.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
     def createModuleLayout(self, *args):
@@ -143,7 +139,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.centerJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.centerJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(self.centerJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['m156_wheel'])
+                self.ar.utils.setJointLabel(self.centerJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['m156_wheel'])
                 # create end joint:
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 # main joint:
@@ -151,10 +147,10 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.mainJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(self.mainJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c058_main'])
+                self.ar.utils.setJointLabel(self.mainJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c058_main'])
                 # create end joint:
                 self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.utils.addJointEndAttr([self.endJoint, self.mainEndJoint])
+                self.ar.utils.addJointEndAttr([self.endJoint, self.mainEndJoint])
                 
                 # create controls:
                 self.wheelCtrl = self.ar.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
@@ -182,9 +178,9 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.wheelCtrlList.append(self.wheelCtrl)
 
                 # origined from attributes:
-                self.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.radiusGuide)
-                self.utils.originedFrom(objName=self.insideCtrl, attrString=self.cvInsideLoc)
-                self.utils.originedFrom(objName=self.outsideCtrl, attrString=self.cvOutsideLoc)
+                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.insideCtrl, attrString=self.cvInsideLoc)
+                self.ar.utils.originedFrom(objName=self.outsideCtrl, attrString=self.cvOutsideLoc)
                 
                 # prepare group to receive steering wheel connection:
                 self.toSteeringGrp = cmds.group(self.insideCtrl, name=side+self.userGuideName+"_"+self.ar.data.lang['c070_steering'].capitalize()+"_Grp")
@@ -209,8 +205,8 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete(cmds.parentConstraint(self.cvOutsideLoc, self.outsideCtrl, maintainOffset=False))
                 
                 # zeroOut controls:
-                zeroGrpList = self.utils.zeroOut([self.mainCtrl, self.wheelCtrl, self.toSteeringGrp, self.outsideCtrl])
-                wheelAutoGrp = self.utils.zeroOut([self.wheelCtrl])
+                zeroGrpList = self.ar.utils.zeroOut([self.mainCtrl, self.wheelCtrl, self.toSteeringGrp, self.outsideCtrl])
+                wheelAutoGrp = self.ar.utils.zeroOut([self.wheelCtrl])
                 wheelAutoGrp = cmds.rename(wheelAutoGrp, side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Auto_Grp")
                 
                 # fixing flip mirror:
@@ -325,7 +321,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 cmds.rename(scBindPose, side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_BP")
                 if self.loadedGeo:
                     if cmds.objExists(self.loadedGeo):
-                        baseName = self.utils.extractSuffix(self.loadedGeo)
+                        baseName = self.ar.utils.extractSuffix(self.loadedGeo)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
@@ -338,7 +334,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                                     itemType = cmds.objectType(item)
                                     if itemType == "mesh" or itemType == "nurbsSurface":
                                         try:
-                                            skinClusterName = self.utils.extractSuffix(item)+"_SC"
+                                            skinClusterName = self.ar.utils.extractSuffix(item)+"_SC"
                                             cmds.skinCluster(self.centerJoint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
                                         except:
                                             pass
@@ -350,14 +346,14 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 upperClusterList = cmds.cluster(latticeList[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Cls") #[deform, handle]
                 middleClusterList = cmds.cluster(latticeList[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Cls") #[deform, handle]
                 lowerClusterList = cmds.cluster(latticeList[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Cls") #[deform, handle]                
-                clusterGrpList = self.utils.zeroOut([upperClusterList[1], middleClusterList[1], lowerClusterList[1]])
+                clusterGrpList = self.ar.utils.zeroOut([upperClusterList[1], middleClusterList[1], lowerClusterList[1]])
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
                 # deform controls:
                 upperDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
                 middleDefCtrl = self.ar.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
                 lowerDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
-                defCtrlGrpList = self.utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
+                defCtrlGrpList = self.ar.utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.userGuideName+"_Ctrl_Grp")
                 
                 # positions:
@@ -366,7 +362,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete(cmds.parentConstraint(lowerClusterList[1], defCtrlGrpList[2], maintainOffset=False))
                 if s == 1: #fix right side controllers upper/lower flipping - workaround
                     if cmds.getAttr(self.guide_base+".flip") == 1:
-                        self.utils.unlockAttr([self.cvCenterLoc])
+                        self.ar.utils.unlockAttr([self.cvCenterLoc])
                         cmds.parent(self.cvCenterLoc, world=True)
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[2], maintainOffset=False))
@@ -396,7 +392,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.ctrlHookGrpList.append(self.toCtrlHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, latticeList[1], latticeList[2], self.geoHolder], self.utils.ignoreTransformIOAttr)
+                self.ar.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, latticeList[1], latticeList[2], self.geoHolder], self.ar.utils.ignoreTransformIOAttr)
                 
                 self.to_ids.extend([receptSteeringMD, inverseSteeringMD, steeringInvCnd, expNode, self.geoHolder, scNode, side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_BP"])
                 for idList in [latticeList, upperClusterList, middleClusterList, lowerClusterList]:

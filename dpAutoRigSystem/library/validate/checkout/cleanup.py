@@ -44,10 +44,10 @@ class Cleanup(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls() #all
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
                     if cmds.objExists(item):
-                        self.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         # conditional to check here
                         if self.cleanupAttr in cmds.listAttr(item):
                             if cmds.getAttr(item+"."+self.cleanupAttr) == 1:

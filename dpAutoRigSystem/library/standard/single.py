@@ -13,12 +13,8 @@ DP_SINGLE_VERSION = 2.07
 
 
 class Single(standard.BaseStandard, layout.BaseLayout):
-    def __init__(self,  *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        standard.BaseStandard.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         # returned data from the dictionary
         self.mainJisList = []
         self.aStaticGrpList = []
@@ -115,7 +111,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName)
+                self.ar.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if not self.getHasIndirectSkin():
                     if self.curveDegree == 0:
@@ -139,12 +135,12 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                         else:
                             indirectSkinRot=(0, 0, -90)
                 self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.guideName+"_JointLoc1")
-                self.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
                 # zeroOut controls:
-                zeroOutCtrlGrp = self.utils.zeroOut([self.singleCtrl], offset=True)[0]
+                zeroOutCtrlGrp = self.ar.utils.zeroOut([self.singleCtrl], offset=True)[0]
                 # hide visibility attribute:
                 cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
                 # fixing flip mirror:
@@ -162,7 +158,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                     cmds.select(clear=True)
                     jxtName = self.jnt.replace("_Jnt", "_Jxt")
                     jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
-                    self.utils.clearDpArAttr([jxt])
+                    self.ar.utils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
                     for attr in self.ar.data.transform_attrs[:-1]:
@@ -178,10 +174,10 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
-                        self.utils.removeUserDefinedAttr(self.singleCtrl, True)
+                        self.ar.utils.removeUserDefinedAttr(self.singleCtrl, True)
                         #cmds.addAttr(self.singleCtrl, longName="dpHolder", attributeType="bool", defaultValue=1)
                         #self.ar.custom_attr.addAttr("custom", [self.singleCtrl], "dpHolder")
-                        self.utils.addCustomAttr([self.singleCtrl], "dpHolder")
+                        self.ar.utils.addCustomAttr([self.singleCtrl], "dpHolder")
                         self.ar.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
                         self.ar.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
@@ -229,7 +225,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                 # create end joint:
                 cmds.select(self.jnt)
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.utils.addJointEndAttr([self.endJoint])
+                self.ar.utils.addJointEndAttr([self.endJoint])
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:

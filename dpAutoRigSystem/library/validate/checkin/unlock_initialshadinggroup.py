@@ -43,9 +43,9 @@ class UnlockInitialshadinggroup(action.ActionStartClass):
             else:
                 toCheckList = ["initialShadingGroup"]
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         if item == "initialShadingGroup":
                             # conditional to check here

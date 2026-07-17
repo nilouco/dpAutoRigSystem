@@ -16,9 +16,6 @@ class Publisher(object):
         self.publisherName = self.ar.data.lang['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
-        self.utils = ar.utils
-        self.pipeliner = ar.pipeliner
-        self.packager = ar.packager
 
 
     def getFileTypeByExtension(self, fileName, *args):
@@ -33,9 +30,9 @@ class Publisher(object):
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-        self.utils.closeUI('dpSuccessPublishedWindow')
-        self.utils.closeUI('dpPublisherWindow')
-        savedScene = self.utils.checkSavedScene()
+        self.ar.utils.closeUI('dpSuccessPublishedWindow')
+        self.ar.utils.closeUI('dpPublisherWindow')
+        savedScene = self.ar.utils.checkSavedScene()
         if not savedScene:
             savedScene = self.ar.pipeliner.userSaveThisScene(True)
             return
@@ -55,22 +52,22 @@ class Publisher(object):
             self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.ar.data.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             # buttons
             publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
-            cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
+            cmds.button(label="Pipeliner", command=partial(self.ar.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
             cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
             cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
-            cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
-            self.pipeliner.mainUI(self.ar)
-            self.utils.closeUI('dpPipelinerWindow')
+            self.ar.pipeliner.mainUI(self.ar)
+            self.ar.utils.closeUI('dpPipelinerWindow')
             self.setPublishFilePath()
 
 
     def editPublishPath(self, *args):
         """ Set the current publish path as the entered text in the textField.
         """
-        self.pipeliner.pipeData['publishPath'] = cmds.textFieldButtonGrp(self.filePathFBG, query=True, text=True)
+        self.ar.pipeliner.pipeData['publishPath'] = cmds.textFieldButtonGrp(self.filePathFBG, query=True, text=True)
 
 
     def setPublishFilePath(self, filePath=None, *args):
@@ -78,12 +75,12 @@ class Publisher(object):
         """
         if not filePath:
             # try to load a pipeline structure to get the filePath to set it up
-            filePath = self.pipeliner.loadPublishPath()
+            filePath = self.ar.pipeliner.loadPublishPath()
         if filePath:
             try:
                 cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(filePath))
-                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.pipeliner.getPipeFileName(filePath)))
-                self.pipeliner.pipeData['publishPath'] = filePath
+                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.ar.pipeliner.getPipeFileName(filePath)))
+                self.ar.pipeliner.pipeData['publishPath'] = filePath
             except:
                 pass
         return filePath
@@ -102,8 +99,8 @@ class Publisher(object):
         """
         rigWipVersion = 0
         shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        if self.pipeliner.pipeData['s_rig'] in shortName:
-            rigWipVersion = shortName[shortName.rfind(self.pipeliner.pipeData['s_rig'])+len(self.pipeliner.pipeData['s_rig']):shortName.rfind(".")]
+        if self.ar.pipeliner.pipeData['s_rig'] in shortName:
+            rigWipVersion = shortName[shortName.rfind(self.ar.pipeliner.pipeData['s_rig'])+len(self.ar.pipeliner.pipeData['s_rig']):shortName.rfind(".")]
         return rigWipVersion
     
 
@@ -125,7 +122,7 @@ class Publisher(object):
         validatorsResult = self.runCheckedValidators() #verify mode
         if validatorsResult:
             mel.eval('warning \"'+validatorsResult+'\";')
-            self.utils.setProgress(endIt=True)
+            self.ar.utils.setProgress(endIt=True)
         else:
             validatorsResult = self.ar.data.lang['v007_allOk']
         self.ar.logger.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
@@ -146,23 +143,23 @@ class Publisher(object):
             - generate the image preview
             If it fails, it'll reopen the current file without save any change and returns False.
         """
-        if self.pipeliner.pipeData['publishPath']:
+        if self.ar.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            self.utils.setProgress(self.ar.data.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
 
             # check if there'a a file name to publish this scene
-            publishFileName = self.pipeliner.getPipeFileName(self.pipeliner.pipeData['publishPath'])
+            publishFileName = self.ar.pipeliner.getPipeFileName(self.ar.pipeliner.pipeData['publishPath'])
             if fromUI:
                 publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
             if publishFileName:
                 # start logging
                 publishLog = {}
-                publishLog["scene"] = self.pipeliner.pipeData['sceneName']
+                publishLog["scene"] = self.ar.pipeliner.pipeData['sceneName']
                 if not publishFileName[-3:-1] == ".m":
-                    publishFileName += ".m"+self.pipeliner.pipeData['sceneName'][-1]
-                self.pipeliner.pipeData['publishFileName'] = publishFileName
-                publishLog["published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
-                publishLog["exportPath"] = self.pipeliner.pipeData['f_drive']+"/"+self.pipeliner.pipeData['f_studio']+"/"+self.pipeliner.pipeData['f_project']+"/"+self.pipeliner.pipeData['f_toClient']+"/"+self.pipeliner.getToday()
+                    publishFileName += ".m"+self.ar.pipeliner.pipeData['sceneName'][-1]
+                self.ar.pipeliner.pipeData['publishFileName'] = publishFileName
+                publishLog["published"] = self.ar.pipeliner.pipeData['publishPath']+"/"+publishFileName
+                publishLog["exportPath"] = self.ar.pipeliner.pipeData['f_drive']+"/"+self.ar.pipeliner.pipeData['f_studio']+"/"+self.ar.pipeliner.pipeData['f_project']+"/"+self.ar.pipeliner.pipeData['f_toClient']+"/"+self.ar.pipeliner.getToday()
                 # comments
                 publishLog["comments"] = ""
                 commentValue = comments
@@ -182,35 +179,35 @@ class Publisher(object):
                     self.abortPublishing(validatorsResult)
                     return False
                 else:
-                    self.utils.setProgress(self.ar.data.lang['i336_storingData']+"...", addNumber=False)
+                    self.ar.utils.setProgress(self.ar.data.lang['i336_storingData']+"...", addNumber=False)
                     
-                    self.pipeliner.pipeData.update(publishLog)
+                    self.ar.pipeliner.pipeData.update(publishLog)
 
                     # try to store data into All_Grp if it exists
-                    self.pipeliner.pipeData['modelVersion'] = None
+                    self.ar.pipeliner.pipeData['modelVersion'] = None
                     all_grp = self.ar.utils.getAllGrp()
                     if all_grp:
                         # published from file
                         if not cmds.objExists(all_grp+".publishedFromFile"):
                             cmds.addAttr(all_grp, longName="publishedFromFile", dataType="string")
-                        cmds.setAttr(all_grp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        cmds.setAttr(all_grp+".publishedFromFile", self.ar.pipeliner.pipeData['sceneName'], type="string")
                         # asset name
                         if not cmds.objExists(all_grp+".assetName"):
                             cmds.addAttr(all_grp, longName="assetName", dataType="string")
-                        cmds.setAttr(all_grp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
+                        cmds.setAttr(all_grp+".assetName", self.ar.pipeliner.pipeData['assetName'], type="string")
                         # comments
                         if not cmds.objExists(all_grp+".comment"):
                             cmds.addAttr(all_grp, longName="comment", dataType="string")
                         cmds.setAttr(all_grp+".comment", commentValue, type="string")
                         # model version
                         shortName = cmds.file(query=True, sceneName=True, shortName=True)
-                        if self.pipeliner.pipeData['s_model'] in shortName:
-                            modelVersion = shortName[shortName.find(self.pipeliner.pipeData['s_model'])+len(self.pipeliner.pipeData['s_model']):]
+                        if self.ar.pipeliner.pipeData['s_model'] in shortName:
+                            modelVersion = shortName[shortName.find(self.ar.pipeliner.pipeData['s_model'])+len(self.ar.pipeliner.pipeData['s_model']):]
                             modelVersion = int(modelVersion[:modelVersion.find("_")])
                             if not cmds.objExists(all_grp+".modelVersion"):
                                 cmds.addAttr(all_grp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(all_grp+".modelVersion", modelVersion)
-                            self.pipeliner.pipeData['modelVersion'] = modelVersion
+                            self.ar.pipeliner.pipeData['modelVersion'] = modelVersion
                         if cmds.objExists(all_grp+".system"):
                             builtVersion = cmds.getAttr(all_grp+".system")
                             if "dpAutoRig_" in builtVersion: #suport old rigged files
@@ -218,75 +215,75 @@ class Publisher(object):
                     else:
                         builtVersion = self.ar.data.version
 
-                    self.utils.setProgress(self.ar.data.lang['i227_getImage']+"...", addNumber=False)
+                    self.ar.utils.setProgress(self.ar.data.lang['i227_getImage']+"...", addNumber=False)
 
                     # publishing file
                     # create folders to publish file if needed
-                    if not os.path.exists(self.pipeliner.pipeData['publishPath']):
+                    if not os.path.exists(self.ar.pipeliner.pipeData['publishPath']):
                         try:
-                            os.makedirs(self.pipeliner.pipeData['publishPath'])
+                            os.makedirs(self.ar.pipeliner.pipeData['publishPath'])
                         except:
                             self.abortPublishing(self.ar.data.lang['v022_noFilePath'])
                             return False
                     
                     # mount folders
-                    if self.pipeliner.pipeData['b_deliver']:
-                        self.pipeliner.mountPackagePath()
-                        if self.pipeliner.pipeData['toClientPath']:
+                    if self.ar.pipeliner.pipeData['b_deliver']:
+                        self.ar.pipeliner.mountPackagePath()
+                        if self.ar.pipeliner.pipeData['toClientPath']:
                             # rigging preview image
-                            if self.pipeliner.pipeData['b_imager']:
-                                self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.getToday())
-                                self.utils.setProgress(endIt=True)
-                                self.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
+                            if self.ar.pipeliner.pipeData['b_imager']:
+                                self.ar.pipeliner.pipeData['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipeData, builtVersion, self.ar.pipeliner.getToday())
+                                self.ar.utils.setProgress(endIt=True)
+                                self.ar.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
                     else:
-                        self.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", addNumber=False)
+                        self.ar.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", addNumber=False)
                     
                     # save published file
-                    cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
+                    cmds.file(rename=self.ar.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], force=True)
 
                     # packager
-                    if self.pipeliner.pipeData['b_deliver']:
-                        if self.pipeliner.pipeData['toClientPath']:
+                    if self.ar.pipeliner.pipeData['b_deliver']:
+                        if self.ar.pipeliner.pipeData['toClientPath']:
                             # toClient
-                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Zipping", addNumber=False)
-                            zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.getToday())
+                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Zipping", addNumber=False)
+                            zipFile = self.ar.packager.zipToClient(self.ar.pipeliner.pipeData['publishPath'], publishFileName, self.ar.pipeliner.pipeData['toClientPath'], self.ar.pipeliner.getToday())
                             # dropbox
-                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Clouding", addNumber=False)
+                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Clouding", addNumber=False)
                             if zipFile:
-                                if self.pipeliner.pipeData['dropboxPath']:
-                                    self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
+                                if self.ar.pipeliner.pipeData['dropboxPath']:
+                                    self.ar.packager.toDropbox(zipFile, self.ar.pipeliner.pipeData['dropboxPath'])
                             # open folder
-                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Folder openning", addNumber=False)
-                            self.packager.openFolder(self.pipeliner.pipeData['toClientPath'])
+                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Folder openning", addNumber=False)
+                            self.ar.packager.openFolder(self.ar.pipeliner.pipeData['toClientPath'])
                         # hist
-                        if self.pipeliner.pipeData['historyPath']:
-                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpHist", addNumber=False)
-                            self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
+                        if self.ar.pipeliner.pipeData['historyPath']:
+                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpHist", addNumber=False)
+                            self.ar.packager.toHistory(self.ar.pipeliner.pipeData['scenePath'], self.ar.pipeliner.pipeData['shortName'], self.ar.pipeliner.pipeData['historyPath'])
                         # organize old published files
-                        if self.pipeliner.assetNameList:
-                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpOld", addNumber=False)
-                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        if self.ar.pipeliner.assetNameList:
+                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpOld", addNumber=False)
+                            self.ar.packager.toOld(self.ar.pipeliner.pipeData['publishPath'], publishFileName, self.ar.pipeliner.assetNameList, self.ar.pipeliner.pipeData['publishPath']+"/"+self.ar.pipeliner.pipeData['s_old'])
                         # discord
-                        if self.pipeliner.pipeData['b_discord']:
-                            self.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpLog", addNumber=False)
-                            messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"
-                            result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
+                        if self.ar.pipeliner.pipeData['b_discord']:
+                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpLog", addNumber=False)
+                            messageText = self.ar.pipeliner.pipeData["sceneName"]+"\n"+self.ar.pipeliner.pipeData['publishPath']+"/**"+self.ar.pipeliner.pipeData['publishFileName']+"**\n*"+self.ar.pipeliner.pipeData["comments"]+"*"
+                            result = self.ar.packager.toDiscord(self.ar.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
                                 print(self.ar.data.lang[result])
 
                     # publishing callback
-                    if self.pipeliner.pipeData['s_callback']:
-                        self.utils.setProgress("Callback...", addNumber=False)
-                        if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
-                            callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'], self.pipeliner.pipeData)
+                    if self.ar.pipeliner.pipeData['s_callback']:
+                        self.ar.utils.setProgress("Callback...", addNumber=False)
+                        if self.ar.pipeliner.pipeData['callbackPath'] and self.ar.pipeliner.pipeData['callbackFile']:
+                            callbackResult = self.ar.packager.toCallback(self.ar.pipeliner.pipeData['callbackPath'], self.ar.pipeliner.pipeData['callbackFile'], self.ar.pipeliner.pipeData)
                             if callbackResult:
                                 print("Callback result =", callbackResult)
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
-                    self.utils.setProgress(endIt=True)
-                    self.utils.closeUI('dpPublisherWindow')
+                    self.ar.utils.setProgress(endIt=True)
+                    self.ar.utils.closeUI('dpPublisherWindow')
                     if fromUI:
                         self.askUserChooseFile(publishFileName)
 
@@ -303,10 +300,10 @@ class Publisher(object):
             End progressWindow.
             Warning the raison of the error.
         """
-        self.utils.setProgress(endIt=True)
-        self.utils.closeUI('dpPublisherWindow')
+        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.closeUI('dpPublisherWindow')
         # reopen current file
-        cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
+        cmds.file(self.ar.pipeliner.pipeData['sceneName'], open=True, force=True)
         # report the error in a log window
         if raison:
             self.ar.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
@@ -318,18 +315,18 @@ class Publisher(object):
             1 - WIP file
             2 - Published file
         """
-        optWip = "1 - "+self.pipeliner.pipeData['shortName']
+        optWip = "1 - "+self.ar.pipeliner.pipeData['shortName']
         optPub = "2 - "+publishFileName
         result = cmds.confirmDialog(title=self.publisherName, message=self.ar.data.lang['v098_askUserChooseFile'], button=[optWip, optPub], defaultButton=optPub, cancelButton=optPub, dismissString=optPub)
         if result == optWip:
-            cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
+            cmds.file(self.ar.pipeliner.pipeData['sceneName'], open=True, force=True)
 
 
     def successPublishedWindow(self, publishedFile, errorList=False, *args):
         """ If everything works well we can call a success publishing window here.
         """
-        self.utils.closeUI('dpSuccessPublishedWindow')
-        self.utils.setProgress(endIt=True)
+        self.ar.utils.closeUI('dpSuccessPublishedWindow')
+        self.ar.utils.setProgress(endIt=True)
         # window
         winWidth  = 250
         winHeight = 130
@@ -348,7 +345,7 @@ class Publisher(object):
             cmds.text(label=self.ar.data.lang['i074_attention'], parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
             for errorFile in errorList:
-                cmds.button(label=errorFile, command=partial(self.pipeliner.loadAsset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
+                cmds.button(label=errorFile, command=partial(self.ar.pipeliner.loadAsset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
         else:
             cmds.separator(style="none", height=20, parent=succesLayout)
@@ -361,27 +358,27 @@ class Publisher(object):
         if path:
             publishedList, errorList = [], []
             if not comments:
-                comments = cmds.textFieldGrp(self.pipeliner.commentBatchTFG, query=True, text=True)
+                comments = cmds.textFieldGrp(self.ar.pipeliner.commentBatchTFG, query=True, text=True)
                 if not comments:
                     comments = self.ar.data.lang['m046_publisher']+" v"+str(DP_PUBLISHER_VERSION)
             if not comments.endswith(self.ar.data.lang['i358_batch']):
                 comments = self.ar.data.lang['i358_batch']+" - "+comments
             if not assetList:
-                assetList = [a[a.rfind("|")+1:-2] for a in self.pipeliner.selectedBatchList if cmds.checkBox(a, query=True, value=True)]
+                assetList = [a[a.rfind("|")+1:-2] for a in self.ar.pipeliner.selectedBatchList if cmds.checkBox(a, query=True, value=True)]
             if assetList:
                 print(self.ar.data.lang['i335_starting']+" "+self.ar.data.lang['i358_batch']+" "+self.ar.data.lang['m046_publisher']+"...")
                 print(self.ar.data.lang['i219_comments']+":", comments)
                 print(self.ar.data.lang['i303_asset']+"s:", assetList)
                 for asset in assetList:
-                    self.pipeliner.loadAsset(path, asset)
+                    self.ar.pipeliner.loadAsset(path, asset)
                     publishResult = self.runPublishing(fromUI=False, comments=comments)
                     if publishResult == False:
                         errorList.append(asset)
                     else:
-                        publishedList.append(self.pipeliner.pipeData['publishFileName'])
+                        publishedList.append(self.ar.pipeliner.pipeData['publishFileName'])
                 if errorList:
                     self.successPublishedWindow("\n".join(publishedList), errorList)
                 else:
                     cmds.file(newFile=True, force=True)
                     self.successPublishedWindow("\n".join(publishedList))
-            self.utils.closeUI("dpSelectAssetCBWindow")
+            self.ar.utils.closeUI("dpSelectAssetCBWindow")

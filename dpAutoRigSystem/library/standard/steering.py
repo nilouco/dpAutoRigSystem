@@ -13,12 +13,8 @@ DP_STEERING_VERSION = 2.04
 
 
 class Steering(standard.BaseStandard, layout.BaseLayout):
-    def __init__(self,  *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        standard.BaseStandard.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
     def createModuleLayout(self, *args):
@@ -74,14 +70,14 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.utils.addJointEndAttr([self.endJoint])
+                self.ar.utils.addJointEndAttr([self.endJoint])
                 # joint labelling:
-                self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_1")
+                self.ar.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_1")
                 # create a control:
                 self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc1")
                 self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointEnd", parentTag=self.steeringCtrl)
-                self.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
-                self.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
+                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
                 self.steeringCtrlList.append(self.steeringCtrl)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
@@ -90,7 +86,7 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 cmds.setAttr(self.endJoint+".translateY", 1)
                 # zeroOut controls:
-                zeroOutCtrlGrpList = self.utils.zeroOut([self.steeringCtrl, self.mainCtrl])
+                zeroOutCtrlGrpList = self.ar.utils.zeroOut([self.steeringCtrl, self.mainCtrl])
                 # hide visibility attribute:
                 self.ar.ctrls.setLockHide([self.steeringCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:

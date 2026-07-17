@@ -43,7 +43,7 @@ class SkinningIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export
@@ -83,16 +83,16 @@ class SkinningIO(action.ActionStartClass):
         """ Reference the latest wip rig file before the current, and return it's tranform elements, if there.
         """
         refNodeList = []
-        wipFilesList = next(os.walk(self.pipeliner.pipeData['assetPath']))[2]
+        wipFilesList = next(os.walk(self.ar.pipeliner.pipeData['assetPath']))[2]
         if len(wipFilesList) > 1:
             wipFilesList.sort()
             if len(self.exportedList) > 1:
                 self.refPathName = self.exportedList[-2][len(self.startName)+1:-5]
-                if os.path.isfile(self.pipeliner.pipeData['assetPath']+"/"+self.refPathName+".ma"):
+                if os.path.isfile(self.ar.pipeliner.pipeData['assetPath']+"/"+self.refPathName+".ma"):
                     self.refPathName = self.refPathName+".ma"
                 else:
                     self.refPathName = self.refPathName+".mb"
-                self.refPathName = self.pipeliner.pipeData['assetPath']+"/"+wipFilesList[-2]
+                self.refPathName = self.ar.pipeliner.pipeData['assetPath']+"/"+wipFilesList[-2]
                 cmds.file(self.refPathName, reference=True, namespace=self.importRefName)
                 refNode = cmds.file(self.refPathName, referenceNode=True, query=True)
                 refNodeList = cmds.referenceQuery(refNode, nodes=True)

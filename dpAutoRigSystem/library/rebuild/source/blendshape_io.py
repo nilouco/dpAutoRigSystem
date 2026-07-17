@@ -45,9 +45,9 @@ class BlendshapeIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 # load alembic plugin
-                if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
+                if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
                     self.ioPath = self.getIOPath(self.ioDir)
                     self.targetPath = self.ioPath+"/"+self.targetName
                     self.originalPath = self.ioPath+"/"+self.originalName
@@ -96,9 +96,9 @@ class BlendshapeIO(action.ActionStartClass):
         """ Return the blendShape data dictionary to export info.
         """
         bsDic = {}
-        self.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
         for bsNode in bsList:
-            self.utils.setProgress(self.ar.data.lang[self.title]+": "+bsNode)
+            self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+bsNode)
             bsDic[bsNode] = {}
             bsDic[bsNode]["targets"] = {}
             # get blendShape node info
@@ -169,7 +169,7 @@ class BlendshapeIO(action.ActionStartClass):
         """ Export the given blendShape target.
         """
         try:
-            self.pipeliner.makeDirIfNotExists(self.targetPath)
+            self.ar.pipeliner.makeDirIfNotExists(self.targetPath)
             # export blendShape targets as compiled maya file
             cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
         except Exception as e:

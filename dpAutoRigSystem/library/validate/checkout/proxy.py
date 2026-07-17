@@ -47,7 +47,7 @@ class Proxy(action.ActionStartClass):
             if objList:
                 proxyGrp = objList[0]
             else:
-                proxyGrp = self.utils.getNodeByMessage("proxyGrp")
+                proxyGrp = self.ar.utils.getNodeByMessage("proxyGrp")
                 if not proxyGrp:
                     if cmds.objExists("Proxy_Grp"):
                         proxyGrp = "Proxy_Grp"
@@ -55,7 +55,7 @@ class Proxy(action.ActionStartClass):
                 if not PROXIED in cmds.listAttr(proxyGrp):
                     meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
                     if not meshList:
-                        renderGrp = self.utils.getNodeByMessage("renderGrp")
+                        renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
                         if not renderGrp:
                             if cmds.objExists("Render_Grp"):
                                 renderGrp = "Render_Grp"
@@ -73,7 +73,7 @@ class Proxy(action.ActionStartClass):
                                             if not PROXIED in cmds.listAttr(meshTransform):
                                                 toProxyList.append(meshTransform[0])
                         if toProxyList:
-                            self.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
+                            self.ar.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
                             self.checkedObjList.append(proxyGrp)
                             self.foundIssueList.append(True)
                             if self.firstMode:
@@ -81,8 +81,8 @@ class Proxy(action.ActionStartClass):
                             else: #fix
                                 try:
                                     for sourceTransform in toProxyList:
-                                        sourceShortName = self.utils.getShortName(sourceTransform)
-                                        self.utils.setProgress(self.ar.data.lang[self.title]+": "+sourceShortName)
+                                        sourceShortName = self.ar.utils.getShortName(sourceTransform)
+                                        self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+sourceShortName)
                                         self.createProxy(sourceTransform, sourceShortName, proxyGrp)
                                     self.proxyIntegration(proxyGrp)
                                     self.resultOkList.append(True)
@@ -160,9 +160,9 @@ class Proxy(action.ActionStartClass):
                         # create proxy geometry
                         dup = cmds.duplicate(source, name=shortName+"_"+str(self.repeatedNameList.count(shortName)).zfill(2)+"_"+jnt+"_Pxy")[0]
                         self.repeatedNameList.append(shortName)
-                        self.utils.removeUserDefinedAttr(dup)
-                        self.utils.deleteOrigShape(dup)
-                        self.utils.removeFromSets(dup)
+                        self.ar.utils.removeUserDefinedAttr(dup)
+                        self.ar.utils.deleteOrigShape(dup)
+                        self.ar.utils.removeFromSets(dup)
                         if nodeFaceList:
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
                             cmds.delete(faceDupList)
@@ -175,7 +175,7 @@ class Proxy(action.ActionStartClass):
                         self.checkReverseNormal(dup, jnt)
                         cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
                         cmds.parent(dup, grp)
-                        self.utils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
+                        self.ar.utils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
                         self.ar.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
                         if drawOverrideList:
@@ -196,7 +196,7 @@ class Proxy(action.ActionStartClass):
         """
         if not PROXIED in cmds.listAttr(grp):
             cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
-        optionCtrl = self.utils.getNodeByMessage("optionCtrl")
+        optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
         if optionCtrl:
             # prepare optionCtrl to deformers connections
             cmds.setAttr(optionCtrl+".proxy", channelBox=True)

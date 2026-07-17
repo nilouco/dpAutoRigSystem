@@ -42,7 +42,7 @@ class DrivenKeyIO(action.ActionStartClass):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.checkAssetContext():
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     nodeList = None
@@ -86,10 +86,10 @@ class DrivenKeyIO(action.ActionStartClass):
         attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
         keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
         keyTimeAttrList = ["keyTime", "keyValue"]
-        self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
         for item in nodeList:
-            self.utils.setProgress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.ar.utils.validateID(item):
                 # getting attributes if they exists
                 dic[item] = { "attributes"     : {},
                             "keys"             : {},
@@ -145,12 +145,12 @@ class DrivenKeyIO(action.ActionStartClass):
         """ Import set driven key nodes from exported dictionary.
             Create missing set driven key nodes and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(drivenKeyDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(drivenKeyDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in drivenKeyDic.keys():
             existingNodesList = []
-            self.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # create set driven key node if it needs
             if not cmds.objExists(item):
                 drivenKeyType = drivenKeyDic[item]["type"]

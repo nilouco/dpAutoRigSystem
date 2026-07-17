@@ -47,9 +47,9 @@ class Vaccine(action.ActionStartClass):
             else:
                 toCheckList = cmds.ls(selection=False, type='script')
             if toCheckList:
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     scriptdata = cmds.scriptNode(item, beforeScript=True, query=True)
                     #if "fuck_All_U" in scriptdata:

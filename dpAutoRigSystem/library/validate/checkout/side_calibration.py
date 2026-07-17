@@ -44,9 +44,9 @@ class SideCalibration(action.ActionStartClass):
                 toCheckList = self.ar.ctrls.getControlList()
             if toCheckList:
                 pairDic = {}
-                self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
                 for item in toCheckList:
-                    self.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".calibrationList"):
                         if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
