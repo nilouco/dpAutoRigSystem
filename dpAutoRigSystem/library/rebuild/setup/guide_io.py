@@ -339,7 +339,7 @@ class GuideIO(action.ActionStartClass):
     def importHeadDeformer(self, hdNet, *args):
         """ Process the headDeformer importing.
         """
-        return self.head_deformer.dpHeadDeformer(hdNet["hdName"], hdNet["hdList"])
+        return self.head_deformer.dpHeadDeformer(hdNet["hdName"], hdNet["hdList"], ui=False)
 
 
     def get_new_name(self, name):

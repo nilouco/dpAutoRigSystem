@@ -13,12 +13,8 @@ WIKI = "06-‐-Tools#-print-selection"
 
 
 class PrintSelection(base.BaseLibrary):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        base.BaseLibrary.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
         
