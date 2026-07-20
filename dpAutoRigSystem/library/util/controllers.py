@@ -1531,7 +1531,9 @@ class ControlClass(object):
             nodeToRunList = self.getControlList()
         if nodeToRunList:
             if resetMode:
+                self.resetPose.verbose = False
                 self.resetPose.runAction(False, nodeToRunList)
+                self.resetPose.verbose = True
                 self.ar.utils.setProgress(endIt=True)
             else: #set default values
                 for item in nodeToRunList:
