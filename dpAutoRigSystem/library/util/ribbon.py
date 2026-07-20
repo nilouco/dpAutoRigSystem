@@ -16,7 +16,6 @@
 # importing libraries:
 from maya import cmds
 
-DP_RIBBONCLASS_VERSION = 2.11
 
 
 class Ribbon(object):

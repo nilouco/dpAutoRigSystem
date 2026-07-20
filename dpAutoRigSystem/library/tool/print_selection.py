@@ -10,7 +10,6 @@ TITLE = "m053_printSel"
 DESCRIPTION = "m054_printSelDesc"
 WIKI = "06-‐-Tools#-print-selection"
 
-DP_PRINTSELECTION_VERSION = 2.01
 
 
 class PrintSelection(base.BaseLibrary):

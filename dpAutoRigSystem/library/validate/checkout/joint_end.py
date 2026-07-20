@@ -8,17 +8,11 @@ TITLE = "v111_jointEnd"
 DESCRIPTION = "v112_jointEndDesc"
 WIKI = "07-‐-Validator#-joint-end-cleaner"
 
-DP_JOINTENDCLEANER_VERSION = 1.02
 
 
 class JointEnd(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_JOINTENDCLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

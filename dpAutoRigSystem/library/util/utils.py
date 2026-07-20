@@ -18,7 +18,6 @@ import datetime
 import stat
 import unicodedata
 
-DP_UTILS_VERSION = 3.14
 
 
 class Utils(object):

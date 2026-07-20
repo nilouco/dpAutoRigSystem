@@ -6,7 +6,6 @@ CLASS_NAME = "PinSide"
 TITLE = "m209_pinSide"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_PINSIDE_VERSION = 1.03
 
 
 class PinSide(curve.BaseCurve):

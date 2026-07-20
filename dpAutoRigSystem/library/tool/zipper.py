@@ -14,7 +14,6 @@ WIKI = "06-‐-Tools#-zipper"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DP_ZIPPER_VERSION = 2.21
 
 
 class Zipper(base.BaseLibrary):
@@ -60,7 +59,7 @@ class Zipper(base.BaseLibrary):
         """
         zipper_winWidth  = 380
         zipper_winHeight = 300
-        cmds.window('dpZipperWindow', title=self.zipperName+" "+str(DP_ZIPPER_VERSION), widthHeight=(zipper_winWidth, zipper_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpZipperWindow', title=self.zipperName+" "+str(self.ar.data.version), widthHeight=(zipper_winWidth, zipper_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpZipperWindow')
         
         # create UI layout and elements:

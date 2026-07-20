@@ -6,7 +6,6 @@ CLASS_NAME = "WheelShape"
 TITLE = "m162_wheelShape"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_WHEELSHAPE_VERSION = 1.02
 
 class WheelShape(curve.BaseCurve):
     def __init__(self, ar):

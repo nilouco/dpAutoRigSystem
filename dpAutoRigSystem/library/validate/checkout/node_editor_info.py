@@ -8,17 +8,11 @@ TITLE = "v146_nodeEditorInfo"
 DESCRIPTION = "v147_nodeEditoInfoDesc"
 WIKI = "07-‐-Validator#-node-editor-info-cleaner"
 
-DP_NODEEDITORINFOCLEANER_VERSION = 1.00
 
 
 class NodeEditorInfo(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_NODEEDITORINFOCLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

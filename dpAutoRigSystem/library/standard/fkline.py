@@ -9,7 +9,6 @@ TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 WIKI = "03-‐-Guides#-fk-line"
 
-DP_FKLINE_VERSION = 2.08
 
 
 class FkLine(standard.BaseStandard, layout.BaseLayout):

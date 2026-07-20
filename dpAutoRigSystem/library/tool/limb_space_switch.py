@@ -9,7 +9,6 @@ TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 WIKI = "06-‐-Tools#-limb-space-switch"
 
-DP_LIMBSPACESWITCH_VERSION = 2.06
 
 
 class LimbSpaceSwitch(base.BaseLibrary):

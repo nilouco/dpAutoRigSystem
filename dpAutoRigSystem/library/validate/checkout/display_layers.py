@@ -8,17 +8,11 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 WIKI = "07-‐-Validator#-display-layers"
 
-DP_DISPLAYLAYERS_VERSION = 1.06
 
 
 class DisplayLayers(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_DISPLAYLAYERS_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

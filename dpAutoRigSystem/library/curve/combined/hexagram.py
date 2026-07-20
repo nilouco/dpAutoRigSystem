@@ -8,7 +8,6 @@ CLASS_NAME = "Hexagram"
 TITLE = "m103_hexagram"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_HEXAGRAM_VERSION = 1.05
 
 
 class Hexagram(curve.BaseCurve):

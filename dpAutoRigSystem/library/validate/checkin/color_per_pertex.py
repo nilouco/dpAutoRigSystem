@@ -8,17 +8,11 @@ TITLE = "v117_colorPerVertex"
 DESCRIPTION = "v118_colorPerVertexDesc"
 WIKI = "07-‐-Validator#-colorpervertex-cleaner"
 
-DP_COLORPERVERTEX_VERSION = 1.01
 
 
 class ColorPerVertex(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_COLORPERVERTEX_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

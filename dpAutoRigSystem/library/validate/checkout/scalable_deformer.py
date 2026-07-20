@@ -8,17 +8,11 @@ TITLE = "v109_scalableDeformer"
 DESCRIPTION = "v110_scalableDeformerDesc"
 WIKI = "07-‐-Validator#-scalable-deformer-checker"
 
-DP_SCALABLEDEFORMERCHECKER_VERSION = 1.01
 
 
 class ScalableDeformer(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_SCALABLEDEFORMERCHECKER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

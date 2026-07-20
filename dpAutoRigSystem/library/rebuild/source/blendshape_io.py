@@ -9,17 +9,11 @@ TITLE = "r030_blendShapeIO"
 DESCRIPTION = "r031_blendShapeIODesc"
 WIKI = "10-‐-Rebuilder#-blendshape"
 
-DP_BLENDSHAPEIO_VERSION = 1.03
 
 
 class BlendshapeIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_BLENDSHAPEIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_blendShapeIO"
         self.startName = "dpBlendShape"

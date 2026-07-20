@@ -11,7 +11,6 @@ TITLE = "m087_reorderAttr"
 DESCRIPTION = "m088_reoderAttrDesc"
 WIKI = "06-‐-Tools#-reorder-attributes"
 
-DP_REORDERATTR_VERSION = 1.04
 
 
 class ReorderAttr(base.BaseLibrary):
@@ -40,7 +39,7 @@ class ReorderAttr(base.BaseLibrary):
         self.ar.utils.closeUI(self.winName)
         reorderAttr_winWidth  = 175
         reorderAttr_winHeight = 75
-        dpReorderAttrWin = cmds.window(self.winName, title=self.ar.data.lang["m087_reorderAttr"]+" "+str(DP_REORDERATTR_VERSION), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpReorderAttrWin = cmds.window(self.winName, title=self.ar.data.lang["m087_reorderAttr"]+" "+str(self.ar.data.version), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         reorderAttrLayout = cmds.columnLayout('reorderAttrLayout', columnOffset=("left", 30))

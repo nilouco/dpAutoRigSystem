@@ -14,7 +14,6 @@ TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 WIKI = "03-‐-Guides#-wheel"
 
-DP_WHEEL_VERSION = 2.07
 
 
 class Wheel(standard.BaseStandard, layout.BaseLayout):

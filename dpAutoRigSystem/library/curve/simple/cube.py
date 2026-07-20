@@ -6,7 +6,6 @@ CLASS_NAME = "Cube"
 TITLE = "m111_cube"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CUBE_VERSION = 1.03
 
 
 class Cube(curve.BaseCurve):

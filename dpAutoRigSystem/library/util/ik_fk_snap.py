@@ -14,7 +14,6 @@ from maya import cmds
 from maya.api import OpenMaya
 import math
 
-DP_IKFKSNAP_VERSION = 2.05
 
 
 
@@ -318,7 +317,6 @@ class IkFkSnapClass(object):
 from maya import cmds
 from maya.api import OpenMaya
 import math
-DP_IKFKSNAP_VERSION = '''+str(DP_IKFKSNAP_VERSION)+'''
 
 class IkFkSnap(object):
     def __init__(self, ikFkSnapNet, *args):

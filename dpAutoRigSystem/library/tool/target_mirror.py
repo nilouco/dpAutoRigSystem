@@ -11,7 +11,6 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 WIKI = "06-‐-Tools#-target-mirror"
 
-DP_TARGETMIRROR_VERSION = 2.07
 
 
 class TargetMirror(base.BaseLibrary):
@@ -40,7 +39,7 @@ class TargetMirror(base.BaseLibrary):
             cmds.deleteUI('dpTargetMirrorWindow', window=True)
         targetMirror_winWidth  = 305
         targetMirror_winHeight = 250
-        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.ar.data.lang["m055_tgtMirror"]+" "+str(DP_TARGETMIRROR_VERSION), widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.ar.data.lang["m055_tgtMirror"]+" "+str(self.ar.data.version), widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         targetMirrorLayout = cmds.columnLayout('targetMirrorLayout')

@@ -6,7 +6,6 @@ CLASS_NAME = "CompressedCircle"
 TITLE = "m119_compressedCircle"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_COMPRESSEDCIRCLE_VERSION = 1.03
 
 
 class CompressedCircle(curve.BaseCurve):

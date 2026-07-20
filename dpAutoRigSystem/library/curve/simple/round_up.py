@@ -6,7 +6,6 @@ CLASS_NAME = "RoundUp"
 TITLE = "m130_roundUp"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_ROUNDUP_VERSION = 1.03
 
 
 class RoundUp(curve.BaseCurve):

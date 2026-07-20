@@ -8,17 +8,11 @@ TITLE = "r064_channelIO"
 DESCRIPTION = "r065_channelIODesc"
 WIKI = "10-‐-Rebuilder#-channel"
 
-DP_CHANNELIO_VERSION = 1.01
 
 
 class ChannelIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_CHANNELIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_channelIO"
         self.startName = "dpChannel"

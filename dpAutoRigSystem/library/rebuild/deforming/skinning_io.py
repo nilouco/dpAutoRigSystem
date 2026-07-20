@@ -9,17 +9,11 @@ TITLE = "r016_skinningIO"
 DESCRIPTION = "r017_skinningIODesc"
 WIKI = "10-‐-Rebuilder#-skinning"
 
-DP_SKINNINGIO_VERSION = 1.01
 
 
 class SkinningIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_SKINNINGIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_skinningIO"
         self.startName = "skinning"

@@ -10,7 +10,6 @@ TITLE = "m214_renamer"
 DESCRIPTION = "m215_renamerDesc"
 WIKI = "06-‐-Tools#-renamer"
 
-DP_RENAMER_VERSION = 1.02
 
 
 class Renamer(base.BaseLibrary):
@@ -58,7 +57,7 @@ class Renamer(base.BaseLibrary):
         # UI:
         renamerWidth = 530
         renamerHeight = 280
-        dpRenamerWin = cmds.window('dpRenamerWin', title=self.ar.data.lang['m214_renamer']+' - v'+str(DP_RENAMER_VERSION), width=renamerWidth, height=renamerHeight, sizeable=False, minimizeButton=False, maximizeButton=False)
+        dpRenamerWin = cmds.window('dpRenamerWin', title=self.ar.data.lang['m214_renamer']+' - v'+str(self.ar.data.version), width=renamerWidth, height=renamerHeight, sizeable=False, minimizeButton=False, maximizeButton=False)
         # UI elements:
         mainLayout = cmds.rowColumnLayout('mainLayout', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)])
         # fields

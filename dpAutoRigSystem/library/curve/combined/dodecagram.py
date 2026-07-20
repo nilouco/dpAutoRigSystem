@@ -8,7 +8,6 @@ CLASS_NAME = "Dodecagram"
 TITLE = "m114_dodecagram"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_DODECAGRAM_VERSION = 1.05
 
 
 class Dodecagram(curve.BaseCurve):

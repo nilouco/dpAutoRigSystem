@@ -17,7 +17,6 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 WIKI = "03-‐-Guides#-limb"
 
-DP_LIMB_VERSION = 3.13
 
 
 class Limb(standard.BaseStandard, layout.BaseLayout):

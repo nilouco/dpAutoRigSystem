@@ -6,7 +6,6 @@ CLASS_NAME = "StarFlat"
 TITLE = "m208_starFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_STARFLAT_VERSION = 1.01
 
 
 class StarFlat(curve.BaseCurve):

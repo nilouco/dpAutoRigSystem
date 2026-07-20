@@ -8,17 +8,11 @@ TITLE = "v144_dataSet"
 DESCRIPTION = "v145_dataSetDesc"
 WIKI = "07-‐-Validator#-data_grp-set-cleaner"
 
-DP_DATASETCLEANER_VERSION = 1.00
 
 
 class DataSet(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_DATASETCLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

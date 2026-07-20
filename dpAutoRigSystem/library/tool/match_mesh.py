@@ -11,7 +11,6 @@ TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
 WIKI = "06-‐-Tools#-match-mesh"
 
-DP_MATCHMESH_VERSION = 3.02
 
 
 class MatchMesh(base.BaseLibrary):

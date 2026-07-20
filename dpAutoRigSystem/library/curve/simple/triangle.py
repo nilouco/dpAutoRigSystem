@@ -6,7 +6,6 @@ CLASS_NAME = "Triangle"
 TITLE = "m102_triangle"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_TRIANGLE_VERSION = 1.03
 
 
 class Triangle(curve.BaseCurve):

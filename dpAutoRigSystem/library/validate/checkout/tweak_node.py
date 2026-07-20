@@ -8,17 +8,11 @@ TITLE = "v130_tweakNode"
 DESCRIPTION = "v131_tweakNodeDesc"
 WIKI = "07-‐-Validator#-tweak-node-cleaner"
 
-DP_TWEAKNODECLEANER_VERSION = 1.02
 
 
 class TweakNode(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_TWEAKNODECLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

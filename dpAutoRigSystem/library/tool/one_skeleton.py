@@ -11,7 +11,6 @@ TITLE = "m254_oneSkeleton"
 DESCRIPTION = "m255_oneSkeletonDesc"
 WIKI = "06-‐-Tools#-one-skeleton"
 
-DP_ONESKELETON_VERSION = 1.03
 
 
 class OneSkeleton(base.BaseLibrary):
@@ -40,7 +39,7 @@ class OneSkeleton(base.BaseLibrary):
         self.ar.utils.closeUI('one_skeleton_win')
         winWidth  = 230
         winHeight = 230
-        cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(DP_ONESKELETON_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(self.ar.data.version), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.columnLayout('main_layout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='one_skeleton_win')
         cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')

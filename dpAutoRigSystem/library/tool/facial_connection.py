@@ -15,7 +15,6 @@ MIDDLE = "Middle"
 SIDED = "Sided"
 FACIALPRESET = "joints"
 
-DP_FACIALCONNECTION_VERSION = 3.00
 
 
 class FacialConnection(base.BaseLibrary):
@@ -126,7 +125,7 @@ class FacialConnection(base.BaseLibrary):
         self.ar.utils.closeUI('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 230
         facialCtrl_winHeight = 330
-        dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(DP_FACIALCONNECTION_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(self.ar.data.version), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
         cmds.separator(height=5, style="in", horizontal=True, parent=facialCtrlLayout)

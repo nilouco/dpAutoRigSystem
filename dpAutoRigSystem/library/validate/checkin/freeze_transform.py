@@ -8,19 +8,11 @@ TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 WIKI = "07-‐-Validator#-freeze-transform"
 
-DP_FREEZETRANSFORM_VERSION = 1.08
 
 
 class FreezeTransform(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
-        kwargs['CLASS_NAME'] = CLASS_NAME
-        kwargs['TITLE'] = TITLE
-        kwargs['DESCRIPTION'] = DESCRIPTION
-        #kwargs['ICON'] = ICON
-        kwargs["WIKI"] = WIKI
-        self.version = DP_FREEZETRANSFORM_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
     def runAction(self, firstMode=True, objList=None, *args):

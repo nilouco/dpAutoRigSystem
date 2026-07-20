@@ -9,17 +9,11 @@ TITLE = "v134_remainingVertex"
 DESCRIPTION = "v135_remainingVertexDesc"
 WIKI = "07-‐-Validator#-remaining-vertex-cleaner"
 
-DP_REMAININGVERTEXCLEANER_VERSION = 1.01
 
 
 class RemainingVertex(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_REMAININGVERTEXCLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

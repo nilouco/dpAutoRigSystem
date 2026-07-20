@@ -8,7 +8,6 @@ CLASS_NAME = "DiamondFlat"
 TITLE = "m177_diamondFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_DIAMONDFLAT_VERSION = 1.07
 
 
 class DiamondFlat(curve.BaseCurve):

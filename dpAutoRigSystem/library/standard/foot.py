@@ -9,7 +9,6 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 WIKI = "03-‐-Guides#-foot"
 
-DP_FOOT_VERSION = 2.08
 
 
 class Foot(standard.BaseStandard, layout.BaseLayout):

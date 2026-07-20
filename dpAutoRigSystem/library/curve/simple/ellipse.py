@@ -6,7 +6,6 @@ CLASS_NAME = "Ellipse"
 TITLE = "m122_ellipse"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_ELLIPSE_VERSION = 1.03
 
 
 class Ellipse(curve.BaseCurve):

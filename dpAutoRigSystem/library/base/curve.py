@@ -4,8 +4,6 @@ from maya import mel
 from . import base
 from importlib import reload
 
-DP_BASECURVE_VERSION = 2.04
-
 
 class BaseCurve(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI):

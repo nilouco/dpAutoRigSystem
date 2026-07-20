@@ -9,7 +9,6 @@ CLASS_NAME = "Arrow"
 TITLE = "m113_arrow"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_ARROW_VERSION = 1.06
 
 
 class Arrow(curve.BaseCurve):

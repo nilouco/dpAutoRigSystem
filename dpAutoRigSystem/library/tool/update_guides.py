@@ -9,7 +9,6 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 WIKI = "06-‐-Tools#-update-guides"
 
-DP_UPDATEGUIDES_VERSION = 1.10
 
 
 class UpdateGuides(base.BaseLibrary):

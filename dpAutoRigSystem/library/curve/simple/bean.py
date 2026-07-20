@@ -6,7 +6,6 @@ CLASS_NAME = "Bean"
 TITLE = "m127_bean"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_BEAN_VERSION = 1.03
 
 
 class Bean(curve.BaseCurve):

@@ -6,7 +6,6 @@ CLASS_NAME = "Drop"
 TITLE = "m128_drop"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_DROP_VERSION = 1.03
 
 
 class Drop(curve.BaseCurve):

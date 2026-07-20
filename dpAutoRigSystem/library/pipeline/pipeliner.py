@@ -10,7 +10,6 @@ import stat
 PIPE_FOLDER = "_dpPipeline"
 #DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.19
 
 
 class Pipeliner(object):
@@ -423,7 +422,7 @@ class Pipeliner(object):
             self.ar = ar
             pipeliner_winWidth  = 380
             pipeliner_winHeight = 480
-            cmds.window('dpPipelinerWindow', title="Pipeliner "+str(DP_PIPELINER_VERSION), widthHeight=(pipeliner_winWidth, pipeliner_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window('dpPipelinerWindow', title="Pipeliner "+str(self.ar.data.version), widthHeight=(pipeliner_winWidth, pipeliner_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             cmds.showWindow('dpPipelinerWindow')
             # create UI layout and elements:
             self.pipelinerLayout = cmds.columnLayout('self.pipelinerLayout', adjustableColumn=True, columnOffset=("both", 10))
@@ -1305,9 +1304,9 @@ class Pipeliner(object):
         cancelName = self.ar.data.lang['i132_cancel']
         continueName = self.ar.data.lang['i174_continue']
         if mustSaveIt:
-            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
         else:
-            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(DP_PIPELINER_VERSION), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName, continueName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName, continueName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
         if confirmResult == cancelName:
             return False
         if confirmResult == continueName:

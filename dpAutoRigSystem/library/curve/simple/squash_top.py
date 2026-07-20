@@ -6,7 +6,6 @@ CLASS_NAME = "SquashTop"
 TITLE = "m121_squashTop"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_SQUASHTOP_VERSION = 1.03
 
 
 class SquashTop(curve.BaseCurve):

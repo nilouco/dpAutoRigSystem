@@ -12,7 +12,6 @@ TITLE = "m239_motionCapture"
 DESCRIPTION = "m240_motionCaptureDesc"
 WIKI = "06-‐-Tools#-motion-capture"
 
-DP_MOTIONCAPTURE_VERSION = 1.03
 
 
 class MotionCapture(base.BaseLibrary):
@@ -44,7 +43,7 @@ class MotionCapture(base.BaseLibrary):
         self.ar.utils.closeUI('dpMotionCaptureWindow')
         mocap_winWidth  = 280
         mocap_winHeight = 470
-        dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.ar.data.lang["m239_motionCapture"]+" "+str(DP_MOTIONCAPTURE_VERSION), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.ar.data.lang["m239_motionCapture"]+" "+str(self.ar.data.version), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         mocapMainLayout = cmds.formLayout('mocapMainLayout')
         mocapTabLayout = cmds.tabLayout('mocapTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=mocapMainLayout)
@@ -886,7 +885,7 @@ class MotionCapture(base.BaseLibrary):
         """
         hikCleanerCode = '''
 from maya import cmds
-DP_MOTIONCAPTURE_VERSION = '''+str(DP_MOTIONCAPTURE_VERSION)+'''
+DP_MOTIONCAPTURE_VERSION = '''+str(self.ar.data.version)+'''
 
 class HumanIKCleaner(object):
     def __init__(self, hikNode, sn, ctrlList, attrList, *args):

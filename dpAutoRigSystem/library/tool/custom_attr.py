@@ -16,7 +16,6 @@ ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnor
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
-DP_CUSTOMATTR_VERSION = 1.11
 
 
 class CustomAttr(base.BaseLibrary):
@@ -66,7 +65,7 @@ class CustomAttr(base.BaseLibrary):
         # window
         customAttributes_winWidth  = 380
         customAttributes_winHeight = 350
-        cmds.window(self.mainWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(customAttributes_winWidth, customAttributes_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.mainWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(customAttributes_winWidth, customAttributes_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         customAttributesLayout = cmds.columnLayout('customAttributesLayout', adjustableColumn=True, columnOffset=("both", 10))
         mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=customAttributesLayout)
@@ -212,7 +211,7 @@ class CustomAttr(base.BaseLibrary):
         self.ar.utils.closeUI(self.addWindowName)
         add_winWidth  = 220
         add_winHeight = 260
-        cmds.window(self.addWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.addWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         addAttrLayout = cmds.columnLayout('addAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text("headerAddTxt", label=self.ar.data.lang['i045_add']+" "+self.ar.data.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=addAttrLayout)
         cmds.separator(style='none', height=10, parent=addAttrLayout)
@@ -296,7 +295,7 @@ class CustomAttr(base.BaseLibrary):
         self.ar.utils.closeUI(self.removeWindowName)
         remove_winWidth  = 200
         remove_winHeight = 250
-        cmds.window(self.removeWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.removeWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         removeAttrLayout = cmds.columnLayout('removeAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text("headerRemoveTxt", label=self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=removeAttrLayout)
         cmds.separator(style='none', height=10, parent=removeAttrLayout)
@@ -387,7 +386,7 @@ class CustomAttr(base.BaseLibrary):
             self.ar.utils.closeUI(self.idWindowName)
             id_winWidth  = 780
             id_winHeight = 350
-            cmds.window(self.idWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(id_winWidth, id_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window(self.idWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(id_winWidth, id_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             self.idAttrLayout = cmds.columnLayout('self.idAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
             cmds.text("headerIdTxt", label=ATTR_DPID+" "+self.ar.data.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=self.idAttrLayout)
             cmds.separator(style='none', height=10, parent=self.idAttrLayout)

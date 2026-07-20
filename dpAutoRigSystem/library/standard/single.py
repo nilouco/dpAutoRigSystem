@@ -9,7 +9,6 @@ TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 WIKI = "03-‐-Guides#-single"
 
-DP_SINGLE_VERSION = 2.07
 
 
 class Single(standard.BaseStandard, layout.BaseLayout):

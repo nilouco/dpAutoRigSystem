@@ -4,7 +4,6 @@ from maya import mel
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.12
 
 
 class Publisher(object):
@@ -40,7 +39,7 @@ class Publisher(object):
             # window
             publisher_winWidth  = 450
             publisher_winHeight = 160
-            cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(DP_PUBLISHER_VERSION), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(self.ar.data.version), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             cmds.showWindow('dpPublisherWindow')
             # create UI layout and elements:
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
@@ -330,7 +329,7 @@ class Publisher(object):
         # window
         winWidth  = 250
         winHeight = 130
-        cmds.window('dpSuccessPublishedWindow', title=self.publisherName+" "+str(DP_PUBLISHER_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpSuccessPublishedWindow', title=self.publisherName+" "+str(self.ar.data.version), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpSuccessPublishedWindow')
         # create UI layout and elements:
         succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
@@ -360,7 +359,7 @@ class Publisher(object):
             if not comments:
                 comments = cmds.textFieldGrp(self.ar.pipeliner.commentBatchTFG, query=True, text=True)
                 if not comments:
-                    comments = self.ar.data.lang['m046_publisher']+" v"+str(DP_PUBLISHER_VERSION)
+                    comments = self.ar.data.lang['m046_publisher']+" v"+str(self.ar.data.version)
             if not comments.endswith(self.ar.data.lang['i358_batch']):
                 comments = self.ar.data.lang['i358_batch']+" - "+comments
             if not assetList:

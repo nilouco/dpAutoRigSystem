@@ -9,7 +9,6 @@ TITLE = "m153_suspension"
 DESCRIPTION = "m154_suspensionDesc"
 WIKI = "03-‐-Guides#-suspension"
 
-DP_SUSPENSION_VERSION = 2.04
 
 
 class Suspension(standard.BaseStandard, layout.BaseLayout):

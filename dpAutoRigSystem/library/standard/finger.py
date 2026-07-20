@@ -9,7 +9,6 @@ TITLE = "m007_finger"
 DESCRIPTION = "m008_fingerDesc"
 WIKI = "03-‐-Guides#-finger"
 
-DP_FINGER_VERSION = 2.05
 
 
 class Finger(standard.BaseStandard, layout.BaseLayout):

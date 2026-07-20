@@ -8,7 +8,6 @@ CLASS_NAME = "EyeFlat"
 TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_EYEFLAT_VERSION = 1.03
 
 
 class EyeFlat(curve.BaseCurve):

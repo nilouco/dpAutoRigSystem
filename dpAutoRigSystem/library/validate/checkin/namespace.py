@@ -8,17 +8,11 @@ TITLE = "v038_namespace"
 DESCRIPTION = "v039_namespaceDesc"
 WIKI = "07-‐-Validator#-namespace-cleaner"
 
-DP_NAMESPACECLEANER_VERSION = 1.03
 
 
 class Namespace(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_NAMESPACECLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
     def runAction(self, firstMode=True, objList=None, *args):

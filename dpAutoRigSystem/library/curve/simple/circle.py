@@ -6,7 +6,6 @@ CLASS_NAME = "Circle"
 TITLE = "m110_circle"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CIRCLE_VERSION = 1.03
 
 
 class Circle(curve.BaseCurve):

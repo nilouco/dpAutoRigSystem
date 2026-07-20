@@ -12,17 +12,11 @@ TITLE = "v078_unlockNormals"
 DESCRIPTION = "v079_unlockNormalsDesc"
 WIKI = "07-‐-Validator#-unlock-normals"
 
-DP_UNLOCKNORMALS_VERSION = 2.00
 
 
 class UnlockNormals(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_UNLOCKNORMALS_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(soft_hard_edges)
         self.softHardEdges = soft_hard_edges.ConvertNormals(self.ar)

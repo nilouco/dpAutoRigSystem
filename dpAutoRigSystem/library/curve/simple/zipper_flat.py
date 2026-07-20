@@ -6,7 +6,6 @@ CLASS_NAME = "ZipperFlat"
 TITLE = "m175_zipperFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_ZIPPERFLAT_VERSION = 1.03
 
 
 class ZipperFlat(curve.BaseCurve):

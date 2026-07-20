@@ -12,17 +12,11 @@ TITLE = "v107_passthroughAttributes"
 DESCRIPTION = "v108_passthroughAttributesDesc"
 WIKI = "07-‐-Validator#-pasthrough-attributes"
 
-DP_PASSTHROUGHATTRIBUTES_VERSION = 1.01
 
 
 class PassthroughAttributes(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_PASSTHROUGHATTRIBUTES_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

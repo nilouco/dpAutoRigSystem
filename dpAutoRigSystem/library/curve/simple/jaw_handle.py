@@ -6,7 +6,6 @@ CLASS_NAME = "JawHandle"
 TITLE = "m132_jawHandle"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_JAWHANDLE_VERSION = 1.03
 
 
 class JawHandle(curve.BaseCurve):

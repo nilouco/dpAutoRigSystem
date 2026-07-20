@@ -6,7 +6,6 @@ CLASS_NAME = "Locator"
 TITLE = "m115_locator"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_LOCATOR_VERSION = 1.03
 
 
 class Locator(curve.BaseCurve):

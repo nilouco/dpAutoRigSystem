@@ -6,7 +6,6 @@ CLASS_NAME = "LocatorFlat"
 TITLE = "m133_locatorFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_LOCATORFLAT_VERSION = 1.03
 
 
 class LocatorFlat(curve.BaseCurve):

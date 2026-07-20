@@ -6,7 +6,6 @@ CLASS_NAME = "ClipStraightFlat"
 TITLE = "m108_clipStraightFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CLIPSTRAIGHTFLAT_VERSION = 1.03
 
 
 class ClipStraightFlat(curve.BaseCurve):

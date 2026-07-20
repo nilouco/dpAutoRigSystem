@@ -9,7 +9,6 @@ TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 WIKI = "03-‐-Guides#-nose"
 
-DP_NOSE_VERSION = 2.05
 
 
 class Nose(standard.BaseStandard, layout.BaseLayout):

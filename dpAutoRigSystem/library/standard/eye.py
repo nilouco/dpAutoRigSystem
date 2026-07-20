@@ -15,7 +15,6 @@ PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
 
-DP_EYE_VERSION = 2.08
 
 
 class Eye(standard.BaseStandard, layout.BaseLayout):

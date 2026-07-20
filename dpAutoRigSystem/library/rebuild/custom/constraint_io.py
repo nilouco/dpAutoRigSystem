@@ -8,17 +8,11 @@ TITLE = "r050_constraintIO"
 DESCRIPTION = "r051_constraintIODesc"
 WIKI = "10-‐-Rebuilder#-constraint"
 
-DP_CONSTRAINTIO_VERSION = 1.02
 
 
 class ConstraintIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_CONSTRAINTIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_constraintIO"
         self.startName = "dpConstraint"

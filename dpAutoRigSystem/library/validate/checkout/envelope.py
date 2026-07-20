@@ -9,17 +9,11 @@ TITLE = "v094_envelope"
 DESCRIPTION = "v095_envelopeDesc"
 WIKI = "07-‐-Validator#-envelope-checker"
 
-DP_ENVELOPECHECKER_VERSION = 1.02
 
 
 class Envelope(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_ENVELOPECHECKER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
     def nodeHasEnvelope(self, node):

@@ -6,7 +6,6 @@ CLASS_NAME = "SpitFlat"
 TITLE = "m118_spitFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_SPITFLAT_VERSION = 1.03
 
 
 class SpitFlat(curve.BaseCurve):

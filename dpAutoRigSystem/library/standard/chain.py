@@ -12,7 +12,6 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 WIKI = "03-‐-Guides#-chain"
 
-DP_CHAIN_VERSION = 2.09
 
 
 class Chain(standard.BaseStandard, layout.BaseLayout):

@@ -6,7 +6,6 @@ CLASS_NAME = "Piramid"
 TITLE = "m134_piramid"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_PIRAMID_VERSION = 1.03
 
 
 class Piramid(curve.BaseCurve):

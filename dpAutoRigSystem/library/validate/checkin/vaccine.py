@@ -10,17 +10,11 @@ TITLE = "v052_vaccine"
 DESCRIPTION = "v053_vaccineDesc"
 WIKI = "07-‐-Validator#-vaccine-cleaner"
 
-DP_VACCINECLEANER_VERSION = 1.04
 
 
 class Vaccine(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_VACCINECLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(action)
     

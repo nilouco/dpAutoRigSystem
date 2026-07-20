@@ -6,7 +6,6 @@ CLASS_NAME = "CurvedCircleUp"
 TITLE = "m124_curvedCircleUp"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CURVEDCIRCLEUP_VERSION = 1.03
 
 
 class CurvedCircleUp(curve.BaseCurve):

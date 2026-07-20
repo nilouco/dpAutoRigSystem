@@ -2,7 +2,6 @@
 from maya import cmds
 from maya import mel
 
-DP_WEIGTHS_VERSION = 1.00
 
 
 class Weights(object):

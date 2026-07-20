@@ -8,7 +8,6 @@ CLASS_NAME = "Smile"
 TITLE = "m101_smile"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_SMILE_VERSION = 1.05
 
 
 class Smile(curve.BaseCurve):

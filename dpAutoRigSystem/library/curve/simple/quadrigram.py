@@ -6,7 +6,6 @@ CLASS_NAME = "Quadrigram"
 TITLE = "m120_quadrigram"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_QUADRIGRAM_VERSION = 1.03
 
 
 class Quadrigram(curve.BaseCurve):

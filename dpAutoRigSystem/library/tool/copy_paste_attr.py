@@ -11,7 +11,6 @@ TITLE = "m135_copyPasteAttr"
 DESCRIPTION = "m136_copyPasteAttrDesc"
 WIKI = "06-‐-Tools#-copy-paste-attribute"
 
-DP_COPYPASTEATTR_VERSION = 2.04
 
 
 class CopyPasteAttr(base.BaseLibrary):
@@ -49,7 +48,7 @@ class CopyPasteAttr(base.BaseLibrary):
 
 
         # UI:
-        dpCopyPasteAttrWin = cmds.window('dpCopyPasteAttrWin', title='CopyPasteAttr - v'+str(DP_COPYPASTEATTR_VERSION), width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpCopyPasteAttrWin = cmds.window('dpCopyPasteAttrWin', title='CopyPasteAttr - v'+str(self.ar.data.version), width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
         # UI elements:
         mainLayout  = cmds.columnLayout('mainLayout', width=150, height=75, adjustableColumn=True, parent=dpCopyPasteAttrWin)
         cmds.button('copyButton', label=self.ar.data.lang['i122_copyAttr'], command=partial(self.ar.ctrls.copyAttr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent=mainLayout)

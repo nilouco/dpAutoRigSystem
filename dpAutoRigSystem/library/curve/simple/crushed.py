@@ -6,7 +6,6 @@ CLASS_NAME = "Crushed"
 TITLE = "m129_crushed"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CRUSHED_VERSION = 1.03
 
 
 class Crushed(curve.BaseCurve):

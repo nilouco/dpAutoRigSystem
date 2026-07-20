@@ -8,7 +8,6 @@ CLASS_NAME = "Diamond"
 TITLE = "m105_diamond"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_DIAMOND_VERSION = 1.07
 
 
 class Diamond(curve.BaseCurve):

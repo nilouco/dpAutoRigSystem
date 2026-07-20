@@ -9,7 +9,6 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 WIKI = "03-‐-Guides#-spine"
 
-DP_SPINE_VERSION = 2.07
 
 
 class Spine(standard.BaseStandard, layout.BaseLayout):

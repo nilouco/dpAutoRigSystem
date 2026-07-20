@@ -6,7 +6,6 @@ CLASS_NAME = "PlusOpen"
 TITLE = "m207_plusOpen"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_PLUSOPEN_VERSION = 1.01
 
 
 class PlusOpen(curve.BaseCurve):

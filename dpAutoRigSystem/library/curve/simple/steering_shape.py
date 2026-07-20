@@ -6,7 +6,6 @@ CLASS_NAME = "SteeringShape"
 TITLE = "m161_steeringShape"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_STEERINGSHAPE_VERSION = 1.02
 
 
 class SteeringShape(curve.BaseCurve):

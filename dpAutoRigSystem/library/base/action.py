@@ -15,8 +15,6 @@ WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.65, 0.65)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
-DP_ACTIONSTARTCLASS_VERSION = 2.09
-
 
 class ActionStartClass(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, verbose=True):
@@ -246,7 +244,6 @@ class ActionStartClass(base.BaseLibrary):
         self.dataLogDic["time"] = self.ar.pipeliner.getToday(True)
         self.dataLogDic["dpARVersion"] = self.ar.data.version
         self.dataLogDic["module"] = self.name
-        self.dataLogDic["version"] = self.version
         self.dataLogDic["name"] = self.title
         self.dataLogDic["mode"] = actionText
         self.dataLogDic["checkedObjList"] = self.checkedObjList

@@ -4,7 +4,6 @@ from maya import mel
 from . import weights
 from importlib import reload
 
-DP_SKINNING_VERSION = 1.10
 
 
 class Skinning(weights.Weights):

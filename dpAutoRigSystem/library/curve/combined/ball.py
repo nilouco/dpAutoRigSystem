@@ -8,7 +8,6 @@ CLASS_NAME = "Ball"
 TITLE = "m116_ball"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_BALL_VERSION = 1.05
 
 
 class Ball(curve.BaseCurve):

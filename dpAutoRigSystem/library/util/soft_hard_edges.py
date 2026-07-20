@@ -11,12 +11,11 @@
 # importing libraries:
 from maya import OpenMaya
 
-DP_SOFTHARDEDGES_VERSION = 1.00
 
 
 class ConvertNormals(object):
     def __init__(self, ar):
-        self.version = DP_SOFTHARDEDGES_VERSION
+        self.ar = ar
 
 
     def getHardEdges(self, item):

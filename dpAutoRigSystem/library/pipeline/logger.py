@@ -3,7 +3,6 @@ from maya import cmds
 import time
 from functools import partial
 
-DP_LOGGER_VERSION = 1.02
 
 
 class Logger(object):

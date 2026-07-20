@@ -8,17 +8,11 @@ TITLE = "v136_remapValueToSetRange"
 DESCRIPTION = "v137_remapValueToSetRangeDesc"
 WIKI = "07-‐-Validator#-remapvalue-to-setrange"
 
-DP_REMAPVALUETOSETRANGE_VERSION = 1.01
 
 
 class RemapvalueToSetrange(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_REMAPVALUETOSETRANGE_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

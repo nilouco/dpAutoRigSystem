@@ -8,7 +8,6 @@ CLASS_NAME = "Octagram"
 TITLE = "m104_octagram"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_OCTAGRAM_VERSION = 1.05
 
 
 class Octagram(curve.BaseCurve):

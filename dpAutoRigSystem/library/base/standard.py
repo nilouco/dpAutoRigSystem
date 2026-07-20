@@ -6,8 +6,6 @@ from ..tool import correction_manager
 from importlib import reload
 
 
-DP_BASESTANDARD_VERSION = 2.13
-
 
 class BaseStandard(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, *args):

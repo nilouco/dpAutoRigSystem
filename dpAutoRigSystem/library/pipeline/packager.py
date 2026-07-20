@@ -20,7 +20,6 @@ CTRL_LAYER = "Ctrl_Lyr"
 PREVIEW_WIDTH = 1024
 PREVIEW_HEIGHT = 720
 
-DP_PACKAGER_VERSION = 2.01
 
 
 class Packager(object):

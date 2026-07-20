@@ -9,7 +9,6 @@ TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 WIKI = "06-‐-Tools#-isolate"
 
-DP_ISOLATE_VERSION = 1.04
 
 
 class Isolate(base.BaseLibrary):

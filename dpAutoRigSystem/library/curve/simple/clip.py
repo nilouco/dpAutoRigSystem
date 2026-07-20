@@ -6,7 +6,6 @@ CLASS_NAME = "Clip"
 TITLE = "m106_clip"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CLIP_VERSION = 1.03
 
 
 class Clip(curve.BaseCurve):

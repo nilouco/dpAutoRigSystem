@@ -8,17 +8,11 @@ TITLE = "v082_unusedSkin"
 DESCRIPTION = "v083_unusedSkinDesc"
 WIKI = "07-‐-Validator#-unused-skin-cleaner"
 
-DP_UNUSEDSKINCLEANER_VERSION = 1.04
 
 
 class UnusedSkin(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_UNUSEDSKINCLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

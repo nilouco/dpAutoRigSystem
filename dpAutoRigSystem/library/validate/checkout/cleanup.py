@@ -8,17 +8,11 @@ TITLE = "v096_cleanup"
 DESCRIPTION = "v097_cleanupDesc"
 WIKI = "07-‐-Validator#-cleanup"
 
-DP_CLEANUP_VERSION = 1.01
 
 
 class Cleanup(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_CLEANUP_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.cleanupAttr = "dpDeleteIt"
     
 

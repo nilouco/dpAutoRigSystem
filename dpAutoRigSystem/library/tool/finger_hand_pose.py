@@ -9,7 +9,6 @@ TITLE = "m256_fingerHandPose"
 DESCRIPTION = "m257_fingerHandPoseDesc"
 WIKI = "06-‐-Tools#-finger-hand-pose"
 
-DP_FINGERHANDPOSE_VERSION = 1.01
 
 
 class FingerHandPose(base.BaseLibrary):

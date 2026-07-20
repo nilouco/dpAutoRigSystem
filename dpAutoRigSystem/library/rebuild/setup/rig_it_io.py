@@ -7,17 +7,11 @@ TITLE = "r028_rigItIO"
 DESCRIPTION = "r029_rigItIODesc"
 WIKI = "10-‐-Rebuilder#-rig-it"
 
-DP_RIGITIO_VERSION = 1.01
 
 
 class RigItIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_RIGITIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.startName = "dpRigIt"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.ar.data.lang['i305_none']

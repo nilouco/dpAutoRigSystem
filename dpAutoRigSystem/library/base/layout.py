@@ -4,8 +4,6 @@ from functools import partial
 from . import base
 from importlib import reload
 
-DP_BASELAYOUT_VERSION = 2.09
-
 
 class BaseLayout(base.BaseLibrary):
     def __init__(self, ar, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, WIKI):

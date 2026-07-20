@@ -9,7 +9,6 @@ TITLE = "m158_steering"
 DESCRIPTION = "m159_steeringDesc"
 WIKI = "03-‐-Guides#-steering"
 
-DP_STEERING_VERSION = 2.04
 
 
 class Steering(standard.BaseStandard, layout.BaseLayout):

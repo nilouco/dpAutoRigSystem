@@ -6,7 +6,6 @@ CLASS_NAME = "Lens"
 TITLE = "m126_lens"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_LENS_VERSION = 1.03
 
 
 class Lens(curve.BaseCurve):

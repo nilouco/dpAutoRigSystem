@@ -11,17 +11,11 @@ TITLE = "r039_rivetIO"
 DESCRIPTION = "r040_rivetIODesc"
 WIKI = "10-‐-Rebuilder#-rivet"
 
-DP_RIVETIO_VERSION = 1.01
 
 
 class RivetIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_RIVETIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(rivet)
         self.rivet = rivet.Rivet(self.ar)

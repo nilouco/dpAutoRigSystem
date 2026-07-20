@@ -8,17 +8,11 @@ TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 WIKI = "07-‐-Validator#-geometry-history"
 
-DP_GEOMETRYHISTORY_VERSION = 1.06
 
 
 class GeometryHistory(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_GEOMETRYHISTORY_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

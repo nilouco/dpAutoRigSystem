@@ -8,17 +8,11 @@ TITLE = "v105_cycle"
 DESCRIPTION = "v106_cycleDesc"
 WIKI = "07-‐-Validator#-cycle-checker"
 
-DP_CYCLECHECKER_VERSION = 1.01
 
 
 class Cycle(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_CYCLECHECKER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

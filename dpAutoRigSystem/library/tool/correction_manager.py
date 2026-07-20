@@ -16,7 +16,6 @@ WIKI = "06-‐-Tools#-correction-manager"
 ANGLE = "Angle"
 DISTANCE = "Distance"
 
-DP_CORRECTIONMANAGER_VERSION = 2.14
 
 
 class CorrectionManager(base.BaseLibrary):
@@ -72,7 +71,7 @@ class CorrectionManager(base.BaseLibrary):
         # window
         correctionManager_winWidth  = 380
         correctionManager_winHeight = 300
-        cmds.window('dpCorrectionManagerWindow', title=self.correctionManagerName+" "+str(DP_CORRECTIONMANAGER_VERSION), widthHeight=(correctionManager_winWidth, correctionManager_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpCorrectionManagerWindow', title=self.correctionManagerName+" "+str(self.ar.data.version), widthHeight=(correctionManager_winWidth, correctionManager_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpCorrectionManagerWindow')
         # create UI layout and elements:
         correctionManagerLayout = cmds.columnLayout('correctionManagerLayout', adjustableColumn=True, columnOffset=("both", 10))

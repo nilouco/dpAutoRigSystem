@@ -13,7 +13,6 @@ WIKI = "06-‐-Tools#-head-deformer"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 4.05
 
 
 class HeadDeformer(base.BaseLibrary):

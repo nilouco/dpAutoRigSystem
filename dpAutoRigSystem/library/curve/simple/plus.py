@@ -6,7 +6,6 @@ CLASS_NAME = "Plus"
 TITLE = "m131_plus"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_PLUS_VERSION = 1.03
 
 
 class Plus(curve.BaseCurve):

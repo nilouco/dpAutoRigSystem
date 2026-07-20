@@ -6,7 +6,6 @@ CLASS_NAME = "Character"
 TITLE = "m125_character"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CHARACTER_VERSION = 1.03
 
 
 class Character(curve.BaseCurve):

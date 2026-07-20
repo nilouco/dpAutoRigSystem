@@ -6,7 +6,6 @@ CLASS_NAME = "Square"
 TITLE = "m100_square"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_SQUARE_VERSION = 1.03
 
 
 class Square(curve.BaseCurve):

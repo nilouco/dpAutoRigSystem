@@ -14,7 +14,6 @@ CHIN = "chin"
 LIPS = "lips"
 UPPERHEAD = "upperHead"
 
-DP_HEAD_VERSION = 3.09
 
 
 class Head(standard.BaseStandard, layout.BaseLayout):
@@ -1229,7 +1228,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
         """ Creates a scriptNode to set the min and max values to the given Face_Ctrl.
         """
         minMaxCode = '''from maya import cmds
-DP_HEAD_VERSION = '''+str(DP_HEAD_VERSION)+'''
+DP_HEAD_VERSION = '''+str(self.ar.data.version)+'''
 class MinMaxValues(object):
     def __init__(self, headNet, *args):
         self.faceCtrl = cmds.listConnections(headNet+".faceCtrl")[0]

@@ -6,7 +6,6 @@ CLASS_NAME = "BallonFlat"
 TITLE = "m117_ballonFlat"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_BALLONFLAT_VERSION = 1.03
 
 
 class BallonFlat(curve.BaseCurve):

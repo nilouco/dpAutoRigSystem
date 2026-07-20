@@ -8,7 +8,6 @@ CLASS_NAME = "OvalDisc"
 TITLE = "m123_ovalDisc"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_OVALDISC_VERSION = 1.05
 
 
 class OvalDisc(curve.BaseCurve):

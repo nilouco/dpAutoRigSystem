@@ -3,7 +3,6 @@ from maya import cmds
 from . import base
 from importlib import reload
 
-DP_BASETEMPLATE_VERSION = 1.00
 
 
 class BaseTemplate(base.BaseLibrary):

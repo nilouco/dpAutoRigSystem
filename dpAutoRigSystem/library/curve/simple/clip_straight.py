@@ -6,7 +6,6 @@ CLASS_NAME = "ClipStraight"
 TITLE = "m109_clipStraight"
 DESCRIPTION = "m099_cvControlDesc"
 
-DP_CLIPSTRAIGHT_VERSION = 1.03
 
 
 class ClipStraight(curve.BaseCurve):

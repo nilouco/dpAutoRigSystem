@@ -8,17 +8,11 @@ TITLE = "v148_unusedDeformer"
 DESCRIPTION = "v149_unusedDeformerDesc"
 WIKI = "07-‐-Validator#-unused-deformer-cleaner"
 
-DP_UNUSEDDEFORMERCLEANER_VERSION = 1.00
 
 
 class UnusedDeformer(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_UNUSEDDEFORMERCLEANER_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

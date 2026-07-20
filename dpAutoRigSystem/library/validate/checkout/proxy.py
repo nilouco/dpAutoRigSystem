@@ -11,17 +11,11 @@ WIKI = "07-‐-Validator#-proxy-creator"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.07
 
 
 class Proxy(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_PROXYCREATOR_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.repeatedNameList = []
     
 

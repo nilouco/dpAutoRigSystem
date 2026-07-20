@@ -8,17 +8,11 @@ TITLE = "r023_supportNodeIO"
 DESCRIPTION = "r024_supportNodeIODesc"
 WIKI = "10-‐-Rebuilder#-support-node"
 
-DP_SUPPORTNODEIO_VERSION = 1.03
 
 
 class SupportNodeIO(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        kwargs["CLASS_NAME"] = CLASS_NAME
-        kwargs["TITLE"] = TITLE
-        kwargs["DESCRIPTION"] = DESCRIPTION
-        kwargs["WIKI"] = WIKI
-        self.version = DP_SUPPORTNODEIO_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_supportNodeIO"
         self.startName = "dpSupportNode"

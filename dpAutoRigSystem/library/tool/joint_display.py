@@ -11,7 +11,6 @@ TITLE = "m233_jointDisplay"
 DESCRIPTION = "m234_jointDisplayDesc"
 WIKI = "06-‐-Tools#-joint-display"
 
-DP_JOINTDISPLAY_VERSION = 1.01
 
 
 class JointDisplay(base.BaseLibrary):
@@ -51,7 +50,7 @@ class JointDisplay(base.BaseLibrary):
         # starting UI
         jointDisplay_winWidth  = 660
         jointDisplay_winHeight = 410
-        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.ar.data.lang["m233_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.ar.data.lang["m233_jointDisplay"]+" "+str(self.ar.data.version), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating Main layout:
         jointDisplayMainLayout = cmds.columnLayout('jointDisplayMainLayout', columnOffset=('both', 5), adjustableColumn=True)

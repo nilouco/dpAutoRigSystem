@@ -8,19 +8,11 @@ TITLE = 'v092_unlockAttributes'
 DESCRIPTION = 'v093_unlockAttributesDesc'
 WIKI = "07-‐-Validator#-unlock-attributes"
 
-DP_UNLOCKATTRIBUTES_VERSION = 1.03
 
 
 class UnlockAttributes(action.ActionStartClass):
-    def __init__(self, *args, **kwargs):
-        # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
-        kwargs['CLASS_NAME'] = CLASS_NAME
-        kwargs['TITLE'] = TITLE
-        kwargs['DESCRIPTION'] = DESCRIPTION
-        #kwargs['ICON'] = ICON
-        kwargs["WIKI"] = WIKI
-        self.version = DP_UNLOCKATTRIBUTES_VERSION
-        action.ActionStartClass.__init__(self, *args, **kwargs)
+    def __init__(self, ar):
+        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
     def runAction(self, firstMode=True, objList=None, *args):

@@ -35,7 +35,6 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.10
 
 
 class Rivet(base.BaseLibrary):
@@ -74,7 +73,7 @@ class Rivet(base.BaseLibrary):
         self.ar.utils.closeUI('dpRivetWindow')
         rivet_winWidth  = 305
         rivet_winHeight = 470
-        dpRivetWin = cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpRivetWin = cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(self.ar.data.version), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         rivetTabsLayout = cmds.tabLayout('rivetTabsLayout', innerMarginWidth=5, innerMarginHeight=5, parent="dpRivetWindow")
         rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10), parent=rivetTabsLayout)
