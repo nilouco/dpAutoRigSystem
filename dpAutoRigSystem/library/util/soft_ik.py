@@ -30,7 +30,7 @@ from maya import cmds
 
 
 
-class SoftIkClass(object):
+class SoftIk(object):
     def __init__(self, ar, *args):
         # defining variables:
         self.ar = ar

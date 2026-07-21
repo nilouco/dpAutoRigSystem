@@ -15,9 +15,9 @@ WIKI = "07-‐-Validator#-broken-rivets"
 
 
 
-class BrokenRivet(action.ActionStartClass):
+class BrokenRivet(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(rivet)
         self.rivet = rivet.Rivet(self.ar)

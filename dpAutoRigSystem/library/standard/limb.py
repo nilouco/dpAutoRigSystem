@@ -27,7 +27,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         self.loadVariables()
         if self.ar.dev:
             self.reloadModules()
-        self.softIk = soft_ik.SoftIkClass(self.ar)
+        self.softIk = soft_ik.SoftIk(self.ar)
         self.correctionManager = correction_manager.CorrectionManager(self.ar)
         self.ribbon = ribbon.Ribbon(self.ar, self)
         self.correctionManager.ui = False
@@ -2025,7 +2025,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
                 
                 # ikFkSnap
-                ik_fk_snap.IkFkSnapClass(self.ar, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], dpDev=self.ar.dev)
+                ik_fk_snap.IkFkSnap(self.ar, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], dpDev=self.ar.dev)
                 
                 # calibration attribute:
                 if self.limbTypeName == self.armName:

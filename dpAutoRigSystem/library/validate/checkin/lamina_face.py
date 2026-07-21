@@ -12,9 +12,9 @@ WIKI = "07-‐-Validator#-lamina-face-cleaner"
 
 
 
-class LaminaFace(action.ActionStartClass):
+class LaminaFace(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

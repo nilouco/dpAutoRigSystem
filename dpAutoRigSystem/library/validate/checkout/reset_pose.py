@@ -26,9 +26,9 @@ ATTR_TYPE = {
 
 
 
-class ResetPose(action.ActionStartClass):
+class ResetPose(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.nonDynZeroAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
         self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
     

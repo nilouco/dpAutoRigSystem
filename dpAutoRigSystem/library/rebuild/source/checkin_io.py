@@ -9,9 +9,9 @@ WIKI = "10-‐-Rebuilder#-checkin"
 
 
 
-class CheckinIO(action.ActionStartClass):
+class CheckinIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.startName = "dpCheckin"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.ar.data.lang['i305_none']

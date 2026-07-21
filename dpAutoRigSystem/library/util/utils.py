@@ -180,7 +180,6 @@ class Utils(object):
         """
         validModules = self.findAllModules(path, folder)
         validModuleNames = []
-        #guideFolder = (path+"/"+folder).partition("/Modules/")[2]
         guideFolder = self.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder
         for m in validModules:
             mod = __import__(guideFolder+"."+m, {}, {}, [m])

@@ -10,9 +10,9 @@ WIKI = "10-‐-Rebuilder#-rename"
 
 
 
-class RenameIO(action.ActionStartClass):
+class RenameIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_renameIO"
         self.startName = "dpRename"

@@ -10,9 +10,9 @@ WIKI = "10-‐-Rebuilder#-connection"
 
 
 
-class ConnectionIO(action.ActionStartClass):
+class ConnectionIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_connectionIO"
         self.startName = "dpConnection"

@@ -11,9 +11,9 @@ WIKI = "10-‐-Rebuilder#-skinning"
 
 
 
-class SkinningIO(action.ActionStartClass):
+class SkinningIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_skinningIO"
         self.startName = "skinning"

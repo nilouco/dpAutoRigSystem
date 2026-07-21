@@ -20,7 +20,7 @@ class CopyPasteAttr(base.BaseLibrary):
             reload(base)
             reload(controllers)
 
-#        self.ar.ctrls = controllers.ControlClass(self.ar)
+#        self.ar.ctrls = controllers.Controllers(self.ar)
 
 
     def build_tool(self, *args):

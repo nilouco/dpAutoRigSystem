@@ -532,7 +532,7 @@ class MotionCapture(base.BaseLibrary):
                 ikExtremSubCtrl = cmds.listConnections(net+".ikExtremSubCtrl")[0]
                 ikJointList = cmds.listConnections(net+".ikJointList")
                 # make an ikFkSnap instance without create another network node.
-                ikFkSnapInst = ik_fk_snap.IkFkSnapClass(self.ar, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], creation=False)
+                ikFkSnapInst = ik_fk_snap.IkFkSnap(self.ar, net, worldRef, fkCtrlList, [ikCornerCtrl, ikExtremCtrl, ikExtremSubCtrl], ikJointList, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], creation=False)
                 # snap from Fk to Ik (that means move ik to fk position)                
                 ikFkSnapInst.snapFkToIk()
                 del ikFkSnapInst

@@ -10,9 +10,9 @@ WIKI = "07-‐-Validator#-unused-skin-cleaner"
 
 
 
-class UnusedSkin(action.ActionStartClass):
+class UnusedSkin(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

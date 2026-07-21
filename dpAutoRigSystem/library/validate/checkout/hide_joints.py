@@ -10,9 +10,9 @@ WIKI = "07-‐-Validator#-hide-all-joints"
 
 
 
-class HideJoints(action.ActionStartClass):
+class HideJoints(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
     def runAction(self, firstMode=True, objList=None, *args):

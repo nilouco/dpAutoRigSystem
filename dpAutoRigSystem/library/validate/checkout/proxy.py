@@ -13,9 +13,9 @@ NO_PROXY = "dpDoNotProxyIt"
 
 
 
-class Proxy(action.ActionStartClass):
+class Proxy(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.repeatedNameList = []
     
 

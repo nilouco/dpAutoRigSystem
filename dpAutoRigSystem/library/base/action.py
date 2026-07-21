@@ -16,7 +16,7 @@ ISSUE_COLOR = (1.0, 0.65, 0.65)
 RUNNING_COLOR = (1.0, 1.0, 1.0)
 
 
-class ActionStartClass(base.BaseLibrary):
+class BaseAction(base.BaseLibrary):
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI, verbose=True):
         """ Initialize the module class for validating and rebuilding.
         """

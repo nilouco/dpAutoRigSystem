@@ -10,9 +10,9 @@ WIKI = "10-‐-Rebuilder#-transformation"
 
 
 
-class TransformationIO(action.ActionStartClass):
+class TransformationIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_transformationIO"
         self.startName = "dpTransformation"

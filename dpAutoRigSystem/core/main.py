@@ -122,7 +122,7 @@ class Start(object):
         self.utils = utils.Utils(self)
         self.pipeliner = pipeliner.Pipeliner(self)
         self.packager = packager.Packager(self)
-        self.ctrls = controllers.ControlClass(self)
+        self.ctrls = controllers.Controllers(self)
         self.publisher = publisher.Publisher(self)
         self.custom_attr = custom_attr.CustomAttr(self)
         self.skin = skinning.Skinning(self)

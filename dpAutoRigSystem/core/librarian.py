@@ -70,14 +70,13 @@ class Lib(object):
                 folder = path
             if not folder in self.ar.data.lib.keys():
                 self.ar.data.lib[folder] = { 
-                                            "modules" : modules,
+                                            #"modules" : modules,
                                             "instances" : libs,
                                             "imported" : imported_modules,
                                             "names" : class_names
                                             }
                 if self.ar.data.verbose:
-                    print(folder+" : "+str(modules))
-        return modules
+                    print(f"{folder}: {str(modules)}")
     
 
     def start_templates(self):

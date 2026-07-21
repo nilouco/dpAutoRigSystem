@@ -17,7 +17,7 @@ import math
 
 
 
-class IkFkSnapClass(object):
+class IkFkSnap(object):
     def __init__(self, ar, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, creation=True, *args):
         # defining variables:
         self.ar = ar

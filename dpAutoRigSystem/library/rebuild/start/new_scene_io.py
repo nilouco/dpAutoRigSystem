@@ -11,9 +11,9 @@ WIKI = "10-‐-Rebuilder#-new-scene"
 
 
 
-class NewSceneIO(action.ActionStartClass):
+class NewSceneIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(action)
         self.startName = "dpNewScene"

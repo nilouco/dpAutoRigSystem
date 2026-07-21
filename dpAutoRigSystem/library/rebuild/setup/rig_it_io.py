@@ -9,9 +9,9 @@ WIKI = "10-‐-Rebuilder#-rig-it"
 
 
 
-class RigItIO(action.ActionStartClass):
+class RigItIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.startName = "dpRigIt"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.ar.data.lang['i305_none']

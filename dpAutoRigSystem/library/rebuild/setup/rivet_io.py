@@ -13,9 +13,9 @@ WIKI = "10-‐-Rebuilder#-rivet"
 
 
 
-class RivetIO(action.ActionStartClass):
+class RivetIO(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(rivet)
         self.rivet = rivet.Rivet(self.ar)

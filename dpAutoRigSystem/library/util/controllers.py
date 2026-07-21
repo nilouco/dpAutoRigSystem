@@ -15,7 +15,7 @@ JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
 
 
-class ControlClass(object):
+class Controllers(object):
     def __init__(self, ar, *args, **kwargs):
         """ Initialize the module class defining variables to use creating preset controls.
         """

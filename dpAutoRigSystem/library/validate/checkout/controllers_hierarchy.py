@@ -10,9 +10,9 @@ WIKI = "07-‐-Validator#-controls-hierarchy"
 
 
 
-class ControllersHierarchy(action.ActionStartClass):
+class ControllersHierarchy(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.ioDir = "s_hierarchyIO"
         self.startName = "dpHierarchy"
 

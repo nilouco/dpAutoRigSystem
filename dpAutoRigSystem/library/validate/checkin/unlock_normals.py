@@ -2,7 +2,7 @@
 from maya import cmds
 from maya import OpenMaya
 from ....library.base import action
-from ....library.util import soft_hard_edges
+from ....library.util import edge_normals
 from importlib import reload
 
 
@@ -14,12 +14,12 @@ WIKI = "07-‐-Validator#-unlock-normals"
 
 
 
-class UnlockNormals(action.ActionStartClass):
+class UnlockNormals(action.BaseAction):
     def __init__(self, ar):
-        action.ActionStartClass.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
-            reload(soft_hard_edges)
-        self.softHardEdges = soft_hard_edges.ConvertNormals(self.ar)
+            reload(edge_normals)
+        self.softHardEdges = edge_normals.ConvertNormals(self.ar)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
