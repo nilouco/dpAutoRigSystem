@@ -75,10 +75,10 @@ class TargetMirror(base.BaseLibrary):
     def dpLoadOriginalModel(self, *args):
         """ Load selected object as original model
         """
-        selectedList = cmds.ls(selection=True)
-        if selectedList:
-            if self.dpCheckGeometry(selectedList[0]):
-                cmds.textField(self.originalModelTextField, edit=True, text=selectedList[0])
+        selected_nodes = cmds.ls(selection=True)
+        if selected_nodes:
+            if self.dpCheckGeometry(selected_nodes[0]):
+                cmds.textField(self.originalModelTextField, edit=True, text=selected_nodes[0])
         else:
             print("Original Model > None")
     

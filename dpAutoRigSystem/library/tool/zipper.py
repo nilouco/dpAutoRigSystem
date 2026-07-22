@@ -94,12 +94,12 @@ class Zipper(base.BaseLibrary):
     def dpLoadOrigModel(self, *args):
         """ Load selected object as original model.
         """
-        selectedList = cmds.ls(selection=True)
-        if selectedList:
-            if cmds.objectType(cmds.listRelatives(selectedList[0], children=True)[0]) == "mesh":
-                cmds.textField(self.origModel_TF, edit=True, text=selectedList[0])
+        selected_nodes = cmds.ls(selection=True)
+        if selected_nodes:
+            if cmds.objectType(cmds.listRelatives(selected_nodes[0], children=True)[0]) == "mesh":
+                cmds.textField(self.origModel_TF, edit=True, text=selected_nodes[0])
                 cmds.button(self.origModel_BT, edit=True, label=self.ar.data.lang['m152_originalModel'], backgroundColor=(0.3, 0.8, 1.0))
-                self.origModel = selectedList[0]
+                self.origModel = selected_nodes[0]
         else:
             mel.eval('warning \"'+self.ar.data.lang['i191_selectPoly']+'\";')
     
@@ -185,13 +185,13 @@ class Zipper(base.BaseLibrary):
             Set curveAxis variable to be used in the curve reverse setup if needed to set up curve direction.
             Update curveDirection variable value to be "X", "Y" or "Z".
         """
-        selectedItem = cmds.radioButtonGrp(self.curveDirectionRB, query=True, select=True)
-        self.curveAxis = selectedItem-1
-        if selectedItem == 1:
+        selected_item = cmds.radioButtonGrp(self.curveDirectionRB, query=True, select=True)
+        self.curveAxis = selected_item-1
+        if selected_item == 1:
             self.curveDirection = "X"
-        elif selectedItem == 2:
+        elif selected_item == 2:
             self.curveDirection = "Y"
-        elif selectedItem == 3:
+        elif selected_item == 3:
             self.curveDirection = "Z"
     
     

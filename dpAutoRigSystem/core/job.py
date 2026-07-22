@@ -55,49 +55,46 @@ class Job(object):
     def selected_guide(self):
         """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
         """
-        # run the UI part:
-        self.selectedModuleInstanceList = []
-        selectedGuideNodeList = []
-        selectedList = []
+        self.selected_instances = []
+        selected_guides = []
+        selected_nodes = []
         # get selected items:
-        selectedList = cmds.ls(selection=True, long=True)
-        if selectedList:
-            updatedGuideNodeList = []
-            needUpdateSelect = False
-            for selectedItem in selectedList:
-                if self.ar.data.guide_base_attr in cmds.listAttr(selectedItem) and cmds.getAttr(selectedItem+"."+self.ar.data.guide_base_attr) == 1:
-                    if not ":" in selectedItem[selectedItem.rfind("|"):]:
-                        newGuide = self.ar.maker.setup_duplicated_guide(selectedItem)
-                        updatedGuideNodeList.append(newGuide)
-                        needUpdateSelect = True
+        selected_nodes = cmds.ls(selection=True, long=True)
+        if selected_nodes:
+            updated_guide_nodes = []
+            need_update_select = False
+            for selected_item in selected_nodes:
+                if self.ar.data.guide_base_attr in cmds.listAttr(selected_item) and cmds.getAttr(selected_item+"."+self.ar.data.guide_base_attr) == 1:
+                    if not ":" in selected_item[selected_item.rfind("|"):]:
+                        updated_guide_nodes.append(self.ar.maker.setup_duplicated_guide(selected_item))
+                        need_update_select = True
                     else:
-                        selectedGuideNodeList.append(selectedItem)
-            if needUpdateSelect:
+                        selected_guides.append(selected_item)
+            if need_update_select:
                 self.ar.ui_manager.refresh_ui()
-                cmds.select(updatedGuideNodeList)
+                cmds.select(updated_guide_nodes)
         # update UI
-        for m, moduleInstance in enumerate(self.ar.data.guide_instances):
-            if cmds.objExists(moduleInstance.guide_base):
-                if moduleInstance.selectButton:
-                    currentColorList = self.ar.ctrls.getGuideRGBColorList(moduleInstance)
-                    if currentColorList:
-                        cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=currentColorList)
-                    if selectedGuideNodeList:
-                        for selectedGuide in selectedGuideNodeList:
-                            selectedGuideInfo = cmds.getAttr(selectedGuide+"."+self.ar.data.module_instance_info_attr)
-                            if selectedGuideInfo == str(moduleInstance):
-                                cmds.button(moduleInstance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
-                                self.selectedModuleInstanceList.append(moduleInstance)
+        for m, module_instance in enumerate(self.ar.data.guide_instances):
+            if cmds.objExists(module_instance.guide_base):
+                if module_instance.selectButton:
+                    current_colors = self.ar.ctrls.getGuideRGBColorList(module_instance)
+                    if current_colors:
+                        cmds.button(module_instance.selectButton, edit=True, label=" ", backgroundColor=current_colors)
+                    if selected_guides:
+                        for selected_guide in selected_guides:
+                            if str(module_instance) == cmds.getAttr(selected_guide+"."+self.ar.data.module_instance_info_attr):
+                                cmds.button(module_instance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
+                                self.selected_instances.append(module_instance)
         # delete module layout:
-        if not selectedGuideNodeList:
+        if not selected_guides:
             if self.ar.data.ui_state:
                 if cmds.frameLayout("rig_edit_selected_module_fl", query=True, exists=True):
                     cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module'])
                 if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
                     cmds.deleteUI("rig_selected_module_cl")
         # re-create module layout:
-        if self.selectedModuleInstanceList:
-            self.selectedModuleInstanceList[-1].reCreateEditSelectedModuleLayout(bSelect=False)
+        if self.selected_instances:
+            self.selected_instances[-1].reCreateEditSelectedModuleLayout(bSelect=False)
         # call reload the geometries in skin UI:
         self.ar.filler.populate_geometries()
 
@@ -141,17 +138,17 @@ class Job(object):
             Calculate the results of transformations to set the calibration attributes.
         """
         if cmds.objExists(item):
-            dupTemp = cmds.duplicate(item, name=item+"_TEMP")[0]
-            cmds.parent(dupTemp, item+"_Zero_1_Grp")
+            duplicated_temp = cmds.duplicate(item, name=item+"_TEMP")[0]
+            cmds.parent(duplicated_temp, item+"_Zero_1_Grp")
             for attr in ["T", "R", "S"]:
                 for axis in ["X", "Y", "Z"]:
-                    new_value = cmds.getAttr(dupTemp+"."+attr.lower()+axis.lower())
+                    new_value = cmds.getAttr(duplicated_temp+"."+attr.lower()+axis.lower())
                     if attr == "S":
                         cmds.setAttr(item+"."+attr.lower()+axis.lower(), 1) #scale
                     else:
                         cmds.setAttr(item+"."+attr.lower()+axis.lower(), 0) #translate, rotate
                     cmds.setAttr(item+".calibrate"+attr+axis, new_value)
-            cmds.delete(dupTemp)
+            cmds.delete(duplicated_temp)
             cmds.select(item)
 
 

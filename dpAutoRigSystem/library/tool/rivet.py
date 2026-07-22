@@ -412,14 +412,14 @@ class Rivet(base.BaseLibrary):
         """ Load selected object a geometry to attach rivet.
         """
         if geoName:
-            selectedList = [geoName]
+            selected_nodes = [geoName]
         elif geoFromUI:
-            selectedList = [cmds.textField(self.geoToAttachTF, query=True, text=True)]
+            selected_nodes = [cmds.textField(self.geoToAttachTF, query=True, text=True)]
         else:
-            selectedList = cmds.ls(selection=True)
-        if selectedList:
-            if self.ar.utils.dpCheckGeometry(selectedList[0]):
-                self.geoToAttach = selectedList[0]
+            selected_nodes = cmds.ls(selection=True)
+        if selected_nodes:
+            if self.ar.utils.dpCheckGeometry(selected_nodes[0]):
+                self.geoToAttach = selected_nodes[0]
                 cmds.textField(self.geoToAttachTF, edit=True, text=self.geoToAttach)
                 self.dpLoadUVSet(self.geoToAttach)
         else:

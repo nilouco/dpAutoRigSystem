@@ -127,8 +127,7 @@ class Lib(object):
             if self.ar.dev:
                 reload(imported_module)
         except Exception as e:
-            errorString = self.ar.data.lang['e017_loadingExtension']+" "+str(module).replace("\"", "")+" : "+str(e)
-            mel.eval('warning \"'+errorString+'\";')
+            mel.eval('warning \"'+self.ar.data.lang['e017_loadingExtension']+" "+str(module).replace("\"", "")+" : "+str(e)+'\";')
             return
         return imported_module
 

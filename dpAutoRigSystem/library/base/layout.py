@@ -715,7 +715,7 @@ class BaseLayout(base.BaseLibrary):
         plusSL = cmds.scrollLayout('plusSL', parent=plusFL)
         cmds.formLayout(plusFL, edit=True, attachForm=((plusSL, 'bottom', 10), (plusSL, 'top', 10), (plusSL, 'left', 10), (plusSL, 'right', 10)))
         # get selected module guides
-        guideInstanceList = self.ar.job.selectedModuleInstanceList.copy()
+        guideInstanceList = self.ar.job.selected_instances.copy()
         if not guideInstanceList:
             guideInstanceList = [self]
         if instance:

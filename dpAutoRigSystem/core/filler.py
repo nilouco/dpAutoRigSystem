@@ -258,8 +258,8 @@ class UIFiller(object):
             geos.append(self.ar.data.lang['i074_attention'])
             geos.append(self.ar.data.lang['i075_moreOne'])
             geos.append(self.ar.data.lang['i076_sameName'])
-            for sameName in same_names:
-                geos.append(sameName)
+            for same_name in same_names:
+                geos.append(same_name)
         
         # sort geometries by name filter:
         geo_name = cmds.textField('skin_geo_name_tf', query=True, text=True)
