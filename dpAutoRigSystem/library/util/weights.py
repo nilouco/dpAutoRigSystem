@@ -34,12 +34,12 @@ class Weights(object):
     
     
     def getIOFileName(self, mesh, *args):
-        """ Returns the cut fileName if found "|" in the given mesh name to avoid windows special character backup issue.
+        """ Returns the cut file_name if found "|" in the given mesh name to avoid windows special character backup issue.
         """
-        fileName = mesh
+        file_name = mesh
         if "|" in mesh:
-            fileName = mesh[mesh.rfind("|")+1:]
-        return fileName
+            file_name = mesh[mesh.rfind("|")+1:]
+        return file_name
     
 
     def getDeformerOrder(self, defList, *args):

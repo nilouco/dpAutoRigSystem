@@ -15,7 +15,7 @@ class DrivenKeyIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_drivenKeyIO"
-        self.startName = "dpDrivenKey"
+        self.start_name = "dpDrivenKey"
         self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
 
 
@@ -46,11 +46,11 @@ class DrivenKeyIO(action.BaseAction):
                         nodeList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
                     if self.first_mode: #export
                         if nodeList:
-                            self.exportDicToJsonFile(self.getDrivenKeyDataDic(nodeList))
+                            self.export_json_file(self.getDrivenKeyDataDic(nodeList))
                         else:
                             self.maybe_done_io("Set Driven Keys")
                     else: #import
-                        drivenKeyDic = self.importLatestJsonFile(self.get_exported_items())
+                        drivenKeyDic = self.import_latest_json_file(self.get_exported_items())
                         if drivenKeyDic:
                             self.importDrivenKeyData(drivenKeyDic)
                         else:
@@ -67,7 +67,7 @@ class DrivenKeyIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -189,7 +189,7 @@ class DrivenKeyIO(action.BaseAction):
             else:
                 existingNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         else:
             if existingNodesList:
                 self.well_done_io(self.ar.data.lang['r032_notImportedData'])

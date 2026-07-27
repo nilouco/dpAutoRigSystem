@@ -342,10 +342,10 @@ class BrokenRivet(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="follicle")
+                check_items = cmds.ls(objList, type="follicle")
             else:
-                toCheckList = cmds.ls(type='follicle')
-            if toCheckList:
+                check_items = cmds.ls(type='follicle')
+            if check_items:
                 folliclesOriginList = self.listFolliclesAtOrigin()
                 rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
                 self.checked_items = rivetControllersList.copy()
@@ -379,5 +379,5 @@ class BrokenRivet(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

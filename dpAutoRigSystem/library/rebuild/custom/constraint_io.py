@@ -15,7 +15,7 @@ class ConstraintIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_constraintIO"
-        self.startName = "dpConstraint"
+        self.start_name = "dpConstraint"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,13 +45,13 @@ class ConstraintIO(action.BaseAction):
                         constraintList = cmds.ls(selection=False, type=self.constraint_types)
                     if self.first_mode: #export
                         if constraintList:
-                            self.exportDicToJsonFile(self.getConstraintDataDic(constraintList))
+                            self.export_json_file(self.get_constraint_data(constraintList))
                         else:
                             self.maybe_done_io("Constraints")
                     else: #import
-                        constDic = self.importLatestJsonFile(self.get_exported_items())
+                        constDic = self.import_latest_json_file(self.get_exported_items())
                         if constDic:
-                            self.importConstraintData(constDic)
+                            self.import_constraint_data(constDic)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -66,6 +66,6 @@ class ConstraintIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data

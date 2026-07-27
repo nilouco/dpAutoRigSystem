@@ -33,12 +33,12 @@ class UnlockInitialshadinggroup(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = ["initialShadingGroup"]
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                for item in toCheckList:
+                check_items = ["initialShadingGroup"]
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         if item == "initialShadingGroup":
@@ -68,5 +68,5 @@ class UnlockInitialshadinggroup(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

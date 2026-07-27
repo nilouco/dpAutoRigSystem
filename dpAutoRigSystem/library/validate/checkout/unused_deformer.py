@@ -39,12 +39,12 @@ class UnusedDeformer(action.BaseAction):
             deformerList = cmds.ls(type="geometryFilter") #deformers
             intermedList = cmds.ls(type="controlPoint", intermediateObjects=True)
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = deformerList.copy()
-                toCheckList.extend(intermedList.copy())
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                check_items = deformerList.copy()
+                check_items.extend(intermedList.copy())
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 if deformerList:
                     for defNode in deformerList:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])
@@ -96,5 +96,5 @@ class UnusedDeformer(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

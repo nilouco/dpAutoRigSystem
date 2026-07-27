@@ -15,7 +15,7 @@ class ModelIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_modelIO"
-        self.startName = "dpModel"
+        self.start_name = "dpModel"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,17 +45,17 @@ class ModelIO(action.BaseAction):
                             if objList:
                                 meshList = objList
                             else:
-                                meshList = self.ar.utils.filterTransformList(self.getModelToExportList(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+                                meshList = self.ar.utils.filterTransformList(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
                             if meshList:
                                 self.ar.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
-                                constraintDataDic = self.removeConstraints(meshList)
-                                self.exportAlembicFile(meshList)
+                                constraintDataDic = self.remove_constraints(meshList)
+                                self.export_alembic_file(meshList)
                                 if constraintDataDic:
-                                    self.importConstraintData(constraintDataDic, False)
+                                    self.import_constraint_data(constraintDataDic, False)
                             else:
                                 self.maybe_done_io("Render_Grp")
                         else: #import
-                            self.importLatestAlembicFile(self.get_exported_items())
+                            self.import_latest_alembic_file(self.get_exported_items())
                     else:
                         self.fail_io(self.ar.data.lang['r010_notFoundPath'])
                 else:
@@ -70,6 +70,6 @@ class ModelIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data

@@ -15,7 +15,7 @@ class RenameIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_renameIO"
-        self.startName = "dpRename"
+        self.start_name = "dpRename"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,9 +45,9 @@ class RenameIO(action.BaseAction):
                         itemList = [n for n in cmds.ls(selection=False, noIntermediate=True) if cmds.attributeQuery(self.ar.data.dp_id, node=n, exists=True)]
                     if itemList:
                         if self.first_mode: #export
-                            self.exportDicToJsonFile(self.getNodeIDDataDic(itemList))
+                            self.export_json_file(self.getNodeIDDataDic(itemList))
                         else: #import
-                            nodeIDDic = self.importLatestJsonFile(self.get_exported_items())
+                            nodeIDDic = self.import_latest_json_file(self.get_exported_items())
                             if nodeIDDic:
                                 self.importNodeIDData(nodeIDDic)
                             else:
@@ -66,7 +66,7 @@ class RenameIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -107,7 +107,7 @@ class RenameIO(action.BaseAction):
                     else:
                         notFoundNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         elif notFoundNodesList:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif maybeList:

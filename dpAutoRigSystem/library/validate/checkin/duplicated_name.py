@@ -34,14 +34,14 @@ class DuplicatedName(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(dag=True, long=True)
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                check_items = cmds.ls(dag=True, long=True)
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 # Dictionary {shortName: [Full paths]}
                 names = defaultdict(list)
-                for obj in toCheckList:
+                for obj in check_items:
                     short = obj.split("|")[-1]
                     names[short].append(obj)
                 # Filter only duplicates
@@ -78,7 +78,7 @@ class DuplicatedName(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
 
 
@@ -89,7 +89,7 @@ class DuplicatedName(action.BaseAction):
             if cmds.objectType(item) == "transform":
                 childrenList = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, type="transform")
                 if childrenList:
-                    childrenList = self.reorderList(childrenList)
+                    childrenList = self.reorder_list(childrenList)
                     for child in childrenList:
                         if cmds.objExists(child):
                             cmds.rename(child, child[child.rfind("|")+1:]+"_"+str(i))

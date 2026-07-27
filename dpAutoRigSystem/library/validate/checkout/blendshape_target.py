@@ -35,18 +35,18 @@ class BlendshapeTarget(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = None
+                check_items = None
                 meshList = cmds.ls(selection=False, type='mesh')
                 if meshList:
-                    toCheckList = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                    check_items = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 # get exception list to keep nodes in the scene
                 deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
                 exceptionList = self.keepGrp(["supportGrp", "renderGrp", "proxyGrp"])
-                for item in toCheckList:
+                for item in check_items:
                     if cmds.objExists(item):
                         if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                             if not item in exceptionList:
@@ -72,7 +72,7 @@ class BlendshapeTarget(action.BaseAction):
                                                     exceptionList.append(wrapConnectedList[0])
                                             
                 # run validation tasks
-                for item in toCheckList:
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         self.checked_items.append(item)
@@ -106,7 +106,7 @@ class BlendshapeTarget(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
 
 

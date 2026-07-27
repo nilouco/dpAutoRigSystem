@@ -33,12 +33,12 @@ class UnusedSkin(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False, type="skinCluster")
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                for item in toCheckList:
+                check_items = cmds.ls(selection=False, type="skinCluster")
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional 1 to check here if there's an influenced node, otherwise delete the unused skinCluster
                     meshList = cmds.skinCluster(item, query=True, geometry=True)
@@ -89,5 +89,5 @@ class UnusedSkin(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

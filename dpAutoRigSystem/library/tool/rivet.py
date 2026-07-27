@@ -280,7 +280,7 @@ class Rivet(base.BaseLibrary):
             Returns the filtered list.
             Update the index list to match the returned list.
         """
-        filteredList = []
+        filtered_items = []
         multiFilterList = [name]
         newIndexList = []
         if separator in name:
@@ -289,14 +289,14 @@ class Rivet(base.BaseLibrary):
             if filterName:
                 for i, item in enumerate(itemList):
                     if str(filterName) in item:
-                        filteredList.append(item)
+                        filtered_items.append(item)
                         newIndexList.append(i)
         if len(newIndexList) > 0:
             newNodesList = []
             for index in newIndexList:
                 newNodesList.append(self.rivetNetNodeList[index])
             self.rivetNetNodeList = newNodesList
-        return filteredList
+        return filtered_items
 
 
     def refreshRivetList(self, *args):

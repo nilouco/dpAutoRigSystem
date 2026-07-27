@@ -15,7 +15,7 @@ class ParentingIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_parentingIO"
-        self.startName = "dpParenting"
+        self.start_name = "dpParenting"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -50,11 +50,11 @@ class ParentingIO(action.BaseAction):
                             parentDic = self.getParentingDataDic(transformList)
                             parentDic.update(self.get_broken_id_data())
                             parentDic.update(self.getModelDataDic())
-                            self.exportDicToJsonFile(parentDic)
+                            self.export_json_file(parentDic)
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
-                        parentDic = self.importLatestJsonFile(self.get_exported_items())
+                        parentDic = self.import_latest_json_file(self.get_exported_items())
                         if parentDic:
                             try:
                                 if self.importBrokenIDData(parentDic):
@@ -76,7 +76,7 @@ class ParentingIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -86,16 +86,16 @@ class ParentingIO(action.BaseAction):
         """
         if not transformList:
             transformList = cmds.ls(selection=False, long=True, type="transform")
-        filteredList = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
-        filteredList = self.reorderList(filteredList)
-        return {"Parent" : filteredList}
+        filtered_items = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filtered_items = self.reorder_list(filtered_items)
+        return {"Parent" : filtered_items}
 
 
     def getModelDataDic(self, *args):
         """ Check if there's a model list to include in the dictionary data to avoid change parenting from them.
         """
         modelDataDic = {}
-        modelList = self.getModelToExportList()
+        modelList = self.get_models_to_export()
         if modelList:
             modelDataDic["ModelList"] = modelList
         return modelDataDic
@@ -172,13 +172,13 @@ class ParentingIO(action.BaseAction):
                 if modelChangedList:
                     self.maybe_done_io(', '.join(modelChangedList))
                 elif wellImportedList:
-                    self.well_done_io(self.latestDataFile)
+                    self.well_done_io(self.latest_data_file)
                 else:
                     self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
             else:
-                self.well_done_io(self.latestDataFile)
+                self.well_done_io(self.latest_data_file)
         else:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
 
 
     def checkIsFromModeling(self, parentDic, nodeType, item, *args):

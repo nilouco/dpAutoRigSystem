@@ -437,12 +437,12 @@ class UpdateGuides(base.BaseLibrary):
     
 
     def filterChildrenFromAnotherBase(self, childrenList, baseGuide):
-        filteredList = []
+        filtered_items = []
         filterStr = baseGuide.split(':')[0]
         for children in childrenList:
             if filterStr in children:
-                filteredList.append(children)
-        return filteredList
+                filtered_items.append(children)
+        return filtered_items
     
 
     def setChildrenGuides(self):

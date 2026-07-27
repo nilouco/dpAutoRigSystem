@@ -33,13 +33,13 @@ class ParentedGeometry(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="mesh")
+                check_items = cmds.ls(objList, type="mesh")
             else:
-                toCheckList = cmds.ls(selection=False, type="mesh") #all meshes in the scene
-            if toCheckList:
-                meshParentList = self.getMeshTransformList(toCheckList)
+                check_items = cmds.ls(selection=False, type="mesh") #all meshes in the scene
+            if check_items:
+                meshParentList = self.get_mesh_transforms(check_items)
                 if meshParentList:
-                    meshParentList = self.reorderList(meshParentList)
+                    meshParentList = self.reorder_list(meshParentList)
                     self.ar.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
                     # avoid reporting the same item multiple times
                     for mesh in meshParentList:
@@ -81,5 +81,5 @@ class ParentedGeometry(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

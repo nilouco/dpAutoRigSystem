@@ -38,7 +38,7 @@ class NonManifold(action.BaseAction):
                     if objList:
                         geoToCleanList = objList
                     else:
-                        geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.getMeshTransformList()))), long=False)
+                        geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.get_mesh_transforms()))), long=False)
                     if geoToCleanList:
                         self.ar.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
                         for geo in geoToCleanList:
@@ -74,7 +74,7 @@ class NonManifold(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
 
 

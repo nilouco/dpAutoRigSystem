@@ -16,7 +16,7 @@ class NewSceneIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(action)
-        self.startName = "dpNewScene"
+        self.start_name = "dpNewScene"
         self.first_bt_enable = False
         self.first_bt_custom_label = self.ar.data.lang['i305_none']
         self.second_bt_custom_label = self.ar.data.lang['i306_run']
@@ -57,6 +57,6 @@ class NewSceneIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress(True)
+        self.end_progress(True)
         self.refresh_view()
         return self.log_data

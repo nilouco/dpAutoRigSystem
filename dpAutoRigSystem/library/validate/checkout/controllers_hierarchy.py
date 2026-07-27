@@ -14,7 +14,7 @@ class ControllersHierarchy(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.io_folder = "s_hierarchyIO"
-        self.startName = "dpHierarchy"
+        self.start_name = "dpHierarchy"
 
 
     def checkNurbs(self, transform):
@@ -145,7 +145,7 @@ class ControllersHierarchy(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     currentFileHierarchyDic = self.raiseHierarchy(rootNode)
-                    lastHierarchyDic = self.importLatestJsonFile(self.get_exported_items(get_any=True))
+                    lastHierarchyDic = self.import_latest_json_file(self.get_exported_items(get_any=True))
                     if lastHierarchyDic:
                         isHierarchySame = self.compareHierarchy(lastHierarchyDic, currentFileHierarchyDic)
                         self.checked_items.append(str(lastHierarchyDic))
@@ -163,7 +163,7 @@ class ControllersHierarchy(action.BaseAction):
                     else: #fix
                         if cmds.file(query=True, sceneName=True) != "":
                             if lastHierarchyDic == None or not isHierarchySame:
-                                self.exportDicToJsonFile(currentFileHierarchyDic)
+                                self.export_json_file(currentFileHierarchyDic)
                             self.found_issues.append(False)
                             self.good_results.append(True)
                         else:
@@ -186,5 +186,5 @@ class ControllersHierarchy(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

@@ -16,7 +16,7 @@ class BlendshapeIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_blendShapeIO"
-        self.startName = "dpBlendShape"
+        self.start_name = "dpBlendShape"
         self.targetName = "dpTarget"
         self.originalName = "dpOriginal"
         self.extention = "shp"
@@ -57,12 +57,12 @@ class BlendshapeIO(action.BaseAction):
                                 for bsNode in bsList:
                                     self.exportTargetFile(bsNode)
                                     transformList = [cmds.listRelatives(geoShape, parent=True, type="transform")[0] for geoShape in bsDic[bsNode]["geometry"]]
-                                    self.exportAlembicFile(transformList, self.originalPath, self.originalName, bsNode, False)
-                                self.exportDicToJsonFile(bsDic)
+                                    self.export_alembic_file(transformList, self.originalPath, self.originalName, bsNode, False)
+                                self.export_json_file(bsDic)
                             else:
                                 self.maybe_done_io("BlendShapes_Grp")
                         else: #import
-                            bsDic = self.importLatestJsonFile(self.get_exported_items())
+                            bsDic = self.import_latest_json_file(self.get_exported_items())
                             if bsDic:
                                 self.importBlendShapes(bsDic)
                             else:
@@ -81,7 +81,7 @@ class BlendshapeIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -241,4 +241,4 @@ class BlendshapeIO(action.BaseAction):
                 cmds.removeMultiInstance("{}.weight[{}]".format(bsNode, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
         cmds.scriptEditorInfo(suppressWarnings=suppressWarningsState, suppressInfo=suppressInfoState, suppressErrors=suppressErrorsState, suppressResults=suppressResultsState)
         if wellImported:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)

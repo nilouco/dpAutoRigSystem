@@ -39,7 +39,7 @@ class GeometryHistory(action.BaseAction):
                         geoToCleanList = objList
                     else:
                         geoList = []
-                        transformList = self.getMeshTransformList()
+                        transformList = self.get_mesh_transforms()
                         if transformList:
                             for transform in transformList:
                                 # Filter which geometry has deformer history and groupLevels to pass through sets and shader
@@ -86,5 +86,5 @@ class GeometryHistory(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

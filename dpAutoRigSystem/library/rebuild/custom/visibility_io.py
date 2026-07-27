@@ -15,7 +15,7 @@ class VisibilityIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_visibilityIO"
-        self.startName = "dpVisibility"
+        self.start_name = "dpVisibility"
         self.ignoreList = ["defaultLayer"]
     
 
@@ -46,9 +46,9 @@ class VisibilityIO(action.BaseAction):
                         itemList = cmds.ls(selection=False)#, type="transform")
                     if itemList:
                         if self.first_mode: #export
-                            self.exportDicToJsonFile(self.getVisibilityDataDic(itemList))
+                            self.export_json_file(self.getVisibilityDataDic(itemList))
                         else: #import
-                            visDic = self.importLatestJsonFile(self.get_exported_items())
+                            visDic = self.import_latest_json_file(self.get_exported_items())
                             if visDic:
                                 self.importVisibilityData(visDic)
                             else:
@@ -67,7 +67,7 @@ class VisibilityIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -111,6 +111,6 @@ class VisibilityIO(action.BaseAction):
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

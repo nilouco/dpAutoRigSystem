@@ -15,7 +15,7 @@ class OffsetMatrixIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_offsetMatrixIO"
-        self.startName = "dpOffsetMatrix"
+        self.start_name = "dpOffsetMatrix"
         self.offsetMatrixAttr = "offsetParentMatrix"
     
 
@@ -47,9 +47,9 @@ class OffsetMatrixIO(action.BaseAction):
                     if nodeList:
                         if self.first_mode: #export
                             toExportDataDic = self.getOffsetMatrixDataDic(nodeList)
-                            self.exportDicToJsonFile(toExportDataDic)
+                            self.export_json_file(toExportDataDic)
                         else: #import
-                            toImportDic = self.importLatestJsonFile(self.get_exported_items())
+                            toImportDic = self.import_latest_json_file(self.get_exported_items())
                             if toImportDic:
                                 self.importOffsetMatrixData(toImportDic)
                             else:
@@ -68,7 +68,7 @@ class OffsetMatrixIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -114,4 +114,4 @@ class OffsetMatrixIO(action.BaseAction):
         if notFoundNodesList:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)

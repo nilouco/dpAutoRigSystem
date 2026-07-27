@@ -34,11 +34,11 @@ class NonQuadFace(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="mesh")
+                check_items = cmds.ls(objList, type="mesh")
             else:
-                toCheckList = cmds.ls(selection=False, type="mesh")
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                check_items = cmds.ls(selection=False, type="mesh")
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 # declare resulted lists
                 polyObjList, trisObjList, trisList, polyList = [], [], [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
@@ -51,8 +51,8 @@ class NonQuadFace(action.BaseAction):
                         parentNode   = fnShapeNode.parent(0)
                         fnParentNode = OpenMaya.MFnDagNode(parentNode)
                         objectName   = fnParentNode.name()
-                        # verify if objName or shapeName is in toCheckList
-                        for obj in toCheckList:
+                        # verify if objName or shapeName is in check_items
+                        for obj in check_items:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 iterPolys = OpenMaya.MItMeshPolygon(shapeNode)
@@ -98,5 +98,5 @@ class NonQuadFace(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

@@ -12,7 +12,7 @@ WIKI = "10-‐-Rebuilder#-checkin"
 class CheckinIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.startName = "dpCheckin"
+        self.start_name = "dpCheckin"
         self.first_bt_enable = False
         self.first_bt_custom_label = self.ar.data.lang['i305_none']
         self.second_bt_custom_label = self.ar.data.lang['i306_run']
@@ -54,6 +54,6 @@ class CheckinIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data

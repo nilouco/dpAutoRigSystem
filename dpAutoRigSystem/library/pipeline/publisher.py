@@ -17,10 +17,10 @@ class Publisher(object):
         self.shortAssetName = None
 
 
-    def getFileTypeByExtension(self, fileName, *args):
+    def getFileTypeByExtension(self, file_name, *args):
         """ Return the file type based in the extension of the given file name.
         """
-        ext = fileName[-2:]
+        ext = file_name[-2:]
         if ext == "mb":
             return "mayaBinary"
         return "mayaAscii"

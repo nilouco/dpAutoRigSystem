@@ -15,7 +15,7 @@ class InputOrderIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_inputOrderIO"
-        self.startName = "dpInputOrder"
+        self.start_name = "dpInputOrder"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,11 +45,11 @@ class InputOrderIO(action.BaseAction):
                         else:
                             deformedList = self.ar.skin.getDeformedItemList(deformerTypeList=self.ar.skin.getAllDeformerTypeList(), ignoreAttr=self.ar.skin.ignoreSkinningAttr)
                         if deformedList:
-                            self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
+                            self.export_json_file(self.getOrderDataDic(deformedList))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" - meshes")
                     else: #import
-                        orderDic = self.importLatestJsonFile(self.get_exported_items())
+                        orderDic = self.import_latest_json_file(self.get_exported_items())
                         if orderDic:
                             self.importInputOrder(orderDic)
                         else:
@@ -66,7 +66,7 @@ class InputOrderIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -107,9 +107,9 @@ class InputOrderIO(action.BaseAction):
                 except Exception as e:
                     wellImported = False
                     print(e)
-                    self.fail_io(self.latestDataFile)
+                    self.fail_io(self.latest_data_file)
             cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
             if wellImported:
-                self.well_done_io(self.latestDataFile)
+                self.well_done_io(self.latest_data_file)
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

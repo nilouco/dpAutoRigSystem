@@ -15,7 +15,7 @@ class ShaderIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_shaderIO"
-        self.startName = "dpShader"
+        self.start_name = "dpShader"
         self.mayaDefaultShader = "openPBRSurface"
     
 
@@ -60,13 +60,13 @@ class ShaderIO(action.BaseAction):
                         if objList:
                             shaderList = objList
                         else:
-                            shaderList = self.getUsedMaterialList()
+                            shaderList = self.get_used_materials()
                         if shaderList:
-                            self.exportDicToJsonFile(self.getShaderDataDic(shaderList))
+                            self.export_json_file(self.getShaderDataDic(shaderList))
                         else:
                             self.maybe_done_io("Shading")
                     else: #import
-                        shaderDic = self.importLatestJsonFile(self.get_exported_items())
+                        shaderDic = self.import_latest_json_file(self.get_exported_items())
                         if shaderDic:
                             try:
                                 self.importShader(shaderDic)
@@ -86,7 +86,7 @@ class ShaderIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -203,4 +203,4 @@ class ShaderIO(action.BaseAction):
         if notFoundMeshList:
             self.fail_io(self.ar.data.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
         else:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)

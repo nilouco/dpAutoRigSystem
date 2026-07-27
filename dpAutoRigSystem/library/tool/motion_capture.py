@@ -807,7 +807,7 @@ class MotionCapture(base.BaseLibrary):
         reset_pose = self.ar.config.get_instance("ResetPose", [self.ar.data.checkout_folder])
         reset_pose.verbose = False
         reset_pose.runAction(False) #fix
-        reset_pose.endProgress()
+        reset_pose.end_progress()
         self.ar.utils.setProgress(endIt=True)
 
 

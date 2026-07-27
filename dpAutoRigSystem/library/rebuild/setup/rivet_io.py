@@ -21,7 +21,7 @@ class RivetIO(action.BaseAction):
         self.rivet = rivet.Rivet(self.ar)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_rivetIO"
-        self.startName = "dpRivet"
+        self.start_name = "dpRivet"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -51,12 +51,12 @@ class RivetIO(action.BaseAction):
                         else:
                             netList = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
                         if netList:
-                            self.exportDicToJsonFile(self.getRivetDataDic(netList))
+                            self.export_json_file(self.getRivetDataDic(netList))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                             cmds.select(clear=True)
                     else: #import
-                        rivetDic = self.importLatestJsonFile(self.get_exported_items())
+                        rivetDic = self.import_latest_json_file(self.get_exported_items())
                         if rivetDic:
                             self.importRivet(rivetDic)
                         else:
@@ -74,7 +74,7 @@ class RivetIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -127,4 +127,4 @@ class RivetIO(action.BaseAction):
                 self.fail_io(net+": "+str(e))
                 break
         if wellImported:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)

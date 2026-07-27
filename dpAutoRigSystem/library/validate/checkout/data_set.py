@@ -40,10 +40,10 @@ class DataSet(action.BaseAction):
                     if cmds.objExists("Data_Grp"):
                         dataGrp = "Data_Grp"
             if dataGrp:
-                toCheckList = cmds.listRelatives(dataGrp, children=True, allDescendents=True)
-                if toCheckList:
-                    self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                    for item in toCheckList:
+                check_items = cmds.listRelatives(dataGrp, children=True, allDescendents=True)
+                if check_items:
+                    self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                    for item in check_items:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         plugList = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
                         if plugList:
@@ -77,5 +77,5 @@ class DataSet(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

@@ -679,5 +679,5 @@ class FacialConnection(base.BaseLibrary):
                                 cmds.connectAttr(plug, bsNode[0]+"."+newTgtList[p], force=True)
                         if cmds.objExists(oldMesh+"Base"):
                             cmds.delete(oldMesh+"Base")
-                        cmds.progressWindow(endProgress=True)
+                        cmds.progressWindow(endPogress=True)
                         cmds.select(clear=True)

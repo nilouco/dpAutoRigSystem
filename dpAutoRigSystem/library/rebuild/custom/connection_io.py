@@ -15,7 +15,7 @@ class ConnectionIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_connectionIO"
-        self.startName = "dpConnection"
+        self.start_name = "dpConnection"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -47,9 +47,9 @@ class ConnectionIO(action.BaseAction):
                         if self.first_mode: #export
                             toExportDataDic = self.getConnectionDataDic(ctrlList)
                             toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.ar.utils.utilityTypeList))) #utilityNodes without dpID
-                            self.exportDicToJsonFile(toExportDataDic)
+                            self.export_json_file(toExportDataDic)
                         else: #import
-                            connectDic = self.importLatestJsonFile(self.get_exported_items())
+                            connectDic = self.import_latest_json_file(self.get_exported_items())
                             if connectDic:
                                 self.importConnectionData(connectDic)
                             else:
@@ -68,7 +68,7 @@ class ConnectionIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -247,4 +247,4 @@ class ConnectionIO(action.BaseAction):
         if notFoundNodesList:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)

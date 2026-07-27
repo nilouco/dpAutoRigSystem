@@ -15,7 +15,7 @@ class UtilityIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_utilityIO"
-        self.startName = "dpUtility"
+        self.start_name = "dpUtility"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,11 +45,11 @@ class UtilityIO(action.BaseAction):
                         utilityList = cmds.ls(selection=False, type=self.ar.utils.utilityTypeList)
                     if self.first_mode: #export
                         if utilityList:
-                            self.exportDicToJsonFile(self.getUtilityDataDic(utilityList))
+                            self.export_json_file(self.getUtilityDataDic(utilityList))
                         else:
                             self.maybe_done_io("Utility nodes.")
                     else: #import
-                        utilityDic = self.importLatestJsonFile(self.get_exported_items())
+                        utilityDic = self.import_latest_json_file(self.get_exported_items())
                         if utilityDic:
                             self.importUtilityData(utilityDic)
                         else:
@@ -66,7 +66,7 @@ class UtilityIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -134,7 +134,7 @@ class UtilityIO(action.BaseAction):
             else:
                 existingNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         else:
             if existingNodesList:
                 self.well_done_io(self.ar.data.lang['r032_notImportedData'])

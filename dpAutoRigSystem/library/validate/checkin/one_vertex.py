@@ -36,12 +36,12 @@ class OneVertex(action.BaseAction):
             if not self.ar.utils.getNetworkNodeByAttr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
                     if objList:
-                        toCheckList = cmds.ls(objList, type="mesh")
+                        check_items = cmds.ls(objList, type="mesh")
                     else:
-                        toCheckList = cmds.ls(selection=False, type="mesh")
-                    if toCheckList:
-                        self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                        oneVertexList = self.checkNonManifoldVertex(toCheckList)
+                        check_items = cmds.ls(selection=False, type="mesh")
+                    if check_items:
+                        self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                        oneVertexList = self.checkNonManifoldVertex(check_items)
                         # conditional to check here
                         if oneVertexList:
                             oneVertexList.sort()
@@ -69,7 +69,7 @@ class OneVertex(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
 
 

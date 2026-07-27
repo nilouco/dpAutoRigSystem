@@ -16,7 +16,7 @@ class SkinningIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_skinningIO"
-        self.startName = "skinning"
+        self.start_name = "skinning"
         self.importRefName = "dpSkinningIO_Import"
     
 
@@ -47,11 +47,11 @@ class SkinningIO(action.BaseAction):
                         else:
                             itemList = self.ar.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.ar.skin.ignoreSkinningAttr)
                         if itemList:
-                            self.exportDicToJsonFile(self.ar.skin.getSkinWeightData(itemList))
+                            self.export_json_file(self.ar.skin.getSkinWeightData(itemList))
                         else:
                             self.maybe_done_io("Render_Grp")
                     else: #import
-                        skinWeightDic = self.importLatestJsonFile(self.get_exported_items())
+                        skinWeightDic = self.import_latest_json_file(self.get_exported_items())
                         if skinWeightDic:
                             self.importSkinning(skinWeightDic)
                         else:
@@ -68,7 +68,7 @@ class SkinningIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -81,7 +81,7 @@ class SkinningIO(action.BaseAction):
         if len(wipFilesList) > 1:
             wipFilesList.sort()
             if len(self.exportedList) > 1:
-                self.refPathName = self.exportedList[-2][len(self.startName)+1:-5]
+                self.refPathName = self.exportedList[-2][len(self.start_name)+1:-5]
                 if os.path.isfile(self.ar.pipeliner.pipeData['assetPath']+"/"+self.refPathName+".ma"):
                     self.refPathName = self.refPathName+".ma"
                 else:
@@ -127,10 +127,10 @@ class SkinningIO(action.BaseAction):
         if toImportList:
             try:
                 # import skin weights
-                self.ar.skin.importSkinWeightsFromFile(toImportList, self.io_path, self.latestDataFile, False)
-                self.well_done_io(self.latestDataFile)
+                self.ar.skin.importSkinWeightsFromFile(toImportList, self.io_path, self.latest_data_file, False)
+                self.well_done_io(self.latest_data_file)
             except Exception as e:
-                self.fail_io(self.latestDataFile+": "+str(e))
+                self.fail_io(self.latest_data_file+": "+str(e))
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
         if not wellImported:

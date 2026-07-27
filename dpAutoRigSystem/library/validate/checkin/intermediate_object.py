@@ -33,12 +33,12 @@ class IntermediateObject(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="mesh", intermediateObjects=True)
+                check_items = cmds.ls(objList, type="mesh", intermediateObjects=True)
             else:
-                toCheckList = cmds.ls(selection=False, type="mesh", intermediateObjects=True) #all intermediateObject meshes in the scene
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                for item in toCheckList:
+                check_items = cmds.ls(selection=False, type="mesh", intermediateObjects=True) #all intermediateObject meshes in the scene
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     self.checked_items.append(item)
                     self.found_issues.append(True)
@@ -63,5 +63,5 @@ class IntermediateObject(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

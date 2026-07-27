@@ -12,7 +12,7 @@ WIKI = "10-‐-Rebuilder#-rig-it"
 class RigItIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.startName = "dpRigIt"
+        self.start_name = "dpRigIt"
         self.first_bt_enable = False
         self.first_bt_custom_label = self.ar.data.lang['i305_none']
         self.second_bt_custom_label = self.ar.data.lang['i306_run']
@@ -51,6 +51,6 @@ class RigItIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress(True)
+        self.end_progress(True)
         self.refresh_view()
         return self.log_data

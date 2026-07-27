@@ -33,13 +33,13 @@ class JointEnd(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False, type="joint")
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                check_items = cmds.ls(selection=False, type="joint")
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 # list joint ends
-                jEndList = [j for j in toCheckList if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
+                jEndList = [j for j in check_items if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
                 jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
                 if jEndList:
                     # check connection with skinCluster to avoid delete it and crash the setup
@@ -76,5 +76,5 @@ class JointEnd(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

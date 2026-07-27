@@ -18,7 +18,7 @@ class DeformationIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_deformationIO"
-        self.startName = "dpDeformation"
+        self.start_name = "dpDeformation"
         if self.ar.dev:
             reload(weights)
         self.defWeights = weights.Weights(self.ar)
@@ -60,13 +60,13 @@ class DeformationIO(action.BaseAction):
                                     hasDef = True
                                     break
                             if hasDef:
-                                self.exportDicToJsonFile(self.getDeformerDataDic(inputDeformerList))
+                                self.export_json_file(self.getDeformerDataDic(inputDeformerList))
                             else:
                                 self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" deformers")
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" mesh")
                     else: #import
-                        deformerDic = self.importLatestJsonFile(self.get_exported_items())
+                        deformerDic = self.import_latest_json_file(self.get_exported_items())
                         if deformerDic:
                             self.importDeformationData(deformerDic)
                         else:
@@ -84,7 +84,7 @@ class DeformationIO(action.BaseAction):
         cmds.select(clear=True)
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -212,7 +212,7 @@ class DeformationIO(action.BaseAction):
                     cmds.connectAttr(deformerDic[deformerNode]["relatedNode"]+".worldMesh[0]", newDefNode+".morphTarget[0]", force=True)
                 else:
                     wellImported = False
-                    self.fail_io(self.latestDataFile+": "+deformerNode+" - "+deformerDic[deformerNode]["relatedNode"])
+                    self.fail_io(self.latest_data_file+": "+deformerNode+" - "+deformerDic[deformerNode]["relatedNode"])
         # parenting
         needParentIt = False
         if deformerDic[deformerNode]["father"]:
@@ -265,7 +265,7 @@ class DeformationIO(action.BaseAction):
                 try:
                     wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
                 except Exception as e:
-                    self.fail_io(self.latestDataFile+": "+deformerNode+" - "+str(e))
+                    self.fail_io(self.latest_data_file+": "+deformerNode+" - "+str(e))
             if notFoundMeshList: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
                 for deformerNode in notFoundMeshList:
                     for shapeNode in deformerDic[deformerNode]["shapeList"]:
@@ -273,9 +273,9 @@ class DeformationIO(action.BaseAction):
                             try:
                                 wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
                             except Exception as e:
-                                self.fail_io(self.latestDataFile+": "+deformerNode+" - "+str(e))
+                                self.fail_io(self.latest_data_file+": "+deformerNode+" - "+str(e))
             if wellImported:
-                self.well_done_io(self.latestDataFile)
+                self.well_done_io(self.latest_data_file)
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(deformerDic.keys())))
         if not wellImported:

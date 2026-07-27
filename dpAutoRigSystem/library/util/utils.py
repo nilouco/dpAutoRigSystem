@@ -123,7 +123,7 @@ class Utils(object):
 
 
     # def findPath(self, filename):
-    #     """ Find and return the absolute path of the fileName.
+    #     """ Find and return the absolute path of the file_name.
     #     """
     #     stringPath   = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename), filename))
     #     correctPath  = stringPath.replace("\\", "/")
@@ -727,7 +727,7 @@ class Utils(object):
         """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
             Returns the filtered list.
         """
-        filteredList = []
+        filtered_items = []
         multiFilterList = [name]
         if separator in name:
             multiFilterList = list(name.split(separator))
@@ -735,9 +735,9 @@ class Utils(object):
             if filterName:
                 for item in itemList:
                     if str(filterName) in item:
-                        if not item in filteredList:
-                            filteredList.append(item)
-        return filteredList
+                        if not item in filtered_items:
+                            filtered_items.append(item)
+        return filtered_items
         
         
     def visitWebSite(self, URL, *args):
@@ -1383,7 +1383,7 @@ class Utils(object):
                 amount = progress
                 addOne = increment amount plus 1
                 addNumber = add amount to the end of the message string
-                endIt = endProgress
+                endIt = end progress
                 isInterruptable = if we can interrupt the process or not. False by default.
 
             Example:

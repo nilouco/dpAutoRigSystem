@@ -15,7 +15,7 @@ class TransformationIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_transformationIO"
-        self.startName = "dpTransformation"
+        self.start_name = "dpTransformation"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,11 +45,11 @@ class TransformationIO(action.BaseAction):
                         else:
                             transformList = cmds.ls(selection=False, long=True, type="transform")
                         if transformList:
-                            self.exportDicToJsonFile(self.getTransformDataDic(transformList))
+                            self.export_json_file(self.getTransformDataDic(transformList))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
-                        transformDic = self.importLatestJsonFile(self.get_exported_items())
+                        transformDic = self.import_latest_json_file(self.get_exported_items())
                         if transformDic:
                             self.importTransformation(transformDic)
                         else:
@@ -66,7 +66,7 @@ class TransformationIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -211,6 +211,6 @@ class TransformationIO(action.BaseAction):
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

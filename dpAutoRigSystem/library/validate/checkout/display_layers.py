@@ -96,7 +96,7 @@ class DisplayLayers(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
 
 

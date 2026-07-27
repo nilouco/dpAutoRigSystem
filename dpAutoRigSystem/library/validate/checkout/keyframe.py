@@ -33,10 +33,10 @@ class Keyframe(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False)
-            if toCheckList:
+                check_items = cmds.ls(selection=False)
+            if check_items:
                 # get animation node list
                 animCurveList = cmds.ls(type="animCurve")
                 if animCurveList:
@@ -49,7 +49,7 @@ class Keyframe(action.BaseAction):
                         self.ar.utils.setProgress(max=len(animatedList), addOne=False, addNumber=False)
                         for item in animatedList:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                            if item in toCheckList:
+                            if item in check_items:
                                 if cmds.objExists(item):
                                     crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
                                     if crvList:
@@ -92,5 +92,5 @@ class Keyframe(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

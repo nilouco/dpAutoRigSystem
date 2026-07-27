@@ -15,7 +15,7 @@ class SupportNodeIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_supportNodeIO"
-        self.startName = "dpSupportNode"
+        self.start_name = "dpSupportNode"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -48,11 +48,11 @@ class SupportNodeIO(action.BaseAction):
                                 itemList = self.getNodeToExportList()
                             if itemList:
                                 self.ar.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
-                                self.exportAlembicFile(itemList, attr=False, curve=True)
+                                self.export_alembic_file(itemList, attr=False, curve=True)
                             else:
                                 self.maybe_done_io("Geometries")
                         else: #import
-                            self.importLatestAlembicFile(self.get_exported_items())
+                            self.import_latest_alembic_file(self.get_exported_items())
                     else:
                         self.fail_io(self.ar.data.lang['r010_notFoundPath'])
                 else:
@@ -67,7 +67,7 @@ class SupportNodeIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 

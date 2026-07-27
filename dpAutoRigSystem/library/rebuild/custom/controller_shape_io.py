@@ -15,7 +15,7 @@ class ControllerShapeIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_controlShapeIO"
-        self.startName = "dpControlShape"
+        self.start_name = "dpControlShape"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -48,7 +48,7 @@ class ControllerShapeIO(action.BaseAction):
                         if self.first_mode: #export
                             try:
                                 self.ar.pipeliner.makeDirIfNotExists(self.io_path)
-                                ctrlFileName = self.io_path+"/"+self.startName+"_"+self.ar.pipeliner.pipeData['currentFileName']+".ma"
+                                ctrlFileName = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipeData['currentFileName']+".ma"
                                 self.ar.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
                                 self.well_done_io(ctrlFileName)
                             except Exception as e:
@@ -79,6 +79,6 @@ class ControllerShapeIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data

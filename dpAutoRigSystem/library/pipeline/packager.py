@@ -29,18 +29,18 @@ class Packager(object):
         self.callback = None
     
     
-    def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
-        """ Create a zipped file with given filePath and fileName replacing the extention (.ma or .mb) to .zip
+    def zipToClient(self, filePath, file_name, destinationFolder, date=None, *args):
+        """ Create a zipped file with given filePath and file_name replacing the extention (.ma or .mb) to .zip
             Add date at the end of the file if it's given.
             Write the zip file in the destinationFolder.
             Returns the zipFilePathName.
         """
         if date:
-            zipName = fileName[:-3]+"_"+date+".zip"
+            zipName = file_name[:-3]+"_"+date+".zip"
         else:
-            zipName = fileName[:-3]+".zip"
+            zipName = file_name[:-3]+".zip"
         zip = zipfile.ZipFile(destinationFolder+"/"+zipName, "w", zipfile.ZIP_DEFLATED)
-        zip.write(filename=filePath+"/"+fileName, arcname=fileName)
+        zip.write(filename=filePath+"/"+file_name, arcname=file_name)
         zip.close()
         return destinationFolder+"/"+zipName
         
@@ -264,11 +264,11 @@ class Packager(object):
                 shutil.move(sourceFolder+"/"+item, destinationFolder)
 
 
-    def removeExistingArchived(self, filePath, fileName, *args):
+    def removeExistingArchived(self, filePath, file_name, *args):
         """ Delete existing same achived version in dpOld if it exists to avoid naming conflict when copying.
         """
-        if os.path.isfile(filePath+"/"+fileName):
-            os.remove(filePath+"/"+fileName)
+        if os.path.isfile(filePath+"/"+file_name):
+            os.remove(filePath+"/"+file_name)
 
     
     def toDiscord(self, webhook, messageText, *args):

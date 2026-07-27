@@ -33,12 +33,12 @@ class EmptyTransform(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                emptyTransformList = self.filterEmptyTransformList(toCheckList)
+                check_items = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                emptyTransformList = self.filterEmptyTransformList(check_items)
                 emptyTransformList.extend(self.filterEmptyTransformList(self.getIgnoreConnected(), True))
                 # conditional to check here
                 if emptyTransformList:
@@ -70,7 +70,7 @@ class EmptyTransform(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
     
     
@@ -78,10 +78,10 @@ class EmptyTransform(action.BaseAction):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
-        filteredList = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
-        filteredList = self.reorderList(filteredList)
+        filtered_items = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filtered_items = self.reorder_list(filtered_items)
         emptyTransforms = []
-        for transform in filteredList:
+        for transform in filtered_items:
             if connected:
                 hasConnection = False
             else:

@@ -41,12 +41,12 @@ class RemapvalueToSetrange(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="remapValue")
+                check_items = cmds.ls(objList, type="remapValue")
             else:
-                toCheckList = cmds.ls(selection=False, type="remapValue")
-            if toCheckList:
+                check_items = cmds.ls(selection=False, type="remapValue")
+            if check_items:
                 remapValueToChangeList = []
-                for item in toCheckList:
+                for item in check_items:
                     indexList = cmds.getAttr(f"{item}.value", multiIndices=True)
                     # Check if color is used - if so, ignore it, since we only convert value remaps
                     if cmds.listConnections(f"{item}.outColor", source=False, destination=True):
@@ -116,5 +116,5 @@ class RemapvalueToSetrange(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

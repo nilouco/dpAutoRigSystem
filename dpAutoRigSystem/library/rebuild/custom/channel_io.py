@@ -15,7 +15,7 @@ class ChannelIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_channelIO"
-        self.startName = "dpChannel"
+        self.start_name = "dpChannel"
     
 
     def runAction(self, first_mode=True, objList=None, *args):
@@ -45,9 +45,9 @@ class ChannelIO(action.BaseAction):
                         itemList = cmds.ls(selection=False, type="transform")
                     if itemList:
                         if self.first_mode: #export
-                            self.exportDicToJsonFile(self.getChannelDataDic(itemList))
+                            self.export_json_file(self.getChannelDataDic(itemList))
                         else: #import
-                            attrDic = self.importLatestJsonFile(self.get_exported_items())
+                            attrDic = self.import_latest_json_file(self.get_exported_items())
                             if attrDic:
                                 self.importChannelData(attrDic)
                             else:
@@ -66,7 +66,7 @@ class ChannelIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -117,6 +117,6 @@ class ChannelIO(action.BaseAction):
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

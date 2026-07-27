@@ -18,7 +18,7 @@ class AttributeIO(action.BaseAction):
             reload(action)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_attributeIO"
-        self.startName = "dpAttribute"
+        self.start_name = "dpAttribute"
         self.defaultValueTypeList = ["bool", "long",  "short",  "byte",  "char",  "enum",  "'float'",  "double",  "doubleAngle",  "doubleLinear"]
     
 
@@ -47,12 +47,12 @@ class AttributeIO(action.BaseAction):
                         itemList = objList
                     else:
                         itemList = self.ar.ctrls.getControlList()
-                        itemList.extend(self.getModelToExportList())
+                        itemList.extend(self.get_models_to_export())
                     if itemList:
                         if self.first_mode: #export
-                            self.exportDicToJsonFile(self.getAttributeDataDic(itemList))
+                            self.export_json_file(self.getAttributeDataDic(itemList))
                         else: #import
-                            attrDic = self.importLatestJsonFile(self.get_exported_items())
+                            attrDic = self.import_latest_json_file(self.get_exported_items())
                             if attrDic:
                                 self.importAttributeData(attrDic)
                             else:
@@ -71,7 +71,7 @@ class AttributeIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         self.refresh_view()
         return self.log_data
 
@@ -171,6 +171,6 @@ class AttributeIO(action.BaseAction):
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
-            self.well_done_io(self.latestDataFile)
+            self.well_done_io(self.latest_data_file)
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

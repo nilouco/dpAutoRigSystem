@@ -819,10 +819,10 @@ class Pipeliner(object):
             if os.path.exists(filePath):
                 fileNameList = next(os.walk(filePath))[2]
                 if fileNameList:
-                    for fileName in fileNameList:
-                        if assetName+self.pipeData['s_middle'] in fileName or assetName.lower()+self.pipeData['s_middle'] in fileName or assetName.upper()+self.pipeData['s_middle'] in fileName:
-                            if not fileName in self.assetNameList:
-                                self.assetNameList.append(fileName)
+                    for file_name in fileNameList:
+                        if assetName+self.pipeData['s_middle'] in file_name or assetName.lower()+self.pipeData['s_middle'] in file_name or assetName.upper()+self.pipeData['s_middle'] in file_name:
+                            if not file_name in self.assetNameList:
+                                self.assetNameList.append(file_name)
                     if self.assetNameList:
                         publishVersion = self.defineFileVersion(self.assetNameList)
             if self.pipeData['b_capitalize']:

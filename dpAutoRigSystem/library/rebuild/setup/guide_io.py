@@ -20,7 +20,7 @@ class GuideIO(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_guideIO"
-        self.startName = "dpGuide"
+        self.start_name = "dpGuide"
         if self.ar.dev:
             reload(head_deformer)
         self.head_deformer = head_deformer.HeadDeformer(self.ar)
@@ -57,7 +57,7 @@ class GuideIO(action.BaseAction):
                             netList.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
                         if netList:
                             self.ar.job.unpin_guide(force=True)
-                            self.exportDicToJsonFile(self.getGuideDataDic(netList))
+                            self.export_json_file(self.getGuideDataDic(netList))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                             cmds.select(clear=True)
@@ -66,7 +66,7 @@ class GuideIO(action.BaseAction):
                         modelPanelList = cmds.getPanel(type="modelPanel")
                         for mp in modelPanelList:
                             cmds.modelEditor(mp, edit=True, xray=True)
-                        guideDic = self.importLatestJsonFile(self.get_exported_items())
+                        guideDic = self.import_latest_json_file(self.get_exported_items())
                         if guideDic:
                             wellImported = False
                             try:
@@ -80,7 +80,7 @@ class GuideIO(action.BaseAction):
                                     self.fail_io(self.ar.data.lang['m197_notPossibleParent']+": "+str(e))
                                 wellImported = False
                             if wellImported:
-                                self.well_done_io(self.latestDataFile)
+                                self.well_done_io(self.latest_data_file)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                         cmds.select(clear=True)
@@ -99,7 +99,7 @@ class GuideIO(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress(True)
+        self.end_progress(True)
         self.refresh_view()
         if self.ar.data.ui_state:
             self.ar.ui_manager.clear_guide_layout()

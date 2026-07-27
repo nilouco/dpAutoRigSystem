@@ -35,10 +35,10 @@ class HideCorrectives(action.BaseAction):
             optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
             if optionCtrl:
                 if objList:
-                    toCheckList = cmds.attributeQuery('correctiveCtrls', node=objList[0], exists=True)
+                    check_items = cmds.attributeQuery('correctiveCtrls', node=objList[0], exists=True)
                 else:
-                    toCheckList = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
-                if toCheckList:
+                    check_items = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
+                if check_items:
                     self.ar.utils.setProgress(max=1)
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     item = optionCtrl+".correctiveCtrls"
@@ -71,7 +71,7 @@ class HideCorrectives(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
     
 

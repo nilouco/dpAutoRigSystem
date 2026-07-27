@@ -33,12 +33,12 @@ class UnknownNodes(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False, type='unknown')
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                for item in toCheckList:
+                check_items = cmds.ls(selection=False, type='unknown')
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     self.checked_items.append(item)
@@ -65,5 +65,5 @@ class UnknownNodes(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

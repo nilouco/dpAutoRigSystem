@@ -33,19 +33,19 @@ class SideCalibration(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = self.ar.ctrls.getControlList()
-            if toCheckList:
+                check_items = self.ar.ctrls.getControlList()
+            if check_items:
                 pairDic = {}
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
-                for item in toCheckList:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".calibrationList"):
                         if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
                             foundOtherSide = False
-                            for node in toCheckList:
+                            for node in check_items:
                                 if node[2:] == item[2:]: #other side found
                                     pairDic[item] = node
                                     foundOtherSide = True
@@ -98,5 +98,5 @@ class SideCalibration(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

@@ -94,7 +94,7 @@ class UIFiller(object):
                         item.title = item.custom_name
                 # rebuilders
                 if folder in self.rebuilder_folders:
-                    item.delete_data_itb = cmds.iconTextButton(image=self.ar.data.icon['x_delete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.delete_data_bt_enable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
+                    item.delete_data_itb = cmds.iconTextButton(image=self.ar.data.icon['x_delete'], height=30, width=30, style='iconOnly', command=item.delete_data, enable=item.delete_data_bt_enable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
             # info icon
             cmds.iconTextButton(item.name+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
             if folder in self.rebuilder_folders:

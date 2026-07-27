@@ -34,15 +34,15 @@ class UnusedNode(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False, materials=True)
-            if toCheckList:
-                if len(toCheckList) > 3: #discarding default materials
+                check_items = cmds.ls(selection=False, materials=True)
+            if check_items:
+                if len(check_items) > 3: #discarding default materials
                     # getting data to analyse
                     defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1', 'openPBR_shader1']
-                    allMatList = list(set(toCheckList) - set(defaultMatList))
-                    usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
+                    allMatList = list(set(check_items) - set(defaultMatList))
+                    usedMatList = list(set(self.get_used_materials()) - set(defaultMatList))
                     # conditional to check here
                     if not len(allMatList) == len(usedMatList):
                         self.ar.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
@@ -72,5 +72,5 @@ class UnusedNode(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data

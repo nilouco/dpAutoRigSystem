@@ -38,16 +38,16 @@ class PassthroughAttributes(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = objList
+                check_items = objList
             else:
-                toCheckList = cmds.ls(selection=False) #all
-            if toCheckList:
+                check_items = cmds.ls(selection=False) #all
+            if check_items:
                 if self.first_mode:
-                    self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 else:
-                    self.ar.utils.setProgress(max=len(toCheckList)*2, addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(check_items)*2, addOne=False, addNumber=False)
                 toOptimizeList = []
-                for item in toCheckList:
+                for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # check optimization
                     for plug, connections in self.getConnectionDic(item).items():
@@ -67,7 +67,7 @@ class PassthroughAttributes(action.BaseAction):
                         self.good_results.append(False)
                     else: #fix
                         self.checked_items.append(self.ar.data.lang[self.title])
-                        for item in toCheckList:
+                        for item in check_items:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             try:
                                 optimizedList = []
@@ -108,7 +108,7 @@ class PassthroughAttributes(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
 
 

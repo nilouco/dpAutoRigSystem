@@ -34,21 +34,21 @@ class BindPose(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if objList:
-                toCheckList = cmds.ls(objList, type="dagPose")
+                check_items = cmds.ls(objList, type="dagPose")
             else:
-                toCheckList = cmds.ls(selection=False, type="dagPose") #bindPose nodes
-            if toCheckList:
-                self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+                check_items = cmds.ls(selection=False, type="dagPose") #bindPose nodes
+            if check_items:
+                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
                 # conditional to check here
-                if len(toCheckList) > 1:
+                if len(check_items) > 1:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                    self.checked_items.append(", ".join(toCheckList))
+                    self.checked_items.append(", ".join(check_items))
                     self.found_issues.append(True)
                     if self.first_mode:
                         self.good_results.append(False)
                     else: #fix
                         try:
-                            for item in toCheckList:
+                            for item in check_items:
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
                             jntList = self.ar.skin.getSkinnedJointList()
@@ -58,7 +58,7 @@ class BindPose(action.BaseAction):
                             self.messages.append(self.ar.data.lang['v004_fixed']+": "+self.bindPoseName)
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(toCheckList))
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(check_items))
             else:
                 self.not_found_node()
         else:
@@ -69,5 +69,5 @@ class BindPose(action.BaseAction):
         # finishing
         self.update_action_buttons()
         self.report_log()
-        self.endProgress()
+        self.end_progress()
         return self.log_data
