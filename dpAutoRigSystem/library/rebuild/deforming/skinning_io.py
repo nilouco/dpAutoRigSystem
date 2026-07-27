@@ -14,33 +14,33 @@ WIKI = "10-‐-Rebuilder#-skinning"
 class SkinningIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_skinningIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_skinningIO"
         self.startName = "skinning"
         self.importRefName = "dpSkinningIO_Import"
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.checkAssetContext():
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    if self.firstMode: #export
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
+                    if self.first_mode: #export
                         itemList = None
                         if objList:
                             itemList = objList
@@ -49,28 +49,28 @@ class SkinningIO(action.BaseAction):
                         if itemList:
                             self.exportDicToJsonFile(self.ar.skin.getSkinWeightData(itemList))
                         else:
-                            self.maybeDoneIO("Render_Grp")
+                            self.maybe_done_io("Render_Grp")
                     else: #import
-                        skinWeightDic = self.importLatestJsonFile(self.getExportedList())
+                        skinWeightDic = self.importLatestJsonFile(self.get_exported_items())
                         if skinWeightDic:
                             self.importSkinning(skinWeightDic)
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        self.refreshView()
-        return self.dataLogDic
+        self.refresh_view()
+        return self.log_data
 
 
     def referOldWipFile(self, *args):
@@ -127,16 +127,16 @@ class SkinningIO(action.BaseAction):
         if toImportList:
             try:
                 # import skin weights
-                self.ar.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.latestDataFile, False)
-                self.wellDoneIO(self.latestDataFile)
+                self.ar.skin.importSkinWeightsFromFile(toImportList, self.io_path, self.latestDataFile, False)
+                self.well_done_io(self.latestDataFile)
             except Exception as e:
-                self.notWorkedWellIO(self.latestDataFile+": "+str(e))
+                self.fail_io(self.latestDataFile+": "+str(e))
         else:
-            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
         if not wellImported:
             if changedShapeMeshList:
-                self.notWorkedWellIO(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+                self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
             elif changedTopoMeshList:
-                self.notWorkedWellIO(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
+                self.fail_io(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
             elif notFoundMeshList:
-                self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

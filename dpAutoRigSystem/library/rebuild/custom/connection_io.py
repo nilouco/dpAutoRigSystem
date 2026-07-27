@@ -13,64 +13,64 @@ WIKI = "10-‐-Rebuilder#-connection"
 class ConnectionIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_connectionIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_connectionIO"
         self.startName = "dpConnection"
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.checkAssetContext():
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
                     ctrlList = None
                     if objList:
                         ctrlList = objList
                     else:
                         ctrlList = self.ar.ctrls.getControlList()
                     if ctrlList:
-                        if self.firstMode: #export
+                        if self.first_mode: #export
                             toExportDataDic = self.getConnectionDataDic(ctrlList)
                             toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.ar.utils.utilityTypeList))) #utilityNodes without dpID
                             self.exportDicToJsonFile(toExportDataDic)
                         else: #import
-                            connectDic = self.importLatestJsonFile(self.getExportedList())
+                            connectDic = self.importLatestJsonFile(self.get_exported_items())
                             if connectDic:
                                 self.importConnectionData(connectDic)
                             else:
-                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                                self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.maybeDoneIO("Ctrls_Grp")
+                        self.maybe_done_io("Ctrls_Grp")
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        self.refreshView()
-        return self.dataLogDic
+        self.refresh_view()
+        return self.log_data
 
 
     def getConnectionDataDic(self, itemList, *args):
@@ -156,7 +156,7 @@ class ConnectionIO(action.BaseAction):
         for item in itemList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.ar.utils.validateID(item):
+                if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
                     for attrDic, multi in zip([self.ar.utils.typeAttrDic, self.ar.utils.typeOutAttrDic, self.ar.utils.typeMultiAttrDic, self.ar.utils.typeOutMultiAttrDic], [False, False, True, True]):
                         gotDic = self.getAttrConnections(item, attrDic, multi)
                         if gotDic:
@@ -221,7 +221,7 @@ class ConnectionIO(action.BaseAction):
                                                 if isLocked:
                                                     cmds.setAttr(ioInfo[plug][0], lock=True)
                                     else: #there is a not connected unitConversion node
-                                        self.notWorkedWellIO(self.ar.data.lang['r047_notConnectedUC']+": "+uc)
+                                        self.fail_io(self.ar.data.lang['r047_notConnectedUC']+": "+uc)
                                 elif cmds.objExists(ioInfo[:ioInfo.find(".")]):
                                     if i == 0: #in
                                         # if there isn't this attribute here, maybe it's an issue parenting the guides. Check the guide serialization before rig them.
@@ -239,12 +239,12 @@ class ConnectionIO(action.BaseAction):
                                             if isLocked:
                                                 cmds.setAttr(ioInfo, lock=True)
                                 else:
-                                     self.maybeDoneIO(ioInfo[:ioInfo.find(".")])
+                                     self.maybe_done_io(ioInfo[:ioInfo.find(".")])
                                 if not item in wellImportedList:
                                     wellImportedList.append(item)
             else:
                 notFoundNodesList.append(item)
         if notFoundNodesList:
-            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:
-            self.wellDoneIO(self.latestDataFile)
+            self.well_done_io(self.latestDataFile)

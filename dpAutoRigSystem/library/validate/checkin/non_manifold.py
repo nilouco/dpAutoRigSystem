@@ -16,19 +16,19 @@ class NonManifold(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
 
         # ---
         # --- validator code --- beginning
@@ -44,38 +44,38 @@ class NonManifold(action.BaseAction):
                         for geo in geoToCleanList:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):
-                                self.checkedObjList.append(geo)
-                                self.foundIssueList.append(True)
-                                if self.firstMode:
-                                    self.resultOkList.append(False)
+                                self.checked_items.append(geo)
+                                self.found_issues.append(True)
+                                if self.first_mode:
+                                    self.good_results.append(False)
                                 else: #fix
                                     try:
                                         cmds.select(geo)
                                         # Cleanup non manifolds
                                         mel.eval('polyCleanupArgList 4 { "0","1","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };')
-                                        self.resultOkList.append(True)
-                                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+geo)
+                                        self.good_results.append(True)
+                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+geo)
                                         mel.eval('changeSelectMode -object;')
                                         cmds.select(clear=True)
                                     except:
-                                        self.resultOkList.append(False)
-                                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+geo)
+                                        self.good_results.append(False)
+                                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+geo)
                     else:
-                        self.notFoundNodes()
+                        self.not_found_node()
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+                    self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['v100_cantExistsGuides'])
+                self.fail_io(self.ar.data.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['v099_cantExistsAllGrp'])
+            self.fail_io(self.ar.data.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data
 
 
     def checkNonManifold(self, itemList, *args):

@@ -35,7 +35,7 @@ class Logger(object):
         if self.info_description:
             infoDesc = cmds.text(self.lang[self.info_description], align=self.info_align, parent=infoLayout)
         if self.info_text:
-            infoText = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
+            info_text = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
             if buttonList:
                 if not buttonList[0] == "None":
                     cmds.button(label=buttonList[0], command=partial(buttonList[1], buttonList[2]), parent=infoLayout)
@@ -51,25 +51,25 @@ class Logger(object):
     def logWin(self, *args):
         """ Just create a window with all information log and print the principal result.
         """
-        # create the logText:
-        logText = self.lang['i014_logStart'] + '\n'
-        logText += str( time.asctime( time.localtime(time.time()) ) ) + '\n\n'
+        # create the log_text:
+        log_text = self.lang['i014_logStart'] + '\n'
+        log_text += str( time.asctime( time.localtime(time.time()) ) ) + '\n\n'
         # get the number of riggedModules:
         nRiggedModule = len(self.ar.maker.guides_to_rig)
-        # pass for rigged module to add informations in logText:
+        # pass for rigged module to add informations in log_text:
         if nRiggedModule != 0:
             success = 'i016_success'
             if nRiggedModule == 1:
                 success = 'i015_success'
-            logText += str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ':\n\n'
+            log_text += str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ':\n\n'
             print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ', thanks!\n')
             for item in self.ar.maker.guides_to_rig:
-                logText += item.guideNamespace
-                if item.customName:
-                    logText += " as " + item.customName
-                logText += '\n'
+                log_text += item.guideNamespace
+                if item.custom_name:
+                    log_text += " as " + item.custom_name
+                log_text += '\n'
         else:
-            logText += self.lang['i017_nothing'] + '\n'
-        logText += '\n' + self.lang['i018_thanks']
+            log_text += self.lang['i017_nothing'] + '\n'
+        log_text += '\n' + self.lang['i018_thanks']
         # creating a info window to show the log:
-        self.infoWin('i019_log', None, logText, 'center', 250, min((350, 150+(nRiggedModule*13))))
+        self.infoWin('i019_log', None, log_text, 'center', 250, min((350, 150+(nRiggedModule*13))))

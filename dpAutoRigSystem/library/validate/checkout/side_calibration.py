@@ -15,19 +15,19 @@ class SideCalibration(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -63,10 +63,10 @@ class SideCalibration(action.BaseAction):
                                             pairCurrentValue = float(format(cmds.getAttr(pairDic[item]+"."+attr),".3f"))
                                             if not itemCurrentValue == pairCurrentValue:
                                                 # found issue here
-                                                self.checkedObjList.append(item+"."+attr)
-                                                self.foundIssueList.append(True)
-                                                if self.firstMode:
-                                                    self.resultOkList.append(False)
+                                                self.checked_items.append(item+"."+attr)
+                                                self.found_issues.append(True)
+                                                if self.first_mode:
+                                                    self.good_results.append(False)
                                                 else: #fix
                                                     try:
                                                         # default values (supposed to be the same for the two sides)
@@ -80,23 +80,23 @@ class SideCalibration(action.BaseAction):
                                                                 cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                             else:
                                                                 cmds.setAttr(item+"."+attr, pairCurrentValue)
-                                                        self.resultOkList.append(True)
-                                                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
+                                                        self.good_results.append(True)
+                                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
                                                     except:
-                                                        self.resultOkList.append(False)
-                                                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
+                                                        self.good_results.append(False)
+                                                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
                                         else:
-                                            self.resultOkList.append(True)
-                                            self.messageList.append(item+"."+attr+" "+self.ar.data.lang['i061_notExists'])
+                                            self.good_results.append(True)
+                                            self.messages.append(item+"."+attr+" "+self.ar.data.lang['i061_notExists'])
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

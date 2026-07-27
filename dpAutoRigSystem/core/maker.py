@@ -783,8 +783,8 @@ class Maker(object):
                 item.check_father_mirror()
                 item.serialize_guide()
             for item in self.guides_to_rig: #it needs another loop to serialize guides parenting before rig them
-                if item.customName:
-                    self.ar.utils.setProgress('Rigging: '+str(item.customName))
+                if item.custom_name:
+                    self.ar.utils.setProgress('Rigging: '+str(item.custom_name))
                 else:
                     self.ar.utils.setProgress('Rigging: '+str(item.guideNamespace))
                 # TODO detected bug returning rig_me

@@ -26,325 +26,318 @@ class BaseAction(base.BaseLibrary):
             reload(base)
         self.verbose = verbose
         self.active = True
-        self.actionCB = None
-        self.firstBT = None
-        self.secondBT = None
-        self.deleteDataITB = None
-        self.actionType = "v000_validator" #or r000_rebuilder
-        self.firstBTEnable = True
-        self.secondBTEnable = True
-        self.deleteDataBTEnable = False
-        self.firstBTLabel = None
-        self.secondBTLabel = None
-        self.firstBTCustomLabel = None
-        self.secondBTCustomLabel = None
-        self.ioDir = None
-        self.maybeDone = False
-        self.infoText = self.ar.data.lang['i305_none']
-        self.dpID = self.ar.data.dp_id
-        self.constraintTypeList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
-        self.customName = ""
+        self.action_cb = None
+        self.first_bt = None
+        self.second_bt = None
+        self.delete_data_itb = None
+        self.action_type = "v000_validator" #or r000_rebuilder
+        self.first_bt_enable = True
+        self.second_bt_enable = True
+        self.delete_data_bt_enable = False
+        self.first_bt_label = None
+        self.second_bt_label = None
+        self.first_bt_custom_label = None
+        self.second_bt_custom_label = None
+        self.io_folder = None
+        self.maybe_done = False
+        self.info_text = self.ar.data.lang['i305_none']
+        self.constraint_types = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
+        self.custom_name = ''
         # returned lists
-        self.checkedObjList = []
-        self.foundIssueList = []
-        self.resultOkList = []
-        self.messageList = []
-        self.dataLogDic = {}
+        self.checked_items = []
+        self.found_issues = []
+        self.good_results = []
+        self.messages = []
+        self.log_data = {}
         # start action type
-        self.setActionType(self.actionType)
+        self.set_action_type(self.action_type)
 
 
-    def setActionType(self, value, *args):
+    def set_action_type(self, value):
         """ Define the button label texts.
         """
-        self.actionType = value
-        if self.actionType == "v000_validator":
-            self.firstBTLabel = self.ar.data.lang['i210_verify']
-            self.secondBTLabel = self.ar.data.lang['c052_fix']
+        self.action_type = value
+        if self.action_type == "v000_validator":
+            self.first_bt_label = self.ar.data.lang['i210_verify']
+            self.second_bt_label = self.ar.data.lang['c052_fix']
         else: #r000_rebuilder
-            self.firstBTLabel = self.ar.data.lang['i164_export']
-            self.secondBTLabel = self.ar.data.lang['i196_import']
-        if self.firstBTCustomLabel:
-            self.firstBTLabel = self.firstBTCustomLabel
-        if self.secondBTCustomLabel:
-            self.secondBTLabel = self.secondBTCustomLabel
+            self.first_bt_label = self.ar.data.lang['i164_export']
+            self.second_bt_label = self.ar.data.lang['i196_import']
+        if self.first_bt_custom_label:
+            self.first_bt_label = self.first_bt_custom_label
+        if self.second_bt_custom_label:
+            self.second_bt_label = self.second_bt_custom_label
 
 
-    def changeActive(self, value, *args):
+    def change_active(self, value, *args):
         """ Set active attribute to given value.
             If there's an UI it will work to update the checkBox and buttons.
         """
         self.active = value
         if self.ar.data.ui_state:
-            if self.actionCB and cmds.checkBox(self.actionCB, query=True, exists=True):
-                cmds.checkBox(self.actionCB, edit=True, value=value)
-            if self.firstBT and cmds.button(self.firstBT, query=True, exists=True):
-                cmds.button(self.firstBT, edit=True, enable=value)
-            if self.secondBT and cmds.button(self.secondBT, query=True, exists=True):
-                cmds.button(self.secondBT, edit=True, enable=value)
+            if self.action_cb and cmds.checkBox(self.action_cb, query=True, exists=True):
+                cmds.checkBox(self.action_cb, edit=True, value=value)
+            if self.first_bt and cmds.button(self.first_bt, query=True, exists=True):
+                cmds.button(self.first_bt, edit=True, enable=value)
+            if self.second_bt and cmds.button(self.second_bt, query=True, exists=True):
+                cmds.button(self.second_bt, edit=True, enable=value)
 
 
-    def cleanUpToStart(self, rebuilding=False, *args):
+    def cleanup_to_start(self, rebuilding=False):
         """ Just redeclare variables and close openned window to run the code properly.
         """
-        print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.getTitle()} IO")
+        print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.get_title()} IO")
         if self.verbose:
-            self.ar.utils.setProgress(self.getTitle()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], addOne=False, addNumber=False)
         # redeclare variables
         self.ar.data.rebuilding = rebuilding
-        self.checkedObjList = []
-        self.foundIssueList = []
-        self.resultOkList = []
-        self.messageList = []
-        self.dataLogDic = {}
+        self.checked_items = []
+        self.found_issues = []
+        self.good_results = []
+        self.messages = []
+        self.log_data = {}
         # close info log window if it exists
         if cmds.window('dpInfoWindow', query=True, exists=True):
             cmds.deleteUI('dpInfoWindow', window=True)
-        self.updateButtonColors(True) #running
+        self.update_button_colors(True) #running
         cmds.refresh()
 
 
-    def resetButtonColors(self, *args):
+    def reset_button_colors(self):
         """ Just set the button colors as default.
         """
         if self.ar.data.ui_state:
-            if cmds.button(self.firstBT, exists=True):
-                cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+            if cmds.button(self.first_bt, exists=True):
+                cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
 
 
-    def updateButtonColors(self, running=False, *args):
+    def update_button_colors(self, running=False):
         """ Update button background colors if using UI.
         """
         if self.ar.data.ui_state:
-            if self.firstBT and cmds.button(self.firstBT, exists=True):
+            if self.first_bt and cmds.button(self.first_bt, exists=True):
                 if running:
-                    if self.firstMode: #verify/export
-                        cmds.button(self.firstBT, edit=True, backgroundColor=RUNNING_COLOR)
-                        cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                    if self.first_mode: #verify/export
+                        cmds.button(self.first_bt, edit=True, backgroundColor=RUNNING_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix/import
-                        cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.secondBT, edit=True, backgroundColor=RUNNING_COLOR)
-                elif self.maybeDone:
-                    if self.firstMode: #verify/export
-                        cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
-                        cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=RUNNING_COLOR)
+                elif self.maybe_done:
+                    if self.first_mode: #verify/export
+                        cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix/import
-                        cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
-                elif self.checkedObjList: #ran
-                    if self.firstMode: #verify/export
-                        if True in self.foundIssueList:
-                            cmds.button(self.firstBT, edit=True, backgroundColor=ISSUE_COLOR)
-                            if self.actionType == "v000_validator":
-                                cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
+                        cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
+                elif self.checked_items: #ran
+                    if self.first_mode: #verify/export
+                        if True in self.found_issues:
+                            cmds.button(self.first_bt, edit=True, backgroundColor=ISSUE_COLOR)
+                            if self.action_type == "v000_validator":
+                                cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
                             else:
-                                cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                                cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                         else:
-                            cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
-                            cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                            cmds.button(self.first_bt, edit=True, backgroundColor=CHECKED_COLOR)
+                            cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix/import
-                        if False in self.resultOkList:
-                            if self.actionType == "v000_validator":
-                                cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
+                        if False in self.good_results:
+                            if self.action_type == "v000_validator":
+                                cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
                             else:
-                                cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                            cmds.button(self.secondBT, edit=True, backgroundColor=ISSUE_COLOR)
+                                cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                            cmds.button(self.second_bt, edit=True, backgroundColor=ISSUE_COLOR)
                         else:
-                            cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                            cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
+                            cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                            cmds.button(self.second_bt, edit=True, backgroundColor=CHECKED_COLOR)
                 else: #wellDone
-                    if self.firstMode: #verify/export
-                        cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
-                        cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                    if self.first_mode: #verify/export
+                        cmds.button(self.first_bt, edit=True, backgroundColor=CHECKED_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix/import
-                        cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
+                        cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=CHECKED_COLOR)
     
 
-    def updateInfoDataButton(self, *args):
+    def update_info_data_button(self):
         """ Just get the latest exported data and edit the info button text.
         """
-        self.infoText = "\n\n"+self.ar.data.lang['r060_latestExportedData']+"\n"
-        buttonLabel = self.getLatestExportedData()
-        buttonCommand = self.ar.packager.openFolder
-        buttonArgument = self.ioPath
+        self.info_text = "\n\n"+self.ar.data.lang['r060_latestExportedData']+"\n"
+        button_label = self.get_latest_exported_data()
+        button_command = self.ar.packager.openFolder
+        button_argument = self.io_path
         if cmds.iconTextButton(self.name+"_itb", query=True, exists=True):
             #functools.partial(<bound method Logger.infoWin of <dpAutoRigSystem.Pipeline.dpLogger.Logger object at 0x00000259E390BD10>>, 'r003_modelIO', 'r004_modelIODesc', None, 'center', 305, 250, wiki='10-‐-Rebuilder#-model')
-            thisWiki = str(cmds.iconTextButton(self.name+"_itb", query=True, command=True)).split("wiki='")[1][:-2]
-            cmds.iconTextButton(self.name+"_itb", edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.infoText, 'center', 305, 250, buttonList=[buttonLabel, buttonCommand, buttonArgument], wiki=thisWiki))
+            this_wiki = str(cmds.iconTextButton(self.name+"_itb", query=True, command=True)).split("wiki='")[1][:-2]
+            cmds.iconTextButton(self.name+"_itb", edit=True, command=partial(self.ar.logger.infoWin, self.title, self.description, self.info_text, 'center', 305, 250, buttonList=[button_label, button_command, button_argument], wiki=this_wiki))
 
 
-    def getLatestExportedData(self, *args):
+    def get_latest_exported_data(self, *args):
         """ Returns the latest exported data or "None".
         """
-        latestData = self.ar.data.lang['i305_none']
-        exportedList = self.getExportedList()
-        if exportedList:
-            exportedList.sort()
-            latestData = exportedList[-1]
-        return latestData
+        latest_data = self.ar.data.lang['i305_none']
+        exported_items = self.get_exported_items()
+        if exported_items:
+            exported_items.sort()
+            latest_data = exported_items[-1]
+        return latest_data
 
 
-    def updateActionButtons(self, running=False, color=True, *args):
+    def update_action_buttons(self, running=False, color=True):
         """ Update buttons colors and enable.
         """
         if color:
-            self.updateButtonColors(running)
-        if self.actionType == "r000_rebuilder":
+            self.update_button_colors(running)
+        if self.action_type == "r000_rebuilder":
             self.updateDeleteDataButton()
-            self.updateInfoDataButton()
+            self.update_info_data_button()
 
 
-    def getTitle(self, *args):
+    def get_title(self):
         """ Check if there's a key in the dictionary with the current title.
             Returns its value or the current title text only.
         """
-        titleText = self.title
+        title_text = self.title
         if self.title in self.ar.data.lang.keys():
-            titleText = self.ar.data.lang[self.title]
-        return titleText
+            title_text = self.ar.data.lang[self.title]
+        return title_text
 
 
-    def reportLog(self, *args):
+    def report_log(self):
         """ Prepare the log output text and data dictionary for this checked validator/rebuilder.
         """
-        # texts
-        nameText = self.ar.data.lang['m006_name']
-        modeText = self.ar.data.lang['v003_mode']
-        foundIssueText = self.ar.data.lang['v006_foundIssue']
-        everythingOkText = self.ar.data.lang['v007_allOk']
-        titleText = self.getTitle()
         # header
-        logText = nameText+": "+titleText+"\n"
+        log_text = self.ar.data.lang['m006_name']+": "+self.get_title()+"\n"
         # mode
-        logText += modeText+": "
-        actionText = self.secondBTLabel.upper()
-        if self.firstMode:
-            actionText = self.firstBTLabel.upper()
-        logText += actionText+"\n"
+        log_text += self.ar.data.lang['v003_mode']+": "
+        action_text = self.second_bt_label.upper()
+        if self.first_mode:
+            action_text = self.first_bt_label.upper()
+        log_text += action_text+"\n"
         # issues
-        if True in self.foundIssueList:
-            logText += foundIssueText+":\n"
-            for i, item in enumerate(self.foundIssueList):
+        if True in self.found_issues:
+            log_text += self.ar.data.lang['v006_foundIssue']+":\n"
+            for i, item in enumerate(self.found_issues):
                 if item == True:
-                    logText += self.checkedObjList[i]
-                    if i != len(self.checkedObjList)-1:
-                        logText += "\n"
+                    log_text += self.checked_items[i]
+                    if i != len(self.checked_items)-1:
+                        log_text += "\n"
         else:
-            logText += everythingOkText
+            log_text += self.ar.data.lang['v007_allOk']
         # messages
-        if self.messageList:
-            for msg in self.messageList:
-                logText += "\n"+msg
-        logText += "\n"
+        if self.messages:
+            for msg in self.messages:
+                log_text += "\n"+msg
+        log_text += "\n"
         # dataLog
-        self.dataLogDic["log"] = self.ar.data.lang[self.actionType]
-        self.dataLogDic["user"] = getpass.getuser()
-        self.dataLogDic["time"] = self.ar.pipeliner.getToday(True)
-        self.dataLogDic["dpARVersion"] = self.ar.data.version
-        self.dataLogDic["module"] = self.name
-        self.dataLogDic["name"] = self.title
-        self.dataLogDic["mode"] = actionText
-        self.dataLogDic["checkedObjList"] = self.checkedObjList
-        self.dataLogDic["foundIssueList"] = self.foundIssueList
-        self.dataLogDic["resultOkList"] = self.resultOkList
-        self.dataLogDic["messageList"] = self.messageList
-        self.dataLogDic["logText"] = logText
+        self.log_data["log"] = self.ar.data.lang[self.action_type]
+        self.log_data["user"] = getpass.getuser()
+        self.log_data["time"] = self.ar.pipeliner.getToday(True)
+        self.log_data["dpARVersion"] = self.ar.data.version
+        self.log_data["module"] = self.name
+        self.log_data["name"] = self.title
+        self.log_data["mode"] = action_text
+        self.log_data["checked_items"] = self.checked_items
+        self.log_data["found_issues"] = self.found_issues
+        self.log_data["good_results"] = self.good_results
+        self.log_data["messages"] = self.messages
+        self.log_data["log_text"] = log_text
         # verbose call info window
         if self.verbose:
-            self.ar.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.ar.data.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n\n"+logText)
-            if not self.ar.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+            self.ar.logger.infoWin('i019_log', self.action_type, self.log_data["time"]+"\n\n"+log_text, "left", 250, 250)
+            print("\n-------------\n"+self.ar.data.lang[self.action_type]+"\n"+self.log_data["time"]+"\n\n"+log_text)
+            if not self.ar.utils.exportLogDicToJson(self.log_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
 
     
-    def notFoundNodes(self, item=None, *args):
+    def not_found_node(self, item=None):
         """ Set dataLog when don't have any objects to verify.
         """
-        self.checkedObjList.append(item)
-        self.foundIssueList.append(False)
-        self.resultOkList.append(True)
-        self.messageList.append(self.ar.data.lang['v014_notFoundNodes'])
+        self.checked_items.append(item)
+        self.found_issues.append(False)
+        self.good_results.append(True)
+        self.messages.append(self.ar.data.lang['v014_notFoundNodes'])
 
 
-    def notWorkedWellIO(self, item="", *args):
+    def fail_io(self, item=""):
         """ Set dataLog when IO not working well for rebuilders.
         """
-        self.checkedObjList.append(item)
-        self.foundIssueList.append(True)
-        self.resultOkList.append(False)
-        self.messageList.append(self.ar.data.lang['r005_notWorkedWell'])
+        self.checked_items.append(item)
+        self.found_issues.append(True)
+        self.good_results.append(False)
+        self.messages.append(self.ar.data.lang['r005_notWorkedWell'])
 
 
-    def wellDoneIO(self, item="", text="r006_wellDone", *args):
+    def well_done_io(self, item="", text="r006_wellDone"):
         """ Set dataLog when rebuilder IO worked well.
         """
-        self.checkedObjList.append(item)
-        self.foundIssueList.append(False)
-        self.resultOkList.append(True)
-        self.messageList.append(self.ar.data.lang[text]+": "+item)
+        self.checked_items.append(item)
+        self.found_issues.append(False)
+        self.good_results.append(True)
+        self.messages.append(self.ar.data.lang[text]+": "+item)
 
 
-    def maybeDoneIO(self, item="", *args):
+    def maybe_done_io(self, item=""):
         """ Set dataLog when IO possible worked well for rebuilders, maybe.
         """
-        self.maybeDone = True
-        self.checkedObjList.append(item)
-        self.foundIssueList.append(False)
-        self.resultOkList.append(True)
-        self.messageList.append(self.ar.data.lang['r063_maybeDoneIO']+": "+item)
+        self.maybe_done = True
+        self.checked_items.append(item)
+        self.found_issues.append(False)
+        self.good_results.append(True)
+        self.messages.append(self.ar.data.lang['r063_maybeDoneIO']+": "+item)
 
 
-    def getIOPath(self, ioDir, *args):
+    def get_io_path(self, io_folder):
         """ Returns the IO path for the current scene.
         """
-        if "assetPath" in self.ar.pipeliner.pipeData.keys() and ioDir:
-            return self.ar.pipeliner.pipeData['assetPath']+"/"+self.ar.pipeliner.pipeData[ioDir]
+        if "assetPath" in self.ar.pipeliner.pipeData.keys() and io_folder:
+            return self.ar.pipeliner.pipeData['assetPath']+"/"+self.ar.pipeliner.pipeData[io_folder]
 
 
-    def getExportedList(self, objList=None, subFolder="", askHasData=False, getAny=False, *args):
-        """ Returns the exported file list in the current asset folder IO or the given objList.
+    def get_exported_items(self, items=None, sub_folder="", ask_has_data=False, get_any=False):
+        """ Returns the exported file list in the current asset folder IO or the given items.
         """
-        exportedList = None
-        resultList = []
-        self.ioPath = self.getIOPath(self.ioDir)
-        if self.ioPath:
-            if askHasData:
-                return os.path.exists(self.ioPath)
-            if objList:
-                exportedList = objList
-                if not type(objList) == list:
-                    exportedList = [objList]
-            elif getAny:
-                if os.path.exists(self.ioPath):
-                    exportedList = next(os.walk(self.ioPath))[2]
+        exported_items = None
+        result = []
+        self.io_path = self.get_io_path(self.io_folder)
+        if self.io_path:
+            if ask_has_data:
+                return os.path.exists(self.io_path)
+            if items:
+                exported_items = items
+                if not type(items) == list:
+                    exported_items = [items]
+            elif get_any:
+                if os.path.exists(self.io_path):
+                    exported_items = next(os.walk(self.io_path))[2]
             else:
-                if os.path.exists(self.ioPath+"/"+subFolder):
-                    exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
-            if exportedList:
-                if subFolder or getAny:
-                    return exportedList
-                assetName = self.ar.pipeliner.pipeData["assetName"]
-                for item in exportedList:
-                    if assetName in item:
-                        resultList.append(item)
-        return resultList
+                if os.path.exists(self.io_path+"/"+sub_folder):
+                    exported_items = next(os.walk(self.io_path+"/"+sub_folder))[2]
+            if exported_items:
+                if sub_folder or get_any:
+                    return exported_items
+                asset_name = self.ar.pipeliner.pipeData["assetName"]
+                for item in exported_items:
+                    if asset_name in item:
+                        result.append(item)
+        return result
 
 
-    def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, objList, *args):
+    def run_actions_in_silence(self, action_names, action_instances, first_mode, items):
         """ Run action from a list without verbose.
         """
-        if actionInstanceList:
-            for actionToRun in actionToRunList:
-                for aInst in actionInstanceList:
-                    if actionToRun in str(aInst):
-                        aInst.verbose = False
-                        aInst.runAction(firstMode, objList)
-                        aInst.verbose = True
+        if action_instances:
+            for action_name in action_names:
+                for action_instance in action_instances:
+                    if action_name in str(action_instance):
+                        action_instance.verbose = False
+                        action_instance.runAction(first_mode, items)
+                        action_instance.verbose = True
 
 
-    def refreshView(self, *args):
+    def refresh_view(self):
         """ Just refresh the viewport and fit the view camera to all visible nodes.
         """
         cmds.refresh()
@@ -353,60 +346,60 @@ class BaseAction(base.BaseLibrary):
         cmds.select(clear=True)
 
 
-    def changeNodeState(self, itemList, findDeformers=True, state=None, dic=None, *args):
+    def change_node_state(self, items, find_deform=True, state=None, dic=None):
         """ Useful for rebuilder to set deformer node state as has no effect before export a not edited mesh.
             Returns the current node state dictionary of the given node list and all descendent hierarchy too.
         """
-        resultDic = {}
-        toChangeNodeStateList = []
-        if findDeformers:
-            for item in itemList:
-                childrenList = cmds.listRelatives(item, children=True, allDescendents=True)
-                if childrenList:
-                    childrenList.append(item)
+        result_data = {}
+        to_change_items = []
+        if find_deform:
+            for item in items:
+                children = cmds.listRelatives(item, children=True, allDescendents=True)
+                if children:
+                    children.append(item)
                 else:
-                    childrenList = [item]
-                for child in childrenList:
+                    children = [item]
+                for child in children:
                     try:
-                        inputDeformerList = cmds.findDeformers(child)
+                        input_deformers = cmds.findDeformers(child)
                     except:
-                        self.messageList.append(self.ar.data.lang['i075_moreOne']+": "+child)
-                        inputDeformerList = False
-                    if inputDeformerList:
-                        for defNode in inputDeformerList:
-                            if not defNode in toChangeNodeStateList:
-                                toChangeNodeStateList.append(defNode)
+                        self.messages.append(self.ar.data.lang['i075_moreOne']+": "+child)
+                        input_deformers = False
+                    if input_deformers:
+                        for deformer_node in input_deformers:
+                            if not deformer_node in to_change_items:
+                                to_change_items.append(deformer_node)
         elif dic:
-            toChangeNodeStateList = dic.keys()
+            to_change_items = dic.keys()
         else:
-            toChangeNodeStateList = itemList
-        if toChangeNodeStateList:
-            for node in toChangeNodeStateList:
+            to_change_items = items
+        if to_change_items:
+            for node in to_change_items:
                 if not cmds.listConnections(node+".nodeState", source=True, destination=False):
                     value = state
                     if dic:
                         value = dic[node]
-                    resultDic[node] = cmds.getAttr(node+".nodeState")
-                    lockAttrStatus = cmds.getAttr(node+".nodeState", lock=True)
-                    lockNodeStatus = cmds.lockNode(node, query=True, lock=True)[0]
+                    result_data[node] = cmds.getAttr(node+".nodeState")
+                    lock_attr_status = cmds.getAttr(node+".nodeState", lock=True)
+                    lock_node_status = cmds.lockNode(node, query=True, lock=True)[0]
                     cmds.lockNode(node, lock=False)
                     cmds.setAttr(node+".nodeState", lock=False)
                     # set nodeState attribute value
                     cmds.setAttr(node+".nodeState", value)
-                    cmds.setAttr(node+".nodeState", lock=lockAttrStatus)
-                    if lockNodeStatus:
+                    cmds.setAttr(node+".nodeState", lock=lock_attr_status)
+                    if lock_node_status:
                         cmds.lockNode(node, lock=True)
-        return resultDic
+        return result_data
     
 
-    def getBrokenIDDataDic(self, toCheckList=None, *args):
+    def get_broken_id_data(self, toCheckList=None):
         """ Return a dictionary with the broken ID nodes as keys and them father nodes as values.
         """
         dic = {"BrokenID" : {}}
         if not toCheckList:
             toCheckList = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
         if toCheckList:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.actionType], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], addOne=False, addNumber=False)
             self.ar.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             filteredList = self.ar.utils.filterTransformList(toCheckList, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
             if filteredList:
@@ -424,7 +417,7 @@ class BaseAction(base.BaseLibrary):
 
 
     def endProgress(self, update_guides=False, *args):
-        print(f"{self.ar.data.lang['m184_end']}: {self.getTitle()} IO\n----------")
+        print(f"{self.ar.data.lang['m184_end']}: {self.get_title()} IO\n----------")
         if self.verbose:
             self.ar.utils.setProgress(endIt=True)
         if update_guides:
@@ -439,37 +432,37 @@ class BaseAction(base.BaseLibrary):
         if dic:
             try:
                 # export json file
-                self.ar.pipeliner.makeDirIfNotExists(self.ioPath)
-                jsonName = self.ioPath+"/"+self.startName+"_"+self.ar.pipeliner.pipeData['currentFileName']+".json"
+                self.ar.pipeliner.makeDirIfNotExists(self.io_path)
+                jsonName = self.io_path+"/"+self.startName+"_"+self.ar.pipeliner.pipeData['currentFileName']+".json"
                 self.ar.pipeliner.saveJsonFile(dic, jsonName)
-                self.wellDoneIO(jsonName)
+                self.well_done_io(jsonName)
             except Exception as e:
-                self.notWorkedWellIO(jsonName+": "+str(e))
+                self.fail_io(jsonName+": "+str(e))
         else:
-            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 
 
-    def exportAlembicFile(self, itemList, path=None, startName=None, fileName=None, attr=True, curve=False, *args):
+    def exportAlembicFile(self, items, path=None, startName=None, fileName=None, attr=True, curve=False, *args):
         """ Export given mesh list to alembic file.
             If curve argument is True, it'll also accept export nurbsCurve shapes.
         """
         try:
             if not path:
-                path = self.ioPath
+                path = self.io_path
             if not startName:
                 startName = self.startName
             if not fileName:
                 fileName = self.ar.pipeliner.pipeData['currentFileName']
-            nodeStateDic = self.changeNodeState(itemList, state=1) #has no effect
+            nodeStateDic = self.change_node_state(items, state=1) #has no effect
             # export alembic
             self.ar.pipeliner.makeDirIfNotExists(path)
-            ioItems = ' -root '.join(itemList)
+            ioItems = ' -root '.join(items)
             attrStr = ""
             if attr:
-                itemList.extend(cmds.listRelatives(itemList, type="mesh", children=True, allDescendents=True, noIntermediate=True) or [])
+                items.extend(cmds.listRelatives(items, type="mesh", children=True, allDescendents=True, noIntermediate=True) or [])
                 if curve:
-                    itemList.extend(cmds.listRelatives(itemList, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
-                for mesh in itemList:
+                    items.extend(cmds.listRelatives(items, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
+                for mesh in items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     userDefAttrList = cmds.listAttr(mesh, userDefined=True)
                     if userDefAttrList:
@@ -478,54 +471,54 @@ class BaseAction(base.BaseLibrary):
             abcName = path+"/"+startName+"_"+fileName+".abc"
             cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+attrStr+" -file "+abcName)
             if nodeStateDic:
-                self.changeNodeState(itemList, findDeformers=False, dic=nodeStateDic) #back deformer as before
-            self.wellDoneIO(abcName)
+                self.change_node_state(items, find_deform=False, dic=nodeStateDic) #back deformer as before
+            self.well_done_io(abcName)
         except Exception as e:
-            self.notWorkedWellIO(', '.join(itemList)+": "+str(e))
+            self.fail_io(', '.join(items)+": "+str(e))
 
 
-    def importLatestAlembicFile(self, exportedList, *args):
+    def importLatestAlembicFile(self, exported_items, *args):
         """ Import the latest alembic file from given exported list.
         """
         self.latestDataFile = None
-        if exportedList:
+        if exported_items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
             try:
                 # import alembic
-                exportedList.sort()
-                self.latestDataFile = exportedList[-1]
-                abcToImport = self.ioPath+"/"+self.latestDataFile
+                exported_items.sort()
+                self.latestDataFile = exported_items[-1]
+                abcToImport = self.io_path+"/"+self.latestDataFile
                 #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
                 mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                self.wellDoneIO(self.latestDataFile)
+                self.well_done_io(self.latestDataFile)
             except Exception as e:
-                self.notWorkedWellIO(self.latestDataFile+": "+str(e))
+                self.fail_io(self.latestDataFile+": "+str(e))
         else:
-            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 
 
-    def importLatestJsonFile(self, exportedList, path=None, *args):
+    def importLatestJsonFile(self, exported_items, path=None, *args):
         """ Return the latest exported json file from given list.
         """
         self.latestDataFile = None
-        if exportedList:
+        if exported_items:
             if not path:
-                path = self.ioPath
-            exportedList.sort()
-            self.latestDataFile = exportedList[-1]
-            return self.ar.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                path = self.io_path
+            exported_items.sort()
+            self.latestDataFile = exported_items[-1]
+            return self.ar.pipeliner.getJsonContent(self.io_path+"/"+exported_items[-1])
         else:
-            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 
 
     def updateDeleteDataButton(self, *args):
         """ Check if there's some exported data for this module and update the delete data button as enable or disable.
         """
-        if self.ioDir and cmds.iconTextButton(self.deleteDataITB, query=True, exists=True):
-            if self.getExportedList(askHasData=True):
-                cmds.iconTextButton(self.deleteDataITB, edit=True, enable=True)
+        if self.io_folder and cmds.iconTextButton(self.delete_data_itb, query=True, exists=True):
+            if self.get_exported_items(ask_has_data=True):
+                cmds.iconTextButton(self.delete_data_itb, edit=True, enable=True)
             else:
-                cmds.iconTextButton(self.deleteDataITB, edit=True, enable=False)
+                cmds.iconTextButton(self.delete_data_itb, edit=True, enable=False)
 
 
     def deleteData(self, *args):
@@ -534,18 +527,18 @@ class BaseAction(base.BaseLibrary):
         # to confirm before delete data
         confirm = cmds.confirmDialog(title=self.ar.data.lang[self.title], icon="question", message=self.ar.data.lang['r059_deleteData'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
         if confirm == self.ar.data.lang['i071_yes']:
-            oldFirstBTLabel = self.firstBTLabel
-            self.firstMode = True
-            self.firstBTLabel = self.ar.data.lang['i344_deleted']
+            oldFirstBTLabel = self.first_bt_label
+            self.first_mode = True
+            self.first_bt_label = self.ar.data.lang['i344_deleted']
             try:
-                shutil.rmtree(self.ioPath, ignore_errors=False)
+                shutil.rmtree(self.io_path, ignore_errors=False)
                 self.updateDeleteDataButton()
-                self.updateInfoDataButton()
-                self.wellDoneIO(self.ioPath, 'i344_deleted')
+                self.update_info_data_button()
+                self.well_done_io(self.io_path, 'i344_deleted')
             except:
-                self.notWorkedWellIO(self.ioPath)
-            self.reportLog()
-            self.firstBTLabel = oldFirstBTLabel
+                self.fail_io(self.io_path)
+            self.report_log()
+            self.first_bt_label = oldFirstBTLabel
 
 
     def getUsedMaterialList(self, *args):
@@ -588,9 +581,9 @@ class BaseAction(base.BaseLibrary):
             for node in tempList:
                 isCleaned = True
                 if not cmds.objExists(node+".guideBase") and not cmds.objExists(node+".dpGuide"):
-                    childrenList = cmds.listRelatives(node, children=True, allDescendents=True)
-                    if childrenList:
-                        for child in childrenList:
+                    children = cmds.listRelatives(node, children=True, allDescendents=True)
+                    if children:
+                        for child in children:
                             if cmds.objExists(child+".guideBase") or cmds.objExists(child+".dpGuide"):
                                 isCleaned = False
                 else:
@@ -610,10 +603,10 @@ class BaseAction(base.BaseLibrary):
             return list(set(cmds.listRelatives(shapeList, type="transform", parent=True, fullPath=True)))
 
 
-    def reorderList(self, itemList, *args):
+    def reorderList(self, items, *args):
         """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
         """
-        return sorted(itemList, key = lambda x: x.count("|"), reverse=True)
+        return sorted(items, key = lambda x: x.count("|"), reverse=True)
 
 
     def getConstraintDataDic(self, constraintList, *args):
@@ -633,7 +626,7 @@ class BaseAction(base.BaseLibrary):
         self.ar.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
         for const in constraintList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.dpID, node=const, exists=True):
+            if not cmds.attributeQuery(self.ar.data.dp_id, node=const, exists=True):
                 # getting attributes if they exists
                 dic[const] = {"attributes" : {},
                               "output"     : {},
@@ -736,27 +729,27 @@ class BaseAction(base.BaseLibrary):
                 else:
                     cmds.createNode(constType, name=item) #broken node
                     if verbose:
-                        self.notWorkedWellIO(self.ar.data.lang['i329_broken']+" node - "+item)
+                        self.fail_io(self.ar.data.lang['i329_broken']+" node - "+item)
             else:
                 existingNodesList.append(item)
         if verbose:
             if wellImportedList:
-                self.wellDoneIO(self.latestDataFile)
+                self.well_done_io(self.latestDataFile)
             else:
                 if existingNodesList:
-                    self.wellDoneIO(self.ar.data.lang['r032_notImportedData'])
+                    self.well_done_io(self.ar.data.lang['r032_notImportedData'])
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
+                    self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
 
 
-    def removeConstraints(self, itemList, *args):
+    def removeConstraints(self, items, *args):
         """ Delete the existing contraints from the given list and descendents.
             Store their info data in a dictionary and return it.
         """
         dataDic = {}
         constraintList = []
-        constraintList.extend(cmds.ls(itemList, type=self.constraintTypeList))
-        constraintList.extend(cmds.ls(cmds.listRelatives(itemList, children=True, allDescendents=True), type=self.constraintTypeList))
+        constraintList.extend(cmds.ls(items, type=self.constraint_types))
+        constraintList.extend(cmds.ls(cmds.listRelatives(items, children=True, allDescendents=True), type=self.constraint_types))
         if constraintList:
             dataDic = self.getConstraintDataDic(constraintList)
             cmds.delete(constraintList)

@@ -13,32 +13,32 @@ WIKI = "10-‐-Rebuilder#-input-order"
 class InputOrderIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_inputOrderIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_inputOrderIO"
         self.startName = "dpInputOrder"
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.checkAssetContext():
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    if self.firstMode: #export
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
+                    if self.first_mode: #export
                         deformedList = None
                         if objList:
                             deformedList = objList
@@ -47,28 +47,28 @@ class InputOrderIO(action.BaseAction):
                         if deformedList:
                             self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" - meshes")
+                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" - meshes")
                     else: #import
-                        orderDic = self.importLatestJsonFile(self.getExportedList())
+                        orderDic = self.importLatestJsonFile(self.get_exported_items())
                         if orderDic:
                             self.importInputOrder(orderDic)
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        self.refreshView()
-        return self.dataLogDic
+        self.refresh_view()
+        return self.log_data
 
 
     def getOrderDataDic(self, deformedList, *args):
@@ -107,9 +107,9 @@ class InputOrderIO(action.BaseAction):
                 except Exception as e:
                     wellImported = False
                     print(e)
-                    self.notWorkedWellIO(self.latestDataFile)
+                    self.fail_io(self.latestDataFile)
             cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
             if wellImported:
-                self.wellDoneIO(self.latestDataFile)
+                self.well_done_io(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

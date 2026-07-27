@@ -15,19 +15,19 @@ class DisplayLayers(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -87,17 +87,17 @@ class DisplayLayers(action.BaseAction):
                     # Extra Lyr to delete
                     self.verifyFixMode(self.extraLayerToDelete)
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data
 
 
     def createDisplayLayers(self, *args):
@@ -175,18 +175,18 @@ class DisplayLayers(action.BaseAction):
             self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
             for i, item in enumerate(itemList):
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                if self.firstMode:
-                    self.resultOkList.append(False)
-                    self.checkedObjList.append(item)
-                    self.foundIssueList.append(True)
+                if self.first_mode:
+                    self.good_results.append(False)
+                    self.checked_items.append(item)
+                    self.found_issues.append(True)
                 else:
                     try:#verify
                         # It will run function only one time to create displayLayers in the last index from the loop, 
                         # otherwise it will create for every index
                         if i == len(itemList) - 1:
                             self.createDisplayLayers()    
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
+                        self.good_results.append(True)
+                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
                     except:#fix
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                        self.good_results.append(False)
+                        self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)

@@ -15,19 +15,19 @@ class Cycle(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -37,28 +37,28 @@ class Cycle(action.BaseAction):
             cycles = None
             if objList:
                 cycles = cmds.cycleCheck(objList, list=True)
-                self.checkedObjList.append(objList)
+                self.checked_items.append(objList)
             else:
                 cycles = cmds.cycleCheck(all=False, list=True)
                 if cycles:
-                    self.checkedObjList.append("\n".join(cycles))
+                    self.checked_items.append("\n".join(cycles))
             if cycles:
-                self.foundIssueList.append(True)
-                if self.firstMode:
-                    self.resultOkList.append(False)
+                self.found_issues.append(True)
+                if self.first_mode:
+                    self.good_results.append(False)
                 else: #fix = can't do it automatically, sorry
-                    self.resultOkList.append(False)
-                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(cycles))
+                    self.good_results.append(False)
+                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(cycles))
             else:
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
+                self.found_issues.append(False)
+                self.good_results.append(True)
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

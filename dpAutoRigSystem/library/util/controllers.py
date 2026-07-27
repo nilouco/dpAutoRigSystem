@@ -132,8 +132,8 @@ class Controllers(object):
 
 
     # CONTROLS functions:
-    def colorShape(self, objList, color, rgb=False, outliner=False, instance=None, *args):
-        """ Create a color override for all shapes from the objList.
+    def colorShape(self, items, color, rgb=False, outliner=False, instance=None, *args):
+        """ Create a color override for all shapes from the items.
         """
         # define colorIndex value
         iColorIdx = color
@@ -142,36 +142,36 @@ class Controllers(object):
                 color = self.dic_colors[color]
         elif color in list(self.dic_colors):
             iColorIdx = self.dic_colors[color]
-        if not objList:
-            objList = cmds.ls(selection=True)
+        if not items:
+            items = cmds.ls(selection=True)
         # find shapes and apply the color override:
-        if objList:
-            for objName in objList:
+        if items:
+            for item in items:
                 if outliner:
-                    self.setColorOverride(objName, color, iColorIdx, rgb, outliner)
+                    self.setColorOverride(item, color, iColorIdx, rgb, outliner)
                 else:
-                    objType = cmds.objectType(objName)
+                    objType = cmds.objectType(item)
                     # verify if the object is the shape type:
                     if objType in self.shapeTypeList:
-                        self.setColorOverride(objName, color, iColorIdx, rgb, instance=instance)
+                        self.setColorOverride(item, color, iColorIdx, rgb, instance=instance)
                     # verify if the object is a transform type:
                     elif objType == "transform":
                         # try get guide shape list
-                        itemList = self.getGuideListByAttr(objName)
+                        itemList = self.getGuideListByAttr(item)
                         if itemList:
                             if rgb:
-                                cmds.setAttr(objName+".guideColorIndex", -1)
-                                cmds.setAttr(objName+".guideColorR", color[0])
-                                cmds.setAttr(objName+".guideColorG", color[1])
-                                cmds.setAttr(objName+".guideColorB", color[2])
+                                cmds.setAttr(item+".guideColorIndex", -1)
+                                cmds.setAttr(item+".guideColorR", color[0])
+                                cmds.setAttr(item+".guideColorG", color[1])
+                                cmds.setAttr(item+".guideColorB", color[2])
                             else:
-                                cmds.setAttr(objName+".guideColorIndex", iColorIdx)
-                                cmds.setAttr(objName+".guideColorR", self.colorList[iColorIdx][0])
-                                cmds.setAttr(objName+".guideColorG", self.colorList[iColorIdx][1])
-                                cmds.setAttr(objName+".guideColorB", self.colorList[iColorIdx][2])
+                                cmds.setAttr(item+".guideColorIndex", iColorIdx)
+                                cmds.setAttr(item+".guideColorR", self.colorList[iColorIdx][0])
+                                cmds.setAttr(item+".guideColorG", self.colorList[iColorIdx][1])
+                                cmds.setAttr(item+".guideColorB", self.colorList[iColorIdx][2])
                         else:
                             # find all shapes children of the transform object:
-                            itemList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
+                            itemList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
                         if itemList:
                             for shape in itemList:
                                 self.setColorOverride(shape, color, iColorIdx, rgb, instance=instance)
@@ -303,8 +303,8 @@ class Controllers(object):
         # Index layout:
         colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20), parent=colorTabLayout)
         # creating buttons
-        for colorIndex, colorValues in enumerate(self.colorList):
-            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.colorShape, [instance.guide_base], colorIndex, instance=instance), parent=colorIndexLayout)
+        for color_index, color_values in enumerate(self.colorList):
+            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.colorShape, [instance.guide_base], color_index, instance=instance), parent=colorIndexLayout)
         # RGB layout:
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorRGBLayout)
@@ -351,55 +351,55 @@ class Controllers(object):
                     print("Error: Cannot connect", toObj, ".", attr, "directely.")
 
 
-    def setLockHide(self, objList, attrList, l=True, k=False, cb=False, *args):
+    def setLockHide(self, items, attrList, l=True, k=False, cb=False, *args):
         """Set lock or hide to attributes for object in lists.
         """
-        if objList and attrList:
-            for obj in objList:
+        if items and attrList:
+            for item in items:
                 for attr in attrList:
                     try:
                         # set lock and hide of given attributes:
-                        cmds.setAttr(obj+"."+attr, lock=l, keyable=k, channelBox=cb)
+                        cmds.setAttr(item+"."+attr, lock=l, keyable=k, channelBox=cb)
                     except:
-                        print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
+                        print("Error: Cannot set", item, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
 
 
-    def setNonKeyable(self, objList, attrList, *args):
+    def setNonKeyable(self, items, attrList, *args):
         """Set as nonKeyable to attributes for the given object list.
         """
-        if objList and attrList:
-            for obj in objList:
+        if items and attrList:
+            for item in items:
                 for attr in attrList:
-                    if attr in cmds.listAttr(obj):
+                    if attr in cmds.listAttr(item):
                         try:
                             # set lock and hide of given attributes:
-                            cmds.setAttr(obj+"."+attr, keyable=False, channelBox=True)
+                            cmds.setAttr(item+"."+attr, keyable=False, channelBox=True)
                         except:
-                            print("Error: Cannot set", obj, ".", attr, "as nonKeayble, sorry.")
+                            print("Error: Cannot set", item, ".", attr, "as nonKeayble, sorry.")
 
 
-    def setNotRenderable(self, objList, *args):
+    def setNotRenderable(self, items, *args):
         """Receive a list of objects, find its shapes if necessary and set all as not renderable.
         """
         # declare a list of attributes for render:
         renderAttrList = ["castsShadows", "receiveShadows", "motionBlur", "primaryVisibility", "smoothShading", "visibleInReflections", "visibleInRefractions", "doubleSided", "miTransparencyCast", "miTransparencyReceive", "miReflectionReceive", "miRefractionReceive", "miFinalGatherCast", "miFinalGatherReceive"]
         # find all children shapes:
-        if objList:
-            for obj in objList:
-                objType = cmds.objectType(obj)
+        if items:
+            for item in items:
+                objType = cmds.objectType(item)
                 # verify if the object is the shape type:
                 if objType in self.shapeTypeList:
                     # set attributes as not renderable:
                     for attr in renderAttrList:
                         try:
-                            cmds.setAttr(obj+"."+attr, 0)
+                            cmds.setAttr(item+"."+attr, 0)
                         except:
-                            #print("Error: Cannot set not renderable ", attr, "as zero for", obj)
+                            #print("Error: Cannot set not renderable ", attr, "as zero for", item)
                             pass
                 # verify if the object is a transform type:
                 elif objType == "transform":
                     # find all shapes children of the transform object:
-                    shapeList = cmds.listRelatives(obj, shapes=True, children=True)
+                    shapeList = cmds.listRelatives(item, shapes=True, children=True)
                     if shapeList:
                         for shape in shapeList:
                             # set attributes as not renderable:
@@ -631,19 +631,17 @@ class Controllers(object):
         return curve
 
 
-    def findHistory(self, objList, historyName, *args):
+    def findHistory(self, items, historyName, *args):
         """Search and return the especific history of the listed objects.
         """
-        if objList:
-            foundHistoryList = []
-            for objName in objList:
+        if items:
+            found_histories = []
+            for item in items:
                 # find historyName in the object's history:
-                histList = cmds.listHistory(objName)
-                for hist in histList:
-                    histType = cmds.objectType(hist)
-                    if histType == historyName:
-                        foundHistoryList.append(hist)
-            return foundHistoryList
+                for hist in cmds.listHistory(item):
+                    if cmds.objectType(hist) == historyName:
+                        found_histories.append(hist)
+            return found_histories
 
 
     def cvBaseGuide(self, ctrlName, r=1, *args):

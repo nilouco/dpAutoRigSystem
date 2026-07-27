@@ -48,20 +48,20 @@ class ReorderAttr(base.BaseLibrary):
         cmds.showWindow(dpReorderAttrWin)
     
     
-    def dpMoveAttr(self, mode, objList=None, attrList=None, verbose=False, jumpHidden=False, *args):
+    def dpMoveAttr(self, mode, items=None, attrList=None, verbose=False, jumpHidden=False, *args):
         """ Change order of attributes in order to move it to up or down in the list position.
         """
         # do ScriptEditor do not print Undo messages:
         cmds.scriptEditorInfo(suppressInfo=False)
-        if not objList:
+        if not items:
             # get current selected objects:
-            objList = cmds.channelBox('mainChannelBox', query=True, mainObjectList=True)
-        if objList:
+            items = cmds.channelBox('mainChannelBox', query=True, mainObjectList=True)
+        if items:
             if not attrList:
                 # get selected attributes from channelBox
                 attrList = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
             if attrList:
-                for obj in objList:
+                for obj in items:
                     userDefAttrList = cmds.listAttr(obj, userDefined=True)
                     if userDefAttrList:
                         if not attrList[0] in userDefAttrList:
@@ -95,7 +95,7 @@ class ReorderAttr(base.BaseLibrary):
                                     if attrPos < attrSize-1:
                                         nextAttrType = cmds.attributeQuery(attrLs[attrPos+1], node=obj, attributeType=True)
                                         if nextAttrType in self.nextAttrTypeList or (not cmds.getAttr(obj+"."+attrLs[attrPos+1], channelBox=True) and not cmds.getAttr(obj+"."+attrLs[attrPos+1], keyable=True)):
-                                            self.dpMoveAttr(mode, objList, attrList, False, True)
+                                            self.dpMoveAttr(mode, items, attrList, False, True)
                                         
                             elif mode == 1: #up
                                 for i in attrList:
@@ -112,7 +112,7 @@ class ReorderAttr(base.BaseLibrary):
                                     if attrPos > 1:
                                         nextAttrType = cmds.attributeQuery(attrLs[attrPos-1], node=obj, attributeType=True)
                                         if nextAttrType in self.nextAttrTypeList or (not cmds.getAttr(obj+"."+attrLs[attrPos-1], channelBox=True) and not cmds.getAttr(obj+"."+attrLs[attrPos-1], keyable=True)):
-                                            self.dpMoveAttr(mode, objList, attrList, False, True)
+                                            self.dpMoveAttr(mode, items, attrList, False, True)
                             
                             # lock all user defined attibutes after the changing position:
                             if lockAttrList:

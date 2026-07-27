@@ -15,19 +15,19 @@ class FreezeTransform(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         ''' Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         '''
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
 
         # ---
         # --- validator code --- beginning
@@ -55,44 +55,44 @@ class FreezeTransform(action.BaseAction):
                                 frozenTR = self.checkFrozenObject(obj, zeroAttrList, 0)
                                 # run for scales
                                 frozenS = self.checkFrozenObject(obj, oneAttrList, 1)
-                                self.checkedObjList.append(obj)
+                                self.checked_items.append(obj)
                                 if frozenTR and frozenS:
-                                    self.foundIssueList.append(False)
-                                    self.resultOkList.append(True)
+                                    self.found_issues.append(False)
+                                    self.good_results.append(True)
                                 else:
-                                    self.foundIssueList.append(True)
-                                    self.resultOkList.append(False)
-                                    self.messageList.append(self.ar.data.lang['v018_foundTransform']+obj)
+                                    self.found_issues.append(True)
+                                    self.good_results.append(False)
+                                    self.messages.append(self.ar.data.lang['v018_foundTransform']+obj)
                                     toFixList.append((obj, idx))
-                        if not self.firstMode and len(toFixList) > 0: #one item to fix
+                        if not self.first_mode and len(toFixList) > 0: #one item to fix
                             for obj in toFixList:
                                 if self.unlockAttributes(obj[0], zeroAttrList) and self.unlockAttributes(obj[0], oneAttrList):
                                     try:
                                         cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
                                         if self.checkFrozenObject(obj[0], zeroAttrList, 0) and self.checkFrozenObject(obj[0], oneAttrList, 1):
-                                            self.foundIssueList[obj[1]] = False
-                                            self.resultOkList[obj[1]] = True
-                                            self.messageList.append(self.ar.data.lang['v019_frozenTransform']+obj[0])
+                                            self.found_issues[obj[1]] = False
+                                            self.good_results[obj[1]] = True
+                                            self.messages.append(self.ar.data.lang['v019_frozenTransform']+obj[0])
                                         else:
                                             raise Exception('Freeze Tranform Failed')
                                     except:
-                                        self.messageList.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
+                                        self.messages.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
                                 else:
-                                    self.messageList.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
+                                    self.messages.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+                    self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['v100_cantExistsGuides'])
+                self.fail_io(self.ar.data.lang['v100_cantExistsGuides'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['v099_cantExistsAllGrp'])
+            self.fail_io(self.ar.data.lang['v099_cantExistsAllGrp'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data
 
 
     def checkFrozenObject(self, obj, attrList, compValue, *args):

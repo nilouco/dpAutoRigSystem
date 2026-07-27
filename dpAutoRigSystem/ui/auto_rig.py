@@ -15,11 +15,11 @@ class MainUI(object):
         """
         if cmds.workspaceControl(self.ar.data.workspace_control_name, query=True, exists=True):
             cmds.workspaceControl(self.ar.data.workspace_control_name, edit=True, close=True)
-        labelText = "dpAutoRigSystem"
-        labelText += " - "+self.ar.data.version
+        label_text = "dpAutoRigSystem"
+        label_text += " - "+self.ar.data.version
         if self.ar.dev:
-            labelText += " ~ dev"
-        uiCallScript = "import dpAutoRigSystem; from dpAutoRigSystem.core import main; ar = main.Start("+str(self.ar.dev)+", intro=False); ar.auto_rig_ui.show_ui();"
+            label_text += " ~ dev"
+        ui_call_script = "import dpAutoRigSystem; from dpAutoRigSystem.core import main; ar = main.Start("+str(self.ar.dev)+", intro=False); ar.auto_rig_ui.show_ui();"
         cmds.workspaceControl(
                                 self.ar.data.workspace_control_name, 
                                 retain=False,
@@ -31,15 +31,15 @@ class MainUI(object):
                                 widthProperty="preferred",
                                 visible=True,
                                 loadImmediately=True,
-                                label=labelText,
-                                uiScript=uiCallScript
+                                label=label_text,
+                                uiScript=ui_call_script
                                 )
     
     
     def show_ui(self):
         """ Call mainUI method and the following instructions to check optionVars, refresh UI elements, start the scriptJobs and close loading window.
         """
-        startSelList = cmds.ls(selection=True)
+        start_selections = cmds.ls(selection=True)
         self.create_main_ui()
         self.ar.ui_manager.set_ui_state(True)
         self.ar.filler.fill_libraries()
@@ -49,7 +49,7 @@ class MainUI(object):
         self.ar.job.garbage_collector()
         self.ar.job.start_jobs()
         self.ar.opening.close_opening_ui()
-        cmds.select(startSelList)
+        cmds.select(start_selections)
         print("dpAutoRigSystem "+self.ar.data.lang['i346_loadedSuccess'])
 
 
@@ -304,8 +304,8 @@ class MainUI(object):
         # color index
         cmds.gridLayout('ctr_color_index_gl', numberOfColumns=16, cellWidthHeight=(20, 20), parent='ctr_color_tab')
         # creating color buttons
-        for colorIndex, colorValues in enumerate(self.ar.ctrls.getColorList()):
-            cmds.button('indexColor_'+str(colorIndex)+'_BT', label=str(colorIndex), backgroundColor=(colorValues[0], colorValues[1], colorValues[2]), command=partial(self.ar.ctrls.colorShape, color=colorIndex), parent='ctr_color_index_gl')
+        for color_index, color_values in enumerate(self.ar.ctrls.getColorList()):
+            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.colorShape, color=color_index), parent='ctr_color_index_gl')
         # RGB layout:
         cmds.columnLayout('ctr_color_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='ctr_color_tab')
         cmds.separator(height=10, style='none', parent='ctr_color_rgb_cl')
@@ -463,11 +463,11 @@ class MainUI(object):
         # rebuilder
         cmds.columnLayout('rebuilder_footer_cl', adjustableColumn=False, parent="rebuilder_tab")
         cmds.separator(style='in', height=20, width=370, parent="rebuilder_footer_cl")
-        cmds.checkBox("rebuilder_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.ui_manager.changeActiveAllModules, self.ar.config.get_rebuilder_instances()), parent="rebuilder_footer_cl")
+        cmds.checkBox("rebuilder_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.ar.ui_manager.change_active_modules, self.ar.config.get_rebuilder_instances()), parent="rebuilder_footer_cl")
         cmds.separator(style='none', height=10, parent="rebuilder_footer_cl")
         cmds.paneLayout("rebuilder_selected_pl", configuration="vertical2", separatorThickness=7.0, width=370, parent="rebuilder_footer_cl")
-        cmds.button("rebuilder_split_data_bt", label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, self.ar.config.get_rebuilder_instances(), True, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
-        cmds.button("rebuilder_rebuild_bt", label=self.ar.data.lang['r001_rebuild'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, self.ar.config.get_rebuilder_instances(), False, True, actionType="r000_rebuilder"), parent="rebuilder_selected_pl")
+        cmds.button("rebuilder_split_data_bt", label=self.ar.data.lang['r002_splitData'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, self.ar.config.get_rebuilder_instances(), True, True, action_type="r000_rebuilder"), parent="rebuilder_selected_pl")
+        cmds.button("rebuilder_rebuild_bt", label=self.ar.data.lang['r001_rebuild'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, self.ar.config.get_rebuilder_instances(), False, True, action_type="r000_rebuilder"), parent="rebuilder_selected_pl")
         cmds.separator(style='none', height=10, parent="rebuilder_footer_cl")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout("rebuilder_tab", edit=True,
@@ -484,8 +484,8 @@ class MainUI(object):
         cmds.columnLayout(name+"_module_cl", adjustableColumn=True, parent=name+"_fl") #rowSpacing=3
         # it'll be filled further...
         cmds.separator(style="none", parent=name+"_fl")
-        cmds.checkBox(name+"_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang[name], value=False, changeCommand=partial(self.ar.ui_manager.changeActiveAllModules, instances), parent=name+"_fl")
+        cmds.checkBox(name+"_select_all_cb", label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all']+" "+self.ar.data.lang[name], value=False, changeCommand=partial(self.ar.ui_manager.change_active_modules, instances), parent=name+"_fl")
         cmds.paneLayout(name+"_select_v2_pl", configuration="vertical2", separatorThickness=7.0, parent=name+"_fl")
-        cmds.button(name+"_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, instances, True, True), parent=name+"_select_v2_pl")
-        cmds.button(name+"_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.runSelectedActions, instances, False, True), parent=name+"_select_v2_pl")
+        cmds.button(name+"_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, True, True), parent=name+"_select_v2_pl")
+        cmds.button(name+"_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, False, True), parent=name+"_select_v2_pl")
         cmds.separator(height=30, parent=name+"_fl")

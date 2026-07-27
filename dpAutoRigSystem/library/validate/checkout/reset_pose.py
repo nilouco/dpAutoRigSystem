@@ -33,19 +33,19 @@ class ResetPose(action.BaseAction):
         self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
 
         # ---
         # --- validator code --- beginning
@@ -60,7 +60,7 @@ class ResetPose(action.BaseAction):
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".dpControl"):
-                        self.checkedObjList.append(item)
+                        self.checked_items.append(item)
 
                         editedAttrList = []
                         attrData = self.getAttrDefaultValueData(item)
@@ -78,19 +78,19 @@ class ResetPose(action.BaseAction):
                                     editedAttrList.append(attr)
                         
                         if editedAttrList:
-                            self.foundIssueList.append(True)
+                            self.found_issues.append(True)
                             for a, attr in enumerate(editedAttrList):
                                 if a == 0:
                                     attrString = "."
                                 else:
                                     attrString += "/"
                                 attrString += attr
-                            self.checkedObjList[-1] = item+attrString
+                            self.checked_items[-1] = item+attrString
                         else:
-                            self.foundIssueList.append(False)
+                            self.found_issues.append(False)
                         
-                        if self.firstMode:
-                            self.resultOkList.append(False)
+                        if self.first_mode:
+                            self.good_results.append(False)
                         else: #fix
                             for attr in editedAttrList:
                                 try:
@@ -101,23 +101,23 @@ class ResetPose(action.BaseAction):
                                         cmds.setAttr(item+"."+attr, int(attrData[attr][0]))
                                     elif attrType == 2: #float
                                         cmds.setAttr(item+"."+attr, float(format(attrData[attr][0],".3f")))
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
+                                    self.good_results.append(True)
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
                                 except:
-                                    self.resultOkList.append(False)
-                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
+                                    self.good_results.append(False)
+                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+"."+attr)
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data
 
 
     def getSetupAttrList(self, item, ignoreAttrList=TO_IGNORE, *args):

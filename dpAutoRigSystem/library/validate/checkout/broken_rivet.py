@@ -324,19 +324,19 @@ class BrokenRivet(action.BaseAction):
                         cmds.disconnectAttr(f"{controller}.rotatePivot", pacConnectedAttr)
 
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -348,9 +348,9 @@ class BrokenRivet(action.BaseAction):
             if toCheckList:
                 folliclesOriginList = self.listFolliclesAtOrigin()
                 rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
-                self.checkedObjList = rivetControllersList.copy()
-                self.foundIssueList = [True] * len(self.checkedObjList)
-                if not self.firstMode:
+                self.checked_items = rivetControllersList.copy()
+                self.found_issues = [True] * len(self.checked_items)
+                if not self.first_mode:
                     maxTries = 5
                     while len(folliclesOriginList) != 0 and maxTries != 0:
                         maxTries -= 1
@@ -361,23 +361,23 @@ class BrokenRivet(action.BaseAction):
                         folliclesOriginList = self.listFolliclesAtOrigin()
                         rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
                     if len(folliclesOriginList) == 0:
-                        self.resultOkList.append(True)
+                        self.good_results.append(True)
                         for fixed in rivetControllersList:
-                            self.messageList.append(self.ar.data.lang['v004_fixed']+": "+fixed)
+                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+fixed)
                     else:
-                        self.resultOkList.append(False)
+                        self.good_results.append(False)
                         rivetControllersList, attachGeoList = self.getConnectionsFromFollicle(folliclesOriginList)
                         for nonFixed in rivetControllersList:
-                            self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+nonFixed)
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+nonFixed)
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

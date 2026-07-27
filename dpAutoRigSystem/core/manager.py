@@ -29,12 +29,12 @@ class UIManager(object):
             cmds.evalDeferred("ar = main.Start(); ar.ui();", lowestPriority=True)
 
 
-    def refresh_ui(self, savedScene=False, resetButtons=True, clearSel=False):
+    def refresh_ui(self, saved_scene=False, reset_buttons=True, clear_selection=False):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
         if self.ar.data.ui_state:
-            if savedScene:
+            if saved_scene:
                 selected = cmds.ls(selection=True)
                 self.ar.data.rebuilding = False
             #clear layouts
@@ -52,17 +52,17 @@ class UIManager(object):
             self.update_skinning_footer()
             # buttons
             if not self.ar.data.rebuilding:
-                if resetButtons:
+                if reset_buttons:
                     self.reset_button_colors()
                 self.ar.pipeliner.refreshAssetData()
                 for item in self.ar.config.get_rebuilder_instances():
-                    item.updateActionButtons(color=False)
+                    item.update_action_buttons(color=False)
             self.ar.job.selection_change()
-            if savedScene:
+            if saved_scene:
                 cmds.select(clear=True)
                 if selected:
                     cmds.select(selected)
-            if clearSel:
+            if clear_selection:
                 cmds.select(clear=True)
 
 
@@ -210,67 +210,67 @@ class UIManager(object):
         items.extend(self.ar.config.get_rebuilder_instances())
         if items:
             for item in items:
-                item.resetButtonColors()
+                item.reset_button_colors()
 
 
-    def changeActiveAllModules(self, items, value, *args):
+    def change_active_modules(self, items, value, *args):
         """ Set all module instances active attribute as True or False.
             Used by validators and rebuilders.
         """
         if items:
             for item in items:
-                item.changeActive(value)
+                item.change_active(value)
 
     
-    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", *args):
+    def run_selected_actions(self, action_instances, first_mode, verbose=True, stop_if_found_block=False, publish_log=None, action_type="v000_validator", *args):
         """ Run the code for each active validator/rebuilder instance.
-            firstMode = True for verify/export
-                      = False for fix/import
+            first_mode = True for verify/export
+                       = False for fix/import
         """
-        if firstMode and actionType == "r000_rebuilder": #splitData
+        if first_mode and action_type == "r000_rebuilder": #splitData
             if self.ar.utils.getDuplicatedNames():
                 confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
                 if confirm == self.ar.data.lang['i072_no']:
                     return
         self.reset_button_colors()
-        actionResultData = {}
-        logText = ""
-        if publishLog:
-            logText = "\nPublisher"
-            logText += "\nScene: "+publishLog["scene"]
-            logText += "\nPublished: "+publishLog["published"]
-            logText += "\nExported: "+publishLog["exportPath"]
-            logText += "\nComments: "+publishLog["comments"]+"\n"
-        if actionInstList:
-            self.ar.utils.setProgress(self.ar.data.lang[actionType]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[actionType], len(actionInstList))
-            for a, actionInst in enumerate(actionInstList):
-                if actionInst.active:
-                    self.ar.utils.setProgress(actionInst.name)
-                    actionInst.verbose = False
-                    actionResultData[actionInst.name] = actionInst.runAction(firstMode)
-                    actionInst.verbose = True
-                    if stopIfFoundBlock:
-                        if True in actionInst.foundIssueList:
-                            if False in actionInst.resultOkList:
-                                return actionResultData, True, a
-        if actionResultData:
-            dataList = list(actionResultData.keys())
-            dataList.sort()
-            for i, dataItem in enumerate(dataList):
-                logText += actionResultData[dataItem]["logText"]
-                if i != len(dataList)-1:
-                    logText += "\n"
-            heightSize = len(dataList)
+        action_result_data = {}
+        log_text = ""
+        if publish_log:
+            log_text = f"\nPublisher"
+            log_text += f"\nScene: {publish_log['scene']}"
+            log_text += f"\nPublished: {publish_log['published']}"
+            log_text += f"\nExported: {publish_log['exportPath']}"
+            log_text += f"\nComments: {publish_log['comments']}\n"
+        if action_instances:
+            self.ar.utils.setProgress(self.ar.data.lang[action_type]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[action_type], len(action_instances))
+            for a, action_instance in enumerate(action_instances):
+                if action_instance.active:
+                    self.ar.utils.setProgress(action_instance.name)
+                    action_instance.verbose = False
+                    action_result_data[action_instance.name] = action_instance.runAction(first_mode)
+                    action_instance.verbose = True
+                    if stop_if_found_block:
+                        if True in action_instance.found_issues:
+                            if False in action_instance.good_results:
+                                return action_result_data, True, a
+        if action_result_data:
+            action_result_keys = list(action_result_data.keys())
+            action_result_keys.sort()
+            for i, item_data in enumerate(action_result_keys):
+                log_text += action_result_data[item_data]["log_text"]
+                if i != len(action_result_keys)-1:
+                    log_text += "\n"
+            height_size = len(action_result_keys)
         else:
-            logText += "\n"+self.ar.data.lang['i207_notMarked']
-            heightSize = 2
-        logText = self.ar.pipeliner.getToday(True)+"\n\n"+logText+"\n"
+            log_text += "\n"+self.ar.data.lang['i207_notMarked']
+            height_size = 2
+        log_text = self.ar.pipeliner.getToday(True)+"\n\n"+log_text+"\n"
         if verbose:
-            self.ar.logger.infoWin('i019_log', actionType, logText, "left", 250, (150+(heightSize)*13))
-            print("\n-------------\n"+self.ar.data.lang[actionType]+"\n"+logText)
-            if publishLog:
-                actionResultData["Publisher"] = publishLog
-            if not self.ar.utils.exportLogDicToJson(actionResultData, subFolder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+            self.ar.logger.infoWin('i019_log', action_type, log_text, "left", 250, (150+(height_size)*13))
+            print("\n-------------\n"+self.ar.data.lang[action_type]+"\n"+log_text)
+            if publish_log:
+                action_result_data["Publisher"] = publish_log
+            if not self.ar.utils.exportLogDicToJson(action_result_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
         self.ar.utils.setProgress(endIt=True)
-        return actionResultData, False, 0
+        return action_result_data, False, 0

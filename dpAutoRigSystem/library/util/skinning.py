@@ -200,16 +200,16 @@ class Skinning(weights.Weights):
         mel.eval("print \""+self.ar.data.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
 
 
-    def copySkinFromOneSource(self, objList=None, ui=False, byUVs=False, *args):
+    def copySkinFromOneSource(self, items=None, ui=False, byUVs=False, *args):
         """ Main function to analise and call copy skin process. 
         """
-        if not objList:
-            objList = cmds.ls(selection=True, long=True, type="transform")
-        if objList and len(objList) > 1:
+        if not items:
+            items = cmds.ls(selection=True, long=True, type="transform")
+        if items and len(items) > 1:
             # get first selected item
-            sourceItem = objList[0]
+            sourceItem = items[0]
             # get other selected items
-            destinationList = objList[1:]
+            destinationList = items[1:]
             shapeList = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
             if shapeList:
                 # check if there's a skinCluster node connected to the first selected item
@@ -226,17 +226,17 @@ class Skinning(weights.Weights):
             mel.eval("warning \""+self.ar.data.lang['e005_selectOneObj']+"\";")
 
 
-    def copySkinSameName(self, objList=None, ui=False, byUVs=False, *args):
+    def copySkinSameName(self, items=None, ui=False, byUVs=False, *args):
         """ Copy the skinning between meshes with the same name, selected or not or using the given list.
         """
-        if not objList:
-            objList = cmds.ls(selection=True, long=True, type="transform")
-            if not objList:
-                objList = cmds.ls(selection=False, long=True, type="transform")
-        if objList:
+        if not items:
+            items = cmds.ls(selection=True, long=True, type="transform")
+            if not items:
+                items = cmds.ls(selection=False, long=True, type="transform")
+        if items:
             if ui:
                 byUVs = self.getByUVsFromUI()
-            self.serializeCopySkin(objList, objList, False, byUVs)
+            self.serializeCopySkin(items, items, False, byUVs)
 
 
     def getByUVsFromUI(self, *args):

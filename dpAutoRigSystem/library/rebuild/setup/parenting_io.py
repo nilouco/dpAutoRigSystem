@@ -13,32 +13,32 @@ WIKI = "10-‐-Rebuilder#-parenting"
 class ParentingIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_parentingIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_parentingIO"
         self.startName = "dpParenting"
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.checkAssetContext():
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    if self.firstMode: #export
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
+                    if self.first_mode: #export
                         transformList = None
                         if objList:
                             transformList = objList
@@ -48,37 +48,37 @@ class ParentingIO(action.BaseAction):
                             self.ar.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
                             # define data to export
                             parentDic = self.getParentingDataDic(transformList)
-                            parentDic.update(self.getBrokenIDDataDic())
+                            parentDic.update(self.get_broken_id_data())
                             parentDic.update(self.getModelDataDic())
                             self.exportDicToJsonFile(parentDic)
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
+                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
-                        parentDic = self.importLatestJsonFile(self.getExportedList())
+                        parentDic = self.importLatestJsonFile(self.get_exported_items())
                         if parentDic:
                             try:
                                 if self.importBrokenIDData(parentDic):
                                     self.importParentingData(parentDic) #double run to first put broken nodes in place
                                 self.importParentingData(parentDic)
                             except Exception as e:
-                                self.notWorkedWellIO(self.ar.data.lang['r032_notImportedData']+": "+str(e))
+                                self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+str(e))
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        self.refreshView()
-        return self.dataLogDic
+        self.refresh_view()
+        return self.log_data
 
 
     def getParentingDataDic(self, transformList=None, *args):
@@ -158,11 +158,11 @@ class ParentingIO(action.BaseAction):
                                         cmds.parent(shortItem, shortFatherNode)
                                         wellImportedList.append(shortItem)
                                     else:
-                                        self.notWorkedWellIO(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortFatherNode)
+                                        self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortFatherNode)
                             else: #root here
                                 modelChangedList.append(item)
                         else:
-                            self.notWorkedWellIO(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortItem)
+                            self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortItem)
                     else:
                         if not self.checkIsFromModeling(parentDic, "transform", item):
                             modelChangedList.append(item)
@@ -170,15 +170,15 @@ class ParentingIO(action.BaseAction):
                             notFoundNodesList.append(shortItem)
             if parentIssueList:
                 if modelChangedList:
-                    self.maybeDoneIO(', '.join(modelChangedList))
+                    self.maybe_done_io(', '.join(modelChangedList))
                 elif wellImportedList:
-                    self.wellDoneIO(self.latestDataFile)
+                    self.well_done_io(self.latestDataFile)
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+                    self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
             else:
-                self.wellDoneIO(self.latestDataFile)
+                self.well_done_io(self.latestDataFile)
         else:
-            self.wellDoneIO(self.latestDataFile)
+            self.well_done_io(self.latestDataFile)
 
 
     def checkIsFromModeling(self, parentDic, nodeType, item, *args):

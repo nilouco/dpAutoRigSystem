@@ -41,7 +41,7 @@ class IkFkSnap(object):
             self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
             self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
             self.ar.custom_attr.addAttr(0, [self.ikFkSnapNet]) #dpID
-            self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
+            self.id = cmds.getAttr(self.ikFkSnapNet+"."+self.ar.data.dp_id)
             self.storeIkFkSnapData()
             if dpDev:
                 cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
@@ -517,7 +517,7 @@ class IkFkSnap(object):
 for net in cmds.ls(type="network"):
     if cmds.objExists(net+".dpNetwork") and cmds.getAttr(net+".dpNetwork") == 1:
         if cmds.objExists(net+".dpIkFkSnapNet") and cmds.getAttr(net+".dpIkFkSnapNet") == 1:
-            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+self.dpID+'''":
+            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+self.id+'''":
                 IkFkSnap(net)
 '''
         sn = cmds.scriptNode(name=self.netName+'_IkFkSnap_SN', sourceType='python', scriptType=2, beforeScript=ikFkSnapCode)

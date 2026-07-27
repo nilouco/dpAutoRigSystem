@@ -14,27 +14,27 @@ WIKI = "10-‐-Rebuilder#-blendshape"
 class BlendshapeIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_blendShapeIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_blendShapeIO"
         self.startName = "dpBlendShape"
         self.targetName = "dpTarget"
         self.originalName = "dpOriginal"
         self.extention = "shp"
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
@@ -42,11 +42,11 @@ class BlendshapeIO(action.BaseAction):
             if self.ar.pipeliner.checkAssetContext():
                 # load alembic plugin
                 if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
-                    self.ioPath = self.getIOPath(self.ioDir)
-                    self.targetPath = self.ioPath+"/"+self.targetName
-                    self.originalPath = self.ioPath+"/"+self.originalName
-                    if self.ioPath:
-                        if self.firstMode: #export
+                    self.io_path = self.get_io_path(self.io_folder)
+                    self.targetPath = self.io_path+"/"+self.targetName
+                    self.originalPath = self.io_path+"/"+self.originalName
+                    if self.io_path:
+                        if self.first_mode: #export
                             bsList = None
                             if objList:
                                 bsList = objList
@@ -60,30 +60,30 @@ class BlendshapeIO(action.BaseAction):
                                     self.exportAlembicFile(transformList, self.originalPath, self.originalName, bsNode, False)
                                 self.exportDicToJsonFile(bsDic)
                             else:
-                                self.maybeDoneIO("BlendShapes_Grp")
+                                self.maybe_done_io("BlendShapes_Grp")
                         else: #import
-                            bsDic = self.importLatestJsonFile(self.getExportedList())
+                            bsDic = self.importLatestJsonFile(self.get_exported_items())
                             if bsDic:
                                 self.importBlendShapes(bsDic)
                             else:
-                                self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                                self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
-                        self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                        self.fail_io(self.ar.data.lang['r010_notFoundPath'])
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
+                    self.fail_io(self.ar.data.lang['e018_notLoadedPlugin']+"AbcExport")
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        self.refreshView()
-        return self.dataLogDic
+        self.refresh_view()
+        return self.log_data
 
 
     def getBSDataDic(self, bsList, *args):
@@ -167,7 +167,7 @@ class BlendshapeIO(action.BaseAction):
             # export blendShape targets as compiled maya file
             cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
         except Exception as e:
-            self.notWorkedWellIO(str(e))
+            self.fail_io(str(e))
 
 
     def importBlendShapes(self, bsDic, *args):
@@ -190,7 +190,7 @@ class BlendshapeIO(action.BaseAction):
                         abcToImport = self.originalPath+"/"+self.originalName+"_"+bsNode+".abc"
                         mel.eval("AbcImport -mode import \""+abcToImport+"\";")
                     except:
-                        self.notWorkedWellIO(self.ar.data.lang["r032_notImportedData"]+": "+self.originalName+"_"+bsNode+".abc")
+                        self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.originalName+"_"+bsNode+".abc")
                         wellImported = False
             if not cmds.objExists(bsNode):
                 # create an empty blendShape node
@@ -205,7 +205,7 @@ class BlendshapeIO(action.BaseAction):
                     #mel.eval('catchQuiet(`blendShape -edit -ip "'+self.targetPath+'/'+self.targetName+'_'+bsNode+'.'+self.extention+'" '+bsNode+'`);')
                     print("--------------------------------\nEnding Autodesk not suppressed messages, sorry!\n--------------------------------\n")
                 except Exception as e:
-                    self.notWorkedWellIO(self.ar.data.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
+                    self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
                     wellImported = False
             for i in list(bsDic[bsNode]["indexTargetDic"].keys()):
                 target = bsDic[bsNode]["indexTargetDic"][i]
@@ -241,4 +241,4 @@ class BlendshapeIO(action.BaseAction):
                 cmds.removeMultiInstance("{}.weight[{}]".format(bsNode, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
         cmds.scriptEditorInfo(suppressWarnings=suppressWarningsState, suppressInfo=suppressInfoState, suppressErrors=suppressErrorsState, suppressResults=suppressResultsState)
         if wellImported:
-            self.wellDoneIO(self.latestDataFile)
+            self.well_done_io(self.latestDataFile)

@@ -13,7 +13,7 @@ WIKI = "07-‐-Validator#-controls-hierarchy"
 class ControllersHierarchy(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.ioDir = "s_hierarchyIO"
+        self.io_folder = "s_hierarchyIO"
         self.startName = "dpHierarchy"
 
 
@@ -22,7 +22,7 @@ class ControllersHierarchy(action.BaseAction):
             shapeList = cmds.listRelatives(transform, shapes=True)
         except Exception as e:
             print(e)
-            self.messageList.append(f"{self.ar.data.lang['v070_duplicateName']} {transform}")
+            self.messages.append(f"{self.ar.data.lang['v070_duplicateName']} {transform}")
             return False
         if shapeList:
             for shape in shapeList:
@@ -92,11 +92,11 @@ class ControllersHierarchy(action.BaseAction):
     def logInfo(self, informationDictionary):
         for ctrl in informationDictionary:
             if informationDictionary[ctrl][0] == None:
-                self.messageList.append(f"{ctrl} {self.ar.data.lang['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
+                self.messages.append(f"{ctrl} {self.ar.data.lang['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
             elif informationDictionary[ctrl][1] == None:
-                self.messageList.append(f"{ctrl} {self.ar.data.lang['v066_wasRemoved']}")
+                self.messages.append(f"{ctrl} {self.ar.data.lang['v066_wasRemoved']}")
             else:
-                self.messageList.append(f"{ctrl} {self.ar.data.lang['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
+                self.messages.append(f"{ctrl} {self.ar.data.lang['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
 
 
     def compareHierarchy(self, originalHierarchy, newHierarchy):
@@ -105,23 +105,23 @@ class ControllersHierarchy(action.BaseAction):
             self.logInfo(infoDic)
             return False
         else:
-            self.messageList.append(self.ar.data.lang['v068_matchingHierarchies'])
+            self.messages.append(self.ar.data.lang['v068_matchingHierarchies'])
             return True
 
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It"s in verify mode by default.
-            If firstMode parameter is False, it"ll run in fix mode.
+            If first_mode parameter is False, it"ll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn"t an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn"t an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -135,56 +135,56 @@ class ControllersHierarchy(action.BaseAction):
             elif cmds.objExists(globalCtrl) and self.checkNurbs(globalCtrl):
                 rootNode = globalCtrl
             else:
-                self.checkedObjList.append(str(rootNode))
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
-                self.messageList.append(self.ar.data.lang['v062_globalMissing'])
+                self.checked_items.append(str(rootNode))
+                self.found_issues.append(False)
+                self.good_results.append(True)
+                self.messages.append(self.ar.data.lang['v062_globalMissing'])
 
             if rootNode:
                 isHierarchySame = True
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
                     currentFileHierarchyDic = self.raiseHierarchy(rootNode)
-                    lastHierarchyDic = self.importLatestJsonFile(self.getExportedList(getAny=True))
+                    lastHierarchyDic = self.importLatestJsonFile(self.get_exported_items(get_any=True))
                     if lastHierarchyDic:
                         isHierarchySame = self.compareHierarchy(lastHierarchyDic, currentFileHierarchyDic)
-                        self.checkedObjList.append(str(lastHierarchyDic))
+                        self.checked_items.append(str(lastHierarchyDic))
                     else:
-                        self.checkedObjList.append("Controls Hierarchy")
-                        self.messageList.append(self.ar.data.lang['v063_firstHierarchy'])
+                        self.checked_items.append("Controls Hierarchy")
+                        self.messages.append(self.ar.data.lang['v063_firstHierarchy'])
 
-                    if self.firstMode: #verify
+                    if self.first_mode: #verify
                         if isHierarchySame:
-                            self.foundIssueList.append(False)
-                            self.resultOkList.append(True)
+                            self.found_issues.append(False)
+                            self.good_results.append(True)
                         else:
-                            self.foundIssueList.append(True)
-                            self.resultOkList.append(False)
+                            self.found_issues.append(True)
+                            self.good_results.append(False)
                     else: #fix
                         if cmds.file(query=True, sceneName=True) != "":
                             if lastHierarchyDic == None or not isHierarchySame:
                                 self.exportDicToJsonFile(currentFileHierarchyDic)
-                            self.foundIssueList.append(False)
-                            self.resultOkList.append(True)
+                            self.found_issues.append(False)
+                            self.good_results.append(True)
                         else:
-                            self.checkedObjList.append("Scene")
-                            self.foundIssueList.append(True)
-                            self.resultOkList.append(False)
-                            self.messageList.append(self.ar.data.lang['v005_cantFix']+" "+self.ar.data.lang['v064_hierarchy'])
-                            self.messageList.append(self.ar.data.lang['i201_saveScene'])
-                    self.maybeDone = False
+                            self.checked_items.append("Scene")
+                            self.found_issues.append(True)
+                            self.good_results.append(False)
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+" "+self.ar.data.lang['v064_hierarchy'])
+                            self.messages.append(self.ar.data.lang['i201_saveScene'])
+                    self.maybe_done = False
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.maybeDone = True
-                self.notFoundNodes()
+                self.maybe_done = True
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

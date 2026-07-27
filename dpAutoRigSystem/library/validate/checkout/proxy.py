@@ -19,19 +19,19 @@ class Proxy(action.BaseAction):
         self.repeatedNameList = []
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
 
         # ---
         # --- validator code --- beginning
@@ -68,10 +68,10 @@ class Proxy(action.BaseAction):
                                                 toProxyList.append(meshTransform[0])
                         if toProxyList:
                             self.ar.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
-                            self.checkedObjList.append(proxyGrp)
-                            self.foundIssueList.append(True)
-                            if self.firstMode:
-                                self.resultOkList.append(False)
+                            self.checked_items.append(proxyGrp)
+                            self.found_issues.append(True)
+                            if self.first_mode:
+                                self.good_results.append(False)
                             else: #fix
                                 try:
                                     for sourceTransform in toProxyList:
@@ -79,30 +79,30 @@ class Proxy(action.BaseAction):
                                         self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+sourceShortName)
                                         self.createProxy(sourceTransform, sourceShortName, proxyGrp)
                                     self.proxyIntegration(proxyGrp)
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+proxyGrp)
+                                    self.good_results.append(True)
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+proxyGrp)
                                 except:
-                                    self.resultOkList.append(False)
-                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+proxyGrp)
+                                    self.good_results.append(False)
+                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+proxyGrp)
                         else:
-                            self.foundIssueList.append(False)
-                            self.resultOkList.append(True)
+                            self.found_issues.append(False)
+                            self.good_results.append(True)
                     else:
-                        self.notFoundNodes(proxyGrp)
+                        self.not_found_node(proxyGrp)
                 else:
-                    self.notFoundNodes(proxyGrp)
+                    self.not_found_node(proxyGrp)
             else:
-                self.notFoundNodes(proxyGrp)
+                self.not_found_node(proxyGrp)
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
         
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data
 
 
     def createProxy(self, source, shortName, grp, *args):

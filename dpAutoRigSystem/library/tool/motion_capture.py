@@ -587,8 +587,8 @@ class MotionCapture(base.BaseLibrary):
         """
         orderedList, idList = [], []
         for item in itemList:
-            if "dpID" in cmds.listAttr(item):
-                idList.append(int(cmds.getAttr(item+".dpID").split(".")[1])) #time
+            if self.ar.data.dp_id in cmds.listAttr(item):
+                idList.append(int(cmds.getAttr(item+"."+self.ar.data.dp_id).split(".")[1])) #time
         if idList:
             tmpList, orderedList = zip(*sorted(zip(idList, itemList)))
         return orderedList
@@ -689,7 +689,7 @@ class MotionCapture(base.BaseLibrary):
         mel.eval("HIKCharacterControlsTool;")
         mel.eval("hikCreateDefinition;")
         self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
-        self.dpID = self.ar.custom_attr.addAttr(0, [self.hikNode])[0] #dpID
+        self.id = self.ar.custom_attr.addAttr(0, [self.hikNode])[0] #dpID
         print(self.ar.data.lang['m251_createdCharDefinition']+" "+self.hikNode)
         return self.hikNode
     
@@ -920,7 +920,7 @@ class HumanIKCleaner(object):
     
 # fire scriptNode
 for hik in cmds.ls(type="HIKCharacterNode"):
-    if cmds.objExists(hik+".dpID") and cmds.getAttr(hik+".dpID") == "'''+self.dpID+'''":
+    if cmds.objExists(hik+".dpID") and cmds.getAttr(hik+".dpID") == "'''+self.id+'''":
         HumanIKCleaner(hik, "'''+self.hikNode+'_Cleaner_SN'+'''", '''+str(self.getAutoRotateCtrlList())+''', '''+str(self.autoRotateAttrList)+''')
 '''
         sn = cmds.scriptNode(name=self.hikNode+'_Cleaner_SN', sourceType='python', scriptType=2, beforeScript=hikCleanerCode)

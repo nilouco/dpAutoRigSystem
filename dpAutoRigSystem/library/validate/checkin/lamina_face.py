@@ -17,19 +17,19 @@ class LaminaFace(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -89,35 +89,35 @@ class LaminaFace(action.BaseAction):
                     laminaObjList.sort()
                     laminaFaceList.sort()
                     for item in laminaObjList:
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
-                            self.messageList.append("Lamina faces: "+str(laminaFaceList))
+                        self.checked_items.append(item)
+                        self.found_issues.append(True)
+                        if self.first_mode:
+                            self.good_results.append(False)
+                            self.messages.append("Lamina faces: "+str(laminaFaceList))
                             cmds.select(laminaFaceList)
                         else: #fix
                             try:
                                 cmds.select(item)
                                 mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"-1\",\"1\" };')
                                 cmds.select(clear=True)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                                self.good_results.append(True)
+                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaFaceList))
                             except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaFaceList))
-                    if self.firstMode:
-                        self.messageList.append("Lamina faces: "+str(laminaFaceList))
-                        self.messageList.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaFaceList)+")\n---")
+                                self.good_results.append(False)
+                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                    if self.first_mode:
+                        self.messages.append("Lamina faces: "+str(laminaFaceList))
+                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaFaceList)+")\n---")
                         cmds.select(laminaFaceList)
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

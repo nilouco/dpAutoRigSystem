@@ -16,35 +16,35 @@ WIKI = "10-‐-Rebuilder#-deformation"
 class DeformationIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_deformationIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_deformationIO"
         self.startName = "dpDeformation"
         if self.ar.dev:
             reload(weights)
         self.defWeights = weights.Weights(self.ar)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.checkAssetContext():
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    if self.firstMode: #export
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
+                    if self.first_mode: #export
                         itemList = None
                         if objList:
                             itemList = objList
@@ -62,31 +62,31 @@ class DeformationIO(action.BaseAction):
                             if hasDef:
                                 self.exportDicToJsonFile(self.getDeformerDataDic(inputDeformerList))
                             else:
-                                self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" deformers")
+                                self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" deformers")
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes']+" mesh")
+                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" mesh")
                     else: #import
-                        deformerDic = self.importLatestJsonFile(self.getExportedList())
+                        deformerDic = self.importLatestJsonFile(self.get_exported_items())
                         if deformerDic:
                             self.importDeformationData(deformerDic)
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
         cmds.select(clear=True)
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        self.refreshView()
-        return self.dataLogDic
+        self.refresh_view()
+        return self.log_data
 
 
     def getDeformerDataDic(self, inputDeformerList, *args):
@@ -212,7 +212,7 @@ class DeformationIO(action.BaseAction):
                     cmds.connectAttr(deformerDic[deformerNode]["relatedNode"]+".worldMesh[0]", newDefNode+".morphTarget[0]", force=True)
                 else:
                     wellImported = False
-                    self.notWorkedWellIO(self.latestDataFile+": "+deformerNode+" - "+deformerDic[deformerNode]["relatedNode"])
+                    self.fail_io(self.latestDataFile+": "+deformerNode+" - "+deformerDic[deformerNode]["relatedNode"])
         # parenting
         needParentIt = False
         if deformerDic[deformerNode]["father"]:
@@ -265,7 +265,7 @@ class DeformationIO(action.BaseAction):
                 try:
                     wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
                 except Exception as e:
-                    self.notWorkedWellIO(self.latestDataFile+": "+deformerNode+" - "+str(e))
+                    self.fail_io(self.latestDataFile+": "+deformerNode+" - "+str(e))
             if notFoundMeshList: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
                 for deformerNode in notFoundMeshList:
                     for shapeNode in deformerDic[deformerNode]["shapeList"]:
@@ -273,13 +273,13 @@ class DeformationIO(action.BaseAction):
                             try:
                                 wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
                             except Exception as e:
-                                self.notWorkedWellIO(self.latestDataFile+": "+deformerNode+" - "+str(e))
+                                self.fail_io(self.latestDataFile+": "+deformerNode+" - "+str(e))
             if wellImported:
-                self.wellDoneIO(self.latestDataFile)
+                self.well_done_io(self.latestDataFile)
         else:
-            self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(deformerDic.keys())))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(deformerDic.keys())))
         if not wellImported:
             if changedShapeMeshList:
-                self.notWorkedWellIO(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+                self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
             elif notFoundMeshList:
-                self.notWorkedWellIO(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

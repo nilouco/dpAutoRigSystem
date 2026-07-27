@@ -154,7 +154,7 @@ class Lib(object):
     def set_validator_preset(self):
         for validator_instance in self.ar.config.get_validator_instances():
             if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]].keys():
-                validator_instance.changeActive(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
+                validator_instance.change_active(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
 
 
     def check_missing_modules(self, folder, check_modules):

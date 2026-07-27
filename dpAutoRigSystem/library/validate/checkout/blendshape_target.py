@@ -17,19 +17,19 @@ class BlendshapeTarget(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -57,7 +57,7 @@ class BlendshapeTarget(action.BaseAction):
                             try:
                                 inputDeformerList = cmds.findDeformers(item)
                             except:
-                                self.messageList.append(self.ar.data.lang['i075_moreOne']+": "+item)
+                                self.messages.append(self.ar.data.lang['i075_moreOne']+": "+item)
                                 inputDeformerList = False
                             if inputDeformerList:
                                 for deformerNode in inputDeformerList:
@@ -75,11 +75,11 @@ class BlendshapeTarget(action.BaseAction):
                 for item in toCheckList:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
-                        self.checkedObjList.append(item)
+                        self.checked_items.append(item)
                         if not item in exceptionList:
-                            self.foundIssueList.append(True)
-                            if self.firstMode:
-                                self.resultOkList.append(False)
+                            self.found_issues.append(True)
+                            if self.first_mode:
+                                self.good_results.append(False)
                             else: #fix        
                                 try:
                                     fatherItemList = cmds.listRelatives(item, parent=True, type="transform")
@@ -88,26 +88,26 @@ class BlendshapeTarget(action.BaseAction):
                                         brotherList = cmds.listRelatives(fatherItemList[0], allDescendents=True, children=True)
                                         if not brotherList:
                                             cmds.delete(fatherItemList[0])
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                    self.good_results.append(True)
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 except:
-                                    self.resultOkList.append(False)
-                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                    self.good_results.append(False)
+                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
                         else:
-                            self.foundIssueList.append(False)
-                            self.resultOkList.append(True)
+                            self.found_issues.append(False)
+                            self.good_results.append(True)
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data
 
 
     def keepGrp(self, grpList, *args):

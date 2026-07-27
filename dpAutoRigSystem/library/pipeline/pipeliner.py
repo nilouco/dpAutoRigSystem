@@ -1262,7 +1262,7 @@ class Pipeliner(object):
         
 
     def runReplaceData(self, path=None, toReplaceList=None, *args):
-        """ Replace the dpData subFolder with the given arguments.
+        """ Replace the dpData sub_folder with the given arguments.
         """
         if not path:
             path = self.pathToReplaceFrom

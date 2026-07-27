@@ -103,12 +103,12 @@ class Publisher(object):
         return rigWipVersion
     
 
-    def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
+    def runCheckedValidators(self, first_mode=True, stop_if_found_block=True, publish_log=None, *args):
         """ Run the verify of fix of checked validators.
         """
         validators = self.ar.config.get_validator_instances()
         if validators:
-            validationResultDataList = self.ar.ui_manager.runSelectedActions(validators, firstMode, True, stopIfFoundBlock, publishLog)
+            validationResultDataList = self.ar.ui_manager.run_selected_actions(validators, first_mode, True, stop_if_found_block, publish_log)
             if validationResultDataList[1]: #found issue
                 stoppedMessage = self.ar.data.lang['v020_publishStopped']+" "+validators[validationResultDataList[2]].name                    
                 return stoppedMessage
@@ -152,20 +152,20 @@ class Publisher(object):
                 publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
             if publishFileName:
                 # start logging
-                publishLog = {}
-                publishLog["scene"] = self.ar.pipeliner.pipeData['sceneName']
+                publish_log = {}
+                publish_log["scene"] = self.ar.pipeliner.pipeData['sceneName']
                 if not publishFileName[-3:-1] == ".m":
                     publishFileName += ".m"+self.ar.pipeliner.pipeData['sceneName'][-1]
                 self.ar.pipeliner.pipeData['publishFileName'] = publishFileName
-                publishLog["published"] = self.ar.pipeliner.pipeData['publishPath']+"/"+publishFileName
-                publishLog["exportPath"] = self.ar.pipeliner.pipeData['f_drive']+"/"+self.ar.pipeliner.pipeData['f_studio']+"/"+self.ar.pipeliner.pipeData['f_project']+"/"+self.ar.pipeliner.pipeData['f_toClient']+"/"+self.ar.pipeliner.getToday()
+                publish_log["published"] = self.ar.pipeliner.pipeData['publishPath']+"/"+publishFileName
+                publish_log["exportPath"] = self.ar.pipeliner.pipeData['f_drive']+"/"+self.ar.pipeliner.pipeData['f_studio']+"/"+self.ar.pipeliner.pipeData['f_project']+"/"+self.ar.pipeliner.pipeData['f_toClient']+"/"+self.ar.pipeliner.getToday()
                 # comments
-                publishLog["comments"] = ""
+                publish_log["comments"] = ""
                 commentValue = comments
                 if fromUI and not comments:
                     commentValue = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
                 if commentValue:
-                    publishLog["comments"] = commentValue
+                    publish_log["comments"] = commentValue
                 
                 # checking validators
                 validatorsResult = False
@@ -173,14 +173,14 @@ class Publisher(object):
                     if fromUI:
                         verifyValidator = cmds.checkBox(self.verifyValidatorsCB, query=True, value=True)
                 if verifyValidator:
-                    validatorsResult = self.runCheckedValidators(False, True, publishLog) #fix mode
+                    validatorsResult = self.runCheckedValidators(False, True, publish_log) #fix mode
                 if validatorsResult:
                     self.abortPublishing(validatorsResult)
                     return False
                 else:
                     self.ar.utils.setProgress(self.ar.data.lang['i336_storingData']+"...", addNumber=False)
                     
-                    self.ar.pipeliner.pipeData.update(publishLog)
+                    self.ar.pipeliner.pipeData.update(publish_log)
 
                     # try to store data into All_Grp if it exists
                     self.ar.pipeliner.pipeData['modelVersion'] = None

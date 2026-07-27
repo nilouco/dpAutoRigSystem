@@ -84,21 +84,21 @@ class UIFiller(object):
                 cmds.button(item.name+'_bt', label=self.ar.data.lang[item.title], height=32, width=200, command=item.build_tool, parent=module_layout)
             # validators and rebuilders
             else:
-                item.actionCB = cmds.checkBox(label=self.ar.data.lang[item.title], value=item.active, changeCommand=item.changeActive, parent=module_layout)
-                item.firstBT = cmds.button(label=item.firstBTLabel, width=45, command=partial(item.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.firstBTEnable, parent=module_layout)
-                item.secondBT = cmds.button(label=item.secondBTLabel.capitalize(), width=45, command=partial(item.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.secondBTEnable, parent=module_layout)
+                item.action_cb = cmds.checkBox(label=self.ar.data.lang[item.title], value=item.active, changeCommand=item.change_active, parent=module_layout)
+                item.first_bt = cmds.button(label=item.first_bt_label, width=45, command=partial(item.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.first_bt_enable, parent=module_layout)
+                item.second_bt = cmds.button(label=item.second_bt_label.capitalize(), width=45, command=partial(item.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.second_bt_enable, parent=module_layout)
                 # validators
                 if folder == "" or folder in self.validator_folders:
-                    if item.customName:
-                        cmds.checkBox(item.actionCB, edit=True, label=item.customName)
-                        item.title = item.customName
+                    if item.custom_name:
+                        cmds.checkBox(item.action_cb, edit=True, label=item.custom_name)
+                        item.title = item.custom_name
                 # rebuilders
                 if folder in self.rebuilder_folders:
-                    item.deleteDataITB = cmds.iconTextButton(image=self.ar.data.icon['x_delete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.deleteDataBTEnable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
+                    item.delete_data_itb = cmds.iconTextButton(image=self.ar.data.icon['x_delete'], height=30, width=30, style='iconOnly', command=item.deleteData, enable=item.delete_data_bt_enable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
             # info icon
             cmds.iconTextButton(item.name+"_itb", image=self.ar.data.icon['info'], height=30, width=30, style='iconOnly', command=partial(self.ar.logger.infoWin, item.title, item.description, None, 'center', 305, 250, wiki=item.wiki), parent=module_layout)
             if folder in self.rebuilder_folders:
-                item.updateActionButtons(color=False) #add latest exported data button
+                item.update_action_buttons(color=False) #add latest exported data button
 
 
     def load_pipeline_validator_preset(self):

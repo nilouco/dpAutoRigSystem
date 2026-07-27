@@ -483,17 +483,17 @@ class FacialConnection(base.BaseLibrary):
     def turnDeformersEnvelope(self, turnOn=False, *args):
         """ Turn on/off envelope attribute in the scene, to avoind miss deformation in base mesh duplication.
         """
-        checkedObjList = []
+        checked_items = []
         allNodesList = cmds.ls()
         allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
         allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
-        checkedObjList.extend(allValidEnvelopeNodes)
-        if checkedObjList:
+        checked_items.extend(allValidEnvelopeNodes)
+        if checked_items:
             if turnOn == True:
-                for node in checkedObjList:
+                for node in checked_items:
                     cmds.setAttr(f"{node}.envelope", 1)
             if turnOn == False:
-                for node in checkedObjList:
+                for node in checked_items:
                     cmds.setAttr(f"{node}.envelope", 0)
             
 

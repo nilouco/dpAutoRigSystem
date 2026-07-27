@@ -19,19 +19,19 @@ class Vaccine(action.BaseAction):
             reload(action)
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
         
         # ---
         # --- validator code --- beginning
@@ -48,10 +48,10 @@ class Vaccine(action.BaseAction):
                     scriptdata = cmds.scriptNode(item, beforeScript=True, query=True)
                     #if "fuck_All_U" in scriptdata:
                     if "_gene" in scriptdata:
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.firstMode:
-                            self.resultOkList.append(False)
+                        self.checked_items.append(item)
+                        self.found_issues.append(True)
+                        if self.first_mode:
+                            self.good_results.append(False)
                         else: #fix
                             try:
                                 cmds.delete(item)
@@ -61,23 +61,23 @@ class Vaccine(action.BaseAction):
                                     if os.path.exists(path+vaccine):
                                         os.remove(path+vaccine)
                                 if os.path.exists(path+"userSetup.py"):
-                                    self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
+                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+"\n    - "+path+"userSetup.py")
                                 else:
-                                    self.messageList.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 cmds.select(clear=True)
-                                self.resultOkList.append(True)
+                                self.good_results.append(True)
                             except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                self.good_results.append(False)
+                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
             else:
-                self.notFoundNodes()
+                self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

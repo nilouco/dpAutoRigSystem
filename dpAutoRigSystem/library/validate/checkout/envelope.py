@@ -31,19 +31,19 @@ class Envelope(action.BaseAction):
         return envelopeValue < 1
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
-            If firstMode parameter is False, it'll run in fix mode.
+            If first_mode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart()
+        self.first_mode = first_mode
+        self.cleanup_to_start()
 
         # ---
         # --- validator code --- beginning
@@ -54,33 +54,33 @@ class Envelope(action.BaseAction):
                 allNodesList = cmds.ls()
             allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
             allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
-            self.checkedObjList.extend(allValidEnvelopeNodes)
-            if self.checkedObjList:
-                self.ar.utils.setProgress(max=len(self.checkedObjList), addOne=False, addNumber=False)
+            self.checked_items.extend(allValidEnvelopeNodes)
+            if self.checked_items:
+                self.ar.utils.setProgress(max=len(self.checked_items), addOne=False, addNumber=False)
 
-                for node in self.checkedObjList:
-                    self.foundIssueList.append(self.verifyEnvelope(node))
+                for node in self.checked_items:
+                    self.found_issues.append(self.verifyEnvelope(node))
 
-                if not self.firstMode:
-                    for idx, issue in enumerate(self.checkedObjList):
+                if not self.first_mode:
+                    for idx, issue in enumerate(self.checked_items):
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         if issue:
                             try:
-                                cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
-                                self.foundIssueList[idx] = False
+                                cmds.setAttr(f"{self.checked_items[idx]}.envelope", 1)
+                                self.found_issues[idx] = False
                             except Exception as e:
                                 mel.eval('print \"dpAR: '+e+'\\n\";')
             else:
-                self.foundIssueList.append(False)
+                self.found_issues.append(False)
 
-            self.resultOkList.append(not True in self.foundIssueList)
+            self.good_results.append(not True in self.found_issues)
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress()
-        return self.dataLogDic
+        return self.log_data

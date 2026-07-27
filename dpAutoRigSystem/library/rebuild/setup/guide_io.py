@@ -18,8 +18,8 @@ MODULES = "Modules.Standard"
 class GuideIO(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.setActionType("r000_rebuilder")
-        self.ioDir = "s_guideIO"
+        self.set_action_type("r000_rebuilder")
+        self.io_folder = "s_guideIO"
         self.startName = "dpGuide"
         if self.ar.dev:
             reload(head_deformer)
@@ -27,28 +27,28 @@ class GuideIO(action.BaseAction):
         self.head_deformer.ui = False
     
 
-    def runAction(self, firstMode=True, objList=None, *args):
+    def runAction(self, first_mode=True, objList=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
-            If firstMode parameter is False, it'll run in import mode.
+            If first_mode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
-                - checkedObjList = node list of checked items
-                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
-                - resultOkList = True if well done, False if we got an error
-                - messageList = reported text
+                - checked_items = node list of checked items
+                - found_issues = True if an issue was found, False if there isn't an issue for the checked node
+                - good_results = True if well done, False if we got an error
+                - messages = reported text
         """
         # starting
-        self.firstMode = firstMode
-        self.cleanUpToStart(True)
+        self.first_mode = first_mode
+        self.cleanup_to_start(True)
         
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.checkAssetContext():
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    self.ar.ui_manager.refresh_ui()
-                    if self.firstMode: #export
+                self.io_path = self.get_io_path(self.io_folder)
+                if self.io_path:
+                    self.ar.ui_manager.refresh_ui(reset_buttons=False)
+                    if self.first_mode: #export
                         netList = None
                         if objList:
                             netList = objList
@@ -59,14 +59,14 @@ class GuideIO(action.BaseAction):
                             self.ar.job.unpin_guide(force=True)
                             self.exportDicToJsonFile(self.getGuideDataDic(netList))
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['v014_notFoundNodes'])
+                            self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                             cmds.select(clear=True)
                     else: #import
                         # apply viewport xray
                         modelPanelList = cmds.getPanel(type="modelPanel")
                         for mp in modelPanelList:
                             cmds.modelEditor(mp, edit=True, xray=True)
-                        guideDic = self.importLatestJsonFile(self.getExportedList())
+                        guideDic = self.importLatestJsonFile(self.get_exported_items())
                         if guideDic:
                             wellImported = False
                             try:
@@ -75,36 +75,36 @@ class GuideIO(action.BaseAction):
                                 self.setupGuideBaseParenting(guide_data)
                             except Exception as e:
                                 if not wellImported: #guide initialization issue
-                                    self.notWorkedWellIO(self.ar.data.lang['m195_couldNotBeSet']+": "+str(e))
+                                    self.fail_io(self.ar.data.lang['m195_couldNotBeSet']+": "+str(e))
                                 else: #parenting issue
-                                    self.notWorkedWellIO(self.ar.data.lang['m197_notPossibleParent']+": "+str(e))
+                                    self.fail_io(self.ar.data.lang['m197_notPossibleParent']+": "+str(e))
                                 wellImported = False
                             if wellImported:
-                                self.wellDoneIO(self.latestDataFile)
+                                self.well_done_io(self.latestDataFile)
                         else:
-                            self.maybeDoneIO(self.ar.data.lang['r007_notExportedData'])
+                            self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                         cmds.select(clear=True)
                         # remove viewport xray
                         for mp in modelPanelList:
                             cmds.modelEditor(mp, edit=True, xray=False)
                 else:
-                    self.notWorkedWellIO(self.ar.data.lang['r010_notFoundPath'])
+                    self.fail_io(self.ar.data.lang['r010_notFoundPath'])
             else:
-                self.notWorkedWellIO(self.ar.data.lang['r027_noAssetContext'])
+                self.fail_io(self.ar.data.lang['r027_noAssetContext'])
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- rebuilder code --- end
         # ---
 
         # finishing
-        self.updateActionButtons()
-        self.reportLog()
+        self.update_action_buttons()
+        self.report_log()
         self.endProgress(True)
-        self.refreshView()
+        self.refresh_view()
         if self.ar.data.ui_state:
             self.ar.ui_manager.clear_guide_layout()
             self.ar.filler.fill_created_guides()
-        return self.dataLogDic
+        return self.log_data
 
 
     def getGuideDataDic(self, netList, *args):
@@ -329,7 +329,7 @@ class GuideIO(action.BaseAction):
                         cmds.select(clear=True)
                     except Exception as e:
                         wellImported = False
-                        self.notWorkedWellIO(net+": "+str(e))
+                        self.fail_io(net+": "+str(e))
                         break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False

@@ -29,7 +29,6 @@ class Utils(object):
         self.order = "_order"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
         self.progress = False
-        self.dpID = self.ar.data.dp_id
         self.defineDics()
 
 
@@ -1052,7 +1051,7 @@ class Utils(object):
                     cmds.setAttr(node+"."+attr, lock=False)
 
 
-    def exportLogDicToJson(self, dic, name=None, path=None, subFolder=None):
+    def exportLogDicToJson(self, dic, name=None, path=None, sub_folder=None):
         """ Save to path the given dictionary as a json file.
         """
         currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
@@ -1060,8 +1059,8 @@ class Utils(object):
             path = cmds.file(query=True, sceneName=True)
         if path:
             dpFolder = path[:path.rfind("/")]
-            if subFolder:
-                dpFolder = dpFolder+"/"+subFolder
+            if sub_folder:
+                dpFolder = dpFolder+"/"+sub_folder
             if not os.path.exists(dpFolder):
                 os.makedirs(dpFolder)
             if not name:
@@ -1134,8 +1133,8 @@ class Utils(object):
     def decomposeID(self, item, *args):
         """ Return a list with the name and date decomposed from dpID attribute of the given node.
         """
-        if cmds.attributeQuery(self.dpID, node=item, exists=True):
-            id = cmds.getAttr(item+"."+self.dpID)
+        if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
+            id = cmds.getAttr(item+"."+self.ar.data.dp_id)
             return self.getDecomposedIDList(id)
         return [None, None, None]
     
@@ -1143,7 +1142,7 @@ class Utils(object):
     def validateID(self, item, *args):
         """ Return True if the decomposed name in the dpID is equal to the given node name.
         """
-        if cmds.attributeQuery(self.dpID, node=item, exists=True):
+        if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
             decomposedIDList = self.decomposeID(item)
             if "dp" == decomposedIDList[0]:
                 if item == decomposedIDList[1]:

@@ -202,7 +202,7 @@ class BaseStandard(base.BaseLibrary):
             cmds.namespace(moveNamespace=(self.guideNamespace, ':'), force=True)
             cmds.namespace(removeNamespace=self.guideNamespace, force=True)
         if not self.ar.data.rebuilding:
-            self.ar.ui_manager.refresh_ui(clearSel=True)
+            self.ar.ui_manager.refresh_ui(clear_selection=True)
     
 
     def duplicateModule(self, *args):
@@ -226,9 +226,9 @@ class BaseStandard(base.BaseLibrary):
                     self.enteredText = ""
             self.enteredText = self.enteredText.replace(" ", "_")
             # call utils to return the normalized text:
-            self.customName = self.ar.utils.normalizeText(self.enteredText, prefixMax=30)
+            self.custom_name = self.ar.utils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:
-            if self.customName == "":
+            if self.custom_name == "":
                 try:
                     cmds.textField(self.userName, edit=True, text="")
                 except:
@@ -236,8 +236,8 @@ class BaseStandard(base.BaseLibrary):
                 cmds.setAttr(self.guide_base+".customName", "", type='string')
                 self.userGuideName = self.guideNamespace.split("__")[-1]
             else:
-                baseName = self.customName
-                suffixNumberList = self.ar.utils.getSuffixNumberList(self.customName)
+                baseName = self.custom_name
+                suffixNumberList = self.ar.utils.getSuffixNumberList(self.custom_name)
                 if suffixNumberList[1]:
                     baseName = suffixNumberList[1]
                 dpAR_nameList = []
@@ -246,23 +246,23 @@ class BaseStandard(base.BaseLibrary):
                     if baseName == self.ar.utils.getSuffixNumberList(cmds.getAttr(net+".guideName"))[1]:
                         dpAR_nameList.append(cmds.getAttr(net+".guideName"))
                 if dpAR_nameList:
-                    if self.customName in dpAR_nameList:
+                    if self.custom_name in dpAR_nameList:
                         for n in range(1, len(dpAR_nameList)+2):
                             if not baseName+str(n).zfill(pad) in dpAR_nameList:
-                                self.customName = baseName+str(n).zfill(pad)
+                                self.custom_name = baseName+str(n).zfill(pad)
                                 break
                 # edit the prefixTextField with the normalText:
                 try:
-                    cmds.textField(self.userName, edit=True, text=self.customName)
-                    cmds.frameLayout(self.moduleFrameLayout, edit=True, label=self.ar.data.lang[self.title]+" - "+self.customName)
+                    cmds.textField(self.userName, edit=True, text=self.custom_name)
+                    cmds.frameLayout(self.moduleFrameLayout, edit=True, label=self.ar.data.lang[self.title]+" - "+self.custom_name)
                 except:
                     pass
-                cmds.setAttr(self.guide_base+".customName", self.customName, type='string')
-                cmds.setAttr(self.annotation+".text", self.customName, type='string')
+                cmds.setAttr(self.guide_base+".customName", self.custom_name, type='string')
+                cmds.setAttr(self.annotation+".text", self.custom_name, type='string')
                 if self.guideNet:
-                    cmds.setAttr(self.guideNet+".guideName", self.customName, type='string')
+                    cmds.setAttr(self.guideNet+".guideName", self.custom_name, type='string')
                 # set userGuideName:
-                self.userGuideName = self.customName
+                self.userGuideName = self.custom_name
                 
 
     def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
@@ -524,12 +524,12 @@ class BaseStandard(base.BaseLibrary):
                         cmds.parent(child, world=True)
             
             # just edit customName and prefix:
-            if self.customName != "" and self.customName != " " and self.customName != "_" and self.customName != None:
+            if self.custom_name != "" and self.custom_name != " " and self.custom_name != "_" and self.custom_name != None:
                 names = [n for n in cmds.ls(selection=False, type="transform") if "dpAR_name" in cmds.listAttr(n)]
                 for item in names:
-                   if self.customName == cmds.getAttr(item+".dpAR_name"):
-                       self.customName = self.customName + "1"
-                self.userGuideName = self.customName
+                   if self.custom_name == cmds.getAttr(item+".dpAR_name"):
+                       self.custom_name = self.custom_name + "1"
+                self.userGuideName = self.custom_name
 
             if self.ar.data.prefix:
                 self.userGuideName = self.ar.data.prefix + self.userGuideName
@@ -585,7 +585,7 @@ class BaseStandard(base.BaseLibrary):
         else:
             guideNumber = self.ar.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
-        self.dpID = self.ar.custom_attr.addAttr(0, [self.guideNet])[0] #dpID
+        self.ar.custom_attr.addAttr(0, [self.guideNet])[0] #dpID
         for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
@@ -695,7 +695,7 @@ class BaseStandard(base.BaseLibrary):
         """
         self.ar.job.unpin_guide(force=True)
         if cmds.objExists(self.guide_base):
-            self.customName = cmds.getAttr(self.guide_base+".customName") or ""
+            self.custom_name = cmds.getAttr(self.guide_base+".customName") or ""
         if not self.serialized:
             afterDataDic, guideDic = {}, {}
             beforeList = self.getBeforeList()
