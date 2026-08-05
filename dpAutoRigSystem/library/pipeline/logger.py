@@ -64,7 +64,7 @@ class Logger(object):
             log_text += str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ':\n\n'
             print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang[success] + ', thanks!\n')
             for item in self.ar.maker.guides_to_rig:
-                log_text += item.guideNamespace
+                log_text += item.guide_namespace
                 if item.custom_name:
                     log_text += " as " + item.custom_name
                 log_text += '\n'

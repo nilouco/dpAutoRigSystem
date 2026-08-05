@@ -494,9 +494,9 @@ class UpdateGuides(base.BaseLibrary):
             mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
-             if self.updateData[guide]['instance'].guideNamespace in allNamespaceList:
-                cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guideNamespace, ':'), force=True)
-                cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guideNamespace, force=True)
+             if self.updateData[guide]['instance'].guide_namespace in allNamespaceList:
+                cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guide_namespace, ':'), force=True)
+                cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guide_namespace, force=True)
         self.ar.ui_manager.refresh_ui()
 
 

@@ -145,7 +145,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                 self.currentNJoints = self.enteredNJoints
                 self.changeMainCtrlsNumber(0)
                 # re-build the preview mirror:
-                layout.BaseLayout.createPreviewMirror(self)
+                self.create_mirror_preview()
             cmds.select(self.guide_base)
         else:
             self.changeJointNumber(5)
@@ -305,7 +305,7 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
             # dynamic:
             self.addDynamic = self.getModuleAttr("dynamic")
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 attrNameLower = self.ar.utils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"

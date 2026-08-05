@@ -126,7 +126,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
             self.currentNJoints = self.enteredNJoints
             self.changeMainCtrlsNumber(0)
             # re-build the preview mirror:
-            layout.BaseLayout.createPreviewMirror(self)
+            self.create_mirror_preview()
         cmds.select(self.guide_base)
 
 
@@ -178,7 +178,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                     self.aimFunction(nJoint2, guideBase, upVectorObject)
                     # Parenting nJoint to world and reset jointLoc position
                     cmds.parent(nJoint2, world=True)
-                    for axis in ["X", "Y", "Z"]:
+                    for axis in self.ar.data.axis:
                         cmds.setAttr(jointLoc + ".translate" + axis, 0)
                         cmds.setAttr(jointLoc + ".rotate" + axis, 0)
                     cmds.parent(nJoint2, jointLoc)
@@ -193,15 +193,14 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
             Each guide will point to the next guide using Radius_Ctrl position as a Object Rotation Up Vector.
         """
         # re-declaring guides names:
-        self.guideBase = self.guide_base
         self.radiusGuide = self.guideName + "_Base_RadiusCtrl"
         self.cvEndJoint = self.guideName + "_JointEnd"
         # Check if the guideBase exists:
-        if cmds.attributeQuery("guideBase", node=self.guideBase, exists=True):
+        if cmds.attributeQuery("guideBase", node=self.guide_base, exists=True):
             # Get the jointLocList and upVectorObject:
-            self.jointLocList, self.upVectorObject = self.getJointLocList(self.guideBase)
+            self.jointLocList, self.upVectorObject = self.getJointLocList(self.guide_base)
             # Reorient the FK line:
-            self.reOrientFkLine(self.jointLocList, self.upVectorObject, self.guideBase, self.cvEndJoint)
+            self.reOrientFkLine(self.jointLocList, self.upVectorObject, self.guide_base, self.cvEndJoint)
 
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
@@ -219,7 +218,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []

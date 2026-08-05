@@ -391,7 +391,7 @@ class Utils(object):
         hook = {}
         allList = cmds.ls(type='transform')
         for item in allList:
-            if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1:
+            if "guideBase" in cmds.listAttr(item) and cmds.getAttr(item+".guideBase") == 1:
                 # module info:
                 guideModuleNamespace = item[:item.find(":")]
                 name = item[:item.find("__")]
@@ -607,7 +607,7 @@ class Utils(object):
         for guideModule in self.ar.data.guide_instances:
             # verify integrity of the guideModule:
             if guideModule.verifyGuideModuleIntegrity():
-                guideNamespaceName = guideModule.guideNamespace
+                guideNamespaceName = guideModule.guide_namespace
                 if guideNamespaceName in allNamespaceList:
                     userGuideName = guideModule.userGuideName
                     if not cmds.objExists(userGuideName+'_Static_Grp'):

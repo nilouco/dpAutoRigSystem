@@ -18,7 +18,7 @@ class FingerHandPose(base.BaseLibrary):
             reload(base)
         self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
         self.oldDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
-        self.sideList = ["", self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
+        self.sides = ["", self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
         self.armName = self.ar.data.lang['c037_arm']
         self.wristName = self.ar.data.lang['c004_arm_extrem']
         self.fingerIndexName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m032_index']
@@ -42,7 +42,7 @@ class FingerHandPose(base.BaseLibrary):
         allGrp = self.ar.utils.getAllGrp()
         if allGrp:
             if cmds.getAttr(allGrp+".dpFingerCount"): #it has fingers
-                for side in self.sideList:
+                for side in self.sides:
                     handCtrl = side+self.armName+"_"+self.wristName+"_ToParent_Ctrl"
                     if cmds.objExists(handCtrl): #there's an arm
                         handCtrlList.append(handCtrl)

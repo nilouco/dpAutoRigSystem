@@ -21,13 +21,13 @@ class Controllers(object):
         """
         # defining variables:
         self.ar = ar
-        self.loadVariables()
+        self.load_variables()
         if self.ar.dev:
             reload(reset_pose)
         self.resetPose = reset_pose.ResetPose(self.ar)
 
 
-    def loadVariables(self, *args):
+    def load_variables(self, *args):
         """ Just load class variables here.
         """
         self.attrValueDic = {}
@@ -602,7 +602,7 @@ class Controllers(object):
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
             cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="OPTIONS", constructionHistory=False)[0]
-            for attr in ["X", "Y", "Z"]:
+            for attr in self.ar.data.axis:
                 cmds.setAttr(cvText+".scale"+attr, 0.3*r)
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
             if txtShapeList:
@@ -1385,7 +1385,7 @@ class Controllers(object):
         """
         to_ids = []
         calibrateAttrList = ["T", "R", "S"]
-        calibrateAxisList = ["X", "Y", "Z"]
+        calibrateAxisList = self.ar.data.axis
         toCalibrationList = []
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
         jcrGrp0 = self.ar.utils.zeroOut([jcrCtrl])[0]

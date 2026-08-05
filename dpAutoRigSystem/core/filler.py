@@ -332,7 +332,7 @@ class UIFiller(object):
         """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
         """
         for item in self.ar.utils.get_guides_to_rig():
-            if not item.guideNet:
+            if not item.guide_net:
                 item.createGuideNetwork()
                 print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.guide_base)
 

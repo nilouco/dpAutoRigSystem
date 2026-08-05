@@ -136,7 +136,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                 cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 # re-build the preview mirror:
-                layout.BaseLayout.createPreviewMirror(self)
+                self.create_mirror_preview()
             cmds.select(self.guide_base)
         else:
             self.changeJointNumber(2)
@@ -162,7 +162,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
             # declaring lists to send information for integration:
             self.scalableGrpList, self.ikCtrlZeroList = [], []
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 self.skinJointList, self.ctrlList = [], []
                 self.base = side+self.userGuideName+'_Guide_Base'
                 if self.addArticJoint:

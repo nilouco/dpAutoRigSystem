@@ -907,7 +907,7 @@ class HumanIKCleaner(object):
             for ctrl in self.ctrlList:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in ["X", "Y", "Z"]:
+                for axis in self.ar.data.axis:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
             print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' "+", ".join(self.ctrlList))
 

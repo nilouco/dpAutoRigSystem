@@ -79,7 +79,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
             # declare lists to store names and attributes:
             self.suspensionBCtrlGrpList, self.fatherBList, self.ctrlHookGrpList = [], [], []
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 # declare guide:
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvALoc = side+self.userGuideName+"_Guide_JointLocA"

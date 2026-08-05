@@ -186,7 +186,7 @@ class Nose(standard.BaseStandard, layout.BaseLayout):
             cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
-            layout.BaseLayout.createPreviewMirror(self)
+            self.create_mirror_preview()
         cmds.select(self.guide_base)
     
 
@@ -212,7 +212,7 @@ class Nose(standard.BaseStandard, layout.BaseLayout):
             # check if need to add nostril:
             self.addNostril = self.getModuleAttr("nostril")
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []

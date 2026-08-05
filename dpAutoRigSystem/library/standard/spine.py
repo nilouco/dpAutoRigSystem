@@ -125,7 +125,7 @@ class Spine(standard.BaseStandard, layout.BaseLayout):
                 cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 # re-build the preview mirror:
-                layout.BaseLayout.createPreviewMirror(self)
+                self.create_mirror_preview()
             cmds.select(self.guide_base)
         else:
             self.changeJointNumber(3)
@@ -145,7 +145,7 @@ class Spine(standard.BaseStandard, layout.BaseLayout):
                 hipsName  = self.ar.data.lang['c027_hips']
                 chestName = self.ar.data.lang['c028_chest']
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 attrNameLower = self.ar.utils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
@@ -526,7 +526,7 @@ class Spine(standard.BaseStandard, layout.BaseLayout):
     def connectSizeAxis(self, fromNode, toNode, *args):
         """ Just connect sizeXYZ to scaleXYZ of given nodes.
         """
-        for axis in ["X", "Y", "Z"]:
+        for axis in self.ar.data.axis:
             if not cmds.objExists(fromNode+".size"+axis):
                 cmds.addAttr(fromNode, longName="size"+axis, attributeType="float", defaultValue=1, keyable=True)
             cmds.connectAttr(fromNode+".size"+axis, toNode+".scale"+axis, force=True)

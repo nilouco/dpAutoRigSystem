@@ -382,7 +382,7 @@ class Maker(object):
 
 
     def set_root_pivot_attr(self):
-        for axis in ["X", "Y", "Z"]:
+        for axis in self.ar.data.axis:
             cmds.connectAttr(self.root_pivot_ctrl+".translate"+axis, self.root_ctrl+".rotatePivot"+axis, force=True)
             cmds.connectAttr(self.root_pivot_ctrl+".translate"+axis, self.root_ctrl+".scalePivot"+axis, force=True)
 
@@ -558,9 +558,9 @@ class Maker(object):
         for item in self.guides_to_rig:
             for s, side in enumerate(self.get_mirror_names(item)):
                 # get hook groups info:
-                self.static_hook_grp = cmds.listConnections(f"{item.guideNet}.{side}StaticHookGrp", destination=False, source=True)[0]
-                self.scalable_hook_grp = cmds.listConnections(f"{item.guideNet}.{side}ScalableHookGrp", destination=False, source=True)[0]
-                self.ctrl_hook_grp = cmds.listConnections(f"{item.guideNet}.{side}ControlHookGrp", destination=False, source=True)[0]
+                self.static_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}StaticHookGrp", destination=False, source=True)[0]
+                self.scalable_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}ScalableHookGrp", destination=False, source=True)[0]
+                self.ctrl_hook_grp = cmds.listConnections(f"{item.guide_net}.{side}ControlHookGrp", destination=False, source=True)[0]
                 # get father info:
                 if self.hook[item.guide_base]['fatherGuide']:
                     # working with father mirror:
@@ -597,11 +597,11 @@ class Maker(object):
                 cmds.setAttr(f"{self.static_hook_grp}.staticHook", 0)
                 cmds.setAttr(f"{self.scalable_hook_grp}.scalableHook", 0)
                 cmds.setAttr(f"{self.ctrl_hook_grp}.ctrlHook", 0)
-                cmds.lockNode(item.guideNet, lock=False)
-                cmds.deleteAttr(f"{item.guideNet}.{side}StaticHookGrp")
-                cmds.deleteAttr(f"{item.guideNet}.{side}ScalableHookGrp")
-                cmds.deleteAttr(f"{item.guideNet}.{side}ControlHookGrp")
-                cmds.lockNode(item.guideNet, lock=True)
+                cmds.lockNode(item.guide_net, lock=False)
+                cmds.deleteAttr(f"{item.guide_net}.{side}StaticHookGrp")
+                cmds.deleteAttr(f"{item.guide_net}.{side}ScalableHookGrp")
+                cmds.deleteAttr(f"{item.guide_net}.{side}ControlHookGrp")
+                cmds.lockNode(item.guide_net, lock=True)
 
 
     def set_option_ctrl_corrective(self, item):
@@ -786,7 +786,7 @@ class Maker(object):
                 if item.custom_name:
                     self.ar.utils.setProgress('Rigging: '+str(item.custom_name))
                 else:
-                    self.ar.utils.setProgress('Rigging: '+str(item.guideNamespace))
+                    self.ar.utils.setProgress('Rigging: '+str(item.guide_namespace))
                 # TODO detected bug returning rig_me
                 item.rig_me() #rig it :)
             # integrating modules together:
@@ -1055,21 +1055,6 @@ class Composer(object):
                         # poleVector autoOrient for arm
                         cmds.delete(root_ctrl_refs[s]+"_PaC")
                         self.to_ids.extend(cmds.parentConstraint(tip_ctrl, root_ctrl_refs[s], maintainOffset=True, name=root_ctrl_refs[s]+"_PaC"))
-
-                    # verify if is quadruped
-                    if limbStyle == self.ar.data.lang['m037_quadruped']:
-                        if self.hook[limb.guide_base]['fatherGuideLoc'] != "JointLoc1":
-                            # get extra info from limb module data:
-                            quad_front_leg = limb.composed['quadFrontLegList'][s]
-                            ik_ctrl = limb.composed['ikCtrlList'][s]
-                            # if quadruped, create a parent contraint from tip_ctrl to front leg:
-                            quad_chest_pac = cmds.parentConstraint(self.ar.maker.root_ctrl, tip_ctrl, quad_front_leg, maintainOffset=True, name=quad_front_leg+"_PaC")[0]
-                            rev_node = cmds.createNode('reverse', name=quad_front_leg+"_Rev")
-                            self.to_ids.extend([quad_chest_pac, rev_node])
-                            cmds.addAttr(ik_ctrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                            cmds.connectAttr(ik_ctrl+".followChestA", quad_chest_pac+"."+tip_ctrl+"W1", force=True)
-                            cmds.connectAttr(ik_ctrl+".followChestA", rev_node+".inputX", force=True)
-                            cmds.connectAttr(rev_node+".outputX", quad_chest_pac+"."+self.ar.maker.root_ctrl+"W0", force=True)
 
 
     def limb_spring_solver(self, limb):

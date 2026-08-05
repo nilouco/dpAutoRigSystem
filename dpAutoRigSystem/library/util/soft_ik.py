@@ -137,7 +137,7 @@ class SoftIk(object):
             cmds.connectAttr(stretchBC+".outputG", softIkRigScaleClp+".inputR", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
-                for k in ["X", "Y", "Z"]:
+                for k in self.ar.data.axis:
                     cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+k, force=True)
                     cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
                 i += 1

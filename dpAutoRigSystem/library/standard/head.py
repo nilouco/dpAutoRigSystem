@@ -20,10 +20,10 @@ class Head(standard.BaseStandard, layout.BaseLayout):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.facialAttrList = ["facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
-        self.loadVariables()
+        self.load_variables()
 
 
-    def loadVariables(self, *args):
+    def load_variables(self, *args):
         """ Just load class variables here.
         """
         # declare variable
@@ -217,7 +217,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(self.deformerCube+".translateZ", 0.5)
         cmds.parent(self.deformerCube, self.cvDeformerCenterLoc)
         self.defRadiusMD = cmds.createNode("multiplyDivide", name=self.guideName+"_DeformerCube_MD")
-        for axis, attr in zip(["X", "Y", "Z"], ["width", "height", "depth"]):
+        for axis, attr in zip(self.ar.data.axis, ["width", "height", "depth"]):
             cmds.setAttr(self.defRadiusMD+".input2"+axis, 2)
             cmds.connectAttr(self.cvDeformerRadiusLoc+".translate"+axis, self.defRadiusMD+".input1"+axis)
             cmds.connectAttr(self.defRadiusMD+".output"+axis, defPolyCube+"."+attr)
@@ -285,7 +285,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
             cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
-            layout.BaseLayout.createPreviewMirror(self)
+            self.create_mirror_preview()
         cmds.select(self.guide_base)
     
 
@@ -577,7 +577,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
             self.worldRefList, self.upperCtrlList, self.upperJawCtrlList, self.facialCtrlGrpList = [], [], [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
                 # redeclaring variables:
                 self.redeclareVariables(self.userGuideName, side, "_Guide")
@@ -1190,7 +1190,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
 
-                    hdNet = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guideNet, ui=False)
+                    hdNet = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guide_net, ui=False)
 
                     self.addNodeToGuideNet([hdNet], ["hdNet"])
                     cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
@@ -1253,22 +1253,22 @@ class MinMaxValues(object):
 for net in cmds.ls(type="network"):
     if cmds.objExists(net+".dpNetwork") and cmds.getAttr(net+".dpNetwork") == 1:
         if cmds.objExists(net+".dpGuideNet") and cmds.getAttr(net+".dpGuideNet") == 1:
-            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+cmds.getAttr(self.guideNet+".dpID")+'''":
+            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+cmds.getAttr(self.guide_net+".dpID")+'''":
                 MinMaxValues(net)
         '''
-        cmds.lockNode(self.guideNet, lock=False)
-        cmds.addAttr(self.guideNet, longName="faceCtrl", attributeType="message")
-        cmds.addAttr(self.guideNet, longName="minMaxScriptNode", attributeType="message")
+        cmds.lockNode(self.guide_net, lock=False)
+        cmds.addAttr(self.guide_net, longName="faceCtrl", attributeType="message")
+        cmds.addAttr(self.guide_net, longName="minMaxScriptNode", attributeType="message")
         cmds.addAttr(fCtrl, longName="guideNet", attributeType="message")
-        cmds.connectAttr(fCtrl+".message", self.guideNet+".faceCtrl", force=True)
-        cmds.connectAttr(self.guideNet+".message", fCtrl+".guideNet", force=True)
-        sn = cmds.scriptNode(name=self.guideNet.replace("Net", 'MinMax_SN'), sourceType='python', scriptType=2, beforeScript=minMaxCode)
+        cmds.connectAttr(fCtrl+".message", self.guide_net+".faceCtrl", force=True)
+        cmds.connectAttr(self.guide_net+".message", fCtrl+".guideNet", force=True)
+        sn = cmds.scriptNode(name=self.guide_net.replace("Net", 'MinMax_SN'), sourceType='python', scriptType=2, beforeScript=minMaxCode)
         self.ar.custom_attr.addAttr(0, [sn]) #dpID
         cmds.addAttr(sn, longName="guideNet", attributeType="message")
-        cmds.connectAttr(sn+".message", self.guideNet+".minMaxScriptNode", force=True)
-        cmds.connectAttr(self.guideNet+".message", sn+".guideNet", force=True)
+        cmds.connectAttr(sn+".message", self.guide_net+".minMaxScriptNode", force=True)
+        cmds.connectAttr(self.guide_net+".message", sn+".guideNet", force=True)
         cmds.scriptNode(sn, executeBefore=True)
-        cmds.lockNode(self.guideNet, lock=True)
+        cmds.lockNode(self.guide_net, lock=True)
 
     
     def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
@@ -1399,7 +1399,7 @@ for net in cmds.ls(type="network"):
     def dpLockLimitAttr(self, fCtrl, ctrlName, lockList, limitList, limitMinY, *args):
         """ Lock or limit attributes for XYZ.
         """
-        for i, axis in enumerate(self.axisList):
+        for i, axis in enumerate(self.ar.data.axis):
             if lockList[i]:
                 cmds.setAttr(fCtrl+".translate"+axis, lock=True, keyable=False)
             else:
@@ -1470,7 +1470,7 @@ for net in cmds.ls(type="network"):
                     if guideSource.split(":")[0] in guideList:
                         if not node in resultList:
                             if self.mirrorAxis != 'off':
-                                if node.startswith(self.sideList[s]):
+                                if node.startswith(self.sides[s]):
                                     resultList.append(node)
                             else:
                                 resultList.append(node)

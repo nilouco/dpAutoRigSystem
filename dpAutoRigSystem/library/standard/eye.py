@@ -489,7 +489,7 @@ class Eye(standard.BaseStandard, layout.BaseLayout):
             # create the main control:
             self.eyeCtrl = self.ar.ctrls.cvControl("id_010_EyeLookAtMain", self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=(2.25*self.ctrlRadius), d=self.curveDegree, guideSource=self.guideName+"_JointEnd")
             cmds.addAttr(self.eyeCtrl, longName=self.ar.data.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
-            cmds.delete(cmds.parentConstraint(self.sideList[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
+            cmds.delete(cmds.parentConstraint(self.sides[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
             if self.mirrorAxis != 'off':
                 cmds.setAttr(self.eyeCtrl+".translate"+self.mirrorAxis, 0)
             self.eyeGrp = cmds.group(self.eyeCtrl, name=self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Grp")
@@ -497,7 +497,7 @@ class Eye(standard.BaseStandard, layout.BaseLayout):
             self.upLocGrp = cmds.group(name=self.userGuideName+"_UpLoc_Grp", empty=True)
             self.to_ids.append(self.upLocGrp)
             # run for all sides:
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 cmds.select(clear=True)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 # declare guide:

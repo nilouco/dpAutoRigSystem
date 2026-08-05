@@ -124,7 +124,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 # redeclaring variables:
                 self.base = side+self.userGuideName+"_Guide_Base"
                 self.cvFootLoc = side+self.userGuideName+"_Guide_Foot"

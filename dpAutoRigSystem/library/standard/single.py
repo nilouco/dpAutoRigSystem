@@ -100,7 +100,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 cmds.select(clear=True)
                 # declare guide:
@@ -119,7 +119,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                 indirectSkinRot = (0, 0, 0)
                 if self.ar.data.lang['c058_main'] in self.userGuideName:
                     ctrlTypeID = "id_054_SingleMain"
-                    if len(self.sideList) > 1:
+                    if len(self.sides) > 1:
                         if self.ar.data.lang['c041_eyebrow'] in self.userGuideName:
                             indirectSkinRot = (0, 0, -90)
                         else:
@@ -166,7 +166,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                     if s == 1:
                         if cmds.getAttr(self.guide_base+".flip") == 1:
                             invMD = cmds.createNode("multiplyDivide", name=jxtName.replace("_Jxt", "_Inv_MD"))
-                            for sAxis in ["X", "Y", "Z"]:
+                            for sAxis in self.ar.data.axis:
                                 cmds.setAttr(invMD+".input2"+sAxis, -1)
                                 cmds.connectAttr(self.singleCtrl+'.translate'+sAxis, invMD+'.input1'+sAxis, force=True)
                                 cmds.connectAttr(invMD+'.output'+sAxis, self.jnt+'.translate'+sAxis, force=True)

@@ -313,7 +313,7 @@ class Ribbon(object):
             cmds.delete(cmds.parentConstraint(lista[idx], extremLoc, maintainOffset=False))
             cornerAutoRotGrp = cmds.group(extremLoc, name=extremLoc+"_Grp")
             extremOrigLoc = cmds.duplicate(extremLoc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
-            for axis in ["X", "Y", "Z"]:
+            for axis in self.ar.data.axis:
                 cmds.connectAttr(lista[idx]+".rotate"+axis, extremLoc+".rotate"+axis, force=True)
                 cmds.setAttr(extremOrigLoc+".rotate"+axis, cmds.getAttr(extremLoc+".rotate"+axis))
             cmds.setAttr(cornerAutoRotGrp+".inheritsTransform", 0)

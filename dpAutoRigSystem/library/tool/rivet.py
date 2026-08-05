@@ -492,7 +492,7 @@ class Rivet(base.BaseLibrary):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
             Return inverted groups.
         """
-        axisList = ["X", "Y", "Z"]
+        axisList = self.ar.data.axis
         invTGrp = None
         invRGrp = None
         if cmds.objExists(nodeName):

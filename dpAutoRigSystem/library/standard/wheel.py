@@ -123,7 +123,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
             # declare lists to store names and attributes:
             self.mainCtrlList, self.wheelCtrlList, self.steeringGrpList, self.ctrlHookGrpList = [], [], [], []
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 # declare guides:
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvCenterLoc = side+self.userGuideName+"_Guide_CenterLoc"

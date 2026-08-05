@@ -18,6 +18,7 @@ class BaseLayout(base.BaseLibrary):
     def basicModuleLayout(self, *args):
         """ Create a Basic Module layout.
         """
+        print("TODO: userGuideName =", self.userGuideName) #TODO
         if self.ar.data.ui_state:
             # declaring facial variables
             self.browTgtList = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
@@ -464,7 +465,7 @@ class BaseLayout(base.BaseLibrary):
                     fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
                     if cmds.objExists(self.guide_base+".flip"):
                         cmds.setAttr(self.guide_base+".flip", fatherFlip)
-                self.createPreviewMirror()
+                self.create_mirror_preview()
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
     
@@ -502,7 +503,7 @@ class BaseLayout(base.BaseLibrary):
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
                     cmds.setAttr(self.guide_base+".mirrorAxis", self.mirrorAxis, type='string')
-                    self.createPreviewMirror()
+                    self.create_mirror_preview()
     
     
     def changeMirrorName(self, item, *args):
@@ -553,7 +554,7 @@ class BaseLayout(base.BaseLibrary):
         cmds.setAttr(self.guide_base+".dynamic", dynamicValue)
 
     
-    def createPreviewMirror(self, *args):
+    def create_mirror_preview(self):
         """ Just create the mirror preview nodes.
             It runs recursively.
         """
@@ -594,7 +595,7 @@ class BaseLayout(base.BaseLibrary):
                         for moduleInstance in self.ar.data.guide_instances:
                             if cmds.objExists(moduleInstance.guide_base):
                                 if cmds.getAttr(moduleInstance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
-                                    moduleInstance.createPreviewMirror()
+                                    moduleInstance.create_mirror_preview()
                 
                 # duplicating the moduleGuide
                 duplicated = cmds.duplicate(self.guide_base, returnRootsOnly=True)[0]
@@ -657,7 +658,7 @@ class BaseLayout(base.BaseLibrary):
                 cmds.connectAttr(self.guide_base+'.worldMatrix', decomposeMatrix+'.inputMatrix', force=True)
                 
                 # connect original guide base decomposeMatrix node output transformations to the mirror guide base node:
-                axisList = ["X", "Y", "Z"]
+                axisList = self.ar.data.axis
                 for axis in axisList:
                     cmds.connectAttr(decomposeMatrix+'.outputTranslate'+axis, self.previewMirrorGuide+'.translate'+axis, force=True)
                     cmds.connectAttr(decomposeMatrix+'.outputRotate'+axis, self.previewMirrorGuide+'.rotate'+axis, force=True)
@@ -722,7 +723,7 @@ class BaseLayout(base.BaseLibrary):
             if not instance in guideInstanceList:
                 guideInstanceList.insert(0, instance)
         for guideInstance in guideInstanceList:
-            guideName = guideInstance.guideNamespace.split("__")[-1]
+            guideName = guideInstance.guide_namespace.split("__")[-1]
             customName = cmds.getAttr(guideInstance.guide_base+".customName")
             if not customName:
                 customName = ""

@@ -190,7 +190,7 @@ class GuideIO(action.BaseAction):
                             start = self.ar.utils.get_translated_names(self.netDic["GuideData"][item]["mirrorName"][0])
                             end = self.ar.utils.get_translated_names(self.netDic["GuideData"][item]["mirrorName"][-1])
                             cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
-                            self.instance.createPreviewMirror()
+                            self.instance.create_mirror_preview()
                         elif baseAttr == "articulation":
                             self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
                         elif baseAttr == "nJoints":
@@ -322,7 +322,7 @@ class GuideIO(action.BaseAction):
                         self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+guideDic[net]['ModuleType'])
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library(self.netDic['ModuleType'], self.ar.data.standard_folder)[0]
-                        self.correlations[f"{self.netDic['ModuleType']}__dpAR_{self.netDic['GuideNumber']}"] = self.instance.guideNamespace
+                        self.correlations[f"{self.netDic['ModuleType']}__dpAR_{self.netDic['GuideNumber']}"] = self.instance.guide_namespace
                         self.instance.build_raw_guide()
                         self.setupInstanceChanges(rebuilding)
                         self.setupGuideTransformations()

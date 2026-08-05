@@ -87,7 +87,7 @@ class HeadDeformer(base.BaseLibrary):
         middleCtrlName = clusterName+self.ar.data.lang["m033_middle"]
         topCtrlName = clusterName+self.ar.data.lang["c099_top"]
         calibrateName = self.ar.data.lang["c111_calibrate"].lower()
-        axisList = ["X", "Y", "Z"]
+        axisList = self.ar.data.axis
         posList = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup

@@ -57,7 +57,7 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
             # declare lists to store names and attributes:
             self.steeringCtrlList = []
             # run for all sides
-            for s, side in enumerate(self.sideList):
+            for s, side in enumerate(self.sides):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 
                 cmds.select(clear=True)
