@@ -123,21 +123,21 @@ class Skinning(weights.Weights):
                 self.ar.logger.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
 
     
-    def serializeCopySkin(self, sourceList, destinationList, oneSource=True, byUVs=False, *args):
+    def serializeCopySkin(self, sourceList, destinations, oneSource=True, byUVs=False, *args):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
-        self.ar.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinationList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinations), addOne=False, addNumber=False)
         for sourceItem in sourceList:
             self.ar.utils.setProgress("Skinning: ")
             if oneSource:
-                for item in destinationList:
+                for item in destinations:
                     self.runCopySkin(sourceItem, item, byUVs)
                 self.ar.utils.setProgress(endIt=True)
                 return
             else:
                 if not sourceItem in ranList:
-                    for item in reversed(destinationList): #to avoid find the same item in the same given list
+                    for item in reversed(destinations): #to avoid find the same item in the same given list
                         if not sourceItem == item:
                             if sourceItem[sourceItem.rfind("|")+1:] == item[item.rfind("|")+1:]:
                                 if self.checkExistingDeformerNode(sourceItem)[0]:
@@ -209,7 +209,7 @@ class Skinning(weights.Weights):
             # get first selected item
             sourceItem = items[0]
             # get other selected items
-            destinationList = items[1:]
+            destinations = items[1:]
             shapeList = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
             if shapeList:
                 # check if there's a skinCluster node connected to the first selected item
@@ -217,7 +217,7 @@ class Skinning(weights.Weights):
                     if ui:
                         byUVs = self.getByUVsFromUI()
                     # call copySkin function
-                    self.serializeCopySkin([sourceItem], destinationList, True, byUVs)
+                    self.serializeCopySkin([sourceItem], destinations, True, byUVs)
                 else:
                     mel.eval("warning \""+self.ar.data.lang['e007_notSkinFound']+"\";")
             else:

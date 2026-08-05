@@ -744,15 +744,15 @@ class Controllers(object):
         return self.attrValueDic
 
 
-    def pasteAttr(self, destinationList=False, verbose=False, *args):
+    def pasteAttr(self, destinations=False, verbose=False, *args):
         """ Get to destination list and set the dictionary values on them.
         """
-        # getting destinationList:
-        if not destinationList:
-            destinationList = cmds.ls(selection=True, long=True)
-        if destinationList and self.attrValueDic:
-            # set dic values to destinationList:
-            for destItem in destinationList:
+        # getting destinations:
+        if not destinations:
+            destinations = cmds.ls(selection=True, long=True)
+        if destinations and self.attrValueDic:
+            # set dic values to destinations:
+            for destItem in destinations:
                 for attr in self.attrValueDic:
                     try:
                         cmds.setAttr(destItem+'.'+attr, self.attrValueDic[attr])
@@ -772,24 +772,24 @@ class Controllers(object):
         """
         # copy attributes and store them in the dictionary:
         self.copyAttr()
-        # get destinationList:
+        # get destinations:
         currentSelectedList = cmds.ls(selection=True, long=True)
         if currentSelectedList:
             if len(currentSelectedList) > 1:
-                destinationList = currentSelectedList[1:]
-                # calling function to paste attributes to destinationList:
-                self.pasteAttr(destinationList, verbose)
+                destinations = currentSelectedList[1:]
+                # calling function to paste attributes to destinations:
+                self.pasteAttr(destinations, verbose)
 
 
-    def transferAttr(self, sourceItem, destinationList, attrList, *args):
-        """ Transfer attributes from sourceItem to destinationList.
+    def transferAttr(self, sourceItem, destinations, attrList, *args):
+        """ Transfer attributes from sourceItem to destinations.
         """
-        if sourceItem and destinationList and attrList:
+        if sourceItem and destinations and attrList:
             self.copyAttr(sourceItem, attrList)
-            self.pasteAttr(destinationList)
+            self.pasteAttr(destinations)
 
 
-    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, force=False, *args):
+    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinations=None, keepColor=True, force=False, *args):
         """ Transfer control shape from sourceItem to destination list
         """
         if not sourceItem:
@@ -798,12 +798,12 @@ class Controllers(object):
                 # get first selected item
                 sourceItem = selList[0]
                 # get other selected items
-                destinationList = selList[1:]
+                destinations = selList[1:]
         if sourceItem:
             sourceShapeList = cmds.listRelatives(sourceItem, shapes=True, type="nurbsCurve", fullPath=True)
             if sourceShapeList:
-                if destinationList:
-                    for destTransform in destinationList:
+                if destinations:
+                    for destTransform in destinations:
                         needKeepVis = False
                         sourceVis = None
                         defList = False
@@ -871,9 +871,9 @@ class Controllers(object):
                             cmds.delete(self.destChildrenGrp)
                     if deleteSource:
                         # update cvControls attributes:
-                        self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
+                        self.transferAttr(sourceItem, destinations, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
-                    self.ar.custom_attr.addAttr(0, destinationList, shapes=True) #dpID
+                    self.ar.custom_attr.addAttr(0, destinations, shapes=True) #dpID
 
 
     def transferPlug(self, fromPlug, toPlug, value=True, connections=True, *args):
@@ -887,8 +887,8 @@ class Controllers(object):
                 if len(inputList) > 1:
                     raise RuntimeError(self.ar.data.lang['e023_unableTransferPlug'])
                 cmds.connectAttr(inputList[0], toPlug, force=True)
-            destinationList = cmds.listConnections(fromPlug, source=False, destination=True, plugs=True) or []
-            for dest in destinationList:
+            destinations = cmds.listConnections(fromPlug, source=False, destination=True, plugs=True) or []
+            for dest in destinations:
                 locked = cmds.getAttr(dest, lock=True)
                 if locked:
                     cmds.setAttr(dest, lock=False)
@@ -897,12 +897,12 @@ class Controllers(object):
                     cmds.setAttr(dest, lock=True)
 
 
-    def setSourceColorOverride(self, sourceItem, destinationList, *args):
+    def setSourceColorOverride(self, sourceItem, destinations, *args):
         """ Check if there's a colorOverride for destination shapes
             and try to set it to source shapes.
         """
         colorList = []
-        for item in destinationList:
+        for item in destinations:
             childShapeList = cmds.listRelatives(item, shapes=True, type="nurbsCurve", fullPath=True)
             if childShapeList:
                 for childShape in childShapeList:
@@ -945,7 +945,7 @@ class Controllers(object):
                             curDegree = 1 #linear
                         cmds.setAttr(item+".degree", curDegree)
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
-                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
+                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinations=[item], keepColor=True)
             cmds.select(transformList)
 
 
@@ -1177,7 +1177,7 @@ class Controllers(object):
             print(self.ar.data.lang['i198_mirrorPrefix'])
 
 
-    def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
+    def transferCalibration(self, sourceItem=False, destinations=False, attrList=False, verbose=True, *args):
         """ Transfer calibration attributes.
         """
         if not sourceItem:
@@ -1186,14 +1186,14 @@ class Controllers(object):
             if currentSelectionList:
                 if len(currentSelectionList) > 1:
                     sourceItem = currentSelectionList[0]
-                    destinationList = currentSelectionList[1:]
+                    destinations = currentSelectionList[1:]
         if sourceItem:
             if not attrList:
                 attrList = self.getListFromStringAttr(sourceItem)
             if attrList:
-                self.transferAttr(sourceItem, destinationList, attrList)
+                self.transferAttr(sourceItem, destinations, attrList)
             if verbose:
-                print(self.ar.data.lang['i195_transferedCalib'], sourceItem, destinationList, attrList)
+                print(self.ar.data.lang['i195_transferedCalib'], sourceItem, destinations, attrList)
         else:
             print(self.ar.data.lang['i042_notSelection'])
 
@@ -1367,7 +1367,7 @@ class Controllers(object):
                             if cmds.objectType(sourceRefNode) == "transform":
                                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destinationNode):
-                                    self.transferShape(deleteSource=False, clearDestinationShapes=True, sourceItem=sourceRefNode, destinationList=[destinationNode], keepColor=False)
+                                    self.transferShape(deleteSource=False, clearDestinationShapes=True, sourceItem=sourceRefNode, destinations=[destinationNode], keepColor=False)
                     # remove referenced file:
                     cmds.file(path, removeReference=True)
                     print("Imported shapes: {0}".format(path))
@@ -1508,7 +1508,7 @@ class Controllers(object):
                         mirrorShapeGrp = cmds.group(empty=True, name=duplicatedSource+"_MirrorShape_Grp")
                         cmds.parent(duplicatedGrp, mirrorShapeGrp)
                         cmds.setAttr(mirrorShapeGrp+".scale"+axis, -1)
-                        self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinationList=[destinationNode], keepColor=True, force=True)
+                        self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinations=[destinationNode], keepColor=True, force=True)
                         cmds.delete(mirrorShapeGrp)
         else:
             print(self.ar.data.lang['i198_mirrorPrefix'])
@@ -1662,7 +1662,7 @@ class Controllers(object):
         groundDirectionCtrl = self.cvControl("id_102_GroundDirection", "groundDirectionCtrl", r=self.dpCheckLinearUnit(radius), dir="+X", rot=(0, -90, 0))
         cmds.setAttr(groundDirectionCtrl+'.tz', self.dpCheckLinearUnit(translate))
         cmds.makeIdentity(groundDirectionCtrl, apply=True)
-        self.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=groundDirectionCtrl, destinationList=[ctrl], keepColor=True, force=False)
+        self.transferShape(deleteSource=True, clearDestinationShapes=False, sourceItem=groundDirectionCtrl, destinations=[ctrl], keepColor=True, force=False)
         # Add ground direction visibility attribute and connect
         cmds.addAttr(ctrl, longName="directionDisplay", attributeType="long", defaultValue=value, minValue=0, maxValue=1, keyable=False)
         cmds.setAttr(ctrl+".directionDisplay", channelBox=True)

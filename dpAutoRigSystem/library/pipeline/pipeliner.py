@@ -181,7 +181,7 @@ class Pipeliner(object):
         "s_supportNodeIO"    : self.ar.data.dp_data+"/dpSupportNode",
         "s_blendShapeIO"     : self.ar.data.dp_data+"/dpBlendShape",
         "s_shaderIO"         : self.ar.data.dp_data+"/dpShader",
-        "s_guideIO"          : self.ar.data.dp_data+"/dpGuide",
+        "s_guideIO"          : self.ar.data.dp_data+"/guide",
         "s_rivetIO"          : self.ar.data.dp_data+"/dpRivet",
         "s_parentingIO"      : self.ar.data.dp_data+"/dpParenting",
         "s_skinningIO"       : self.ar.data.dp_data+"/skinning",

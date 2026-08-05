@@ -13,32 +13,32 @@ class Cube(curve.BaseCurve):
         curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
     
     
-    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
+    def cvMain(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, *args):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
-        return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide)
+        return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide)
         
     
     
     def getLinearPoints(self):
         """ Get a list of linear points for this kind of control curve.
-            Set class object variables cvPointList, cvKnotList and cvPeriodic.
+            Set class object variables cv_points, cvKnotList and cv_periodic.
         """
-        r = self.cvSize
-        self.cvPointList = [(-r, -r, r), (-r, r, r), (r, r, r), (r, -r, r), (-r, -r, r), 
+        r = self.cv_size
+        self.cv_points = [(-r, -r, r), (-r, r, r), (r, r, r), (r, -r, r), (-r, -r, r), 
                             (-r, -r, -r), (-r, r, -r), (-r, r, r), (r, r, r), (r, r, -r), (r, -r, -r),
                             (r, -r, r), (r, -r, -r), (-r, -r, -r), (-r, r, -r), (r, r, -r)]
-        self.cvKnotList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-        self.cvPeriodic = False #open
+        self.cv_knots = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        self.cv_periodic = False #open
     
     
     def getCubicPoints(self):
         """ Get a list of cubic points for this kind of control curve.
-            Set class object variables cvPointList, cvKnotList and cvPeriodic.
+            Set class object variables cv_points, cvKnotList and cv_periodic.
         """
-        r = self.cvSize
-        self.cvPointList = [(-r, r, r), (-r, r, 0.75*r), (-r, r, -0.75*r), (-r, r, -r), (-0.75*r, r, -r), 
+        r = self.cv_size
+        self.cv_points = [(-r, r, r), (-r, r, 0.75*r), (-r, r, -0.75*r), (-r, r, -r), (-0.75*r, r, -r), 
                             (0.75*r, r, -r), (r, r, -r), (r, r, -0.75*r), (r, r, 0.75*r), (r, r, r), 
                             (0.75*r, r, r), (-0.75*r, r, r), (-r, r, r), (-r, r, 0.75*r), (-r, r, -0.75*r), 
                             (-r, r, 0.75*r), (-r, r, r), (-r, 0.75*r, r), (-r, -0.75*r,  r), (-r, -r, r), 
@@ -54,8 +54,8 @@ class Cube(curve.BaseCurve):
                             (r, r, r), (r, r, 0.75*r), (r, r, -0.75*r), (r, r, -r), (r, 0.75*r, -r),
                             (r, -0.75*r, -r), (r, -r, -r), (0.75*r, -r, -r), (-0.75*r, -r, -r), (-r, -r, -r),
                             (-r, -0.75*r, -r), (-r, 0.75*r, -r), (-r, r, -r), (-0.75*r, r, -r), (0.75*r, r, -r)]
-        self.cvKnotList = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+        self.cv_knots = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
                             26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
                             51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
                             76, 77, 78, 79, 80]
-        self.cvPeriodic = False #open
+        self.cv_periodic = False #open

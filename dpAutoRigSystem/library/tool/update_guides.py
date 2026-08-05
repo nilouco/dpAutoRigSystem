@@ -121,15 +121,15 @@ class UpdateGuides(base.BaseLibrary):
         return resultList
 
 
-    def getAttrValue(self, dpGuide, attr, locked=False):
+    def getAttrValue(self, guide, attr, locked=False):
         if locked:
             try:
-                return cmds.getAttr(dpGuide+'.'+attr, lock=True)
+                return cmds.getAttr(guide+'.'+attr, lock=True)
             except:
                 return False
         else:
             try:
-                return cmds.getAttr(dpGuide+'.'+attr, silent=True)
+                return cmds.getAttr(guide+'.'+attr, silent=True)
             except:
                 return ''
     
@@ -167,28 +167,28 @@ class UpdateGuides(base.BaseLibrary):
             return self.ar.data.lang['m028_arm']
 
 
-    def setAttrValue(self, dpGuide, attr, value):
+    def setAttrValue(self, guide, attr, value):
         try:
-            cmds.setAttr(dpGuide+'.'+attr, value)
+            cmds.setAttr(guide+'.'+attr, value)
         except:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+guide+'.'+attr+'\\n\";')
 
 
-    def setAttrStrValue(self, dpGuide, attr, value):
+    def setAttrStrValue(self, guide, attr, value):
         try:
-            cmds.setAttr(dpGuide+'.'+attr, value, type='string')
+            cmds.setAttr(guide+'.'+attr, value, type='string')
         except:
-            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
+            mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+guide+'.'+attr+'\\n\";')
     
 
-    def setEyelidGuideAttribute(self, dpGuide, value):
-        currentInstance = self.getNewGuideInstance(dpGuide)
+    def setEyelidGuideAttribute(self, guide, value):
+        currentInstance = self.getNewGuideInstance(guide)
         cvUpperEyelidLoc = currentInstance.guideName+"_UpperEyelidLoc"
         cvLowerEyelidLoc = currentInstance.guideName+"_LowerEyelidLoc"
         jEyelid = currentInstance.guideName+"_JEyelid"
         jUpperEyelid = currentInstance.guideName+"_JUpperEyelid"
         jLowerEyelid = currentInstance.guideName+"_JLowerEyelid"
-        cmds.setAttr(dpGuide+".eyelid", value)
+        cmds.setAttr(guide+".eyelid", value)
         cmds.setAttr(cvUpperEyelidLoc+".visibility", value)
         cmds.setAttr(cvLowerEyelidLoc+".visibility", value)
         cmds.setAttr(jEyelid+".visibility", value)
@@ -196,90 +196,90 @@ class UpdateGuides(base.BaseLibrary):
         cmds.setAttr(jLowerEyelid+".visibility", value)
 
 
-    def setIrisGuideAttribute(self, dpGuide, value):
-        currentInstance = self.getNewGuideInstance(dpGuide)
+    def setIrisGuideAttribute(self, guide, value):
+        currentInstance = self.getNewGuideInstance(guide)
         cvIrisLoc = currentInstance.guideName+"_IrisLoc"
-        cmds.setAttr(dpGuide+".iris", value)
+        cmds.setAttr(guide+".iris", value)
         cmds.setAttr(cvIrisLoc+".visibility", value)
 
 
-    def setPupilGuideAttribute(self, dpGuide, value):
-        currentInstance = self.getNewGuideInstance(dpGuide)
+    def setPupilGuideAttribute(self, guide, value):
+        currentInstance = self.getNewGuideInstance(guide)
         cvPupilLoc = currentInstance.guideName+"_PupilLoc"
-        cmds.setAttr(dpGuide+".pupil", value)
+        cmds.setAttr(guide+".pupil", value)
         cmds.setAttr(cvPupilLoc+".visibility", value)
 
 
-    def setNostrilGuideAttribute(self, dpGuide, value):
-        currentInstance = self.getNewGuideInstance(dpGuide)
-        cmds.setAttr(dpGuide+".nostril", value)
+    def setNostrilGuideAttribute(self, guide, value):
+        currentInstance = self.getNewGuideInstance(guide)
+        cmds.setAttr(guide+".nostril", value)
         cmds.setAttr(currentInstance.cvLNostrilLoc+".visibility", value)
         cmds.setAttr(currentInstance.cvRNostrilLoc+".visibility", value)
     
 
-    def checkSetNewGuideToAttr(self, dpGuide, attr, value):
+    def checkSetNewGuideToAttr(self, guide, attr, value):
         if value in self.updateData:
-            self.setAttrStrValue(dpGuide, attr, self.updateData[value]['newGuide'])
+            self.setAttrStrValue(guide, attr, self.updateData[value]['newGuide'])
         else:
-            self.setAttrStrValue(dpGuide, attr, value)
+            self.setAttrStrValue(guide, attr, value)
             
 
-    def setGuideAttributes(self, dpGuide, attr, value, lock=False):
+    def setGuideAttributes(self, guide, attr, value, lock=False):
         """ Verify if we have specific attribute cases to work with each kind of module guides.
             Ignore known attributes.
         """
         ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
         if attr not in ignoreList:
             if attr == 'nJoints':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.changeJointNumber(value)
             elif attr == 'style':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 if currentInstance.name == 'Limb':
                     expectedValue = self.translateLimbStyleValue(value)
                 else:
                     expectedValue = self.translateSpineStyleValue(value)
                 currentInstance.changeStyle(expectedValue)
             elif attr == 'type':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 expectedValue = self.translateLimbTypeValue(value)
                 currentInstance.changeType(expectedValue)
             elif attr == 'mirrorAxis':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.changeMirror(value)
             elif attr == 'mirrorName':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.changeMirrorName(value)
             elif attr == 'displayAnnotation':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.displayAnnotation(value)
             elif attr == 'rigType':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.rigType = value
-                self.setAttrStrValue(dpGuide, attr, value)
+                self.setAttrStrValue(guide, attr, value)
             elif attr == 'lockedList' and value != '':
-                self.setAttrStrValue(dpGuide, attr, value)
+                self.setAttrStrValue(guide, attr, value)
             # EYE ATTRIBUTES
             elif attr == 'eyelid':
-                self.setEyelidGuideAttribute(dpGuide, value)
+                self.setEyelidGuideAttribute(guide, value)
             elif attr == 'iris':
-                self.setIrisGuideAttribute(dpGuide, value)
+                self.setIrisGuideAttribute(guide, value)
             elif attr == 'pupil':
-                self.setPupilGuideAttribute(dpGuide, value)
+                self.setPupilGuideAttribute(guide, value)
             elif attr == 'aimDirection':
-                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance = self.getNewGuideInstance(guide)
                 aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
                 currentInstance.changeAimDirection(aimMenuItemList[value])
             # self.noseName ATTRIBUTES
             elif attr == 'nostril':
-                self.setNostrilGuideAttribute(dpGuide, value)
+                self.setNostrilGuideAttribute(guide, value)
             # self.suspensionName ATTRIBUTES AND self.wheelName ATTRIBUTES
             elif attr == 'fatherB' or attr == 'geo':
-                self.checkSetNewGuideToAttr(dpGuide, attr, value)
+                self.checkSetNewGuideToAttr(guide, attr, value)
             else:
-                self.setAttrValue(dpGuide, attr, value)
+                self.setAttrValue(guide, attr, value)
             if lock:
-                cmds.setAttr(f'{dpGuide}.{attr}', lock=True)
+                cmds.setAttr(f'{guide}.{attr}', lock=True)
             if self.ar.data.ui_state:
                 cmds.refresh()
     

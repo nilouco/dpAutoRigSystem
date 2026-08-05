@@ -52,7 +52,7 @@ class PassthroughAttributes(action.BaseAction):
                     # check optimization
                     for plug, connections in self.getConnectionDic(item).items():
                         sources = connections["sourceList"]
-                        destinations = connections["destinationList"]
+                        destinations = connections["destinations"]
                         if not sources or not destinations:
                             continue
                         if len(sources) == 1:
@@ -74,7 +74,7 @@ class PassthroughAttributes(action.BaseAction):
                                 for i in range(self.iterNumber):
                                     for plug, connections in self.getConnectionDic(item).items():
                                         sources = connections["sourceList"]
-                                        destinations = connections["destinationList"]
+                                        destinations = connections["destinations"]
                                         if not sources or not destinations:
                                             continue
                                         if len(sources) == 1:
@@ -154,8 +154,8 @@ class PassthroughAttributes(action.BaseAction):
                 dict: {plug: {"sources": sources, "destinations": destination}}
         """
         sourceList = cmds.listConnections(nodesOrPlugs, source=True, destination=False, connections=True, plugs=True, shapes=True, skipConversionNodes=skipConversionNodes) or []
-        destinationList = cmds.listConnections(nodesOrPlugs, source=False, destination=True, connections=True, plugs=True, shapes=True, skipConversionNodes=skipConversionNodes) or []
-        if not sourceList and not destinationList:
+        destinations = cmds.listConnections(nodesOrPlugs, source=False, destination=True, connections=True, plugs=True, shapes=True, skipConversionNodes=skipConversionNodes) or []
+        if not sourceList and not destinations:
             return {}
         
         plugs = set()
@@ -165,7 +165,7 @@ class PassthroughAttributes(action.BaseAction):
             plugs.add(plug)
         
         destinationsByPlugDic = defaultdict(list)
-        for plug, dest in self.pairwise(destinationList):
+        for plug, dest in self.pairwise(destinations):
             destinationsByPlugDic[plug].append(dest)
             plugs.add(plug)
         
@@ -173,6 +173,6 @@ class PassthroughAttributes(action.BaseAction):
         for plug in plugs:
             resultDic[plug] = {
                 "sourceList": sourcesByPlugDic.get(plug, []),
-                "destinationList": destinationsByPlugDic.get(plug, [])
+                "destinations": destinationsByPlugDic.get(plug, [])
             }
         return resultDic

@@ -570,20 +570,20 @@ class BaseAction(base.BaseLibrary):
             unparented_meshes = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
             if unparented_meshes:
                 for item in unparented_meshes:
-                    if not cmds.objExists(item+"."+self.ar.data.master_attr):
+                    if not self.ar.data.master_attr in cmds.listAttr(item):
                         father = item[:item[1:].find("|")+1]
                         if father:
-                            if not cmds.objExists(father+"."+self.ar.data.master_attr):
+                            if not self.ar.data.master_attr in cmds.listAttr(father):
                                 if not father in temps:
                                     temps.append(father)
         if temps:
             for node in temps:
                 is_cleaned = True
-                if not cmds.objExists(node+".guideBase") and not cmds.objExists(node+".dpGuide"):
+                if not "guideBase" in cmds.listAttr(node) and not "dpGuide" in cmds.listAttr(node):
                     children = cmds.listRelatives(node, children=True, allDescendents=True)
                     if children:
                         for child in children:
-                            if cmds.objExists(child+".guideBase") or cmds.objExists(child+".dpGuide"):
+                            if "guideBase" in cmds.listAttr(child) or "dpGuide" in cmds.listAttr(child):
                                 is_cleaned = False
                 else:
                     is_cleaned = False
@@ -632,14 +632,14 @@ class BaseAction(base.BaseLibrary):
                               "type"       : cmds.objectType(const)
                             }
                 for attr in attributes:
-                    if cmds.objExists(const+"."+attr):
+                    if attr in cmds.listAttr(const):
                         dic[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
                 dic[const]["worldUpMatrix"] = []
-                if cmds.objExists(const+".worldUpMatrix"):
+                if "worldUpMatrix" in cmds.listAttr(const):
                     dic[const]["worldUpMatrix"] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
                 dic[const]["constraintParentInverseMatrix"] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
                 dic[const]["target"] = {}
-                if cmds.objExists(const+".target"):
+                if "target" in cmds.listAttr(const):
                     target_attr = None
                     if cmds.objExists(const+".target[0].targetParentMatrix"):
                         target_attr = "targetParentMatrix"
@@ -654,7 +654,7 @@ class BaseAction(base.BaseLibrary):
                 # store connection info to disconnect when import if need to skip the constraint driving
                 for output_attr in output_attributes:
                     dic[const]["output"][output_attr] = None
-                    if cmds.objExists(const+"."+output_attr):
+                    if output_attr in cmds.listAttr(const):
                         if cmds.listConnections(const+"."+output_attr, source=False, destination=True):
                             dic[const]["output"][output_attr] = True
                         else:
@@ -718,7 +718,7 @@ class BaseAction(base.BaseLibrary):
                             cmds.connectAttr(constraint_data[item]["worldUpMatrix"][0]+".worldMatrix", const+".worldUpMatrix", force=True)
                         # disconnect to keep the same exported skip option
                         for output_attr in constraint_data[item]["output"].keys():
-                            if cmds.objExists(const+"."+output_attr):
+                            if output_attr in cmds.listAttr(const):
                                 if not constraint_data[item]["output"][output_attr]:
                                     connected_items = cmds.listConnections(const+"."+output_attr, source=False, destination=True, plugs=True)
                                     if connected_items:

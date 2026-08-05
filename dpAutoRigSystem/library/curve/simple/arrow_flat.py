@@ -16,34 +16,34 @@ class ArrowFlat(curve.BaseCurve):
             reload(curve)
     
     
-    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
+    def cvMain(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, *args):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
-        return self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide)
+        return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide)
         
     
     
     def getLinearPoints(self):
         """ Get a list of linear points for this kind of control curve.
-            Set class object variables cvPointList, cvKnotList and cvPeriodic.
+            Set class object variables cv_points, cvKnotList and cv_periodic.
         """
-        r = self.cvSize
-        self.cvPointList = [(0, 0, 0), (-0.5*r, 0.4*r, 0), (-0.25*r, 0.4*r, 0), (-0.25*r, r, 0), (0.25*r, r, 0), 
+        r = self.cv_size
+        self.cv_points = [(0, 0, 0), (-0.5*r, 0.4*r, 0), (-0.25*r, 0.4*r, 0), (-0.25*r, r, 0), (0.25*r, r, 0), 
                             (0.25*r, 0.4*r, 0), (0.5*r, 0.4*r, 0), (0, 0, 0)]
-        self.cvKnotList = [1, 2, 3, 4, 5, 6, 7, 8]
-        self.cvPeriodic = True #closed
+        self.cv_knots = [1, 2, 3, 4, 5, 6, 7, 8]
+        self.cv_periodic = True #closed
     
     
     def getCubicPoints(self):
         """ Get a list of cubic points for this kind of control curve.
-            Set class object variables cvPointList, cvKnotList and cvPeriodic.
+            Set class object variables cv_points, cvKnotList and cv_periodic.
         """
-        r = self.cvSize
-        self.cvPointList = [(0, 0, 0), (-0.125*r, 0.1*r, 0), (-0.25*r, 0.2*r, 0), (-0.5*r, 0.4*r, 0), (-0.465471500274*r, 0.4*r, 0),
+        r = self.cv_size
+        self.cv_points = [(0, 0, 0), (-0.125*r, 0.1*r, 0), (-0.25*r, 0.2*r, 0), (-0.5*r, 0.4*r, 0), (-0.465471500274*r, 0.4*r, 0),
                             (-0.298095832074*r, 0.4*r, 0), (-0.25*r, 0.4*r, 0), (-0.25*r, 0.45507734556*r, 0), (-0.25*r, 0.94955051446*r, 0), (-0.25*r, r, 0),
                             (-0.194052638657*r, r, 0), (0.219315978634*r, r, 0), (0.25*r, r, 0), (0.25*r, 0.94955051446*r, 0), (0.25*r, 0.45507734556*r, 0),
                             (0.25*r, 0.4*r, 0), (0.298095832074*r, 0.4*r, 0), (0.465471500274*r, 0.4*r, 0), (0.5*r, 0.4*r, 0), (0.25*r, 0.2*r, 0),
                             (0.125*r, 0.1*r, 0), (0, 0, 0), (-0.125*r, 0.1*r, 0), (-0.25*r, 0.2*r, 0)]
-        self.cvKnotList = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-        self.cvPeriodic = True #closed
+        self.cv_knots = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+        self.cv_periodic = True #closed
