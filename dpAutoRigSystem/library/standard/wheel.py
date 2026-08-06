@@ -21,13 +21,13 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-    def createModuleLayout(self, *args):
-        standard.BaseStandard.createModuleLayout(self)
+    def create_module_layout(self):
+        standard.BaseStandard.create_module_layout(self)
         layout.BaseLayout.basicModuleLayout(self)
     
     
-    def createGuide(self, *args):
-        standard.BaseStandard.createGuide(self)
+    def create_guide(self, *args):
+        self.create_guide_base()
         # Custom GUIDE:
         cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="geo", dataType='string')
@@ -37,42 +37,41 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(self.guide_base+".showControls", 1)
         cmds.setAttr(self.guide_base+".steering", 0)
         
-        self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
-        self.jGuideCenter = cmds.joint(name=self.guideName+"_JGuideCenter", radius=0.001)
+        self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
+        self.jGuideCenter = cmds.joint(name=self.name_guide+"_JGuideCenter", radius=0.001)
         cmds.setAttr(self.jGuideCenter+".template", 1)
         cmds.parent(self.jGuideCenter, self.guide_base, relative=True)
         
-        self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.guideName+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
+        self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
         self.ar.ctrls.colorShape([self.cvFrontLoc], "blue")
         self.ar.ctrls.shapeSizeSetup(self.cvFrontLoc)
         cmds.parent(self.cvFrontLoc, self.cvCenterLoc)
         cmds.setAttr(self.cvFrontLoc+".tx", 1.3)
-        self.jGuideFront = cmds.joint(name=self.guideName+"_JGuideFront", radius=0.001)
+        self.jGuideFront = cmds.joint(name=self.name_guide+"_JGuideFront", radius=0.001)
         cmds.setAttr(self.jGuideFront+".template", 1)
         cmds.transformLimits(self.cvFrontLoc, translationX=(1, 1), enableTranslationX=(True, False))
-        radiusCtrl = self.guide_base+"_RadiusCtrl"
         cvFrontLocPosNode = cmds.createNode("plusMinusAverage", name=self.cvFrontLoc+"_Pos_PMA")
         cmds.setAttr(cvFrontLocPosNode+".input1D[0]", -0.5)
-        cmds.connectAttr(radiusCtrl+".translateX", cvFrontLocPosNode+".input1D[1]")
+        cmds.connectAttr(self.radius_ctrl+".translateX", cvFrontLocPosNode+".input1D[1]")
         cmds.connectAttr(cvFrontLocPosNode+".output1D", self.cvFrontLoc+".tx")
         self.ar.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        self.cvInsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_InsideLoc", r=0.2, d=1, guide=True)
+        self.cvInsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_InsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvInsideLoc, self.cvCenterLoc)
         cmds.setAttr(self.cvInsideLoc+".tz", 0.3)
-        self.jGuideInside = cmds.joint(name=self.guideName+"_JGuideInside", radius=0.001)
+        self.jGuideInside = cmds.joint(name=self.name_guide+"_JGuideInside", radius=0.001)
         cmds.setAttr(self.jGuideInside+".template", 1)
         cmds.transformLimits(self.cvInsideLoc, tz=(0.01, 1), etz=(True, False))
         inverseRadius = cmds.createNode("multiplyDivide", name=self.guide_base+"_Radius_Inv_MD")
         cmds.setAttr(inverseRadius+".input2X", -1)
-        cmds.connectAttr(radiusCtrl+".translateX", inverseRadius+".input1X")
+        cmds.connectAttr(self.radius_ctrl+".translateX", inverseRadius+".input1X")
         cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
         self.ar.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
-        self.cvOutsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_OutsideLoc", r=0.2, d=1, guide=True)
+        self.cvOutsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_OutsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvOutsideLoc, self.cvCenterLoc)
         cmds.setAttr(self.cvOutsideLoc+".tz", -0.3)
-        self.jGuideOutside = cmds.joint(name=self.guideName+"_JGuideOutside", radius=0.001)
+        self.jGuideOutside = cmds.joint(name=self.name_guide+"_JGuideOutside", radius=0.001)
         cmds.setAttr(self.jGuideOutside+".template", 1)
         cmds.transformLimits(self.cvOutsideLoc, tz=(-1, 0.01), etz=(False, True))
         cmds.connectAttr(inverseRadius+".outputX", self.cvOutsideLoc+".translateY")
@@ -152,7 +151,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.ar.utils.addJointEndAttr([self.endJoint, self.mainEndJoint])
                 
                 # create controls:
-                self.wheelCtrl = self.ar.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
+                self.wheelCtrl = self.ar.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc")
                 # add clip shape on wheel shape and optimize control CV shapes:
                 self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 0) ), destinations=[self.wheelCtrl], keepColor=False)
                 self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 90) ), destinations=[self.wheelCtrl], keepColor=False)
@@ -170,9 +169,9 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete(self.wheelCtrl, constructionHistory=True)
                 
                 # create defaults controls shape
-                self.mainCtrl = self.ar.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
-                self.insideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_InsideLoc", parentTag=self.mainCtrl)
-                self.outsideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_OutsideLoc", parentTag=self.mainCtrl)
+                self.mainCtrl = self.ar.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                self.insideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.name_guide+"_InsideLoc", parentTag=self.mainCtrl)
+                self.outsideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.name_guide+"_OutsideLoc", parentTag=self.mainCtrl)
                 self.mainCtrlList.append(self.mainCtrl)
                 self.wheelCtrlList.append(self.wheelCtrl)
 
@@ -349,9 +348,9 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
                 # deform controls:
-                upperDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
-                middleDefCtrl = self.ar.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
-                lowerDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.guideName+"_CenterLoc", parentTag=self.wheelCtrl)
+                upperDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                middleDefCtrl = self.ar.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                lowerDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
                 defCtrlGrpList = self.ar.utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.userGuideName+"_Ctrl_Grp")
                 
@@ -402,7 +401,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
             self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
-        self.deleteModule()
+        self.delete_guide()
         self.renameUnitConversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     

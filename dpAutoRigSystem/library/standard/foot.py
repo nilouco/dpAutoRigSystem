@@ -27,32 +27,32 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
         self.aScalableGrp = []
 
 
-    def createModuleLayout(self, *args):
-        standard.BaseStandard.createModuleLayout(self)
+    def create_module_layout(self):
+        standard.BaseStandard.create_module_layout(self)
         layout.BaseLayout.basicModuleLayout(self)
 
 
-    def createGuide(self, *args):
-        standard.BaseStandard.createGuide(self)
+    def create_guide(self, *args):
+        self.create_guide_base()
         # Custom GUIDE:
         # create cvJointLoc and cvLocators:
-        self.cvFootLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_Foot", r=0.3, d=1, guide=True)
-        self.cvRFALoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_RfA", r=0.3, d=1, guide=True)
-        self.cvRFBLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_RfB", r=0.3, d=1, guide=True)
-        self.cvRFCLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_RfC", r=0.3, d=1, guide=True)
-        self.cvRFDLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_RfD", r=0.3, d=1, guide=True)
-        self.cvRFELoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_RfE", r=0.3, d=1, guide=True)
-        self.cvRFFLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_RfF", r=0.3, d=1, guide=True)
+        self.cvFootLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Foot", r=0.3, d=1, guide=True)
+        self.cvRFALoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfA", r=0.3, d=1, guide=True)
+        self.cvRFBLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfB", r=0.3, d=1, guide=True)
+        self.cvRFCLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfC", r=0.3, d=1, guide=True)
+        self.cvRFDLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfD", r=0.3, d=1, guide=True)
+        self.cvRFELoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfE", r=0.3, d=1, guide=True)
+        self.cvRFFLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfF", r=0.3, d=1, guide=True)
         # create jointGuides:
-        self.jGuideFoot = cmds.joint(name=self.guideName+"_JGuideFoot", radius=0.001)
-        self.jGuideRFF = cmds.joint(name=self.guideName+"_JGuideRfF", radius=0.001)
-        self.jGuideRFE = cmds.joint(name=self.guideName+"_JGuideRfE", radius=0.001)
+        self.jGuideFoot = cmds.joint(name=self.name_guide+"_JGuideFoot", radius=0.001)
+        self.jGuideRFF = cmds.joint(name=self.name_guide+"_JGuideRfF", radius=0.001)
+        self.jGuideRFE = cmds.joint(name=self.name_guide+"_JGuideRfE", radius=0.001)
         cmds.select(clear=True)
-        self.jGuideRFA = cmds.joint(name=self.guideName+"_JGuideRfA", radius=0.001)
-        self.jGuideRFD = cmds.joint(name=self.guideName+"_JGuideRfD", radius=0.001)
-        self.jGuideRFB = cmds.joint(name=self.guideName+"_JGuideRfB", radius=0.001)
-        self.jGuideRFC = cmds.joint(name=self.guideName+"_JGuideRfC", radius=0.001)
-        self.jGuideRFAC = cmds.joint(name=self.guideName+"_JGuideRfAC", radius=0.001)
+        self.jGuideRFA = cmds.joint(name=self.name_guide+"_JGuideRfA", radius=0.001)
+        self.jGuideRFD = cmds.joint(name=self.name_guide+"_JGuideRfD", radius=0.001)
+        self.jGuideRFB = cmds.joint(name=self.name_guide+"_JGuideRfB", radius=0.001)
+        self.jGuideRFC = cmds.joint(name=self.name_guide+"_JGuideRfC", radius=0.001)
+        self.jGuideRFAC = cmds.joint(name=self.name_guide+"_JGuideRfAC", radius=0.001)
         # set jointGuides as templates:
         cmds.setAttr(self.jGuideFoot+".template", 1)
         cmds.setAttr(self.jGuideRFA+".template", 1)
@@ -63,10 +63,10 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(self.jGuideRFF+".template", 1)
         cmds.parent(self.jGuideFoot, self.jGuideRFA, self.guide_base, relative=True)
         # create cvEnd:
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvRFFLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-        self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
+        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.parent(self.jGuideEnd, self.jGuideRFF)
         # make parents between cvLocs:
@@ -178,11 +178,11 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
                 # creating Fk controls:
-                self.footCtrl = self.ar.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Foot")
+                self.footCtrl = self.ar.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z", guideSource=self.name_guide+"_Foot")
                 self.footCtrlList.append(self.footCtrl)
                 cmds.setAttr(self.footCtrl+".rotateOrder", 1)
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
-                self.middleFootCtrl = self.ar.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfF")
+                self.middleFootCtrl = self.ar.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.name_guide+"_RfF")
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
                 cmds.matchTransform(self.footCtrl, self.cvFootLoc, position=True, rotation=True)
@@ -446,7 +446,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
             self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
-        self.deleteModule()
+        self.delete_guide()
         self.renameUnitConversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
 

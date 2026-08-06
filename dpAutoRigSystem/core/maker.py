@@ -33,8 +33,8 @@ class Maker(object):
             self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+name)
             cmds.refresh()
         mod, guide = self.create_raw_guide(module)
-        mod.editGuideModuleName(name)
-        cmds.setAttr(mod.radiusCtrl+".translateX", radius)
+        mod.set_guide_custom_name(name)
+        cmds.setAttr(mod.radius_ctrl+".translateX", radius)
         cmds.setAttr(mod.cvEndJoint+".translateZ", end)
         cmds.setAttr(guide+".translateX", t[0])
         cmds.setAttr(guide+".translateY", t[1])
@@ -144,7 +144,7 @@ class Maker(object):
         if custom_name_attr in current_attrs:
             custom_name_value = cmds.getAttr(selected_item+'.'+custom_name_attr)
             if custom_name_value != "" and custom_name_value != None:
-                new_guide_instance.editGuideModuleName(custom_name_value)
+                new_guide_instance.set_guide_custom_name(custom_name_value)
         self.ar.utils.setProgress(self.ar.data.lang['i067_duplicating'])
         if mirror_axis_attr in current_attrs:
             mirror_axis_value = cmds.getAttr(selected_item+'.'+mirror_axis_attr)

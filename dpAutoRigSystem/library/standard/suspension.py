@@ -16,8 +16,8 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-    def createModuleLayout(self, *args):
-        standard.BaseStandard.createModuleLayout(self)
+    def create_module_layout(self):
+        standard.BaseStandard.create_module_layout(self)
         layout.BaseLayout.basicModuleLayout(self)
     
     
@@ -25,22 +25,22 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
         return cmds.getAttr(self.guide_base + "." + moduleAttr)
         
     
-    def createGuide(self, *args):
-        standard.BaseStandard.createGuide(self)
+    def create_guide(self, *args):
+        self.create_guide_base()
         # Custom GUIDE:
         cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="fatherB", dataType='string')
         
-        self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocA", r=0.3, d=1, guide=True)
-        self.jAGuide = cmds.joint(name=self.guideName+"_jAGuide", radius=0.001)
+        self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
+        self.jAGuide = cmds.joint(name=self.name_guide+"_jAGuide", radius=0.001)
         cmds.setAttr(self.jAGuide+".template", 1)
         cmds.parent(self.jAGuide, self.guide_base, relative=True)
         
-        self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocB", r=0.3, d=1, guide=True)
+        self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
         cmds.parent(self.cvBLoc, self.cvALoc)
         cmds.setAttr(self.cvBLoc+".tz", 3)
         cmds.setAttr(self.cvBLoc+".rotateX", 180)
-        self.jBGuide = cmds.joint(name=self.guideName+"_jBGuide", radius=0.001)
+        self.jBGuide = cmds.joint(name=self.name_guide+"_jBGuide", radius=0.001)
         cmds.setAttr(self.jBGuide+".template", 1)
         cmds.transformLimits(self.cvBLoc, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvBLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
@@ -102,9 +102,9 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                     self.jointList.append(jnt)
                     
                     # create a control:
-                    mainCtrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter)
-                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter, parentTag=mainCtrl)
-                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter, parentTag=ctrl)
+                    mainCtrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+letter)
+                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=mainCtrl)
+                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=ctrl)
                     self.ar.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
                     self.ar.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:
@@ -177,7 +177,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
             self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
-        self.deleteModule()
+        self.delete_guide()
         self.renameUnitConversion()
     
     

@@ -33,9 +33,9 @@ class BaseStandard(base.BaseLibrary):
         self.guide_namespace = self.name+"__"+self.userGuideName
         # defining guideNamespace:
         cmds.namespace(setNamespace=":")
-        self.guideName = self.guide_namespace+":Guide"
-        self.guide_base = self.guideName+"_Base"
-        self.radiusCtrl = self.guide_base+"_RadiusCtrl"
+        self.name_guide = self.guide_namespace+":Guide"
+        self.guide_base = self.name_guide+"_Base"
+        self.radius_ctrl = self.guide_base+"_RadiusCtrl"
         self.annotation = self.guide_base+"_Ant"
 
 
@@ -52,7 +52,7 @@ class BaseStandard(base.BaseLibrary):
         if not cmds.namespace(exists=self.guide_namespace):
             cmds.namespace(add=self.guide_namespace)
             # create GUIDE for this module:
-            self.createGuide()
+            self.create_guide()
         
         self.load_raw_guide()
         return self.guide_base
@@ -63,86 +63,37 @@ class BaseStandard(base.BaseLibrary):
             self.userGuideName = userGuideName
         if self.ar.data.ui_state:
             # create the Module layout in the mainUI - modulesLayoutA:        
-            self.createModuleLayout()
+            self.create_module_layout()
         # update module instance info:
-        self.updateModuleInstanceInfo()
+        self.update_module_instance_info()
         self.guide_net = self.ar.utils.getNodeByMessage("net", self.guide_base)
         if self.guide_net:
             self.raw = cmds.getAttr(self.guide_net+".rawGuide")
 
-
     
-    def createModuleLayout(self, *args):
+    def create_module_layout(self):
         """ Create the Module Layout, so it will exists in the right as a new options to editModules.
         """
-        # MODULE LAYOUT:
-#        print("self.guide_base = ", self.guide_base)
-        layoutName = ""
+        layout_name = ""
         if "customName" in cmds.listAttr(self.guide_base):
-            layoutName = cmds.getAttr(self.guide_base+".customName")
-        if not layoutName:
-            layoutName = self.userGuideName
-        self.moduleLayoutName = self.ar.data.lang[self.title]+" - "+layoutName
+            layout_name = cmds.getAttr(self.guide_base+".customName")
+        if not layout_name:
+            layout_name = self.userGuideName
+        self.module_layout_name = self.ar.data.lang[self.title]+" - "+layout_name
         if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
-            self.moduleFrameLayout = cmds.frameLayout(self.moduleLayoutName , label=self.moduleLayoutName, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
-            self.topColumn = cmds.columnLayout(self.moduleLayoutName+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
+            self.module_fl = cmds.frameLayout(self.module_layout_name+"_fl" , label=self.module_layout_name, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
+            self.top_cl = cmds.columnLayout(self.module_layout_name+"_top_cl", adjustableColumn=True, parent=self.module_fl)
         # rig_guides_inst_cl -> here we have just the column layouts to be populated by modules.
     
     
-    def createGuide(self, *args):
-        """ Create the elements to Guide module in the scene, like controls, etc...
+    def create_guide_base(self):
+        """ Create the node elements to Guide module in the scene, like guides, attributes, etc...
         """
-        # GUIDE:
         self.ar.opt.check_use_default_render_layer()
-        # create guide base (main):
-        guideBaseList = self.ar.ctrls.cvBaseGuide(self.guide_base, r=2)
-        self.guide_base = guideBaseList[0]
-        self.radiusCtrl = guideBaseList[1]
-        # add attributes to be read when rigging module:
-        baseBooleanAttrList = ['guideBase', 'mirrorEnable', 'displayAnnotation']
-        for baseBooleanAttr in baseBooleanAttrList:
-            cmds.addAttr(self.guide_base, longName=baseBooleanAttr, attributeType='bool')
-            cmds.setAttr(self.guide_base+"."+baseBooleanAttr, 1)
-        
-        baseStringAttrList  = ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
-        for baseStringAttr in baseStringAttrList:
-            cmds.addAttr(self.guide_base, longName=baseStringAttr, dataType='string')
-        cmds.setAttr(self.guide_base+".moduleType", self.name, type='string')
-        cmds.setAttr(self.guide_base+".moduleNamespace", self.guide_base[:self.guide_base.rfind(":")], type='string')
-        cmds.setAttr(self.guide_base+".mirrorAxis", "off", type='string')
-        cmds.setAttr(self.guide_base+".mirrorName", self.ar.data.lang['p002_left']+' --> '+self.ar.data.lang['p003_right'], type='string')
-        cmds.setAttr(self.guide_base+".hookNode", "_Grp", type='string')
-        cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
-
-        cmds.setAttr(self.guide_base+".guideObjectInfo", self.ar.config.get_instance(self.name, [self.ar.data.standard_folder], "imported"), type='string')
-        cmds.setAttr(self.guide_base+".rigType", self.rigType, type='string')
-        cmds.setAttr(self.guide_base+".dpARVersion", self.ar.data.version, type='string')
-        
-        baseFloatAttrList = ['shapeSize', 'worldSize']
-        for baseFloatAttr in baseFloatAttrList:
-            cmds.addAttr(self.guide_base, longName=baseFloatAttr, attributeType='float', defaultValue=1)
-            cmds.setAttr(self.guide_base+"."+baseFloatAttr, keyable=True)
-
-        baseIntegerAttrList = ['degree']
-        for baseIntAttr in baseIntegerAttrList:
-            cmds.addAttr(self.guide_base, longName=baseIntAttr, attributeType='short')
-        cmds.setAttr(self.guide_base+".degree", self.ar.data.degree_option)
-        
-        baseIntegerAttrList = ['guideColorIndex']
-        for baseIntegerAttr in baseIntegerAttrList:
-            cmds.addAttr(self.guide_base, longName=baseIntegerAttr, attributeType='long')
-        for c, guideColorAttr in enumerate(['guideColorR', 'guideColorG', 'guideColorB']):
-            cmds.addAttr(self.guide_base, longName=guideColorAttr, attributeType='float')
-            cmds.setAttr(self.guide_base+"."+guideColorAttr, self.ar.ctrls.colorList[0][c])
-
-        # create annotation to this module:
-        self.annotation = cmds.annotate(self.guide_base, tx=self.guide_base, point=(0,2,0))
-        self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]
-        self.annotation = cmds.rename(self.annotation, self.guide_base+"_Ant")
-        cmds.parent(self.annotation, self.guide_base)
-        cmds.setAttr(self.annotation+'.text', self.guide_base[self.guide_base.find("__")+2:self.guide_base.rfind(":")], type='string')
-        cmds.setAttr(self.annotation+'.template', 1)
-        cmds.connectAttr(self.guide_base+"_RadiusCtrl.translateX", self.annotation+".translateY", force=True)
+        # create guide base (main guide node):
+        self.guide_base, self.radius_ctrl = self.ar.ctrls.cvBaseGuide(self.guide_base, r=2)
+        self.add_guide_base_attr()
+        self.create_guide_annotation()
         # setup worldSize
         self.ar.ctrls.getDPARTempGrp()
         self.createWorldSize()
@@ -151,16 +102,56 @@ class BaseStandard(base.BaseLibrary):
         self.ar.data.guide_instances.append(self)
         if self.ar.data.ui_state:
             self.ar.ui_manager.update_guide_footer()
+
+
+    def add_guide_base_attr(self):
+        # add attributes to be read when rigging module:
+        for bool_attr in ['guideBase', 'mirrorEnable', 'displayAnnotation']:
+            cmds.addAttr(self.guide_base, longName=bool_attr, attributeType='bool')
+            cmds.setAttr(self.guide_base+"."+bool_attr, 1)
+        for str_attr in ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']:
+            cmds.addAttr(self.guide_base, longName=str_attr, dataType='string')
+        cmds.setAttr(self.guide_base+".moduleType", self.name, type='string')
+        cmds.setAttr(self.guide_base+".moduleNamespace", self.guide_base[:self.guide_base.rfind(":")], type='string')
+        cmds.setAttr(self.guide_base+".mirrorAxis", "off", type='string')
+        cmds.setAttr(self.guide_base+".mirrorName", self.ar.data.lang['p002_left']+' --> '+self.ar.data.lang['p003_right'], type='string')
+        cmds.setAttr(self.guide_base+".hookNode", "_Grp", type='string')
+        cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
+        cmds.setAttr(self.guide_base+".guideObjectInfo", self.ar.config.get_instance(self.name, [self.ar.data.standard_folder], "imported"), type='string')
+        cmds.setAttr(self.guide_base+".rigType", self.rigType, type='string')
+        cmds.setAttr(self.guide_base+".dpARVersion", self.ar.data.version, type='string')
+        for float_attr in ['shapeSize', 'worldSize']:
+            cmds.addAttr(self.guide_base, longName=float_attr, attributeType='float', defaultValue=1)
+            cmds.setAttr(self.guide_base+"."+float_attr, keyable=True)
+        for int_short_attr in ['degree']:
+            cmds.addAttr(self.guide_base, longName=int_short_attr, attributeType='short')
+        cmds.setAttr(self.guide_base+".degree", self.ar.data.degree_option)
+        for int_long_attr in ['guideColorIndex']:
+            cmds.addAttr(self.guide_base, longName=int_long_attr, attributeType='long')
+        for c, guide_color_attr in enumerate(['guideColorR', 'guideColorG', 'guideColorB']):
+            cmds.addAttr(self.guide_base, longName=guide_color_attr, attributeType='float')
+            cmds.setAttr(self.guide_base+"."+guide_color_attr, self.ar.ctrls.colorList[0][c])
+
+
+    def create_guide_annotation(self):
+        # create annotation to this module:
+        self.annotation = cmds.annotate(self.guide_base, tx=self.guide_base, point=(0,2,0))
+        self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]
+        self.annotation = cmds.rename(self.annotation, self.guide_base+"_Ant")
+        cmds.parent(self.annotation, self.guide_base)
+        cmds.setAttr(self.annotation+'.text', self.guide_base[self.guide_base.find("__")+2:self.guide_base.rfind(":")], type='string')
+        cmds.setAttr(self.annotation+'.template', 1)
+        cmds.connectAttr(self.radius_ctrl+".translateX", self.annotation+".translateY", force=True)
+
     
-    
-    def updateModuleInstanceInfo(self, *args):
+    def update_module_instance_info(self):
         """ Just update modeuleInstanceInfo attribute in the guideNode transform.
         """
         cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
     
     
-    def verifyGuideModuleIntegrity(self, *args):
-        """ This function verify the integrity of the current module.
+    def check_guide_integrity(self):
+        """ This function verify the integrity of the current module guide checking if there's an active guideBase attribute.
             Returns True if Ok and False if Fail.
         """
         # conditionals to be elegible as a rigged guide module:
@@ -170,14 +161,14 @@ class BaseStandard(base.BaseLibrary):
                     return True
                 else:
                     try:
-                        self.deleteModule()
+                        self.delete_guide()
                         mel.eval('warning \"'+ self.ar.data.lang['e000_guideNotFound'] +' - '+ self.guide_base +'\";')
                     except:
                         pass
                     return False
     
     
-    def deleteModule(self, *args):
+    def delete_guide(self, *args):
         """ Delete the Guide, ModuleLayout and Namespace.
         """
         for item in [self.guide_base[:self.guide_base.find(":")]+"_MirrorGrp",
@@ -187,36 +178,35 @@ class BaseStandard(base.BaseLibrary):
         # delete the guide module:
         self.ar.utils.clearNodeGrp(self.guide_base, 'guideBase', unparent=True)
         # remove the namespaces:
-        allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
-        if self.guide_namespace in allNamespaceList:
+        if self.guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
             cmds.namespace(moveNamespace=(self.guide_namespace, ':'), force=True)
             cmds.namespace(removeNamespace=self.guide_namespace, force=True)
         if not self.ar.data.rebuilding:
             self.ar.ui_manager.refresh_ui(clear_selection=True)
     
 
-    def duplicateModule(self, *args):
-        """ This module will just do a simple duplicate from Maya because we have a scriptJob to do the creating a new instance setup.
+    def duplicate_guide(self, *args):
+        """ This module will just do a simple duplicate from Maya because we have a scriptJob to do the setup creation of a new guide instance.
         """
         cmds.duplicate(self.guide_base)
 
     
-    def editGuideModuleName(self, checkText=None, pad=1, *args):
-        """ Edit the userGuideName to use the user custom name from module UI.
+    def set_guide_custom_name(self, check_text=None, pad=1, *args):
+        """ Edit the userGuideName to set the user custom name from module UI.
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
-            if checkText:
-                self.enteredText = checkText
+        if self.check_guide_integrity():
+            if check_text:
+                inputted_text = check_text
             else:
                 try:
                     # get the entered text:
-                    self.enteredText = cmds.textField(self.userName, query=True, text=True)
+                    inputted_text = cmds.textField(self.userName, query=True, text=True)
                 except:
-                    self.enteredText = ""
-            self.enteredText = self.enteredText.replace(" ", "_")
+                    inputted_text = ""
+            inputted_text = inputted_text.replace(" ", "_")
             # call utils to return the normalized text:
-            self.custom_name = self.ar.utils.normalizeText(self.enteredText, prefixMax=30)
+            self.custom_name = self.ar.utils.normalizeText(inputted_text, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.custom_name == "":
                 try:
@@ -226,25 +216,25 @@ class BaseStandard(base.BaseLibrary):
                 cmds.setAttr(self.guide_base+".customName", "", type='string')
                 self.userGuideName = self.guide_namespace.split("__")[-1]
             else:
-                baseName = self.custom_name
-                suffixNumberList = self.ar.utils.getSuffixNumberList(self.custom_name)
-                if suffixNumberList[1]:
-                    baseName = suffixNumberList[1]
-                dpAR_nameList = []
+                base_name = self.custom_name
+                suffix_numbers = self.ar.utils.getSuffixNumberList(self.custom_name)
+                if suffix_numbers[1]:
+                    base_name = suffix_numbers[1]
+                dpar_names = []
                 nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
                 for net in nets:
-                    if baseName == self.ar.utils.getSuffixNumberList(cmds.getAttr(net+".guideName"))[1]:
-                        dpAR_nameList.append(cmds.getAttr(net+".guideName"))
-                if dpAR_nameList:
-                    if self.custom_name in dpAR_nameList:
-                        for n in range(1, len(dpAR_nameList)+2):
-                            if not baseName+str(n).zfill(pad) in dpAR_nameList:
-                                self.custom_name = baseName+str(n).zfill(pad)
+                    if base_name == self.ar.utils.getSuffixNumberList(cmds.getAttr(net+".guideName"))[1]:
+                        dpar_names.append(cmds.getAttr(net+".guideName"))
+                if dpar_names:
+                    if self.custom_name in dpar_names:
+                        for n in range(1, len(dpar_names)+2):
+                            if not base_name+str(n).zfill(pad) in dpar_names:
+                                self.custom_name = base_name+str(n).zfill(pad)
                                 break
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField(self.userName, edit=True, text=self.custom_name)
-                    cmds.frameLayout(self.moduleFrameLayout, edit=True, label=self.ar.data.lang[self.title]+" - "+self.custom_name)
+                    cmds.frameLayout(self.module_fl, edit=True, label=self.ar.data.lang[self.title]+" - "+self.custom_name)
                 except:
                     pass
                 cmds.setAttr(self.guide_base+".customName", self.custom_name, type='string')
@@ -255,103 +245,103 @@ class BaseStandard(base.BaseLibrary):
                 self.userGuideName = self.custom_name
                 
 
-    def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
+    def setup_corrective_net(self, ctrl, first_node, second_node, net_name, axis, axis_order, input_end_value, is_leg=None, legs=None):
         """ Create the correction manager network node and returns it.
-            legList = [
+            legs = [
                         0 = rename,
                         1 = axis,
-                        2 = axisOrder
+                        2 = axis_order
                         3 = inputValue,
                     ]
         """
         if not cmds.objExists(ctrl+"."+self.ar.data.lang['c124_corrective']):
             cmds.addAttr(ctrl, longName=self.ar.data.lang['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # corrective network node
-        correctiveNet = self.correction_manager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correction_manager.angleName, toRivet=False, fromUI=False)
-        cmds.connectAttr(ctrl+"."+self.ar.data.lang['c124_corrective'], correctiveNet+".corrective", force=True)
-        cmds.setAttr(correctiveNet+".axis", axis)
-        cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
-        if isLeg:
-            cmds.setAttr(correctiveNet+".axis", legList[1])
-            cmds.setAttr(correctiveNet+".axisOrder", legList[2])
-        correctionNetInputValue = cmds.getAttr(correctiveNet+".inputValue")
-        if correctionNetInputValue+inputEndValue == 0:
-            inputEndValue += 1
-        cmds.setAttr(correctiveNet+".inputStart", correctionNetInputValue) #offset default position
-        cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+inputEndValue)
-        if isLeg:
-            if correctionNetInputValue+legList[3] == 0:
-                legList[3] += 1
-            cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+legList[3])
-            correctiveNet = self.correction_manager.changeName(legList[0])+"_Net"
-        return correctiveNet
+        net = self.correction_manager.createCorrectionManager([first_node, second_node], name=net_name, correctType=self.correction_manager.angleName, toRivet=False, fromUI=False)
+        cmds.connectAttr(ctrl+"."+self.ar.data.lang['c124_corrective'], net+".corrective", force=True)
+        cmds.setAttr(net+".axis", axis)
+        cmds.setAttr(net+".axisOrder", axis_order)
+        if is_leg:
+            cmds.setAttr(net+".axis", legs[1])
+            cmds.setAttr(net+".axisOrder", legs[2])
+        net_input_value = cmds.getAttr(net+".inputValue")
+        if net_input_value+input_end_value == 0:
+            input_end_value += 1
+        cmds.setAttr(net+".inputStart", net_input_value) #offset default position
+        cmds.setAttr(net+".inputEnd", net_input_value+input_end_value)
+        if is_leg:
+            if net_input_value+legs[3] == 0:
+                legs[3] += 1
+            cmds.setAttr(net+".inputEnd", net_input_value+legs[3])
+            net = self.correction_manager.changeName(legs[0])+"_Net"
+        return net
 
 
-    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, invertList, mirrorList=None, *args):
+    def setup_corrective_controllers(self, corrective_joints, s, label_name, corrective_nets, calibrate_presets, inverts, mirrors=None):
         """ Create corrective joint controllers.
         """
-        if jcrList:
+        if corrective_joints:
             l = 0
-            sDefault = s
-            mirrorPrefixList = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
-            for i, jcr in enumerate(jcrList):
+            s_default = s
+            mirror_prefixes = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
+            for i, jcr in enumerate(corrective_joints):
                 if not i == 0: #exclude jar in the index 0
                     # logic to mirror calibration setup for left and right sides of a centered module like neck/head
                     m = i
-                    if mirrorList:
-                        if mirrorList[i]:
+                    if mirrors:
+                        if mirrors[i]:
                             s += 1
                             if l == 0:
-                                oldJcr = jcr
-                                jcr = cmds.rename(jcr, mirrorPrefixList[l]+"_"+jcr)
+                                old_jcr = jcr
+                                jcr = cmds.rename(jcr, mirror_prefixes[l]+"_"+jcr)
                             else:
-                                jcr = cmds.rename(jcr, mirrorPrefixList[l]+"_"+oldJcr)
+                                jcr = cmds.rename(jcr, mirror_prefixes[l]+"_"+old_jcr)
                                 m -= 1
-                            jcrList[i] = jcr
+                            corrective_joints[i] = jcr
                             l += 1
                         else:
                             m = i
-                            s = sDefault
+                            s = s_default
                     else:
-                        s = sDefault
+                        s = s_default
                     # add joint label, create controller, zeroOut
-                    self.ar.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, labelName+"_"+str(m))
-                    jcrCtrl, jcrGrp = self.ar.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
-                    cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
+                    self.ar.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, label_name+"_"+str(m))
+                    jcr_ctrl, jcr_grp = self.ar.ctrls.createCorrectiveJointCtrl(corrective_joints[i], corrective_nets[i], radius=self.ctrlRadius*0.2)
+                    cmds.parent(jcr_grp, self.corrective_ctrls_grp)
                     # preset calibration
-                    for calibrateAttr in calibratePresetList[i].keys():
-                        if "calibrateT" in calibrateAttr:
-                            cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr]*self.ctrlRadius)
+                    for calibrate_attr in calibrate_presets[i].keys():
+                        if "calibrateT" in calibrate_attr:
+                            cmds.setAttr(jcr_ctrl+"."+calibrate_attr, calibrate_presets[i][calibrate_attr]*self.ctrlRadius)
                         else:
-                            cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
-                    if invertList:
-                        invertAttrList = invertList[i]
-                        if invertAttrList:
-                            for invertAttr in invertAttrList:
-                                cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
-                                cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
+                            cmds.setAttr(jcr_ctrl+"."+calibrate_attr, calibrate_presets[i][calibrate_attr])
+                    if inverts:
+                        invert_attrs = inverts[i]
+                        if invert_attrs:
+                            for invert_attr in invert_attrs:
+                                cmds.setAttr(jcr_ctrl+"."+invert_attr, 1)
+                                cmds.addAttr(jcr_ctrl+"."+invert_attr, edit=True, defaultValue=1)
 
 
-    def changeMainCtrlsNumber(self, enteredNCtrls, *args):
+    def change_main_ctrls_number(self, inputted_number, *args):
         """ Edit the number of main controllers in the guide.
         """
         self.ar.opt.check_use_default_render_layer()
         # get the number of main controllers entered by user:
-        if enteredNCtrls == 0:
-            try:
-                self.nMainCtrlAttr = cmds.intField(self.nMainCtrlIF, query=True, value=True)
-            except:
+        if inputted_number == 0:
+            if self.ar.data.ui_state:
+                main_number = cmds.intField(self.nMainCtrlIF, query=True, value=True)
+            else:
                 return
         else:
-            self.nMainCtrlAttr = enteredNCtrls
+            main_number = inputted_number
         # limit range
-        if self.nMainCtrlAttr >= self.currentNJoints:
-            self.nMainCtrlAttr = self.currentNJoints - 1
-            if self.nMainCtrlAttr == 0:
-                self.nMainCtrlAttr = 1
+        if main_number >= self.currentNJoints:
+            main_number = self.currentNJoints - 1
+            if main_number == 0:
+                main_number = 1
                 cmds.checkBox(self.mainCtrlsCB, edit=True, editable=False)
-            cmds.intField(self.nMainCtrlIF, edit=True, value=self.nMainCtrlAttr)
-        cmds.setAttr(self.guide_base+".nMain", self.nMainCtrlAttr)
+            cmds.intField(self.nMainCtrlIF, edit=True, value=main_number)
+        cmds.setAttr(self.guide_base+".nMain", main_number)
 
 
     def changeStyle(self, style, *args):
@@ -366,7 +356,7 @@ class BaseStandard(base.BaseLibrary):
             cmds.setAttr(self.guide_base+".style", 2)
 
 
-    def enableMainCtrls(self, value, *args):
+    def enable_main_ctrls(self, value):
         """ Just enable or disable the main controllers int field UI.
         """
         cmds.intField(self.nMainCtrlIF, edit=True, editable=value)
@@ -377,7 +367,7 @@ class BaseStandard(base.BaseLibrary):
         """ Just store the main controllers checkBox value and enable the int field.
         """
         cmds.setAttr(self.guide_base+".mainControls", value)
-        self.enableMainCtrls(value)
+        self.enable_main_ctrls(value)
 
 
     def addFkMainCtrls(self, side, ctrlList, *args):
@@ -400,7 +390,7 @@ class BaseStandard(base.BaseLibrary):
                 currentCtrlZero = cmds.listRelatives(currentCtrl, parent=True)[0]
                 if n == startAt:
                     # create a main controller
-                    mainCtrl = self.ar.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.guideName+"_Base", parentTag=self.getParentToTag(mainCtrlList))
+                    mainCtrl = self.ar.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.name_guide+"_Base", parentTag=self.getParentToTag(mainCtrlList))
                     mainCtrlList.append(mainCtrl)
                     self.ar.ctrls.colorShape([mainCtrl], "cyan")
                     cmds.addAttr(mainCtrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
@@ -482,7 +472,7 @@ class BaseStandard(base.BaseLibrary):
         self.ar.utils.closeUI(self.ar.data.plus_info_win_name)
         self.ar.utils.closeUI(self.ar.data.color_override_win_name)
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             self.to_ids = []
             self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
             try:
@@ -498,8 +488,8 @@ class BaseStandard(base.BaseLibrary):
             self.ar.opt.check_use_default_render_layer()
             
             # get the radius value to controls:
-            if cmds.objExists(self.radiusCtrl):
-                self.ctrlRadius = self.ar.utils.getCtrlRadius(self.radiusCtrl)
+            if cmds.objExists(self.radius_ctrl):
+                self.ctrlRadius = self.ar.utils.getCtrlRadius(self.radius_ctrl)
             else:
                 self.ctrlRadius = 1
                 
@@ -593,7 +583,7 @@ class BaseStandard(base.BaseLibrary):
         cmds.lockNode(self.guide_net, lock=False)
         cmds.connectAttr(self.guide_net+".message", self.guide_base+".net", force=True)
         cmds.connectAttr(self.guide_base+".message", self.guide_net+".linkedNode", force=True)
-        self.addNodeToGuideNet([self.guide_base, self.radiusCtrl, self.annotation], ["main", "radiusCtrl", "annotation"])
+        self.addNodeToGuideNet([self.guide_base, self.radius_ctrl, self.annotation], ["main", "radiusCtrl", "annotation"])
 
     
     def addNodeToGuideNet(self, nodeList, messageAttrList, *args):

@@ -184,7 +184,7 @@ class GuideIO(action.BaseAction):
                             if custom_name:
                                 if not rebuilding: #template
                                     custom_name = self.ar.utils.get_translated_names(custom_name)
-                                self.instance.editGuideModuleName(custom_name)
+                                self.instance.set_guide_custom_name(custom_name)
                         elif baseAttr == "mirrorAxis":
                             cmds.setAttr(new_item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
                             start = self.ar.utils.get_translated_names(self.netDic["GuideData"][item]["mirrorName"][0])

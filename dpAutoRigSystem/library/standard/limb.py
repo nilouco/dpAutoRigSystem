@@ -65,8 +65,8 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         self.ankleCorrectiveList = []
 
 
-    def createModuleLayout(self, *args):
-        standard.BaseStandard.createModuleLayout(self)
+    def create_module_layout(self):
+        standard.BaseStandard.create_module_layout(self)
         layout.BaseLayout.basicModuleLayout(self)
 
 
@@ -95,8 +95,8 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
 
 
     # @utils.profiler
-    def createGuide(self, *args):
-        standard.BaseStandard.createGuide(self)
+    def create_guide(self, *args):
+        self.create_guide_base()
         # Custom GUIDE:
         cmds.addAttr(self.guide_base, longName="type", attributeType='enum', enumName=self.ar.data.lang['m028_arm']+':'+self.ar.data.lang['m030_leg'])
         cmds.addAttr(self.guide_base, longName="hasBend", attributeType='bool')
@@ -114,12 +114,12 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
 
         # create cvJointLoc and cvLocators:
-        self.cvBeforeLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_Before", r=0.3, d=1, guide=True)
-        self.cvMainLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_Main", r=0.5, d=1, guide=True, pin=False)
-        self.cvCornerLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_Corner", r=0.3, d=1, guide=True)
-        self.cvCornerBLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_CornerB", r=0.5, d=1, guide=True)
-        self.cvExtremLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.guideName+"_Extrem", r=0.5, d=1, guide=True)
-        self.cvUpVectorLoc = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_CornerUpVector", r=0.5, d=1, guide=True)
+        self.cvBeforeLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Before", r=0.3, d=1, guide=True)
+        self.cvMainLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Main", r=0.5, d=1, guide=True, pin=False)
+        self.cvCornerLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_Corner", r=0.3, d=1, guide=True)
+        self.cvCornerBLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_CornerB", r=0.5, d=1, guide=True)
+        self.cvExtremLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Extrem", r=0.5, d=1, guide=True)
+        self.cvUpVectorLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_CornerUpVector", r=0.5, d=1, guide=True)
         
         # set quadruped locator config:
         cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
@@ -128,10 +128,10 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
 
         # create jointGuides:
         cmds.select(clear=True)
-        self.jGuideBefore = cmds.joint(name=self.guideName+"_JGuideBefore", radius=0.001)
-        self.jGuideMain = cmds.joint(name=self.guideName+"_JGuideMain", radius=0.001)
-        self.jGuideCorner = cmds.joint(name=self.guideName+"_JGuideCorner", radius=0.001)
-        self.jGuideExtrem = cmds.joint(name=self.guideName+"_JGuideExtrem", radius=0.001)
+        self.jGuideBefore = cmds.joint(name=self.name_guide+"_JGuideBefore", radius=0.001)
+        self.jGuideMain = cmds.joint(name=self.name_guide+"_JGuideMain", radius=0.001)
+        self.jGuideCorner = cmds.joint(name=self.name_guide+"_JGuideCorner", radius=0.001)
+        self.jGuideExtrem = cmds.joint(name=self.name_guide+"_JGuideExtrem", radius=0.001)
 
         # create cornerGroups:
         self.cornerGrp = cmds.group(self.cvCornerLoc, name=self.cvCornerLoc+"_Grp")
@@ -144,10 +144,10 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         cmds.parent(self.jGuideBefore, self.guide_base, relative=True)
 
         # create cvEnd:
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvExtremLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-        self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
+        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.parent(self.jGuideEnd, self.jGuideExtrem)
 
@@ -225,14 +225,14 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         """ AimConstraint setup in order to auto orient mainGuide with CornerGuide
         """ 
         # re-declaring guide names:
-        self.cvMainLoc = self.guideName+"_Main"
-        self.cvCornerLoc = self.guideName+"_Corner"
-        self.cvExtremLoc = self.guideName+"_Extrem"
-        self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
-        self.cornerPointGrp = self.guideName+"_Corner_Grp_Zero_0_Grp"
-        self.guideMainDrvNull = self.guideName+"_Main_Drv_Null"
-        self.cornerDrvNull = self.guideName+"_Corner_Drv_Null"
-        self.cornerDrvNullGrp =  self.guideName+"_Corner_Drv_Null_Grp"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cvExtremLoc = self.name_guide+"_Extrem"
+        self.cvUpVectorLoc = self.name_guide+"_CornerUpVector"
+        self.cornerPointGrp = self.name_guide+"_Corner_Grp_Zero_0_Grp"
+        self.guideMainDrvNull = self.name_guide+"_Main_Drv_Null"
+        self.cornerDrvNull = self.name_guide+"_Corner_Drv_Null"
+        self.cornerDrvNullGrp =  self.name_guide+"_Corner_Drv_Null_Grp"
 
         # creating group to mainLoc:
         self.cvMainLocGrp = self.ar.utils.zeroOut([self.cvMainLoc])[0]
@@ -283,14 +283,14 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         """ Need to delete the previous setup in order to autoAim works with different type of limb
         """
         # re-declaring guide names:
-        self.cvMainLoc = self.guideName+"_Main"
-        self.cvMainLocGrp = self.guideName+"_Main_Zero_0_Grp"
-        self.guideMainDrvNull = self.guideName+"_Main_Drv_Null"
-        self.cornerDrvNull = self.guideName+"_Corner_Drv_Null"
-        self.cornerDrvNullAic = self.guideName+"_Corner_Drv_Null_Grp_AiC"
-        self.cornerDrvNullGrp = self.guideName+"_Corner_Drv_Null_Grp"
-        self.cvCornerLoc = self.guideName+"_Corner"
-        self.cornerPoc = self.guideName+"_Corner_Grp_Zero_0_Grp_PoC"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cvMainLocGrp = self.name_guide+"_Main_Zero_0_Grp"
+        self.guideMainDrvNull = self.name_guide+"_Main_Drv_Null"
+        self.cornerDrvNull = self.name_guide+"_Corner_Drv_Null"
+        self.cornerDrvNullAic = self.name_guide+"_Corner_Drv_Null_Grp_AiC"
+        self.cornerDrvNullGrp = self.name_guide+"_Corner_Drv_Null_Grp"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cornerPoc = self.name_guide+"_Corner_Grp_Zero_0_Grp_PoC"
         
         # deleting previous constraints:
         cmds.delete(self.cornerPoc, self.cornerDrvNullAic, self.cornerPoc, self.cornerUpVectorPoc, self.cornerNullPoc)
@@ -322,9 +322,9 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
             It will check which side the corner is to adjust the aim constraint offset
         """
         # re-declaring variables:
-        self.cvMainLoc = self.guideName+"_Main"
-        self.cvCornerLoc = self.guideName+"_Corner"
-        self.cvExtremLoc = self.guideName+"_Extrem"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cvExtremLoc = self.name_guide+"_Extrem"
 
         # get guides position in worldSpace:
         posMain = OpenMaya.MVector(cmds.xform(self.cvMainLoc, query=True, worldSpace=True, translation=True))
@@ -359,7 +359,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         """ Adjust aimOffset depends on corner position
         """
         # re-declaring corner guide name:
-        self.cvCornerLoc = self.guideName+"_Corner"
+        self.cvCornerLoc = self.name_guide+"_Corner"
         
         # when the limbType is arm, it will call the crossProduct function to get the right offset for X
         if self.getLimbType()==self.armName:
@@ -379,11 +379,11 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         """ This function reOrient guides orientations, creating temporary aimConstraints for them.
         """
         # re-declaring guide names:
-        self.cvBeforeLoc = self.guideName+"_Before"
-        self.cvMainLoc = self.guideName+"_Main"
-        self.cvCornerLoc = self.guideName+"_Corner"
-        self.cvExtremLoc = self.guideName+"_Extrem"
-        self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
+        self.cvBeforeLoc = self.name_guide+"_Before"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cvExtremLoc = self.name_guide+"_Extrem"
+        self.cvUpVectorLoc = self.name_guide+"_CornerUpVector"
 
         # Adjust offset when it's arm or leg. Using diferent axis for arm or leg.
         if self.getLimbType()==self.armName:
@@ -413,12 +413,12 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
         """ New functions when the button reOrient is pressed. For Arm, the extrem will point to the corner. For legs, the extrem will point to the ground.
         """
         # re-declaring guides names:
-        self.mainAic = self.guideName+"_Main_Zero_0_Grp_AiC"
-        self.cvBeforeLoc = self.guideName+"_Before"
-        self.cvMainLoc = self.guideName+"_Main"
-        self.cvCornerLoc = self.guideName+"_Corner"
-        self.cvExtremLoc = self.guideName+"_Extrem"
-        self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
+        self.mainAic = self.name_guide+"_Main_Zero_0_Grp_AiC"
+        self.cvBeforeLoc = self.name_guide+"_Before"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cvExtremLoc = self.name_guide+"_Extrem"
+        self.cvUpVectorLoc = self.name_guide+"_CornerUpVector"
         
         # re-orient extremLoc to align with cornerLoc if the clavicle and wrist aren't pinned.
         if not cmds.getAttr(self.cvExtremLoc+".pinGuide") and not cmds.getAttr(self.cvBeforeLoc+".pinGuide"):
@@ -545,14 +545,14 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
             and rotate the main in order to be more easy to user edit.
         """
         # re-declaring guide names:
-        self.cvBeforeLoc = self.guideName+"_Before"
-        self.cvMainLoc = self.guideName+"_Main"
-        self.cornerGrp = self.guideName+"_Corner_Grp"
-        self.cvCornerLoc = self.guideName+"_Corner"
-        self.cvCornerBLoc = self.guideName+"_CornerB"
-        self.cvExtremLoc = self.guideName+"_Extrem"
-        self.cvEndJoint = self.guideName+"_JointEnd"
-        self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
+        self.cvBeforeLoc = self.name_guide+"_Before"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cornerGrp = self.name_guide+"_Corner_Grp"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cvCornerBLoc = self.name_guide+"_CornerB"
+        self.cvExtremLoc = self.name_guide+"_Extrem"
+        self.cvEndJoint = self.name_guide+"_JointEnd"
+        self.cvUpVectorLoc = self.name_guide+"_CornerUpVector"
         self.cornerAIC = self.cornerGrp+"_AiC"
 
         self.ar.utils.unlockAttr([self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc, self.cvEndJoint, self.cvUpVectorLoc, self.cornerAIC])
@@ -806,7 +806,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 self.fkCtrlList, self.origFromList = [], []
                 for n, jName in enumerate(self.jNameList):
                     if n == 0:
-                        fkCtrl = self.ar.ctrls.cvControl("id_030_LimbClavicle", side+self.userGuideName+"_"+jName+"_Ctrl", r=(self.ctrlRadius * 2), d=self.curveDegree, rot=(45, 0 ,-90), guideSource=self.guideName+"_Before", parentTag=self.getParentToTag(self.fkCtrlList))
+                        fkCtrl = self.ar.ctrls.cvControl("id_030_LimbClavicle", side+self.userGuideName+"_"+jName+"_Ctrl", r=(self.ctrlRadius * 2), d=self.curveDegree, rot=(45, 0 ,-90), guideSource=self.name_guide+"_Before", parentTag=self.getParentToTag(self.fkCtrlList))
                     else:
                         fkCtrl = self.ar.ctrls.cvControl("id_031_LimbFk", side+self.userGuideName+"_"+jName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name+"__"+self.cvLocList[n][len(side):].replace("_Guide", ":Guide"), parentTag=self.getParentToTag(self.fkCtrlList))
                     
@@ -850,7 +850,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                         cmds.parent(self.origGrp, self.origFromList[n - 1])
                     # add wrist_toParent_Ctrl
                     if n == len(self.jNameList)-1:
-                        self.toParentExtremCtrl = self.ar.ctrls.cvControl("id_032_LimbToParent", ctrlName=side+self.userGuideName+"_"+extremName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree, guideSource=self.guideName+"_Extrem", parentTag=self.fkCtrlList[-1])
+                        self.toParentExtremCtrl = self.ar.ctrls.cvControl("id_032_LimbToParent", ctrlName=side+self.userGuideName+"_"+extremName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree, guideSource=self.name_guide+"_Extrem", parentTag=self.fkCtrlList[-1])
                         cmds.parent(self.toParentExtremCtrl, self.origGrp)
                         if s == 0:
                             cmds.setAttr(self.toParentExtremCtrl+".translateX", self.ctrlRadius)
@@ -897,7 +897,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete(tempToDelE, tempToDelF, tempToDelF1, tempToDelF2, tempToDelG)
 
                 # creating a group reference to recept the attributes:
-                self.worldRef = self.ar.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Base")
+                self.worldRef = self.ar.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", guideSource=self.name_guide+"_Base")
                 cmds.addAttr(self.worldRef, longName="ikFkSnap", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.ar.data.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
@@ -938,8 +938,8 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 cmds.parentConstraint(self.fkCtrlList[0], self.skinJointList[0], maintainOffset=True, name=self.skinJointList[0]+"_PaC")
 
                 # creating ik controls:
-                self.ikExtremCtrl = self.ar.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
-                self.ikExtremSubCtrl = self.ar.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem", parentTag=self.ikExtremCtrl)
+                self.ikExtremCtrl = self.ar.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.name_guide+"_Extrem")
+                self.ikExtremSubCtrl = self.ar.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.name_guide+"_Extrem", parentTag=self.ikExtremCtrl)
                 cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
                 self.ar.ctrls.setLockHide([self.ikExtremSubCtrl], ["sx", "sy", "sz", "v"])
                 self.ar.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
@@ -947,7 +947,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 # creating orient controller
                 if self.limbTypeName == self.armName:
                     cmds.addAttr(self.ikExtremCtrl, longName="orient", attributeType="double", defaultValue=1, min=0, max=1, keyable=True)
-                    self.extremOrientCtrl = self.ar.ctrls.cvControl("id_101_LimbExtremOrient", ctrlName=side+self.userGuideName+"_"+extremName+"_Orient_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, guideSource=self.guideName+"_Extrem", parentTag=self.fkCtrlList[0])
+                    self.extremOrientCtrl = self.ar.ctrls.cvControl("id_101_LimbExtremOrient", ctrlName=side+self.userGuideName+"_"+extremName+"_Orient_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, guideSource=self.name_guide+"_Extrem", parentTag=self.fkCtrlList[0])
                     cmds.connectAttr(self.extremOrientCtrl+".message", self.toParentExtremCtrl+".parentTag", force=True)
                     tempOrientCtrlCluster = cmds.cluster(self.extremOrientCtrl)[1]
                     if s == 0:
@@ -955,7 +955,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     else:
                         cmds.setAttr(tempOrientCtrlCluster+".tz", -0.2*self.ctrlRadius)
                     cmds.delete(self.extremOrientCtrl, constructionHistory=True)
-                    self.ikCornerCtrl = self.ar.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Corner", parentTag=self.fkCtrlList[0])
+                    self.ikCornerCtrl = self.ar.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.name_guide+"_Corner", parentTag=self.fkCtrlList[0])
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 2) #zxy
                     cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 2) #zxy
                     cmds.setAttr(self.extremOrientCtrl+".rotateOrder", 2) #zxy
@@ -965,7 +965,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     cmds.delete(self.origGrp+"_PaC")
                     cmds.parentConstraint(self.extremOrientCtrl, self.origGrp, maintainOffset=False, name=self.origGrp+"_PaC")
                 else:
-                    self.ikCornerCtrl = self.ar.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Corner", parentTag=self.fkCtrlList[0])
+                    self.ikCornerCtrl = self.ar.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.name_guide+"_Corner", parentTag=self.fkCtrlList[0])
                     cmds.connectAttr(self.ikExtremCtrl+".message", self.toParentExtremCtrl+".parentTag", force=True)
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 3) #xzy
                     cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 3) #xzy
@@ -1078,7 +1078,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 # setup quadruped extra control:
                 if quadruped:
                     cmds.rename(ikHandleExtraList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_Extra_Eff")
-                    self.quadExtraCtrl = self.ar.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z", guideSource=self.guideName+"_Extrem", parentTag=self.ikExtremCtrl)
+                    self.quadExtraCtrl = self.ar.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z", guideSource=self.name_guide+"_Extrem", parentTag=self.ikExtremCtrl)
                     if s == 1:
                         cmds.setAttr(self.quadExtraCtrl+".rotateY", 180)
                         cmds.makeIdentity(self.quadExtraCtrl, rotate=True, apply=True)
@@ -1337,7 +1337,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                         forearmDistZ = -(tempDist / 3)
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
-                    forearmCtrl = self.ar.ctrls.cvControl("id_037_LimbForearm", side+self.userGuideName+"_"+self.ar.data.lang['c030_forearm']+"_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree, guideSource=self.guideName+"_Corner", parentTag=self.ikCornerCtrl)
+                    forearmCtrl = self.ar.ctrls.cvControl("id_037_LimbForearm", side+self.userGuideName+"_"+self.ar.data.lang['c030_forearm']+"_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree, guideSource=self.name_guide+"_Corner", parentTag=self.ikCornerCtrl)
                     forearmGrp = cmds.group(forearmCtrl, name=side+self.userGuideName+"_"+self.ar.data.lang['c030_forearm']+"_Grp")
                     forearmZero = cmds.group(forearmGrp, name=side+self.userGuideName+"_"+self.ar.data.lang['c030_forearm']+"_Zero_0_Grp")
                     tempToDelete = cmds.parentConstraint(forearmJnt, forearmZero, maintainOffset=False)
@@ -1850,12 +1850,12 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     self.correctiveCtrl = self.bendGrps['ctrlList'][2]
                     if quadruped:
                         self.correctiveBCtrl = self.bendGrps['ctrlList'][3]
-                self.cornerCorrectiveNet = self.setupCorrectiveNet(self.correctiveCtrl, self.skinJointList[1], self.skinJointList[2], side+self.userGuideName+"_"+self.jNameList[2]+"_YawRight", 0, 0, -110, isLeg, [side+self.userGuideName+"_"+self.jNameList[2]+"_YawLeft", 1, 1, -110])
+                self.cornerCorrectiveNet = self.setup_corrective_net(self.correctiveCtrl, self.skinJointList[1], self.skinJointList[2], side+self.userGuideName+"_"+self.jNameList[2]+"_YawRight", 0, 0, -110, isLeg, [side+self.userGuideName+"_"+self.jNameList[2]+"_YawLeft", 1, 1, -110])
                 correctionNetInputValue = cmds.getAttr(self.cornerCorrectiveNet+".inputValue")
                 if correctionNetInputValue > 0:
                     cmds.setAttr(self.cornerCorrectiveNet+".inputEnd", correctionNetInputValue+110)
                 if quadruped:
-                    self.cornerBCorrectiveNet = self.setupCorrectiveNet(self.correctiveBCtrl, self.skinJointList[2], self.skinJointList[3], side+self.userGuideName+"_"+self.jNameList[3]+"_YawRight", 0, 0, -110, isLeg, [side+self.userGuideName+"_"+self.jNameList[3]+"_YawLeft", 1, 1, -110])
+                    self.cornerBCorrectiveNet = self.setup_corrective_net(self.correctiveBCtrl, self.skinJointList[2], self.skinJointList[3], side+self.userGuideName+"_"+self.jNameList[3]+"_YawRight", 0, 0, -110, isLeg, [side+self.userGuideName+"_"+self.jNameList[3]+"_YawLeft", 1, 1, -110])
                     correctionBNetInputValue = cmds.getAttr(self.cornerBCorrectiveNet+".inputValue")
                     if correctionBNetInputValue <= 0:
                         cmds.setAttr(self.cornerBCorrectiveNet+".inputEnd", correctionBNetInputValue+110)
@@ -1871,54 +1871,54 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     cmds.delete(cmds.listRelatives(beforeJxt, children=True, allDescendents=True, fullPath=True))
                     if self.addCorrective:
                         # corrective controls group
-                        self.correctiveCtrlsGrp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
-                        self.correctiveCtrlGrpList.append(self.correctiveCtrlsGrp)
-                        cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
+                        self.corrective_ctrls_grp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
+                        self.correctiveCtrlGrpList.append(self.corrective_ctrls_grp)
+                        cmds.parent(self.corrective_ctrls_grp, self.toCtrlHookGrp)
                         
                         # clavicle / hips
                         beforeCorrectiveNetList = [None]
-                        beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60]))
+                        beforeCorrectiveNetList.append(self.setup_corrective_net(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60]))
                         beforeCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, True, False, False, False, False)
                         beforeJntList = self.ar.utils.articulationJoint(beforeJxt, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
-                        self.setupJcrControls(beforeJntList, s, self.jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(beforeJntList, s, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList, invertList)
 
                         # shoulder / leg
                         mainCorrectiveNetList = [None]
-                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
-                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
+                        mainCorrectiveNetList.append(self.setup_corrective_net(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
+                        mainCorrectiveNetList.append(self.setup_corrective_net(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
                         mainCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
                         mainJntList = self.ar.utils.articulationJoint(self.shoulderRefGrp, self.skinJointList[1], 2, [(0, mainJarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
-                        self.setupJcrControls(mainJntList, s, self.jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(mainJntList, s, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList, invertList)
                         
                         # elbow / knee
                         cornerCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
                         cornerCorrectiveNetList = [None, self.cornerCorrectiveNet, self.cornerCorrectiveNet, self.cornerCorrectiveNet]
-                        self.setupJcrControls(self.cornerJntList, s, self.jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(self.cornerJntList, s, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, invertList)
 
                         # quadruped kneeB
                         if quadruped:
                             cornerBCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
                             cornerBCorrectiveNetList = [None, self.cornerBCorrectiveNet, self.cornerBCorrectiveNet, self.cornerBCorrectiveNet]
-                            self.setupJcrControls(self.cornerBJntList, s, self.jointLabelAdd, self.userGuideName+"_"+cornerBNumber+"_"+cornerBName, cornerBCorrectiveNetList, cornerBCalibratePresetList, invertList)
+                            self.setup_corrective_controllers(self.cornerBJntList, s, self.userGuideName+"_"+cornerBNumber+"_"+cornerBName, cornerBCorrectiveNetList, cornerBCalibratePresetList, invertList)
                         
                         # wrist / ankle
                         extremCorrectiveNetList = [None]
                         if self.limbTypeName == self.armName:
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 2, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 2, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 2, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.extremOrientCtrl, side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 2, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
                         else: #leg
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 2, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
-                            extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 2, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 2, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
+                            extremCorrectiveNetList.append(self.setup_corrective_net(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 2, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
                         extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
                         if self.limbTypeName == self.armName:
                             extremJntList = self.ar.utils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)], orientCtrl=self.extremOrientCtrl)
                         else:
                             extremJntList = self.ar.utils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
-                        self.setupJcrControls(extremJntList, s, self.jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(extremJntList, s, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
                         # fix rotate with 100% of value for the wrist axis - Thanks Andre Ruegger for the help!
                         extremJax = cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0]
                         orientConnection = cmds.listConnections(extremJax+".rotateZ", destination=False, source=True, plugs=True)[0]
@@ -1974,7 +1974,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                         if self.bendGrps:
                             mainJar = mainJntList[0]
                             mainJax = cmds.listRelatives(mainJntList[0], parent=True, type="joint")[0]
-                            mainSubCtrl = self.ar.ctrls.cvControl("id_095_LimbMainSub", ctrlName=side+self.userGuideName+"_"+mainName+"_Sub_Ctrl", r=(self.ctrlRadius * 0.9), d=self.curveDegree, guideSource=self.guideName+"_Main", parentTag=self.fkCtrlList[0])
+                            mainSubCtrl = self.ar.ctrls.cvControl("id_095_LimbMainSub", ctrlName=side+self.userGuideName+"_"+mainName+"_Sub_Ctrl", r=(self.ctrlRadius * 0.9), d=self.curveDegree, guideSource=self.name_guide+"_Main", parentTag=self.fkCtrlList[0])
                             self.ar.ctrls.setLockHide([mainSubCtrl], ["sx", "sy", "sz", "v"])
                             self.ar.ctrls.setSubControlDisplay(self.fkCtrlList[0], mainSubCtrl, 0)
                             mainSubCtrlZero = self.ar.utils.zeroOut([mainSubCtrl])[0]
@@ -2061,7 +2061,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
             self.composingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
-        self.deleteModule()
+        self.delete_guide()
         self.renameUnitConversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
 

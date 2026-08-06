@@ -32,10 +32,10 @@ class BaseLayout(base.BaseLibrary):
             self.jointsType = "jointsType"
             self.facialUserType = self.bsType
             # BASIC MODULE LAYOUT:
-            self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
+            self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.top_cl)
             # create basic module UI:
             self.selectButton = cmds.button(label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=self.selectButtonCallback, parent=self.basicColumn)
-            self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.guide_base+".customName"), changeCommand=self.editGuideModuleName, parent=self.basicColumn)
+            self.userName = cmds.textField('userName', annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(self.guide_base+".customName"), changeCommand=self.set_guide_custom_name, parent=self.basicColumn)
             cmds.iconTextButton(image=self.ar.data.icon['plus_info'], height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self), parent=self.basicColumn)
             self.reCreateEditSelectedModuleLayout(self)
     
@@ -87,7 +87,7 @@ class BaseLayout(base.BaseLibrary):
         self.fatherMirrorExists = None
         self.fatherFlipExists = None
         # verify the integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             # select the module to be re-build the selectedLayout:
             if bSelect:
                 cmds.select(self.guide_base)
@@ -117,10 +117,10 @@ class BaseLayout(base.BaseLibrary):
                 
                 # UI
                 # edit label of frame layout:
-                guideName = cmds.getAttr(self.guide_base+".customName")
-                if not guideName:
-                    guideName = self.userGuideName
-                cmds.frameLayout("rig_edit_selected_module_fl", edit=True, collapse=self.ar.data.collapse_edit_sel_mod, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module']+" :  "+self.ar.data.lang[self.title]+" - "+guideName)
+                name_guide = cmds.getAttr(self.guide_base+".customName")
+                if not name_guide:
+                    name_guide = self.userGuideName
+                cmds.frameLayout("rig_edit_selected_module_fl", edit=True, collapse=self.ar.data.collapse_edit_sel_mod, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module']+" :  "+self.ar.data.lang[self.title]+" - "+name_guide)
                 # edit button with "S" letter indicating it is selected:
                 cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                 cmds.columnLayout("rig_selected_module_cl", adjustableColumn=True, parent="rig_edit_selected_module_fl")
@@ -138,8 +138,8 @@ class BaseLayout(base.BaseLibrary):
                     cmds.text(" ", parent=self.segDelColumn)
                     cmds.text(" ", parent=self.segDelColumn)
                 # create Delete button:
-                self.deleteButton = cmds.button(label=self.ar.data.lang['m005_delete'], command=self.deleteModule, backgroundColor=(1.0, 0.7, 0.7), parent=self.segDelColumn)
-                self.duplicateButton = cmds.button(label=self.ar.data.lang['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.ar.data.lang['i068_CtrlD'], parent=self.segDelColumn)
+                self.deleteButton = cmds.button(label=self.ar.data.lang['m005_delete'], command=self.delete_guide, backgroundColor=(1.0, 0.7, 0.7), parent=self.segDelColumn)
+                self.duplicateButton = cmds.button(label=self.ar.data.lang['m070_duplicate'], command=self.duplicate_guide, backgroundColor=(0.7, 0.6, 0.8), annotation=self.ar.data.lang['i068_CtrlD'], parent=self.segDelColumn)
 
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
@@ -336,13 +336,12 @@ class BaseLayout(base.BaseLibrary):
                         if self.nJointsAttr > 0:
                             self.mainCtrlColumn = cmds.rowLayout('mainCtrlColumn', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="rig_selected_module_cl" )
                             hasMain = cmds.getAttr(self.guide_base+".mainControls")
-                            nMainCtrlAttr = cmds.getAttr(self.guide_base+".nMain")
                             if self.nJointsAttr > 1:
                                 self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
-                                self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=hasMain, parent=self.mainCtrlColumn)
+                                self.nMainCtrlIF = cmds.intField(value=cmds.getAttr(self.guide_base+".nMain"), minValue=1, changeCommand=partial(self.change_main_ctrls_number, 0), editable=hasMain, parent=self.mainCtrlColumn)
                             else:
                                 self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
-                                self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
+                                self.nMainCtrlIF = cmds.intField(value=cmds.getAttr(self.guide_base+".nMain"), minValue=1, changeCommand=partial(self.change_main_ctrls_number, 0), editable=False, parent=self.mainCtrlColumn)
                                 cmds.setAttr(self.guide_base+".mainControls", 0)
                 
                 if self.styleExists:
@@ -431,7 +430,7 @@ class BaseLayout(base.BaseLibrary):
         """ Get the current display setting from interface to show or hide the Annotation for this module.
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             self.annotation = self.guide_base+"_Ant"
             cmds.setAttr(self.annotation+'.visibility', value)
             cmds.setAttr(self.guide_base+'.displayAnnotation', value)
@@ -443,7 +442,7 @@ class BaseLayout(base.BaseLibrary):
             Return "stopIt" if there's a father guide mirror.
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             mirroredGuideFather = self.ar.utils.mirroredGuideFather(self.guide_base)
             if mirroredGuideFather:
                 cmds.setAttr(self.guide_base+".mirrorEnable", 0)
@@ -486,7 +485,7 @@ class BaseLayout(base.BaseLibrary):
     def changeRadiusSize(self, *args):
         """ Set the attribute value for the viewport radius size.
         """
-        cmds.setAttr(self.radiusCtrl+".translateX", cmds.floatSliderGrp(self.radiusSizeFSG, query=True, value=True))
+        cmds.setAttr(self.radius_ctrl+".translateX", cmds.floatSliderGrp(self.radiusSizeFSG, query=True, value=True))
         
 
     def changeMirror(self, item, *args):
@@ -494,7 +493,7 @@ class BaseLayout(base.BaseLibrary):
             Also, call the builder of the preview mirror (for the viewport).
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             # check if the father guide is in X=0 in order to permit mirror:
             stopMirrorOperation = self.check_father_mirror()
             if not stopMirrorOperation:
@@ -510,7 +509,7 @@ class BaseLayout(base.BaseLibrary):
         """ This function receives the mirror menu name item and set it as a string in the guide base (main).
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             cmds.setAttr(self.guide_base+".mirrorName", item, type='string')
     
     
@@ -540,7 +539,7 @@ class BaseLayout(base.BaseLibrary):
         """ This function receives the degree menu name item string and set it as a int in the guide base (main).
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             if item == '3 - Cubic':
                 cmds.setAttr(self.guide_base+".degree", 3)
             else:
@@ -694,7 +693,7 @@ class BaseLayout(base.BaseLibrary):
         """ This function receives the deformedBy menu name item and set it as a integer value in the guide base (main).
         """
         # verify integrity of the guideModule:
-        if self.verifyGuideModuleIntegrity():
+        if self.check_guide_integrity():
             cmds.setAttr(self.guide_base+".deformedBy", int(item[0]))
 
 
@@ -723,19 +722,19 @@ class BaseLayout(base.BaseLibrary):
             if not instance in guideInstanceList:
                 guideInstanceList.insert(0, instance)
         for guideInstance in guideInstanceList:
-            guideName = guideInstance.guide_namespace.split("__")[-1]
+            name_guide = guideInstance.guide_namespace.split("__")[-1]
             customName = cmds.getAttr(guideInstance.guide_base+".customName")
             if not customName:
                 customName = ""
             # creating text layout:
             cmds.separator(style='none', height=10, parent=plusSL)
             headerRCL = cmds.rowColumnLayout(numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 55), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=plusSL)
-            cmds.text(label=guideName, align='left', parent=headerRCL)
+            cmds.text(label=name_guide, align='left', parent=headerRCL)
             cmds.text(label=customName, align='left', font='boldLabelFont', parent=headerRCL)
             cmds.separator(style='none', height=10, parent=plusSL)
             guideInstance.annotationCheckBox = cmds.checkBox(label=guideInstance.ar.data.lang['m014_annotation'], annotation=guideInstance.ar.data.lang['m014_annotation'], value=cmds.getAttr(guideInstance.guide_base+'.displayAnnotation'), onCommand=partial(guideInstance.displayAnnotation, 1), offCommand=partial(guideInstance.displayAnnotation, 0), parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
-            guideInstance.radiusSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['c067_radius'].capitalize(), field=True, width=widthSize, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.radiusCtrl+".translateX"), changeCommand=guideInstance.changeRadiusSize, dragCommand=guideInstance.changeRadiusSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
+            guideInstance.radiusSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['c067_radius'].capitalize(), field=True, width=widthSize, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.radius_ctrl+".translateX"), changeCommand=guideInstance.changeRadiusSize, dragCommand=guideInstance.changeRadiusSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=5, parent=plusSL)
             guideInstance.shapeSizeFSG = cmds.floatSliderGrp(label=guideInstance.ar.data.lang['m067_shape']+" "+guideInstance.ar.data.lang['i115_size'], width=widthSize, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(guideInstance.guide_base+'.shapeSize'), changeCommand=guideInstance.changeShapeSize, dragCommand=guideInstance.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusSL)
             cmds.separator(style='none', height=10, parent=plusSL)

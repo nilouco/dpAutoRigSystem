@@ -231,25 +231,25 @@ class Utils(object):
             return len(numberList)
     
         
-    def normalizeText(self, enteredText="", prefixMax=4):
-        """ Analisys the enteredText to conform it in order to use in Application (Maya).
+    def normalizeText(self, inputted_text="", prefixMax=4):
+        """ Analisys the inputted_text to conform it in order to use in Application (Maya).
             Return the normalized text.
         """
         normalText = ""
-        enteredText = ''.join(c for c in unicodedata.normalize('NFD', enteredText) if unicodedata.category(c) != 'Mn') #strip accents
-        if enteredText:
+        inputted_text = ''.join(c for c in unicodedata.normalize('NFD', inputted_text) if unicodedata.category(c) != 'Mn') #strip accents
+        if inputted_text:
             # analisys if it starts with number or has a whitespace or special character:
-            if re.match("[0-9]", enteredText[0]): #starts with number
+            if re.match("[0-9]", inputted_text[0]): #starts with number
                 return normalText
             else:
-                #if re.search("\s", enteredText[:len(enteredText)-1]): #has space
-                enteredText = enteredText.replace(" ", "_")
-                while re.search(r"\W", enteredText): #special character
-                    span = re.search(r"\W", enteredText).span()[0]
-                    enteredText = enteredText[:span]+"_"+enteredText[span+1:]
-                if not len(enteredText) < prefixMax:
-                    enteredText = enteredText[:prefixMax]
-                normalText = enteredText
+                #if re.search("\s", inputted_text[:len(inputted_text)-1]): #has space
+                inputted_text = inputted_text.replace(" ", "_")
+                while re.search(r"\W", inputted_text): #special character
+                    span = re.search(r"\W", inputted_text).span()[0]
+                    inputted_text = inputted_text[:span]+"_"+inputted_text[span+1:]
+                if not len(inputted_text) < prefixMax:
+                    inputted_text = inputted_text[:prefixMax]
+                normalText = inputted_text
         return normalText
 
 
@@ -603,12 +603,11 @@ class Utils(object):
         """
         guides_to_rig = []
         headModuleList = []
-        allNamespaceList = cmds.namespaceInfo(listNamespace=True)
         for guideModule in self.ar.data.guide_instances:
             # verify integrity of the guideModule:
-            if guideModule.verifyGuideModuleIntegrity():
+            if guideModule.check_guide_integrity():
                 guideNamespaceName = guideModule.guide_namespace
-                if guideNamespaceName in allNamespaceList:
+                if guideNamespaceName in cmds.namespaceInfo(listOnlyNamespaces=True):
                     userGuideName = guideModule.userGuideName
                     if not cmds.objExists(userGuideName+'_Static_Grp'):
                         if not "dpHead" in str(guideModule):

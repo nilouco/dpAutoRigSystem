@@ -183,11 +183,11 @@ class UpdateGuides(base.BaseLibrary):
 
     def setEyelidGuideAttribute(self, guide, value):
         currentInstance = self.getNewGuideInstance(guide)
-        cvUpperEyelidLoc = currentInstance.guideName+"_UpperEyelidLoc"
-        cvLowerEyelidLoc = currentInstance.guideName+"_LowerEyelidLoc"
-        jEyelid = currentInstance.guideName+"_JEyelid"
-        jUpperEyelid = currentInstance.guideName+"_JUpperEyelid"
-        jLowerEyelid = currentInstance.guideName+"_JLowerEyelid"
+        cvUpperEyelidLoc = currentInstance.name_guide+"_UpperEyelidLoc"
+        cvLowerEyelidLoc = currentInstance.name_guide+"_LowerEyelidLoc"
+        jEyelid = currentInstance.name_guide+"_JEyelid"
+        jUpperEyelid = currentInstance.name_guide+"_JUpperEyelid"
+        jLowerEyelid = currentInstance.name_guide+"_JLowerEyelid"
         cmds.setAttr(guide+".eyelid", value)
         cmds.setAttr(cvUpperEyelidLoc+".visibility", value)
         cmds.setAttr(cvLowerEyelidLoc+".visibility", value)
@@ -198,14 +198,14 @@ class UpdateGuides(base.BaseLibrary):
 
     def setIrisGuideAttribute(self, guide, value):
         currentInstance = self.getNewGuideInstance(guide)
-        cvIrisLoc = currentInstance.guideName+"_IrisLoc"
+        cvIrisLoc = currentInstance.name_guide+"_IrisLoc"
         cmds.setAttr(guide+".iris", value)
         cmds.setAttr(cvIrisLoc+".visibility", value)
 
 
     def setPupilGuideAttribute(self, guide, value):
         currentInstance = self.getNewGuideInstance(guide)
-        cvPupilLoc = currentInstance.guideName+"_PupilLoc"
+        cvPupilLoc = currentInstance.name_guide+"_PupilLoc"
         cmds.setAttr(guide+".pupil", value)
         cmds.setAttr(cvPupilLoc+".visibility", value)
 
@@ -358,8 +358,8 @@ class UpdateGuides(base.BaseLibrary):
             currentNewGuide = self.ar.config.get_instance(self.updateData[guide]['name'], [self.ar.data.standard_folder])
             currentNewGuide.build_raw_guide()
             # rename as it's predecessor
-            guideName = self.updateData[guide]['attributes']['customName']
-            currentNewGuide.editGuideModuleName(guideName)
+            name_guide = self.updateData[guide]['attributes']['customName']
+            currentNewGuide.set_guide_custom_name(name_guide)
             self.updateData[guide]['newGuide'] = currentNewGuide.guide_base
             self.newGuidesInstanceList.append(currentNewGuide)
             if self.ar.data.ui_state:
@@ -370,9 +370,9 @@ class UpdateGuides(base.BaseLibrary):
         for guide in self.updateData:
             currentCustomName = self.updateData[guide]['attributes']['customName']
             if currentCustomName == '' or currentCustomName == None:
-                self.updateData[guide]['instance'].editGuideModuleName(self.updateData[guide]['instance'].guide_base.split(':')[0]+'_OLD')
+                self.updateData[guide]['instance'].set_guide_custom_name(self.updateData[guide]['instance'].guide_base.split(':')[0]+'_OLD')
             else:
-                self.updateData[guide]['instance'].editGuideModuleName(currentCustomName+'_OLD')
+                self.updateData[guide]['instance'].set_guide_custom_name(currentCustomName+'_OLD')
 
 
     def retrieveNewParent(self, currentParent):
@@ -457,9 +457,9 @@ class UpdateGuides(base.BaseLibrary):
             oldGuideChildrenOnlyList = list(map(lambda name : name.split(':')[1], oldGuideChildrenList))
             for i, newChild in enumerate(newGuideChildrenList):
                 if newGuideChildrenOnlyList[i] in oldGuideChildrenOnlyList:
-                    guideName = self.updateData[guide]['children'][guide.split(':')[0]+':'+newGuideChildrenOnlyList[i]]
-                    self.copyAttrFromGuides(newChild, guideName['attributes'])
-                    self.copyAttrFromGuides(newChild, guideName['transformAttributes'])
+                    name_guide = self.updateData[guide]['children'][guide.split(':')[0]+':'+newGuideChildrenOnlyList[i]]
+                    self.copyAttrFromGuides(newChild, name_guide['attributes'])
+                    self.copyAttrFromGuides(newChild, name_guide['transformAttributes'])
     
 
     def listNewAttr(self):
@@ -492,9 +492,8 @@ class UpdateGuides(base.BaseLibrary):
             cmds.delete(*self.updateData.keys())
         except:
             mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
-        allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
-             if self.updateData[guide]['instance'].guide_namespace in allNamespaceList:
+             if self.updateData[guide]['instance'].guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
                 cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guide_namespace, ':'), force=True)
                 cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guide_namespace, force=True)
         self.ar.ui_manager.refresh_ui()

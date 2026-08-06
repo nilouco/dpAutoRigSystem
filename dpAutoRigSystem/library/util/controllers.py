@@ -652,35 +652,35 @@ class Controllers(object):
         #r = self.dpCheckLinearUnit(r)
         # create a simple circle curve:
         circle = cmds.circle(n=ctrlName, ch=True, o=True, nr=(0, 0, 1), d=3, s=8, radius=r)[0]
-        radiusCtrl = cmds.circle(n=ctrlName+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
+        radius_ctrl = cmds.circle(n=ctrlName+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
         # rename curveShape:
-        self.renameShape([circle, radiusCtrl])
+        self.renameShape([circle, radius_ctrl])
         # configure system of limits and radius:
-        cmds.setAttr(radiusCtrl+".translateX", r)
-        cmds.parent(radiusCtrl, circle, relative=True)
-        cmds.transformLimits(radiusCtrl, tx=(0.01, 1), etx=(True, False))
-        self.setLockHide([radiusCtrl], ['ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.setAttr(radius_ctrl+".translateX", r)
+        cmds.parent(radius_ctrl, circle, relative=True)
+        cmds.transformLimits(radius_ctrl, tx=(0.01, 1), etx=(True, False))
+        self.setLockHide([radius_ctrl], ['ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # find makeNurbCircle history of the circles:
-        historyList = self.findHistory([circle, radiusCtrl], 'makeNurbCircle')
+        historyList = self.findHistory([circle, radius_ctrl], 'makeNurbCircle')
         circleHistory     = historyList[0]
         radiusCtrlHistory = historyList[1]
         # rename and make a connection for circle:
         circleHistory = cmds.rename(circleHistory, circle+"_makeNurbCircle")
-        cmds.connectAttr(radiusCtrl+".tx", circleHistory+".radius", force=True)
-        radiusCtrlHistory = cmds.rename(radiusCtrlHistory, radiusCtrl+"_makeNurbCircle")
-        # create a mutiplyDivide in order to automatisation the radius of the radiusCtrl:
-        radiusCtrlMD = cmds.createNode('multiplyDivide', name=radiusCtrl+'_MD')
-        cmds.connectAttr(radiusCtrl+'.translateX', radiusCtrlMD+'.input1X', force=True)
+        cmds.connectAttr(radius_ctrl+".tx", circleHistory+".radius", force=True)
+        radiusCtrlHistory = cmds.rename(radiusCtrlHistory, radius_ctrl+"_makeNurbCircle")
+        # create a mutiplyDivide in order to automatisation the radius of the radius_ctrl:
+        radiusCtrlMD = cmds.createNode('multiplyDivide', name=radius_ctrl+'_MD')
+        cmds.connectAttr(radius_ctrl+'.translateX', radiusCtrlMD+'.input1X', force=True)
         cmds.setAttr(radiusCtrlMD+'.input2X', 0.15)
         cmds.connectAttr(radiusCtrlMD+".outputX", radiusCtrlHistory+".radius", force=True)
         # colorize curveShapes:
         self.colorShape([circle], 'yellow')
-        self.colorShape([radiusCtrl], 'cyan')
+        self.colorShape([radius_ctrl], 'cyan')
         cmds.setAttr(circle+"0Shape.lineWidth", 2)
         cmds.select(clear=True)
         # pinGuide:
         self.ar.job.create_pin_guide(circle)
-        return [circle, radiusCtrl]
+        return [circle, radius_ctrl]
 
 
     def setAndFreeze(nodeName="", tx=None, ty=None, tz=None, rx=None, ry=None, rz=None, sx=None, sy=None, sz=None, freeze=True):
