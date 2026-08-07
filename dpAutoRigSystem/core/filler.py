@@ -333,7 +333,7 @@ class UIFiller(object):
         """
         for item in self.ar.utils.get_guides_to_rig():
             if not item.guide_net:
-                item.createGuideNetwork()
+                item.create_guide_network()
                 print(self.ar.data.lang["v004_fixed"]+" guideNet: "+item.guide_base)
 
 

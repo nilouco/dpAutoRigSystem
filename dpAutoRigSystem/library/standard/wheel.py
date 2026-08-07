@@ -84,7 +84,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
         cmds.parentConstraint(self.cvInsideLoc, self.jGuideInside, maintainOffset=False, name=self.cvInsideLoc+"_PaC")
         cmds.parentConstraint(self.cvOutsideLoc, self.jGuideOutside, maintainOffset=False, name=self.cvOutsideLoc+"_PaC")
         # include nodes into net
-        self.addNodeToGuideNet([self.cvCenterLoc, self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc], ["CenterLoc", "FrontLoc", "InsideLoc", "OutsideLoc"])
+        self.add_node_to_guide_net([self.cvCenterLoc, self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc], ["CenterLoc", "FrontLoc", "InsideLoc", "OutsideLoc"])
     
     
     def changeStartFrame(self, *args):
@@ -137,7 +137,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.centerJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.centerJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.setJointLabel(self.centerJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['m156_wheel'])
+                self.ar.utils.setJointLabel(self.centerJoint, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['m156_wheel'])
                 # create end joint:
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 # main joint:
@@ -145,33 +145,33 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.mainJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.setJointLabel(self.mainJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c058_main'])
+                self.ar.utils.setJointLabel(self.mainJoint, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c058_main'])
                 # create end joint:
                 self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.ar.utils.addJointEndAttr([self.endJoint, self.mainEndJoint])
                 
                 # create controls:
-                self.wheelCtrl = self.ar.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc")
+                self.wheelCtrl = self.ar.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.ar.data.lang['m156_wheel']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_CenterLoc")
                 # add clip shape on wheel shape and optimize control CV shapes:
-                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 0) ), destinations=[self.wheelCtrl], keepColor=False)
-                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 90) ), destinations=[self.wheelCtrl], keepColor=False)
-                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 180) ), destinations=[self.wheelCtrl], keepColor=False)
-                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 270) ), destinations=[self.wheelCtrl], keepColor=False)
+                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 0) ), destinations=[self.wheelCtrl], keepColor=False)
+                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 90) ), destinations=[self.wheelCtrl], keepColor=False)
+                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 180) ), destinations=[self.wheelCtrl], keepColor=False)
+                self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 270) ), destinations=[self.wheelCtrl], keepColor=False)
                 # optimize control CV shapes:
                 clusterShape1 = cmds.cluster(self.wheelCtrl+"1Shape"+".cv[1:]")[1]
                 clusterShape2 = cmds.cluster(self.wheelCtrl+"2Shape"+".cv[1:]")[1]
                 clusterShape3 = cmds.cluster(self.wheelCtrl+"3Shape"+".cv[1:]")[1]
                 clusterShape4 = cmds.cluster(self.wheelCtrl+"4Shape"+".cv[1:]")[1]
-                cmds.setAttr(clusterShape1+".translateY", self.ctrlRadius*0.9)
-                cmds.setAttr(clusterShape2+".translateX", -self.ctrlRadius*0.9)
-                cmds.setAttr(clusterShape3+".translateY", -self.ctrlRadius*0.9)
-                cmds.setAttr(clusterShape4+".translateX", self.ctrlRadius*0.9)
+                cmds.setAttr(clusterShape1+".translateY", self.radius*0.9)
+                cmds.setAttr(clusterShape2+".translateX", -self.radius*0.9)
+                cmds.setAttr(clusterShape3+".translateY", -self.radius*0.9)
+                cmds.setAttr(clusterShape4+".translateX", self.radius*0.9)
                 cmds.delete(self.wheelCtrl, constructionHistory=True)
                 
                 # create defaults controls shape
-                self.mainCtrl = self.ar.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
-                self.insideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.name_guide+"_InsideLoc", parentTag=self.mainCtrl)
-                self.outsideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.name_guide+"_OutsideLoc", parentTag=self.mainCtrl)
+                self.mainCtrl = self.ar.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius*0.4, d=self.curve_degree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                self.insideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.name_guide+"_InsideLoc", parentTag=self.mainCtrl)
+                self.outsideCtrl = self.ar.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.ar.data.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.name_guide+"_OutsideLoc", parentTag=self.mainCtrl)
                 self.mainCtrlList.append(self.mainCtrl)
                 self.wheelCtrlList.append(self.wheelCtrl)
 
@@ -196,9 +196,9 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 cmds.scaleConstraint(self.mainCtrl, self.mainJoint, maintainOffset=True, name=self.mainJoint+"_ScC")
                 cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.mainEndJoint, maintainOffset=False))
                 if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
-                    cmds.move(self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
+                    cmds.move(self.radius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 else:
-                    cmds.move(-self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
+                    cmds.move(-self.radius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 cmds.delete(cmds.parentConstraint(self.cvInsideLoc, self.toSteeringGrp, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvOutsideLoc, self.outsideCtrl, maintainOffset=False))
                 
@@ -235,7 +235,7 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 # add attributes:
                 cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c047_autoRotate'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c068_startFrame'], attributeType="long", defaultValue=1, keyable=False)
-                cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c067_radius'], attributeType="float", min=0.01, defaultValue=self.ctrlRadius, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c067_radius'], attributeType="float", min=0.01, defaultValue=self.radius, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c069_radiusScale'], attributeType="float", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=1, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.ar.data.lang['c070_steering'], attributeType="short", minValue=0, maxValue=1, defaultValue=0, keyable=True)
@@ -338,8 +338,8 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                                             pass
                 
                 # lattice:
-                latticeList = cmds.lattice(self.geoHolder, divisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, position=(0, 0, 0), scale=(self.ctrlRadius*2, self.ctrlRadius*2, self.ctrlRadius*2), name=side+self.userGuideName+"_FFD") #[deformer, lattice, base]
-                cmds.scale(self.ctrlRadius*2, self.ctrlRadius*2, self.ctrlRadius*2, latticeList[2])
+                latticeList = cmds.lattice(self.geoHolder, divisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, position=(0, 0, 0), scale=(self.radius*2, self.radius*2, self.radius*2), name=side+self.userGuideName+"_FFD") #[deformer, lattice, base]
+                cmds.scale(self.radius*2, self.radius*2, self.radius*2, latticeList[2])
                 # clusters:
                 upperClusterList = cmds.cluster(latticeList[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Cls") #[deform, handle]
                 middleClusterList = cmds.cluster(latticeList[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Cls") #[deform, handle]
@@ -348,9 +348,9 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
                 # deform controls:
-                upperDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
-                middleDefCtrl = self.ar.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
-                lowerDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                upperDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                middleDefCtrl = self.ar.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
+                lowerDefCtrl = self.ar.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, rot=(0, 0, 180), guideSource=self.name_guide+"_CenterLoc", parentTag=self.wheelCtrl)
                 defCtrlGrpList = self.ar.utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.userGuideName+"_Ctrl_Grp")
                 
@@ -386,36 +386,35 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 cmds.connectAttr(self.wheelCtrl+"."+self.ar.data.lang['c021_showControls'], defCtrlGrp+".visibility", force=True)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.hookSetup(side, [zeroGrpList[2]], [self.centerJoint, self.mainJoint, defGrp], [self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder])
-                self.ctrlHookGrpList.append(self.toCtrlHookGrp)
+                self.create_hook_setup(side, [zeroGrpList[2]], [self.centerJoint, self.mainJoint, defGrp], [self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder])
+                self.ctrlHookGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
                 self.ar.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, latticeList[1], latticeList[2], self.geoHolder], self.ar.utils.ignoreTransformIOAttr)
                 
                 self.to_ids.extend([receptSteeringMD, inverseSteeringMD, steeringInvCnd, expNode, self.geoHolder, scNode, side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_BP"])
                 for idList in [latticeList, upperClusterList, middleClusterList, lowerClusterList]:
                     self.to_ids.extend(idList)
-                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.composingInfo()
+            self.composing_info()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.delete_guide()
-        self.renameUnitConversion()
+        self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
     
-    def composingInfo(self, *args):
-        standard.BaseStandard.composingInfo(self)
+    def composing_info(self):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                                        "mainCtrlList"    : self.mainCtrlList,
-                                        "wheelCtrlList"   : self.wheelCtrlList,
-                                        "steeringGrpList" : self.steeringGrpList,
-                                        "ctrlHookGrpList" : self.ctrlHookGrpList,
-                                    }
+                            "mainCtrlList"    : self.mainCtrlList,
+                            "wheelCtrlList"   : self.wheelCtrlList,
+                            "steeringGrpList" : self.steeringGrpList,
+                            "ctrlHookGrpList" : self.ctrlHookGrpList,
+                        }
 
 
 ###

@@ -61,15 +61,15 @@ class MatchMesh(base.BaseLibrary):
 
             # getting meshes
             if cmds.objectType(selList[0]) != "mesh":
-                childrenList = cmds.listRelatives(selList[0], children=True, type="mesh")
-                if childrenList:
-                    fromMesh = childrenList[0]
+                children = cmds.listRelatives(selList[0], children=True, type="mesh")
+                if children:
+                    fromMesh = children[0]
                 else:
                     gotMeshes = False
             if cmds.objectType(selList[1]) != "mesh":
-                childrenList = cmds.listRelatives(selList[1], children=True, type="mesh")
-                if childrenList:
-                    toMesh = childrenList[0]
+                children = cmds.listRelatives(selList[1], children=True, type="mesh")
+                if children:
+                    toMesh = children[0]
                 else:
                     gotMeshes = False
             

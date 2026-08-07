@@ -95,20 +95,20 @@ class FreezeTransform(action.BaseAction):
         return self.log_data
 
 
-    def checkFrozenObject(self, obj, attrList, compValue, *args):
+    def checkFrozenObject(self, obj, attributes, compValue, *args):
         """ Compare values.
             Return True if equal.
         """
-        for attr in attrList:
+        for attr in attributes:
             if cmds.getAttr(obj+'.'+attr) != compValue:
                 return False
         return True
 
 
-    def unlockAttributes(self, obj, attrList, *args):
+    def unlockAttributes(self, obj, attributes, *args):
         """ Just unlock attributes.
         """
-        for attr in attrList:
+        for attr in attributes:
             if self.animCurvesList:
                 if obj+'_'+attr in self.animCurvesList:
                     return False

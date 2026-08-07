@@ -90,10 +90,10 @@ class EmptyTransform(action.BaseAction):
                     nodeGraphList = cmds.listConnections(transform, type="nodeGraphEditorInfo") or []
                     hasConnection = set(hasConnection)-set(nodeGraphList)
             if not hasConnection:
-                childrenList = cmds.listRelatives(transform, children=True, fullPath=True)
-                if not childrenList:
+                children = cmds.listRelatives(transform, children=True, fullPath=True)
+                if not children:
                     emptyTransforms.append(transform)
-                elif len(list(set(childrenList).intersection(emptyTransforms))) == len(childrenList):
+                elif len(list(set(children).intersection(emptyTransforms))) == len(children):
                     emptyTransforms.append(transform)
         return emptyTransforms
     
@@ -102,10 +102,10 @@ class EmptyTransform(action.BaseAction):
         """ Ignore dpAr default nodes
         """
         ignoredList = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
-        nodeList = []
+        nodes = []
         for item in ignoredList:
             gotNode = self.ar.utils.getNodeByMessage(item)
             if gotNode:
-                nodeList.append(gotNode)
-        return nodeList
+                nodes.append(gotNode)
+        return nodes
     

@@ -56,36 +56,36 @@ class Isolate(base.BaseLibrary):
     def dpMain(self, *args):
         """ Main function.
             Check existen nodes and call the scripted function.
-            # nodeList[0] = Root_Ctrl
-            # nodeList[1] = Grand Father transform from selected item
-            # nodeList[2] = Selected item (control)
+            # nodes[0] = Root_Ctrl
+            # nodes[1] = Grand Father transform from selected item
+            # nodes[2] = Selected item (control)
         """
-        # declaring nodeList to create the isolate setup:
-        nodeList = [self.rootCtrl, self.grandFatherItem, self.selItem]
-        if len(nodeList) == 3:
-            for nodeName in nodeList:
+        # declaring nodes to create the isolate setup:
+        nodes = [self.rootCtrl, self.grandFatherItem, self.selItem]
+        if len(nodes) == 3:
+            for nodeName in nodes:
                 if not cmds.objExists(nodeName):
                     print(self.ar.data.lang['e004_objNotExist'], nodeName)
                     return
         # call scripted function
-        self.dpIsolate(self.isolateName, nodeList)
+        self.dpIsolate(self.isolateName, nodes)
         
         
-    def dpIsolate(self, attrName, nodeList, *args):
+    def dpIsolate(self, attrName, nodes, *args):
         """ Function to run isolate setup.
         """
         # get father zero out transform node
-        zeroGrp = cmds.listRelatives(nodeList[2], allParents=True, type="transform")[0]
+        zeroGrp = cmds.listRelatives(nodes[2], allParents=True, type="transform")[0]
         # create parent constraint
-        pConst = cmds.parentConstraint(nodeList[0], nodeList[1], zeroGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zeroGrp+"_PaC")[0]
+        pConst = cmds.parentConstraint(nodes[0], nodes[1], zeroGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zeroGrp+"_PaC")[0]
         cmds.setAttr(pConst+".interpType", 0) #noFlip
         # add isolate attribute to selected control
-        cmds.addAttr(nodeList[2], longName=attrName, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
+        cmds.addAttr(nodes[2], longName=attrName, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
         # create reverse node
-        reverseNode = cmds.createNode('reverse', name=nodeList[2]+"_"+attrName.capitalize()+"_Rev")
+        reverseNode = cmds.createNode('reverse', name=nodes[2]+"_"+attrName.capitalize()+"_Rev")
         self.ar.custom_attr.addAttr(0, [pConst, reverseNode]) #dpID
         # do isolate connections
-        cmds.connectAttr(nodeList[2]+"."+attrName, pConst+"."+nodeList[0]+"W0", force=True)
-        cmds.connectAttr(nodeList[2]+"."+attrName, reverseNode+".inputX", force=True)
-        cmds.connectAttr(reverseNode+".outputX", pConst+"."+nodeList[1]+"W1", force=True)
-        cmds.select(nodeList[2])
+        cmds.connectAttr(nodes[2]+"."+attrName, pConst+"."+nodes[0]+"W0", force=True)
+        cmds.connectAttr(nodes[2]+"."+attrName, reverseNode+".inputX", force=True)
+        cmds.connectAttr(reverseNode+".outputX", pConst+"."+nodes[1]+"W1", force=True)
+        cmds.select(nodes[2])

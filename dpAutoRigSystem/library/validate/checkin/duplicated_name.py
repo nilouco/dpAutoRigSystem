@@ -87,10 +87,10 @@ class DuplicatedName(action.BaseAction):
         """
         if cmds.objExists(item):
             if cmds.objectType(item) == "transform":
-                childrenList = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, type="transform")
-                if childrenList:
-                    childrenList = self.reorder_list(childrenList)
-                    for child in childrenList:
+                children = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, type="transform")
+                if children:
+                    children = self.reorder_list(children)
+                    for child in children:
                         if cmds.objExists(child):
                             cmds.rename(child, child[child.rfind("|")+1:]+"_"+str(i))
                 cmds.rename(item, item[item.rfind("|")+1:]+"_"+str(i))

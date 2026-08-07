@@ -73,21 +73,21 @@ class ConnectionIO(action.BaseAction):
         return self.log_data
 
 
-    def getConnectionDataDic(self, itemList, *args):
+    def getConnectionDataDic(self, items, *args):
         """ Processes the given list to collect the info about their connections to rebuild.
             Returns a dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-        for item in itemList:
+        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                attrList = self.ar.data.transform_attrs.copy()
+                attributes = self.ar.data.transform_attrs.copy()
                 userDefList = cmds.listAttr(item, userDefined=True)
                 if userDefList:
-                    attrList.extend(userDefList)
+                    attributes.extend(userDefList)
                 connectedAttrList = []
-                for attr in attrList:
+                for attr in attributes:
                     if cmds.objExists(item+"."+attr):
                         if cmds.listConnections(item+"."+attr):
                             connectedAttrList.append(attr)
@@ -148,12 +148,12 @@ class ConnectionIO(action.BaseAction):
         return dic
     
 
-    def getUtilitiesDataDic(self, itemList, *args):
+    def getUtilitiesDataDic(self, items, *args):
         """ Return the connection data from given utility nodes list.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-        for item in itemList:
+        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):

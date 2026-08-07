@@ -307,16 +307,16 @@ class UpdateGuides(base.BaseLibrary):
 
 
     def listChildren(self, baseGuide):
-        childrenList = cmds.listRelatives(baseGuide, allDescendents=True, children=True, type='transform')
-        childrenList = self.filterNotNurbsCurveAndTransform(childrenList)
-        childrenList = self.filterAnotation(childrenList)
-        return childrenList
+        children = cmds.listRelatives(baseGuide, allDescendents=True, children=True, type='transform')
+        children = self.filterNotNurbsCurveAndTransform(children)
+        children = self.filterAnotation(children)
+        return children
     
 
-    def splitTransformAttrValues(self, guide, attrList):
+    def splitTransformAttrValues(self, guide, attributes):
         nonTransformDic = {}
         transformDic = {}
-        for attribute in attrList:
+        for attribute in attributes:
             attributeValue = self.getAttrValue(guide, attribute)
             if attribute in self.ar.data.transform_attrs[:-1]: #without visibility
                 attributeValueLocked = self.getAttrValue(guide, attribute, True)
@@ -343,8 +343,8 @@ class UpdateGuides(base.BaseLibrary):
                 self.updateData[baseGuide]['instance'] = guides_to_rig[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
                 self.updateData[baseGuide]['children'] = {}
                 self.updateData[baseGuide]['parent'] = self.getGuideParent(baseGuide)
-                childrenList = self.listChildren(baseGuide)
-                for child in childrenList:
+                children = self.listChildren(baseGuide)
+                for child in children:
                     self.updateData[baseGuide]['children'][child] = {'attributes': {}}
                     self.updateData[baseGuide]['children'][child] = {'transformAttributes': {}}
                     guideAttrList = self.listKeyUserAttr(child)
@@ -436,10 +436,10 @@ class UpdateGuides(base.BaseLibrary):
             self.copyAttrFromGuides(self.updateData[guide]['newGuide'], self.updateData[guide][attributesSet])
     
 
-    def filterChildrenFromAnotherBase(self, childrenList, baseGuide):
+    def filterChildrenFromAnotherBase(self, children, baseGuide):
         filtered_items = []
         filterStr = baseGuide.split(':')[0]
-        for children in childrenList:
+        for children in children:
             if filterStr in children:
                 filtered_items.append(children)
         return filtered_items

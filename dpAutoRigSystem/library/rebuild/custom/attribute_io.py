@@ -42,15 +42,15 @@ class AttributeIO(action.BaseAction):
             if self.ar.pipeliner.checkAssetContext():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    itemList = None
+                    items = None
                     if objList:
-                        itemList = objList
+                        items = objList
                     else:
-                        itemList = self.ar.ctrls.getControlList()
-                        itemList.extend(self.get_models_to_export())
-                    if itemList:
+                        items = self.ar.ctrls.getControlList()
+                        items.extend(self.get_models_to_export())
+                    if items:
                         if self.first_mode: #export
-                            self.export_json_file(self.getAttributeDataDic(itemList))
+                            self.export_json_file(self.getAttributeDataDic(items))
                         else: #import
                             attrDic = self.import_latest_json_file(self.get_exported_items())
                             if attrDic:
@@ -82,22 +82,22 @@ class AttributeIO(action.BaseAction):
             Returns the dictionary to export.
         """
         dic = {}
-        itemList = objList.copy()
-        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        items = objList.copy()
+        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
         for node in objList:
             meshList = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
             if meshList:
-                itemList.extend([m for m in meshList if not cmds.getAttr(m+".intermediateObject")] or [])
-                itemList.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type="transform") or [] if cmds.listRelatives(t, children=True, type="mesh")] or [])
-        itemList = list(set(itemList))
-        itemList.sort()
-        for item in itemList:
+                items.extend([m for m in meshList if not cmds.getAttr(m+".intermediateObject")] or [])
+                items.extend([t for t in cmds.listRelatives(node, allDescendents=True, children=True, type="transform") or [] if cmds.listRelatives(t, children=True, type="mesh")] or [])
+        items = list(set(items))
+        items.sort()
+        for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            attrList = cmds.listAttr(item, userDefined=True)
-            if attrList:
+            attributes = cmds.listAttr(item, userDefined=True)
+            if attributes:
                 dic[item] = {"attributes" : {},
-                                "order" : attrList}
-                for attr in attrList:
+                                "order" : attributes}
+                for attr in attributes:
                     if not cmds.getAttr(item+"."+attr, type=True) == "message":
                         attrType = cmds.getAttr(item+"."+attr, type=True)
                         dic[item]["attributes"][attr] = {

@@ -123,9 +123,9 @@ class Controllers(object):
             guideList.append(item)
             if "__" in item and ":" in item and item.endswith("Guide_Base"):
                 spaceName = item.split(":")[0]
-                childrenList = cmds.listRelatives(item, children=True, allDescendents=True, noIntermediate=True, type=self.shapeTypeList)
-                if childrenList:
-                    for child in childrenList:
+                children = cmds.listRelatives(item, children=True, allDescendents=True, noIntermediate=True, type=self.shapeTypeList)
+                if children:
+                    for child in children:
                         if child.startswith(spaceName):
                             guideList.append(child)
         return guideList
@@ -157,8 +157,8 @@ class Controllers(object):
                     # verify if the object is a transform type:
                     elif objType == "transform":
                         # try get guide shape list
-                        itemList = self.getGuideListByAttr(item)
-                        if itemList:
+                        items = self.getGuideListByAttr(item)
+                        if items:
                             if rgb:
                                 cmds.setAttr(item+".guideColorIndex", -1)
                                 cmds.setAttr(item+".guideColorR", color[0])
@@ -171,9 +171,9 @@ class Controllers(object):
                                 cmds.setAttr(item+".guideColorB", self.colorList[iColorIdx][2])
                         else:
                             # find all shapes children of the transform object:
-                            itemList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
-                        if itemList:
-                            for shape in itemList:
+                            items = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
+                        if items:
+                            for shape in items:
                                 self.setColorOverride(shape, color, iColorIdx, rgb, instance=instance)
 
 
@@ -209,19 +209,19 @@ class Controllers(object):
                         cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
 
 
-    def removeColor(self, itemList, *args):
+    def removeColor(self, items, *args):
         """ Just remove color of given list or selected nodes.
         """
-        if not itemList:
-            itemList = cmds.ls(selection=True)
-        if itemList:
-            for item in itemList:
+        if not items:
+            items = cmds.ls(selection=True)
+        if items:
+            for item in items:
                 guideList = self.getGuideListByAttr(item)
                 if guideList:
                     for guide in guideList:
-                        if not guide in itemList:
-                            itemList.append(guide)
-            for item in itemList:
+                        if not guide in items:
+                            items.append(guide)
+            for item in items:
                 isGuide = False
                 if "Guide" in item:
                     self.colorShape([item], "blue")
@@ -267,24 +267,24 @@ class Controllers(object):
         return currentRGBList
 
 
-    def setColorRGBByUI(self, itemList=None, slider=None, instance=None, *args, **kwargs):
+    def setColorRGBByUI(self, items=None, slider=None, instance=None, *args, **kwargs):
         """ Read from UI the rgb color to set override of given list or selected nodes.
         """
-        if not itemList:
-            itemList = cmds.ls(selection=True)
-        if itemList:
+        if not items:
+            items = cmds.ls(selection=True)
+        if items:
             if slider:
-                self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), rgb=True, instance=instance)
+                self.colorShape(items, cmds.colorSliderGrp(slider, query=True, rgbValue=True), rgb=True, instance=instance)
 
 
-    def setColorOutlinerByUI(self, itemList=None, slider=None, *args):
+    def setColorOutlinerByUI(self, items=None, slider=None, *args):
         """ Read from UI the rgb color to set override of given list or selected nodes.
         """
-        if not itemList:
-            itemList = cmds.ls(selection=True)
-        if itemList:
+        if not items:
+            items = cmds.ls(selection=True)
+        if items:
             if slider:
-                self.colorShape(itemList, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
+                self.colorShape(items, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
 
 
     def colorizeUI(self, instance, *args, **kwargs):
@@ -339,11 +339,11 @@ class Controllers(object):
         return resultList
 
 
-    def directConnect(self, fromObj, toObj, attrList=['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], f=True, *args):
+    def directConnect(self, fromObj, toObj, attributes=['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], f=True, *args):
         """Connect attributes from list directely between two objects given.
         """
         if cmds.objExists(fromObj) and cmds.objExists(toObj):
-            for attr in attrList:
+            for attr in attributes:
                 try:
                     # connect attributes:
                     cmds.connectAttr(fromObj+"."+attr, toObj+"."+attr, force=f)
@@ -351,12 +351,12 @@ class Controllers(object):
                     print("Error: Cannot connect", toObj, ".", attr, "directely.")
 
 
-    def setLockHide(self, items, attrList, l=True, k=False, cb=False, *args):
+    def setLockHide(self, items, attributes, l=True, k=False, cb=False, *args):
         """Set lock or hide to attributes for object in lists.
         """
-        if items and attrList:
+        if items and attributes:
             for item in items:
-                for attr in attrList:
+                for attr in attributes:
                     try:
                         # set lock and hide of given attributes:
                         cmds.setAttr(item+"."+attr, lock=l, keyable=k, channelBox=cb)
@@ -364,12 +364,12 @@ class Controllers(object):
                         print("Error: Cannot set", item, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
 
 
-    def setNonKeyable(self, items, attrList, *args):
+    def setNonKeyable(self, items, attributes, *args):
         """Set as nonKeyable to attributes for the given object list.
         """
-        if items and attrList:
+        if items and attributes:
             for item in items:
-                for attr in attrList:
+                for attr in attributes:
                     if attr in cmds.listAttr(item):
                         try:
                             # set lock and hide of given attributes:
@@ -713,7 +713,7 @@ class Controllers(object):
                     pass
 
 
-    def copyAttr(self, sourceItem=False, attrList=False, verbose=False, *args):
+    def copyAttr(self, sourceItem=False, attributes=False, verbose=False, *args):
         """ Get and store in a dictionary the attributes from sourceItem.
             Returns the dictionary with attribute values.
         """
@@ -725,17 +725,17 @@ class Controllers(object):
             else:
                 print(self.ar.data.lang["e015_selectToCopyAttr"])
         if cmds.objExists(sourceItem):
-            if not attrList:
+            if not attributes:
                 # getting channelBox selected attributes:
                 currentAttrList = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
                 if not currentAttrList:
                     # list all attributes if nothing is selected:
                     currentAttrList = cmds.listAttr(sourceItem, visible=True, keyable=True)
-                attrList = currentAttrList
-            if attrList:
+                attributes = currentAttrList
+            if attributes:
                 # store attribute values in a dic:
                 self.attrValueDic = {}
-                for attr in attrList:
+                for attr in attributes:
                     if attr in cmds.listAttr(sourceItem):
                         value = cmds.getAttr(sourceItem+'.'+attr)
                         self.attrValueDic[attr] = value
@@ -781,11 +781,11 @@ class Controllers(object):
                 self.pasteAttr(destinations, verbose)
 
 
-    def transferAttr(self, sourceItem, destinations, attrList, *args):
+    def transferAttr(self, sourceItem, destinations, attributes, *args):
         """ Transfer attributes from sourceItem to destinations.
         """
-        if sourceItem and destinations and attrList:
-            self.copyAttr(sourceItem, attrList)
+        if sourceItem and destinations and attributes:
+            self.copyAttr(sourceItem, attributes)
             self.pasteAttr(destinations)
 
 
@@ -1165,19 +1165,19 @@ class Controllers(object):
                             for node in allNodeList:
                                 self.mirrorCalibration(node, fromPrefix, toPrefix)
             else:
-                attrList = self.getListFromStringAttr(nodeName)
-                if attrList:
+                attributes = self.getListFromStringAttr(nodeName)
+                if attributes:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
                         notMirrorAttrList = self.getListFromStringAttr(nodeName, "notMirrorList")
                         if notMirrorAttrList:
-                            attrList = list(set(attrList) - set(notMirrorAttrList))
-                        self.transferAttr(nodeName, [destinationNode], attrList)
+                            attributes = list(set(attributes) - set(notMirrorAttrList))
+                        self.transferAttr(nodeName, [destinationNode], attributes)
         else:
             print(self.ar.data.lang['i198_mirrorPrefix'])
 
 
-    def transferCalibration(self, sourceItem=False, destinations=False, attrList=False, verbose=True, *args):
+    def transferCalibration(self, sourceItem=False, destinations=False, attributes=False, verbose=True, *args):
         """ Transfer calibration attributes.
         """
         if not sourceItem:
@@ -1188,24 +1188,24 @@ class Controllers(object):
                     sourceItem = currentSelectionList[0]
                     destinations = currentSelectionList[1:]
         if sourceItem:
-            if not attrList:
-                attrList = self.getListFromStringAttr(sourceItem)
-            if attrList:
-                self.transferAttr(sourceItem, destinations, attrList)
+            if not attributes:
+                attributes = self.getListFromStringAttr(sourceItem)
+            if attributes:
+                self.transferAttr(sourceItem, destinations, attributes)
             if verbose:
-                print(self.ar.data.lang['i195_transferedCalib'], sourceItem, destinations, attrList)
+                print(self.ar.data.lang['i195_transferedCalib'], sourceItem, destinations, attributes)
         else:
             print(self.ar.data.lang['i042_notSelection'])
 
 
-    def setStringAttrFromList(self, nodeName, attrList, attrName="calibrationList", *args):
+    def setStringAttrFromList(self, nodeName, attributes, attrName="calibrationList", *args):
         """ Set the given attribute that contains a list of the given list.
             Add a string attribute if it doesn't exists.
             Useful for calibrationList attribute.
         """
         if cmds.objExists(nodeName):
-            if attrList:
-                calibrationAttr = ';'.join(attrList)
+            if attributes:
+                calibrationAttr = ';'.join(attributes)
                 if not attrName in cmds.listAttr(nodeName):
                     cmds.addAttr(nodeName, longName=attrName, dataType="string")
                 cmds.setAttr(nodeName+"."+attrName, calibrationAttr, type="string")
@@ -1224,21 +1224,21 @@ class Controllers(object):
             If have a given attr, it'll filter if there are nodes with this attribute.
             Returns a list of them.
         """
-        nodeList = []
+        nodes = []
         allList = cmds.ls(selection=False, type="transform")
         if allList:
             if attr:
                 for item in allList:
                     if attr in cmds.listAttr(item):
-                        nodeList.append(item)
+                        nodes.append(item)
             else:
                 for item in allList:
                     if DPCONTROL in cmds.listAttr(item) and cmds.getAttr(item+"."+DPCONTROL):
-                        nodeList.append(item)
-        return nodeList
+                        nodes.append(item)
+        return nodes
 
 
-    def exportShape(self, nodeList=None, path=None, IO=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, verbose=False, dir="dpControlShape", *args):
+    def exportShape(self, nodes=None, path=None, IO=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, verbose=False, dir="dpControlShape", *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
@@ -1253,9 +1253,9 @@ class Controllers(object):
             else:
                 mel.eval('warning \"'+self.ar.data.lang['i201_saveScene']+'\";')
                 return
-        if not nodeList:
-            nodeList = self.getControlList()
-        if nodeList:
+        if not nodes:
+            nodes = self.getControlList()
+        if nodes:
             if not path:
                 if IO:
                     dpFolder = currentPath[:currentPath.rfind("/")+1]+self.ar.dpData+"/"+dir
@@ -1268,14 +1268,14 @@ class Controllers(object):
                         path = pathList[0] 
             if path:
                 if ui:
-                    self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodeList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), addOne=False, addNumber=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
                 cmds.undoInfo(openChunk=True)
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
-                for item in nodeList:
+                for item in nodes:
                     if ui or verbose:
                         self.ar.utils.setProgress(self.doingName+': Shape')
                     snapshotName = item+SNAPSHOT_SUFFIX
@@ -1323,15 +1323,15 @@ class Controllers(object):
             self.ar.utils.setProgress(endIt=True)
 
 
-    def importShape(self, nodeList=None, path=None, IO=False, ui=True, verbose=False, dir="dpControlShape", *args):
+    def importShape(self, nodes=None, path=None, IO=False, ui=True, verbose=False, dir="dpControlShape", *args):
         """ Import control shapes from an external loaded Maya file.
             If not get an user defined parameter for a node list, it will import all shapes.
             If the IO parameter is True, it will use the default path as current location inside dpControlShapeIO directory.
         """
         importShapeNamespace = "dpImportShape"
-        if not nodeList:
-            nodeList = self.getControlList()
-        if nodeList:
+        if not nodes:
+            nodes = self.getControlList()
+        if nodes:
             if IO:
                 currentPath = cmds.file(query=True, sceneName=True)
                 if not currentPath:
@@ -1535,9 +1535,9 @@ class Controllers(object):
                 self.ar.utils.setProgress(endIt=True)
             else: #set default values
                 for item in nodeToRunList:
-                    attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
-                    if attrList:
-                        for attr in attrList:
+                    attributes = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
+                    if attributes:
+                        for attr in attributes:
                             # hack to avoid Maya limitation to edit boolean attributes
                             if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
                                 cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
@@ -1590,9 +1590,9 @@ class Controllers(object):
         if ctrlList:
             ctrlList.sort()
             for c, ctrl in enumerate(ctrlList):
-                attrList = self.resetPose.getSetupAttrList(ctrl, self.ignoreDefaultValuesAttrList)
-                if attrList:
-                    for a, attr in enumerate(attrList):
+                attributes = self.resetPose.getSetupAttrList(ctrl, self.ignoreDefaultValuesAttrList)
+                if attributes:
+                    for a, attr in enumerate(attributes):
                         cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.dvSelectedLayout)
                         if a == 0:
                             cmds.button(label=ctrl, command=partial(self.selectControl, ctrl, True))

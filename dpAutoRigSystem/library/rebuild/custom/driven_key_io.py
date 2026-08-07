@@ -39,14 +39,14 @@ class DrivenKeyIO(action.BaseAction):
             if self.ar.pipeliner.checkAssetContext():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    nodeList = None
+                    nodes = None
                     if objList:
-                        nodeList = objList
+                        nodes = objList
                     else:
-                        nodeList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+                        nodes = cmds.ls(selection=False, type=self.drivenKeyTypeList)
                     if self.first_mode: #export
-                        if nodeList:
-                            self.export_json_file(self.getDrivenKeyDataDic(nodeList))
+                        if nodes:
+                            self.export_json_file(self.getDrivenKeyDataDic(nodes))
                         else:
                             self.maybe_done_io("Set Driven Keys")
                     else: #import
@@ -72,16 +72,16 @@ class DrivenKeyIO(action.BaseAction):
         return self.log_data
 
 
-    def getDrivenKeyDataDic(self, nodeList, *args):
+    def getDrivenKeyDataDic(self, nodes, *args):
         """ Processes the given set driven key node list to collect and mount the info data.
             Returns the dictionary to export.
         """
         dic = {}
-        attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
+        attributes = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
         keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
         keyTimeAttrList = ["keyTime", "keyValue"]
-        self.ar.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
-        for item in nodeList:
+        self.ar.utils.setProgress(max=len(nodes), addOne=False, addNumber=False)
+        for item in nodes:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
                 # getting attributes if they exists
@@ -108,7 +108,7 @@ class DrivenKeyIO(action.BaseAction):
                             "size"             : cmds.getAttr(item+".keyTimeValue", multiIndices=True, size=True),
                             "name"             : item
                             }
-                for attr in attrList:
+                for attr in attributes:
                     if cmds.objExists(item+"."+attr):
                         dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                 # storage the keys

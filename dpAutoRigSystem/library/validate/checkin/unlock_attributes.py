@@ -34,13 +34,13 @@ class UnlockAttributes(action.BaseAction):
         if not self.ar.utils.getAllGrp():
             if not self.ar.utils.getNetworkNodeByAttr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
-                    nodeList = cmds.ls(selection=False)
+                    nodes = cmds.ls(selection=False)
                     if objList:
-                        nodeList = objList
-                    if nodeList:
+                        nodes = objList
+                    if nodes:
                         lockedAttrDic = {}
-                        self.ar.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
-                        for item in nodeList:
+                        self.ar.utils.setProgress(max=len(nodes), addOne=False, addNumber=False)
+                        for item in nodes:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             lockedAttrList = cmds.listAttr(item, locked=True)
                             if lockedAttrList:

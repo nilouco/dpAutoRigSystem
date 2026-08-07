@@ -166,11 +166,11 @@ class CustomAttr(base.BaseLibrary):
         """
         toSelectList = []
         if self.typeList:
-            nodeList = cmds.ls(type=self.typeList)
+            nodes = cmds.ls(type=self.typeList)
         else:
-            nodeList = cmds.ls(defaultNodes=False)
-        if nodeList:
-            for item in nodeList:
+            nodes = cmds.ls(defaultNodes=False)
+        if nodes:
+            for item in nodes:
                 if not item in toSelectList:
                     addThisItem = True
                     for suffix in self.doNotDisplayList:
@@ -220,35 +220,35 @@ class CustomAttr(base.BaseLibrary):
         cmds.showWindow(self.addWindowName)
 
 
-    def getDescendentsList(self, itemList, shapes=True, *args):
+    def getDescendentsList(self, items, shapes=True, *args):
         """ Returns the children nodes or shapes from given item list.
         """
         resultList = []
-        for item in itemList:
+        for item in items:
             if cmds.objExists(item):
-                childrenList = cmds.listRelatives(item, allDescendents=True, children=True)
+                children = cmds.listRelatives(item, allDescendents=True, children=True)
                 if shapes:
-                    childrenList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
-                if childrenList:
-                    resultList.extend(childrenList)
+                    children = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
+                if children:
+                    resultList.extend(children)
         return resultList
 
 
-    def addAttr(self, attrIndex, itemList=None, attrName=None, shapes=True, descendents=False, *args):
+    def addAttr(self, attrIndex, items=None, attrName=None, shapes=True, descendents=False, *args):
         """ Create attributes in the selected node if they don't exists yet.
             Return a list of created dpID.
         """
         idList = []
         attr = None
-        if not itemList:
-            itemList = cmds.ls(selection=True)
-        if itemList:
+        if not items:
+            items = cmds.ls(selection=True)
+        if items:
             if shapes:
-                itemList.extend(self.getDescendentsList(itemList))
+                items.extend(self.getDescendentsList(items))
             if descendents:
-                itemList.extend(self.getDescendentsList(itemList, False))
-            itemList = list(set(itemList)) # just remove duplicated items
-            for item in itemList:
+                items.extend(self.getDescendentsList(items, False))
+            items = list(set(items)) # just remove duplicated items
+            for item in items:
                 if cmds.objExists(item):
                     if attrIndex == "custom":
                         if attrName:
@@ -307,12 +307,12 @@ class CustomAttr(base.BaseLibrary):
         cmds.showWindow(self.removeWindowName)
 
 
-    def removeAttr(self, attr, itemList=None, *args):
+    def removeAttr(self, attr, items=None, *args):
         """ Delete the given attribute and reload the removeAttrUI.
         """
-        itemList = self.getItemList(itemList)
-        if itemList:
-            for item in itemList:
+        items = self.getItemList(items)
+        if items:
+            for item in items:
                 if cmds.attributeQuery(attr, node=item, exists=True):
                     cmds.setAttr(item+"."+attr, edit=True, lock=False)
                     cmds.deleteAttr(item+"."+attr)
@@ -321,13 +321,13 @@ class CustomAttr(base.BaseLibrary):
                             cmds.deleteUI("removeButton"+attr)
 
 
-    def getCustomAttrList(self, itemList=None, *args):
+    def getCustomAttrList(self, items=None, *args):
         """ Return all boolean attributes starting with "dp".
         """
         customAttrList = []
-        itemList = self.getItemList(itemList)
-        if itemList:    
-            for item in itemList:
+        items = self.getItemList(items)
+        if items:    
+            for item in items:
                 currentItemAttrList = cmds.listAttr(item)
                 if currentItemAttrList:
                     if ATTR_DPID in currentItemAttrList:
@@ -339,30 +339,30 @@ class CustomAttr(base.BaseLibrary):
         return customAttrList
 
 
-    def getItemList(self, itemList=None, *args):
-        """ Check if the itemList is a valid item or select all type to return it.
+    def getItemList(self, items=None, *args):
+        """ Check if the items is a valid item or select all type to return it.
         """
-        if not itemList:
+        if not items:
             return cmds.ls(selection=True, type=self.typeList)
-        return itemList
+        return items
 
 
-    def updateID(self, itemList=None, *args):
+    def updateID(self, items=None, *args):
         """ Remove and Add a new dpID attribute.
         """
-        self.removeAttr(ATTR_DPID, itemList)
-        return self.addAttr(0, itemList)
+        self.removeAttr(ATTR_DPID, items)
+        return self.addAttr(0, items)
 
 
-    def revealID(self, itemList=None, win=False, *args):
+    def revealID(self, items=None, win=False, *args):
         """ If UI, it opens a window to reveal the decomposed ID.
             Returns a dictionary with the IDs data.
         """
         idDic = {}
-        if not itemList:
-            itemList = [node for node in cmds.ls(selection=True) for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignoreList]
-        if itemList:
-            for item in itemList:
+        if not items:
+            items = [node for node in cmds.ls(selection=True) for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignoreList]
+        if items:
+            for item in items:
                 decomposedIDList = self.ar.utils.decomposeID(item)
                 idDic[item] = {#"node" : item,
                                 ATTR_DPID : cmds.getAttr(item+"."+ATTR_DPID),

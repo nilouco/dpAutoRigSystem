@@ -96,9 +96,9 @@ class BaseStandard(base.BaseLibrary):
         self.create_guide_annotation()
         # setup worldSize
         self.ar.ctrls.getDPARTempGrp()
-        self.createWorldSize()
+        self.create_world_size()
         # prepare guide to serialization
-        self.createGuideNetwork()
+        self.create_guide_network()
         self.ar.data.guide_instances.append(self)
         if self.ar.data.ui_state:
             self.ar.ui_manager.update_guide_footer()
@@ -305,13 +305,13 @@ class BaseStandard(base.BaseLibrary):
                     else:
                         s = s_default
                     # add joint label, create controller, zeroOut
-                    self.ar.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, label_name+"_"+str(m))
-                    jcr_ctrl, jcr_grp = self.ar.ctrls.createCorrectiveJointCtrl(corrective_joints[i], corrective_nets[i], radius=self.ctrlRadius*0.2)
+                    self.ar.utils.setJointLabel(jcr, s+self.joint_label_add, 18, label_name+"_"+str(m))
+                    jcr_ctrl, jcr_grp = self.ar.ctrls.createCorrectiveJointCtrl(corrective_joints[i], corrective_nets[i], radius=self.radius*0.2)
                     cmds.parent(jcr_grp, self.corrective_ctrls_grp)
                     # preset calibration
                     for calibrate_attr in calibrate_presets[i].keys():
                         if "calibrateT" in calibrate_attr:
-                            cmds.setAttr(jcr_ctrl+"."+calibrate_attr, calibrate_presets[i][calibrate_attr]*self.ctrlRadius)
+                            cmds.setAttr(jcr_ctrl+"."+calibrate_attr, calibrate_presets[i][calibrate_attr]*self.radius)
                         else:
                             cmds.setAttr(jcr_ctrl+"."+calibrate_attr, calibrate_presets[i][calibrate_attr])
                     if inverts:
@@ -363,107 +363,105 @@ class BaseStandard(base.BaseLibrary):
         cmds.checkBox(self.mainCtrlsCB, edit=True, editable=True)
 
 
-    def setAddMainCtrls(self, value, *args):
+    def set_main_ctrls(self, value, *args):
         """ Just store the main controllers checkBox value and enable the int field.
         """
         cmds.setAttr(self.guide_base+".mainControls", value)
         self.enable_main_ctrls(value)
 
 
-    def addFkMainCtrls(self, side, ctrlList, *args):
+    def add_fk_main_ctrls(self, side, ctrlList):
         """ Implement the fk main controllers.
         """
-        mainCtrlList = []
+        main_ctrls = []
         # getting and calculating values
-        totalToAddMain = 1
-        self.nMain = cmds.getAttr(self.base+".nMain")
-        if self.nMain > 1:
-            totalToAddMain = int(self.nJoints/self.nMain)
+        total_to_add_main = 1
+        self.n_main = cmds.getAttr(self.base+".nMain")
+        if self.n_main > 1:
+            total_to_add_main = int(self.nJoints/self.n_main)
         # run throgh the chain
-        for m in range(0, self.nMain):
-            startAt = m*totalToAddMain
-            endAt = (m+1)*totalToAddMain
-            if m == self.nMain-1:
-                endAt = self.nJoints
-            for n in range(startAt, endAt):
-                currentCtrl = ctrlList[n]
-                currentCtrlZero = cmds.listRelatives(currentCtrl, parent=True)[0]
-                if n == startAt:
+        for m in range(0, self.n_main):
+            start = m*total_to_add_main
+            end = (m+1)*total_to_add_main
+            if m == self.n_main-1:
+                end = self.nJoints
+            for n in range(start, end):
+                current_ctrl = ctrlList[n]
+                current_ctrl_zero = cmds.listRelatives(current_ctrl, parent=True)[0]
+                if n == start:
                     # create a main controller
-                    mainCtrl = self.ar.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree, guideSource=self.name_guide+"_Base", parentTag=self.getParentToTag(mainCtrlList))
-                    mainCtrlList.append(mainCtrl)
-                    self.ar.ctrls.colorShape([mainCtrl], "cyan")
-                    cmds.addAttr(mainCtrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                    main_ctrl = self.ar.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.radius*1.2, d=self.curve_degree, guideSource=self.name_guide+"_Base", parentTag=self.get_parent_to_tag(main_ctrls))
+                    main_ctrls.append(main_ctrl)
+                    self.ar.ctrls.colorShape([main_ctrl], "cyan")
+                    cmds.addAttr(main_ctrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     # position
-                    cmds.parent(mainCtrl, currentCtrlZero)
-                    cmds.makeIdentity(mainCtrl, apply=False, translate=True, rotate=True, scale=True)
-                    cmds.parent(currentCtrl, mainCtrl)
+                    cmds.parent(main_ctrl, current_ctrl_zero)
+                    cmds.makeIdentity(main_ctrl, apply=False, translate=True, rotate=True, scale=True)
+                    cmds.parent(current_ctrl, main_ctrl)
                     # intensity utilities
-                    rIntensityMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_R_Main_MD")
-                    self.to_ids.append(rIntensityMD)
+                    r_intensity_md = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_R_Main_MD")
+                    self.to_ids.append(r_intensity_md)
                     for axis in self.ar.data.axis:
-                        cmds.connectAttr(mainCtrl+".rotate"+axis, rIntensityMD+".input1"+axis, force=True)
-                        cmds.connectAttr(mainCtrl+"."+self.ar.data.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
+                        cmds.connectAttr(main_ctrl+".rotate"+axis, r_intensity_md+".input1"+axis, force=True)
+                        cmds.connectAttr(main_ctrl+"."+self.ar.data.lang['c049_intensity'], r_intensity_md+".input2"+axis, force=True)
                 else:
                     # offseting sub controllers
-                    offsetGrp = cmds.group(name=currentCtrl+"_Offset_Grp", empty=True)
-                    cmds.parent(offsetGrp, currentCtrlZero)
-                    cmds.makeIdentity(offsetGrp, apply=False, translate=True, rotate=True, scale=True)
-                    cmds.parent(currentCtrl, offsetGrp)
+                    offset_grp = cmds.group(name=current_ctrl+"_Offset_Grp", empty=True)
+                    cmds.parent(offset_grp, current_ctrl_zero)
+                    cmds.makeIdentity(offset_grp, apply=False, translate=True, rotate=True, scale=True)
+                    cmds.parent(current_ctrl, offset_grp)
                     for axis in self.ar.data.axis:
-                        cmds.connectAttr(rIntensityMD+".output"+axis, offsetGrp+".rotate"+axis, force=True)
+                        cmds.connectAttr(r_intensity_md+".output"+axis, offset_grp+".rotate"+axis, force=True)
                 # display sub controllers shapes
-                self.ar.ctrls.setSubControlDisplay(mainCtrl, currentCtrl, 0)
+                self.ar.ctrls.setSubControlDisplay(main_ctrl, current_ctrl, 0)
     
 
-    def getMirrorSideList(self, *args):
+    def get_mirror_sides(self):
         """ Processes the mirror information for the current guide.
-        Defines self.sides to be used by the module.
+            Defines self.sides to be used by the module.
         """
         # analisys the mirror module:
-        self.mirrorAxis = cmds.getAttr(self.guide_base+".mirrorAxis")
-        if self.mirrorAxis != 'off':
+        self.mirror_axis = cmds.getAttr(self.guide_base+".mirrorAxis")
+        if self.mirror_axis != 'off':
             # get rigs names:
-            self.mirrorNames = cmds.getAttr(self.guide_base+".mirrorName")
+            self.mirror_names = cmds.getAttr(self.guide_base+".mirrorName")
             # get first and last letters to use as side initials (prefix):
-            self.sides = [self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_']
+            self.sides = [self.mirror_names[0]+'_', self.mirror_names[len(self.mirror_names)-1]+'_']
             for s, side in enumerate(self.sides):
                 duplicated = cmds.duplicate(self.guide_base, name=side+self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
+                for item in cmds.listRelatives(duplicated, allDescendents=True):
                     cmds.rename(item, side+self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
+                self.mirror_grp = cmds.group(name="Guide_Base_Grp", empty=True)
+                cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirror_grp, absolute=True)
                 # re-rename grp:
-                cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
+                cmds.rename(self.mirror_grp, side+self.userGuideName+'_'+self.mirror_grp)
                 # do a group mirror with negative scaling:
                 if s == 1:
-                    withoutFlip = False
+                    without_flip = False
                     if cmds.objExists(self.guide_base+".flip"):
                         if cmds.getAttr(self.guide_base+".flip") == 0:
-                            withoutFlip = True
-                    if withoutFlip:
-                        for axis in self.mirrorAxis:
-                            gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                            flipedValue = gotValue*(-2)
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
+                            without_flip = True
+                    if without_flip:
+                        for axis in self.mirror_axis:
+                            got_value = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
+                            fliped_value = got_value*(-2)
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirror_grp+'.translate'+axis, fliped_value)
                     else:
-                        for axis in self.mirrorAxis:
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+                        for axis in self.mirror_axis:
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirror_grp+'.scale'+axis, -1)
             # joint labelling:
-            self.jointLabelAdd = 1
+            self.joint_label_add = 1
         else: # if not mirror:
             duplicated = cmds.duplicate(self.guide_base, name=self.userGuideName+'_Guide_Base')[0]
-            allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-            for item in allGuideList:
+            for item in cmds.listRelatives(duplicated, allDescendents=True):
                 cmds.rename(item, self.userGuideName+"_"+item)
-            self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
+            self.mirror_grp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
             # re-rename grp:
-            cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
+            cmds.rename(self.mirror_grp, self.userGuideName+'_'+self.mirror_grp)
             # joint labelling:
-            self.jointLabelAdd = 0
+            self.joint_label_add = 0
         # store the number of this guide by module type
-        self.dpAR_count = self.ar.utils.findModuleLastNumber(self.name, "moduleType", True)
+        self.dpar_count = self.ar.utils.findModuleLastNumber(self.name, "moduleType", True)
 
 
     def rig_me(self, *args):
@@ -488,18 +486,17 @@ class BaseStandard(base.BaseLibrary):
             self.ar.opt.check_use_default_render_layer()
             
             # get the radius value to controls:
+            self.radius = 1
             if cmds.objExists(self.radius_ctrl):
-                self.ctrlRadius = self.ar.utils.getCtrlRadius(self.radius_ctrl)
-            else:
-                self.ctrlRadius = 1
+                self.radius = self.ar.utils.getCtrlRadius(self.radius_ctrl)
                 
             # get curve degree:
-            self.curveDegree = cmds.getAttr(self.guide_base+".degree")
+            self.curve_degree = cmds.getAttr(self.guide_base+".degree")
             
             # unparent all guide modules child:
-            childrenList = cmds.listRelatives(self.guide_base, allDescendents=True, type='transform')
-            if childrenList:
-                for child in childrenList:
+            children = cmds.listRelatives(self.guide_base, allDescendents=True, type='transform')
+            if children:
+                for child in children:
                     if "guideBase" in cmds.listAttr(child) and cmds.getAttr(child+".guideBase") == 1:
                         cmds.parent(child, world=True)
             
@@ -514,61 +511,64 @@ class BaseStandard(base.BaseLibrary):
             if self.ar.data.prefix:
                 self.userGuideName = self.ar.data.prefix + self.userGuideName
             cmds.select(clear=True)
-            self.getMirrorSideList()
+            self.get_mirror_sides()
+            self.articulation = self.get_guide_attr("articulation")
+            self.corrective = self.get_guide_attr("corrective")
+            self.flip = self.get_guide_attr("flip")
     
 
-    def hookSetup(self, side, ctrlList, scalableList=None, staticList=None, *args):
+    def create_hook_setup(self, side, ctrlList, scalableList=None, staticList=None, *args):
         """ Generate the hook setup to find lists of controllers, scalable and static groups.
             Add message attributes to map hooked groups for the rigged module.
         """
         # create a masterModuleGrp to be checked if this rig exists:
-        self.toCtrlHookGrp     = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
-        self.toScalableHookGrp = cmds.group(empty=True, name=side+self.userGuideName+"_Scalable_Grp")
-        self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
+        self.ctrl_hook_grp = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
+        self.scalable_hook_grp = cmds.group(empty=True, name=side+self.userGuideName+"_Scalable_Grp")
+        self.static_hook_grp = cmds.group(self.ctrl_hook_grp, self.scalable_hook_grp, name=side+self.userGuideName+"_Static_Grp")
         if staticList:
-            cmds.parent(staticList, self.toStaticHookGrp)
+            cmds.parent(staticList, self.static_hook_grp)
         if scalableList:
-            cmds.parent(scalableList, self.toScalableHookGrp)
-        self.ar.custom_attr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp]) #dpID
+            cmds.parent(scalableList, self.scalable_hook_grp)
+        self.ar.custom_attr.addAttr(0, [self.ctrl_hook_grp, self.scalable_hook_grp, self.static_hook_grp]) #dpID
         # add hook attributes to be read when rigging composed modules:
-        self.ar.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-        self.ar.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-        self.ar.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+        self.ar.utils.addHook(objName=self.ctrl_hook_grp, hookType='ctrlHook')
+        self.ar.utils.addHook(objName=self.scalable_hook_grp, hookType='scalableHook')
+        self.ar.utils.addHook(objName=self.static_hook_grp, hookType='staticHook')
         cmds.lockNode(self.guide_net, lock=False)
         # add module type counter value
         if not 'dpAR_count' in cmds.listAttr(self.guide_net):
             cmds.addAttr(self.guide_net, longName='dpAR_count', attributeType='long', keyable=False)
-            cmds.setAttr(self.guide_net+'.dpAR_count', self.dpAR_count)
+            cmds.setAttr(self.guide_net+'.dpAR_count', self.dpar_count)
         # message attributes
         cmds.addAttr(self.guide_net, longName=side+"ControlHookGrp", attributeType="message")
         cmds.addAttr(self.guide_net, longName=side+"StaticHookGrp", attributeType="message")
         cmds.addAttr(self.guide_net, longName=side+"ScalableHookGrp", attributeType="message")
-        cmds.connectAttr(self.toCtrlHookGrp+".message", self.guide_net+"."+side+"ControlHookGrp", force=True)
-        cmds.connectAttr(self.toScalableHookGrp+".message", self.guide_net+"."+side+"ScalableHookGrp", force=True)
-        cmds.connectAttr(self.toStaticHookGrp+".message", self.guide_net+"."+side+"StaticHookGrp", force=True)
-        cmds.setAttr(self.toScalableHookGrp+".visibility", self.getJointsVisibility())
-        cmds.setAttr(self.toStaticHookGrp+".visibility", self.getJointsVisibility())
+        cmds.connectAttr(self.ctrl_hook_grp+".message", self.guide_net+"."+side+"ControlHookGrp", force=True)
+        cmds.connectAttr(self.scalable_hook_grp+".message", self.guide_net+"."+side+"ScalableHookGrp", force=True)
+        cmds.connectAttr(self.static_hook_grp+".message", self.guide_net+"."+side+"StaticHookGrp", force=True)
+        cmds.setAttr(self.scalable_hook_grp+".visibility", self.ar.data.display_joint)
+        cmds.setAttr(self.static_hook_grp+".visibility", self.ar.data.display_joint)
         cmds.lockNode(self.guide_net, lock=True)
 
     
-    def composingInfo(self, *args):
+    def composing_info(self):
         """ This method just create this dictionary in order to build information of module integration.
         """
         self.composed = {}
     
 
-    def createGuideNetwork(self, number=None, *args):
+    def create_guide_network(self, number=None):
         """ Create a network for the current guide and store on it the nodes used in this module by message.
         """
         if number:
-            guideNumber = number
+            guide_number = number
         else:
-            guideNumber = self.ar.utils.findLastNumber()
-        self.guide_net = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
+            guide_number = self.ar.utils.findLastNumber()
+        self.guide_net = cmds.createNode("network", name="dpGuide_"+guide_number+"_Net")
         self.ar.custom_attr.addAttr(0, [self.guide_net])[0] #dpID
-        for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
-            cmds.addAttr(self.guide_net, longName=baseAttr, attributeType="bool")
-            cmds.setAttr(self.guide_net+"."+baseAttr, 1)
+        for base_attr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
+            cmds.addAttr(self.guide_net, longName=base_attr, attributeType="bool")
+            cmds.setAttr(self.guide_net+"."+base_attr, 1)
         cmds.addAttr(self.guide_net, longName="moduleType", dataType="string")
         cmds.addAttr(self.guide_net, longName="guideName", dataType="string")
         cmds.addAttr(self.guide_net, longName="guideNumber", dataType="string")
@@ -577,193 +577,182 @@ class BaseStandard(base.BaseLibrary):
         cmds.addAttr(self.guide_net, longName="linkedNode", attributeType="message")
         cmds.setAttr(self.guide_net+".moduleType", self.name, type="string")
         cmds.setAttr(self.guide_net+".guideName", self.userGuideName, type="string")
-        cmds.setAttr(self.guide_net+".guideNumber", guideNumber, type="string")
+        cmds.setAttr(self.guide_net+".guideNumber", guide_number, type="string")
         if not "net" in cmds.listAttr(self.guide_base):
             cmds.addAttr(self.guide_base, longName="net", attributeType="message")
         cmds.lockNode(self.guide_net, lock=False)
         cmds.connectAttr(self.guide_net+".message", self.guide_base+".net", force=True)
         cmds.connectAttr(self.guide_base+".message", self.guide_net+".linkedNode", force=True)
-        self.addNodeToGuideNet([self.guide_base, self.radius_ctrl, self.annotation], ["main", "radiusCtrl", "annotation"])
+        self.add_node_to_guide_net([self.guide_base, self.radius_ctrl, self.annotation], ["main", "radiusCtrl", "annotation"])
 
     
-    def addNodeToGuideNet(self, nodeList, messageAttrList, *args):
+    def add_node_to_guide_net(self, nodes, message_attrs):
         """ Include the given node list to the respective given attribute list as message connection in the network.
         """
-        for node, messageAttr in zip(nodeList, messageAttrList):
-            if not cmds.objExists(self.guide_net+"."+messageAttr):
-                self.lockNodeStatus = cmds.lockNode(self.guide_net, query=True, lock=True)[0]
+        for node, message_attr in zip(nodes, message_attrs):
+            if not message_attr in cmds.listAttr(self.guide_net):
+                self.lock_node_status = cmds.lockNode(self.guide_net, query=True, lock=True)[0]
                 cmds.lockNode(self.guide_net, lock=False)
-                cmds.addAttr(self.guide_net, longName=messageAttr, attributeType="message")
-            cmds.connectAttr(node+".message", self.guide_net+"."+messageAttr, force=True)
-            self.addAttrToBeforeData(messageAttr)
+                cmds.addAttr(self.guide_net, longName=message_attr, attributeType="message")
+            cmds.connectAttr(node+".message", self.guide_net+"."+message_attr, force=True)
+            self.add_attr_to_before_data(message_attr)
 
 
-    def removeAttrFromGuideNet(self, attrList, *args):
+    def remove_attr_from_guide_net(self, attributes):
         """ Remove the given attribute list from the network node.
         """
-        for attr in attrList:
+        for attr in attributes:
             cmds.deleteAttr(self.guide_net+"."+attr)
-            beforeList = self.getBeforeList()
-            if attr in beforeList:
-                beforeList.remove(attr)
-                self.setBeforeList(beforeList)
+            befores = self.get_befores()
+            if attr in befores:
+                befores.remove(attr)
+                self.set_befores(befores)
     
 
-    def addAttrToBeforeData(self, attr, *args):
+    def add_attr_to_before_data(self, attr):
         """ Just read the current before attribute string, add the new give attribute to it and set the guide network attibute with this new info.
             Returns the updated before data string.
         """
-        beforeString = cmds.getAttr(self.guide_net+".beforeData") or ""
-        beforeString = beforeString + attr + ";"
-        cmds.setAttr(self.guide_net+".beforeData", beforeString, type="string")
-        if self.lockNodeStatus:
+        before = cmds.getAttr(self.guide_net+".beforeData") or ""
+        before = f"{before}{attr};"
+        cmds.setAttr(self.guide_net+".beforeData", before, type="string")
+        if self.lock_node_status:
             cmds.lockNode(self.guide_net, lock=True)
-        return beforeString
+        return before
 
 
-    def getBeforeList(self, *args):
+    def get_befores(self):
         """ Just return a list with the splited items from the guide network beforeData string attribute.
         """
-        beforeString = cmds.getAttr(self.guide_net+".beforeData")
-        if beforeString:
-            return list(filter(None, beforeString.split(";")))
+        before = cmds.getAttr(self.guide_net+".beforeData")
+        if before:
+            return list(filter(None, before.split(";")))
 
 
-    def setBeforeList(self, bList, *args):
+    def set_befores(self, befores):
         """ Receives a list and set it as beforeData string attribute in the guide network.
         """
-        cmds.setAttr(self.guide_net+".beforeData", (";").join(bList)+";", type="string")
+        cmds.setAttr(self.guide_net+".beforeData", (";").join(befores)+";", type="string")
 
 
-    def getNodeData(self, node, *args):
+    def get_node_data(self, node):
         """ Get and return all transformation data for the transform, also the userDefined attributes and them values.
             Returns a dictionary with this info.
         """
-        attrList = cmds.listAttr(node, keyable=True)
-        userDefinedAttrList = cmds.listAttr(node, unlocked=True, userDefined=True)
-        if attrList:
-            attrDic = {}
-            fatherList = cmds.listRelatives(node, parent=True)
-            if fatherList:
-                attrDic["FatherNode"] = fatherList[0]
-                if cmds.objExists(node+".guideBase") and cmds.getAttr(node+".guideBase") == 1:
-                    if not "__" in fatherList[0]: #not a rawGuide
-                        if cmds.objExists(fatherList[0]+".guideSource"):
-                            attrDic["FatherNode"] = cmds.getAttr(fatherList[0]+".guideSource")
+        attributes = cmds.listAttr(node, keyable=True)
+        user_defined_attributes = cmds.listAttr(node, unlocked=True, userDefined=True)
+        if attributes:
+            attr_data = {}
+            fathers = cmds.listRelatives(node, parent=True)
+            if fathers:
+                attr_data["FatherNode"] = fathers[0]
+                if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1:
+                    if not "__" in fathers[0]: #not a rawGuide
+                        if "guideSource" in cmds.listAttr(fathers[0]):
+                            attr_data["FatherNode"] = cmds.getAttr(fathers[0]+".guideSource")
                     cmds.parent(node, world=True) #to export guide base transformation in worldSpace
             else:
-                attrDic["FatherNode"] = None
-            if userDefinedAttrList:
-                attrList.extend(userDefinedAttrList)
-            attrList = list(set(attrList))
-            attrList.sort()
-            for attr in attrList:
+                attr_data["FatherNode"] = None
+            if user_defined_attributes:
+                attributes.extend(user_defined_attributes)
+            attributes = list(set(attributes))
+            attributes.sort()
+            for attr in attributes:
                 if cmds.getAttr(node+"."+attr, type=True) == "message":
-                    attrConnectList = cmds.listConnections(node+"."+attr, source=True, destination=False)
-                    if attrConnectList:
-                        attrDic[attr] = attrConnectList[0]
+                    connections = cmds.listConnections(node+"."+attr, source=True, destination=False)
+                    if connections:
+                        attr_data[attr] = connections[0]
                 else:
-                    attrDic[attr] = cmds.getAttr(node+"."+attr)
+                    attr_data[attr] = cmds.getAttr(node+"."+attr)
             if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1:
-                if fatherList:
-                    cmds.parent(node, fatherList[0])
-            return attrDic
+                if fathers:
+                    cmds.parent(node, fathers[0])
+            return attr_data
 
 
-    def serialize_guide(self, buildIt=True, *args):
+    def serialize_guide(self, build_it=True):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
         self.ar.job.unpin_guide(force=True)
         if cmds.objExists(self.guide_base):
             self.custom_name = cmds.getAttr(self.guide_base+".customName") or ""
         if not self.serialized:
-            afterDataDic, guideDic = {}, {}
-            beforeList = self.getBeforeList()
-            if beforeList:
-                if buildIt:
+            after_data, guide_data = {}, {}
+            befores = self.get_befores()
+            if befores:
+                if build_it:
                     self.raw = False
                     cmds.setAttr(self.guide_net+".rawGuide", 0)
-                afterDataDic["GuideNumber"] = cmds.getAttr(self.guide_net+".guideNumber")
-                afterDataDic["ModuleType"] = self.name
-                afterDataDic["RawGuide"] = self.raw
-                afterDataDic["BeforeData"] = beforeList
-                for beforeAttr in beforeList:
-                    nodeName = cmds.listConnections(self.guide_net+"."+beforeAttr, source=True, destination=False) or None
-                    if nodeName:
-                        if cmds.objExists(nodeName[0]):
-                            guideDic[nodeName[0]] = self.getNodeData(nodeName[0])
-                            if buildIt:
+                after_data["GuideNumber"] = cmds.getAttr(self.guide_net+".guideNumber")
+                after_data["ModuleType"] = self.name
+                after_data["RawGuide"] = self.raw
+                after_data["BeforeData"] = befores
+                for before_attr in befores:
+                    node_name = cmds.listConnections(self.guide_net+"."+before_attr, source=True, destination=False) or None
+                    if node_name:
+                        if cmds.objExists(node_name[0]):
+                            guide_data[node_name[0]] = self.get_node_data(node_name[0])
+                            if build_it:
                                 cmds.lockNode(self.guide_net, lock=False)
-                                cmds.deleteAttr(self.guide_net+"."+beforeAttr)
+                                cmds.deleteAttr(self.guide_net+"."+before_attr)
                                 cmds.lockNode(self.guide_net, lock=True)
-                afterDataDic["GuideData"] = guideDic
-                cmds.setAttr(self.guide_net+".afterData", afterDataDic, type="string")
-                if buildIt:
+                after_data["GuideData"] = guide_data
+                cmds.setAttr(self.guide_net+".afterData", after_data, type="string")
+                if build_it:
                     cmds.lockNode(self.guide_net, lock=True) #to avoid deleting this network node
                     self.serialized = True
         else: #update linked node to avoid cleanup this network if it's broken
             cmds.lockNode(self.guide_net, lock=False)
-            optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
-            if optionCtrl:
-                cmds.connectAttr(optionCtrl+".message", self.guide_net+".linkedNode", force=True)
+            option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+            if option_ctrl:
+                cmds.connectAttr(option_ctrl+".message", self.guide_net+".linkedNode", force=True)
             else:
-                cmds.connectAttr(self.toStaticHookGrp+".message", self.guide_net+".linkedNode", force=True)
+                cmds.connectAttr(self.static_hook_grp+".message", self.guide_net+".linkedNode", force=True)
             cmds.lockNode(self.guide_net, lock=True)
     
 
-    def renameUnitConversion(self, unitConversionList=None, *args):
+    def rename_unit_conversion(self, unit_conversions=None):
         """ Rename just the new unitConverson created after the beginning of the module building.
         """
-        if not unitConversionList:
-            unitConversionList = cmds.ls(selection=False, type="unitConversion")
-        if unitConversionList:
+        if not unit_conversions:
+            unit_conversions = cmds.ls(selection=False, type="unitConversion")
+        if unit_conversions:
             if self.oldUnitConversionList:
-                unitConversionList = list(set(unitConversionList)-set(self.oldUnitConversionList))
-            if unitConversionList:
-                self.ar.utils.nodeRenamingTreatment(unitConversionList)
+                unit_conversions = list(set(unit_conversions)-set(self.oldUnitConversionList))
+            if unit_conversions:
+                self.ar.utils.nodeRenamingTreatment(unit_conversions)
 
 
-    def createWorldSize(self, *args):
+    def create_world_size(self):
         """ Create a null transform and use it as worldSize reference setup to scale the main by offsetTransformMatrix.
         """
-        self.wsRef = cmds.createNode("transform", name=self.guide_namespace+":Guide_Base_WorldSize_Ref")
+        world_size_ref = cmds.createNode("transform", name=self.guide_namespace+":Guide_Base_WorldSize_Ref")
         for attr in self.ar.data.axis:
-            cmds.connectAttr(self.guide_base+".worldSize", self.wsRef+".scale"+attr)
-        cmds.connectAttr(self.wsRef+".worldMatrix[0]", self.guide_base+".offsetParentMatrix", force=True)
-        cmds.setAttr(self.wsRef+".visibility", False)
-        cmds.setAttr(self.wsRef+".template", 1)
-        cmds.parent(self.wsRef, self.ar.data.temp_grp)
+            cmds.connectAttr(self.guide_base+".worldSize", world_size_ref+".scale"+attr)
+        cmds.connectAttr(world_size_ref+".worldMatrix[0]", self.guide_base+".offsetParentMatrix", force=True)
+        cmds.setAttr(world_size_ref+".visibility", False)
+        cmds.setAttr(world_size_ref+".template", 1)
+        cmds.parent(world_size_ref, self.ar.data.temp_grp)
 
 
-    def getParentToTag(self, itemList, returnItem=None, *args):
+    def get_parent_to_tag(self, items, return_item=None):
         """ Return the latest item from given list or the second given param.
         """
-        if itemList:
-            return itemList[-1]
-        return returnItem
+        if items:
+            return items[-1]
+        return return_item
 
 
     # Getters:
     #
-    def getArticulation(self, *args):
-        return cmds.getAttr(self.guide_base+".articulation")
-
-    def getModuleAttr(self, moduleAttr, *args):
-        return cmds.getAttr(self.guide_base+"."+moduleAttr)
+    def get_guide_attr(self, attr):
+        if attr in cmds.listAttr(self.guide_base):
+            return cmds.getAttr(self.guide_base+"."+attr)
     
-    def getJointsVisibility(self, *args):
-        try:
-            return cmds.checkBox('displayJointsCB', query=True, value=True)
-        except:
-            return 1
-
     
     # Setters:
     #
-    def setArticulation(self, value, *args):
-        self.addArticJoint = value
+    def set_articulation(self, value):
+        self.articulation = value
         cmds.setAttr(self.guide_base+".articulation", value)
     
-    def setCorrective(self, value, *args):
-        self.addCorrective = value
-        cmds.setAttr(self.guide_base+".corrective", value)

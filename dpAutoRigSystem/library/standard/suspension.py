@@ -21,7 +21,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
         layout.BaseLayout.basicModuleLayout(self)
     
     
-    def getModuleAttr(self, moduleAttr, *args):
+    def get_guide_attr(self, moduleAttr, *args):
         return cmds.getAttr(self.guide_base + "." + moduleAttr)
         
     
@@ -52,7 +52,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
         cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScC")
         cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScC")
         # include nodes into net
-        self.addNodeToGuideNet([self.cvALoc, self.cvBLoc], ["JointLocA", "JointLocB"])
+        self.add_node_to_guide_net([self.cvALoc, self.cvBLoc], ["JointLocA", "JointLocB"])
     
     
     def loadFatherB(self, *args):
@@ -98,13 +98,13 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:
-                    self.ar.utils.setJointLabel(jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+letter)
+                    self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.userGuideName+"_"+letter)
                     self.jointList.append(jnt)
                     
                     # create a control:
-                    mainCtrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+letter)
-                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=mainCtrl)
-                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=ctrl)
+                    mainCtrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter)
+                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=mainCtrl)
+                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=ctrl)
                     self.ar.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
                     self.ar.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:
@@ -167,26 +167,25 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                     self.fatherBList.append(None)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.hookSetup(side, self.mainCtrlList, self.jointList, [self.locatorsGrp])
-                self.ctrlHookGrpList.append(self.toCtrlHookGrp)
+                self.create_hook_setup(side, self.mainCtrlList, self.jointList, [self.locatorsGrp])
+                self.ctrlHookGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.composingInfo()
+            self.composing_info()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.delete_guide()
-        self.renameUnitConversion()
+        self.rename_unit_conversion()
     
     
-    def composingInfo(self, *args):
-        standard.BaseStandard.composingInfo(self)
+    def composing_info(self):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                                        "suspensionBCtrlGrpList" : self.suspensionBCtrlGrpList,
-                                        "fatherBList"        : self.fatherBList,
-                                        "ctrlHookGrpList"    : self.ctrlHookGrpList,
-                                    }
+                            "suspensionBCtrlGrpList" : self.suspensionBCtrlGrpList,
+                            "fatherBList"        : self.fatherBList,
+                            "ctrlHookGrpList"    : self.ctrlHookGrpList,
+                        }

@@ -41,14 +41,14 @@ class SupportNodeIO(action.BaseAction):
                     self.io_path = self.get_io_path(self.io_folder)
                     if self.io_path:
                         if self.first_mode: #export
-                            itemList = None
+                            items = None
                             if objList:
-                                itemList = objList
+                                items = objList
                             else:
-                                itemList = self.getNodeToExportList()
-                            if itemList:
+                                items = self.getNodeToExportList()
+                            if items:
                                 self.ar.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
-                                self.export_alembic_file(itemList, attr=False, curve=True)
+                                self.export_alembic_file(items, attr=False, curve=True)
                             else:
                                 self.maybe_done_io("Geometries")
                         else: #import
@@ -80,9 +80,9 @@ class SupportNodeIO(action.BaseAction):
         for geoGrp in geoGrpList:
             grp = self.ar.utils.getNodeByMessage(geoGrp)
             if grp:
-                itemList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-                itemList.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
-                if itemList:
+                items = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+                items.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
+                if items:
                     geoList.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.ar.utils.getSuffixNumberList(n)[1].endswith("Base")] or [])
         if cmds.objExists("Zipper_Curves_Grp"):
             geoList.extend(cmds.listRelatives("Zipper_Curves_Grp", children=True))

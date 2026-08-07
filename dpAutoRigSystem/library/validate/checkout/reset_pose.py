@@ -124,11 +124,11 @@ class ResetPose(action.BaseAction):
         """ Returns the desired attribute list to work with set or reset default values.
         """
         cleanAttrList = []
-        attrList = cmds.listAttr(item, channelBox=True)
-        if not attrList:
-            attrList = []
-        if attrList:
-            for attrName in attrList:
+        attributes = cmds.listAttr(item, channelBox=True)
+        if not attributes:
+            attributes = []
+        if attributes:
+            for attrName in attributes:
                 if not cmds.attributeQuery(attrName, node=item, attributeType=True) == "bool":
                     cleanAttrList.append(attrName)
         allAttrList = cmds.listAttr(item)
@@ -150,9 +150,9 @@ class ResetPose(action.BaseAction):
             index 2 = attribute type
         """
         attrData = {}
-        attrList = self.getSetupAttrList(item)
-        if attrList:
-            for attr in attrList:
+        attributes = self.getSetupAttrList(item)
+        if attributes:
+            for attr in attributes:
                 attrType = cmds.attributeQuery(attr, node=item, attributeType=True)
                 currentValue = cmds.getAttr(item+"."+attr)
                 if attr in self.nonDynZeroAttrList: #translate and rotate

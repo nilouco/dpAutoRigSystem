@@ -41,13 +41,13 @@ class SkinningIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     if self.first_mode: #export
-                        itemList = None
+                        items = None
                         if objList:
-                            itemList = objList
+                            items = objList
                         else:
-                            itemList = self.ar.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.ar.skin.ignoreSkinningAttr)
-                        if itemList:
-                            self.export_json_file(self.ar.skin.getSkinWeightData(itemList))
+                            items = self.ar.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.ar.skin.ignoreSkinningAttr)
+                        if items:
+                            self.export_json_file(self.ar.skin.getSkinWeightData(items))
                         else:
                             self.maybe_done_io("Render_Grp")
                     else: #import

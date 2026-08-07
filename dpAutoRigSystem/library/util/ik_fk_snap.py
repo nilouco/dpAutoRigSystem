@@ -243,20 +243,20 @@ class IkFkSnap(object):
                     cmds.setAttr(father+".scaleZ", -1)
 
 
-    def zeroKeyAttrValue(self, ctrl, attrList, *args):
+    def zeroKeyAttrValue(self, ctrl, attributes, *args):
         """ Set zero value and keyframe the given attributes in the controller.
         """
-        for attr in attrList:
+        for attr in attributes:
             if cmds.objExists(ctrl+"."+attr):
                 if cmds.getAttr(ctrl+"."+attr):
                     cmds.setAttr(ctrl+"."+attr, 0)
                     cmds.setKeyframe(ctrl, attribute=attr)
 
 
-    def transferAttrFromTo(self, fromCtrl, toCtrl, attrList):
+    def transferAttrFromTo(self, fromCtrl, toCtrl, attributes):
         """ It compares the attributes to transfer values from/to given controllers and keyframe them.
         """
-        for attr in attrList:
+        for attr in attributes:
             if cmds.objExists(fromCtrl+"."+attr) and cmds.objExists(toCtrl+"."+attr):
                 fromValue = cmds.getAttr(fromCtrl+"."+attr)
                 toValue = cmds.getAttr(toCtrl+"."+attr)
@@ -461,19 +461,19 @@ class IkFkSnap(object):
                     cmds.setAttr(father+".scaleY", -1)
                     cmds.setAttr(father+".scaleZ", -1)
 
-    def zeroKeyAttrValue(self, ctrl, attrList, *args):
+    def zeroKeyAttrValue(self, ctrl, attributes, *args):
         """ Set zero value and keyframe the given attributes in the controller.
         """
-        for attr in attrList:
+        for attr in attributes:
             if cmds.objExists(ctrl+"."+attr):
                 if cmds.getAttr(ctrl+"."+attr):
                     cmds.setAttr(ctrl+"."+attr, 0)
                     cmds.setKeyframe(ctrl, attribute=attr)
 
-    def transferAttrFromTo(self, fromCtrl, toCtrl, attrList):
+    def transferAttrFromTo(self, fromCtrl, toCtrl, attributes):
         """ It compares the attributes to transfer values from/to given controllers and keyframe them.
         """
-        for attr in attrList:
+        for attr in attributes:
             if cmds.objExists(fromCtrl+"."+attr) and cmds.objExists(toCtrl+"."+attr):
                 fromValue = cmds.getAttr(fromCtrl+"."+attr)
                 toValue = cmds.getAttr(toCtrl+"."+attr)

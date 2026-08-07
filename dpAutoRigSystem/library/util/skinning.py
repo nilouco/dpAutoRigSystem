@@ -314,12 +314,12 @@ class Skinning(weights.Weights):
         return skinDataDic
 
 
-    def getSkinWeightData(self, itemList, *args):
+    def getSkinWeightData(self, items, *args):
         """ Return the the skinCluster weights data of the given item list.
         """
-        self.ar.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(items), addOne=False, addNumber=False)
         skinWeightsDic = {}
-        for item in itemList:
+        for item in items:
             self.ar.utils.setProgress('SkinningIO: '+item)
             skinWeightsDic[item] = {}
             # get skinCluster nodes for the given item
@@ -382,13 +382,13 @@ class Skinning(weights.Weights):
                 cmds.setAttr(skinClusterName+"."+attrName+"["+str(vertex)+"]", skinWeightDic[vertex])
 
 
-    def importSkinWeightsFromFile(self, itemList, path, filename, verbose=True, *args):
+    def importSkinWeightsFromFile(self, items, path, filename, verbose=True, *args):
         """ Import the skinCluster weights of the given item in the given path and filename.
         """
-        self.ar.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(items), addOne=False, addNumber=False)
         skinWeightDic = self.ar.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
-            for item in itemList:
+            for item in items:
                 self.ar.utils.setProgress("SkinningIO: "+item)
                 if cmds.objExists(item):
                     for skinClusterName in skinWeightDic[item].keys():
@@ -415,16 +415,16 @@ class Skinning(weights.Weights):
             Export: if export parameter is True
             Import: if export parameter is False
         """
-        itemList = cmds.ls(selection=True, type="transform")
-        if not itemList:
+        items = cmds.ls(selection=True, type="transform")
+        if not items:
             cmds.confirmDialog(title="SkinCluster Weights IO", message=self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['m225_selectAnything'], button=[self.ar.data.lang['i038_canceled']])
             return
         action = self.ar.data.lang['i196_import']
         if export:
             action = self.ar.data.lang['i164_export']
         path = cmds.fileDialog2(fileMode=3, caption=action+" "+self.ar.data.lang['i298_folder'], okCaption=action)
-        if itemList and path:
-            for item in itemList:
+        if items and path:
+            for item in items:
                 filename = path[0]+"/"+self.ioStartName+"_"+self.getIOFileName(item)+".json"
                 if cmds.listRelatives(item, children=True, allDescendents=True, shapes=True):
                     if export:

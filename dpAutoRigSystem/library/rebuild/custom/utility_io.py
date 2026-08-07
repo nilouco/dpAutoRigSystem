@@ -95,12 +95,12 @@ class UtilityIO(action.BaseAction):
                         indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
                         if indexList:
                             dot = ""
-                            attrList = [""]
+                            attributes = [""]
                             if self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]:
                                 dot = "."
-                                attrList = self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]
+                                attributes = self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]
                             for i in indexList:
-                                for attr in attrList:
+                                for attr in attributes:
                                     attrName = multiAttr+"["+str(i)+"]"+dot+attr
                                     attrValue = cmds.getAttr(item+"."+attrName)
                                     dic[item]["attributes"][attrName] = attrValue

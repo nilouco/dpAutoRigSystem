@@ -108,10 +108,10 @@ class Weights(object):
             Use given lists and attribute to filter the results.
         """
         deformedItemList, ranList = [], []
-        itemList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh") or []
-        itemList.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve") or [])
-        if itemList:
-            for item in itemList:
+        items = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh") or []
+        items.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve") or [])
+        if items:
+            for item in items:
                 transformNode = item[:item[1:].find("|")+1]
                 if not transformNode in ranList:
                     ranList.append(transformNode)
@@ -190,14 +190,14 @@ class Weights(object):
         return defDic
 
 
-    def getComponentTagInfo(self, nodeList=None, *args):
+    def getComponentTagInfo(self, nodes=None, *args):
         """ Return the dictionary with the componentTag tagged info.
         """
-        if not nodeList:
-            nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
+        if not nodes:
+            nodes = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
         tagInfoDic = {}
-        if nodeList:
-            for node in nodeList:
+        if nodes:
+            for node in nodes:
                 outAttr = cmds.deformableShape(node, localShapeOutAttr=True)[0]
                 tagHistList = cmds.geometryAttrInfo(node+"."+outAttr, componentTagHistory=True)
                 if tagHistList:
@@ -235,7 +235,7 @@ class Weights(object):
         return tagInfluenceDic
     
 
-    def getComponentTagFalloff(self, nodeList=None, *args):
+    def getComponentTagFalloff(self, nodes=None, *args):
         """ Mount and return a dictionary with all componentTag falloff nodes to export them.
         """
         falloffDic = {}
@@ -253,10 +253,10 @@ class Weights(object):
                          "target"           : ["weight", "mode"],
                          "weightInfoLayers" : ["defaultWeight"]
                         }
-        if not nodeList:
-            nodeList = cmds.ls(selection=False, type=list(falloffTypeAttrDic.keys()))
-        if nodeList:
-            for node in nodeList:
+        if not nodes:
+            nodes = cmds.ls(selection=False, type=list(falloffTypeAttrDic.keys()))
+        if nodes:
+            for node in nodes:
                 nodeType = cmds.objectType(node)
                 falloffDic[node] = { "name" : node,
                                      "type" : nodeType,
@@ -299,12 +299,12 @@ class Weights(object):
         return wellImported
 
 
-    def importComponentTagInfo(self, taggedDic, nodeList, *args):
+    def importComponentTagInfo(self, taggedDic, nodes, *args):
         """ Import component tag tagged "nodes" as "tag" info.
         """
         wellImported = True
         toImportList, self.notWorkWellInfoList = [], []
-        currentTaggedDic = self.getComponentTagInfo(nodeList)
+        currentTaggedDic = self.getComponentTagInfo(nodes)
         for taggedNode in taggedDic.keys():
             # check mesh existing
             if cmds.objExists(taggedNode):
@@ -497,11 +497,11 @@ class Weights(object):
         return resultList
 
 
-    def assignDeformer(self, deformerNode, itemList, *args):
+    def assignDeformer(self, deformerNode, items, *args):
         """ Assign the deformer node to the given item list if it isn't assigned yet.
         """
-        if deformerNode and itemList:
-            for item in itemList:
+        if deformerNode and items:
+            for item in items:
                 needToAddDef = True
                 inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
                 if inputDeformerList:

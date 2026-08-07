@@ -96,20 +96,20 @@ class CorrectionManager(base.BaseLibrary):
     def renameLinkedNodes(self, oldName, name, *args):
         """ List all connected nodes by message into the network and rename them using given parameters.
         """
-        messageAttrList = []
-        attrList = cmds.listAttr(self.net)
-        for attr in attrList:
+        message_attrs = []
+        attributes = cmds.listAttr(self.net)
+        for attr in attributes:
             if cmds.getAttr(self.net+"."+attr, type=True) == "message":
-                messageAttrList.append(attr)
-        if messageAttrList:
-            for messageAttr in messageAttrList:
-                connectedNodeList = cmds.listConnections(self.net+"."+messageAttr)
+                message_attrs.append(attr)
+        if message_attrs:
+            for message_attr in message_attrs:
+                connectedNodeList = cmds.listConnections(self.net+"."+message_attr)
                 if connectedNodeList:
-                    childrenList = cmds.listRelatives(connectedNodeList[0], children=True, allDescendents=True)
+                    children = cmds.listRelatives(connectedNodeList[0], children=True, allDescendents=True)
                     cmds.rename(connectedNodeList[0], connectedNodeList[0].replace(oldName, name))
                     self.ar.custom_attr.updateID([connectedNodeList[0].replace(oldName, name)])
-                    if childrenList:
-                        for children in childrenList:
+                    if children:
+                        for children in children:
                             try:
                                 cmds.rename(children, children.replace(oldName, name))
                                 self.ar.custom_attr.updateID([children.replace(oldName, name)])
@@ -372,7 +372,7 @@ class CorrectionManager(base.BaseLibrary):
             mel.eval('warning \"'+toAttach+' '+self.ar.data.lang['i061_notExists']+'\";')
 
 
-    def createCorrectionManager(self, nodeList=None, name=None, correctType=None, toRivet=False, fromUI=False, *args):
+    def createCorrectionManager(self, nodes=None, name=None, correctType=None, toRivet=False, fromUI=False, *args):
         """ Create nodes to calculate the correction we want to mapper fix.
             Returns the created network node.
         """
@@ -380,13 +380,13 @@ class CorrectionManager(base.BaseLibrary):
         loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
         loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
-            if not nodeList:
-                nodeList = cmds.ls(selection=True, flatten=True)
-            if nodeList:
-                if len(nodeList) == 2:
+            if not nodes:
+                nodes = cmds.ls(selection=True, flatten=True)
+            if nodes:
+                if len(nodes) == 2:
                     self.to_ids = []
-                    origNode = nodeList[0]
-                    actionNode = nodeList[1]
+                    origNode = nodes[0]
+                    actionNode = nodes[1]
                     cmds.undoInfo(openChunk=True)
                     
                     # main group
@@ -437,11 +437,11 @@ class CorrectionManager(base.BaseLibrary):
                     cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     # add serialization attributes
-                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisChc", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
+                    message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisChc", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
                     if correctType == self.distanceName:
-                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
-                    for messageAttr in messageAttrList:
-                        cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
+                        message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
+                    for message_attr in message_attrs:
+                        cmds.addAttr(self.net, longName=message_attr, attributeType="message")
                     cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
                     optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
                     if optionCtrl:

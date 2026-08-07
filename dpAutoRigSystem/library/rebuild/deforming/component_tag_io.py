@@ -43,22 +43,22 @@ class ComponentTagIO(action.BaseAction):
             if self.ar.pipeliner.checkAssetContext():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    nodeList = None
+                    nodes = None
                     if objList:
-                        nodeList = objList
+                        nodes = objList
                     else:
-                        nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
+                        nodes = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
                     if self.first_mode: #export
-                        if nodeList:
+                        if nodes:
                             # finding tags
                             hasTag = False
-                            for node in nodeList:
+                            for node in nodes:
                                 if cmds.geometryAttrInfo(node+"."+cmds.deformableShape(node, localShapeOutAttr=True)[0], componentTagHistory=True):
                                     hasTag = True
                                     break
                             if hasTag:
                                 # Declaring the data dictionary to export it
-                                self.tagDataDic = { "tagged"     : self.defWeights.getComponentTagInfo(nodeList),
+                                self.tagDataDic = { "tagged"     : self.defWeights.getComponentTagInfo(nodes),
                                                     "influencer" : self.defWeights.getComponentTagInfluencer(),
                                                     "falloff"    : self.defWeights.getComponentTagFalloff()
                                                 }
@@ -70,7 +70,7 @@ class ComponentTagIO(action.BaseAction):
                     else: #import
                         tagDataDic = self.import_latest_json_file(self.get_exported_items())
                         if tagDataDic:
-                            self.importTag(tagDataDic, nodeList)
+                            self.importTag(tagDataDic, nodes)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -91,13 +91,13 @@ class ComponentTagIO(action.BaseAction):
         return self.log_data
 
 
-    def importTag(self, tagDataDic, nodeList, *args):
+    def importTag(self, tagDataDic, nodes, *args):
         """ Import componentTag data.
         """
         fail = False
         # import tagged (tag info into the received deformed mesh)
         if tagDataDic["tagged"]:
-            if not self.defWeights.importComponentTagInfo(tagDataDic["tagged"], nodeList):
+            if not self.defWeights.importComponentTagInfo(tagDataDic["tagged"], nodes):
                 self.fail_io(self.latest_data_file+": tagged - "+", ".join(self.defWeights.notWorkWellInfoList))
                 fail = True
         # import influencers (tag info into the deformer node)

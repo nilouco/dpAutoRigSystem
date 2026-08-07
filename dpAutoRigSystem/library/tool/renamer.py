@@ -265,9 +265,9 @@ class Renamer(base.BaseLibrary):
             if self.selOption == 2: #Hierarchy
                 for item in self.originalList:
                     try:
-                        childrenList = cmds.listRelatives(item, allDescendents=True)
-                        if childrenList:
-                            for child in childrenList:
+                        children = cmds.listRelatives(item, allDescendents=True)
+                        if children:
+                            for child in children:
                                 if not child in self.originalList:
                                     self.originalList.append(child)
                     except: #more than one object with the same name
@@ -284,9 +284,9 @@ class Renamer(base.BaseLibrary):
             if self.previewList:
                 for i, item in enumerate(self.originalList):
                     if not cmds.objExists(item):
-                        itemList = cmds.ls("*"+item+"*")
-                        if itemList:
-                            item = itemList[0]
+                        items = cmds.ls("*"+item+"*")
+                        if items:
+                            item = items[0]
                     if cmds.objExists(item):
                         cmds.rename(item, self.previewList[i])
                     else:

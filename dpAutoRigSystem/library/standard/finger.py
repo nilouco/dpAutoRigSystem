@@ -57,7 +57,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
         self.ar.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # include nodes into net
-        self.addNodeToGuideNet([self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointLoc2", "JointEnd"])
+        self.add_node_to_guide_net([self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointLoc2", "JointEnd"])
 
         # change the number of phalanges to 3:
         self.changeJointNumber(3)
@@ -67,7 +67,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
         cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
         cmds.parent(self.cvBaseJoint, self.guide_base)
-        self.addNodeToGuideNet([self.cvBaseJoint], ["JointLoc0"])
+        self.add_node_to_guide_net([self.cvBaseJoint], ["JointLoc0"])
 
         # transform cvLocs in order to put as a good finger guide:
         cmds.setAttr(self.guide_base+".rotateX", 90)
@@ -112,7 +112,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                         cmds.setAttr(self.jGuide+".template", 1)
                         cmds.parent(self.jGuide, self.name_guide+"_JGuide"+str(n-1))
                         self.ar.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-                        self.addNodeToGuideNet([self.cvJointLoc], ["JointLoc"+str(n)])
+                        self.add_node_to_guide_net([self.cvJointLoc], ["JointLoc"+str(n)])
                 elif self.enteredNJoints < self.currentNJoints:
                     # re-define cvEndJoint:
                     self.cvJointLoc = self.name_guide+"_JointLoc"+str(self.enteredNJoints)
@@ -127,7 +127,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                     cmds.delete(self.name_guide+"_JointLoc"+str(self.enteredNJoints+1))
                     cmds.delete(self.name_guide+"_JGuide"+str(self.enteredNJoints+1))
                     for j in range(self.enteredNJoints+1, self.currentNJoints+1):
-                        self.removeAttrFromGuideNet(["JointLoc"+str(j)])
+                        self.remove_attr_from_guide_net(["JointLoc"+str(j)])
                 # re-parent cvEndJoint:
                 cmds.parent(self.cvEndJoint, self.cvJointLoc)
                 cmds.setAttr(self.cvEndJoint+".tz", 1.3)
@@ -156,17 +156,14 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
         standard.BaseStandard.rig_me(self)
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
-            # articulation joint:
-            self.addArticJoint = self.getArticulation()
-            self.addCorrective = self.getModuleAttr("corrective")
             # declaring lists to send information for integration:
             self.scalableGrpList, self.ikCtrlZeroList = [], []
             # run for all sides
             for s, side in enumerate(self.sides):
                 self.skinJointList, self.ctrlList = [], []
                 self.base = side+self.userGuideName+'_Guide_Base'
-                if self.addArticJoint:
-                    if self.addCorrective:
+                if self.articulation:
+                    if self.corrective:
                         # corrective controls group
                         self.corrective_ctrls_grp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
                         self.correctiveCtrlGrpList.append(self.corrective_ctrls_grp)
@@ -183,23 +180,23 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName+"_%02d"%(n))
                     # create a control:
                     if n == 1:
-                        self.fingerCtrl = self.ar.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90), guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.ctrlList[0])
+                        self.fingerCtrl = self.ar.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.radius * 2.0), d=self.curve_degree, rot=(0, 0, -90), guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.ctrlList[0])
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         self.ar.utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
                         if s == 1:
-                            if self.mirrorAxis == 'X':
+                            if self.mirror_axis == 'X':
                                 cmds.setAttr(self.fingerCtrl+'.rotateZ', 180)
-                            elif self.mirrorAxis == 'Y':
+                            elif self.mirror_axis == 'Y':
                                 cmds.setAttr(self.fingerCtrl+'.rotateY', 180)
-                            elif self.mirrorAxis == 'Z':
+                            elif self.mirror_axis == 'Z':
                                 cmds.setAttr(self.fingerCtrl+'.rotateZ', 180)
-                            elif self.mirrorAxis == 'XY':
+                            elif self.mirror_axis == 'XY':
                                 cmds.setAttr(self.fingerCtrl+'.rotateX', 180)
-                            elif self.mirrorAxis == 'XYZ':
+                            elif self.mirror_axis == 'XYZ':
                                 cmds.setAttr(self.fingerCtrl+'.rotateZ', 180)
                             cmds.makeIdentity(self.fingerCtrl, apply=True, translate=False, rotate=True, scale=False)
                         # scale compensate attribute:
@@ -223,7 +220,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.skinJointList[0]+".segmentScaleCompensate", force=True)
                     else:
-                        self.fingerCtrl = self.ar.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.getParentToTag(self.ctrlList))
+                        self.fingerCtrl = self.ar.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.get_parent_to_tag(self.ctrlList))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         if n == self.nJoints:
                             self.ar.utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
@@ -288,11 +285,11 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                     
                     # add articulationJoint:
                     if n > 0:
-                        if self.addArticJoint:
-                            if self.addCorrective:
+                        if self.articulation:
+                            if self.corrective:
                                 correctiveNetList = [None]
                                 correctiveNetList.append(self.setup_corrective_net(side+self.userGuideName+"_01_Ctrl", self.skinJointList[n-1], self.skinJointList[n], side+self.userGuideName+"_"+str(n)+"_PitchDown", 1, 1, -90))
-                                articJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.ctrlRadius, 0, 0)])
+                                articJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.radius, 0, 0)])
                                 self.setup_corrective_controllers(articJntList, s, self.userGuideName+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
                                 if s == 1:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
@@ -301,7 +298,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                             else:
                                 articJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt)
                                 cmds.connectAttr(self.scaleCompensateCond+".outColorR", articJntList[0]+".segmentScaleCompensate", force=True)
-                            self.ar.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     
                     if n == self.nJoints:
@@ -398,7 +395,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                     cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
                     endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.ar.data.joint_end_attr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
                     cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
-                    self.ikCtrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree, guideSource=self.name_guide+"_JointEnd", parentTag=self.ctrlList[1])
+                    self.ikCtrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.radius * 0.3), d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.ctrlList[1])
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
@@ -489,29 +486,28 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                 else:
                     ctrlHookList.append(self.ikCtrlZero)
                     scalableHookList = [side+self.userGuideName+"_00_Jnt"]
-                self.hookSetup(side, ctrlHookList, scalableHookList)
-                if self.addCorrective:
-                    cmds.parent(self.corrective_ctrls_grp, self.toCtrlHookGrp)
-                self.scalableGrpList.append(self.toScalableHookGrp)
+                self.create_hook_setup(side, ctrlHookList, scalableHookList)
+                if self.corrective:
+                    cmds.parent(self.corrective_ctrls_grp, self.ctrl_hook_grp)
+                self.scalableGrpList.append(self.scalable_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.composingInfo()
+            self.composing_info()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.delete_guide()
-        self.renameUnitConversion()
+        self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
 
 
-    def composingInfo(self, *args):
-        standard.BaseStandard.composingInfo(self)
+    def composing_info(self):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                                        "scalableGrpList": self.scalableGrpList,
-                                        "ikCtrlZeroList": self.ikCtrlZeroList,
-                                        "correctiveCtrlGrpList": self.correctiveCtrlGrpList
-                                    }
+                            "scalableGrpList": self.scalableGrpList,
+                            "ikCtrlZeroList": self.ikCtrlZeroList,
+                            "correctiveCtrlGrpList": self.correctiveCtrlGrpList
+                        }

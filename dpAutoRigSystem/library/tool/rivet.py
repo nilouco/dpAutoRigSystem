@@ -162,7 +162,7 @@ class Rivet(base.BaseLibrary):
         cmds.select(selectionList)
 
 
-    def removeRivetFromList(self, indexList, itemList):
+    def removeRivetFromList(self, indexList, items):
         """ Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
         """
         self.disablePac(indexList)
@@ -172,7 +172,7 @@ class Rivet(base.BaseLibrary):
             if netNode:
                 self.removeRivetFromNetNode(netNode)
             else:
-                mel.eval('print \"dpAR: '+self.ar.data.lang['m204_unableRemRivet']+itemList[i]+'\\n\";')
+                mel.eval('print \"dpAR: '+self.ar.data.lang['m204_unableRemRivet']+items[i]+'\\n\";')
         self.refreshRivetList()
         cmds.select(clear=True)
     
@@ -275,7 +275,7 @@ class Rivet(base.BaseLibrary):
             return None
 
 
-    def filterRivetName(self, name, itemList, separator):
+    def filterRivetName(self, name, items, separator):
         """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
             Returns the filtered list.
             Update the index list to match the returned list.
@@ -287,7 +287,7 @@ class Rivet(base.BaseLibrary):
             multiFilterList = list(name.split(separator))
         for filterName in multiFilterList:
             if filterName:
-                for i, item in enumerate(itemList):
+                for i, item in enumerate(items):
                     if str(filterName) in item:
                         filtered_items.append(item)
                         newIndexList.append(i)
@@ -328,11 +328,11 @@ class Rivet(base.BaseLibrary):
         selList = cmds.ls(selection=True)
         if selList:
             if len(selList) > 1:
-                itemList = selList[:-1]
-                itemList.sort()
+                items = selList[:-1]
+                items.sort()
                 geo = selList[-1]
                 self.dpLoadGeoToAttach(geo)
-                self.dpAddSelect(itemList)
+                self.dpAddSelect(items)
 
 
     def riseRemoveAndIndexList(self, needToRemoveSet, hasRivetList):
@@ -354,7 +354,7 @@ class Rivet(base.BaseLibrary):
         # getting UI values
         geoToAttach = cmds.textField(self.geoToAttachTF, query=True, text=True)
         uvSet = cmds.textField(self.uvSetTF, query=True, text=True)
-        itemList = cmds.textScrollList(self.itemScrollList, query=True, allItems=True)
+        items = cmds.textScrollList(self.itemScrollList, query=True, allItems=True)
         attachTranslate = cmds.checkBox(self.attachTCB, query=True, value=True)
         attachRotate = cmds.checkBox(self.attachRCB, query=True, value=True)
         addFatherGrp = cmds.checkBox(self.fatherGrpCB, query=True, value=True)
@@ -367,7 +367,7 @@ class Rivet(base.BaseLibrary):
         hasRivetList = self.itemsWithRivetList()
         if hasRivetList:
             hasRivetSet = set(hasRivetList)
-            toCreateSet = set(itemList)
+            toCreateSet = set(items)
             needToRemove = toCreateSet & hasRivetSet
         if needToRemove:
             if len(needToRemove) > 0:
@@ -383,8 +383,8 @@ class Rivet(base.BaseLibrary):
                     return
 
         # call run function to create Rivet setup using UI values
-        self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(itemList), addOne=False, addNumber=False)
-        self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
+        self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), addOne=False, addNumber=False)
+        self.dpCreateRivet(geoToAttach, uvSet, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.ar.utils.setProgress(endIt=True)
         self.ar.utils.closeUI('dpRivetWindow')
     
@@ -522,7 +522,7 @@ class Rivet(base.BaseLibrary):
         return invTGrp, invRGrp
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, reuseFaceToRivet=False, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, reuseFaceToRivet=False, *args):
         """ Create the Rivet setup.
             Returns the created network node list. 
         """
@@ -559,7 +559,7 @@ class Rivet(base.BaseLibrary):
             if reuseFaceToRivet and cmds.objExists(reuseFaceToRivet):
                 geoToAttach = reuseFaceToRivet
             else:
-                geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4)
+                geoToAttach = self.createFaceToRivet(items, self.extractGeoToRivet(geoToAttach), 4)
             self.deformFaceToRivet(geoToAttach, self.originedGeo)
             supportGrp = self.ar.utils.getNodeByMessage("supportGrp")
             if supportGrp:
@@ -572,10 +572,10 @@ class Rivet(base.BaseLibrary):
             self.shapeToAttach = self.shapeToAttachList[0]
             # get shape type:
             self.shapeType = cmds.objectType(self.shapeToAttach)
-            # verify if there are vertices, cv's or lattice points in our itemList:
-            if itemList:
+            # verify if there are vertices, cv's or lattice points in our items:
+            if items:
                 asked = False
-                for i, item in enumerate(itemList):
+                for i, item in enumerate(items):
                     if ".vtx" in item or ".cv" in item or ".pt" in item:
                         if askComponent:
                             if not asked:
@@ -588,9 +588,9 @@ class Rivet(base.BaseLibrary):
                                 elif isComponent == "Together":
                                     togetherList.append(item)
                                 elif isComponent == "Ignore":
-                                    itemList.remove(item)
+                                    items.remove(item)
                             elif isComponent == "Ignore":
-                                itemList.remove(item)
+                                items.remove(item)
                             elif isComponent == "Together":
                                 togetherList.append(item)
                             else: #Individually
@@ -628,7 +628,7 @@ class Rivet(base.BaseLibrary):
                         cmds.delete(self.rivetGrp)
                     else:
                         for rivet in self.rivetList:
-                            if not rivet in itemList:
+                            if not rivet in items:
                                 # clear created clusters:
                                 cmds.delete(rivet)
                     mel.eval("error \"Canceled process: items to be Rivet can't be animated or have locked attributes, sorry.\";")
@@ -741,7 +741,7 @@ class Rivet(base.BaseLibrary):
                 cmds.addAttr(self.net, longName="pacNode", attributeType="message")
                 cmds.addAttr(self.net, longName="rivetData", dataType="string")
                 # set
-                cmds.setAttr(self.net+".rivetData", json.dumps(self.getRivetData(itemList[r], geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset)), type="string")
+                cmds.setAttr(self.net+".rivetData", json.dumps(self.getRivetData(items[r], geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset)), type="string")
                 # connect
                 cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)
                 cmds.connectAttr(folTransf+".message", self.net+".follicle", force=True)
@@ -751,14 +751,14 @@ class Rivet(base.BaseLibrary):
                 if faceToRivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
                     cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformerNode", force=True)
-                if len(itemList) == len(self.rivetList):
-                    if cmds.objExists(itemList[r]):
-                        cmds.connectAttr(itemList[r]+".message", self.net+".itemNode", force=True)
-                        if not cmds.objExists(f"{itemList[r]}.rivetNet"):
-                            cmds.addAttr(itemList[r], longName="rivetNet", attributeType="message")
-                            cmds.connectAttr(self.net+".message", itemList[r]+".rivetNet", force=True)
+                if len(items) == len(self.rivetList):
+                    if cmds.objExists(items[r]):
+                        cmds.connectAttr(items[r]+".message", self.net+".itemNode", force=True)
+                        if not cmds.objExists(f"{items[r]}.rivetNet"):
+                            cmds.addAttr(items[r], longName="rivetNet", attributeType="message")
+                            cmds.connectAttr(self.net+".message", items[r]+".rivetNet", force=True)
                         else:
-                            rivetNetList = cmds.listAttr(itemList[r], string="rivetNet*")
+                            rivetNetList = cmds.listAttr(items[r], string="rivetNet*")
                             rivetNetList.sort(reverse=True)
                             lastIndex = rivetNetList[0].removeprefix("rivetNet")
                             if lastIndex == "":
@@ -767,8 +767,8 @@ class Rivet(base.BaseLibrary):
                                 lastIndex = int(lastIndex)
                             newIndex = lastIndex + 1
                             currentLongName = f"rivetNet{newIndex}"
-                            cmds.addAttr(itemList[r], longName=currentLongName, attributeType="message")
-                            cmds.connectAttr(self.net+".message", f"{itemList[r]}.{currentLongName}", force=True)
+                            cmds.addAttr(items[r], longName=currentLongName, attributeType="message")
+                            cmds.connectAttr(self.net+".message", f"{items[r]}.{currentLongName}", force=True)
             
             # check invert group (back) in order to avoid double transformations:
             if addInvert:
@@ -789,7 +789,7 @@ class Rivet(base.BaseLibrary):
         return self.netList
     
 
-    def getRivetData(self, itemNode, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset, *args):
+    def getRivetData(self, itemNode, geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset, *args):
         """ Collect all rivet data and return it as a dictionary.
         """
         dataDic = {
@@ -797,7 +797,7 @@ class Rivet(base.BaseLibrary):
                     "itemNode"        : itemNode,
                     "geoToAttach"     : self.originedGeo,
                     "uvSetName"       : uvSetName,
-                    "itemList"        : itemList,
+                    "items"        : items,
                     "attachTranslate" : attachTranslate,
                     "attachRotate"    : attachRotate,
                     "addFatherGrp"    : addFatherGrp,
@@ -1023,16 +1023,16 @@ class Rivet(base.BaseLibrary):
         return wrapGeo, wrapNode
 
 
-    def parentToTransform(self, itemList, destParent, *args):
+    def parentToTransform(self, items, destParent, *args):
         """ Just check if the item is child of the destination parent node then parent it if needed.
         """
-        if itemList and destParent:
+        if items and destParent:
             if cmds.objExists(destParent):
-                for item in itemList:
-                    childrenList = cmds.listRelatives(destParent, allDescendents=True, children=True)
-                    if not childrenList:
+                for item in items:
+                    children = cmds.listRelatives(destParent, allDescendents=True, children=True)
+                    if not children:
                         cmds.parent(item, destParent)
-                    elif not item in childrenList:
+                    elif not item in children:
                         cmds.parent(item, destParent)
 
 

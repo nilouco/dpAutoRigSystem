@@ -39,14 +39,14 @@ class VisibilityIO(action.BaseAction):
             if self.ar.pipeliner.checkAssetContext():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    itemList = None
+                    items = None
                     if objList:
-                        itemList = objList
+                        items = objList
                     else:
-                        itemList = cmds.ls(selection=False)#, type="transform")
-                    if itemList:
+                        items = cmds.ls(selection=False)#, type="transform")
+                    if items:
                         if self.first_mode: #export
-                            self.export_json_file(self.getVisibilityDataDic(itemList))
+                            self.export_json_file(self.getVisibilityDataDic(items))
                         else: #import
                             visDic = self.import_latest_json_file(self.get_exported_items())
                             if visDic:
@@ -72,13 +72,13 @@ class VisibilityIO(action.BaseAction):
         return self.log_data
 
 
-    def getVisibilityDataDic(self, itemList, *args):
+    def getVisibilityDataDic(self, items, *args):
         """ Processes the given item list to check the visibility value if it doesn't have input connection.
             Returns the dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-        for item in itemList:
+        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if "visibility" in cmds.listAttr(item):

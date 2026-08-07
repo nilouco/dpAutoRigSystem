@@ -191,12 +191,12 @@ class Utils(object):
     def findLastNumber(self, name="dpGuideNet", attr="guideNumber", pad=3, *args):
         """ Returns a padding string of the number of network node in the scene or zero.
         """
-        nodeList = self.getNetworkNodeByAttr(name)
-        if not nodeList:
+        nodes = self.getNetworkNodeByAttr(name)
+        if not nodes:
             return str(0).zfill(pad)
         else:
             numberList = []
-            for node in nodeList:
+            for node in nodes:
                 if attr in cmds.listAttr(node):
                     numberList.append(int(cmds.getAttr(node+"."+attr)))
             if not numberList:
@@ -210,14 +210,14 @@ class Utils(object):
             Return its highest number.
         """
         # work with rigged modules in the scene:
-        nodeList, numberList = [], []
+        nodes, numberList = [], []
         guideTypeCount = 0
         if guideNet:
-            nodeList = self.getNetworkNodeByAttr("dpGuideNet")
+            nodes = self.getNetworkNodeByAttr("dpGuideNet")
         else:
-            nodeList = cmds.ls(selection=False, transforms=True)
-        if nodeList:
-            for node in nodeList:
+            nodes = cmds.ls(selection=False, transforms=True)
+        if nodes:
+            for node in nodes:
                 if cmds.objExists(node+"."+typeName):
                     if cmds.getAttr(node+"."+typeName) == className:
                         numberList.append(className)
@@ -333,11 +333,11 @@ class Utils(object):
         return zeroList
 
 
-    def addCustomAttr(self, nodeList, attrName, attrType="bool", keyableAttr=True, defaultValueAttr=True, *args):
+    def addCustomAttr(self, nodes, attrName, attrType="bool", keyableAttr=True, defaultValueAttr=True, *args):
         """ Useful method to add the same attribute and values to a list of given nodes.
         """
-        if nodeList and attrName:
-            for node in nodeList:
+        if nodes and attrName:
+            for node in nodes:
                 if not attrName in cmds.listAttr(node):
                     cmds.addAttr(node, longName=attrName, attributeType=attrType, keyable=keyableAttr, defaultValue=defaultValueAttr)
 
@@ -386,7 +386,7 @@ class Utils(object):
     def get_hook(self):
         """ Mount a dictionary with guide modules hierarchies.
             Return a dictionary with the father and children lists inside of each guide like:
-            {guide{'guideModuleNamespace':"...", 'name':"...", 'guideCustomName':"...", 'guideMirrorAxis':"...", 'guideMirrorName':"...", 'fatherGuide':"...", 'fatherNode':"...", 'fatherModule':"...", 'fatherCustomName':"...", 'fatherMirrorAxis':"...", 'fatherMirrorName':"...", 'fatherGuideLoc':"...", 'childrenList':[...]}}
+            {guide{'guideModuleNamespace':"...", 'name':"...", 'guideCustomName':"...", 'guideMirrorAxis':"...", 'guideMirrorName':"...", 'fatherGuide':"...", 'fatherNode':"...", 'fatherModule':"...", 'fatherCustomName':"...", 'fatherMirrorAxis':"...", 'fatherMirrorName':"...", 'fatherGuideLoc':"...", 'children':[...]}}
         """
         hook = {}
         allList = cmds.ls(type='transform')
@@ -403,9 +403,9 @@ class Utils(object):
                 
                 # get children:
                 guideChildrenList = []
-                childrenList = cmds.listRelatives(item, allDescendents=True, type='transform')
-                if childrenList:
-                    for child in childrenList:
+                children = cmds.listRelatives(item, allDescendents=True, type='transform')
+                if children:
+                    for child in children:
                         if cmds.objExists(child+".guideBase"):
                             if cmds.getAttr(child+".guideBase") == 1:
                                 guideChildrenList.append(child)
@@ -457,13 +457,13 @@ class Utils(object):
                 
                 # mounting dictionary:
                 if guideParentList and guideChildrenList:
-                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":guideChildrenList}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "children":guideChildrenList}
                 elif guideParentList:
-                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "childrenList":[]}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":guideParent, "fatherNode":fatherNodeList[0], "fatherModule":fatherModule, "fatherInstance":fatherInstance, "fatherCustomName":fatherCustomName, "fatherMirrorAxis":fatherMirrorAxis, "fatherMirrorName":fatherMirrorName, "fatherGuideLoc":fatherGuideLoc, "parentNode":parentNode, "children":[]}
                 elif guideChildrenList:
-                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":guideChildrenList}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "children":guideChildrenList}
                 else:
-                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "childrenList":[]}
+                    hook[item]={"guideModuleNamespace":guideModuleNamespace, "name":name, "guideInstance":guideInstance, "guideCustomName":guideCustomName, "guideMirrorAxis":guideMirrorAxis, "guideMirrorName":guideMirrorName, "fatherGuide":"", "fatherNode":"", "fatherModule":"", "fatherInstance":"", "fatherCustomName":"", "fatherMirrorAxis":"", "fatherMirrorName":"", "fatherGuideLoc":"", "parentNode":parentNode, "children":[]}
         return hook
 
 
@@ -552,9 +552,9 @@ class Utils(object):
         """
         guideChildrenList = []
         if cmds.objExists(nodeName):
-            childrenList = cmds.listRelatives(nodeName, allDescendents=True, type='transform')
-            if childrenList:
-                for child in childrenList:
+            children = cmds.listRelatives(nodeName, allDescendents=True, type='transform')
+            if children:
+                for child in children:
                     if cmds.objExists(child+".guideBase") and cmds.getAttr(child+".guideBase") == 1:
                         guideChildrenList.append(child)
         return guideChildrenList
@@ -658,12 +658,12 @@ class Utils(object):
         return resultList
 
 
-    def clearDpArAttr(self, itemList):
+    def clearDpArAttr(self, items):
         """ Delete all dpAR (dpAutoRigSystem) attributes in this joint
         """
         dpArAttrList = ['dpAR_joint']
-        if itemList:
-            for item in itemList:
+        if items:
+            for item in items:
                 for dpArAttr in dpArAttrList:
                     if cmds.objExists(item+"."+dpArAttr):
                         cmds.deleteAttr(item+"."+dpArAttr)
@@ -673,9 +673,9 @@ class Utils(object):
         """ Delete all child of the item node passed as argument.
         """
         if(cmds.objExists(item)):
-            childrenList = cmds.listRelatives(item, children=True, fullPath=True)
-            if(childrenList):
-                for child in childrenList:
+            children = cmds.listRelatives(item, children=True, fullPath=True)
+            if(children):
+                for child in children:
                     cmds.delete(child)
 
 
@@ -722,7 +722,7 @@ class Utils(object):
         return nodeName
 
 
-    def filterName(self, name, itemList, separator):
+    def filterName(self, name, items, separator):
         """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
             Returns the filtered list.
         """
@@ -732,7 +732,7 @@ class Utils(object):
             multiFilterList = list(name.split(separator))
         for filterName in multiFilterList:
             if filterName:
-                for item in itemList:
+                for item in items:
                     if str(filterName) in item:
                         if not item in filtered_items:
                             filtered_items.append(item)
@@ -1043,8 +1043,8 @@ class Utils(object):
         return chainlength
 
 
-    def unlockAttr(self, nodeList):
-        for node in nodeList:
+    def unlockAttr(self, nodes):
+        for node in nodes:
             if cmds.objExists(node):
                 for attr in self.ar.data.transform_attrs:
                     cmds.setAttr(node+"."+attr, lock=False)
@@ -1209,12 +1209,12 @@ class Utils(object):
         return attrNameLower
 
 
-    def setAttrValues(self, itemList, attrList, valueList):
+    def setAttrValues(self, items, attributes, valueList):
         """ Just set the attribute values for the given lists.
         """
-        if itemList and attrList and valueList:
-            for item in itemList:
-                for attr, value in zip(attrList, valueList):
+        if items and attributes and valueList:
+            for item in items:
+                for attr, value in zip(attributes, valueList):
                     cmds.setAttr(item+"."+attr, value)
 
 
@@ -1244,14 +1244,14 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList=None, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, filterLattice=True, verbose=True, title="Rigging", *args):
+    def filterTransformList(self, items=None, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, filterLattice=True, verbose=True, title="Rigging", *args):
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
-        if itemList:
+        if items:
             cameraList = ["|persp", "|top", "|side", "|front"]
             constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "poleVectorConstraint"]
             toRemoveList = []
-            for item in itemList:
+            for item in items:
                 if verbose:
                     self.setProgress(title)
                 itemType = cmds.objectType(item)
@@ -1294,8 +1294,8 @@ class Utils(object):
                         if cmds.listRelatives(item, children=True, type=defName) or itemType == defName:
                             toRemoveList.append(item)
             if toRemoveList:
-                itemList = list(set(itemList) - set(toRemoveList))
-        return itemList
+                items = list(set(items) - set(toRemoveList))
+        return items
 
 
     def deleteOrigShape(self, item, deleteIntermediate=True, *args):
@@ -1340,16 +1340,16 @@ class Utils(object):
         return resultDic
 
 
-    def nodeRenamingTreatment(self, itemList=None, nodeType="unitConversion", suffix="_UC", *args):
+    def nodeRenamingTreatment(self, items=None, nodeType="unitConversion", suffix="_UC", *args):
         """ Rename unitConversion nodes to something like this:
             [IN]capitals+#+attr+_+[OUT]capitals+#+attr+"_UC"
             or the given nodeType and suffix.
         """
-        if not itemList:
-            itemList = cmds.ls(selection=False, type=nodeType)
-        if itemList:
-            self.ar.custom_attr.addAttr(0, itemList) #dpID
-            for item in itemList:
+        if not items:
+            items = cmds.ls(selection=False, type=nodeType)
+        if items:
+            self.ar.custom_attr.addAttr(0, items) #dpID
+            for item in items:
                 if not item.endswith(suffix):
                     if cmds.attributeQuery("input", node=item, exists=True):
                         newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
@@ -1474,11 +1474,11 @@ class Utils(object):
         return [n for n in cmds.ls(selection=False, shortNames=True) if "|" in n] or False
 
 
-    def addJointEndAttr(self, itemList, *args):
+    def addJointEndAttr(self, items, *args):
         """ Create a jointEnd boolean attribute to the given list.
         """
-        if itemList:
-            for item in itemList:
+        if items:
+            for item in items:
                 if not self.ar.data.joint_end_attr in cmds.listAttr(item):
                     cmds.addAttr(item, longName=self.ar.data.joint_end_attr, attributeType="bool", defaultValue=1)
         

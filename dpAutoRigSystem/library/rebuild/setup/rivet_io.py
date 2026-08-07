@@ -95,7 +95,7 @@ class RivetIO(action.BaseAction):
                 addIt = True
                 if n > 0:
                     for x in range(0, i):
-                        if data["itemNode"] in dic[x]["itemList"]:
+                        if data["itemNode"] in dic[x]["items"]:
                             addIt = False
                             break
                 if addIt:
@@ -117,7 +117,7 @@ class RivetIO(action.BaseAction):
                 self.ar.data.ui_state = False
                 # recreate rivet:
                 self.rivet.deformerToUse = netDic['deformerToUse']
-                rivetList = self.rivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['itemList'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
+                rivetList = self.rivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['items'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
                 self.ar.data.ui_state = old_ui_state
                 if not rivetList:
                     wellImported = False

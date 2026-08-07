@@ -48,9 +48,9 @@ class ParentedGeometry(action.BaseAction):
                         if cmds.objExists(mesh):
                             allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
                             # get all descendents and check if it's different than its parent
-                            childrenList = self.ar.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
-                            if childrenList:
-                                for item in childrenList:
+                            children = self.ar.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
+                            if children:
+                                for item in children:
                                     if not self.ar.utils.getShortName(item, False) in self.checked_items:
                                         self.checked_items.append(self.ar.utils.getShortName(item, False)) # get only the last part of the path
                                         self.found_issues.append(True)

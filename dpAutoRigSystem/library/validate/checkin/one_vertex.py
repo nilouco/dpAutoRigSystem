@@ -73,11 +73,11 @@ class OneVertex(action.BaseAction):
         return self.log_data
 
 
-    def checkNonManifoldVertex(self, itemList, *args):
+    def checkNonManifoldVertex(self, items, *args):
         """ Return a list of nonManifold vertex if exists.
         """
         nmVertexList, foundList = [], []
-        for item in itemList:
+        for item in items:
             cmds.select(item)
             foundList.extend(mel.eval('polyCleanupArgList 4 { "0","2","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };'))
         if foundList:

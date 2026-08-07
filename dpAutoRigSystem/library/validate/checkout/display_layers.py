@@ -115,11 +115,11 @@ class DisplayLayers(action.BaseAction):
             cmds.delete(self.extraLayerToDelete)
         
 
-    def createNewLayer(self, itemList, layerName, geoType=True, *args):
+    def createNewLayer(self, items, layerName, geoType=True, *args):
         """ Creates Geo_Lyr with the objects inside Render_Grp and Proxy_Grp
         """
-        if itemList:
-            cmds.select(itemList)
+        if items:
+            cmds.select(items)
             newLayer = str(cmds.createDisplayLayer(name=layerName, noRecurse=True))
             # Count numbers in name
             numeric = 0
@@ -166,14 +166,14 @@ class DisplayLayers(action.BaseAction):
             return allGeoList
     
 
-    def verifyFixMode(self, itemList, *args):
+    def verifyFixMode(self, items, *args):
         """ This function will check if the item is a list or not.
             If it's a list it will append the items in the dic and run the main function once.
             If it's not a list it will append the obj and run the main function.
         """
-        if itemList:
-            self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-            for i, item in enumerate(itemList):
+        if items:
+            self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+            for i, item in enumerate(items):
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 if self.first_mode:
                     self.good_results.append(False)
@@ -183,7 +183,7 @@ class DisplayLayers(action.BaseAction):
                     try:#verify
                         # It will run function only one time to create displayLayers in the last index from the loop, 
                         # otherwise it will create for every index
-                        if i == len(itemList) - 1:
+                        if i == len(items) - 1:
                             self.createDisplayLayers()    
                         self.good_results.append(True)
                         self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)

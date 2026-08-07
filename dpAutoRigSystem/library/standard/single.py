@@ -66,7 +66,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
         cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScC")
         cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScC")
         # include nodes into net
-        self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
+        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
     
     
     def changeIndirectSkin(self, *args):
@@ -110,11 +110,11 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName)
+                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName)
                 # create a control:
                 if not self.getHasIndirectSkin():
-                    if self.curveDegree == 0:
-                        self.curveDegree = 1
+                    if self.curve_degree == 0:
+                        self.curve_degree = 1
                 # work with curve shape and rotation cases:
                 indirectSkinRot = (0, 0, 0)
                 if self.ar.data.lang['c058_main'] in self.userGuideName:
@@ -133,7 +133,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                             indirectSkinRot=(0, 0, 90)
                         else:
                             indirectSkinRot=(0, 0, -90)
-                self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
+                self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
                 self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
@@ -229,30 +229,29 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.getHasIndirectSkin():
-                    self.hookSetup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], staticList=[side+self.userGuideName+"_Jxt"])
+                    self.create_hook_setup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], staticList=[side+self.userGuideName+"_Jxt"])
                 else:
-                    self.hookSetup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], [side+self.userGuideName+"_Jnt"])
-                self.aStaticGrpList.append(self.toStaticHookGrp)
-                self.aCtrlGrpList.append(self.toCtrlHookGrp)
+                    self.create_hook_setup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], [side+self.userGuideName+"_Jnt"])
+                self.aStaticGrpList.append(self.static_hook_grp)
+                self.aCtrlGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.composingInfo()
+            self.composing_info()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.delete_guide()
-        self.renameUnitConversion()
+        self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
     
-    def composingInfo(self, *args):
-        standard.BaseStandard.composingInfo(self)
+    def composing_info(self):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                                        "mainJisList"   : self.mainJisList,
-                                        "staticGrpList" : self.aStaticGrpList,
-                                        "ctrlGrpList"   : self.aCtrlGrpList,
-                                    }
+                            "mainJisList"   : self.mainJisList,
+                            "staticGrpList" : self.aStaticGrpList,
+                            "ctrlGrpList"   : self.aCtrlGrpList,
+                        }

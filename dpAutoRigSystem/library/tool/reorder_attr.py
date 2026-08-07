@@ -48,7 +48,7 @@ class ReorderAttr(base.BaseLibrary):
         cmds.showWindow(dpReorderAttrWin)
     
     
-    def dpMoveAttr(self, mode, items=None, attrList=None, verbose=False, jumpHidden=False, *args):
+    def dpMoveAttr(self, mode, items=None, attributes=None, verbose=False, jumpHidden=False, *args):
         """ Change order of attributes in order to move it to up or down in the list position.
         """
         # do ScriptEditor do not print Undo messages:
@@ -57,14 +57,14 @@ class ReorderAttr(base.BaseLibrary):
             # get current selected objects:
             items = cmds.channelBox('mainChannelBox', query=True, mainObjectList=True)
         if items:
-            if not attrList:
+            if not attributes:
                 # get selected attributes from channelBox
-                attrList = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
-            if attrList:
+                attributes = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
+            if attributes:
                 for obj in items:
                     userDefAttrList = cmds.listAttr(obj, userDefined=True)
                     if userDefAttrList:
-                        if not attrList[0] in userDefAttrList:
+                        if not attributes[0] in userDefAttrList:
                             if verbose:
                                 mel.eval("warning \""+self.ar.data.lang["m235_selectedStaticAttr"]+"\";")
                         else:
@@ -77,11 +77,11 @@ class ReorderAttr(base.BaseLibrary):
 
                             # start moving attributes
                             if mode == 0: #down
-                                if len(attrList) > 1:
-                                    attrList.reverse()
-                                    sortedList = attrList.copy()
-                                if len(attrList) == 1:
-                                    sortedList = attrList.copy()
+                                if len(attributes) > 1:
+                                    attributes.reverse()
+                                    sortedList = attributes.copy()
+                                if len(attributes) == 1:
+                                    sortedList = attributes.copy()
                                 for i in sortedList:
                                     attrLs = cmds.listAttr(obj, userDefined=True)
                                     attrSize = len(attrLs)
@@ -95,10 +95,10 @@ class ReorderAttr(base.BaseLibrary):
                                     if attrPos < attrSize-1:
                                         nextAttrType = cmds.attributeQuery(attrLs[attrPos+1], node=obj, attributeType=True)
                                         if nextAttrType in self.nextAttrTypeList or (not cmds.getAttr(obj+"."+attrLs[attrPos+1], channelBox=True) and not cmds.getAttr(obj+"."+attrLs[attrPos+1], keyable=True)):
-                                            self.dpMoveAttr(mode, items, attrList, False, True)
+                                            self.dpMoveAttr(mode, items, attributes, False, True)
                                         
                             elif mode == 1: #up
-                                for i in attrList:
+                                for i in attributes:
                                     attrLs = cmds.listAttr(obj, userDefined=True)
                                     attrSize = len(attrLs)
                                     attrPos = attrLs.index(i)
@@ -112,7 +112,7 @@ class ReorderAttr(base.BaseLibrary):
                                     if attrPos > 1:
                                         nextAttrType = cmds.attributeQuery(attrLs[attrPos-1], node=obj, attributeType=True)
                                         if nextAttrType in self.nextAttrTypeList or (not cmds.getAttr(obj+"."+attrLs[attrPos-1], channelBox=True) and not cmds.getAttr(obj+"."+attrLs[attrPos-1], keyable=True)):
-                                            self.dpMoveAttr(mode, items, attrList, False, True)
+                                            self.dpMoveAttr(mode, items, attributes, False, True)
                             
                             # lock all user defined attibutes after the changing position:
                             if lockAttrList:

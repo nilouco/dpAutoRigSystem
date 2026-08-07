@@ -39,14 +39,14 @@ class OffsetMatrixIO(action.BaseAction):
             if self.ar.pipeliner.checkAssetContext():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    nodeList = None
+                    nodes = None
                     if objList:
-                        nodeList = objList
+                        nodes = objList
                     else:
-                        nodeList = cmds.ls(selection=False, type="transform")
-                    if nodeList:
+                        nodes = cmds.ls(selection=False, type="transform")
+                    if nodes:
                         if self.first_mode: #export
-                            toExportDataDic = self.getOffsetMatrixDataDic(nodeList)
+                            toExportDataDic = self.getOffsetMatrixDataDic(nodes)
                             self.export_json_file(toExportDataDic)
                         else: #import
                             toImportDic = self.import_latest_json_file(self.get_exported_items())
@@ -73,13 +73,13 @@ class OffsetMatrixIO(action.BaseAction):
         return self.log_data
 
 
-    def getOffsetMatrixDataDic(self, itemList, *args):
+    def getOffsetMatrixDataDic(self, items, *args):
         """ Processes the given list to collect the info about their parent offset matrix connections to rebuild.
             Returns a dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-        for item in itemList:
+        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 inPlugList = cmds.listConnections(item+"."+self.offsetMatrixAttr, source=True, destination=False, plugs=True)

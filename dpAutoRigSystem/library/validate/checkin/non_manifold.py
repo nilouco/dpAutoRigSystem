@@ -78,12 +78,12 @@ class NonManifold(action.BaseAction):
         return self.log_data
 
 
-    def checkNonManifold(self, itemList, *args):
+    def checkNonManifold(self, items, *args):
         """ Verify if there are non manifold meshes and return them if exists.
         """
         nonManifoldList = []
-        if itemList:
-            for item in itemList:
+        if items:
+            for item in items:
                 if cmds.polyInfo(item, nonManifoldEdges=True, nonManifoldUVEdges=True, nonManifoldUVs=True, nonManifoldVertices=True):
                     nonManifoldList.append(item)
         return nonManifoldList

@@ -387,13 +387,13 @@ class FacialConnection(base.BaseLibrary):
         self.ar.utils.closeUI('dpFacialConnectionWindow')
 
     
-    def dpGetJointNodeList(self, itemList, *args):
+    def dpGetJointNodeList(self, items, *args):
         """ Load the respective items to build the joint target list (offset group node) and returns it.
         """
         self.offsetSuffix = "_Ctrl_Offset_Grp"
         leftPrefix = self.ar.data.lang["p002_left"]+"_"
         rightPrefix = self.ar.data.lang["p003_right"]+"_"
-        for item in itemList:
+        for item in items:
             centerName = item+self.offsetSuffix
             leftName   = leftPrefix+item+self.offsetSuffix
             rightName  = rightPrefix+item+self.offsetSuffix
@@ -409,9 +409,9 @@ class FacialConnection(base.BaseLibrary):
     def dpGetSizeFactor(self, toNode, *args):
         """ Get the child control size value and return it.
         """
-        childrenList = cmds.listRelatives(toNode, children=True, type="transform")
-        if childrenList:
-            for child in childrenList:
+        children = cmds.listRelatives(toNode, children=True, type="transform")
+        if children:
+            for child in children:
                 if cmds.objExists(child+".dpControl"):
                     if cmds.getAttr(child+".dpControl") == 1:
                         if cmds.objExists(child+".size"):

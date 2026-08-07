@@ -71,14 +71,14 @@ class TransformationIO(action.BaseAction):
         return self.log_data
 
 
-    def getTransformDataDic(self, itemList, *args):
+    def getTransformDataDic(self, items, *args):
         """ Return the transform data info to export.
         """
-        self.ar.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
         # define dictionary to export
         transformDic = {}
-        itemList = self.ar.utils.filterTransformList(itemList, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
-        for item in itemList:
+        items = self.ar.utils.filterTransformList(items, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             useThisTransform = True
             if cmds.objExists(item+".dpNotTransformIO"):

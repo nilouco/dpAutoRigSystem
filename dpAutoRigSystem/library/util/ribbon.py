@@ -29,8 +29,8 @@ class Ribbon(object):
             Returns a dictionary with all nodes needed to be integrated.
         """
         self.limbInstance = limbInstance
-        self.ctrlRadius = limbInstance.ctrlRadius
-        self.curveDegree = limbInstance.curveDegree
+        self.radius = limbInstance.radius
+        self.curve_degree = limbInstance.curve_degree
         self.limbManualVVAttr = self.ar.data.lang['m019_limb'].lower()+"Manual_"+self.ar.data.lang['c031_volumeVariation']
         self.limbVVAttr       = self.ar.data.lang['m019_limb'].lower()+"_"+self.ar.data.lang['c031_volumeVariation']
         self.limbMinVVAttr    = self.ar.data.lang['m019_limb'].lower()+"Min_"+self.ar.data.lang['c031_volumeVariation']
@@ -69,10 +69,10 @@ class Ribbon(object):
 
         cmds.delete(cmds.orientConstraint(oriLoc, midLoc, mo=False, skip=skipa, weight=1))
         
-        upctrlList = self.createBendCtrl(prefix+myName+'_Up_Offset_Ctrl', r=self.ctrlRadius)
+        upctrlList = self.createBendCtrl(prefix+myName+'_Up_Offset_Ctrl', r=self.radius)
         upctrl = upctrlList[0]
         upctrlCtrl = upctrlList[1]
-        downctrlList = self.createBendCtrl(prefix+myName+'_Down_Offset_Ctrl', r=self.ctrlRadius)
+        downctrlList = self.createBendCtrl(prefix+myName+'_Down_Offset_Ctrl', r=self.radius)
         downctrl = downctrlList[0]
         downctrlCtrl = downctrlList[1]
         elbowctrlList = self.createElbowCtrl(prefix+myName+'_'+cornerName+'_Offset_Ctrl', armStyle=arm)
@@ -100,7 +100,7 @@ class Ribbon(object):
             cmds.delete(cmds.orientConstraint(oriBLoc, auxBLoc, mo=False, skip=skipa, weight=1))
             cmds.delete(cmds.parentConstraint(lista[2], midBLoc, mo=False, w=1))
             cmds.delete(cmds.orientConstraint(oriBLoc, midBLoc, mo=False, skip=skipa, weight=1))
-            downBctrlList = self.createBendCtrl(prefix+myName+'_DownB_Offset_Ctrl', r=self.ctrlRadius)
+            downBctrlList = self.createBendCtrl(prefix+myName+'_DownB_Offset_Ctrl', r=self.radius)
             downBctrl = downBctrlList[0]
             downBctrlCtrl = downBctrlList[1]
             elbowBctrlList = self.createElbowCtrl(prefix+myName+'_'+cornerName+'B_Offset_Ctrl', armStyle=arm)
@@ -400,7 +400,7 @@ class Ribbon(object):
             Returns the group zeroOut and the control curve.
         """
         grp = None
-        curve = self.ar.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.guide_base)
+        curve = self.ar.ctrls.cvControl("id_038_RibbonBend", myName, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.limbInstance.guide_base)
         self.ar.ctrls.setLockHide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=myName+'_Grp')
@@ -413,9 +413,9 @@ class Ribbon(object):
             Returns the group, the control curve and its zeroOut group.
         """
         if armStyle:
-            curve = self.ar.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.name_guide+"_Corner")
+            curve = self.ar.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.limbInstance.name_guide+"_Corner")
         else:
-            curve = self.ar.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0), guideSource=self.limbInstance.name_guide+"_Corner")
+            curve = self.ar.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guideSource=self.limbInstance.name_guide+"_Corner")
         grp = None
         if zero:
             zero0 = cmds.group(curve, name=myName+'_Zero_0_Grp')
@@ -636,7 +636,7 @@ class Ribbon(object):
         
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
-        mid_Ctrl = self.ar.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.name_guide+"_Corner")
+        mid_Ctrl = self.ar.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.limbInstance.name_guide+"_Corner")
         self.ar.utils.removeUserDefinedAttr(mid_Ctrl, True)
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
@@ -713,7 +713,7 @@ class Ribbon(object):
             
             # create extra control
             extraName = jnt[:-4] #removed _Jnt suffix
-            extraCtrl = self.ar.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.limbInstance.guide_base, parentTag=self.limbInstance.getParentToTag(extraCtrlList))
+            extraCtrl = self.ar.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.limbInstance.guide_base, parentTag=self.limbInstance.get_parent_to_tag(extraCtrlList))
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
@@ -765,11 +765,11 @@ class Ribbon(object):
                             else: #leg
                                 # flip direction to conform with left side
                                 addDir = -1 * addDir
-                        cmds.setAttr(jad+".translate"+addAxis, addDir*self.ctrlRadius*0.5)
+                        cmds.setAttr(jad+".translate"+addAxis, addDir*self.radius*0.5)
                         self.ar.utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
-                        addCtrl = self.ar.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.limbInstance.guide_base)
+                        addCtrl = self.ar.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guideSource=self.limbInstance.guide_base)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = self.ar.utils.zeroOut([addCtrl])[0]
                         cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))

@@ -337,10 +337,10 @@ class BaseLayout(base.BaseLibrary):
                             self.mainCtrlColumn = cmds.rowLayout('mainCtrlColumn', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="rig_selected_module_cl" )
                             hasMain = cmds.getAttr(self.guide_base+".mainControls")
                             if self.nJointsAttr > 1:
-                                self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
+                                self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.set_main_ctrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=cmds.getAttr(self.guide_base+".nMain"), minValue=1, changeCommand=partial(self.change_main_ctrls_number, 0), editable=hasMain, parent=self.mainCtrlColumn)
                             else:
-                                self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
+                                self.mainCtrlsCB = cmds.checkBox(label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.set_main_ctrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=cmds.getAttr(self.guide_base+".nMain"), minValue=1, changeCommand=partial(self.change_main_ctrls_number, 0), editable=False, parent=self.mainCtrlColumn)
                                 cmds.setAttr(self.guide_base+".mainControls", 0)
                 
@@ -500,8 +500,8 @@ class BaseLayout(base.BaseLibrary):
                 # loading Maya matrix node (for mirror porpuses)
                 loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
-                    self.mirrorAxis = item
-                    cmds.setAttr(self.guide_base+".mirrorAxis", self.mirrorAxis, type='string')
+                    self.mirror_axis = item
+                    cmds.setAttr(self.guide_base+".mirrorAxis", self.mirror_axis, type='string')
                     self.create_mirror_preview()
     
     
@@ -564,8 +564,8 @@ class BaseLayout(base.BaseLibrary):
             cmds.delete(self.previewMirrorGrpName)
         # get children, verifying if there are children guides:
         guideChildrenList = self.ar.utils.getGuideChildrenList(self.guide_base)
-        self.mirrorAxis = cmds.getAttr(self.guide_base+".mirrorAxis")
-        if self.mirrorAxis != 'off':
+        self.mirror_axis = cmds.getAttr(self.guide_base+".mirrorAxis")
+        if self.mirror_axis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
                 hidden = not self.ar.data.display_temp_grp #invert to apply
                 self.ar.data.guide_mirror_grp = cmds.group(name=self.ar.data.guide_mirror_grp, empty=True)
@@ -589,7 +589,7 @@ class BaseLayout(base.BaseLibrary):
                         # get initial values from father guide base:
                         fatherMirrorName = cmds.getAttr(self.guide_base+".mirrorName")
                         # set values to guide base:
-                        cmds.setAttr(guideChild+".mirrorAxis", self.mirrorAxis, type='string')
+                        cmds.setAttr(guideChild+".mirrorAxis", self.mirror_axis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
                         for moduleInstance in self.ar.data.guide_instances:
                             if cmds.objExists(moduleInstance.guide_base):
@@ -684,7 +684,7 @@ class BaseLayout(base.BaseLibrary):
             cmds.setAttr(self.previewMirrorGrp+'.scaleY', 1)
             cmds.setAttr(self.previewMirrorGrp+'.scaleZ', 1)
             # set a negative value to the scale mirror axis:
-            for axis in self.mirrorAxis:
+            for axis in self.mirror_axis:
                 cmds.setAttr(self.previewMirrorGrp+'.scale'+axis, -1)
         cmds.select(selList)
 

@@ -192,7 +192,7 @@ class GuideIO(action.BaseAction):
                             cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
                             self.instance.create_mirror_preview()
                         elif baseAttr == "articulation":
-                            self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
+                            self.instance.set_articulation(self.netDic["GuideData"][item]["articulation"])
                         elif baseAttr == "nJoints":
                             self.instance.changeJointNumber(self.netDic["GuideData"][item]["nJoints"])
                         elif baseAttr == "type": #limb

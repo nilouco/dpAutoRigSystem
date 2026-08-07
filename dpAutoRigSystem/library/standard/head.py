@@ -224,7 +224,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(self.deformerCube+".template", 1)
         self.ar.utils.addCustomAttr([self.deformerCube], self.ar.skin.ignoreSkinningAttr)
         # include nodes into net
-        self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
+        self.add_node_to_guide_net([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
                                 ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "DeformerCenter", "DeformerRadius", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
     
 
@@ -261,7 +261,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     #Do not maintain offset and ensure cv will be at the same place than the joint
                     cmds.parentConstraint(self.cvNeckLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
                     cmds.scaleConstraint(self.cvNeckLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScC")
-                    self.addNodeToGuideNet([self.cvNeckLoc], ["Neck"+str(n-1)])
+                    self.add_node_to_guide_net([self.cvNeckLoc], ["Neck"+str(n-1)])
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvNeckLoc:
                 self.cvNeckLoc = self.name_guide+"_Neck"+str(self.enteredNJoints)
@@ -274,7 +274,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete(self.name_guide+"_Neck"+str(self.enteredNJoints))
                 cmds.delete(self.name_guide+"_JGuideNeck"+str(self.enteredNJoints))
                 for j in range(self.enteredNJoints, self.currentNJoints):
-                    self.removeAttrFromGuideNet(["Neck"+str(j)])
+                    self.remove_attr_from_guide_net(["Neck"+str(j)])
             # get the length of the neck to position segments.
             dist = self.ar.utils.distanceBet(self.name_guide+"_Neck0", self.name_guide+"_Head")[0]
             # translateY to input on each cvLocator
@@ -509,7 +509,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
         invertList = [[], [], ["invertTX", "invertRY", "invertRZ"], [], []]
         presetList = [{}, {"calibrateTX":1}, {"calibrateTX":1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
         if s == 1:
-            if self.addFlip:
+            if self.flip:
                 invertList = [[], ["invertTX"], ["invertTX"], ["invertTZ"], ["invertTZ"]]
         return presetList, invertList
 
@@ -569,10 +569,6 @@ class Head(standard.BaseStandard, layout.BaseLayout):
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             style = cmds.getAttr(self.guide_base+".style")
-            # articulation joint:
-            self.addArticJoint = self.getArticulation()
-            self.addFlip = self.getModuleAttr("flip")
-            self.addCorrective = self.getModuleAttr("corrective")
             # declare lists to store names and attributes:
             self.worldRefList, self.upperCtrlList, self.upperJawCtrlList, self.facialCtrlGrpList = [], [], [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
@@ -584,7 +580,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                 
                 # generating naming:
                 headJntName = side+self.userGuideName+"_01_"+self.ar.data.lang['c024_head']+"_Jnt"
-                if self.addArticJoint:
+                if self.articulation:
                     headJntName = side+self.userGuideName+"_02_"+self.ar.data.lang['c024_head']+"_Jnt"
                 upperJawJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c025_jaw']+"_Jnt"
                 upperHeadJntName = side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head']+"_Jnt"
@@ -628,12 +624,12 @@ class Head(standard.BaseStandard, layout.BaseLayout):
 
                 # creating controllers:
                 for n in range(0, self.nJoints):
-                    neckCtrl = self.ar.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z", guideSource=self.name_guide+"_Neck"+str(n), parentTag=self.getParentToTag(self.neckCtrlList))
+                    neckCtrl = self.ar.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.radius/((n*0.2)+1)), d=self.curve_degree, dir="-Z", guideSource=self.name_guide+"_Neck"+str(n), parentTag=self.get_parent_to_tag(self.neckCtrlList))
                     if n > 0:
                         cmds.parent(neckCtrl, self.neckCtrlList[-1])
                     self.neckCtrlList.append(neckCtrl)
-                self.headCtrl = self.ar.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree, guideSource=self.name_guide+"_Head", parentTag=self.neckCtrlList[-1])
-                self.headSubCtrl = self.ar.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree, guideSource=self.name_guide+"_Head", parentTag=self.headCtrl)
+                self.headCtrl = self.ar.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.radius * 2.5), d=self.curve_degree, guideSource=self.name_guide+"_Head", parentTag=self.neckCtrlList[-1])
+                self.headSubCtrl = self.ar.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.radius * 2.2), d=self.curve_degree, guideSource=self.name_guide+"_Head", parentTag=self.headCtrl)
                 toFlipList = [self.headCtrl, self.headSubCtrl]
                 # hiding visibility attributes:
                 self.ar.ctrls.setLockHide([self.headCtrl, self.headSubCtrl], ['v'], l=False)
@@ -653,20 +649,20 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     self.upperJawJnt = cmds.joint(name=upperJawJntName, scaleCompensate=False)
                     self.upperHeadJnt = cmds.joint(name=upperHeadJntName, scaleCompensate=False)
                     self.upperEndJnt = cmds.joint(name=upperEndJntName, scaleCompensate=False, radius=0.5)
-                    self.ar.utils.setJointLabel(self.upperJawJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c025_jaw'])
-                    self.ar.utils.setJointLabel(self.upperHeadJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head'])
-                    cmds.setAttr(self.upperEndJnt+".translateY", 0.3*self.ctrlRadius)
+                    self.ar.utils.setJointLabel(self.upperJawJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c025_jaw'])
+                    self.ar.utils.setJointLabel(self.upperHeadJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head'])
+                    cmds.setAttr(self.upperEndJnt+".translateY", 0.3*self.radius)
                     dpARJointList.extend([self.upperJawJnt, self.upperHeadJnt])
-                    self.upperJawCtrl = self.ar.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.name_guide+"_UpperJaw", parentTag=self.headSubCtrl)
-                    self.upperHeadCtrl = self.ar.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.name_guide+"_UpperHead", parentTag=self.upperJawCtrl)
+                    self.upperJawCtrl = self.ar.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.radius, d=self.curve_degree, headDef=1, guideSource=self.name_guide+"_UpperJaw", parentTag=self.headSubCtrl)
+                    self.upperHeadCtrl = self.ar.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.radius, d=self.curve_degree, headDef=1, guideSource=self.name_guide+"_UpperHead", parentTag=self.upperJawCtrl)
                     toFlipList.extend([self.upperJawCtrl, self.upperHeadCtrl])
                     self.ar.ctrls.setLockHide([self.upperJawCtrl, self.upperHeadCtrl], ['v'], l=False)
                     cmds.select(self.headJnt)
                 if hasJaw:
                     self.jawJnt = cmds.joint(name=jawJntName, scaleCompensate=False)
-                    self.ar.utils.setJointLabel(self.jawJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c025_jaw'])
+                    self.ar.utils.setJointLabel(self.jawJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c025_jaw'])
                     dpARJointList.extend([self.jawJnt])
-                    self.jawCtrl = self.ar.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.ctrlRadius *0.5), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_Jaw", parentTag=self.headSubCtrl)
+                    self.jawCtrl = self.ar.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=(self.radius *0.5), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_Jaw", parentTag=self.headSubCtrl)
                     toFlipList.extend([self.jawCtrl])
                     self.ar.ctrls.setLockHide([self.jawCtrl], ['v'], l=False)
                     if hasChin:
@@ -674,11 +670,11 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                         self.chinJnt = cmds.joint(name=chinJntName, scaleCompensate=False)
                         self.chewJnt = cmds.joint(name=chewJntName, scaleCompensate=False)
                         self.endJnt  = cmds.joint(name=endJntName, scaleCompensate=False, radius=0.5)
-                        self.ar.utils.setJointLabel(self.chinJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c026_chin'])
-                        self.ar.utils.setJointLabel(self.chewJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c048_chew'])
+                        self.ar.utils.setJointLabel(self.chinJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c026_chin'])
+                        self.ar.utils.setJointLabel(self.chewJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c048_chew'])
                         dpARJointList.extend([self.chinJnt, self.chewJnt])
-                        self.chinCtrl = self.ar.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.13), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_Chin", parentTag=self.jawCtrl)
-                        self.chewCtrl = self.ar.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.08), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_Chew", parentTag=self.chinCtrl)
+                        self.chinCtrl = self.ar.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.radius * 0.13), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_Chin", parentTag=self.jawCtrl)
+                        self.chewCtrl = self.ar.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.radius * 0.08), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_Chew", parentTag=self.chinCtrl)
                         toFlipList.extend([self.chinCtrl, self.chewCtrl])
                         self.ar.ctrls.setLockHide([self.chinCtrl, self.chewCtrl], ['v'], l=False)
                     cmds.select(self.headJnt)
@@ -696,13 +692,13 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     cmds.select(clear=True)
                     self.ar.utils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.ar.data.lang['c039_lip'])
                     self.ar.utils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.ar.data.lang['c039_lip'])
-                    self.ar.utils.setJointLabel(self.upperLipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c039_lip'])
-                    self.ar.utils.setJointLabel(self.lowerLipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c045_lower']+self.ar.data.lang['c039_lip'])
+                    self.ar.utils.setJointLabel(self.upperLipJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c039_lip'])
+                    self.ar.utils.setJointLabel(self.lowerLipJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c045_lower']+self.ar.data.lang['c039_lip'])
                     dpARJointList.extend([self.lCornerLipJnt, self.rCornerLipJnt, self.upperLipJnt, self.lowerLipJnt])
-                    self.lCornerLipCtrl = self.ar.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_LCornerLip", parentTag=self.headSubCtrl)
-                    self.rCornerLipCtrl = self.ar.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_RCornerLip", parentTag=self.headSubCtrl)
-                    self.upperLipCtrl = self.ar.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_UpperLip", parentTag=self.headSubCtrl)
-                    self.lowerLipCtrl = self.ar.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.name_guide+"_LowerLip", parentTag=self.headSubCtrl)
+                    self.lCornerLipCtrl = self.ar.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_LCornerLip", parentTag=self.headSubCtrl)
+                    self.rCornerLipCtrl = self.ar.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_RCornerLip", parentTag=self.headSubCtrl)
+                    self.upperLipCtrl = self.ar.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_UpperLip", parentTag=self.headSubCtrl)
+                    self.lowerLipCtrl = self.ar.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_LowerLip", parentTag=self.headSubCtrl)
                     toFlipList.extend([self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl])
                     self.ar.ctrls.setLockHide([self.upperLipCtrl, self.lowerLipCtrl], ['v'], l=False)
                 dpARJointList.extend(self.neckJointList)
@@ -710,8 +706,8 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 for n in range(0, self.nJoints):
-                    self.ar.utils.setJointLabel(self.neckJointList[n], s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c023_neck']+"_"+str(n).zfill(2))
-                self.ar.utils.setJointLabel(self.headJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c024_head'])
+                    self.ar.utils.setJointLabel(self.neckJointList[n], s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c023_neck']+"_"+str(n).zfill(2))
+                self.ar.utils.setJointLabel(self.headJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c024_head'])
                 
                 # facial controls
                 facialCtrlList = []
@@ -762,17 +758,17 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                 cmds.delete([self.headCtrl, self.headSubCtrl], constructionHistory=True)
                 if hasJaw:
                     tempJawCluster = cmds.cluster(self.jawCtrl)[1]
-                    cmds.setAttr(tempJawCluster+".translateY", -1*self.ctrlRadius)
-                    cmds.setAttr(tempJawCluster+".translateZ", self.ctrlRadius)
+                    cmds.setAttr(tempJawCluster+".translateY", -1*self.radius)
+                    cmds.setAttr(tempJawCluster+".translateZ", self.radius)
                     cmds.delete([self.jawCtrl], constructionHistory=True)
                 if hasChin:
                     tempChinCluster = cmds.cluster(self.chinCtrl)[1]
-                    cmds.setAttr(tempChinCluster+".translateY", -0.75*self.ctrlRadius)
-                    cmds.setAttr(tempChinCluster+".translateZ", 1.45*self.ctrlRadius)
+                    cmds.setAttr(tempChinCluster+".translateY", -0.75*self.radius)
+                    cmds.setAttr(tempChinCluster+".translateZ", 1.45*self.radius)
                     cmds.setAttr(tempChinCluster+".rotateX", 22)
                     tempChewCluster = cmds.cluster(self.chewCtrl)[1]
-                    cmds.setAttr(tempChewCluster+".translateY", -0.75*self.ctrlRadius)
-                    cmds.setAttr(tempChewCluster+".translateZ", 1.47*self.ctrlRadius)
+                    cmds.setAttr(tempChewCluster+".translateY", -0.75*self.radius)
+                    cmds.setAttr(tempChewCluster+".translateZ", 1.47*self.radius)
                     cmds.setAttr(tempChewCluster+".rotateX", 22)
                     cmds.delete([self.chinCtrl, self.chewCtrl], constructionHistory=True)
                 
@@ -863,7 +859,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                 # edit the mirror shape to a good direction of controls:
                 # fixing flip mirror:
                 if s == 1:
-                    if self.addFlip:
+                    if self.flip:
                         for toFlipNode in toFlipList:
                             cmds.setAttr(toFlipNode+".scaleX", -1)
                             cmds.setAttr(toFlipNode+".scaleY", -1)
@@ -889,7 +885,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                         zeroRCorner = self.ar.utils.zeroOut([self.rCornerLipCtrl])[0]
                         self.lLipGrp = cmds.group(self.lCornerLipCtrl, name=self.lCornerLipCtrl+"_Grp")
                         self.rLipGrp = cmds.group(self.rCornerLipCtrl, name=self.rCornerLipCtrl+"_Grp")
-                        if not self.addFlip:
+                        if not self.flip:
                             cmds.setAttr(zeroRCorner+".scaleX", -1)
                         if hasChin:
                             cmds.parent(zeroLowerLip, self.chinCtrl, absolute=True) #lowerLipCtrl
@@ -1057,10 +1053,10 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     self.to_ids.extend([upperLipRev, self.lLipRevNode, self.rLipRevNode])
 
                 # articulation joint:
-                if self.addArticJoint:
+                if self.articulation:
                     # neckBase
                     neckBaseJzt = self.ar.utils.zeroOutJoints([self.neckJointList[0]])[0]
-                    if self.addCorrective:
+                    if self.corrective:
                         # corrective controls group
                         self.corrective_ctrls_grp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
                         self.correctiveCtrlGrpList.append(self.corrective_ctrls_grp)
@@ -1078,14 +1074,14 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                             correctiveNetList.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchUp", 0, 0, 80))
                             correctiveNetList.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchDown", 0, 0, -80))
                             
-                            articJntList = self.ar.utils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
+                            articJntList = self.ar.utils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
                             self.setup_corrective_controllers(articJntList, s, neckCtrlBaseName+"_"+str(n), correctiveNetList, neckHeadCalibratePresetList, invertList, [False, True, True, False, False])
                             if s == 1:
-                                if self.addFlip:
+                                if self.flip:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
                                     cmds.setAttr(articJntList[0]+".scaleY", -1)
                                     cmds.setAttr(articJntList[0]+".scaleZ", -1)
-                            self.ar.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
+                            self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.userGuideName+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
 
                         # head corrective
                         headCorrectiveNetList = [None]
@@ -1094,23 +1090,23 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                         headCorrectiveNetList.append(self.setup_corrective_net(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.ar.data.lang['c024_head']+"_PitchUp", 0, 0, 80))
                         headCorrectiveNetList.append(self.setup_corrective_net(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.ar.data.lang['c024_head']+"_PitchDown", 0, 0, -80))
                         headCalibratePresetList, invertList = self.getCalibratePresetList(s)
-                        articJntList = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
+                        articJntList = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
                         self.setup_corrective_controllers(articJntList, s, side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList, [False, True, True, False, False])
                         if s == 1:
-                            if self.addFlip:
+                            if self.flip:
                                 cmds.setAttr(articJntList[0]+".scaleX", -1)
                                 cmds.setAttr(articJntList[0]+".scaleY", -1)
                                 cmds.setAttr(articJntList[0]+".scaleZ", -1)
                     else:
                         articJntList = self.ar.utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
-                        self.ar.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
+                        self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.userGuideName+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
                         cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
                         articJntList = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt)
                     
                     self.neckJointList.insert(0, neckBaseJzt)
                     cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
                     cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
-                    self.ar.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
+                    self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.userGuideName+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
                     cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
                 
                 # facial controls hierarchy
@@ -1174,9 +1170,9 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     toHookList.append(zeroJaw)
                 if hasLips:
                     toHookList.extend([zeroLCorner, zeroRCorner])
-                self.hookSetup(side, toHookList, [self.neckJointList[0]], [self.worldRef])
-                if self.addCorrective:
-                    cmds.parent(self.corrective_ctrls_grp, self.toCtrlHookGrp)
+                self.create_hook_setup(side, toHookList, [self.neckJointList[0]], [self.worldRef])
+                if self.corrective:
+                    cmds.parent(self.corrective_ctrls_grp, self.ctrl_hook_grp)
                 
                 # head deformer
                 if cmds.getAttr(self.guide_base+".deformer") and hasUpperHead:
@@ -1192,20 +1188,20 @@ class Head(standard.BaseStandard, layout.BaseLayout):
 
                     hdNet = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guide_net, ui=False)
 
-                    self.addNodeToGuideNet([hdNet], ["hdNet"])
+                    self.add_node_to_guide_net([hdNet], ["hdNet"])
                     cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
                 elif cmds.objExists(self.name_guide+"_DeformerCube_MD"):
                     cmds.delete(self.name_guide+"_DeformerCube_MD")
 
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
 
                 self.ar.utils.addCustomAttr([self.headOrientGrp, self.worldRef], self.ar.utils.ignoreTransformIOAttr)
                 if hasLips:
                     self.ar.utils.addCustomAttr([self.lLipGrp, self.rLipGrp], self.ar.utils.ignoreTransformIOAttr)
                 if self.correctiveCtrlGrpList:
                     self.ar.utils.addCustomAttr(self.correctiveCtrlGrpList, self.ar.utils.ignoreTransformIOAttr)
-                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
                 
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.guide_base+".facial"):
@@ -1216,11 +1212,11 @@ class Head(standard.BaseStandard, layout.BaseLayout):
 
             # finalize this rig:
             self.serialize_guide()
-            self.composingInfo()
+            self.composing_info()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.delete_guide()
-        self.renameUnitConversion()
+        self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
 
@@ -1271,7 +1267,7 @@ for net in cmds.ls(type="network"):
         cmds.lockNode(self.guide_net, lock=True)
 
     
-    def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
+    def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attributes, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
         """ Important method to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
@@ -1307,7 +1303,7 @@ for net in cmds.ls(type="network"):
             # lock or limit XYZ axis:
             self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
             self.ar.ctrls.setLockHide([fCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
-            scaleFactorValue = self.facialFactor*self.ctrlRadius
+            scaleFactorValue = self.facialFactor*self.radius
             cmds.addAttr(fCtrl, longName="scaleFactor", attributeType="float", defaultValue=scaleFactorValue, minValue=0.001)
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleX", force=True)
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleY", force=True)
@@ -1321,8 +1317,8 @@ for net in cmds.ls(type="network"):
                 cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
             # start working with custom attributes
             facialAttrList = []
-            if attrList:
-                for a, attr in enumerate(attrList):
+            if attributes:
+                for a, attr in enumerate(attributes):
                     if not attr == None:
                         ctrlAttr = attr
                         if sideName:
@@ -1458,8 +1454,8 @@ for net in cmds.ls(type="network"):
             if self.name_guide in hook[item]['fatherGuide']:
                 if not item in guideList:
                     guideList.append(item.split(":")[0])
-                    if hook[item]['childrenList']:
-                        for child in hook[item]['childrenList']:
+                    if hook[item]['children']:
+                        for child in hook[item]['children']:
                             if not child in guideList:
                                 guideList.append(child.split(":")[0])
         if guideList:
@@ -1469,7 +1465,7 @@ for net in cmds.ls(type="network"):
                     guideSource = cmds.getAttr(node+".guideSource")
                     if guideSource.split(":")[0] in guideList:
                         if not node in resultList:
-                            if self.mirrorAxis != 'off':
+                            if self.mirror_axis != 'off':
                                 if node.startswith(self.sides[s]):
                                     resultList.append(node)
                             else:
@@ -1477,18 +1473,17 @@ for net in cmds.ls(type="network"):
         return resultList
 
 
-    def composingInfo(self, *args):
-        standard.BaseStandard.composingInfo(self)
+    def composing_info(self):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                                        "worldRefList"         : self.worldRefList,
-                                        "upperCtrlList"        : self.upperCtrlList,
-                                        "ctrlList"             : self.aCtrls,
-                                        "InnerCtrls"           : self.aInnerCtrls,
-                                        "lCtrls"               : self.aLCtrls,
-                                        "rCtrls"               : self.aRCtrls,
-                                        "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
-                                        "upperJawCtrlList"     : self.upperJawCtrlList,
-                                        "facialCtrlGrpList"    : self.facialCtrlGrpList
-                                    }
+                            "worldRefList"         : self.worldRefList,
+                            "upperCtrlList"        : self.upperCtrlList,
+                            "ctrlList"             : self.aCtrls,
+                            "InnerCtrls"           : self.aInnerCtrls,
+                            "lCtrls"               : self.aLCtrls,
+                            "rCtrls"               : self.aRCtrls,
+                            "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
+                            "upperJawCtrlList"     : self.upperJawCtrlList,
+                            "facialCtrlGrpList"    : self.facialCtrlGrpList
+                        }

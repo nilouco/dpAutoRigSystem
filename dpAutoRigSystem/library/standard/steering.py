@@ -47,7 +47,7 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
         cmds.setAttr(self.guide_base+".translateY", 3)
         cmds.setAttr(self.guide_base+".rotateX", 45)
         # include nodes into net
-        self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
+        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
     
     
     def rig_me(self, *args):
@@ -71,10 +71,10 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.ar.utils.addJointEndAttr([self.endJoint])
                 # joint labelling:
-                self.ar.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_1")
+                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName+"_1")
                 # create a control:
-                self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_JointLoc1")
-                self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.name_guide+"_JointEnd", parentTag=self.steeringCtrl)
+                self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
+                self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.steeringCtrl)
                 self.ar.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
                 self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
                 self.steeringCtrlList.append(self.steeringCtrl)
@@ -133,24 +133,23 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
                 cmds.scaleConstraint(self.steeringCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.hookSetup(side, [zeroOutCtrlGrpList[1]], [side+self.userGuideName+"_1_Jnt"])
+                self.create_hook_setup(side, [zeroOutCtrlGrpList[1]], [side+self.userGuideName+"_1_Jnt"])
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.ar.custom_attr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
+                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
-            self.composingInfo()
+            self.composing_info()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.delete_guide()
-        self.renameUnitConversion()
+        self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
     
     
-    def composingInfo(self, *args):
-        standard.BaseStandard.composingInfo(self)
+    def composing_info(self):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                                        "steeringCtrlList"   : self.steeringCtrlList,
-                                    }
+                            "steeringCtrlList"   : self.steeringCtrlList,
+                        }

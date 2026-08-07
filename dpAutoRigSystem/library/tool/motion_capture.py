@@ -582,15 +582,15 @@ class MotionCapture(base.BaseLibrary):
         print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
 
 
-    def getOrderedByTimeID(self, itemList, *args):
+    def getOrderedByTimeID(self, items, *args):
         """ Return ordered list of the given item list by the time in the dpID.
         """
         orderedList, idList = [], []
-        for item in itemList:
+        for item in items:
             if self.ar.data.dp_id in cmds.listAttr(item):
                 idList.append(int(cmds.getAttr(item+"."+self.ar.data.dp_id).split(".")[1])) #time
         if idList:
-            tmpList, orderedList = zip(*sorted(zip(idList, itemList)))
+            tmpList, orderedList = zip(*sorted(zip(idList, items)))
         return orderedList
 
 
@@ -884,11 +884,11 @@ from maya import cmds
 DP_MOTIONCAPTURE_VERSION = '''+str(self.ar.data.version)+'''
 
 class HumanIKCleaner(object):
-    def __init__(self, hikNode, sn, ctrlList, attrList, *args):
+    def __init__(self, hikNode, sn, ctrlList, attributes, *args):
         self.hikNode = hikNode
         self.myself = sn
         self.ctrlList = ctrlList
-        self.attrList = attrList
+        self.attributes = attributes
         cmds.scriptJob(nodeDeleted=(self.hikNode, self.jobDeletedMocap), killWithScene=False, compressUndo=True)
 
     def jobDeletedMocap(self, *args):
@@ -914,7 +914,7 @@ class HumanIKCleaner(object):
     def lockAutoRotateAttr(self, ctrl, value, *args):
         """ Lock or unlock the autoRotate attribute for the given controller.
         """
-        for followAttr in self.attrList:
+        for followAttr in self.attributes:
             if followAttr in cmds.listAttr(ctrl):
                 cmds.setAttr(ctrl+"."+followAttr, lock=value)
     

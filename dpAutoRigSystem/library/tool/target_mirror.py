@@ -174,7 +174,7 @@ class TargetMirror(base.BaseLibrary):
         """ Create the mirrored targets.
         """
         # declaring variables
-        attrList = ["tx", "ty", "tz"]
+        attributes = ["tx", "ty", "tz"]
         # get loaded original node
         origNode = cmds.textField(self.originalModelTextField, query=True, text=True)
         if self.dpCheckGeometry(origNode):
@@ -228,7 +228,7 @@ class TargetMirror(base.BaseLibrary):
                             # position:
                             if cmds.checkBox(self.mirrorPosCB, query=True, value=True):
                                 try:
-                                    for attr in attrList:
+                                    for attr in attributes:
                                         cmds.setAttr(newTarget+"."+attr, cmds.getAttr(item+"."+attr))
                                     axisValue = cmds.getAttr(item+".translate"+axis)*(-1)
                                     cmds.setAttr(newTarget+".translate"+axis, axisValue)

@@ -118,7 +118,7 @@ class BlendshapeTarget(action.BaseAction):
             for item in grpList:
                 nodeGrp = self.ar.utils.getNodeByMessage(item)
                 if nodeGrp:
-                    nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
-                    if nodeList:
-                        resultList.extend(nodeList)
+                    nodes = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
+                    if nodes:
+                        resultList.extend(nodes)
         return resultList
