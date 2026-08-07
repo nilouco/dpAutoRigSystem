@@ -16,7 +16,7 @@ class EyeFlat(curve.BaseCurve):
         self.dependences = ['Lens', 'Circle']
     
     
-    def cvMain(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=0, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, *args):
+    def cv_main(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=0, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
@@ -30,13 +30,13 @@ class EyeFlat(curve.BaseCurve):
             mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')
     
     
-    def generateCombineCurves(self, use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, *args):
-        """ Combine controls in order to return it.
+    def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
+        """ Combine controllers in order to return it.
         """
         lens = self.ar.config.get_instance("Lens", [self.ar.data.curve_simple_folder])
         circle = self.ar.config.get_instance("Circle", [self.ar.data.curve_simple_folder])
-        curve1 = lens.cvMain(False, cv_id, cv_name, cv_size, cv_degree)
-        curve2 = circle.cvMain(False, cv_id, cv_name, cv_size, cv_degree)
+        curve1 = lens.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        curve2 = circle.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         cmds.setAttr(curve1+".rotateZ", 90)
         cmds.setAttr(curve2+".scaleX", 0.38)
         cmds.setAttr(curve2+".scaleY", 0.38)

@@ -514,7 +514,7 @@ class Controllers(object):
         controlInstance = self.ar.config.get_instance(ctrlModule, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
         if controlInstance:
             # create curve
-            curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
+            curve = controlInstance.cv_main(False, ctrlType, ctrlName, r, d, dir, rot, 1)
             if corrective:
                 self.addCorrectiveAttrs(curve)
                 self.ar.job.start_corrective_edit_mode([curve])
@@ -545,7 +545,7 @@ class Controllers(object):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.ar.config.get_instance(cvType, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
-        curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
+        curve = curveInstance.cv_main(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
             self.addGuideAttrs(curve, color, pin)
         return curve

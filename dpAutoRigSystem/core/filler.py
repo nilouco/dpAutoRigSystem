@@ -65,7 +65,7 @@ class UIFiller(object):
             icon_name = self.ar.ui_manager.get_icon_name(item)
             # controller curves
             if folder == self.ar.data.curve_simple_folder or folder == self.ar.data.curve_combined_folder:
-                cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.name, annotation=item.name, height=32, width=32, command=partial(item.cvMain, True), parent=layout)
+                cmds.iconTextButton(image=self.ar.data.icon[icon_name], label=item.name, annotation=item.name, height=32, width=32, command=partial(item.cv_main, True), parent=layout)
                 return
             # layout and icon
             module_layout = cmds.rowLayout(item.name+"_rl", numberOfColumns=columns, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 0), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=layout)

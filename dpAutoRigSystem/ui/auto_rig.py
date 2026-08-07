@@ -100,7 +100,7 @@ class MainUI(object):
     def create_the_create_menu(self):
         cmds.menu('create_menu', label='Create', parent='main_menu_bar')
         cmds.menuItem('template_mi', label='Template', command=self.ar.maker.create_template, parent='create_menu')
-        cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.dpTranslatorMain, parent='create_menu')
+        cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.translator_ui, parent='create_menu')
         cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.config.open_pipeliner, parent='create_menu')
         cmds.menuItem('create_curve_preset_mi', label='Curve Preset', command=partial(self.ar.config.create_preset, "curve", self.ar.data.curve_preset_folder, True), parent='create_menu')
         cmds.menuItem('create_validator_preset_mi', label='Validator Preset', command=partial(self.ar.config.create_preset, "validator", self.ar.data.validate_preset_folder, False), parent='create_menu')

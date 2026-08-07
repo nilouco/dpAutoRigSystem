@@ -16,7 +16,7 @@ class Octagram(curve.BaseCurve):
         self.dependences = ['Square']
     
     
-    def cvMain(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, *args):
+    def cv_main(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
@@ -30,11 +30,11 @@ class Octagram(curve.BaseCurve):
             mel.eval('error \"'+ self.ar.data.lang['e001_guideNotChecked'] +' - '+ (", ").join(missing_modules) +'\";')
     
     
-    def generateCombineCurves(self, use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, *args):
-        """ Combine controls in order to return it.
+    def create_combined_curves(self, cv_id, cv_name, cv_size, cv_degree):
+        """ Combine controllers in order to return it.
         """
         square = self.ar.config.get_instance("Square", [self.ar.data.curve_simple_folder])
-        curve1 = square.cvMain(False, cv_id, cv_name, cv_size, cv_degree)
-        curve2 = square.cvMain(False, cv_id, cv_name, cv_size, cv_degree)
+        curve1 = square.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
+        curve2 = square.cv_main(False, cv_id, cv_name, cv_size, cv_degree)
         cmds.setAttr(curve2+".rotateZ", 45)
         return self.combine_curves([curve1, curve2])

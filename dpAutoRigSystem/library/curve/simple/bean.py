@@ -13,15 +13,14 @@ class Bean(curve.BaseCurve):
         curve.BaseCurve.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, None)
     
     
-    def cvMain(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False, *args):
+    def cv_main(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
         return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide)
         
     
-    
-    def getLinearPoints(self):
+    def get_linear_points(self):
         """ Get a list of linear points for this kind of control curve.
             Set class object variables cv_points, cvKnotList and cv_periodic.
         """
@@ -32,7 +31,7 @@ class Bean(curve.BaseCurve):
         self.cv_periodic = True #closed
     
     
-    def getCubicPoints(self):
+    def get_cubic_points(self):
         """ Get a list of cubic points for this kind of control curve.
             Set class object variables cv_points, cvKnotList and cv_periodic.
         """

@@ -11,310 +11,310 @@ class Translator(object):
         """
         # declaring variables
         self.ar = ar
-        self.translatorString = "dpAutoRigSystem - "+self.ar.data.lang['t000_translator']
-        self.sourceLangList = list(self.ar.data.lang)
-        self.keyLen = len(self.sourceLangList) - 1
-        self.langIndexStart = 7 #after userInfo
-        self.langIndex = self.langIndexStart
-        self.newLangList = []
-        self.resultString = []
-        self.validadeNoSpecialChar = re.compile('[^a-zA-Z]')
+        self.translator_title = "dpAutoRigSystem - "+self.ar.data.lang['t000_translator']
+        self.source_langs = list(self.ar.data.lang)
+        self.key_len = len(self.source_langs) - 1
+        self.lang_index_start = 7 #after userInfo
+        self.lang_index = self.lang_index_start
+        self.new_langs = []
+        self.str_result = []
+        self.check_no_special_char = re.compile('[^a-zA-Z]')
     
     
-    def dpTranslatorBack(self, *args):
+    def go_back(self, *args):
         """ Back to previews sentence translated.
         """
-        if self.langIndex > 0:
-            self.dpTranslatorBackward()
+        if self.lang_index > 0:
+            self.backward()
         else:
-            cmds.button(self.backBT, edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
+            cmds.button('back_bt', edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
     
     
-    def dpTranslatorSame(self, *args):
+    def go_same(self, *args):
         """ Get the text from source scrollField in order to use it as a translated text.
         """
         # get info from source scrollField:
-        if self.langIndex <= self.keyLen:
-            self.newLangList[self.langIndex] = cmds.scrollField(self.sourceTextSF, query=True, text=True)
-            self.dpTranslatorForward()
+        if self.lang_index <= self.key_len:
+            self.new_langs[self.lang_index] = cmds.scrollField(self.source_text_sf, query=True, text=True)
+            self.forward()
     
     
-    def dpTranslatorNext(self, *args):
+    def go_next(self, *args):
         """ Get the text from newLangText scrollField to use it as the user translated text.
         """
         # get info from translated scrollField:
-        if self.langIndex <= self.keyLen:
-            validatedValue = False
-            currentText = cmds.scrollField(self.newLangTextSF, query=True, text=True)
-            if not currentText == None:
-                if not currentText == "":
-                    if not currentText == " ":
-                        if not currentText == self.ar.data.lang['t007_writeText']:
-                            sourceText = cmds.scrollField(self.sourceTextSF, query=True, text=True)
+        if self.lang_index <= self.key_len:
+            validated = False
+            current_text = cmds.scrollField(self.new_lang_text_sf, query=True, text=True)
+            if not current_text == None:
+                if not current_text == "":
+                    if not current_text == " ":
+                        if not current_text == self.ar.data.lang['t007_writeText']:
+                            sourceText = cmds.scrollField(self.source_text_sf, query=True, text=True)
                             
                             if sourceText.startswith("\n"):
-                                if not currentText.startswith("\n"):
-                                    currentText = "\n"+currentText
+                                if not current_text.startswith("\n"):
+                                    current_text = "\n"+current_text
                             elif sourceText[0].isupper():
-                                currentText = currentText[0].upper()+currentText[1:]
+                                current_text = current_text[0].upper()+current_text[1:]
                             elif sourceText[0].islower():
-                                currentText = currentText[0].lower()+currentText[1:]
+                                current_text = current_text[0].lower()+current_text[1:]
                             if sourceText.endswith("\n"):
-                                if not currentText.endswith("\n"):
-                                    currentText = currentText+"\n"
+                                if not current_text.endswith("\n"):
+                                    current_text = current_text+"\n"
                             else:
-                                if currentText.endswith("\n"):
-                                    currentText = currentText[:-1]
+                                if current_text.endswith("\n"):
+                                    current_text = current_text[:-1]
                                 elif sourceText.endswith("."):
-                                    if not currentText.endswith("."):
-                                        currentText = currentText+"."
+                                    if not current_text.endswith("."):
+                                        current_text = current_text+"."
                                 elif sourceText.endswith(":"):
-                                    if not currentText.endswith(":"):
-                                        currentText = currentText+":"
+                                    if not current_text.endswith(":"):
+                                        current_text = current_text+":"
                             
-                            if self.sourceLangList[self.langIndex].startswith("c"): #control
-                                if not self.validadeNoSpecialChar.search(currentText): #no special char
-                                    validatedValue = True
+                            if self.source_langs[self.lang_index].startswith("c"): #control
+                                if not self.check_no_special_char.search(current_text): #no special char
+                                    validated = True
                             else:
-                                validatedValue = True
-            if validatedValue:
-                self.newLangList[self.langIndex] = currentText
-                self.dpTranslatorForward()
+                                validated = True
+            if validated:
+                self.new_langs[self.lang_index] = current_text
+                self.forward()
             else:
-                cmds.scrollField(self.newLangTextSF, edit=True, text=self.ar.data.lang['t007_writeText'])
+                cmds.scrollField(self.new_lang_text_sf, edit=True, text=self.ar.data.lang['t007_writeText'])
         else:
-            self.dpTranslatorForward()
+            self.forward()
     
     
-    def dpTranslatorBackward(self, *args):
+    def backward(self):
         """ Move index backward and update UI in order to load the previews translated sentence.
         """
         # edit UI buttons:
-        cmds.button(self.backBT, edit=True, enable=True, backgroundColor=(0.3, 0.7, 0.8))
-        cmds.button(self.sameBT, edit=True, enable=True, backgroundColor=(0.2, 0.8, 0.9))
-        cmds.button(self.nextBT, edit=True, enable=True, backgroundColor=(0.1, 0.9, 1.0))
-        cmds.button(self.finishBT, edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
+        cmds.button('back_bt', edit=True, enable=True, backgroundColor=(0.3, 0.7, 0.8))
+        cmds.button('same_bt', edit=True, enable=True, backgroundColor=(0.2, 0.8, 0.9))
+        cmds.button('next_bt', edit=True, enable=True, backgroundColor=(0.1, 0.9, 1.0))
+        cmds.button('finish_bt', edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
         # return back index to get a new translated text or just for user check:
-        self.langIndex -= 1
-        self.dpTranslatorUpdateUI()
+        self.lang_index -= 1
+        self.update_translator_ui()
     
     
-    def dpTranslatorForward(self, *args):
+    def forward(self):
         """ Move index forward and update UI in order to get a new translated sentence.
         """
-        # if finished keyLen then disable Same and Next buttons and enable Finish button
-        if self.langIndex == self.keyLen:
-            cmds.button(self.sameBT, edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
-            cmds.button(self.nextBT, edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
-            cmds.button(self.finishBT, edit=True, enable=True, backgroundColor=(0.1, 0.9, 1.0))
+        # if finished key_len then disable Same and Next buttons and enable Finish button
+        if self.lang_index == self.key_len:
+            cmds.button('same_bt', edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
+            cmds.button('next_bt', edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
+            cmds.button('finish_bt', edit=True, enable=True, backgroundColor=(0.1, 0.9, 1.0))
         else:
-            cmds.button(self.backBT, edit=True, enable=True, backgroundColor=(0.3, 0.7, 0.8))
+            cmds.button('back_bt', edit=True, enable=True, backgroundColor=(0.3, 0.7, 0.8))
             # pass to next index to get a new translated text from user:
-            self.langIndex += 1
-            self.dpTranslatorUpdateUI()
+            self.lang_index += 1
+            self.update_translator_ui()
     
     
-    def dpTranslatorFinish(self, *args):
+    def go_finish(self, *args):
         """ Finish the translation process parsing the new lang string to generate json dictionary.
             Save new language json file and load it in the main dpAutoRig UI.
         """
-        # parse newLangList to newLangString:
-        for i, indexID in enumerate(self.sourceLangList):
-            self.resultString += ',"'+indexID+'":"'+self.newLangList[i]+'"'
-        self.resultString += "}"
+        # parse new_langs to newLangString:
+        for i, index_id in enumerate(self.source_langs):
+            self.str_result += ',"'+index_id+'":"'+self.new_langs[i]+'"'
+        self.str_result += "}"
         
         # avoid json fail changing "\" to "\\":
-        self.resultString = self.resultString.replace("\n", "\\n")
+        self.str_result = self.str_result.replace("\n", "\\n")
         
         # create json file:
-        resultDict = self.ar.config.save_json_file(self.resultString, self.ar.data.language_folder, '_preset')
+        result_data = self.ar.config.save_json_file(self.str_result, self.ar.data.language_folder, '_preset')
         # set this new lang as userDefined language:
-        self.ar.langDic[resultDict['_preset']] = resultDict
-        self.ar.langName = resultDict['_preset']
-        cmds.optionVar(remove="dpAutoRigLastLanguage")
-        cmds.optionVar(stringValue=("dpAutoRigLastLanguage", self.ar.langName))
+        self.ar.data.lang = result_data
+        self.ar.opt.set_option_var(self.ar.data.language_option_var, result_data['_preset'])
         # closes translator UI:
-        self.dpClearTranslatorUI(2)
+        self.clear_translator_ui(2)
         # show preset creation result window:
-        self.ar.logger.infoWin('i149_createLanguage', 'i150_languageCreated', '\n'+self.ar.langName+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.authorName+' '+self.ar.data.lang['t008_finishMessage'].lower(), 'center', 205, 270)
+        self.ar.logger.infoWin('i149_createLanguage', 'i150_languageCreated', '\n'+result_data['_preset']+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.author_name+' '+self.ar.data.lang['t008_finishMessage'].lower(), 'center', 205, 270)
         # close and reload dpAR UI in order to avoid Maya crash:
         self.ar.ui_manager.reload_ui()
     
     
-    def dpTranslatorMain(self, *args):
+    def translator_ui(self, *args):
         """ Open a serie of dialog boxes to get user input to mount a new language json dictionary.
             We show a window to translate step by step.
         """
         # give info:
-        greetingsDialog = cmds.confirmDialog(
+        greetings_dialog = cmds.confirmDialog(
                                             title=self.ar.data.lang['t000_translator'],
                                             message=self.ar.data.lang['t001_greeting'],
                                             button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
                                             defaultButton=self.ar.data.lang['i131_ok'],
                                             cancelButton=self.ar.data.lang['i132_cancel'],
                                             dismissString=self.ar.data.lang['i132_cancel'])
-        if greetingsDialog == self.ar.data.lang['i131_ok']:
-            self.dpGetUserInfoUI()
+        if greetings_dialog == self.ar.data.lang['i131_ok']:
+            self.get_user_info_ui()
     
     
-    def dpClearTranslatorUI(self, win, *args):
+    def clear_translator_ui(self, win, *args):
         """ Check if the window exists then delete it if true.
         """
         if cmds.window('dpARTranslatorWin'+str(win), query=True, exists=True):
             cmds.deleteUI('dpARTranslatorWin'+str(win), window=True)
     
     
-    def dpCollectUserInfo(self, *args):
+    def collect_user_info(self, *args):
         """ Get all inicial info from user UI in order to complete the key ids starting with "_".
             Verify if the user is trying to create a new language using the same existing name then confirm if it will be overwritten.
         """
         # get author name:
-        self.authorName = cmds.textFieldGrp(self.authorTFG, query=True, text=True)
+        self.author_name = cmds.textFieldGrp(self.author_tfg, query=True, text=True)
         # get email contact:
-        emailName = cmds.textFieldGrp(self.emailTFG, query=True, text=True)
+        email_name = cmds.textFieldGrp(self.email_tfg, query=True, text=True)
         # get website contact:
-        websiteName = cmds.textFieldGrp(self.websiteTFG, query=True, text=True)
+        website_name = cmds.textFieldGrp(self.website_tfg, query=True, text=True)
         # get language name:
-        self.newLangName = cmds.textFieldGrp(self.newLanguageTFG, query=True, text=True)
+        self.new_lang_name = cmds.textFieldGrp(self.new_lang_tfg, query=True, text=True)
         
         # parse user info:
-        if self.authorName and self.newLangName:
-            contactName = ""
-            if emailName and websiteName:
-                contactName = emailName+"\n"+websiteName
-            self.newLangName = self.newLangName[0].upper()+self.newLangName[1:]
+        if self.author_name and self.new_lang_name:
+            contact_name = ""
+            if email_name and website_name:
+                contact_name = email_name+"\n"+website_name
+            self.new_lang_name = self.new_lang_name[0].upper()+self.new_lang_name[1:]
             date = str(datetime.datetime.now().date())
             
             # verify if we have an existing language with the same name:
-            confirmSameLangName = self.ar.data.lang['i071_yes']
-            if self.newLangName in self.ar.data.lang_preset_data:
-                confirmSameLangName = cmds.confirmDialog(
+            confirm_same_lang_name = self.ar.data.lang['i071_yes']
+            if self.new_lang_name in self.ar.data.lang_preset_data:
+                confirm_same_lang_name = cmds.confirmDialog(
                                                         title=self.ar.data.lang['t000_translator'],
                                                         message=self.ar.data.lang['i135_existingName'], 
                                                         button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], 
                                                         defaultButton=self.ar.data.lang['i071_yes'], 
                                                         cancelButton=self.ar.data.lang['i072_no'], 
                                                         dismissString=self.ar.data.lang['i072_no'])
-            if confirmSameLangName == self.ar.data.lang['i071_yes']:
-                # starting newLangList appends:
-                self.newLangList.append(self.authorName)
-                self.newLangList.append(self.ar.data.lang['_collaborators'])
-                self.newLangList.append(contactName)
-                self.newLangList.append(date)
-                self.newLangList.append(self.newLangName)
-                self.newLangList.append("dpTranslator v"+str(self.ar.data.version))
-                self.newLangList.append(date)
-                # fill newLangList it "" (nothing) in order to generate all list array and just update its values:
-                for i in range(self.langIndex, self.keyLen+1):
-                    self.newLangList.append("empty")
+            if confirm_same_lang_name == self.ar.data.lang['i071_yes']:
+                # starting new_langs appends:
+                self.new_langs.append(self.author_name)
+                self.new_langs.append(self.ar.data.lang['_collaborators'])
+                self.new_langs.append(contact_name)
+                self.new_langs.append(date)
+                self.new_langs.append(self.new_lang_name)
+                self.new_langs.append("dpTranslator v"+str(self.ar.data.version))
+                self.new_langs.append(date)
+                # fill new_langs it "" (nothing) in order to generate all list array and just update its values:
+                for i in range(self.lang_index, self.key_len+1):
+                    self.new_langs.append("empty")
                 # starting result string:
-                self.resultString = '{"_author":"'+self.authorName+'","_contact":"'+contactName+'","_date":"'+date+'","_preset":"'+self.newLangName+'","_translator":"dpTranslator v'+str(self.ar.data.version)+'","_updated":"'+date+'"'
+                self.str_result = '{"_author":"'+self.author_name+'","_contact":"'+contact_name+'","_date":"'+date+'","_preset":"'+self.new_lang_name+'","_translator":"dpTranslator v'+str(self.ar.data.version)+'","_updated":"'+date+'"'
 
-                self.dpClearTranslatorUI(1)
-                self.dpGetLangStringUI()
+                self.clear_translator_ui(1)
+                self.translation_lang_ui()
     
     
-    def dpGetUserInfoUI(self, *args):
+    def get_user_info_ui(self):
         """ First window UI to get the basic user info for sentence ids starting with "_".
         """
-        self.dpClearTranslatorUI(1)
+        self.clear_translator_ui(1)
+        self.ar.utils.closeUI('translator_get_info_win')
         # starting window:
-        dpARTranslatorWin1 = cmds.window('dpARTranslatorWin1', title=self.translatorString, iconName='dpAutoRig', widthHeight=(500, 180), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
-        dpARTranslatorLayout1 = cmds.columnLayout('dpARTranslatorLayout1', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent=dpARTranslatorWin1)
-        cmds.separator(style='none', parent=dpARTranslatorLayout1)
-        self.authorTFG = cmds.textFieldGrp('authorTFG', label=self.ar.data.lang['t002_yourName'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        self.emailTFG = cmds.textFieldGrp('emailTFG', label=self.ar.data.lang['t003_emailContact'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        self.websiteTFG = cmds.textFieldGrp('websiteTFG', label=self.ar.data.lang['t004_websiteContact'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        self.newLanguageTFG = cmds.textFieldGrp('newLanguageTFG', label=self.ar.data.lang['t005_langName'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        cmds.button('startTranslationBT', label=self.ar.data.lang['t006_startTranslator'], command=self.dpCollectUserInfo, parent=dpARTranslatorLayout1)
+        cmds.window('translator_get_info_win', title=self.translator_title, iconName='dpAutoRig', widthHeight=(500, 180), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
+        cmds.columnLayout('translator_get_info_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_get_info_win')
+        cmds.separator(style='none', parent='translator_get_info_cl')
+        self.author_tfg = cmds.textFieldGrp('author_tfg', label=self.ar.data.lang['t002_yourName'], text='', adjustableColumn2=1, parent='translator_get_info_cl')
+        self.email_tfg = cmds.textFieldGrp('email_tfg', label=self.ar.data.lang['t003_emailContact'], text='', adjustableColumn2=1, parent='translator_get_info_cl')
+        self.website_tfg = cmds.textFieldGrp('website_tfg', label=self.ar.data.lang['t004_websiteContact'], text='', adjustableColumn2=1, parent='translator_get_info_cl')
+        self.new_lang_tfg = cmds.textFieldGrp('new_lang_tfg', label=self.ar.data.lang['t005_langName'], text='', adjustableColumn2=1, parent='translator_get_info_cl')
+        cmds.button('startTranslationBT', label=self.ar.data.lang['t006_startTranslator'], command=self.collect_user_info, parent='translator_get_info_cl')
         # show UI:
-        cmds.showWindow(dpARTranslatorWin1)
+        cmds.showWindow('translator_get_info_win')
     
     
-    def dpTranslatorUpdateUI(self, *args):
+    def update_translator_ui(self):
         """ Method to update the main UI with info from translated text, id, type, name, etc.
         """
-        cmds.text(self.curIndexTxt, edit=True, label=str(self.langIndex))
-        cmds.text(self.keyIDTxt, edit=True, label=self.sourceLangList[self.langIndex])
-        cmds.scrollField(self.sourceTextSF, edit=True, text=self.ar.data.lang[self.sourceLangList[self.langIndex]])
+        cmds.text('current_index_txt', edit=True, label=str(self.lang_index))
+        cmds.text('key_id_txt', edit=True, label=self.source_langs[self.lang_index])
+        cmds.scrollField(self.source_text_sf, edit=True, text=self.ar.data.lang[self.source_langs[self.lang_index]])
         
-        if self.langIndex == self.keyLen:
-            cmds.scrollField(self.newLangTextSF, edit=True, text='')
-        elif self.newLangList[self.langIndex] == "empty":
-            cmds.scrollField(self.newLangTextSF, edit=True, text='')
+        if self.lang_index == self.key_len:
+            cmds.scrollField(self.new_lang_text_sf, edit=True, text='')
+        elif self.new_langs[self.lang_index] == "empty":
+            cmds.scrollField(self.new_lang_text_sf, edit=True, text='')
         else:
-            cmds.scrollField(self.newLangTextSF, edit=True, text=self.newLangList[self.langIndex])
+            cmds.scrollField(self.new_lang_text_sf, edit=True, text=self.new_langs[self.lang_index])
         
-        # case indexID for each type:
-        footerText = ""
-        if self.sourceLangList[self.langIndex].startswith("_"):
-            curKeyType = self.ar.data.lang['i013_info']
-        elif self.sourceLangList[self.langIndex].startswith("a"):
-            curKeyType = self.ar.data.lang['i153_presentation']
-        elif self.sourceLangList[self.langIndex].startswith("b"):
-            curKeyType = self.ar.data.lang['i139_bug']
-        elif self.sourceLangList[self.langIndex].startswith("c"):
-            curKeyType = self.ar.data.lang['i140_control']
-            footerText = self.ar.data.lang['i152_noSpecialChar']
-        elif self.sourceLangList[self.langIndex].startswith("e"):
-            curKeyType = self.ar.data.lang['i141_error']
-        elif self.sourceLangList[self.langIndex].startswith("i"):
-            curKeyType = self.ar.data.lang['i142_interface']
-        elif self.sourceLangList[self.langIndex].startswith("m"):
-            curKeyType = self.ar.data.lang['i143_module']
-        elif self.sourceLangList[self.langIndex].startswith("p"):
-            curKeyType = self.ar.data.lang['i144_prefix']
-        elif self.sourceLangList[self.langIndex].startswith("t"):
-            curKeyType = self.ar.data.lang['t000_translator']
-        elif self.sourceLangList[self.langIndex].startswith("v"):
-            curKeyType = self.ar.data.lang['v000_validator']
+        # case index_id for each type:
+        footer_text = ""
+        if self.source_langs[self.lang_index].startswith("_"):
+            current_key_type = self.ar.data.lang['i013_info']
+        elif self.source_langs[self.lang_index].startswith("a"):
+            current_key_type = self.ar.data.lang['i153_presentation']
+        elif self.source_langs[self.lang_index].startswith("b"):
+            current_key_type = self.ar.data.lang['i139_bug']
+        elif self.source_langs[self.lang_index].startswith("c"):
+            current_key_type = self.ar.data.lang['i140_control']
+            footer_text = self.ar.data.lang['i152_noSpecialChar']
+        elif self.source_langs[self.lang_index].startswith("e"):
+            current_key_type = self.ar.data.lang['i141_error']
+        elif self.source_langs[self.lang_index].startswith("i"):
+            current_key_type = self.ar.data.lang['i142_interface']
+        elif self.source_langs[self.lang_index].startswith("m"):
+            current_key_type = self.ar.data.lang['i143_module']
+        elif self.source_langs[self.lang_index].startswith("p"):
+            current_key_type = self.ar.data.lang['i144_prefix']
+        elif self.source_langs[self.lang_index].startswith("t"):
+            current_key_type = self.ar.data.lang['t000_translator']
+        elif self.source_langs[self.lang_index].startswith("r"):
+            current_key_type = self.ar.data.lang['r000_rebuilder']
+        elif self.source_langs[self.lang_index].startswith("v"):
+            current_key_type = self.ar.data.lang['v000_validator']
         
         # update UI elements:
-        cmds.text(self.keyTypeTxt, edit=True, label=curKeyType)
-        cmds.text(self.extraInfoTxt, edit=True, label=footerText)
+        cmds.text('key_type_txt', edit=True, label=current_key_type)
+        cmds.text(self.extra_info_txt, edit=True, label=footer_text)
     
     
-    def dpGetLangStringUI(self, *args):
+    def translation_lang_ui(self):
         """ Show main UI in order to get user translated input texts.
             It will call update UI to start using predefined list of user info.
         """
-        self.dpClearTranslatorUI(2)
-        
+        self.clear_translator_ui(2)
+        self.ar.utils.closeUI('translator_lang_win')
         # translator UI:
-        dpARTranslatorWin2 = cmds.window('dpARTranslatorWin2', title=self.translatorString, iconName='dpAutoRig', widthHeight=(400, 400), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
-        dpARTranslatorLayout = cmds.columnLayout('dpARTranslatorLayout', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent=dpARTranslatorWin2)
-        cmds.separator(style='none', parent=dpARTranslatorLayout)
-        langNameLayout = cmds.rowColumnLayout('langNameLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langNameTxt', label=self.ar.data.lang['i151_language']+":", parent=langNameLayout)
-        cmds.text('newLangNameTxt', label=self.newLangName, parent=langNameLayout)
+        cmds.window('translator_lang_win', title=self.translator_title, iconName='dpAutoRig', widthHeight=(400, 400), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
+        cmds.columnLayout('translator_lang_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_lang_win')
+        cmds.separator(style='none', parent='translator_lang_cl')
+        cmds.rowColumnLayout('lang_name_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')
+        cmds.text('langNameTxt', label=self.ar.data.lang['i151_language']+":", parent='lang_name_rcl')
+        cmds.text('newLangNameTxt', label=self.new_lang_name, parent='lang_name_rcl')
         # counter:
-        counterLayout = cmds.rowColumnLayout('counterLayout', numberOfColumns=4, columnWidth=[(1, 70), (2, 20), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent=dpARTranslatorLayout)
-        cmds.text('sentenceTxt', label=self.ar.data.lang['i136_sentence']+":", parent=counterLayout)
-        self.curIndexTxt = cmds.text('curIndexTxt', label='0', parent=counterLayout)
-        cmds.text('counterHifenTxt', label='/', parent=counterLayout)
-        cmds.text('keyLenTxt', label=self.keyLen, parent=counterLayout)
+        cmds.rowColumnLayout('counter_rcl', numberOfColumns=4, columnWidth=[(1, 70), (2, 20), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent='translator_lang_cl')
+        cmds.text('sentenceTxt', label=self.ar.data.lang['i136_sentence']+":", parent='counter_rcl')
+        cmds.text('current_index_txt', label='0', parent='counter_rcl')
+        cmds.text('counterHifenTxt', label='/', parent='counter_rcl')
+        cmds.text('keyLenTxt', label=self.key_len, parent='counter_rcl')
         # lang Key Type:
-        langKeyTypeLayout = cmds.rowColumnLayout('langKeyTypeLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langKeyTypeTxt', label=self.ar.data.lang['i138_type']+":", parent=langKeyTypeLayout)
-        self.keyTypeTxt = cmds.text('keyTypeTxt', label='0', parent=langKeyTypeLayout)
+        cmds.rowColumnLayout('lang_key_type_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')
+        cmds.text('langKeyTypeTxt', label=self.ar.data.lang['i138_type']+":", parent='lang_key_type_rcl')
+        cmds.text('key_type_txt', label='0', parent='lang_key_type_rcl')
         # lang Key ID:
-        langKeyLayout = cmds.rowColumnLayout('langKeyLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langKeyIDTxt', label=self.ar.data.lang['i137_id']+":", parent=langKeyLayout)
-        self.keyIDTxt = cmds.text('keyIDTxt', label='0', parent=langKeyLayout)
+        cmds.rowColumnLayout('lang_key_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent='translator_lang_cl')
+        cmds.text('langKeyIDTxt', label=self.ar.data.lang['i137_id']+":", parent='lang_key_rcl')
+        cmds.text('key_id_txt', label='0', parent='lang_key_rcl')
         # translator text scrollFields:
-        textsPL = cmds.paneLayout('textsPL', configuration='horizontal2', parent=dpARTranslatorLayout)
-        self.sourceTextSF = cmds.scrollField('sourceTextSF', editable=False, wordWrap=False, text='', parent=textsPL)
-        self.newLangTextSF = cmds.scrollField('newLangTextSF', editable=True, wordWrap=False, text='', parent=textsPL)
-        self.extraInfoTxt = cmds.text('extraInfoTxt', label='', parent=dpARTranslatorLayout)
+        cmds.paneLayout('texts_pl', configuration='horizontal2', parent='translator_lang_cl')
+        self.source_text_sf = cmds.scrollField('source_text_sf', editable=False, wordWrap=False, text='', parent='texts_pl')
+        self.new_lang_text_sf = cmds.scrollField('new_lang_text_sf', editable=True, wordWrap=False, text='', parent='texts_pl')
+        self.extra_info_txt = cmds.text('extra_info_txt', label='', parent='translator_lang_cl')
         # translator buttons:
-        buttonsPL = cmds.paneLayout('buttonsPL', configuration='vertical3', parent=dpARTranslatorLayout)
-        self.backBT = cmds.button('backBT', label=self.ar.data.lang['i145_back'], backgroundColor=(0.3, 0.6, 0.7), command=self.dpTranslatorBack, parent=buttonsPL)
-        self.sameBT = cmds.button('sameBT', label=self.ar.data.lang['i146_same'], backgroundColor=(0.2, 0.8, 0.9), command=self.dpTranslatorSame, parent=buttonsPL)
-        self.nextBT = cmds.button('nextBT', label=self.ar.data.lang['i147_next'], backgroundColor=(0.1, 0.9, 1.0), command=self.dpTranslatorNext, parent=buttonsPL)
-        self.finishBT = cmds.button('finishBT', label=self.ar.data.lang['i148_finish'], backgroundColor=(0.8, 0.8, 0.8), enable=False, command=self.dpTranslatorFinish, parent=dpARTranslatorLayout)
-        cmds.separator(style='none', parent=dpARTranslatorLayout)
-        cmds.showWindow(dpARTranslatorWin2)
+        cmds.paneLayout('buttons_pl', configuration='vertical3', parent='translator_lang_cl')
+        cmds.button('back_bt', label=self.ar.data.lang['i145_back'], backgroundColor=(0.3, 0.6, 0.7), command=self.go_back, parent='buttons_pl')
+        cmds.button('same_bt', label=self.ar.data.lang['i146_same'], backgroundColor=(0.2, 0.8, 0.9), command=self.go_same, parent='buttons_pl')
+        cmds.button('next_bt', label=self.ar.data.lang['i147_next'], backgroundColor=(0.1, 0.9, 1.0), command=self.go_next, parent='buttons_pl')
+        cmds.button('finish_bt', label=self.ar.data.lang['i148_finish'], backgroundColor=(0.8, 0.8, 0.8), enable=False, command=self.go_finish, parent='translator_lang_cl')
+        cmds.separator(style='none', parent='translator_lang_cl')
+        cmds.showWindow('translator_lang_win')
         
         # update translator UI:
-        self.dpTranslatorUpdateUI()
-        
+        self.update_translator_ui()

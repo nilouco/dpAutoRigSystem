@@ -165,18 +165,18 @@ class BaseCurve(base.BaseLibrary):
         self.cv_rot = cv_rot
         self.cv_action = cv_action
         # getting UI info:
-        if use_ui:
+        if use_ui and self.ar.data.ui_state:
             self.get_controller_ui_values(self.cv_name)
         
         # combine or create curve using the parameters:
         if combine:
-            self.cv_curve = self.generateCombineCurves(use_ui, self.cv_id, self.cv_name, self.cv_size, self.cv_degree, self.cv_direction)
+            self.cv_curve = self.create_combined_curves(self.cv_id, self.cv_name, self.cv_size, self.cv_degree)
         else:
             # getting curve info to be created based on choose degree:
             if self.cv_degree == 1: #linear
-                self.getLinearPoints()
+                self.get_linear_points()
             else: #cubic
-                self.getCubicPoints()
+                self.get_cubic_points()
             self.cv_curve = self.create_curve(self.cv_name, self.cv_degree, self.cv_points, self.cv_knots, self.cv_periodic, guide)
         # set control direction for the control curve:
         self.set_controller_direction(self.cv_curve, self.cv_direction)
