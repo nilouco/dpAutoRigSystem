@@ -36,7 +36,7 @@ class MotionCapture(base.BaseLibrary):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating MotionCaptureUI Window:
-        self.ar.utils.closeUI('dpMotionCaptureWindow')
+        self.ar.utils.close_ui('dpMotionCaptureWindow')
         mocap_winWidth  = 280
         mocap_winHeight = 470
         dpMotionCaptureWin = cmds.window('dpMotionCaptureWindow', title=self.ar.data.lang["m239_motionCapture"]+" "+str(self.ar.data.version), widthHeight=(mocap_winWidth, mocap_winHeight), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)

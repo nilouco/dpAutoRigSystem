@@ -121,7 +121,7 @@ class Updater(object):
                 button_command = self.ar.packager.open_folder
                 button_argument = folder[0][:folder[0].rfind("/")]
                 self.ar.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', folder[0]+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
-                self.ar.utils.closeUI('dpUpdateWindow')
+                self.ar.utils.close_ui('dpUpdateWindow')
             except:
                 self.ar.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', folder[0]+'\n\n'+self.ar.data.lang['i097_sorry'], 'center', 205, 270)
             self.ar.utils.setProgress(endIt=True)

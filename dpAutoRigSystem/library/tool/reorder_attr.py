@@ -32,7 +32,7 @@ class ReorderAttr(base.BaseLibrary):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpReorderAttrUI Window:
-        self.ar.utils.closeUI(self.winName)
+        self.ar.utils.close_ui(self.winName)
         reorderAttr_winWidth  = 175
         reorderAttr_winHeight = 75
         dpReorderAttrWin = cmds.window(self.winName, title=self.ar.data.lang["m087_reorderAttr"]+" "+str(self.ar.data.version), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)

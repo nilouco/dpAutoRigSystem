@@ -26,7 +26,7 @@ class Logger(object):
         self.info_winHeight   = height
         self.info_align       = align
         # creating Info Window:
-        self.ar.utils.closeUI("dpInfoWindow")
+        self.ar.utils.close_ui("dpInfoWindow")
         cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.ar.data.version+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent="dpInfoWindow")

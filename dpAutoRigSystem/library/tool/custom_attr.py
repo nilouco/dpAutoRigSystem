@@ -35,10 +35,10 @@ class CustomAttr(base.BaseLibrary):
     def build_tool(self, *args):
         # call main UI function
         if self.ar.data.ui_state:
-            self.ar.utils.closeUI(self.mainWindowName)
-            self.ar.utils.closeUI(self.addWindowName)
-            self.ar.utils.closeUI(self.removeWindowName)
-            self.ar.utils.closeUI(self.idWindowName)
+            self.ar.utils.close_ui(self.mainWindowName)
+            self.ar.utils.close_ui(self.addWindowName)
+            self.ar.utils.close_ui(self.removeWindowName)
+            self.ar.utils.close_ui(self.idWindowName)
             self.getItemFilter()
             self.mainUI()
             self.updateNameDisplay()
@@ -204,7 +204,7 @@ class CustomAttr(base.BaseLibrary):
     def addAttrUI(self, *args):
         """ Create a window with buttons to add new attributes.
         """
-        self.ar.utils.closeUI(self.addWindowName)
+        self.ar.utils.close_ui(self.addWindowName)
         add_winWidth  = 220
         add_winHeight = 260
         cmds.window(self.addWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -288,7 +288,7 @@ class CustomAttr(base.BaseLibrary):
     def removeAttrUI(self, *args):
         """ Create a window showing the current dp custom attributes to delete them.
         """
-        self.ar.utils.closeUI(self.removeWindowName)
+        self.ar.utils.close_ui(self.removeWindowName)
         remove_winWidth  = 200
         remove_winHeight = 250
         cmds.window(self.removeWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -379,7 +379,7 @@ class CustomAttr(base.BaseLibrary):
         """ Create a window with exposed dpID attributes.
         """
         if idDic:
-            self.ar.utils.closeUI(self.idWindowName)
+            self.ar.utils.close_ui(self.idWindowName)
             id_winWidth  = 780
             id_winHeight = 350
             cmds.window(self.idWindowName, title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(id_winWidth, id_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)

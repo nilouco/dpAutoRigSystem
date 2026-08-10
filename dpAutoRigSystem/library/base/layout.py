@@ -705,7 +705,7 @@ class BaseLayout(base.BaseLibrary):
         plus_winHeight = 180
         widthSize = (0.8*plus_winWidth)
         # creating Plus Info Window:
-        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
+        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
         if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
             cmds.deleteUI('plusFL')
             self.dpPlusInfo = self.ar.data.plus_info_win_name

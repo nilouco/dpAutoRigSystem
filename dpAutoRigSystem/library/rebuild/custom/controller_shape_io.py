@@ -35,7 +35,7 @@ class ControllerShapeIO(action.BaseAction):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.ar.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     ctrlList = None
@@ -47,7 +47,7 @@ class ControllerShapeIO(action.BaseAction):
                         self.ar.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
                         if self.first_mode: #export
                             try:
-                                self.ar.pipeliner.makeDirIfNotExists(self.io_path)
+                                self.ar.pipeliner.make_dir_if_not_exists(self.io_path)
                                 ctrlFileName = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".ma"
                                 self.ar.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
                                 self.well_done_io(ctrlFileName)

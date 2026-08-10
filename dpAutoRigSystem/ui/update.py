@@ -18,7 +18,7 @@ class UpdateUI(object):
         win_width = 305
         win_height = 300
         # creating Update Window:
-        self.ar.utils.closeUI('dpUpdateWindow')
+        self.ar.utils.close_ui('dpUpdateWindow')
         cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i089_update'], iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         cmds.columnLayout("update_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpUpdateWindow")

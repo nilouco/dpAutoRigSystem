@@ -548,7 +548,7 @@ class Agreement(object):
             terms_width  = 205
             terms_height = 200
             # creating Terms and Conditions Window:
-            self.ar.utils.closeUI('dpTermsCondWindow')
+            self.ar.utils.close_ui('dpTermsCondWindow')
             cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
             # creating text layout:
             cmds.columnLayout("terms_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpTermsCondWindow")

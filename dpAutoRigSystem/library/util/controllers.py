@@ -293,7 +293,7 @@ class Controllers(object):
         """
         currentRBGColor = self.getCurrentRGBColor(instance.guide_base)
         currentRBGOutlinerColor = self.getCurrentRGBColor(instance.guide_base, True)
-        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
+        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
         # creating colorOverride Window:
         colorOverride_winWidth  = 170
         colorOverride_winHeight = 115
@@ -1552,7 +1552,7 @@ class Controllers(object):
     def defaultValueEditor(self, *args):
         """ Create an UI to edit the attributes default values.
         """
-        self.ar.utils.closeUI(self.defaultValueWindowName)
+        self.ar.utils.close_ui(self.defaultValueWindowName)
         # window
         defaultValueOption_winWidth  = 430
         defaultValueOption_winHeight = 300

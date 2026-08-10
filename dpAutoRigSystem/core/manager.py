@@ -54,7 +54,7 @@ class UIManager(object):
             if not self.ar.data.rebuilding:
                 if reset_buttons:
                     self.reset_button_colors()
-                self.ar.pipeliner.refreshAssetData()
+                self.ar.pipeliner.refresh_asset_data()
                 for item in self.ar.config.get_rebuilder_instances():
                     item.update_action_buttons(color=False)
             self.ar.job.selection_change()
@@ -131,7 +131,7 @@ class UIManager(object):
                         self.ar.data.color_override_win_name
                        ]
         for win_name in win_names:
-            self.ar.utils.closeUI(win_name)
+            self.ar.utils.close_ui(win_name)
         self.set_ui_state(False)
 
     
@@ -264,7 +264,7 @@ class UIManager(object):
         else:
             log_text += "\n"+self.ar.data.lang['i207_notMarked']
             height_size = 2
-        log_text = self.ar.pipeliner.getToday(True)+"\n\n"+log_text+"\n"
+        log_text = self.ar.pipeliner.get_today(True)+"\n\n"+log_text+"\n"
         if verbose:
             self.ar.logger.infoWin('i019_log', action_type, log_text, "left", 250, (150+(height_size)*13))
             print("\n-------------\n"+self.ar.data.lang[action_type]+"\n"+log_text)

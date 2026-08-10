@@ -13,47 +13,48 @@ PIPE_FOLDER = "_dpPipeline"
 
 
 class Pipeliner(object):
-    def __init__(self, ar, *args):
+    def __init__(self, ar):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
         self.ar = ar
-        self.settingsFile = "pipeline_settings.json"
-        self.defaultInfoFile = "pipeline_info.json"
-        self.infoFile = self.defaultInfoFile
-        self.webhookFile = "webhook.json"
-        self.hookFile = "hook.json"
+        self.settings_file = "pipeline_settings.json"
+        self.default_info_file = "pipeline_info.json"
+        self.info_file = self.default_info_file
+        self.webhook_file = "webhook.json"
+        self.hook_file = "hook.json"
         self.callback_file = "publish_callback.py"
-        self.customAssetNameFile = "custom_asset_name.json"
+        self.custom_asset_name_file = "custom_asset_name.json"
         self.pipe_data = {}
-        self.pipe_data = self.getPipelineData()
-        self.declarePipelineAnnotation()
-        self.refreshAssetData()
+        self.pipe_data = self.get_pipeline_data()
+        self.declare_pipeline_annotation()
+        self.refresh_asset_data()
 
 
-    def refreshAssetData(self, *args):
+    def refresh_asset_data(self, *args):
         """ Load the asset data from saved file in the pipeline.
         """
         if not self.ar.data.rebuilding:
-            self.pipe_data = self.getPipelineData()
-            self.getPipeFileName()
-            self.refreshProjectUI()
-            self.refreshAssetNameUI()
+            self.pipe_data = self.get_pipeline_data()
+            self.get_pipe_filename()
+            self.refresh_project_ui()
+            self.refresh_asset_name_ui()
         
 
-    def getToday(self, fullTime=False, *args):
-        """ Just returns the date like 1980-11-13
+    def get_today(self, full=False):
+        """ Just returns the simple date like: 1980-11-13
+            or full: 1980-11-13_15-32-39
         """
-        if fullTime:
+        if full:
             return str(time.asctime(time.localtime(time.time())))
         return time.strftime("%Y-%m-%d", time.localtime())
     
 
-    def getJsonContent(self, jsonPath, *args):
+    def get_json_content(self, json_path):
         """ Open, read, close and return the json file content.
         """
         try:
-            dic = open(jsonPath, "r", encoding='utf-8')
+            dic = open(json_path, "r", encoding='utf-8')
             content = json.loads(dic.read())
             dic.close()
         except:
@@ -61,52 +62,52 @@ class Pipeliner(object):
         return content
 
 
-    def getJsonSettingsPath(self, *args):
+    def get_json_settings_path(self):
         """ Returns the json path for the pipeline settings file.
         """
-        basePath = self.ar.data.dp_auto_rig_path+"/Pipeline"
-        return os.path.join(basePath, self.settingsFile).replace("\\", "/")
+        base_path = self.ar.data.dp_auto_rig_path+"/library/pipeline"
+        return os.path.join(base_path, self.settings_file).replace("\\", "/")
 
 
-    def getPipelinePath(self, *args):
+    def get_pipeline_path(self):
         """ Returns the path content of the _dpPipelineSetting json file if it exists.
             Otherwise returns False.
         """
-        jsonPath = self.getJsonSettingsPath()
-        if os.path.exists(jsonPath):
-            content = self.getJsonContent(jsonPath)
+        json_path = self.get_json_settings_path()
+        if os.path.exists(json_path):
+            content = self.get_json_content(json_path)
             if content:
                 if os.path.exists(content['path']):
-                    self.infoFile = content['file']
+                    self.info_file = content['file']
                     return content['path']
         return False
         
     
-    def updateDataByJsonPath(self, jsonPath, *args):
+    def update_data_by_json_path(self, json_path):
         """ Read the json file and return the merged pipe_data and it's content if it exists.
         """
-        if os.path.exists(jsonPath):
-            content = self.getJsonContent(jsonPath)
+        if os.path.exists(json_path):
+            content = self.get_json_content(json_path)
             if content:
                 self.pipe_data.update(content)
                 return content
 
 
-    def getPipelineInfo(self, *args):
+    def get_pipeline_info(self):
         """ Load PipelineInfo data and returns it.
         """
-        jsonInfoPath = os.path.join(self.pipe_data['path'], self.infoFile).replace("\\", "/")
-        return self.updateDataByJsonPath(jsonInfoPath)
+        json_info_path = os.path.join(self.pipe_data['path'], self.info_file).replace("\\", "/")
+        return self.update_data_by_json_path(json_info_path)
 
 
-    def getHookInfo(self, *args):
+    def get_hook_info(self):
         """ Load Hook data and returns it.
         """
-        jsonHookPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hookFile).replace("\\", "/")
-        return self.updateDataByJsonPath(jsonHookPath)
+        json_hook_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hook_file).replace("\\", "/")
+        return self.update_data_by_json_path(json_hook_path)
     
 
-    def getInfoByPath(self, field, dependent, path=None, *args):
+    def get_info_by_path(self, field, dependent, path=None):
         """ Use field as the given data to return the result about.
             Use dependent as the split data to edit the result.
             Returns the pipeline info name if there's one.
@@ -121,16 +122,16 @@ class Pipeliner(object):
                 if self.pipe_data[dependent]:
                     try:
                         name = name[name.rfind(self.pipe_data[dependent]+"/")+len(self.pipe_data[dependent])+1:]
-                        toEndIt = False
+                        to_end_it = False
                         if self.pipe_data["f_wip"]:
                             if self.pipe_data["f_wip"] in name:
                                 name = name.split(self.pipe_data["f_wip"])[0]
-                                toEndIt = True
+                                to_end_it = True
                         if self.pipe_data["f_publish"]:
                             if self.pipe_data["f_publish"] in name:
                                 name = name.split(self.pipe_data["f_publish"])[0]
-                                toEndIt = True
-                        if toEndIt:
+                                to_end_it = True
+                        if to_end_it:
                             if name.endswith("/"):
                                 name = name[:-1]
                             if "/" in name:
@@ -145,23 +146,23 @@ class Pipeliner(object):
             return self.pipe_data[field]
 
 
-    def getCustomAssetNameInfo(self, assetName, *args):
+    def getCustomAssetNameInfo(self, asset_name, *args):
         """ Returns the path content of the custom_asset_name json file if it exists.
-            Otherwise returns the given assetName.
+            Otherwise returns the given asset_name.
         """
-        if assetName:
-            if os.path.exists(self.pipe_data['path']+"/"+self.customAssetNameFile):
-                content = self.getJsonContent(self.pipe_data['path']+"/"+self.customAssetNameFile)
+        if asset_name:
+            if os.path.exists(self.pipe_data['path']+"/"+self.custom_asset_name_file):
+                content = self.get_json_content(self.pipe_data['path']+"/"+self.custom_asset_name_file)
                 if content:
-                    if assetName in list(content.keys()):
-                        return content[assetName]
-        return assetName
+                    if asset_name in list(content.keys()):
+                        return content[asset_name]
+        return asset_name
     
 
-    def declareDefaultPipelineInfo(self, *args):
+    def get_default_pipeline_info(self):
         """ Returns a default pipeline info data to load the UI if there isn't any.
         """
-        defaultPipeInfo = {
+        return {
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
@@ -233,13 +234,12 @@ class Pipeliner(object):
         "b_i_date"           : True,
         "b_i_degrade"        : True
         }
-        return defaultPipeInfo
 
 
-    def declarePipelineAnnotation(self, *args):
+    def declare_pipeline_annotation(self):
         """ Just declare a member variable to get the pipeline annotation data to search the values in the language dictionary.
         """
-        self.pipelineAnnotation = {
+        self.pipeline_annotation = {
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
@@ -313,24 +313,24 @@ class Pipeliner(object):
         }
 
 
-    def getPipelineData(self, loadedPipeInfo=None, *args):
+    def get_pipeline_data(self, loaded_pipe_info=None):
         """ Read the dpPipelineSetting to find the pipeline info.
             Mount the pipe_data dictionary and return it.
         """
         loaded = True
-        oldPipeData = {}
+        old_pipe_data = {}
         if self.pipe_data:
-            oldPipeData = self.pipe_data.copy()
-        if not loadedPipeInfo:
-            self.pipeInfo = self.declareDefaultPipelineInfo()
-            self.pipe_data = self.pipeInfo
-            self.restoreOldPipeData(oldPipeData)
+            old_pipe_data = self.pipe_data.copy()
+        if not loaded_pipe_info:
+            self.pipe_info = self.get_default_pipeline_info()
+            self.pipe_data = self.pipe_info
+            self.restore_old_pipe_data(old_pipe_data)
             self.pipe_data['publishPath'] = False
             self.pipe_data['addOnsPath'] = False
             self.pipe_data['finishingPath'] = False
             self.pipe_data['presetsPath'] = False
             # getting pipeline settings
-            self.pipe_data['path'] = self.getPipelinePath()
+            self.pipe_data['path'] = self.get_pipeline_path()
         self.pipe_data['sceneName'] = cmds.file(query=True, sceneName=True)
         self.pipe_data['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
         self.pipe_data['mayaProject'] = cmds.workspace(query=True, fullName=True)
@@ -339,15 +339,15 @@ class Pipeliner(object):
         if not self.pipe_data['path']:
             # mouting pipeline data dictionary
             if self.pipe_data['sceneName']:
-                self.getInfoByPath("f_drive", None)
+                self.get_info_by_path("f_drive", None)
                 if not self.pipe_data['sceneName'] == self.pipe_data['f_drive']+"/"+self.pipe_data['shortName']:
-                    self.getInfoByPath("f_studio", "f_drive")
-                    self.getInfoByPath("f_project", "f_studio")
+                    self.get_info_by_path("f_studio", "f_drive")
+                    self.get_info_by_path("f_project", "f_studio")
                 self.pipe_data['wipPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_wip']
                 self.pipe_data['projectPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
                 self.pipe_data['path'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipe_data['path']):
-                    self.restoreOldPipeData(oldPipeData)
+                    self.restore_old_pipe_data(old_pipe_data)
                     self.pipe_data['wipPath'] = self.pipe_data['mayaProject']+"/"+self.pipe_data['f_wip']
                     loaded = False
                 if not os.path.exists(self.pipe_data['projectPath']):
@@ -356,67 +356,67 @@ class Pipeliner(object):
                 loaded = False
         if loaded:
             # merge pipeline info
-            self.pipeInfo = self.getPipelineInfo()
-            if self.pipeInfo:
+            self.pipe_info = self.get_pipeline_info()
+            if self.pipe_info:
                 # mounting structured pipeline data
                 self.pipe_data['publishPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_publish']
                 self.pipe_data['addOnsPath'] = self.pipe_data['path']+"/"+self.pipe_data['s_addOns']
                 self.pipe_data['finishingPath'] = self.pipe_data['path']+"/"+self.pipe_data['s_finishing']
                 self.pipe_data['presetsPath'] = self.pipe_data['path']+"/"+self.pipe_data['s_presets']
             else:
-                self.pipeInfo = self.declareDefaultPipelineInfo()
-                print('Not found', self.infoFile)
-        self.getHookInfo()
+                self.pipe_info = self.get_default_pipeline_info()
+                print('Not found', self.info_file)
+        self.get_hook_info()
         return self.pipe_data
 
 
-    def restoreOldPipeData(self, oldPipeData=None, *args):
+    def restore_old_pipe_data(self, old_pipe_data=None):
         """ Check if there are old loaded path to restore them after loading the default dictionary.
         """
-        keyList = ["f_drive", "f_studio", "f_project", "f_wip", "f_publish", "f_toClient", "projectPath", "path"]
-        if oldPipeData:
-            for key in keyList:
-                if key in oldPipeData.keys():
-                    if oldPipeData[key]:
-                        self.pipe_data[key] = oldPipeData[key]
+        items = ["f_drive", "f_studio", "f_project", "f_wip", "f_publish", "f_toClient", "projectPath", "path"]
+        if old_pipe_data:
+            for item in items:
+                if item in old_pipe_data.keys():
+                    if old_pipe_data[item]:
+                        self.pipe_data[item] = old_pipe_data[item]
                     else:
-                        self.pipe_data[key] = ""
+                        self.pipe_data[item] = ""
 
 
-    def conformLoadedInfo(self, key, resultInfoList, *args):
+    def conform_loaded_info(self, item, result_items):
         """ Edit the loaded info to conform the splited data correctly.
         """
-        conformInfo = resultInfoList[0].replace("\\", "/")
-        if key == "f_drive":
-            conformInfo = self.getInfoByPath("f_drive", None, conformInfo)
-        elif key == "f_studio":
-            conformInfo = self.getInfoByPath("f_studio", "f_drive", conformInfo)
-        elif key == "f_project":
-            conformInfo = self.getInfoByPath("f_project", "f_studio", conformInfo)
-        elif key == "f_wip":
-            conformInfo = self.getInfoByPath("f_wip", "f_project", conformInfo)
-        elif key == "f_publish":
-            conformInfo = self.getInfoByPath("f_publish", "f_project", conformInfo)
-        elif key == "f_toClient":
-            conformInfo = self.getInfoByPath("f_toClient", "f_project", conformInfo)
-        return conformInfo
+        conform_info = result_items[0].replace("\\", "/")
+        if item == "f_drive":
+            conform_info = self.get_info_by_path("f_drive", None, conform_info)
+        elif item == "f_studio":
+            conform_info = self.get_info_by_path("f_studio", "f_drive", conform_info)
+        elif item == "f_project":
+            conform_info = self.get_info_by_path("f_project", "f_studio", conform_info)
+        elif item == "f_wip":
+            conform_info = self.get_info_by_path("f_wip", "f_project", conform_info)
+        elif item == "f_publish":
+            conform_info = self.get_info_by_path("f_publish", "f_project", conform_info)
+        elif item == "f_toClient":
+            conform_info = self.get_info_by_path("f_toClient", "f_project", conform_info)
+        return conform_info
 
     
-    def loadInfoKey(self, key, *args):
-        """ Method called by the Pipeliner UI button to load the info about the key.
+    def load_info_key(self, item, *args):
+        """ Method called by the Pipeliner UI button to load the info about the item.
         """
-        resultInfoList = cmds.fileDialog2(fileMode=3, dialogStyle=2)
-        if resultInfoList:
-            conformInfo = self.conformLoadedInfo(key, resultInfoList)
-            cmds.textFieldButtonGrp(self.infoUI[key], edit=True, text=conformInfo)
-            self.setPipelineInfoFile()
+        result_items = cmds.fileDialog2(fileMode=3, dialogStyle=2)
+        if result_items:
+            conform_info = self.conform_loaded_info(item, result_items)
+            cmds.textFieldButtonGrp(self.infoUI[item], edit=True, text=conform_info)
+            self.set_pipeline_info_file()
 
 
     def mainUI(self, ar=None, loadedFileInfo=False, *args):
         """ Open an UI to load, set and save the pipeline info.
         """
-        self.ar.utils.closeUI('dpPipelinerWindow')
-        self.getPipelineData(loadedFileInfo)
+        self.ar.utils.close_ui('dpPipelinerWindow')
+        self.get_pipeline_data(loadedFileInfo)
         # window
         if ar:
             self.ar = ar
@@ -430,8 +430,8 @@ class Pipeliner(object):
             pipelineInfoLayout = cmds.columnLayout('pipelineInfoLayout', adjustableColumn=True, columnOffset=("left", 10), parent=self.pipelinerLayout)
             cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
             cmds.text('pipelineInfo', label="Pipeline "+self.ar.data.lang['i013_info'], height=30, font='boldLabelFont', parent=pipelineInfoLayout)
-            pathData = self.getPathData()
-            self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.ar.data.lang['i220_filePath'], text=pathData, buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.loadPipeInfo, changeCommand=partial(self.loadPipeInfo, True), adjustableColumn=2, parent=pipelineInfoLayout)
+            path_data = self.get_path_data()
+            self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.ar.data.lang['i220_filePath'], text=path_data, buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.load_pipe_info, changeCommand=partial(self.load_pipe_info, True), adjustableColumn=2, parent=pipelineInfoLayout)
             cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
             # pipeline data
             cmds.text('pipelineData', height=30, label="Pipeline Data", font='boldLabelFont', parent=pipelineInfoLayout)
@@ -439,116 +439,116 @@ class Pipeliner(object):
             self.pipelineDataLayout = cmds.columnLayout('pipelineDataLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelineScrollLayout)
             self.pipelineFooterLayout = cmds.columnLayout('pipelineFooterLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
             # load data from pipeline info
-            self.loadUIData()
+            self.load_ui_data()
 
 
-    def loadUIData(self, *args):
+    def load_ui_data(self, *args):
         """ Populate the UI with loaded data file info.
         """
         cmds.deleteUI(self.pipelineDataLayout)
         cmds.deleteUI(self.pipelineFooterLayout)
         self.pipelineDataLayout = cmds.columnLayout('pipelineDataLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelineScrollLayout)
-        if self.pipeInfo:
+        if self.pipe_info:
             self.infoUI = {}
-            for key in list(self.pipeInfo):
+            for key in list(self.pipe_info):
                 if "_" in key:
                     if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=partial(self.load_info_key, key), adjustableColumn=2, parent=self.pipelineDataLayout)
                     elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], numberOfFields=1, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], numberOfFields=1, parent=self.pipelineDataLayout)
                     elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], parent=self.pipelineDataLayout)
                     elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.ar.data.lang[self.pipelineAnnotation[key]], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], parent=self.pipelineDataLayout)
             # try to force loading empty data info
             try:
                 if self.pipe_data['sceneName']:
                     if not cmds.textFieldButtonGrp(self.infoUI['f_drive'], query=True, text=True):
-                        self.getInfoByPath("f_drive", None)
+                        self.get_info_by_path("f_drive", None)
                         cmds.textFieldButtonGrp(self.infoUI['f_drive'], edit=True, text=self.pipe_data['f_drive'])
                     if not cmds.textFieldButtonGrp(self.infoUI['f_studio'], query=True, text=True):
-                        self.getInfoByPath("f_studio", "f_drive")
+                        self.get_info_by_path("f_studio", "f_drive")
                         cmds.textFieldButtonGrp(self.infoUI['f_studio'], edit=True, text=self.pipe_data['f_studio'])
                     if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
-                        self.getInfoByPath("f_project", "f_studio")
+                        self.get_info_by_path("f_project", "f_studio")
                         cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipe_data['f_project'])
             except:
                 pass
             self.pipelineFooterLayout = cmds.columnLayout('pipelineFooterLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
             cmds.separator(style='in', height=20, parent=self.pipelineFooterLayout)
             self.pipelineFooterButtonsLayout = cmds.paneLayout("pipelineFooterButtonsLayout", configuration="vertical3", separatorThickness=2.0, parent=self.pipelineFooterLayout)
-            cmds.button('resetPipeInfoBT', label=self.ar.data.lang['i271_reset'], command=self.resetPipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.button('newPipeInfoBT', label=self.ar.data.lang['i304_new'], command=self.newPipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.button('savePipeInfoBT', label=self.ar.data.lang['i222_save'], command=self.savePipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
+            cmds.button('resetPipeInfoBT', label=self.ar.data.lang['i271_reset'], command=self.reset_pipe_info, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
+            cmds.button('newPipeInfoBT', label=self.ar.data.lang['i304_new'], command=self.new_pipe_info, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
+            cmds.button('savePipeInfoBT', label=self.ar.data.lang['i222_save'], command=self.save_pipe_info, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
             cmds.separator(style='none', height=5, parent=self.pipelineFooterLayout)
         else:
-            pathData = self.getPathData()
-            cmds.text(pathData, parent=self.pipelineDataLayout)
+            path_data = self.get_path_data()
+            cmds.text(path_data, parent=self.pipelineDataLayout)
 
 
-    def getPathData(self, *args):
+    def get_path_data(self, *args):
         """ Returns the concatenated path and info file name.
         """
-        pathData = self.ar.data.lang['i062_notFound']
-        if self.pipeInfo and self.pipe_data['path']:
-            pathData = self.pipe_data['path']+"/"+self.infoFile
-        return pathData
+        path_data = self.ar.data.lang['i062_notFound']
+        if self.pipe_info and self.pipe_data['path']:
+            path_data = self.pipe_data['path']+"/"+self.info_file
+        return path_data
 
 
-    def loadPublishPath(self, *args):
+    def load_publish_path(self):
         """ Returns the absolute path to publish the current file.
         """
         if self.pipe_data['path']:
-            projectFolder = self.pipe_data['f_project']
-            if projectFolder:
-                projectFolder += "/"
+            project_folder = self.pipe_data['f_project']
+            if project_folder:
+                project_folder += "/"
             else:
                 # try to find the project name by scene path
-                projectFolder = self.pipe_data['sceneName'][self.pipe_data['sceneName'].rfind(self.pipe_data['f_studio'])+len(self.pipe_data['f_studio'])+1:self.pipe_data['sceneName'].rfind(self.pipe_data['f_wip'])]
-            self.pipe_data['publishPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+projectFolder+self.pipe_data['f_publish']
+                project_folder = self.pipe_data['sceneName'][self.pipe_data['sceneName'].rfind(self.pipe_data['f_studio'])+len(self.pipe_data['f_studio'])+1:self.pipe_data['sceneName'].rfind(self.pipe_data['f_wip'])]
+            self.pipe_data['publishPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+project_folder+self.pipe_data['f_publish']
             return self.pipe_data['publishPath']
         else:
             print(self.ar.data.lang['i350_notFoundPipeInfoFile'])
 
 
-    def loadPipeInfo(self, loaded=None, *args):
+    def load_pipe_info(self, loaded=None, *args):
         """ Update the Pipeliner UI data section with loaded info file.
         """
-        loadedFilePathList = None
+        loaded_file_paths = None
         if loaded:
             loaded = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
             if loaded.endswith('.json'):
                 loaded = loaded.replace("\\", "/")
                 if os.path.exists(loaded):
-                    loadedFilePathList = [loaded]
+                    loaded_file_paths = [loaded]
         else:
-            loadedFilePathList = cmds.fileDialog2(fileFilter='*.json', fileMode=1, dialogStyle=2)
-        if loadedFilePathList:
-            loadedFilePath = loadedFilePathList[0].replace("\\", "/")
-            self.pipe_data['path'] = loadedFilePath[:loadedFilePath.rfind("/")]
-            self.infoFile = loadedFilePath[loadedFilePath.rfind("/")+1:]
-            cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=loadedFilePath)
-            self.getPipelineData(self.infoFile)
-            self.loadUIData()
-            self.setPipelineSettingsPath(self.pipe_data['path'], self.infoFile)
+            loaded_file_paths = cmds.fileDialog2(fileFilter='*.json', fileMode=1, dialogStyle=2)
+        if loaded_file_paths:
+            loaded_file_path = loaded_file_paths[0].replace("\\", "/")
+            self.pipe_data['path'] = loaded_file_path[:loaded_file_path.rfind("/")]
+            self.info_file = loaded_file_path[loaded_file_path.rfind("/")+1:]
+            cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=loaded_file_path)
+            self.get_pipeline_data(self.info_file)
+            self.load_ui_data()
+            self.set_pipeline_settings_path(self.pipe_data['path'], self.info_file)
 
     
-    def setPipelineSettingsPath(self, path, file, *args):
+    def set_pipeline_settings_path(self, path, file):
         """ Set the json file for dpPipelineSetting in the main dpAutoRigSystem folder to use the path and file given.
         """
         if path and file:
-            jsonPath = self.getJsonSettingsPath()
-            print("jasonPath =", jsonPath)
-            if os.path.exists(jsonPath):
-                settingsDic = self.getJsonContent(jsonPath)
-                settingsDic['path'] = path
-                settingsDic['file'] = file
+            json_path = self.get_json_settings_path()
+            print("jasonPath =", json_path)
+            if os.path.exists(json_path):
+                settings_data = self.get_json_content(json_path)
+                settings_data['path'] = path
+                settings_data['file'] = file
                 # write json file in the HD
-                with open(jsonPath, 'w') as jsonFile:
-                    json.dump(settingsDic, jsonFile, indent=4, sort_keys=True)
+                with open(json_path, 'w') as json_file:
+                    json.dump(settings_data, json_file, indent=4, sort_keys=True)
 
     
-    def getUIDataToSave(self, *args):
+    def get_ui_data_to_save(self):
         """ Read the UI fields and load them values in the pipe_data dictionary.
         """
         for k, key in enumerate(list(self.infoUI)):
@@ -562,88 +562,88 @@ class Pipeliner(object):
                 self.pipe_data[key] = cmds.textFieldGrp(self.infoUI[key], query=True, text=True)
 
 
-    def setPipelineInfoFile(self, *args):
+    def set_pipeline_info_file(self):
         """ Save the pipeline info file with all pipe_data into a json file.
             Except the current scene data info.
         """
-        self.pipe_data['updated'] = self.getToday()
-        cleanPipeData = self.pipe_data
-        cleanPipeData.pop('sceneName', None)
-        cleanPipeData.pop('shortName', None)
-        outFile = open(self.pipe_data['path']+"/"+self.infoFile, "w")
-        json.dump(cleanPipeData, outFile, indent=4)
-        outFile.close()
+        self.pipe_data['updated'] = self.get_today()
+        clean_pipe_data = self.pipe_data
+        clean_pipe_data.pop('sceneName', None)
+        clean_pipe_data.pop('shortName', None)
+        out_file = open(self.pipe_data['path']+"/"+self.info_file, "w")
+        json.dump(clean_pipe_data, out_file, indent=4)
+        out_file.close()
 
 
-    def makeDirIfNotExists(self, pathToMake=None, *args):
+    def make_dir_if_not_exists(self, path_to_make=None):
         """ Check if the path exists and create it if it doesn't exists.
             Returns True if it worked well.
         """
-        if pathToMake:
-            if not os.path.exists(pathToMake):
-                os.makedirs(pathToMake)
+        if path_to_make:
+            if not os.path.exists(path_to_make):
+                os.makedirs(path_to_make)
                 return True
 
 
-    def createPipelineInfoSubFolders(self, *args):
+    def create_pipeline_info_sub_folders(self):
         """ Create pipeline info addOnsPath, finishingPath and presetsPath sub folders if they don't exists.
         """
-        self.makeDirIfNotExists(self.pipe_data['addOnsPath'])
-        self.makeDirIfNotExists(self.pipe_data['finishingPath'])
-        self.makeDirIfNotExists(self.pipe_data['presetsPath'])
+        self.make_dir_if_not_exists(self.pipe_data['addOnsPath'])
+        self.make_dir_if_not_exists(self.pipe_data['finishingPath'])
+        self.make_dir_if_not_exists(self.pipe_data['presetsPath'])
 
 
-    def resetPipeInfo(self, *args):
+    def reset_pipe_info(self, *args):
         """ Reset the pipeline info data to default values.
         """
         cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text="")
-        self.pipeInfo = self.declareDefaultPipelineInfo()
-        self.pipe_data = self.pipeInfo
-        self.loadUIData()
-        self.setPipelineSettingsPath(self.ar.data.lang['i357_putInfoFilePathHere'], self.defaultInfoFile)
+        self.pipe_info = self.get_default_pipeline_info()
+        self.pipe_data = self.pipe_info
+        self.load_ui_data()
+        self.set_pipeline_settings_path(self.ar.data.lang['i357_putInfoFilePathHere'], self.default_info_file)
 
 
-    def newPipeInfo(self, filePathName=None, *args):
+    def new_pipe_info(self, file_path=None, *args):
         """ Will create a new pipeline info file with default setting in the given path and filename given or choose by user.
         """
-        if not filePathName:
-            filePathNameList = cmds.fileDialog2(fileFilter='*.json', fileMode=0, dialogStyle=2) or None
-            if filePathNameList:
-                filePathName = filePathNameList[0]
-                if "." in filePathName:
-                    if not filePathName.endswith(".json"):
-                        filePathName = filePathName[:filePathName.rfind(".")]+".json"
-        if filePathName:
-            cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=filePathName)
-            self.pipe_data['path'] = filePathName[:filePathName.rfind("/")]
-            self.pipe_data['date'] = self.getToday()
-            self.infoFile = filePathName[filePathName.rfind("/")+1:]
-            self.savePipeInfo(closeUI=False)
+        if not file_path:
+            file_path_names = cmds.fileDialog2(fileFilter='*.json', fileMode=0, dialogStyle=2) or None
+            if file_path_names:
+                file_path = file_path_names[0]
+                if "." in file_path:
+                    if not file_path.endswith(".json"):
+                        file_path = file_path[:file_path.rfind(".")]+".json"
+        if file_path:
+            cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=file_path)
+            self.pipe_data['path'] = file_path[:file_path.rfind("/")]
+            self.pipe_data['date'] = self.get_today()
+            self.info_file = file_path[file_path.rfind("/")+1:]
+            self.save_pipe_info(close_ui=False)
 
 
-    def savePipeInfo(self, closeUI=True, *args):
+    def save_pipe_info(self, close_ui=True, *args):
         """ Save the pipeline data into the json file in the HD.
             Write the pipeline data path in the pipeline setting json file.
         """
-        self.getUIDataToSave()
-        pathDataFromUI = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
-        if pathDataFromUI:
-            if "/" in pathDataFromUI:
-                self.pipe_data['path'] = pathDataFromUI[:pathDataFromUI.rfind("/")]
-            if pathDataFromUI.endswith(".json"):
-                self.infoFile = pathDataFromUI[pathDataFromUI.rfind("/")+1:]
-        if self.pipe_data['path'] and self.infoFile:
-            self.makeDirIfNotExists(self.pipe_data['path'])
-            self.setPipelineInfoFile()
-            self.createPipelineInfoSubFolders()
-            self.setPipelineSettingsPath(self.pipe_data['path'], self.infoFile)
+        self.get_ui_data_to_save()
+        path_data_from_ui = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
+        if path_data_from_ui:
+            if "/" in path_data_from_ui:
+                self.pipe_data['path'] = path_data_from_ui[:path_data_from_ui.rfind("/")]
+            if path_data_from_ui.endswith(".json"):
+                self.info_file = path_data_from_ui[path_data_from_ui.rfind("/")+1:]
+        if self.pipe_data['path'] and self.info_file:
+            self.make_dir_if_not_exists(self.pipe_data['path'])
+            self.set_pipeline_info_file()
+            self.create_pipeline_info_sub_folders()
+            self.set_pipeline_settings_path(self.pipe_data['path'], self.info_file)
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
-        if closeUI:
-            self.ar.utils.closeUI('dpPipelinerWindow')
+        if close_ui:
+            self.ar.utils.close_ui('dpPipelinerWindow')
 
 
-    def mountPackagePath(self, *args):
+    def mount_package_path(self):
         """ Mount paths into pipe_data to use them in the Package module.
         """
         self.pipe_data['toClientPath'] = None
@@ -657,44 +657,44 @@ class Pipeliner(object):
             if self.pipe_data['b_deliver']:
                 self.pipe_data['toClientPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_toClient']
                 if self.pipe_data['b_dateDir']:
-                    self.pipe_data['toClientPath'] += "/"+self.getToday()
-                self.makeDirIfNotExists(self.pipe_data['toClientPath'])
+                    self.pipe_data['toClientPath'] += "/"+self.get_today()
+                self.make_dir_if_not_exists(self.pipe_data['toClientPath'])
             # hist path
             if self.pipe_data['b_archive']:
                 if self.pipe_data['assetNameFolderIssue']:
-                    self.pipe_data['scenePath'] = self.getCurrentPath()
+                    self.pipe_data['scenePath'] = self.get_current_path()
                 else:
                     self.pipe_data['scenePath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_wip']+"/"+self.pipe_data['assetName']
                 self.pipe_data['historyPath'] = self.pipe_data['scenePath']+"/"+self.pipe_data['s_hist']
-                self.makeDirIfNotExists(self.pipe_data['historyPath'])
+                self.make_dir_if_not_exists(self.pipe_data['historyPath'])
             # dropbox path
             if self.pipe_data['b_cloud']:
                 if self.pipe_data['s_dropbox']:
                     # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
                     if os.name == "posix": #Linux or Mac
-                        dropDir = "~/.dropbox"
+                        dropbox_folder = "~/.dropbox"
                     else: #Windows
-                        dropDir = os.getenv('LOCALAPPDATA')+"/Dropbox"
-                    if os.path.exists(dropDir):
-                        dropInfo = dropDir+"/info.json"
-                        if os.path.exists(dropInfo):
-                            content = self.getJsonContent(dropInfo)
+                        dropbox_folder = os.getenv('LOCALAPPDATA')+"/Dropbox"
+                    if os.path.exists(dropbox_folder):
+                        dropbox_info = dropbox_folder+"/info.json"
+                        if os.path.exists(dropbox_info):
+                            content = self.get_json_content(dropbox_info)
                             if content:
                                 self.pipe_data['dropInfoPath'] = content[list(content)[0]]['path'].replace("\\", "/")
 #                                self.pipe_data['dropInfoHost'] = content[list(content)[0]]['host']
                                 self.pipe_data['dropboxPath'] = self.pipe_data['dropInfoPath']+"/"+self.pipe_data['s_dropbox']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
-                                self.makeDirIfNotExists(self.pipe_data['dropboxPath'])
+                                self.make_dir_if_not_exists(self.pipe_data['dropboxPath'])
             # old
-            self.makeDirIfNotExists(self.pipe_data['publishPath']+"/"+self.pipe_data['s_old'])
+            self.make_dir_if_not_exists(self.pipe_data['publishPath']+"/"+self.pipe_data['s_old'])
             # discord
             if self.pipe_data['b_discord']:
                 if self.pipe_data['s_webhook']:
                     self.pipe_data['publishedWebhook'] = self.pipe_data['s_webhook']
                 else: 
-                    self.jsonWebhookPath = os.path.join(self.pipe_data['path'], self.webhookFile).replace("\\", "/")
+                    self.json_webhook_path = os.path.join(self.pipe_data['path'], self.webhook_file).replace("\\", "/")
                     wh = None
-                    if os.path.exists(self.jsonWebhookPath):
-                        content = self.getJsonContent(self.jsonWebhookPath)
+                    if os.path.exists(self.json_webhook_path):
+                        content = self.get_json_content(self.json_webhook_path)
                         if content:
                             wh = content['webhook']
                     else:
@@ -712,156 +712,156 @@ class Pipeliner(object):
                 self.pipe_data['callbackFile'] = callback[callback.rfind("/")+1:-3]
 
 
-    def getCurrentPath(self, *args):
+    def get_current_path(self):
         """ Returns the current scene path.
         """
-        currentPath = cmds.file(query=True, sceneName=True)
-        return currentPath[:currentPath.rfind("/")]
+        current_path = cmds.file(query=True, sceneName=True)
+        return current_path[:current_path.rfind("/")]
 
 
-    def getCurrentFileName(self, complete=False, *args):
+    def get_current_filename(self, complete=False, *args):
         """ Returns the current file name with or without the extension depending of the given complete parameter.
         """
-        shortSceneName = cmds.file(query=True, sceneName=True, shortName=True)
-        if shortSceneName:
+        short_scene_name = cmds.file(query=True, sceneName=True, shortName=True)
+        if short_scene_name:
             if complete:
-                return shortSceneName
-            return shortSceneName[:shortSceneName.rfind(".")]
+                return short_scene_name
+            return short_scene_name[:short_scene_name.rfind(".")]
     
     
-    def getFileExtension(self, *args):
+    def get_file_extension(self):
         """ Returns the current file extension.
         """
-        shortSceneName = cmds.file(query=True, sceneName=True, shortName=True)
-        if shortSceneName:
-            return shortSceneName[shortSceneName.rfind("."):]
+        short_scene_name = cmds.file(query=True, sceneName=True, shortName=True)
+        if short_scene_name:
+            return short_scene_name[short_scene_name.rfind("."):]
 
 
-    def saveJsonFile(self, dataDic, fileNamePath, indentation=4, sortKeys=True, *args):
+    def save_json_file(self, data, filename_path, indentation=4, to_sort_keys=True):
         """ Save the json file with the given data dic in the given file name path.
         """
         # write json file in the HD:
-        with open(fileNamePath, 'w') as jsonFile:
-            json.dump(dataDic, jsonFile, indent=indentation, sort_keys=sortKeys)
+        with open(filename_path, 'w') as json_file:
+            json.dump(data, json_file, indent=indentation, sort_keys=to_sort_keys)
 
 
-    def defineFileVersion(self, assetNameList, *args):
+    def define_file_version(self, asset_names):
         """ Return the max number plus one of a versioned files list.
         """
-        if assetNameList:
-            numberList = []
-            for item in assetNameList:
-                numberList.append(int(item[:item.rfind(".")].split(self.pipe_data['s_middle'])[1]))
-            return max(numberList)+1
+        if asset_names:
+            numbers = []
+            for item in asset_names:
+                numbers.append(int(item[:item.rfind(".")].split(self.pipe_data['s_middle'])[1]))
+            return max(numbers)+1
     
 
-    def getRigWIPVersion(self, shortName=None, *args):
+    def get_wip_rig_version(self, short_name=None, *args):
         """ Find the rig version by scene name and return it.
         """
-        rigWipVersion = 0
-        if not shortName:
-            shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        if self.pipe_data['s_rig'] in shortName:
-            rigWipVersion = shortName[shortName.rfind(self.pipe_data['s_rig'])+len(self.pipe_data['s_rig']):shortName.rfind(".")]
-        return rigWipVersion
+        wip_rig_version = 0
+        if not short_name:
+            short_name = cmds.file(query=True, sceneName=True, shortName=True)
+        if self.pipe_data['s_rig'] in short_name:
+            wip_rig_version = short_name[short_name.rfind(self.pipe_data['s_rig'])+len(self.pipe_data['s_rig']):short_name.rfind(".")]
+        return wip_rig_version
 
 
-    def getModelVersion(self, shortName=None, *args):
+    def get_model_version(self, short_name=None, *args):
         """ Find the model version by scene name and return it.
         """
-        modelVersion = 0
-        if not shortName:
-            shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        if self.pipe_data['s_model'] in shortName:
-            modelVersion = shortName[shortName.rfind(self.pipe_data['s_model'])+len(self.pipe_data['s_model']):shortName.rfind(self.pipe_data['s_rig'])]
-        return modelVersion
+        model_version = 0
+        if not short_name:
+            short_name = cmds.file(query=True, sceneName=True, shortName=True)
+        if self.pipe_data['s_model'] in short_name:
+            model_version = short_name[short_name.rfind(self.pipe_data['s_model'])+len(self.pipe_data['s_model']):short_name.rfind(self.pipe_data['s_rig'])]
+        return model_version
     
 
-    def getAssetName(self, *args):
+    def get_asset_name(self):
         """ Compare the sceneName with the father folder name to define if we use the assetName as a default pipeline setup.
             Return True or False and the shortName of the asset if found.
             Otherwise return False
         """
-        folderName = None
-        assetName = None
-        currentPath = self.getCurrentPath()
-        if currentPath:
-            folderName = currentPath[currentPath.rfind("/")+1:]
-        shortSceneName = self.getCurrentFileName()
-        if shortSceneName:
-            assetName = shortSceneName
-            if "_" in shortSceneName:
-                assetName = shortSceneName[:shortSceneName.find("_")]
+        folder_name = None
+        asset_name = None
+        current_path = self.get_current_path()
+        if current_path:
+            folder_name = current_path[current_path.rfind("/")+1:]
+        short_scene_name = self.get_current_filename()
+        if short_scene_name:
+            asset_name = short_scene_name
+            if "_" in short_scene_name:
+                asset_name = short_scene_name[:short_scene_name.find("_")]
             for ext in [".ma", ".mb"]:
-                if assetName.endswith(ext):
-                    assetName = assetName[:-3]
-        if folderName or assetName:
-            if folderName == assetName:
-                return [True, assetName]
-        if assetName:
-            return [False, assetName]
-        elif folderName:
-            return [False, folderName]
+                if asset_name.endswith(ext):
+                    asset_name = asset_name[:-3]
+        if folder_name or asset_name:
+            if folder_name == asset_name:
+                return [True, asset_name]
+        if asset_name:
+            return [False, asset_name]
+        elif folder_name:
+            return [False, folder_name]
         return [False, None]
 
 
-    def getPipeFileName(self, file_path=None, *args):
+    def get_pipe_filename(self, file_path=None):
         """ Return the generated file name based on the pipeline publish folder.
             It checks the asset name and define the file version to save the published file.
         """
         self.pipe_data['assetName'] = None
-        self.assetNameList = []
+        self.asset_names = []
         if not file_path:
-            file_path = self.getCurrentPath()
-        self.pipe_data['assetNameFolderIssue'], assetName = self.getAssetName()
-        if assetName:
-            publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
+            file_path = self.get_current_path()
+        self.pipe_data['assetNameFolderIssue'], asset_name = self.get_asset_name()
+        if asset_name:
+            publish_version = 1 #starts the number versioning by one to have the first delivery file as _v001.
             if os.path.exists(file_path):
-                fileNameList = next(os.walk(file_path))[2]
-                if fileNameList:
-                    for file_name in fileNameList:
-                        if assetName+self.pipe_data['s_middle'] in file_name or assetName.lower()+self.pipe_data['s_middle'] in file_name or assetName.upper()+self.pipe_data['s_middle'] in file_name:
-                            if not file_name in self.assetNameList:
-                                self.assetNameList.append(file_name)
-                    if self.assetNameList:
-                        publishVersion = self.defineFileVersion(self.assetNameList)
+                filenames = next(os.walk(file_path))[2]
+                if filenames:
+                    for filename in filenames:
+                        if asset_name+self.pipe_data['s_middle'] in filename or asset_name.lower()+self.pipe_data['s_middle'] in filename or asset_name.upper()+self.pipe_data['s_middle'] in filename:
+                            if not filename in self.asset_names:
+                                self.asset_names.append(filename)
+                    if self.asset_names:
+                        publish_version = self.define_file_version(self.asset_names)
             if self.pipe_data['b_capitalize']:
-                assetName = assetName.capitalize()
+                asset_name = asset_name.capitalize()
             elif self.pipe_data['b_lower']:
-                assetName = assetName.lower()
+                asset_name = asset_name.lower()
             elif self.pipe_data['b_upper']:
-                assetName = assetName.upper()
-            self.pipe_data['assetName'] = assetName
-            self.pipe_data['assetPath'] = self.getCurrentPath()
-            self.pipe_data['currentFileName'] = self.getCurrentFileName()
-            self.pipe_data['extension'] = self.getFileExtension()
-            self.pipe_data['rigVersion'] = self.getRigWIPVersion()
-            self.pipe_data['publishVersion'] = publishVersion
-            self.pipe_data['fileName'] = self.pipe_data['s_prefix']+assetName+self.pipe_data['s_middle']+(str(publishVersion).zfill(int(self.pipe_data['i_padding']))+self.pipe_data['s_suffix'])
+                asset_name = asset_name.upper()
+            self.pipe_data['assetName'] = asset_name
+            self.pipe_data['assetPath'] = self.get_current_path()
+            self.pipe_data['currentFileName'] = self.get_current_filename()
+            self.pipe_data['extension'] = self.get_file_extension()
+            self.pipe_data['rigVersion'] = self.get_wip_rig_version()
+            self.pipe_data['publishVersion'] = publish_version
+            self.pipe_data['fileName'] = self.pipe_data['s_prefix']+asset_name+self.pipe_data['s_middle']+(str(publish_version).zfill(int(self.pipe_data['i_padding']))+self.pipe_data['s_suffix'])
             return self.pipe_data['fileName']
         else:
             return False
 
 
-    def saveVersion(self, *args):
+    def save_version(self, *args):
         """ UI to chose save asset version options.
         """
-        if self.checkAssetContext():
+        if self.check_asset_context():
             # declaring variables:
             saveVersion_title     = 'dpAutoRig - '+self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower()
             saveVersion_winWidth  = 380
             saveVersion_winHeight = 220
             saveVersion_align     = "left"
             # window:
-            self.ar.utils.closeUI("dpSaveVersionWindow")
+            self.ar.utils.close_ui("dpSaveVersionWindow")
             dpSaveVersionWin = cmds.window('dpSaveVersionWindow', title=saveVersion_title, iconName='dpInfo', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
             # creating text layout:
             saveVersionColumnLayout = cmds.columnLayout('saveVersionColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpSaveVersionWin)
             cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
             cmds.textFieldGrp('currentPathTFG', label="Path", text=self.pipe_data['wipPath'], columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
-            cmds.textFieldGrp('currentFileNameTFG', label=self.ar.data.lang['i276_current'], text=self.getCurrentFileName(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
-            self.saveModelVersionTFG = cmds.textFieldGrp('saveModelVersionTFG', label="Model "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.getModelVersion())), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
-            self.saveRigVersionTFG = cmds.textFieldGrp('saveRigVersionTFG', label="WIP "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.getRigWIPVersion())+1), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
+            cmds.textFieldGrp('currentFileNameTFG', label=self.ar.data.lang['i276_current'], text=self.get_current_filename(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
+            self.saveModelVersionTFG = cmds.textFieldGrp('saveModelVersionTFG', label="Model "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.get_model_version())), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
+            self.saveRigVersionTFG = cmds.textFieldGrp('saveRigVersionTFG', label="WIP "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.get_wip_rig_version())+1), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
             cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
             cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=saveVersion_align, parent=saveVersionColumnLayout)
             previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=saveVersionColumnLayout)
@@ -883,15 +883,15 @@ class Pipeliner(object):
                 thisType = "mayaBinary"
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=thisType, force=True)
-            self.ar.utils.closeUI("dpSaveVersionWindow")
+            self.ar.utils.close_ui("dpSaveVersionWindow")
             self.ar.data.rebuilding = False
-            self.refreshAssetData()
+            self.refresh_asset_data()
 
 
-    def refreshAssetNameUI(self, *args):
+    def refresh_asset_name_ui(self, *args):
         """ Just read again the pipeline data and set the UI with the assetName.
         """
-        if self.checkAssetContext():
+        if self.check_asset_context():
             try:
                 cmds.frameLayout("asset_fl", edit=True, label=self.ar.data.lang['i303_asset']+" - "+self.pipe_data['assetName'])
                 cmds.textFieldGrp("asset_name_tfg", edit=True, text=self.pipe_data['assetName'])
@@ -909,18 +909,18 @@ class Pipeliner(object):
                 pass
 
 
-    def checkAssetContext(self, *args):
+    def check_asset_context(self):
         """ Returns True if there's an asset context to work the rebuilding or False if not.
         """
-        hasAssetContext = False
+        has_asset_context = False
         if self.pipe_data:
             if self.pipe_data['assetName']:
                 if not self.pipe_data['assetName'] == "None":
-                    hasAssetContext = True
-        return hasAssetContext
+                    has_asset_context = True
+        return has_asset_context
     
 
-    def refreshProjectUI(self, *args):
+    def refresh_project_ui(self):
         """ Just edit the UI with the current pipeline path.
         """
         # get path to update open_folder button command
@@ -937,16 +937,16 @@ class Pipeliner(object):
             pass
 
 
-    def getLatestFile(self, path, *args):
+    def get_latest_file(self, path):
         """ Returns the latest listed file in the given path.
         """
-        latestFileList = next(os.walk(path))[2]
-        if latestFileList:
-            latestFileList.sort()
-            return latestFileList[-1]
+        latest_files = next(os.walk(path))[2]
+        if latest_files:
+            latest_files.sort()
+            return latest_files[-1]
 
 
-    def loadAsset(self, path=None, file=None, mode=0, *arts):
+    def load_asset(self, path=None, file=None, mode=0, *args):
         """ Open the saved Maya file with the user choose by UI or given path and file name arguments.
             Mode:
             0 = load: open Maya scene.
@@ -979,7 +979,7 @@ class Pipeliner(object):
                 assetFolder = path+"/"+file
                 if mode == 0: #load
                     # Get latest version
-                    latestFile = self.getLatestFile(assetFolder)
+                    latestFile = self.get_latest_file(assetFolder)
                     # Open maya scene
                     if latestFile:
                         savedScene = self.ar.utils.checkSavedScene()
@@ -1007,7 +1007,7 @@ class Pipeliner(object):
 
     def selectAssetFromListUI(self, assetList, path, mode, *args):
         """ Let user select the asset file we use in the given mode (load or replaceData).
-            Button will call the loadAsset method again passing the choose arguments.
+            Button will call the load_asset method again passing the choose arguments.
             Works well for load and replace data.
         """
         # declaring variables:
@@ -1015,7 +1015,7 @@ class Pipeliner(object):
         select_winWidth = 240
         select_winHeight = 285
         select_align = "center"
-        self.ar.utils.closeUI("dpSelectAssetWindow")
+        self.ar.utils.close_ui("dpSelectAssetWindow")
         dpSelectAssetWin = cmds.window('dpSelectAssetWindow', title=selectAsset_title, iconName='dpInfo', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         selectColumnLayout = cmds.columnLayout('selectColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetWin)
@@ -1028,12 +1028,12 @@ class Pipeliner(object):
 
 
     def selectAssetFromUI(self, path, mode, *args):
-        """ Transfer path and mode arguments to loadAsset method and also pass the selected item from the text scroll list UI.
+        """ Transfer path and mode arguments to load_asset method and also pass the selected item from the text scroll list UI.
         """
         selectedAssetItemList = cmds.textScrollList(self.selectAssetTSL, query=True, selectItem=True)
         if selectedAssetItemList:
-            self.loadAsset(path, selectedAssetItemList[0], mode)
-            self.ar.utils.closeUI("dpSelectAssetWindow")
+            self.load_asset(path, selectedAssetItemList[0], mode)
+            self.ar.utils.close_ui("dpSelectAssetWindow")
 
 
     def selectAssetCheckBoxUI(self, assetList, path, mode, *args):
@@ -1044,7 +1044,7 @@ class Pipeliner(object):
         selectCB_winWidth = 240
         selectCB_winHeight = 285
         selectCB_align = "center"
-        self.ar.utils.closeUI("dpSelectAssetCBWindow")
+        self.ar.utils.close_ui("dpSelectAssetCBWindow")
         dpSelectAssetCBWin = cmds.window('dpSelectAssetCBWindow', title=selectAssetCB_title, iconName='dpInfo', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating layout:
         selectBatchLayout = cmds.columnLayout('selectBatchLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetCBWin)
@@ -1070,9 +1070,9 @@ class Pipeliner(object):
     def loadProjectPath(self, *args):
         """ Open a file dialog to get the project path and write it in the respective field.
         """
-        resultInfoList = cmds.fileDialog2(fileMode=3, dialogStyle=2)
-        if resultInfoList:
-            cmds.textFieldButtonGrp(self.projectPathTFBG, edit=True, text=resultInfoList[0])
+        result_items = cmds.fileDialog2(fileMode=3, dialogStyle=2)
+        if result_items:
+            cmds.textFieldButtonGrp(self.projectPathTFBG, edit=True, text=result_items[0])
 
 
     def getNewAssetPreviewTextByUI(self, *args):
@@ -1114,11 +1114,11 @@ class Pipeliner(object):
         """
         if existingFile and "wipPath" in list(self.pipe_data.keys()):
             path = self.pipe_data['wipPath']+"/"+self.pipe_data['assetName']
-            modelVersionValue = str(int(self.getModelVersion(self.getLatestFile(path))))
-            rigVersionValue = str(int(self.getRigWIPVersion(self.getLatestFile(path)))+1)
+            modelVersionValue = str(int(self.get_model_version(self.get_latest_file(path))))
+            rigVersionValue = str(int(self.get_wip_rig_version(self.get_latest_file(path)))+1)
         else:
-            modelVersionValue = str(int(self.getModelVersion()))
-            rigVersionValue = str(int(self.getRigWIPVersion())+1)
+            modelVersionValue = str(int(self.get_model_version()))
+            rigVersionValue = str(int(self.get_wip_rig_version())+1)
         return self.pipe_data['assetPath']+"/"+self.pipe_data['assetName']+self.pipe_data['s_model']+modelVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+rigVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['extension']
     
 
@@ -1131,7 +1131,7 @@ class Pipeliner(object):
         self.newAsset_winHeight = 220
         self.newAsset_align     = "left"
         # creating New Asset Window:
-        self.ar.utils.closeUI("dpNewAssetWindow")
+        self.ar.utils.close_ui("dpNewAssetWindow")
         dpNewAssetWin = cmds.window('dpNewAssetWindow', title=self.newAsset_title, iconName='dpInfo', widthHeight=(self.newAsset_winWidth, self.newAsset_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpNewAssetWin)
@@ -1160,13 +1160,13 @@ class Pipeliner(object):
             self.newAssetFile = assetFile
         if self.newAssetFile:
             folder = self.newAssetFile[:self.newAssetFile.rfind("/")]
-            if self.makeDirIfNotExists(folder):
+            if self.make_dir_if_not_exists(folder):
                 cmds.file(rename=self.newAssetFile)
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
-                self.ar.utils.closeUI("dpNewAssetWindow")
+                self.ar.utils.close_ui("dpNewAssetWindow")
                 self.ar.data.rebuilding = False
-                self.refreshAssetData()
+                self.refresh_asset_data()
             else:
                 cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i349_alreadyExistsAsset'], button="Ok")
         else:
@@ -1216,7 +1216,7 @@ class Pipeliner(object):
         self.replaceDPData_winHeight = 330+(len(self.existDataList)*16)
         self.replaceDPData_align     = "left"
         # creating replace dpData Window:
-        self.ar.utils.closeUI("dpReplaceDPDataWindow")
+        self.ar.utils.close_ui("dpReplaceDPDataWindow")
         dpReplaceDPDataWindow = cmds.window('dpReplaceDPDataWindow', title=self.replaceDPData_title, iconName='dpInfo', widthHeight=(self.replaceDPData_winWidth, self.replaceDPData_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         replaceDataColumnLayout = cmds.columnLayout('replaceDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
@@ -1258,7 +1258,7 @@ class Pipeliner(object):
                 self.dpDataToReplaceList.append(item)
         if self.dpDataToReplaceList:
             self.runReplaceData()
-            self.ar.utils.closeUI("dpReplaceDPDataWindow")
+            self.ar.utils.close_ui("dpReplaceDPDataWindow")
         
 
     def runReplaceData(self, path=None, toReplaceList=None, *args):
@@ -1282,7 +1282,7 @@ class Pipeliner(object):
                                 os.chmod(destPath+"/"+destFile, stat.S_IWUSR)
                                 os.remove(destPath+"/"+destFile)
                     else:
-                        self.makeDirIfNotExists(destPath)
+                        self.make_dir_if_not_exists(destPath)
                     sourceItem = next(os.walk(sourcePath))[2][-1]
                     ext = sourceItem[sourceItem.rfind("."):]
                     prefix = sourceItem[:sourceItem.find("_")+1]

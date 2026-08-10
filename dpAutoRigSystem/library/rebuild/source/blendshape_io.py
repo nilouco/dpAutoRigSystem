@@ -39,7 +39,7 @@ class BlendshapeIO(action.BaseAction):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.ar.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
                 if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
                     self.io_path = self.get_io_path(self.io_folder)
@@ -163,7 +163,7 @@ class BlendshapeIO(action.BaseAction):
         """ Export the given blendShape target.
         """
         try:
-            self.ar.pipeliner.makeDirIfNotExists(self.targetPath)
+            self.ar.pipeliner.make_dir_if_not_exists(self.targetPath)
             # export blendShape targets as compiled maya file
             cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
         except Exception as e:

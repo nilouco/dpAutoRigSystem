@@ -40,7 +40,7 @@ class CopyPasteAttr(base.BaseLibrary):
         """ UI (window).
         """
 #        self.closeCopyPasteAttrUI()
-        self.ar.utils.closeUI("dpCopyPasteAttrWin")
+        self.ar.utils.close_ui("dpCopyPasteAttrWin")
 
 
         # UI:

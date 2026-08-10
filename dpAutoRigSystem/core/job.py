@@ -35,7 +35,7 @@ class Job(object):
         cmds.scriptJob(event=('deleteAll', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         #cmds.scriptJob(event=('NewSceneOpened', self.ar.ui_manager.refresh_ui), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         cmds.scriptJob(event=('SceneSaved', partial(self.ar.ui_manager.refresh_ui, saved_scene=True, reset_buttons=False)), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
-        cmds.scriptJob(event=('workspaceChanged', self.ar.pipeliner.refreshAssetData), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
+        cmds.scriptJob(event=('workspaceChanged', self.ar.pipeliner.refresh_asset_data), parent='dpAutoRigSystemWC', killWithScene=False, compressUndo=True)
         self.start_corrective_edit_mode()
         self.selection_change()
         self.selected_guide()

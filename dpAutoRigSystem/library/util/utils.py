@@ -195,14 +195,14 @@ class Utils(object):
         if not nodes:
             return str(0).zfill(pad)
         else:
-            numberList = []
+            numbers = []
             for node in nodes:
                 if attr in cmds.listAttr(node):
-                    numberList.append(int(cmds.getAttr(node+"."+attr)))
-            if not numberList:
+                    numbers.append(int(cmds.getAttr(node+"."+attr)))
+            if not numbers:
                 return str(0).zfill(pad)
             else:
-                return str(max(numberList)+1).zfill(pad)
+                return str(max(numbers)+1).zfill(pad)
 
 
     def findModuleLastNumber(self, className, typeName, guideNet=False):
@@ -210,7 +210,7 @@ class Utils(object):
             Return its highest number.
         """
         # work with rigged modules in the scene:
-        nodes, numberList = [], []
+        nodes, numbers = [], []
         guideTypeCount = 0
         if guideNet:
             nodes = self.getNetworkNodeByAttr("dpGuideNet")
@@ -220,15 +220,15 @@ class Utils(object):
             for node in nodes:
                 if cmds.objExists(node+"."+typeName):
                     if cmds.getAttr(node+"."+typeName) == className:
-                        numberList.append(className)
+                        numbers.append(className)
         # try check if there is a masterGrp and get its counter:
         allGrp = self.getAllGrp()
         if allGrp:
             guideTypeCount = cmds.getAttr(allGrp+'.dp'+className+'Count') #v5
-        if guideTypeCount > len(numberList):
+        if guideTypeCount > len(numbers):
             return guideTypeCount
         else:
-            return len(numberList)
+            return len(numbers)
     
         
     def normalizeText(self, inputted_text="", prefixMax=4):
@@ -1103,7 +1103,7 @@ class Utils(object):
     #
     # TODO: passe it to Manager class
     #
-    def closeUI(self, winName, *args):
+    def close_ui(self, winName, *args):
         """ Closes the given window name if it exists.
         """
         if cmds.window(winName, query=True, exists=True):

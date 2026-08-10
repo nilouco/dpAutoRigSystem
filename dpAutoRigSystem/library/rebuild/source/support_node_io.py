@@ -35,7 +35,7 @@ class SupportNodeIO(action.BaseAction):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.ar.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
                 if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
                     self.io_path = self.get_io_path(self.io_folder)

@@ -386,7 +386,7 @@ class Skinning(weights.Weights):
         """ Import the skinCluster weights of the given item in the given path and filename.
         """
         self.ar.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(items), addOne=False, addNumber=False)
-        skinWeightDic = self.ar.pipeliner.getJsonContent(path+"/"+filename)
+        skinWeightDic = self.ar.pipeliner.get_json_content(path+"/"+filename)
         if skinWeightDic:
             for item in items:
                 self.ar.utils.setProgress("SkinningIO: "+item)
@@ -429,7 +429,7 @@ class Skinning(weights.Weights):
                 if cmds.listRelatives(item, children=True, allDescendents=True, shapes=True):
                     if export:
                         skinClusterDic = self.getSkinWeightData([item])
-                        self.ar.pipeliner.saveJsonFile(skinClusterDic, filename)
+                        self.ar.pipeliner.save_json_file(skinClusterDic, filename)
                     else:
                         self.importSkinWeightsFromFile([item], path[0], self.ioStartName+"_"+self.getIOFileName(item)+".json")
         self.ar.utils.setProgress(endIt=True)

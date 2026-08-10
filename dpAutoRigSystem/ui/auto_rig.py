@@ -439,11 +439,11 @@ class MainUI(object):
         cmds.textFieldGrp("asset_name_tfg", label=self.ar.data.lang['i303_asset']+":", text=self.ar.pipeliner.pipe_data['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
         # asset buttons
         cmds.rowColumnLayout("asset_buttons_rcl", numberOfColumns=5, columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left"), (5, "left")], columnAttach=[(1, "left", 10), (2, "left", 10), (3, "left", 10), (4, "left", 10), (5, "left", 10)], parent="asset_fl")
-        cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeliner.saveVersion, parent="asset_buttons_rcl")
-        cmds.button("asset_load_bt", label=self.ar.data.lang['i187_load'], command=self.ar.pipeliner.loadAsset, parent="asset_buttons_rcl")
+        cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeliner.save_version, parent="asset_buttons_rcl")
+        cmds.button("asset_load_bt", label=self.ar.data.lang['i187_load'], command=self.ar.pipeliner.load_asset, parent="asset_buttons_rcl")
         cmds.button("asset_new_bt", label=self.ar.data.lang['i304_new'], command=self.ar.pipeliner.createNewAssetUI, parent="asset_buttons_rcl")
         cmds.button("asset_open_folder_bt", label=self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder'], command=partial(self.ar.packager.open_folder, self.ar.pipeliner.pipe_data['projectPath']), parent="asset_buttons_rcl")
-        cmds.button("asset_replace_data_bt", label=self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data, command=partial(self.ar.pipeliner.loadAsset, mode=1), parent="asset_buttons_rcl")
+        cmds.button("asset_replace_data_bt", label=self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data, command=partial(self.ar.pipeliner.load_asset, mode=1), parent="asset_buttons_rcl")
         cmds.separator(style='in', height=20, width=370, parent="asset_main_cl")
         # processes
         cmds.rowColumnLayout('processes_rcl', adjustableColumn=1, numberOfColumns=2, columnAlign=[(1, "left"), (2, "right")], columnWidth=[(1, 360), (2, 17)], columnAttach=[(1, "both", 10), (2, "right", 10)], parent="rebuilder_tab")

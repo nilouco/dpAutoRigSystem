@@ -38,7 +38,7 @@ class Zipper(base.BaseLibrary):
     def build_tool(self, *args):
         # call main UI function
 #        self.dpZipperCloseUI()
-        self.ar.utils.closeUI('dpZipperWindow')
+        self.ar.utils.close_ui('dpZipperWindow')
         self.dpZipperUI()
         self.dpLoadData()
     
@@ -484,7 +484,7 @@ class Zipper(base.BaseLibrary):
                     self.dpZipperDataGrp()
 
 #                    self.dpZipperCloseUI()
-                    self.ar.utils.closeUI("dpZipperWindow")
+                    self.ar.utils.close_ui("dpZipperWindow")
 
 
                     self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="addDoubleLinear"))-set(self.oldAddDoubleLinearList)), "addDoubleLinear", "_ADL")

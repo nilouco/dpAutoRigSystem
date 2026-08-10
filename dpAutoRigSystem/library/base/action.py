@@ -234,7 +234,7 @@ class BaseAction(base.BaseLibrary):
         # dataLog
         self.log_data["log"] = self.ar.data.lang[self.action_type]
         self.log_data["user"] = getpass.getuser()
-        self.log_data["time"] = self.ar.pipeliner.getToday(True)
+        self.log_data["time"] = self.ar.pipeliner.get_today(True)
         self.log_data["dpARVersion"] = self.ar.data.version
         self.log_data["module"] = self.name
         self.log_data["name"] = self.title
@@ -432,9 +432,9 @@ class BaseAction(base.BaseLibrary):
         if dic:
             try:
                 # export json file
-                self.ar.pipeliner.makeDirIfNotExists(self.io_path)
+                self.ar.pipeliner.make_dir_if_not_exists(self.io_path)
                 json_name = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".json"
-                self.ar.pipeliner.saveJsonFile(dic, json_name)
+                self.ar.pipeliner.save_json_file(dic, json_name)
                 self.well_done_io(json_name)
             except Exception as e:
                 self.fail_io(json_name+": "+str(e))
@@ -455,7 +455,7 @@ class BaseAction(base.BaseLibrary):
                 file_name = self.ar.pipeliner.pipe_data['currentFileName']
             node_state_data = self.change_node_state(items, state=1) #has no effect
             # export alembic
-            self.ar.pipeliner.makeDirIfNotExists(path)
+            self.ar.pipeliner.make_dir_if_not_exists(path)
             io_items = ' -root '.join(items)
             attributes = ""
             if attr:
@@ -506,7 +506,7 @@ class BaseAction(base.BaseLibrary):
                 path = self.io_path
             exported_items.sort()
             self.latest_data_file = exported_items[-1]
-            return self.ar.pipeliner.getJsonContent(self.io_path+"/"+exported_items[-1])
+            return self.ar.pipeliner.get_json_content(self.io_path+"/"+exported_items[-1])
         else:
             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
 

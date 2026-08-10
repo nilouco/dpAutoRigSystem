@@ -29,8 +29,8 @@ class Publisher(object):
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-        self.ar.utils.closeUI('dpSuccessPublishedWindow')
-        self.ar.utils.closeUI('dpPublisherWindow')
+        self.ar.utils.close_ui('dpSuccessPublishedWindow')
+        self.ar.utils.close_ui('dpPublisherWindow')
         savedScene = self.ar.utils.checkSavedScene()
         if not savedScene:
             savedScene = self.ar.pipeliner.userSaveThisScene(True)
@@ -54,12 +54,12 @@ class Publisher(object):
             cmds.button(label="Pipeliner", command=partial(self.ar.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
             cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.runDiagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
             cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.runPublishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
-            cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.loadAsset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.load_asset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
             self.ar.pipeliner.mainUI(self.ar)
-            self.ar.utils.closeUI('dpPipelinerWindow')
+            self.ar.utils.close_ui('dpPipelinerWindow')
             self.setPublishFilePath()
 
 
@@ -74,11 +74,11 @@ class Publisher(object):
         """
         if not file_path:
             # try to load a pipeline structure to get the file_path to set it up
-            file_path = self.ar.pipeliner.loadPublishPath()
+            file_path = self.ar.pipeliner.load_publish_path()
         if file_path:
             try:
                 cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(file_path))
-                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.ar.pipeliner.getPipeFileName(file_path)))
+                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.ar.pipeliner.get_pipe_filename(file_path)))
                 self.ar.pipeliner.pipe_data['publishPath'] = file_path
             except:
                 pass
@@ -92,15 +92,6 @@ class Publisher(object):
         if dialogResult:
             self.setPublishFilePath(dialogResult[0])
 
-
-    def getRigWIPVersion(self, *args):
-        """ Find the rig version by scene name and return it.
-        """
-        rigWipVersion = 0
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        if self.ar.pipeliner.pipe_data['s_rig'] in shortName:
-            rigWipVersion = shortName[shortName.rfind(self.ar.pipeliner.pipe_data['s_rig'])+len(self.ar.pipeliner.pipe_data['s_rig']):shortName.rfind(".")]
-        return rigWipVersion
     
 
     def runCheckedValidators(self, first_mode=True, stop_if_found_block=True, publish_log=None, *args):
@@ -147,7 +138,7 @@ class Publisher(object):
             self.ar.utils.setProgress(self.ar.data.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
 
             # check if there'a a file name to publish this scene
-            publishFileName = self.ar.pipeliner.getPipeFileName(self.ar.pipeliner.pipe_data['publishPath'])
+            publishFileName = self.ar.pipeliner.get_pipe_filename(self.ar.pipeliner.pipe_data['publishPath'])
             if fromUI:
                 publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
             if publishFileName:
@@ -158,7 +149,7 @@ class Publisher(object):
                     publishFileName += ".m"+self.ar.pipeliner.pipe_data['sceneName'][-1]
                 self.ar.pipeliner.pipe_data['publishFileName'] = publishFileName
                 publish_log["published"] = self.ar.pipeliner.pipe_data['publishPath']+"/"+publishFileName
-                publish_log["exportPath"] = self.ar.pipeliner.pipe_data['f_drive']+"/"+self.ar.pipeliner.pipe_data['f_studio']+"/"+self.ar.pipeliner.pipe_data['f_project']+"/"+self.ar.pipeliner.pipe_data['f_toClient']+"/"+self.ar.pipeliner.getToday()
+                publish_log["exportPath"] = self.ar.pipeliner.pipe_data['f_drive']+"/"+self.ar.pipeliner.pipe_data['f_studio']+"/"+self.ar.pipeliner.pipe_data['f_project']+"/"+self.ar.pipeliner.pipe_data['f_toClient']+"/"+self.ar.pipeliner.get_today()
                 # comments
                 publish_log["comments"] = ""
                 commentValue = comments
@@ -227,11 +218,11 @@ class Publisher(object):
                     
                     # mount folders
                     if self.ar.pipeliner.pipe_data['b_deliver']:
-                        self.ar.pipeliner.mountPackagePath()
+                        self.ar.pipeliner.mount_package_path()
                         if self.ar.pipeliner.pipe_data['toClientPath']:
                             # rigging preview image
                             if self.ar.pipeliner.pipe_data['b_imager']:
-                                self.ar.pipeliner.pipe_data['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipe_data, builtVersion, self.ar.pipeliner.getToday())
+                                self.ar.pipeliner.pipe_data['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipe_data, builtVersion, self.ar.pipeliner.get_today())
                                 self.ar.utils.setProgress(endIt=True)
                                 self.ar.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
                     else:
@@ -246,7 +237,7 @@ class Publisher(object):
                         if self.ar.pipeliner.pipe_data['toClientPath']:
                             # toClient
                             self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Zipping", addNumber=False)
-                            zipFile = self.ar.packager.create_zip_to_client(self.ar.pipeliner.pipe_data['publishPath'], publishFileName, self.ar.pipeliner.pipe_data['toClientPath'], self.ar.pipeliner.getToday())
+                            zipFile = self.ar.packager.create_zip_to_client(self.ar.pipeliner.pipe_data['publishPath'], publishFileName, self.ar.pipeliner.pipe_data['toClientPath'], self.ar.pipeliner.get_today())
                             # dropbox
                             self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Clouding", addNumber=False)
                             if zipFile:
@@ -282,7 +273,7 @@ class Publisher(object):
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
                     self.ar.utils.setProgress(endIt=True)
-                    self.ar.utils.closeUI('dpPublisherWindow')
+                    self.ar.utils.close_ui('dpPublisherWindow')
                     if fromUI:
                         self.askUserChooseFile(publishFileName)
 
@@ -300,7 +291,7 @@ class Publisher(object):
             Warning the raison of the error.
         """
         self.ar.utils.setProgress(endIt=True)
-        self.ar.utils.closeUI('dpPublisherWindow')
+        self.ar.utils.close_ui('dpPublisherWindow')
         # reopen current file
         cmds.file(self.ar.pipeliner.pipe_data['sceneName'], open=True, force=True)
         # report the error in a log window
@@ -324,7 +315,7 @@ class Publisher(object):
     def successPublishedWindow(self, publishedFile, errorList=False, *args):
         """ If everything works well we can call a success publishing window here.
         """
-        self.ar.utils.closeUI('dpSuccessPublishedWindow')
+        self.ar.utils.close_ui('dpSuccessPublishedWindow')
         self.ar.utils.setProgress(endIt=True)
         # window
         winWidth  = 250
@@ -344,7 +335,7 @@ class Publisher(object):
             cmds.text(label=self.ar.data.lang['i074_attention'], parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
             for errorFile in errorList:
-                cmds.button(label=errorFile, command=partial(self.ar.pipeliner.loadAsset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
+                cmds.button(label=errorFile, command=partial(self.ar.pipeliner.load_asset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
             cmds.separator(style="none", height=20, parent=succesLayout)
         else:
             cmds.separator(style="none", height=20, parent=succesLayout)
@@ -369,7 +360,7 @@ class Publisher(object):
                 print(self.ar.data.lang['i219_comments']+":", comments)
                 print(self.ar.data.lang['i303_asset']+"s:", assetList)
                 for asset in assetList:
-                    self.ar.pipeliner.loadAsset(path, asset)
+                    self.ar.pipeliner.load_asset(path, asset)
                     publishResult = self.runPublishing(fromUI=False, comments=comments)
                     if publishResult == False:
                         errorList.append(asset)
@@ -380,4 +371,4 @@ class Publisher(object):
                 else:
                     cmds.file(newFile=True, force=True)
                     self.successPublishedWindow("\n".join(publishedList))
-            self.ar.utils.closeUI("dpSelectAssetCBWindow")
+            self.ar.utils.close_ui("dpSelectAssetCBWindow")

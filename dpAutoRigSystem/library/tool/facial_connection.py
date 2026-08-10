@@ -118,7 +118,7 @@ class FacialConnection(base.BaseLibrary):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating targetMirrorUI Window:
-        self.ar.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.close_ui('dpFacialConnectionWindow')
         facialCtrl_winWidth  = 230
         facialCtrl_winHeight = 330
         dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(self.ar.data.version), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -239,7 +239,7 @@ class FacialConnection(base.BaseLibrary):
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.ar.data.lang["i042_notSelection"]+"\";")
-        self.ar.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.close_ui('dpFacialConnectionWindow')
     
 
     def dpDuplicateRenameAndInitShaderTgt(self, fromMesh, prefix, tgt, suffix, *args):
@@ -319,7 +319,7 @@ class FacialConnection(base.BaseLibrary):
                         resultList.append(result)
         if self.ar.data.ui_state and resultList:
             self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
-        self.ar.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.close_ui('dpFacialConnectionWindow')
     
 
     def dpConnectToJoints(self, ctrlList=None, *args):
@@ -384,7 +384,7 @@ class FacialConnection(base.BaseLibrary):
                     self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and resultList:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
-        self.ar.utils.closeUI('dpFacialConnectionWindow')
+        self.ar.utils.close_ui('dpFacialConnectionWindow')
 
     
     def dpGetJointNodeList(self, items, *args):

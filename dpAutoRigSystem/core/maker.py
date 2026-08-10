@@ -85,7 +85,7 @@ class Maker(object):
                         name = self.ar.ui_manager.ask_prompt_dialog("Template", self.ar.data.lang["m006_name"]).lower()
             if name:
                 # export json file
-                self.ar.pipeliner.saveJsonFile(guides_data, f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.template_folder.replace('.', '/')}/{name}.json")
+                self.ar.pipeliner.save_json_file(guides_data, f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.template_folder.replace('.', '/')}/{name}.json")
                 print(self.ar.data.lang["i133_presetCreated"], name)
                 self.ar.ui_manager.reload_ui()
         else:
@@ -490,7 +490,7 @@ class Maker(object):
                             delta += 1
                     if verbose and not self.ar.data.rebuilding:
                         self.ar.utils.setProgress(endIt=True)
-                    self.ar.utils.closeUI(reorder_attr.winName)
+                    self.ar.utils.close_ui(reorder_attr.winName)
     
 
     def before_start_rig_all(self):
@@ -498,8 +498,8 @@ class Maker(object):
             print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
         self.ar.utils.setProgress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
-        self.ar.utils.closeUI(self.ar.data.plus_info_win_name)
-        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
+        self.ar.utils.close_ui(self.ar.data.plus_info_win_name)
+        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
 
 
     def refresh_before_build(self):

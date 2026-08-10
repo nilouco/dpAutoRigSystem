@@ -467,8 +467,8 @@ class BaseStandard(base.BaseLibrary):
     def rig_me(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
         """
-        self.ar.utils.closeUI(self.ar.data.plus_info_win_name)
-        self.ar.utils.closeUI(self.ar.data.color_override_win_name)
+        self.ar.utils.close_ui(self.ar.data.plus_info_win_name)
+        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
         # verify integrity of the guideModule:
         if self.check_guide_integrity():
             self.to_ids = []

@@ -32,7 +32,7 @@ class OneSkeleton(base.BaseLibrary):
 
     def create_ui(self, *args):
         # creating Window:
-        self.ar.utils.closeUI('one_skeleton_win')
+        self.ar.utils.close_ui('one_skeleton_win')
         winWidth  = 230
         winHeight = 230
         cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(self.ar.data.version), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -61,7 +61,7 @@ class OneSkeleton(base.BaseLibrary):
         joint_type = cmds.radioButtonGrp('skeleton_rbg', query=True, select=True)-1
         use_scale = cmds.checkBox('use_scale_cb', query=True, value=True)
         self.createOneSkeleton(hierarchy=joint_type, scale=use_scale)
-        self.ar.utils.closeUI('one_skeleton_win')
+        self.ar.utils.close_ui('one_skeleton_win')
 
 
     def change_prefix(self, value, *args):

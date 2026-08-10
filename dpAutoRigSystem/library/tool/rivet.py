@@ -66,7 +66,7 @@ class Rivet(base.BaseLibrary):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpRivetUI Window:
-        self.ar.utils.closeUI('dpRivetWindow')
+        self.ar.utils.close_ui('dpRivetWindow')
         rivet_winWidth  = 305
         rivet_winHeight = 470
         dpRivetWin = cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(self.ar.data.version), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -386,7 +386,7 @@ class Rivet(base.BaseLibrary):
         self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), addOne=False, addNumber=False)
         self.dpCreateRivet(geoToAttach, uvSet, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.ar.utils.setProgress(endIt=True)
-        self.ar.utils.closeUI('dpRivetWindow')
+        self.ar.utils.close_ui('dpRivetWindow')
     
     
     def dpSelectUVSetWin(self, uvSetList, *args):

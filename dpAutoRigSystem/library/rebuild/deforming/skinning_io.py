@@ -37,7 +37,7 @@ class SkinningIO(action.BaseAction):
         # ---
         # --- rebuilder code --- beginning
         if not cmds.file(query=True, reference=True):
-            if self.ar.pipeliner.checkAssetContext():
+            if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     if self.first_mode: #export

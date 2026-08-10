@@ -42,7 +42,7 @@ class JointDisplay(base.BaseLibrary):
         """ Create a window in order to load the joints in the scene.
         """
         # call close UI function
-        self.ar.utils.closeUI('dpJointDisplayWindow')
+        self.ar.utils.close_ui('dpJointDisplayWindow')
         # starting UI
         jointDisplay_winWidth  = 660
         jointDisplay_winHeight = 410

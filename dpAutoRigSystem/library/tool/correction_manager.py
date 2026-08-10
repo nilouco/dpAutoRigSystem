@@ -37,8 +37,8 @@ class CorrectionManager(base.BaseLibrary):
     def build_tool(self, *args):
         # call main UI function
         if self.ar.data.ui_state:
-#            self.closeUI()
-            self.ar.utils.closeUI("dpCorrectionManagerWindow")
+#            self.close_ui()
+            self.ar.utils.close_ui("dpCorrectionManagerWindow")
             self.mainUI()
             self.refreshUI()
             
@@ -50,7 +50,7 @@ class CorrectionManager(base.BaseLibrary):
         self.actualizeEditLayout()
 
         
-    # def closeUI(self, *args):
+    # def close_ui(self, *args):
     #     """ Delete existing CorrectionManager window if it exists.
     #     """
     #     if cmds.window('dpCorrectionManagerWindow', query=True, exists=True):

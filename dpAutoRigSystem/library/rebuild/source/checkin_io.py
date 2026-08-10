@@ -35,7 +35,7 @@ class CheckinIO(action.BaseAction):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.ar.pipeliner.checkAssetContext():
+        if self.ar.pipeliner.check_asset_context():
             if self.first_mode: #export
                 self.well_done_io(self.ar.data.lang['v007_allOk'])
             else: #import

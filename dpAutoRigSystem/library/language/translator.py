@@ -216,7 +216,7 @@ class Translator(object):
         """ First window UI to get the basic user info for sentence ids starting with "_".
         """
         self.clear_translator_ui(1)
-        self.ar.utils.closeUI('translator_get_info_win')
+        self.ar.utils.close_ui('translator_get_info_win')
         # starting window:
         cmds.window('translator_get_info_win', title=self.translator_title, iconName='dpAutoRig', widthHeight=(500, 180), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
         cmds.columnLayout('translator_get_info_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_get_info_win')
@@ -280,7 +280,7 @@ class Translator(object):
             It will call update UI to start using predefined list of user info.
         """
         self.clear_translator_ui(2)
-        self.ar.utils.closeUI('translator_lang_win')
+        self.ar.utils.close_ui('translator_lang_win')
         # translator UI:
         cmds.window('translator_lang_win', title=self.translator_title, iconName='dpAutoRig', widthHeight=(400, 400), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
         cmds.columnLayout('translator_lang_cl', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent='translator_lang_win')

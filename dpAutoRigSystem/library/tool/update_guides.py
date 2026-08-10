@@ -46,7 +46,7 @@ class UpdateGuides(base.BaseLibrary):
     def summaryUI(self):
         """ Update Guides Summary UI for log info.
         """
-        self.ar.utils.closeUI('updateSummary')
+        self.ar.utils.close_ui('updateSummary')
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
         updateSummaryCL = cmds.columnLayout('updateSummaryCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
@@ -72,8 +72,8 @@ class UpdateGuides(base.BaseLibrary):
     def updateGuidesUI(self):
         """ Main Update Guides UI.
         """
-        self.ar.utils.closeUI('updateGuidesWindow')
-        self.ar.utils.closeUI('updateSummary')
+        self.ar.utils.close_ui('updateGuidesWindow')
+        self.ar.utils.close_ui('updateSummary')
         if self.ar.data.ui_state:
             cmds.window('updateGuidesWindow', title="Guides Info")
             updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
@@ -484,7 +484,7 @@ class UpdateGuides(base.BaseLibrary):
     
 
     def doDelete(self, *args):
-        self.ar.utils.closeUI('updateSummary')
+        self.ar.utils.close_ui('updateSummary')
         for guide in self.updateData:
             if cmds.listRelatives(guide, parent=True):
                 cmds.parent(guide, world=True)
@@ -531,7 +531,7 @@ class UpdateGuides(base.BaseLibrary):
     def doUpdate(self, *args):
         """ Main method to update the guides in the scene.
         """
-        self.ar.utils.closeUI('updateGuidesWindow')
+        self.ar.utils.close_ui('updateGuidesWindow')
         # Starts progress bar feedback
         self.ar.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, addOne=False)
         # Rename guides to discard as *_OLD
