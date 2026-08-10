@@ -46,7 +46,7 @@ class NewSceneIO(action.BaseAction):
                 try:
                     # start a new clean scene and keep the same asset context
                     cmds.file(newFile=True, force=True)
-                    self.well_done_io(self.ar.pipeliner.pipeData["assetName"])
+                    self.well_done_io(self.ar.pipeliner.pipe_data["assetName"])
                 except Exception as e:
                     self.fail_io(str(e))
         else:

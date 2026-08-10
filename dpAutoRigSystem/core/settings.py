@@ -264,7 +264,7 @@ class Configuration(object):
                 self.ar.opt.set_option_var(preset_option_var, preset_name)
             # show preset creation result window:
             button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
-            button_command = self.ar.packager.openFolder
+            button_command = self.ar.packager.open_folder
             button_argument = os.path.join(self.ar.data.dp_auto_rig_path, preset_folder.replace(".", "/"))
             self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+preset_name+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             # close and reload dpAR UI in order to avoid Maya crash
@@ -286,13 +286,11 @@ class Configuration(object):
 
 
     def get_validator_addons(self, path="addOnsPath"):
-        """ Return a list of Validator's AddOns or Finishing to load.
+        """ Return a list of Validator's AddOns or Finishing to load and mount their folder.
         """
-        if os.path.exists(self.ar.pipeliner.pipeData[path]):
-            start_path = self.ar.pipeliner.pipeData[path][:self.ar.pipeliner.pipeData[path].rfind("/")]
-            end_path = self.ar.pipeliner.pipeData[path][self.ar.pipeliner.pipeData[path].rfind("/")+1:]
-            print("start_path = ", start_path)
-            print("end_path = ", end_path)
+        if os.path.exists(self.ar.pipeliner.pipe_data[path]):
+            start_path = self.ar.pipeliner.pipe_data[path][:self.ar.pipeliner.pipe_data[path].rfind("/")]
+            end_path = self.ar.pipeliner.pipe_data[path][self.ar.pipeliner.pipe_data[path].rfind("/")+1:]
             return self.ar.utils.findAllModules(start_path, end_path)
                     
 
@@ -539,8 +537,8 @@ class Agreement(object):
             local_info['dpAR'] = self.ar.data.version
             #print(local_info)
             if local_info:
-                wh = self.ar.utils.mountWH(self.ar.data.discord_url, self.ar.pipeliner.pipeData['h000_location'])
-                self.ar.packager.toDiscord(wh, str(local_info))
+                wh = self.ar.utils.mountWH(self.ar.data.discord_url, self.ar.pipeliner.pipe_data['h000_location'])
+                self.ar.packager.to_discord(wh, str(local_info))
 
 
     def ask_terms_cond(self, *args):

@@ -434,15 +434,15 @@ class MainUI(object):
         # project pipeline asset
         cmds.columnLayout('asset_main_cl', adjustableColumn=False, parent="rebuilder_tab")
         cmds.frameLayout('asset_fl', label=self.ar.data.lang['i303_asset'], collapsable=True, collapse=False, width=370, parent="asset_main_cl")
-        cmds.textFieldGrp("asset_maya_project_tfg", label="Maya "+self.ar.data.lang['i301_project']+":", text=self.ar.pipeliner.pipeData['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
-        cmds.textFieldGrp("asset_pipeline_tfg", label="Pipeline:", text=self.ar.pipeliner.pipeData['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
-        cmds.textFieldGrp("asset_name_tfg", label=self.ar.data.lang['i303_asset']+":", text=self.ar.pipeliner.pipeData['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
+        cmds.textFieldGrp("asset_maya_project_tfg", label="Maya "+self.ar.data.lang['i301_project']+":", text=self.ar.pipeliner.pipe_data['mayaProject'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
+        cmds.textFieldGrp("asset_pipeline_tfg", label="Pipeline:", text=self.ar.pipeliner.pipe_data['projectPath'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
+        cmds.textFieldGrp("asset_name_tfg", label=self.ar.data.lang['i303_asset']+":", text=self.ar.pipeliner.pipe_data['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
         # asset buttons
         cmds.rowColumnLayout("asset_buttons_rcl", numberOfColumns=5, columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left"), (5, "left")], columnAttach=[(1, "left", 10), (2, "left", 10), (3, "left", 10), (4, "left", 10), (5, "left", 10)], parent="asset_fl")
         cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeliner.saveVersion, parent="asset_buttons_rcl")
         cmds.button("asset_load_bt", label=self.ar.data.lang['i187_load'], command=self.ar.pipeliner.loadAsset, parent="asset_buttons_rcl")
         cmds.button("asset_new_bt", label=self.ar.data.lang['i304_new'], command=self.ar.pipeliner.createNewAssetUI, parent="asset_buttons_rcl")
-        cmds.button("asset_open_folder_bt", label=self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder'], command=partial(self.ar.packager.openFolder, self.ar.pipeliner.pipeData['projectPath']), parent="asset_buttons_rcl")
+        cmds.button("asset_open_folder_bt", label=self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder'], command=partial(self.ar.packager.open_folder, self.ar.pipeliner.pipe_data['projectPath']), parent="asset_buttons_rcl")
         cmds.button("asset_replace_data_bt", label=self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data, command=partial(self.ar.pipeliner.loadAsset, mode=1), parent="asset_buttons_rcl")
         cmds.separator(style='in', height=20, width=370, parent="asset_main_cl")
         # processes

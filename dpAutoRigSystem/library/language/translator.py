@@ -289,7 +289,7 @@ class Translator(object):
         cmds.text('langNameTxt', label=self.ar.data.lang['i151_language']+":", parent='lang_name_rcl')
         cmds.text('newLangNameTxt', label=self.new_lang_name, parent='lang_name_rcl')
         # counter:
-        cmds.rowColumnLayout('counter_rcl', numberOfColumns=4, columnWidth=[(1, 70), (2, 20), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent='translator_lang_cl')
+        cmds.rowColumnLayout('counter_rcl', numberOfColumns=4, columnWidth=[(1, 70), (2, 30), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'right'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent='translator_lang_cl')
         cmds.text('sentenceTxt', label=self.ar.data.lang['i136_sentence']+":", parent='counter_rcl')
         cmds.text('current_index_txt', label='0', parent='counter_rcl')
         cmds.text('counterHifenTxt', label='/', parent='counter_rcl')

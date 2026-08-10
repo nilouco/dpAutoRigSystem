@@ -48,7 +48,7 @@ class ControllerShapeIO(action.BaseAction):
                         if self.first_mode: #export
                             try:
                                 self.ar.pipeliner.makeDirIfNotExists(self.io_path)
-                                ctrlFileName = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipeData['currentFileName']+".ma"
+                                ctrlFileName = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".ma"
                                 self.ar.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
                                 self.well_done_io(ctrlFileName)
                             except Exception as e:

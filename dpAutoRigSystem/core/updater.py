@@ -118,7 +118,7 @@ class Updater(object):
             try:
                 urllib.request.urlretrieve(url, folder[0])
                 button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
-                button_command = self.ar.packager.openFolder
+                button_command = self.ar.packager.open_folder
                 button_argument = folder[0][:folder[0].rfind("/")]
                 self.ar.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', folder[0]+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
                 self.ar.utils.closeUI('dpUpdateWindow')

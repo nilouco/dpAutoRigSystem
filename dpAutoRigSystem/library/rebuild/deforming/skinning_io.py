@@ -77,16 +77,16 @@ class SkinningIO(action.BaseAction):
         """ Reference the latest wip rig file before the current, and return it's tranform elements, if there.
         """
         refNodeList = []
-        wipFilesList = next(os.walk(self.ar.pipeliner.pipeData['assetPath']))[2]
+        wipFilesList = next(os.walk(self.ar.pipeliner.pipe_data['assetPath']))[2]
         if len(wipFilesList) > 1:
             wipFilesList.sort()
             if len(self.exportedList) > 1:
                 self.refPathName = self.exportedList[-2][len(self.start_name)+1:-5]
-                if os.path.isfile(self.ar.pipeliner.pipeData['assetPath']+"/"+self.refPathName+".ma"):
+                if os.path.isfile(self.ar.pipeliner.pipe_data['assetPath']+"/"+self.refPathName+".ma"):
                     self.refPathName = self.refPathName+".ma"
                 else:
                     self.refPathName = self.refPathName+".mb"
-                self.refPathName = self.ar.pipeliner.pipeData['assetPath']+"/"+wipFilesList[-2]
+                self.refPathName = self.ar.pipeliner.pipe_data['assetPath']+"/"+wipFilesList[-2]
                 cmds.file(self.refPathName, reference=True, namespace=self.importRefName)
                 refNode = cmds.file(self.refPathName, referenceNode=True, query=True)
                 refNodeList = cmds.referenceQuery(refNode, nodes=True)

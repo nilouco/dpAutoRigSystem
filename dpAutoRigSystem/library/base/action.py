@@ -166,7 +166,7 @@ class BaseAction(base.BaseLibrary):
         """
         self.info_text = "\n\n"+self.ar.data.lang['r060_latestExportedData']+"\n"
         button_label = self.get_latest_exported_data()
-        button_command = self.ar.packager.openFolder
+        button_command = self.ar.packager.open_folder
         button_argument = self.io_path
         if cmds.iconTextButton(self.name+"_itb", query=True, exists=True):
             #functools.partial(<bound method Logger.infoWin of <dpAutoRigSystem.Pipeline.dpLogger.Logger object at 0x00000259E390BD10>>, 'r003_modelIO', 'r004_modelIODesc', None, 'center', 305, 250, wiki='10-‐-Rebuilder#-model')
@@ -292,8 +292,8 @@ class BaseAction(base.BaseLibrary):
     def get_io_path(self, io_folder):
         """ Returns the IO path for the current scene.
         """
-        if "assetPath" in self.ar.pipeliner.pipeData.keys() and io_folder:
-            return self.ar.pipeliner.pipeData['assetPath']+"/"+self.ar.pipeliner.pipeData[io_folder]
+        if "assetPath" in self.ar.pipeliner.pipe_data.keys() and io_folder:
+            return self.ar.pipeliner.pipe_data['assetPath']+"/"+self.ar.pipeliner.pipe_data[io_folder]
 
 
     def get_exported_items(self, items=None, sub_folder="", ask_has_data=False, get_any=False):
@@ -318,7 +318,7 @@ class BaseAction(base.BaseLibrary):
             if exported_items:
                 if sub_folder or get_any:
                     return exported_items
-                asset_name = self.ar.pipeliner.pipeData["assetName"]
+                asset_name = self.ar.pipeliner.pipe_data["assetName"]
                 for item in exported_items:
                     if asset_name in item:
                         result.append(item)
@@ -433,7 +433,7 @@ class BaseAction(base.BaseLibrary):
             try:
                 # export json file
                 self.ar.pipeliner.makeDirIfNotExists(self.io_path)
-                json_name = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipeData['currentFileName']+".json"
+                json_name = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".json"
                 self.ar.pipeliner.saveJsonFile(dic, json_name)
                 self.well_done_io(json_name)
             except Exception as e:
@@ -452,7 +452,7 @@ class BaseAction(base.BaseLibrary):
             if not start_name:
                 start_name = self.start_name
             if not file_name:
-                file_name = self.ar.pipeliner.pipeData['currentFileName']
+                file_name = self.ar.pipeliner.pipe_data['currentFileName']
             node_state_data = self.change_node_state(items, state=1) #has no effect
             # export alembic
             self.ar.pipeliner.makeDirIfNotExists(path)

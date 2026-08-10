@@ -88,7 +88,7 @@ class HeadDeformer(base.BaseLibrary):
         topCtrlName = clusterName+self.ar.data.lang["c099_top"]
         calibrateName = self.ar.data.lang["c111_calibrate"].lower()
         axisList = self.ar.data.axis
-        posList = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
+        position = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
         validName = self.ar.utils.validateName(deformerName+"_FFD", "FFD")
@@ -261,7 +261,7 @@ class HeadDeformer(base.BaseLibrary):
             # create subControls setup
             subCtrlList = []
             subCtrlGrpList = []
-            for pos, latticeSubPoints in zip(posList, latticeSubPointsList):
+            for pos, latticeSubPoints in zip(position, latticeSubPointsList):
                 # create and connect cluster
                 namePos = bottomCtrlName.replace(self.ar.data.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")

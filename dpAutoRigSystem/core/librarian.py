@@ -32,12 +32,12 @@ class Lib(object):
         # validators
         self.start_modules_by_folder(self.ar.data.checkin_folder)
         self.start_modules_by_folder(self.ar.data.checkout_folder)
-        if self.ar.pipeliner.pipeData['addOnsPath'] and self.ar.config.get_validator_addons():
-            self.start_modules_by_folder("", path=self.ar.pipeliner.pipeData['addOnsPath'])
-            self.ar.data.checkaddon_folder = self.ar.pipeliner.pipeData['addOnsPath']
-        if self.ar.pipeliner.pipeData['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
-            self.start_modules_by_folder("", path=self.ar.pipeliner.pipeData['finishingPath'])
-            self.ar.data.checkfinishing_folder = self.ar.pipeliner.pipeData['finishingPath']
+        if self.ar.pipeliner.pipe_data['addOnsPath'] and self.ar.config.get_validator_addons():
+            self.start_modules_by_folder('', path=self.ar.pipeliner.pipe_data['addOnsPath'])
+            self.ar.data.checkaddon_folder = self.ar.pipeliner.pipe_data['addOnsPath']
+        if self.ar.pipeliner.pipe_data['finishingPath'] and self.ar.config.get_validator_addons("finishingPath"):
+            self.start_modules_by_folder('', path=self.ar.pipeliner.pipe_data['finishingPath'])
+            self.ar.data.checkfinishing_folder = self.ar.pipeliner.pipe_data['finishingPath']
         # rebuilders
         self.start_modules_by_folder(self.ar.data.start_folder)
         self.start_modules_by_folder(self.ar.data.source_folder)
@@ -121,7 +121,7 @@ class Lib(object):
             if folder:
                 folder = folder.replace("/", ".")
                 imported_module = __import__(f"{basePath}.{folder}.{module}", {}, {}, [module])
-            elif path:
+            elif path: #addon probably
                 sys.path.append(path)
                 imported_module = __import__(module, {}, {}, [module])
             if self.ar.dev:
@@ -141,9 +141,9 @@ class Lib(object):
     def load_pipeline_validator(self):
         """ Load the Validator's presets from the pipeline path.
         """
-        if self.ar.pipeliner.pipeData['presetsPath']:
-            if os.path.exists(self.ar.pipeliner.pipeData['presetsPath']):
-                studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipeData['presetsPath']+"/", True)
+        if self.ar.pipeliner.pipe_data['presetsPath']:
+            if os.path.exists(self.ar.pipeliner.pipe_data['presetsPath']):
+                studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipe_data['presetsPath']+"/", True)
                 if studio_preset:
                     self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
                     self.ar.data.validator_preset_data.update(studio_preset_data)

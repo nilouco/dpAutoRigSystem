@@ -1436,16 +1436,16 @@ class Utils(object):
         return shortName
 
 
-    def deleteFile(self, filePath, *args):
+    def deleteFile(self, file_path, *args):
         """ Force delete given file.
         """
-        if os.path.exists(filePath):
+        if os.path.exists(file_path):
             try:
-                os.remove(filePath)
+                os.remove(file_path)
             except PermissionError as exc:
                 # use a brute force to delete without permission:
-                os.chmod(filePath, stat.S_IWUSR)
-                os.remove(filePath)
+                os.chmod(file_path, stat.S_IWUSR)
+                os.remove(file_path)
 
 
     def cleanupDeletedGuides(self, *args):
