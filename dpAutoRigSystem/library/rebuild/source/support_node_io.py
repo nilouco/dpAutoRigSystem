@@ -47,7 +47,7 @@ class SupportNodeIO(action.BaseAction):
                             else:
                                 items = self.getNodeToExportList()
                             if items:
-                                self.ar.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
+                                self.ar.utils.setProgress(self.ar.data.lang[self.title], add_one=False, add_number=False)
                                 self.export_alembic_file(items, attr=False, curve=True)
                             else:
                                 self.maybe_done_io("Geometries")

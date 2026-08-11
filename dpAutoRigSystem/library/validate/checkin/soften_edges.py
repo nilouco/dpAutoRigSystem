@@ -37,7 +37,7 @@ class SoftenEdges(action.BaseAction):
             else:
                 allMeshList = cmds.ls(selection=False, type="mesh")
             if allMeshList:
-                self.ar.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(allMeshList), add_one=False, add_number=False)
                 for mesh in allMeshList:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):

@@ -843,7 +843,7 @@ class Pipeliner(object):
             return False
 
 
-    def save_version(self, *args):
+    def save_version_ui(self, *args):
         """ UI to chose save asset version options.
         """
         if self.check_asset_context():
@@ -866,7 +866,7 @@ class Pipeliner(object):
             cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=saveVersion_align, parent=saveVersionColumnLayout)
             previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=saveVersionColumnLayout)
             self.saveVersionPreviewTxt = cmds.text('saveVersionPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-            cmds.button('runSaveVersionBT', label=self.ar.data.lang['i222_save'], align=saveVersion_align, command=self.runSaveVersion, parent=saveVersionColumnLayout)
+            cmds.button('runSaveVersionBT', label=self.ar.data.lang['i222_save'], align=saveVersion_align, command=self.save_version, parent=saveVersionColumnLayout)
             # call save asset version Window:
             cmds.showWindow(dpSaveVersionWin)
             self.getSaveVersionPreviewTextByUI()
@@ -874,21 +874,21 @@ class Pipeliner(object):
             cmds.confirmDialog(title=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower(), message=self.ar.data.lang['r069_noAssetToSaveVersion'], button="Ok")
 
 
-    def runSaveVersion(self, *args):
+    def save_version(self, *args):
         """ Just save a new asset file version.
         """
         if self.saveVersionFile:
-            thisType = "mayaAscii"
+            this_type = "mayaAscii"
             if "extension" in self.pipe_data.keys() and self.pipe_data['extension'].endswith("mb"):
-                thisType = "mayaBinary"
+                this_type = "mayaBinary"
             cmds.file(rename=self.saveVersionFile)
-            cmds.file(save=True, type=thisType, force=True)
+            cmds.file(save=True, type=this_type, force=True)
             self.ar.utils.close_ui("dpSaveVersionWindow")
             self.ar.data.rebuilding = False
             self.refresh_asset_data()
 
 
-    def refresh_asset_name_ui(self, *args):
+    def refresh_asset_name_ui(self):
         """ Just read again the pipeline data and set the UI with the assetName.
         """
         if self.check_asset_context():
@@ -961,41 +961,41 @@ class Pipeliner(object):
                 cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i350_notFoundPipeInfoFile'], button="Ok")
         if path and os.path.exists(path):
             if not file:
-                assetList = next(os.walk(path))[1]
-                if assetList:
-                    assetList.sort()
+                assets = next(os.walk(path))[1]
+                if assets:
+                    assets.sort()
                     if mode == 2:
-                        self.selectAssetCheckBoxUI(assetList, path, mode)
+                        self.selectAssetCheckBoxUI(assets, path, mode)
                         return
                     elif mode == 1: #replaceData exclude the current asset from given list to chose.
-                        assetList.remove(self.pipe_data['assetName'])
+                        assets.remove(self.pipe_data['assetName'])
                     # Load UI to choose one asset to define the file to use
-                    self.selectAssetFromListUI(assetList, path, mode)
+                    self.selectAssetFromListUI(assets, path, mode)
                     return
                 else:
                     # Inform that it isn't possible to continue without wip assets to load
                     cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i351_notFoundWIPAssets'], button="Ok")
             if file:
-                assetFolder = path+"/"+file
+                asset_folder = path+"/"+file
                 if mode == 0: #load
                     # Get latest version
-                    latestFile = self.get_latest_file(assetFolder)
+                    latest_file = self.get_latest_file(asset_folder)
                     # Open maya scene
-                    if latestFile:
-                        savedScene = self.ar.utils.checkSavedScene()
-                        if not savedScene:
-                            savedScene = self.userSaveThisScene(False)
-                        if savedScene:
+                    if latest_file:
+                        saved_scene = self.ar.utils.checkSavedScene()
+                        if not saved_scene:
+                            saved_scene = self.confirm_save_this_scene(False)
+                        if saved_scene:
                             self.ar.data.rebuilding = False
-                            cmds.file(assetFolder+"/"+latestFile, open=True, ignoreVersion=True, force=True)
-                            cmds.workspace(directory=assetFolder)
+                            cmds.file(asset_folder+"/"+latest_file, open=True, ignoreVersion=True, force=True)
+                            cmds.workspace(directory=asset_folder)
                             self.pipe_data['sceneName'] = cmds.file(query=True, sceneName=True)
                             self.pipe_data['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
                 elif mode == 1: #replaceData
                     # Open UI to select each desired module dpData to replace from
-                    self.pathToReplaceFrom = assetFolder
-                    self.getDPDataExistListToReplace(self.pathToReplaceFrom)
-                    if self.existDataList:
+                    self.path_to_replace_from = asset_folder
+                    self.get_datas_to_replace(self.path_to_replace_from)
+                    if self.ios:
                         self.dpDataToReplaceUI(file)
                     else:
                         # There's no data do replace from the selected asset
@@ -1005,7 +1005,7 @@ class Pipeliner(object):
             cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i352_notFoundWIPPath'], button="Ok")
 
 
-    def selectAssetFromListUI(self, assetList, path, mode, *args):
+    def selectAssetFromListUI(self, assets, path, mode, *args):
         """ Let user select the asset file we use in the given mode (load or replaceData).
             Button will call the load_asset method again passing the choose arguments.
             Works well for load and replace data.
@@ -1021,7 +1021,7 @@ class Pipeliner(object):
         selectColumnLayout = cmds.columnLayout('selectColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetWin)
         cmds.separator(style='none', height=10, parent=selectColumnLayout)
         cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+":", align="left", parent=selectColumnLayout)
-        self.selectAssetTSL = cmds.textScrollList('selectAssetTSL', allowMultiSelection=False, append=assetList, parent=selectColumnLayout)
+        self.selectAssetTSL = cmds.textScrollList('selectAssetTSL', allowMultiSelection=False, append=assets, parent=selectColumnLayout)
         self.runSelectAssetBT = cmds.button('runSelectAssetBT', label=self.ar.data.lang['m004_select'], align=select_align, command=partial(self.selectAssetFromUI, path, mode), parent=selectColumnLayout)
         # call Window:
         cmds.showWindow(dpSelectAssetWin)
@@ -1036,7 +1036,7 @@ class Pipeliner(object):
             self.ar.utils.close_ui("dpSelectAssetWindow")
 
 
-    def selectAssetCheckBoxUI(self, assetList, path, mode, *args):
+    def selectAssetCheckBoxUI(self, assets, path, mode, *args):
         """ Let user select the assets to publish in batch.
         """
         # declaring variables:
@@ -1050,18 +1050,18 @@ class Pipeliner(object):
         selectBatchLayout = cmds.columnLayout('selectBatchLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetCBWin)
         cmds.separator(style='none', height=10, parent=selectBatchLayout)
         cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+"s:", align="left", parent=selectBatchLayout)
-        if len(assetList) > 1:
+        if len(assets) > 1:
             cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=False, changeCommand=self.selectAllAssetCB, parent=selectBatchLayout)
         cmds.separator(style='in', height=10, parent=selectBatchLayout)
         selectCBAssetSL = cmds.scrollLayout('selectCBAssetSL', parent=selectBatchLayout)
         selectCBColumnLayout = cmds.columnLayout('selectCBColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=selectCBAssetSL)
         # assets checkboxes
         self.selectedBatchList = []
-        for asset in assetList:
+        for asset in assets:
             self.selectedBatchList.append(cmds.checkBox(asset+"CB", label=asset, parent=selectCBColumnLayout))
         cmds.separator(style='in', height=10, parent=selectBatchLayout)
         self.commentBatchTFG = cmds.textFieldGrp('commentBatchTFG', label=self.ar.data.lang['i219_comments'], text='', adjustableColumn=2, editable=True, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth=[(1, 55), (2, 50)], parent=selectBatchLayout)
-        self.runSelectCBAssetBT = cmds.button('runSelectCBAssetBT', label=self.ar.data.lang['i216_publish'], align=selectCB_align, command=partial(self.ar.publisher.loadPublishingBatch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=selectBatchLayout)
+        self.runSelectCBAssetBT = cmds.button('runSelectCBAssetBT', label=self.ar.data.lang['i216_publish'], align=selectCB_align, command=partial(self.ar.publisher.load_publishing_batch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=selectBatchLayout)
         cmds.separator(style='none', height=5, parent=selectBatchLayout)
         # call Window:
         cmds.showWindow(dpSelectAssetCBWin)
@@ -1078,7 +1078,7 @@ class Pipeliner(object):
     def getNewAssetPreviewTextByUI(self, *args):
         """ Generate and return the new asset file name with complete path, using the UI info.
         """
-        self.newAssetFile = ""
+        self.new_asset_file = ""
         newAssetName = cmds.textFieldGrp(self.newAssetNameTFG, query=True, text=True)
         newModelVersion = cmds.textFieldGrp(self.newModelVersionTFG, query=True, text=True)
         newWIPVersion = cmds.textFieldGrp(self.newWIPVersionTFG, query=True, text=True)
@@ -1091,10 +1091,10 @@ class Pipeliner(object):
                 if not wipFolder.endswith("/"):
                     wipFolder = wipFolder+"/"
             if newWIPVersion and newModelVersion and newAssetName:
-                self.newAssetFile = projectPath+wipFolder+newAssetName+"/"+newAssetName+self.pipe_data['s_model']+newModelVersion.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+newWIPVersion.zfill(self.pipe_data['i_padding'])+".ma"
-        if self.newAssetFile:
-            cmds.text(self.newAssetPreviewTxt, edit=True, label=self.newAssetFile)
-        return self.newAssetFile
+                self.new_asset_file = projectPath+wipFolder+newAssetName+"/"+newAssetName+self.pipe_data['s_model']+newModelVersion.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+newWIPVersion.zfill(self.pipe_data['i_padding'])+".ma"
+        if self.new_asset_file:
+            cmds.text(self.newAssetPreviewTxt, edit=True, label=self.new_asset_file)
+        return self.new_asset_file
 
 
     def getSaveVersionPreviewTextByUI(self, *args):
@@ -1108,19 +1108,6 @@ class Pipeliner(object):
             cmds.text(self.saveVersionPreviewTxt, edit=True, label=previewSaveVersionFileName)
         return self.saveVersionPreviewTxt
         
-
-    def getNextFileVersionName(self, existingFile=True, *args):
-        """ Concatenate asset info to compose rig version file name to save.
-        """
-        if existingFile and "wipPath" in list(self.pipe_data.keys()):
-            path = self.pipe_data['wipPath']+"/"+self.pipe_data['assetName']
-            modelVersionValue = str(int(self.get_model_version(self.get_latest_file(path))))
-            rigVersionValue = str(int(self.get_wip_rig_version(self.get_latest_file(path)))+1)
-        else:
-            modelVersionValue = str(int(self.get_model_version()))
-            rigVersionValue = str(int(self.get_wip_rig_version())+1)
-        return self.pipe_data['assetPath']+"/"+self.pipe_data['assetName']+self.pipe_data['s_model']+modelVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+rigVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['extension']
-    
 
     def createNewAssetUI(self, *args):
         """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.
@@ -1147,21 +1134,21 @@ class Pipeliner(object):
         cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
         previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=newAssetColumnLayout)
         self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-        cmds.button('runCreateNewAssetBT', label=self.ar.data.lang['i158_create'], align=self.newAsset_align, command=self.createNewAsset, parent=newAssetColumnLayout)
+        cmds.button('runCreateNewAssetBT', label=self.ar.data.lang['i158_create'], align=self.newAsset_align, command=self.create_new_asset, parent=newAssetColumnLayout)
         # call New Asset Window:
         cmds.showWindow(dpNewAssetWin)
         self.getNewAssetPreviewTextByUI()
 
 
-    def createNewAsset(self, assetFile=None, *args):
+    def create_new_asset(self, asset_file=None, *args):
         """ Create a new asset context saving a maya file with the given asset file complete path.
         """
-        if assetFile:
-            self.newAssetFile = assetFile
-        if self.newAssetFile:
-            folder = self.newAssetFile[:self.newAssetFile.rfind("/")]
+        if asset_file:
+            self.new_asset_file = asset_file
+        if self.new_asset_file:
+            folder = self.new_asset_file[:self.new_asset_file.rfind("/")]
             if self.make_dir_if_not_exists(folder):
-                cmds.file(rename=self.newAssetFile)
+                cmds.file(rename=self.new_asset_file)
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
                 self.ar.utils.close_ui("dpNewAssetWindow")
@@ -1173,10 +1160,10 @@ class Pipeliner(object):
             cmds.confirmDialog(title=self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i307_fillFieldCorrectly'], button="Ok")
 
 
-    def getDPDataExistListToReplace(self, path, *args):
+    def get_datas_to_replace(self, path, *args):
         """ Check if exists exported module data in the given path.
         """
-        defaultList = [
+        io_elements = [
             "modelIO",
             "supportNodeIO",
             "blendShapeIO",
@@ -1201,10 +1188,10 @@ class Pipeliner(object):
             "visibilityIO",
             "channelIO"
             ]
-        self.existDataList = []
-        for item in defaultList:
+        self.ios = []
+        for item in io_elements:
             if os.path.exists(path+"/"+self.pipe_data["s_"+item]):
-                self.existDataList.append(item)
+                self.ios.append(item)
 
 
     def dpDataToReplaceUI(self, fromAssetName, *args):
@@ -1213,7 +1200,7 @@ class Pipeliner(object):
         # declaring variables:
         self.replaceDPData_title     = 'dpAutoRig - '+self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data+" - "+self.ar.data.lang['i303_asset']
         self.replaceDPData_winWidth  = 220
-        self.replaceDPData_winHeight = 330+(len(self.existDataList)*16)
+        self.replaceDPData_winHeight = 330+(len(self.ios)*16)
         self.replaceDPData_align     = "left"
         # creating replace dpData Window:
         self.ar.utils.close_ui("dpReplaceDPDataWindow")
@@ -1224,10 +1211,10 @@ class Pipeliner(object):
         cmds.text("rebuilderReplaceDataText", label=self.ar.data.lang['i308_toReplaceDPData'], parent=replaceDataColumnLayout)
         cmds.text("rebuilderReplaceDataAssetText", label="\n"+self.pipe_data['assetName'], font="boldLabelFont", parent=replaceDataColumnLayout)
         cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        for item in self.existDataList:
+        for item in self.ios:
             cmds.checkBox(item+"CB", label=item, value=True)
         cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        if len(self.existDataList) > 1:
+        if len(self.ios) > 1:
             cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=True, changeCommand=self.selectAllDataCB, parent=replaceDataColumnLayout)
             cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
         cmds.button('runReplaceDataBT', label=self.ar.data.lang['m219_replace'].upper()+"\n"+fromAssetName+" -> "+self.pipe_data['assetName'], align=self.replaceDPData_align, command=self.replaceDataByUI, parent=replaceDataColumnLayout)
@@ -1238,7 +1225,7 @@ class Pipeliner(object):
     def selectAllDataCB(self, cbValue, *args):
         """ Set all existing data checkbox values.
         """
-        for item in self.existDataList:
+        for item in self.ios:
             cmds.checkBox(item+"CB", edit=True, value=cbValue)
 
 
@@ -1252,72 +1239,72 @@ class Pipeliner(object):
     def replaceDataByUI(self, *args):
         """ Read the dpReplaceDPDataWindow UI to get the active checkBoxes in order to return it in a list.
         """
-        self.dpDataToReplaceList = []
-        for item in self.existDataList:
+        self.to_replace_datas = []
+        for item in self.ios:
             if cmds.checkBox(item+"CB", query=True, value=True):
-                self.dpDataToReplaceList.append(item)
-        if self.dpDataToReplaceList:
-            self.runReplaceData()
+                self.to_replace_datas.append(item)
+        if self.to_replace_datas:
+            self.replace_data()
             self.ar.utils.close_ui("dpReplaceDPDataWindow")
         
 
-    def runReplaceData(self, path=None, toReplaceList=None, *args):
+    def replace_data(self, path=None, to_replace_items=None):
         """ Replace the dpData sub_folder with the given arguments.
         """
         if not path:
-            path = self.pathToReplaceFrom
-        if not toReplaceList:
-            toReplaceList = self.dpDataToReplaceList
-        if path and toReplaceList:
-            for toReplace in toReplaceList:
-                sourcePath = path+"/"+self.pipe_data['s_'+toReplace]
-                destPath = self.pipe_data['assetPath']+"/"+self.pipe_data['s_'+toReplace]
-                if os.path.exists(sourcePath):
-                    if os.path.exists(destPath):
-                        for destFile in next(os.walk(destPath))[2]:
+            path = self.path_to_replace_from
+        if not to_replace_items:
+            to_replace_items = self.to_replace_datas
+        if path and to_replace_items:
+            for item in to_replace_items:
+                source_path = path+"/"+self.pipe_data['s_'+item]
+                dest_path = self.pipe_data['assetPath']+"/"+self.pipe_data['s_'+item]
+                if os.path.exists(source_path):
+                    if os.path.exists(dest_path):
+                        for dest_file in next(os.walk(dest_path))[2]:
                             try:
-                                os.remove(destPath+"/"+destFile)
+                                os.remove(dest_path+"/"+dest_file)
                             except PermissionError as exc:
                                 # use a brute force to delete without permission:
-                                os.chmod(destPath+"/"+destFile, stat.S_IWUSR)
-                                os.remove(destPath+"/"+destFile)
+                                os.chmod(dest_path+"/"+dest_file, stat.S_IWUSR)
+                                os.remove(dest_path+"/"+dest_file)
                     else:
-                        self.make_dir_if_not_exists(destPath)
-                    sourceItem = next(os.walk(sourcePath))[2][-1]
-                    ext = sourceItem[sourceItem.rfind("."):]
-                    prefix = sourceItem[:sourceItem.find("_")+1]
-                    destItem = destPath+"/"+prefix+self.pipe_data['assetName']+self.pipe_data['s_model']+"0".zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+"0".zfill(self.pipe_data['i_padding'])+ext
-                    shutil.copy2(sourcePath+"/"+sourceItem, destItem)
+                        self.make_dir_if_not_exists(dest_path)
+                    source_item = next(os.walk(source_path))[2][-1]
+                    ext = source_item[source_item.rfind("."):]
+                    prefix = source_item[:source_item.find("_")+1]
+                    dest_item = dest_path+"/"+prefix+self.pipe_data['assetName']+self.pipe_data['s_model']+"0".zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+"0".zfill(self.pipe_data['i_padding'])+ext
+                    shutil.copy2(source_path+"/"+source_item, dest_item)
             # Concatenate done message
-            sucessMessageText = self.ar.data.lang['r068_replacedDataSuccess']+"\n\n"+self.ar.data.lang['i036_from']+": "+path+"\n"+self.ar.data.lang['i037_to']+": "+self.pipe_data['assetName']+"\n\n"+" \n".join(toReplaceList)
-            cmds.confirmDialog(title="dpAutoRigSystem", message=sucessMessageText, button="Ok")
+            sucess_message_text = self.ar.data.lang['r068_replacedDataSuccess']+"\n\n"+self.ar.data.lang['i036_from']+": "+path+"\n"+self.ar.data.lang['i037_to']+": "+self.pipe_data['assetName']+"\n\n"+" \n".join(to_replace_items)
+            cmds.confirmDialog(title="dpAutoRigSystem", message=sucess_message_text, button="Ok")
 
 
-    def userSaveThisScene(self, mustSaveIt=True, *args):
+    def confirm_save_this_scene(self, must_save_it=True, *args):
         """ Open a confirmDialog to user save or save as this file.
             Return the saved file path or False if canceled.
-            If not mustSaveIt, the user can choose continue without saving, them it'll return True.
+            If not must_save_it, the user can choose continue without saving, them it'll return True.
         """
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        saveName = self.ar.data.lang['i222_save']
-        saveAsName = self.ar.data.lang['i223_saveAs']
-        cancelName = self.ar.data.lang['i132_cancel']
-        continueName = self.ar.data.lang['i174_continue']
-        if mustSaveIt:
-            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+        short_name = cmds.file(query=True, sceneName=True, shortName=True)
+        save_name = self.ar.data.lang['i222_save']
+        save_as_name = self.ar.data.lang['i223_saveAs']
+        cancel_name = self.ar.data.lang['i132_cancel']
+        continue_name = self.ar.data.lang['i174_continue']
+        if must_save_it:
+            confirm_result = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[save_name, save_as_name, cancel_name], defaultButton=save_name, cancelButton=cancel_name, dismissString=cancel_name)
         else:
-            confirmResult = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName, continueName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
-        if confirmResult == cancelName:
+            confirm_result = cmds.confirmDialog(title="dpAutoRigSystem - Pipeliner "+str(self.ar.data.version), message=self.ar.data.lang['i201_saveScene'], button=[save_name, save_as_name, cancel_name, continue_name], defaultButton=save_name, cancelButton=cancel_name, dismissString=cancel_name)
+        if confirm_result == cancel_name:
             return False
-        if confirmResult == continueName:
+        if confirm_result == continue_name:
             return True
         else:
-            if not shortName or confirmResult == saveAsName: #untitled or saveAs
-                newNameList = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
-                if newNameList:
-                    newName = newNameList[0]
-                    ext = self.ar.publisher.getFileTypeByExtension(newName)
-                    cmds.file(rename=newName)
+            if not short_name or confirm_result == save_as_name: #untitled or saveAs
+                new_names = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
+                if new_names:
+                    new_name = new_names[0]
+                    ext = self.ar.publisher.get_file_type_by_extension(new_name)
+                    cmds.file(rename=new_name)
                     return cmds.file(save=True, type=ext)
                 else:
                     return False

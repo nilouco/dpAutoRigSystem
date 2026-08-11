@@ -70,7 +70,7 @@ class CorrectionManager(base.BaseLibrary):
         correctionManagerLayout = cmds.columnLayout('correctionManagerLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text("infoTxt", label=self.ar.data.lang['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent=correctionManagerLayout)
         correctionManagerLayoutA = cmds.rowColumnLayout('correctionManagerLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=correctionManagerLayout)
-        self.createBT = cmds.button('createBT', label=self.ar.data.lang['i158_create'], command=partial(self.createCorrectionManager, fromUI=True), backgroundColor=(0.7, 1.0, 0.7), parent=correctionManagerLayoutA)
+        self.createBT = cmds.button('createBT', label=self.ar.data.lang['i158_create'], command=partial(self.createCorrectionManager, from_ui=True), backgroundColor=(0.7, 1.0, 0.7), parent=correctionManagerLayoutA)
         self.createTF = cmds.textField('createTF', editable=True, parent=correctionManagerLayoutA)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         refreshLayout = cmds.rowColumnLayout('refreshLayoutA', numberOfColumns=4, columnWidth=[(1, 50), (2, 150), (2, 100), (3, 80)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'both', 10), (2, 'left', 0), (3, 'left', 10), (4, 'left', 90)], parent=correctionManagerLayout)
@@ -372,7 +372,7 @@ class CorrectionManager(base.BaseLibrary):
             mel.eval('warning \"'+toAttach+' '+self.ar.data.lang['i061_notExists']+'\";')
 
 
-    def createCorrectionManager(self, nodes=None, name=None, correctType=None, toRivet=False, fromUI=False, *args):
+    def createCorrectionManager(self, nodes=None, name=None, correctType=None, toRivet=False, from_ui=False, *args):
         """ Create nodes to calculate the correction we want to mapper fix.
             Returns the created network node.
         """
@@ -415,7 +415,7 @@ class CorrectionManager(base.BaseLibrary):
                             correctType = self.angleName
 
                     # rivet
-                    if fromUI:
+                    if from_ui:
                         toRivet = cmds.checkBox(self.rivetCB, query=True, value=True)
                     if toRivet:
                         self.dpRivetInst = rivet.Rivet(self.ar)

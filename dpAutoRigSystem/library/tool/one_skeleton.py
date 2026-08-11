@@ -142,7 +142,7 @@ class OneSkeleton(base.BaseLibrary):
         """
         scale_constraints = []
         newJointList = []
-        self.ar.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(sourceList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(sourceList), add_one=False, add_number=False)
         for sourceNode in sourceList:
             self.ar.utils.setProgress("Joint")
             cmds.select(clear=True)

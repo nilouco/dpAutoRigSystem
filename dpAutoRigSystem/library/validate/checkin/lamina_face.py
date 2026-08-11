@@ -39,7 +39,7 @@ class LaminaFace(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="mesh")
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
                 laminaObjList, laminaFaceList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)

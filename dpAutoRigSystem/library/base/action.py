@@ -88,7 +88,7 @@ class BaseAction(base.BaseLibrary):
         """
         print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.get_title()} IO")
         if self.verbose:
-            self.ar.utils.setProgress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
         # redeclare variables
         self.ar.data.rebuilding = rebuilding
         self.checked_items = []
@@ -399,8 +399,8 @@ class BaseAction(base.BaseLibrary):
         if not check_items:
             check_items = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
         if check_items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], addOne=False, addNumber=False)
-            self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
+            self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
             filtered_items = self.ar.utils.filterTransformList(check_items, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
             if filtered_items:
                 for item in filtered_items:
@@ -482,7 +482,7 @@ class BaseAction(base.BaseLibrary):
         """
         self.latest_data_file = None
         if exported_items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title], addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang[self.title], add_one=False, add_number=False)
             try:
                 # import alembic
                 exported_items.sort()
@@ -622,7 +622,7 @@ class BaseAction(base.BaseLibrary):
         #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
         #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
         #            }
-        self.ar.utils.setProgress(max=len(constraints), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(constraints), add_one=False, add_number=False)
         for const in constraints:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=const, exists=True):
@@ -666,7 +666,7 @@ class BaseAction(base.BaseLibrary):
         """ Import constraints from exported dictionary.
             Create missing constraints and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(constraint_data.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(constraint_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in constraint_data.keys():

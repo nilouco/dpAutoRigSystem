@@ -76,7 +76,7 @@ class ChannelIO(action.BaseAction):
             Returns the dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
@@ -94,7 +94,7 @@ class ChannelIO(action.BaseAction):
         """ Import tranform attributes states from exported dictionary.
             Just set them as locked, hidden, non keyable or not.
         """
-        self.ar.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(attrDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         for item in attrDic.keys():

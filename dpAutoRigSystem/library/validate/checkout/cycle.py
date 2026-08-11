@@ -32,7 +32,7 @@ class Cycle(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            self.ar.utils.setProgress(max=1, addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=1, add_one=False, add_number=False)
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             cycles = None
             if objList:

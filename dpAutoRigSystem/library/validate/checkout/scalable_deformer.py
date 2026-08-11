@@ -40,7 +40,7 @@ class ScalableDeformer(action.BaseAction):
             if check_items:
                 optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
                 if optionCtrl:
-                    self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                     rigScaleOutput = [optionCtrl+"."+self.rigScaleOutputAttr]
                     itemAttrToFixList = []
                     for node in check_items:

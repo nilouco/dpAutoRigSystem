@@ -1371,7 +1371,7 @@ class Utils(object):
         return str("".join([n for n in plug.split(".")[0] if n.isupper() or n.isnumeric()])+plug.split(".")[1].replace("[", "").replace("]", ""))
 
 
-    def setProgress(self, message="Rigging...", header="dpAutoRigSystem", max=100, amount=0, addOne=True, addNumber=True, endIt=False, isInterruptable=False, *args):
+    def setProgress(self, message="Rigging...", header="dpAutoRigSystem", max=100, amount=0, add_one=True, add_number=True, endIt=False, isInterruptable=False, *args):
         """ Centralize the progressWindow calling in one method.
             Try to use the cmds.progressWindow as a more automate process.
             
@@ -1380,13 +1380,13 @@ class Utils(object):
                 header = tittle
                 max = maxValue
                 amount = progress
-                addOne = increment amount plus 1
-                addNumber = add amount to the end of the message string
+                add_one = increment amount plus 1
+                add_number = add amount to the end of the message string
                 endIt = end progress
                 isInterruptable = if we can interrupt the process or not. False by default.
 
             Example:
-                self.ar.utils.setProgress(messageName, titleName, 20, addOne=False)
+                self.ar.utils.setProgress(messageName, titleName, 20, add_one=False)
                 self.ar.utils.setProgress(doingName+': '+backWheelName)
 
             Returns the progress: 
@@ -1398,7 +1398,7 @@ class Utils(object):
             self.progress = False
         else:
             if self.progress: #edit
-                if addOne:
+                if add_one:
                     self.currentAmount += 1
                 else:
                     self.currentAmount = amount
@@ -1406,7 +1406,7 @@ class Utils(object):
                     if max > 0:
                         cmds.progressWindow(edit=True, maxValue=max, progress=0)
                 else:
-                    if addNumber:
+                    if add_number:
                         message = message+" # "+str(self.currentAmount)
                     cmds.progressWindow(edit=True, progress=self.currentAmount, status=message)
             else: #create

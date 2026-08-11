@@ -38,7 +38,7 @@ class SideCalibration(action.BaseAction):
                 check_items = self.ar.ctrls.getControlList()
             if check_items:
                 pairDic = {}
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here

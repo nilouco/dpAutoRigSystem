@@ -55,7 +55,7 @@ class GeometryHistory(action.BaseAction):
                         # Get shortName to better reading in display log
                         geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
                     if geoToCleanList:
-                        self.ar.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(geoToCleanList), add_one=False, add_number=False)
                         for geo in geoToCleanList:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):

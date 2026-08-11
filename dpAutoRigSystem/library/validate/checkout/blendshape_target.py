@@ -42,7 +42,7 @@ class BlendshapeTarget(action.BaseAction):
                 if meshList:
                     check_items = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 # get exception list to keep nodes in the scene
                 deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
                 exceptionList = self.keepGrp(["supportGrp", "renderGrp", "proxyGrp"])

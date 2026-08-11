@@ -1120,7 +1120,7 @@ class Controllers(object):
         importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.ar.data.lang['i196_import']+" "+self.ar.data.lang['i193_calibration'])
         if not importCalibrationPath:
             return
-        self.ar.utils.setProgress(self.ar.data.lang['i214_refFile'], importCalibrationNamespace, addOne=False)
+        self.ar.utils.setProgress(self.ar.data.lang['i214_refFile'], importCalibrationNamespace, add_one=False)
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
@@ -1128,8 +1128,8 @@ class Controllers(object):
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
             for item in refNodeList:
-                self.ar.utils.setProgress(max=len(refNodeList), addOne=False, addNumber=False)
-                self.ar.utils.setProgress(self.ar.data.lang['i215_setAttr'], addOne=True)
+                self.ar.utils.setProgress(max=len(refNodeList), add_one=False, add_number=False)
+                self.ar.utils.setProgress(self.ar.data.lang['i215_setAttr'], add_one=True)
                 if "calibrationList" in cmds.listAttr(item):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
@@ -1268,7 +1268,7 @@ class Controllers(object):
                         path = pathList[0] 
             if path:
                 if ui:
-                    self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), add_one=False, add_number=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1360,7 +1360,7 @@ class Controllers(object):
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
                         if ui:
-                            self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(refNodeList), addOne=False, addNumber=False)
+                            self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(refNodeList), add_one=False, add_number=False)
                         for sourceRefNode in refNodeList:
                             if ui or verbose:
                                 self.ar.utils.setProgress(self.doingName+': Shape')
@@ -1490,7 +1490,7 @@ class Controllers(object):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
-                            self.ar.utils.setProgress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(allNodeList), addOne=False, addNumber=False)
+                            self.ar.utils.setProgress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(allNodeList), add_one=False, add_number=False)
                             for node in allNodeList:
                                 if node in allControlList:
                                     self.ar.utils.setProgress(self.ar.data.lang['m067_shape']+": "+node)

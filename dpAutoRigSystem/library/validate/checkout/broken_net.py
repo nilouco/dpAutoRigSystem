@@ -37,7 +37,7 @@ class BrokenNet(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type='network')
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional to check here

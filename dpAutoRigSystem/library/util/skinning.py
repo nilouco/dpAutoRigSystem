@@ -127,7 +127,7 @@ class Skinning(weights.Weights):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
-        self.ar.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinations), addOne=False, addNumber=False)
+        self.ar.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinations), add_one=False, add_number=False)
         for sourceItem in sourceList:
             self.ar.utils.setProgress("Skinning: ")
             if oneSource:
@@ -317,7 +317,7 @@ class Skinning(weights.Weights):
     def getSkinWeightData(self, items, *args):
         """ Return the the skinCluster weights data of the given item list.
         """
-        self.ar.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ioStartName+': '+self.ar.data.lang['c110_start'], self.ioStartName, len(items), add_one=False, add_number=False)
         skinWeightsDic = {}
         for item in items:
             self.ar.utils.setProgress('SkinningIO: '+item)
@@ -385,7 +385,7 @@ class Skinning(weights.Weights):
     def importSkinWeightsFromFile(self, items, path, filename, verbose=True, *args):
         """ Import the skinCluster weights of the given item in the given path and filename.
         """
-        self.ar.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ioStartName+": "+self.ar.data.lang['c110_start'], self.ioStartName, len(items), add_one=False, add_number=False)
         skinWeightDic = self.ar.pipeliner.get_json_content(path+"/"+filename)
         if skinWeightDic:
             for item in items:

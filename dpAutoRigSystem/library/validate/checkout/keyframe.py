@@ -46,7 +46,7 @@ class Keyframe(action.BaseAction):
                         if connectionList and not connectionList[0] in animatedList:
                             animatedList.append(connectionList[0])
                     if animatedList:
-                        self.ar.utils.setProgress(max=len(animatedList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(animatedList), add_one=False, add_number=False)
                         for item in animatedList:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if item in check_items:

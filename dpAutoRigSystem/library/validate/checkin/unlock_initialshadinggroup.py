@@ -37,7 +37,7 @@ class UnlockInitialshadinggroup(action.BaseAction):
             else:
                 check_items = ["initialShadingGroup"]
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):

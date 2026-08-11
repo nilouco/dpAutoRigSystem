@@ -75,7 +75,7 @@ class InputOrderIO(action.BaseAction):
         """ Return the deformer order data dictionary to export.
         """
         orderDic = {}
-        self.ar.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(deformedList), add_one=False, add_number=False)
         for item in deformedList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             orderDic[item] = self.ar.skin.getOrderList(item)
@@ -85,7 +85,7 @@ class InputOrderIO(action.BaseAction):
     def importInputOrder(self, orderDic, *args):
         """ Import the input order data from given dictionary.
         """
-        self.ar.utils.setProgress(max=len(orderDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(orderDic.keys()), add_one=False, add_number=False)
         wellImported = True
         toImportList, notFoundMeshList, = [], []
         for item in orderDic.keys():

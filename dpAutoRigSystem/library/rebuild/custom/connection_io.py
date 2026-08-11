@@ -78,7 +78,7 @@ class ConnectionIO(action.BaseAction):
             Returns a dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
@@ -152,7 +152,7 @@ class ConnectionIO(action.BaseAction):
         """ Return the connection data from given utility nodes list.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
@@ -181,7 +181,7 @@ class ConnectionIO(action.BaseAction):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.ar.utils.setProgress(max=len(connectDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(connectDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         for item in connectDic.keys():

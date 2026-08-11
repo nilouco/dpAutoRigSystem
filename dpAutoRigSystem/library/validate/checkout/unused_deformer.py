@@ -44,7 +44,7 @@ class UnusedDeformer(action.BaseAction):
                 check_items = deformerList.copy()
                 check_items.extend(intermedList.copy())
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 if deformerList:
                     for defNode in deformerList:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])

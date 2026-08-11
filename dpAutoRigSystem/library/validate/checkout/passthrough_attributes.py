@@ -43,9 +43,9 @@ class PassthroughAttributes(action.BaseAction):
                 check_items = cmds.ls(selection=False) #all
             if check_items:
                 if self.first_mode:
-                    self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 else:
-                    self.ar.utils.setProgress(max=len(check_items)*2, addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(check_items)*2, add_one=False, add_number=False)
                 toOptimizeList = []
                 for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])

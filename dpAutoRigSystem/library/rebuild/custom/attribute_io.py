@@ -83,7 +83,7 @@ class AttributeIO(action.BaseAction):
         """
         dic = {}
         items = objList.copy()
-        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for node in objList:
             meshList = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
             if meshList:
@@ -124,7 +124,7 @@ class AttributeIO(action.BaseAction):
         """ Import attributes from exported dictionary.
             Add missing attributes and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(attrDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         for item in attrDic.keys():

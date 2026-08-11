@@ -56,7 +56,7 @@ class Envelope(action.BaseAction):
             allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
             self.checked_items.extend(allValidEnvelopeNodes)
             if self.checked_items:
-                self.ar.utils.setProgress(max=len(self.checked_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(self.checked_items), add_one=False, add_number=False)
 
                 for node in self.checked_items:
                     self.found_issues.append(self.verifyEnvelope(node))

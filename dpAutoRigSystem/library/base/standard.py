@@ -257,7 +257,7 @@ class BaseStandard(base.BaseLibrary):
         if not cmds.objExists(ctrl+"."+self.ar.data.lang['c124_corrective']):
             cmds.addAttr(ctrl, longName=self.ar.data.lang['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # corrective network node
-        net = self.correction_manager.createCorrectionManager([first_node, second_node], name=net_name, correctType=self.correction_manager.angleName, toRivet=False, fromUI=False)
+        net = self.correction_manager.createCorrectionManager([first_node, second_node], name=net_name, correctType=self.correction_manager.angleName, toRivet=False, from_ui=False)
         cmds.connectAttr(ctrl+"."+self.ar.data.lang['c124_corrective'], net+".corrective", force=True)
         cmds.setAttr(net+".axis", axis)
         cmds.setAttr(net+".axisOrder", axis_order)

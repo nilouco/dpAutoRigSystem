@@ -39,7 +39,7 @@ class InvertedNormals(action.BaseAction):
             else:
                 objMeshList = cmds.ls(selection=False, type='mesh')
             if objMeshList:
-                self.ar.utils.setProgress(max=len(objMeshList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(objMeshList), add_one=False, add_number=False)
                 geomIter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kMesh)
                 while not geomIter.isDone():
                     nextGeom = False

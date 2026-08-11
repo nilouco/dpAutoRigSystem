@@ -37,7 +37,7 @@ class IntermediateObject(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="mesh", intermediateObjects=True) #all intermediateObject meshes in the scene
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     self.checked_items.append(item)

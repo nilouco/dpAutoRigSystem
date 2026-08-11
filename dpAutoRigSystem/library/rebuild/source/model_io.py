@@ -47,7 +47,7 @@ class ModelIO(action.BaseAction):
                             else:
                                 meshList = self.ar.utils.filterTransformList(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
                             if meshList:
-                                self.ar.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
+                                self.ar.utils.setProgress(max=len(meshList), add_one=False, add_number=False)
                                 constraintDataDic = self.remove_constraints(meshList)
                                 self.export_alembic_file(meshList)
                                 if constraintDataDic:

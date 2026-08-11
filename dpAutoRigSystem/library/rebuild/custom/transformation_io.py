@@ -74,7 +74,7 @@ class TransformationIO(action.BaseAction):
     def getTransformDataDic(self, items, *args):
         """ Return the transform data info to export.
         """
-        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         # define dictionary to export
         transformDic = {}
         items = self.ar.utils.filterTransformList(items, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
@@ -154,7 +154,7 @@ class TransformationIO(action.BaseAction):
     def importTransformation(self, transformDic, *args):
         """ Import transfomation data from given dictionary.
         """
-        self.ar.utils.setProgress(max=len(transformDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(transformDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         for item in transformDic.keys():

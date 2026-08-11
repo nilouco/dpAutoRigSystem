@@ -76,7 +76,7 @@ class RenameIO(action.BaseAction):
             Returns the dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
@@ -88,7 +88,7 @@ class RenameIO(action.BaseAction):
         """ Import data from exported dictionary.
             Check if nodes exist in the scene, otherwise try to find in the dpID if it was probably renamed.
         """
-        self.ar.utils.setProgress(max=len(nodeIDDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(nodeIDDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         notFoundNodesList = []

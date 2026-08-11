@@ -95,7 +95,7 @@ class ShaderIO(action.BaseAction):
         """ Return shader data dictionary to export.
         """
         shaderDic = {}
-        self.ar.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(shaderList), add_one=False, add_number=False)
         for shader in shaderList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+shader)
             fileNode = None

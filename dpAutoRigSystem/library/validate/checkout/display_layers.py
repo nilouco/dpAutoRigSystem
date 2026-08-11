@@ -172,7 +172,7 @@ class DisplayLayers(action.BaseAction):
             If it's not a list it will append the obj and run the main function.
         """
         if items:
-            self.ar.utils.setProgress(max=len(items), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
             for i, item in enumerate(items):
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 if self.first_mode:

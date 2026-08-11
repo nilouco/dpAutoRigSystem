@@ -41,7 +41,7 @@ class Outliner(action.BaseAction):
             if not objList:
                 objList = cmds.ls(selection=False, type="transform")
             if objList:
-                self.ar.utils.setProgress(max=len(hiddenList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(hiddenList), add_one=False, add_number=False)
                 for item in hiddenList:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     if item in objList:

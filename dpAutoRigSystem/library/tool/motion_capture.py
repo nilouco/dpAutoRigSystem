@@ -476,7 +476,7 @@ class MotionCapture(base.BaseLibrary):
         """
         if self.ar.data.ui_state:
             rib = cmds.checkBox(self.mapRibbonCB, query=True, value=True)
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], addOne=False, addNumber=False, max=8)
+        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=8)
         self.hikCreateCharacterDefinition()
         self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hikAssignJointsToDefinition(rib)
@@ -940,7 +940,7 @@ for hik in cmds.ls(type="HIKCharacterNode"):
                     startFrame = int(cmds.playbackOptions(query=True, minTime=True))
                 if end == None:
                     endFrame = int(cmds.playbackOptions(query=True, maxTime=True))
-                self.ar.utils.setProgress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], addOne=False, addNumber=False, max=(endFrame-startFrame))
+                self.ar.utils.setProgress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(endFrame-startFrame))
                 initialTime = cmds.currentTime(query=True)
                 for t in range(startFrame, endFrame+1):
                     self.ar.utils.setProgress("Timeline")

@@ -38,7 +38,7 @@ class Cleanup(action.BaseAction):
             else:
                 check_items = cmds.ls() #all
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     if cmds.objExists(item):
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])

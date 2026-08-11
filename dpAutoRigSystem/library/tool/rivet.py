@@ -192,7 +192,7 @@ class Rivet(base.BaseLibrary):
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(trueIndexList), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(trueIndexList), add_one=False, add_number=False)
             self.removeRivetFromList(trueIndexList, selectionList)
             self.checkRivetGrp()
             self.ar.utils.setProgress(endIt=True)
@@ -374,7 +374,7 @@ class Rivet(base.BaseLibrary):
                 removeExistingRivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
                 if removeExistingRivet == self.ar.data.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(needToRemoveList), add_one=False, add_number=False)
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
                     self.ar.utils.setProgress(endIt=True)
                 elif removeExistingRivet == self.ar.data.lang['i072_no']:
@@ -383,7 +383,7 @@ class Rivet(base.BaseLibrary):
                     return
 
         # call run function to create Rivet setup using UI values
-        self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), add_one=False, add_number=False)
         self.dpCreateRivet(geoToAttach, uvSet, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.ar.utils.setProgress(endIt=True)
         self.ar.utils.close_ui('dpRivetWindow')

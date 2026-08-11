@@ -181,7 +181,7 @@ class TargetMirror(base.BaseLibrary):
             # get target list:
             targetList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
             if targetList:
-                self.ar.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
+                self.ar.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targetList), add_one=False, add_number=False)
                 cancelled = False
                 self.to_ids = []
                 # get mirror information from UI

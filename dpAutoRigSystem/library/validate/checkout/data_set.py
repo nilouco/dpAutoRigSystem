@@ -42,7 +42,7 @@ class DataSet(action.BaseAction):
             if dataGrp:
                 check_items = cmds.listRelatives(dataGrp, children=True, allDescendents=True)
                 if check_items:
-                    self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                     for item in check_items:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         plugList = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)

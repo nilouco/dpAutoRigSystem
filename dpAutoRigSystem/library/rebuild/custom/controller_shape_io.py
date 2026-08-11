@@ -44,7 +44,7 @@ class ControllerShapeIO(action.BaseAction):
                     else:
                         ctrlList = self.ar.ctrls.getControlList()
                     if ctrlList:
-                        self.ar.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(ctrlList), add_one=False, add_number=False)
                         if self.first_mode: #export
                             try:
                                 self.ar.pipeliner.make_dir_if_not_exists(self.io_path)

@@ -40,7 +40,7 @@ class NonManifold(action.BaseAction):
                     else:
                         geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.get_mesh_transforms()))), long=False)
                     if geoToCleanList:
-                        self.ar.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(geoToCleanList), add_one=False, add_number=False)
                         for geo in geoToCleanList:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):

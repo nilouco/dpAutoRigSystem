@@ -90,7 +90,7 @@ class BlendshapeIO(action.BaseAction):
         """ Return the blendShape data dictionary to export info.
         """
         bsDic = {}
-        self.ar.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(bsList), add_one=False, add_number=False)
         for bsNode in bsList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+bsNode)
             bsDic[bsNode] = {}

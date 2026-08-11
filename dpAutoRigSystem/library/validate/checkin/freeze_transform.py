@@ -42,7 +42,7 @@ class FreezeTransform(action.BaseAction):
                         allObjectList = cmds.ls(selection=False, type='transform', long=True)
                     # analisys transformations
                     if len(allObjectList) > 0:
-                        self.ar.utils.setProgress(max=len(allObjectList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(allObjectList), add_one=False, add_number=False)
                         self.animCurvesList = cmds.ls(type='animCurve')
                         zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
                         oneAttrList = ['scaleX', 'scaleY', 'scaleZ']

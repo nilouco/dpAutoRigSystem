@@ -533,7 +533,7 @@ class UpdateGuides(base.BaseLibrary):
         """
         self.ar.utils.close_ui('updateGuidesWindow')
         # Starts progress bar feedback
-        self.ar.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, addOne=False)
+        self.ar.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
         self.ar.utils.setProgress(self.ar.data.lang['m199_creatingNewGuides'])

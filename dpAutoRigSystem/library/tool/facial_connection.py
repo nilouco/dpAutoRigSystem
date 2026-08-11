@@ -633,7 +633,7 @@ class FacialConnection(base.BaseLibrary):
                     if targetList:
                         # progress window
                         progressAmount = 0
-                        self.ar.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targetList), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targetList), add_one=False, add_number=False)
                         cancelled = False
                         nbTarget = len(targetList)
                         reconnectList = []

@@ -38,7 +38,7 @@ class BindPose(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="dagPose") #bindPose nodes
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 # conditional to check here
                 if len(check_items) > 1:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])

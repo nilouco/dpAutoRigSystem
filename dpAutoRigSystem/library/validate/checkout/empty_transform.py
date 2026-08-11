@@ -37,7 +37,7 @@ class EmptyTransform(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 emptyTransformList = self.filterEmptyTransformList(check_items)
                 emptyTransformList.extend(self.filterEmptyTransformList(self.getIgnoreConnected(), True))
                 # conditional to check here

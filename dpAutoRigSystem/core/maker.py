@@ -98,7 +98,7 @@ class Maker(object):
         """
         # Duplicating a module guide
         print(self.ar.data.lang['i067_duplicating'])
-        self.ar.utils.setProgress("dpAutoRigSystem", self.ar.data.lang['i067_duplicating'], max=3, addOne=False, addNumber=False)
+        self.ar.utils.setProgress("dpAutoRigSystem", self.ar.data.lang['i067_duplicating'], max=3, add_one=False, add_number=False)
         # declaring variables
         segments_attr = "nJoints"
         custom_name_attr = "customName"
@@ -476,7 +476,7 @@ class Maker(object):
                 reorder_attr = self.ar.config.get_instance("ReorderAttr", [self.ar.data.tools_folder])
                 if reorder_attr:
                     if verbose and not self.ar.data.rebuilding:
-                        self.ar.utils.setProgress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrs), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrs), add_one=False, add_number=False)
                     delta = 0
                     for i, attr in enumerate(attrs):
                         if verbose:
@@ -497,7 +497,7 @@ class Maker(object):
         if not self.ar.data.rebuilding:
             print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
-        self.ar.utils.setProgress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
+        self.ar.utils.setProgress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', add_one=False, add_number=False)
         self.ar.utils.close_ui(self.ar.data.plus_info_win_name)
         self.ar.utils.close_ui(self.ar.data.color_override_win_name)
 
@@ -773,7 +773,7 @@ class Maker(object):
         self.refresh_before_build()
         self.guides_to_rig = self.ar.utils.get_guides_to_rig()
         if self.guides_to_rig:
-            self.ar.utils.setProgress(max=len(self.guides_to_rig), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(self.guides_to_rig), add_one=False, add_number=False)
             if not self.check_good_guide_version(self.guides_to_rig):
                 return
             if self.ar.data.compose_all:

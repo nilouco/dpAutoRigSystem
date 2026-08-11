@@ -76,7 +76,7 @@ class CalibrationIO(action.BaseAction):
             Returns the dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(ctrlList), add_one=False, add_number=False)
         for ctrl in ctrlList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             calibrationList = self.ar.ctrls.getListFromStringAttr(ctrl)
@@ -90,7 +90,7 @@ class CalibrationIO(action.BaseAction):
     def importCalibrationData(self, calibrationDic, *args):
         """ Import the calibration setup from the given calibration data dictionary.
         """
-        self.ar.utils.setProgress(max=len(calibrationDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(calibrationDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         for item in calibrationDic.keys():

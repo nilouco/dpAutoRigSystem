@@ -39,7 +39,7 @@ class UnlockAttributes(action.BaseAction):
                         nodes = objList
                     if nodes:
                         lockedAttrDic = {}
-                        self.ar.utils.setProgress(max=len(nodes), addOne=False, addNumber=False)
+                        self.ar.utils.setProgress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             lockedAttrList = cmds.listAttr(item, locked=True)

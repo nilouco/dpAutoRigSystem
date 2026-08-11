@@ -41,7 +41,7 @@ class Wip(action.BaseAction):
                     if cmds.objExists("WIP_Grp"):
                         wipGrp = "WIP_Grp"
             if wipGrp:
-                self.ar.utils.setProgress(max=len(wipGrp), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(wipGrp), add_one=False, add_number=False)
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 self.checked_items.append(wipGrp)
                 wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)

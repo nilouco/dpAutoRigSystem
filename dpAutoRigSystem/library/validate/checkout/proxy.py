@@ -67,7 +67,7 @@ class Proxy(action.BaseAction):
                                             if not PROXIED in cmds.listAttr(meshTransform):
                                                 toProxyList.append(meshTransform[0])
                         if toProxyList:
-                            self.ar.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
+                            self.ar.utils.setProgress(max=len(toProxyList), add_one=False, add_number=False)
                             self.checked_items.append(proxyGrp)
                             self.found_issues.append(True)
                             if self.first_mode:

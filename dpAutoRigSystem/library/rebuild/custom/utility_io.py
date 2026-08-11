@@ -76,7 +76,7 @@ class UtilityIO(action.BaseAction):
             Returns the dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(utilityList), add_one=False, add_number=False)
         for item in utilityList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
@@ -113,7 +113,7 @@ class UtilityIO(action.BaseAction):
         """ Import utility nodes from exported dictionary.
             Create missing utility nodes and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(utilityDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(utilityDic.keys()), add_one=False, add_number=False)
         # define lists to check result
         wellImportedList = []
         for item in utilityDic.keys():

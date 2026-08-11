@@ -45,7 +45,7 @@ class ParentingIO(action.BaseAction):
                         else:
                             transformList = cmds.ls(selection=False, long=True, type="transform")
                         if transformList:
-                            self.ar.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
+                            self.ar.utils.setProgress(max=len(transformList), add_one=False, add_number=False)
                             # define data to export
                             parentDic = self.getParentingDataDic(transformList)
                             parentDic.update(self.get_broken_id_data())
@@ -106,7 +106,7 @@ class ParentingIO(action.BaseAction):
             Return True if there are broken nodes.
         """
         if "BrokenID" in parentDic.keys():
-            self.ar.utils.setProgress(max=len(parentDic["BrokenID"]), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(parentDic["BrokenID"]), add_one=False, add_number=False)
             for nodeType in parentDic["BrokenID"].keys():
                 if nodeType == "transform":
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
@@ -125,7 +125,7 @@ class ParentingIO(action.BaseAction):
         """ Import parenting data and put the nodes as the correct hierarchy if needed.
         """
         if not self.getParentingDataDic()["Parent"] == parentDic["Parent"]:
-            self.ar.utils.setProgress(max=len(parentDic["Parent"]), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(parentDic["Parent"]), add_one=False, add_number=False)
             # define lists to check result
             wellImportedList = []
             parentIssueList = []

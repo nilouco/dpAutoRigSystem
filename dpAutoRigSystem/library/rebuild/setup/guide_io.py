@@ -111,7 +111,7 @@ class GuideIO(action.BaseAction):
         """ Return a dictionary of the guide data to export it.
         """
         toExportDataDic = {}
-        self.ar.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(netList), add_one=False, add_number=False)
         for net in netList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # mount a dic with all data 
@@ -279,7 +279,7 @@ class GuideIO(action.BaseAction):
         toInitializeGuide = True
         ask_again = True
         self.correlations = {}
-        self.ar.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(guideDic.keys()), add_one=False, add_number=False)
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = True
             self.ar.filler.fill_created_guides()

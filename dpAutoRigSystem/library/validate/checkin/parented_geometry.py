@@ -40,7 +40,7 @@ class ParentedGeometry(action.BaseAction):
                 meshParentList = self.get_mesh_transforms(check_items)
                 if meshParentList:
                     meshParentList = self.reorder_list(meshParentList)
-                    self.ar.utils.setProgress(max=len(meshParentList), addOne=False, addNumber=False)
+                    self.ar.utils.setProgress(max=len(meshParentList), add_one=False, add_number=False)
                     # avoid reporting the same item multiple times
                     for mesh in meshParentList:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])

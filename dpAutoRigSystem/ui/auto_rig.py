@@ -439,7 +439,7 @@ class MainUI(object):
         cmds.textFieldGrp("asset_name_tfg", label=self.ar.data.lang['i303_asset']+":", text=self.ar.pipeliner.pipe_data['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
         # asset buttons
         cmds.rowColumnLayout("asset_buttons_rcl", numberOfColumns=5, columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left"), (5, "left")], columnAttach=[(1, "left", 10), (2, "left", 10), (3, "left", 10), (4, "left", 10), (5, "left", 10)], parent="asset_fl")
-        cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeliner.save_version, parent="asset_buttons_rcl")
+        cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeliner.save_version_ui, parent="asset_buttons_rcl")
         cmds.button("asset_load_bt", label=self.ar.data.lang['i187_load'], command=self.ar.pipeliner.load_asset, parent="asset_buttons_rcl")
         cmds.button("asset_new_bt", label=self.ar.data.lang['i304_new'], command=self.ar.pipeliner.createNewAssetUI, parent="asset_buttons_rcl")
         cmds.button("asset_open_folder_bt", label=self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder'], command=partial(self.ar.packager.open_folder, self.ar.pipeliner.pipe_data['projectPath']), parent="asset_buttons_rcl")

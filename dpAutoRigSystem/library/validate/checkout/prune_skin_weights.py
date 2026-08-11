@@ -39,7 +39,7 @@ class PruneSkinWeights(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type='skinCluster')
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), addOne=False, addNumber=False)
+                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for skinClusterNode in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     meshList = cmds.skinCluster(skinClusterNode, query=True, geometry=True)

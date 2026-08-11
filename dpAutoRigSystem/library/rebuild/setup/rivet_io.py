@@ -84,7 +84,7 @@ class RivetIO(action.BaseAction):
             Returns the dictionary to export.
         """
         dic = {}
-        self.ar.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(netList), add_one=False, add_number=False)
         i = 0
         for n, net in enumerate(netList):
             if self.ar.data.verbose:
@@ -108,7 +108,7 @@ class RivetIO(action.BaseAction):
         """ Import rivet data creating new instances with exported attribute values.
         """
         wellImported = True
-        self.ar.utils.setProgress(max=len(rivetDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(rivetDic.keys()), add_one=False, add_number=False)
         for net in rivetDic.keys():
             try:
                 netDic = rivetDic[net]

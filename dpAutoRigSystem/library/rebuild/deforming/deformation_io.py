@@ -92,7 +92,7 @@ class DeformationIO(action.BaseAction):
     def getDeformerDataDic(self, inputDeformerList, *args):
         """ Return the deformer data dictionary to export.
         """
-        self.ar.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
+        self.ar.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), add_one=False, add_number=False)
         # Declaring the data dictionary to export it
         deformerDic = {}
         # run for all deformer types to get info
@@ -259,7 +259,7 @@ class DeformationIO(action.BaseAction):
                 else:
                     notFoundMeshList.append(deformerNode)
         if toImportList:
-            self.ar.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
+            self.ar.utils.setProgress(max=len(toImportList), add_one=False, add_number=False)
             for deformerNode in toImportList:
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 try:
