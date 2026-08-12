@@ -240,15 +240,11 @@ class Configuration(object):
                 result_value = result_value[0]
         return result_value
 
-        
-    def open_pipeliner(self, *args):
-       print("WIP opening piliener UI", args)
-       self.ar.pipeliner.mainUI(self.ar)
 
-
-    def create_preset(self, preset_type="curve", preset_folder="Modules/Curves/Presets", set_option_var=True, *args):
+    def create_preset(self, preset_type, preset_folder, set_option_var=True, *args):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
+        new_preset = None
         if preset_type == "curve":
             preset_option_var = self.ar.data.curve_option_var
             new_preset = self.ar.ctrls.create_curve_preset()

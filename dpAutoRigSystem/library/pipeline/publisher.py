@@ -51,14 +51,14 @@ class Publisher(object):
             self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.ar.data.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             # buttons
             publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
-            cmds.button(label="Pipeliner", command=partial(self.ar.pipeliner.mainUI, self.ar), parent=publisherBPLayout)
+            cmds.button(label="Pipeliner", command=self.ar.pipeline_ui.create_ui, parent=publisherBPLayout)
             cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.run_diagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
             cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.run_publishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
             cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.load_asset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
-            self.ar.pipeliner.mainUI(self.ar)
+            self.ar.pipeline_ui.create_ui()
             self.ar.utils.close_ui('dpPipelinerWindow')
             self.setPublishFilePath()
 
@@ -347,13 +347,14 @@ class Publisher(object):
         if path:
             published_items, errors = [], []
             if not comments:
-                comments = cmds.textFieldGrp(self.ar.pipeliner.commentBatchTFG, query=True, text=True)
+                comments = cmds.textFieldGrp('comment_batch_tfg', query=True, text=True)
                 if not comments:
                     comments = self.ar.data.lang['m046_publisher']+" v"+str(self.ar.data.version)
             if not comments.endswith(self.ar.data.lang['i358_batch']):
                 comments = self.ar.data.lang['i358_batch']+" - "+comments
             if not assets:
-                assets = [a[a.rfind("|")+1:-2] for a in self.ar.pipeliner.selectedBatchList if cmds.checkBox(a, query=True, value=True)]
+                if self.ar.data.ui_state:
+                    assets = [a[a.rfind("|")+1:-3] for a in self.ar.pipeline_ui.select_asset_checkboxes if cmds.checkBox(a, query=True, value=True)] #removed '_cb'
             if assets:
                 print(self.ar.data.lang['i335_starting']+" "+self.ar.data.lang['i358_batch']+" "+self.ar.data.lang['m046_publisher']+"...")
                 print(self.ar.data.lang['i219_comments']+":", comments)

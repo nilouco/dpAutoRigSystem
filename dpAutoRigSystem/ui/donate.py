@@ -1,5 +1,6 @@
-from functools import partial
+#import libraries
 from maya import cmds
+from functools import partial
 
 
 class DonateUI(object):
@@ -25,7 +26,7 @@ class DonateUI(object):
         cmds.text(win_description, align=win_align, parent="donate_cl")
         cmds.separator(style='none', height=10, parent="donate_cl")
         #brPaypalButton:
-        cmds.button('brlPaypalButton', label=self.ar.data.lang['i167_donate']+" - R$ - Real", align=align, command=partial(self.ar.utils.visitWebSite, self.ar.data.donate_url+"BRL"), parent="donate_cl")
+        cmds.button('brlPaypalButton', label=self.ar.data.lang['i167_donate']+" - R$ - Real", align=win_align, command=partial(self.ar.utils.visitWebSite, self.ar.data.donate_url+"BRL"), parent="donate_cl")
         #usdPaypalButton = cmds.button('usdPaypalButton', label=self.ar.data.lang['i167_donate']+" - USD - Dollar", align=align, command=partial(self.ar.utils.visitWebSite, self.donateURL+"USD"), parent="donate_cl")
         # call Donate Window:
         cmds.showWindow("dpDonateWindow")

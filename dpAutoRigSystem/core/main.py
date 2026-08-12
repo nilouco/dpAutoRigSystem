@@ -45,6 +45,8 @@ from . import job
 from ..ui import auto_rig
 from ..ui import update
 from ..ui import donate
+from ..ui import pipeline
+from ..ui import publish
 from .. import version
 
 
@@ -100,6 +102,8 @@ class Start(object):
             reload(auto_rig)
             reload(update)
             reload(donate)
+            reload(pipeline)
+            reload(publish)
             print("Reloaded imported modules")
 
 
@@ -141,6 +145,8 @@ class Start(object):
         self.auto_rig_ui = auto_rig.MainUI(self)
         self.update_ui = update.UpdateUI(self)
         self.donate_ui = donate.DonateUI(self)
+        self.pipeline_ui = pipeline.PipelineUI(self)
+        self.publish_ui = publish.PublishUI(self)
 
 
     def ui(self):

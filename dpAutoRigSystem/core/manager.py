@@ -121,7 +121,7 @@ class UIManager(object):
                         "dpARLoadWin", 
                         "dpInfoWindow", 
                         "dpNewAssetWindow", 
-                        "dpReplaceDPDataWindow", 
+                        'dpReplaceDPDataWindow', 
                         "dpSelectAssetWindow", 
                         "dpSaveVersionWindow", 
                         "dpTermsCondWindow", 

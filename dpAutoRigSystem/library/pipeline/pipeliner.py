@@ -37,7 +37,7 @@ class Pipeliner(object):
         if not self.ar.data.rebuilding:
             self.pipe_data = self.get_pipeline_data()
             self.get_pipe_filename()
-            self.refresh_project_ui()
+            self.refresh_project()
             self.refresh_asset_name_ui()
         
 
@@ -83,7 +83,7 @@ class Pipeliner(object):
         return False
         
     
-    def update_data_by_json_path(self, json_path):
+    def update_pipe_data_by_json_path(self, json_path):
         """ Read the json file and return the merged pipe_data and it's content if it exists.
         """
         if os.path.exists(json_path):
@@ -97,14 +97,14 @@ class Pipeliner(object):
         """ Load PipelineInfo data and returns it.
         """
         json_info_path = os.path.join(self.pipe_data['path'], self.info_file).replace("\\", "/")
-        return self.update_data_by_json_path(json_info_path)
+        return self.update_pipe_data_by_json_path(json_info_path)
 
 
     def get_hook_info(self):
         """ Load Hook data and returns it.
         """
         json_hook_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hook_file).replace("\\", "/")
-        return self.update_data_by_json_path(json_hook_path)
+        return self.update_pipe_data_by_json_path(json_hook_path)
     
 
     def get_info_by_path(self, field, dependent, path=None):
@@ -145,19 +145,6 @@ class Pipeliner(object):
             self.pipe_data[field] = name
             return self.pipe_data[field]
 
-
-    def getCustomAssetNameInfo(self, asset_name, *args):
-        """ Returns the path content of the custom_asset_name json file if it exists.
-            Otherwise returns the given asset_name.
-        """
-        if asset_name:
-            if os.path.exists(self.pipe_data['path']+"/"+self.custom_asset_name_file):
-                content = self.get_json_content(self.pipe_data['path']+"/"+self.custom_asset_name_file)
-                if content:
-                    if asset_name in list(content.keys()):
-                        return content[asset_name]
-        return asset_name
-    
 
     def get_default_pipeline_info(self):
         """ Returns a default pipeline info data to load the UI if there isn't any.
@@ -401,90 +388,6 @@ class Pipeliner(object):
             conform_info = self.get_info_by_path("f_toClient", "f_project", conform_info)
         return conform_info
 
-    
-    def load_info_key(self, item, *args):
-        """ Method called by the Pipeliner UI button to load the info about the item.
-        """
-        result_items = cmds.fileDialog2(fileMode=3, dialogStyle=2)
-        if result_items:
-            conform_info = self.conform_loaded_info(item, result_items)
-            cmds.textFieldButtonGrp(self.infoUI[item], edit=True, text=conform_info)
-            self.set_pipeline_info_file()
-
-
-    def mainUI(self, ar=None, loadedFileInfo=False, *args):
-        """ Open an UI to load, set and save the pipeline info.
-        """
-        self.ar.utils.close_ui('dpPipelinerWindow')
-        self.get_pipeline_data(loadedFileInfo)
-        # window
-        if ar:
-            self.ar = ar
-            pipeliner_winWidth  = 380
-            pipeliner_winHeight = 480
-            cmds.window('dpPipelinerWindow', title="Pipeliner "+str(self.ar.data.version), widthHeight=(pipeliner_winWidth, pipeliner_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-            cmds.showWindow('dpPipelinerWindow')
-            # create UI layout and elements:
-            self.pipelinerLayout = cmds.columnLayout('self.pipelinerLayout', adjustableColumn=True, columnOffset=("both", 10))
-            # pipeline info
-            pipelineInfoLayout = cmds.columnLayout('pipelineInfoLayout', adjustableColumn=True, columnOffset=("left", 10), parent=self.pipelinerLayout)
-            cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
-            cmds.text('pipelineInfo', label="Pipeline "+self.ar.data.lang['i013_info'], height=30, font='boldLabelFont', parent=pipelineInfoLayout)
-            path_data = self.get_path_data()
-            self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.ar.data.lang['i220_filePath'], text=path_data, buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.load_pipe_info, changeCommand=partial(self.load_pipe_info, True), adjustableColumn=2, parent=pipelineInfoLayout)
-            cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
-            # pipeline data
-            cmds.text('pipelineData', height=30, label="Pipeline Data", font='boldLabelFont', parent=pipelineInfoLayout)
-            self.pipelineScrollLayout = cmds.scrollLayout('pipelineScrollLayout', parent=self.pipelinerLayout)
-            self.pipelineDataLayout = cmds.columnLayout('pipelineDataLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelineScrollLayout)
-            self.pipelineFooterLayout = cmds.columnLayout('pipelineFooterLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
-            # load data from pipeline info
-            self.load_ui_data()
-
-
-    def load_ui_data(self, *args):
-        """ Populate the UI with loaded data file info.
-        """
-        cmds.deleteUI(self.pipelineDataLayout)
-        cmds.deleteUI(self.pipelineFooterLayout)
-        self.pipelineDataLayout = cmds.columnLayout('pipelineDataLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelineScrollLayout)
-        if self.pipe_info:
-            self.infoUI = {}
-            for key in list(self.pipe_info):
-                if "_" in key:
-                    if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=partial(self.load_info_key, key), adjustableColumn=2, parent=self.pipelineDataLayout)
-                    elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], numberOfFields=1, parent=self.pipelineDataLayout)
-                    elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], parent=self.pipelineDataLayout)
-                    elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipe_info[key], annotation=self.ar.data.lang[self.pipeline_annotation[key]], parent=self.pipelineDataLayout)
-            # try to force loading empty data info
-            try:
-                if self.pipe_data['sceneName']:
-                    if not cmds.textFieldButtonGrp(self.infoUI['f_drive'], query=True, text=True):
-                        self.get_info_by_path("f_drive", None)
-                        cmds.textFieldButtonGrp(self.infoUI['f_drive'], edit=True, text=self.pipe_data['f_drive'])
-                    if not cmds.textFieldButtonGrp(self.infoUI['f_studio'], query=True, text=True):
-                        self.get_info_by_path("f_studio", "f_drive")
-                        cmds.textFieldButtonGrp(self.infoUI['f_studio'], edit=True, text=self.pipe_data['f_studio'])
-                    if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
-                        self.get_info_by_path("f_project", "f_studio")
-                        cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipe_data['f_project'])
-            except:
-                pass
-            self.pipelineFooterLayout = cmds.columnLayout('pipelineFooterLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
-            cmds.separator(style='in', height=20, parent=self.pipelineFooterLayout)
-            self.pipelineFooterButtonsLayout = cmds.paneLayout("pipelineFooterButtonsLayout", configuration="vertical3", separatorThickness=2.0, parent=self.pipelineFooterLayout)
-            cmds.button('resetPipeInfoBT', label=self.ar.data.lang['i271_reset'], command=self.reset_pipe_info, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.button('newPipeInfoBT', label=self.ar.data.lang['i304_new'], command=self.new_pipe_info, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.button('savePipeInfoBT', label=self.ar.data.lang['i222_save'], command=self.save_pipe_info, backgroundColor=(0.75, 0.75, 0.75), parent=self.pipelineFooterButtonsLayout)
-            cmds.separator(style='none', height=5, parent=self.pipelineFooterLayout)
-        else:
-            path_data = self.get_path_data()
-            cmds.text(path_data, parent=self.pipelineDataLayout)
-
 
     def get_path_data(self, *args):
         """ Returns the concatenated path and info file name.
@@ -516,7 +419,7 @@ class Pipeliner(object):
         """
         loaded_file_paths = None
         if loaded:
-            loaded = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
+            loaded = cmds.textFieldButtonGrp('pipeline_path_data_tfbg', query=True, text=True)
             if loaded.endswith('.json'):
                 loaded = loaded.replace("\\", "/")
                 if os.path.exists(loaded):
@@ -527,7 +430,7 @@ class Pipeliner(object):
             loaded_file_path = loaded_file_paths[0].replace("\\", "/")
             self.pipe_data['path'] = loaded_file_path[:loaded_file_path.rfind("/")]
             self.info_file = loaded_file_path[loaded_file_path.rfind("/")+1:]
-            cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=loaded_file_path)
+            cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text=loaded_file_path)
             self.get_pipeline_data(self.info_file)
             self.load_ui_data()
             self.set_pipeline_settings_path(self.pipe_data['path'], self.info_file)
@@ -538,7 +441,6 @@ class Pipeliner(object):
         """
         if path and file:
             json_path = self.get_json_settings_path()
-            print("jasonPath =", json_path)
             if os.path.exists(json_path):
                 settings_data = self.get_json_content(json_path)
                 settings_data['path'] = path
@@ -546,20 +448,6 @@ class Pipeliner(object):
                 # write json file in the HD
                 with open(json_path, 'w') as json_file:
                     json.dump(settings_data, json_file, indent=4, sort_keys=True)
-
-    
-    def get_ui_data_to_save(self):
-        """ Read the UI fields and load them values in the pipe_data dictionary.
-        """
-        for k, key in enumerate(list(self.infoUI)):
-            if key.startswith("f_"):
-                self.pipe_data[key] = cmds.textFieldButtonGrp(self.infoUI[key], query=True, text=True)
-            elif key.startswith("i_"):
-                self.pipe_data[key] = cmds.intFieldGrp(self.infoUI[key], query=True, value1=True)
-            elif key.startswith("b_"):
-                self.pipe_data[key] = cmds.checkBox(self.infoUI[key], query=True, value=True)
-            elif key.startswith("s_"):
-                self.pipe_data[key] = cmds.textFieldGrp(self.infoUI[key], query=True, text=True)
 
 
     def set_pipeline_info_file(self):
@@ -596,7 +484,7 @@ class Pipeliner(object):
     def reset_pipe_info(self, *args):
         """ Reset the pipeline info data to default values.
         """
-        cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text="")
+        cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text="")
         self.pipe_info = self.get_default_pipeline_info()
         self.pipe_data = self.pipe_info
         self.load_ui_data()
@@ -614,7 +502,7 @@ class Pipeliner(object):
                     if not file_path.endswith(".json"):
                         file_path = file_path[:file_path.rfind(".")]+".json"
         if file_path:
-            cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=file_path)
+            cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text=file_path)
             self.pipe_data['path'] = file_path[:file_path.rfind("/")]
             self.pipe_data['date'] = self.get_today()
             self.info_file = file_path[file_path.rfind("/")+1:]
@@ -625,13 +513,14 @@ class Pipeliner(object):
         """ Save the pipeline data into the json file in the HD.
             Write the pipeline data path in the pipeline setting json file.
         """
-        self.get_ui_data_to_save()
-        path_data_from_ui = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
-        if path_data_from_ui:
-            if "/" in path_data_from_ui:
-                self.pipe_data['path'] = path_data_from_ui[:path_data_from_ui.rfind("/")]
-            if path_data_from_ui.endswith(".json"):
-                self.info_file = path_data_from_ui[path_data_from_ui.rfind("/")+1:]
+        self.ar.pipeline_ui.get_ui_data_to_save()
+        if self.ar.data.ui_state:
+            path_data_from_ui = cmds.textFieldButtonGrp('pipeline_path_data_tfbg', query=True, text=True)
+            if path_data_from_ui:
+                if "/" in path_data_from_ui:
+                    self.pipe_data['path'] = path_data_from_ui[:path_data_from_ui.rfind("/")]
+                if path_data_from_ui.endswith(".json"):
+                    self.info_file = path_data_from_ui[path_data_from_ui.rfind("/")+1:]
         if self.pipe_data['path'] and self.info_file:
             self.make_dir_if_not_exists(self.pipe_data['path'])
             self.set_pipeline_info_file()
@@ -841,38 +730,7 @@ class Pipeliner(object):
             return self.pipe_data['fileName']
         else:
             return False
-
-
-    def save_version_ui(self, *args):
-        """ UI to chose save asset version options.
-        """
-        if self.check_asset_context():
-            # declaring variables:
-            saveVersion_title     = 'dpAutoRig - '+self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower()
-            saveVersion_winWidth  = 380
-            saveVersion_winHeight = 220
-            saveVersion_align     = "left"
-            # window:
-            self.ar.utils.close_ui("dpSaveVersionWindow")
-            dpSaveVersionWin = cmds.window('dpSaveVersionWindow', title=saveVersion_title, iconName='dpInfo', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
-            # creating text layout:
-            saveVersionColumnLayout = cmds.columnLayout('saveVersionColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpSaveVersionWin)
-            cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
-            cmds.textFieldGrp('currentPathTFG', label="Path", text=self.pipe_data['wipPath'], columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
-            cmds.textFieldGrp('currentFileNameTFG', label=self.ar.data.lang['i276_current'], text=self.get_current_filename(), columnWidth2=(80, 150), editable=False, adjustableColumn=2, parent=saveVersionColumnLayout)
-            self.saveModelVersionTFG = cmds.textFieldGrp('saveModelVersionTFG', label="Model "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.get_model_version())), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
-            self.saveRigVersionTFG = cmds.textFieldGrp('saveRigVersionTFG', label="WIP "+self.ar.data.lang['m205_version'].lower(), text=str(int(self.get_wip_rig_version())+1), columnWidth2=(80, 50), textChangedCommand=self.getSaveVersionPreviewTextByUI, parent=saveVersionColumnLayout)
-            cmds.separator(style='none', height=10, parent=saveVersionColumnLayout)
-            cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=saveVersion_align, parent=saveVersionColumnLayout)
-            previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=saveVersionColumnLayout)
-            self.saveVersionPreviewTxt = cmds.text('saveVersionPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-            cmds.button('runSaveVersionBT', label=self.ar.data.lang['i222_save'], align=saveVersion_align, command=self.save_version, parent=saveVersionColumnLayout)
-            # call save asset version Window:
-            cmds.showWindow(dpSaveVersionWin)
-            self.getSaveVersionPreviewTextByUI()
-        else:
-            cmds.confirmDialog(title=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m205_version'].lower(), message=self.ar.data.lang['r069_noAssetToSaveVersion'], button="Ok")
-
+        
 
     def save_version(self, *args):
         """ Just save a new asset file version.
@@ -920,8 +778,8 @@ class Pipeliner(object):
         return has_asset_context
     
 
-    def refresh_project_ui(self):
-        """ Just edit the UI with the current pipeline path.
+    def refresh_project(self):
+        """ Just edit the pipeline data with current pipeline path and call the UI manager to update them.
         """
         # get path to update open_folder button command
         path = self.pipe_data['projectPath']
@@ -929,21 +787,18 @@ class Pipeliner(object):
             path = self.pipe_data['wipPath']
         if self.pipe_data['assetName'] and self.pipe_data['assetPath']:
             path = self.pipe_data['assetPath']
-        try:
-            cmds.textFieldGrp("asset_maya_project_tfg", edit=True, text=self.pipe_data['mayaProject'])
-            cmds.textFieldGrp("asset_pipeline_tfg", edit=True, text=self.pipe_data['projectPath'])
-            cmds.button("asset_open_folder_bt", edit=True, command=partial(self.ar.packager.open_folder, path))
-        except:
-            pass
+        if self.ar.data.ui_state:
+            self.ar.pipeline_ui.refresh_project_ui(path)
 
 
     def get_latest_file(self, path):
         """ Returns the latest listed file in the given path.
         """
-        latest_files = next(os.walk(path))[2]
-        if latest_files:
-            latest_files.sort()
-            return latest_files[-1]
+        if path and os.path.exists(path):
+            latest_files = next(os.walk(path))[2]
+            if latest_files:
+                latest_files.sort()
+                return latest_files[-1]
 
 
     def load_asset(self, path=None, file=None, mode=0, *args):
@@ -965,12 +820,12 @@ class Pipeliner(object):
                 if assets:
                     assets.sort()
                     if mode == 2:
-                        self.selectAssetCheckBoxUI(assets, path, mode)
+                        self.ar.pipeline_ui.select_asset_checkbox_ui(assets, path)
                         return
                     elif mode == 1: #replaceData exclude the current asset from given list to chose.
                         assets.remove(self.pipe_data['assetName'])
                     # Load UI to choose one asset to define the file to use
-                    self.selectAssetFromListUI(assets, path, mode)
+                    self.ar.pipeline_ui.select_asset_ui(assets, path, mode)
                     return
                 else:
                     # Inform that it isn't possible to continue without wip assets to load
@@ -996,7 +851,7 @@ class Pipeliner(object):
                     self.path_to_replace_from = asset_folder
                     self.get_datas_to_replace(self.path_to_replace_from)
                     if self.ios:
-                        self.dpDataToReplaceUI(file)
+                        self.ar.pipeline_ui.replace_data_ui(file)
                     else:
                         # There's no data do replace from the selected asset
                         cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['r007_notExportedData']+": "+file, button="Ok")
@@ -1005,139 +860,16 @@ class Pipeliner(object):
             cmds.confirmDialog(title=self.ar.data.lang['i187_load']+" "+self.ar.data.lang['i303_asset'], message=self.ar.data.lang['i352_notFoundWIPPath'], button="Ok")
 
 
-    def selectAssetFromListUI(self, assets, path, mode, *args):
-        """ Let user select the asset file we use in the given mode (load or replaceData).
-            Button will call the load_asset method again passing the choose arguments.
-            Works well for load and replace data.
-        """
-        # declaring variables:
-        selectAsset_title = 'dpAutoRig - '+self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']
-        select_winWidth = 240
-        select_winHeight = 285
-        select_align = "center"
-        self.ar.utils.close_ui("dpSelectAssetWindow")
-        dpSelectAssetWin = cmds.window('dpSelectAssetWindow', title=selectAsset_title, iconName='dpInfo', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
-        # creating layout:
-        selectColumnLayout = cmds.columnLayout('selectColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetWin)
-        cmds.separator(style='none', height=10, parent=selectColumnLayout)
-        cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+":", align="left", parent=selectColumnLayout)
-        self.selectAssetTSL = cmds.textScrollList('selectAssetTSL', allowMultiSelection=False, append=assets, parent=selectColumnLayout)
-        self.runSelectAssetBT = cmds.button('runSelectAssetBT', label=self.ar.data.lang['m004_select'], align=select_align, command=partial(self.selectAssetFromUI, path, mode), parent=selectColumnLayout)
-        # call Window:
-        cmds.showWindow(dpSelectAssetWin)
-
-
-    def selectAssetFromUI(self, path, mode, *args):
-        """ Transfer path and mode arguments to load_asset method and also pass the selected item from the text scroll list UI.
-        """
-        selectedAssetItemList = cmds.textScrollList(self.selectAssetTSL, query=True, selectItem=True)
-        if selectedAssetItemList:
-            self.load_asset(path, selectedAssetItemList[0], mode)
-            self.ar.utils.close_ui("dpSelectAssetWindow")
-
-
-    def selectAssetCheckBoxUI(self, assets, path, mode, *args):
-        """ Let user select the assets to publish in batch.
-        """
-        # declaring variables:
-        selectAssetCB_title = 'dpAutoRig - '+self.ar.data.lang['m046_publisher']+" "+self.ar.data.lang['i358_batch']
-        selectCB_winWidth = 240
-        selectCB_winHeight = 285
-        selectCB_align = "center"
-        self.ar.utils.close_ui("dpSelectAssetCBWindow")
-        dpSelectAssetCBWin = cmds.window('dpSelectAssetCBWindow', title=selectAssetCB_title, iconName='dpInfo', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-        # creating layout:
-        selectBatchLayout = cmds.columnLayout('selectBatchLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=dpSelectAssetCBWin)
-        cmds.separator(style='none', height=10, parent=selectBatchLayout)
-        cmds.text(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i303_asset']+"s:", align="left", parent=selectBatchLayout)
-        if len(assets) > 1:
-            cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=False, changeCommand=self.selectAllAssetCB, parent=selectBatchLayout)
-        cmds.separator(style='in', height=10, parent=selectBatchLayout)
-        selectCBAssetSL = cmds.scrollLayout('selectCBAssetSL', parent=selectBatchLayout)
-        selectCBColumnLayout = cmds.columnLayout('selectCBColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent=selectCBAssetSL)
-        # assets checkboxes
-        self.selectedBatchList = []
-        for asset in assets:
-            self.selectedBatchList.append(cmds.checkBox(asset+"CB", label=asset, parent=selectCBColumnLayout))
-        cmds.separator(style='in', height=10, parent=selectBatchLayout)
-        self.commentBatchTFG = cmds.textFieldGrp('commentBatchTFG', label=self.ar.data.lang['i219_comments'], text='', adjustableColumn=2, editable=True, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth=[(1, 55), (2, 50)], parent=selectBatchLayout)
-        self.runSelectCBAssetBT = cmds.button('runSelectCBAssetBT', label=self.ar.data.lang['i216_publish'], align=selectCB_align, command=partial(self.ar.publisher.load_publishing_batch, path), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=selectBatchLayout)
-        cmds.separator(style='none', height=5, parent=selectBatchLayout)
-        # call Window:
-        cmds.showWindow(dpSelectAssetCBWin)
-
-
-    def loadProjectPath(self, *args):
-        """ Open a file dialog to get the project path and write it in the respective field.
-        """
-        result_items = cmds.fileDialog2(fileMode=3, dialogStyle=2)
-        if result_items:
-            cmds.textFieldButtonGrp(self.projectPathTFBG, edit=True, text=result_items[0])
-
-
-    def getNewAssetPreviewTextByUI(self, *args):
-        """ Generate and return the new asset file name with complete path, using the UI info.
-        """
-        self.new_asset_file = ""
-        newAssetName = cmds.textFieldGrp(self.newAssetNameTFG, query=True, text=True)
-        newModelVersion = cmds.textFieldGrp(self.newModelVersionTFG, query=True, text=True)
-        newWIPVersion = cmds.textFieldGrp(self.newWIPVersionTFG, query=True, text=True)
-        projectPath = cmds.textFieldButtonGrp(self.projectPathTFBG, query=True, text=True)
-        if projectPath:
-            if not projectPath.endswith("/"):
-                projectPath = projectPath+"/"
-            wipFolder = self.pipe_data['f_wip']
-            if wipFolder:
-                if not wipFolder.endswith("/"):
-                    wipFolder = wipFolder+"/"
-            if newWIPVersion and newModelVersion and newAssetName:
-                self.new_asset_file = projectPath+wipFolder+newAssetName+"/"+newAssetName+self.pipe_data['s_model']+newModelVersion.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+newWIPVersion.zfill(self.pipe_data['i_padding'])+".ma"
-        if self.new_asset_file:
-            cmds.text(self.newAssetPreviewTxt, edit=True, label=self.new_asset_file)
-        return self.new_asset_file
-
-
-    def getSaveVersionPreviewTextByUI(self, *args):
+    def get_save_version_preview_text(self, *args):
         """ Concatenate UI info to compose rig version file name to save.
         """
-        modelVersionValue = cmds.textFieldGrp(self.saveModelVersionTFG, query=True, text=True)
-        rigVersionValue = cmds.textFieldGrp(self.saveRigVersionTFG, query=True, text=True)
+        modelVersionValue = cmds.textFieldGrp('save_version_model_tfg', query=True, text=True)
+        rigVersionValue = cmds.textFieldGrp('save_version_rig_tfg', query=True, text=True)
         previewSaveVersionFileName = self.pipe_data['assetName']+self.pipe_data['s_model']+modelVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['s_rig']+rigVersionValue.zfill(self.pipe_data['i_padding'])+self.pipe_data['extension']
         self.saveVersionFile = self.pipe_data['assetPath']+"/"+previewSaveVersionFileName
         if self.saveVersionFile:
-            cmds.text(self.saveVersionPreviewTxt, edit=True, label=previewSaveVersionFileName)
-        return self.saveVersionPreviewTxt
-        
-
-    def createNewAssetUI(self, *args):
-        """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.
-        """
-        # declaring variables:
-        self.newAsset_title     = 'dpAutoRig - '+self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset']
-        self.newAsset_winWidth  = 380
-        self.newAsset_winHeight = 220
-        self.newAsset_align     = "left"
-        # creating New Asset Window:
-        self.ar.utils.close_ui("dpNewAssetWindow")
-        dpNewAssetWin = cmds.window('dpNewAssetWindow', title=self.newAsset_title, iconName='dpInfo', widthHeight=(self.newAsset_winWidth, self.newAsset_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
-        # creating text layout:
-        newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent=dpNewAssetWin)
-        cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
-        self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.ar.data.lang['i303_asset']+" "+self.ar.data.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, adjustableColumn=2, parent=newAssetColumnLayout)
-        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.ar.data.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.ar.data.lang['m205_version'].lower(), text="0", columnWidth2=(80, 50), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        try:
-            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.ar.data.lang['i301_project']+" path", text=self.pipe_data['projectPath'], columnWidth3=(80, 150, 30), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        except:
-            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.ar.data.lang['i301_project']+" path", text="", columnWidth3=(80, 150, 30), buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
-        cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
-        cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
-        previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=newAssetColumnLayout)
-        self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
-        cmds.button('runCreateNewAssetBT', label=self.ar.data.lang['i158_create'], align=self.newAsset_align, command=self.create_new_asset, parent=newAssetColumnLayout)
-        # call New Asset Window:
-        cmds.showWindow(dpNewAssetWin)
-        self.getNewAssetPreviewTextByUI()
+            cmds.text('save_version_preview_txt', edit=True, label=previewSaveVersionFileName)
+        return 'save_version_preview_txt'
 
 
     def create_new_asset(self, asset_file=None, *args):
@@ -1194,67 +926,13 @@ class Pipeliner(object):
                 self.ios.append(item)
 
 
-    def dpDataToReplaceUI(self, fromAssetName, *args):
-        """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
-        """
-        # declaring variables:
-        self.replaceDPData_title     = 'dpAutoRig - '+self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data+" - "+self.ar.data.lang['i303_asset']
-        self.replaceDPData_winWidth  = 220
-        self.replaceDPData_winHeight = 330+(len(self.ios)*16)
-        self.replaceDPData_align     = "left"
-        # creating replace dpData Window:
-        self.ar.utils.close_ui("dpReplaceDPDataWindow")
-        dpReplaceDPDataWindow = cmds.window('dpReplaceDPDataWindow', title=self.replaceDPData_title, iconName='dpInfo', widthHeight=(self.replaceDPData_winWidth, self.replaceDPData_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
-        # creating layout:
-        replaceDataColumnLayout = cmds.columnLayout('replaceDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
-        cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        cmds.text("rebuilderReplaceDataText", label=self.ar.data.lang['i308_toReplaceDPData'], parent=replaceDataColumnLayout)
-        cmds.text("rebuilderReplaceDataAssetText", label="\n"+self.pipe_data['assetName'], font="boldLabelFont", parent=replaceDataColumnLayout)
-        cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        for item in self.ios:
-            cmds.checkBox(item+"CB", label=item, value=True)
-        cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        if len(self.ios) > 1:
-            cmds.checkBox(label=self.ar.data.lang['m004_select']+" "+self.ar.data.lang['i211_all'], value=True, changeCommand=self.selectAllDataCB, parent=replaceDataColumnLayout)
-            cmds.separator(style='none', height=10, parent=replaceDataColumnLayout)
-        cmds.button('runReplaceDataBT', label=self.ar.data.lang['m219_replace'].upper()+"\n"+fromAssetName+" -> "+self.pipe_data['assetName'], align=self.replaceDPData_align, command=self.replaceDataByUI, parent=replaceDataColumnLayout)
-        # call New Asset Window:
-        cmds.showWindow(dpReplaceDPDataWindow)
-        
-    
-    def selectAllDataCB(self, cbValue, *args):
-        """ Set all existing data checkbox values.
-        """
-        for item in self.ios:
-            cmds.checkBox(item+"CB", edit=True, value=cbValue)
-
-
-    def selectAllAssetCB(self, cbValue, *args):
-        """ Set all existing asset checkbox values.
-        """
-        for item in self.selectedBatchList:
-            cmds.checkBox(item, edit=True, value=cbValue)
-
-
-    def replaceDataByUI(self, *args):
-        """ Read the dpReplaceDPDataWindow UI to get the active checkBoxes in order to return it in a list.
-        """
-        self.to_replace_datas = []
-        for item in self.ios:
-            if cmds.checkBox(item+"CB", query=True, value=True):
-                self.to_replace_datas.append(item)
-        if self.to_replace_datas:
-            self.replace_data()
-            self.ar.utils.close_ui("dpReplaceDPDataWindow")
-        
-
     def replace_data(self, path=None, to_replace_items=None):
         """ Replace the dpData sub_folder with the given arguments.
         """
         if not path:
             path = self.path_to_replace_from
         if not to_replace_items:
-            to_replace_items = self.to_replace_datas
+            to_replace_items = self.ar.pipeline_ui.to_replace_datas
         if path and to_replace_items:
             for item in to_replace_items:
                 source_path = path+"/"+self.pipe_data['s_'+item]

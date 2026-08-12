@@ -101,7 +101,7 @@ class MainUI(object):
         cmds.menu('create_menu', label='Create', parent='main_menu_bar')
         cmds.menuItem('template_mi', label='Template', command=self.ar.maker.create_template, parent='create_menu')
         cmds.menuItem('translator_mi', label='Translator', command=self.ar.translator.translator_ui, parent='create_menu')
-        cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.config.open_pipeliner, parent='create_menu')
+        cmds.menuItem('pipeliner_mi', label='Pipeliner', command=self.ar.pipeline_ui.create_ui, parent='create_menu')
         cmds.menuItem('create_curve_preset_mi', label='Curve Preset', command=partial(self.ar.config.create_preset, "curve", self.ar.data.curve_preset_folder, True), parent='create_menu')
         cmds.menuItem('create_validator_preset_mi', label='Validator Preset', command=partial(self.ar.config.create_preset, "validator", self.ar.data.validate_preset_folder, False), parent='create_menu')
 
@@ -439,9 +439,9 @@ class MainUI(object):
         cmds.textFieldGrp("asset_name_tfg", label=self.ar.data.lang['i303_asset']+":", text=self.ar.pipeliner.pipe_data['assetName'], editable=False, adjustableColumn=2, columnWidth=[(1, 80), (2, 120)], parent="asset_fl")
         # asset buttons
         cmds.rowColumnLayout("asset_buttons_rcl", numberOfColumns=5, columnAlign=[(1, "left"), (2, "left"), (3, "left"), (4, "left"), (5, "left")], columnAttach=[(1, "left", 10), (2, "left", 10), (3, "left", 10), (4, "left", 10), (5, "left", 10)], parent="asset_fl")
-        cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeliner.save_version_ui, parent="asset_buttons_rcl")
+        cmds.button("asset_save_version_bt", label=self.ar.data.lang['i222_save']+" "+self.ar.data.lang['m205_version'], command=self.ar.pipeline_ui.save_version_ui, parent="asset_buttons_rcl")
         cmds.button("asset_load_bt", label=self.ar.data.lang['i187_load'], command=self.ar.pipeliner.load_asset, parent="asset_buttons_rcl")
-        cmds.button("asset_new_bt", label=self.ar.data.lang['i304_new'], command=self.ar.pipeliner.createNewAssetUI, parent="asset_buttons_rcl")
+        cmds.button("asset_new_bt", label=self.ar.data.lang['i304_new'], command=self.ar.pipeline_ui.create_new_asset_ui, parent="asset_buttons_rcl")
         cmds.button("asset_open_folder_bt", label=self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder'], command=partial(self.ar.packager.open_folder, self.ar.pipeliner.pipe_data['projectPath']), parent="asset_buttons_rcl")
         cmds.button("asset_replace_data_bt", label=self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data, command=partial(self.ar.pipeliner.load_asset, mode=1), parent="asset_buttons_rcl")
         cmds.separator(style='in', height=20, width=370, parent="asset_main_cl")

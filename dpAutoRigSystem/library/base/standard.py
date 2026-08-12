@@ -62,7 +62,6 @@ class BaseStandard(base.BaseLibrary):
         if userGuideName:
             self.userGuideName = userGuideName
         if self.ar.data.ui_state:
-            # create the Module layout in the mainUI - modulesLayoutA:        
             self.create_module_layout()
         # update module instance info:
         self.update_module_instance_info()
