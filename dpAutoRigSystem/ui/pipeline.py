@@ -224,12 +224,12 @@ class PipelineUI(object):
         """
         # declaring variables:
         title     = 'dpAutoRig - '+self.ar.data.lang['i158_create']+" "+self.ar.data.lang['i304_new']+" "+self.ar.data.lang['i303_asset']
-        winWidth  = 380
-        winHeight = 220
+        win_width  = 380
+        win_height = 220
         align     = "left"
         # creating New Asset Window:
         self.ar.utils.close_ui("dpNewAssetWindow")
-        cmds.window('dpNewAssetWindow', title=title, iconName='dpInfo', widthHeight=(winWidth, winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpNewAssetWindow', title=title, iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         cmds.columnLayout('new_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent='dpNewAssetWindow')
         cmds.separator(style='none', height=10, parent='new_asset_cl')
@@ -276,12 +276,12 @@ class PipelineUI(object):
         """
         # declaring variables:
         title     = 'dpAutoRig - '+self.ar.data.lang['m219_replace']+" "+self.ar.data.dp_data+" - "+self.ar.data.lang['i303_asset']
-        winWidth  = 220
-        winHeight = 330+(len(self.ar.pipeliner.ios)*16)
+        win_width  = 220
+        win_height = 330+(len(self.ar.pipeliner.ios)*16)
         align     = "left"
         # creating replace dpData Window:
         self.ar.utils.close_ui('dpReplaceDPDataWindow')
-        cmds.window('dpReplaceDPDataWindow', title=title, iconName='dpInfo', widthHeight=(winWidth, winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        cmds.window('dpReplaceDPDataWindow', title=title, iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         cmds.columnLayout('replace_data_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpReplaceDPDataWindow')
         cmds.separator(style='none', height=10, parent='replace_data_cl')

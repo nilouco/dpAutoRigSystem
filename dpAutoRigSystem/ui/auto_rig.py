@@ -132,6 +132,7 @@ class MainUI(object):
         cmds.menuItem('check_imported_guides_mi', label="Imported guides", command=partial(self.ar.filler.check_imported_guides, True), parent='check_guides_mi')
         cmds.menuItem('check_guide_nets_mi', label="Guide networks", command=self.ar.filler.check_guide_nets, parent='check_guides_mi')
         cmds.menuItem('check_guide_versions_mi', label="Guide versions", command=self.ar.filler.check_guide_versions, parent='check_guides_mi')
+        cmds.menuItem('end_progress_window_mi', label='End progress window', command=partial(self.ar.utils.setProgress, endIt=True), parent='dev_menu')
 
 
     def create_radio_menu(self, name, parent_menu, current, data, option_var=None):
@@ -420,7 +421,7 @@ class MainUI(object):
         # publisher
         cmds.columnLayout('validator_footer_cl', adjustableColumn=True, parent="validator_tab")
         cmds.separator(style='none', height=3, parent="validator_footer_cl")
-        cmds.button("validator_publisher_bt", label=self.ar.data.lang['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.ar.publisher.mainUI, parent="validator_footer_cl")
+        cmds.button("validator_publisher_bt", label=self.ar.data.lang['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.ar.publish_ui.create_ui, parent="validator_footer_cl")
         cmds.separator(style='none', height=5, parent="validator_footer_cl")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout("validator_tab", edit=True,

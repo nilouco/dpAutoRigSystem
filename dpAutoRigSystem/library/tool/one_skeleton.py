@@ -33,9 +33,9 @@ class OneSkeleton(base.BaseLibrary):
     def create_ui(self, *args):
         # creating Window:
         self.ar.utils.close_ui('one_skeleton_win')
-        winWidth  = 230
-        winHeight = 230
-        cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(self.ar.data.version), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        win_width  = 230
+        win_height = 230
+        cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(self.ar.data.version), widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
         cmds.columnLayout('main_layout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='one_skeleton_win')
         cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')

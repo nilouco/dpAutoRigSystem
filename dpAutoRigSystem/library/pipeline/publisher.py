@@ -10,11 +10,12 @@ class Publisher(object):
     def __init__(self, ar):
         """ Initialize the module class loading variables.
         """
-        # defining variables:
         self.ar = ar
-        # self.ar.data.lang['m046_publisher'] = self.ar.data.lang['m046_publisher']
-        # self.currentAssetName = None
-        # self.shortAssetName = None
+        self.validate_checked = True
+
+
+    def set_publish_validate_checked(self, value, *args):
+        self.validate_checked = value
 
 
     def get_file_type_by_extension(self, file_name):
@@ -24,73 +25,6 @@ class Publisher(object):
         if ext == "mb":
             return "mayaBinary"
         return "mayaAscii"
-
-
-    def mainUI(self, *args):
-        """ This is the main method to load the Publisher UI.
-        """
-        self.ar.utils.close_ui('dpSuccessPublishedWindow')
-        self.ar.utils.close_ui('dpPublisherWindow')
-        savedScene = self.ar.utils.checkSavedScene()
-        if not savedScene:
-            savedScene = self.ar.pipeliner.confirm_save_this_scene(True)
-            return
-        if savedScene:
-            # window
-            publisher_winWidth  = 450
-            publisher_winHeight = 160
-            cmds.window('dpPublisherWindow', title=self.ar.data.lang['m046_publisher']+" "+str(self.ar.data.version), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-            cmds.showWindow('dpPublisherWindow')
-            # create UI layout and elements:
-            publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
-            cmds.separator(style="none", height=20, parent=publisherLayout)
-            # fields
-            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.ar.data.lang['i220_filePath'], text='', buttonLabel=self.ar.data.lang['i187_load'], buttonCommand=self.user_load_file_path, adjustableColumn=2, changeCommand=self.edit_publish_path, parent=publisherLayout)
-            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.ar.data.lang['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-            self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.ar.data.lang['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.ar.data.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
-            # buttons
-            publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical4', paneSize=[(1, 20, 20), (2, 20, 20), (3, 45, 20), (2, 20, 20)], parent=publisherLayout)
-            cmds.button(label="Pipeliner", command=self.ar.pipeline_ui.create_ui, parent=publisherBPLayout)
-            cmds.button('diagnoseBT', label=self.ar.data.lang['i224_diagnose'], command=self.run_diagnosing, height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
-            cmds.button('publishBT', label=self.ar.data.lang['i216_publish'], command=partial(self.run_publishing, True, self.ar.data.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
-            cmds.button('publishBatchBT', label=self.ar.data.lang['i358_batch'], command=partial(self.ar.pipeliner.load_asset, mode=2), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
-
-            # workaround to load pipeliner data correctly
-            # TODO find a way to load without UI
-            self.ar.pipeline_ui.create_ui()
-            self.ar.utils.close_ui('dpPipelinerWindow')
-            self.setPublishFilePath()
-
-
-    def edit_publish_path(self, *args):
-        """ Set the current publish path as the entered text in the textField.
-        """
-        self.ar.pipeliner.pipe_data['publishPath'] = cmds.textFieldButtonGrp(self.filePathFBG, query=True, text=True)
-
-
-    def setPublishFilePath(self, file_path=None, *args):
-        """ Set the publish file path and return it.
-        """
-        if not file_path:
-            # try to load a pipeline structure to get the file_path to set it up
-            file_path = self.ar.pipeliner.load_publish_path()
-        if file_path:
-            try:
-                cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(file_path))
-                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.ar.pipeliner.get_pipe_filename(file_path)))
-                self.ar.pipeliner.pipe_data['publishPath'] = file_path
-            except:
-                pass
-        return file_path
-
-
-    def user_load_file_path(self, *args):
-        """ Ask user to load a file path.
-        """
-        dialog_result = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.ar.data.lang['i187_load'])
-        if dialog_result:
-            self.setPublishFilePath(dialog_result[0])
 
 
     def run_checked_validators(self, first_mode=True, stop_if_found_block=True, publish_log=None):
@@ -139,7 +73,7 @@ class Publisher(object):
             # check if there'a a file name to publish this scene
             publish_filename = self.ar.pipeliner.get_pipe_filename(self.ar.pipeliner.pipe_data['publishPath'])
             if from_ui:
-                publish_filename = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
+                publish_filename = cmds.textFieldGrp('publisher_filename_tfg', query=True, text=True)
             if publish_filename:
                 # start logging
                 publish_log = {}
@@ -153,16 +87,13 @@ class Publisher(object):
                 publish_log["comments"] = ""
                 comment_value = comments
                 if from_ui and not comments:
-                    comment_value = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
+                    comment_value = cmds.textFieldGrp('publisher_comment_tfg', query=True, text=True)
                 if comment_value:
                     publish_log["comments"] = comment_value
                 
                 # checking validators
                 validation_results = False
-                if verify_validator:
-                    if from_ui:
-                        verify_validator = cmds.checkBox(self.verifyValidatorsCB, query=True, value=True)
-                if verify_validator:
+                if verify_validator and self.validate_checked:
                     validation_results = self.run_checked_validators(False, True, publish_log) #fix mode
                 if validation_results:
                     self.abort_publishing(validation_results)
@@ -270,7 +201,7 @@ class Publisher(object):
                                 print("Callback result =", callback_result)
 
                     # publisher log window
-                    self.successPublishedWindow(publish_filename)
+                    self.ar.publish_ui.success_published_ui(publish_filename)
                     self.ar.utils.setProgress(endIt=True)
                     self.ar.utils.close_ui('dpPublisherWindow')
                     if from_ui:
@@ -311,46 +242,17 @@ class Publisher(object):
             cmds.file(self.ar.pipeliner.pipe_data['sceneName'], open=True, force=True)
 
 
-    def successPublishedWindow(self, publishedFile, errors=False, *args):
-        """ If everything works well we can call a success publishing window here.
-        """
-        self.ar.utils.close_ui('dpSuccessPublishedWindow')
-        self.ar.utils.setProgress(endIt=True)
-        # window
-        winWidth  = 250
-        winHeight = 130
-        cmds.window('dpSuccessPublishedWindow', title=self.ar.data.lang['m046_publisher']+" "+str(self.ar.data.version), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
-        cmds.showWindow('dpSuccessPublishedWindow')
-        # create UI layout and elements:
-        succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
-        if publishedFile:
-            cmds.separator(style="none", height=20, parent=succesLayout)
-            cmds.text(label=self.ar.data.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
-            cmds.separator(style="none", height=20, parent=succesLayout)
-            cmds.text(label=publishedFile, parent=succesLayout)
-        if errors:
-            cmds.separator(style="in", height=20, parent=succesLayout)
-            cmds.text(label=self.ar.data.lang['i141_error']+":", font='boldLabelFont', parent=succesLayout)
-            cmds.text(label=self.ar.data.lang['i074_attention'], parent=succesLayout)
-            cmds.separator(style="none", height=20, parent=succesLayout)
-            for errorFile in errors:
-                cmds.button(label=errorFile, command=partial(self.ar.pipeliner.load_asset, file=errorFile), backgroundColor=(0.95, 0.55, 0.55), parent=succesLayout)
-            cmds.separator(style="none", height=20, parent=succesLayout)
-        else:
-            cmds.separator(style="none", height=20, parent=succesLayout)
-            cmds.text(label=self.ar.data.lang['i018_thanks'], parent=succesLayout)
-
-
     def load_publishing_batch(self, path, assets=None, comments=None, *args):
         """ Load assets to batch publish them.
         """
         if path:
             published_items, errors = [], []
             if not comments:
-                comments = cmds.textFieldGrp('comment_batch_tfg', query=True, text=True)
+                if cmds.textFieldGrp('comment_batch_tfg', query=True, exists=True):
+                    comments = cmds.textFieldGrp('comment_batch_tfg', query=True, text=True)
                 if not comments:
                     comments = self.ar.data.lang['m046_publisher']+" v"+str(self.ar.data.version)
-            if not comments.endswith(self.ar.data.lang['i358_batch']):
+            if not comments.startswith(self.ar.data.lang['i358_batch']) and not comments.endswith(self.ar.data.lang['i358_batch']):
                 comments = self.ar.data.lang['i358_batch']+" - "+comments
             if not assets:
                 if self.ar.data.ui_state:
@@ -361,14 +263,14 @@ class Publisher(object):
                 print(self.ar.data.lang['i303_asset']+"s:", assets)
                 for asset in assets:
                     self.ar.pipeliner.load_asset(path, asset)
-                    publishResult = self.run_publishing(from_ui=False, comments=comments)
-                    if publishResult == False:
+                    publish_result = self.run_publishing(from_ui=False, comments=comments)
+                    if publish_result == False:
                         errors.append(asset)
                     else:
                         published_items.append(self.ar.pipeliner.pipe_data['publishFileName'])
                 if errors:
-                    self.successPublishedWindow("\n".join(published_items), errors)
+                    self.ar.publish_ui.success_published_ui("\n".join(published_items), errors)
                 else:
                     cmds.file(newFile=True, force=True)
-                    self.successPublishedWindow("\n".join(published_items))
+                    self.ar.publish_ui.success_published_ui("\n".join(published_items))
             self.ar.utils.close_ui("dpSelectAssetCBWindow")
