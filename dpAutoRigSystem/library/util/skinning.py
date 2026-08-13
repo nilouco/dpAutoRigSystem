@@ -301,14 +301,14 @@ class Skinning(weights.Weights):
         return skinWeightsList
     
 
-    def getSkinListWeights(self, item, skinClusterNode, attrName="blendWeights", *args):
+    def getSkinListWeights(self, item, skinClusterNode, attr_name="blendWeights", *args):
         """ Returns a dictionary with the skin blend weights by each item component (vertex or cv) that has non zero blend weight value.
         """
         skinDataDic = {}
         componentList = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
         componentList.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
         for component in range(0, len(componentList)):
-            value = cmds.getAttr(skinClusterNode+"."+attrName+"["+str(component)+"]")
+            value = cmds.getAttr(skinClusterNode+"."+attr_name+"["+str(component)+"]")
             if not value == 0:
                 skinDataDic[component] = value
         return skinDataDic
@@ -374,12 +374,12 @@ class Skinning(weights.Weights):
         self.normalizeItemWeights(item)
 
 
-    def setImportedSkinListWeights(self, skinClusterName, skinWeightDic, attrName="blendWeights", *args):
+    def setImportedSkinListWeights(self, skinClusterName, skinWeightDic, attr_name="blendWeights", *args):
         """ Set the skinCluster blend or dropoff weight values from the given dictionary.
         """
         if skinWeightDic:
             for vertex in skinWeightDic.keys():
-                cmds.setAttr(skinClusterName+"."+attrName+"["+str(vertex)+"]", skinWeightDic[vertex])
+                cmds.setAttr(skinClusterName+"."+attr_name+"["+str(vertex)+"]", skinWeightDic[vertex])
 
 
     def importSkinWeightsFromFile(self, items, path, filename, verbose=True, *args):

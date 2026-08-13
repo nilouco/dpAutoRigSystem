@@ -20,7 +20,7 @@ class SkinningIO(action.BaseAction):
         self.importRefName = "dpSkinningIO_Import"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -42,8 +42,8 @@ class SkinningIO(action.BaseAction):
                 if self.io_path:
                     if self.first_mode: #export
                         items = None
-                        if objList:
-                            items = objList
+                        if inputs:
+                            items = inputs
                         else:
                             items = self.ar.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.ar.skin.ignoreSkinningAttr)
                         if items:
@@ -80,8 +80,8 @@ class SkinningIO(action.BaseAction):
         wipFilesList = next(os.walk(self.ar.pipeliner.pipe_data['assetPath']))[2]
         if len(wipFilesList) > 1:
             wipFilesList.sort()
-            if len(self.exportedList) > 1:
-                self.refPathName = self.exportedList[-2][len(self.start_name)+1:-5]
+            if len(self.exported_items) > 1:
+                self.refPathName = self.exported_items[-2][len(self.start_name)+1:-5]
                 if os.path.isfile(self.ar.pipeliner.pipe_data['assetPath']+"/"+self.refPathName+".ma"):
                     self.refPathName = self.refPathName+".ma"
                 else:

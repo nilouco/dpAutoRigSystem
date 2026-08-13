@@ -15,7 +15,7 @@ class ScalableDeformer(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -33,8 +33,8 @@ class ScalableDeformer(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                check_items = objList
+            if inputs:
+                check_items = inputs
             else:
                 check_items = cmds.ls(selection=False, type=['skinCluster', 'deltaMush'])
             if check_items:
@@ -45,9 +45,9 @@ class ScalableDeformer(action.BaseAction):
                     itemAttrToFixList = []
                     for node in check_items:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                        nodeType = cmds.objectType(node)
+                        node_type = cmds.objectType(node)
                         # check skinCluster nodes and connections
-                        if nodeType == "skinCluster":
+                        if node_type == "skinCluster":
                             if cmds.getAttr(node+".skinningMethod") != 0: # If it's not "Classic Linear"
                                 if cmds.getAttr(node+".dqsSupportNonRigid") == False:
                                     itemAttrToFixList.append(node+".dqsSupportNonRigid")
@@ -56,7 +56,7 @@ class ScalableDeformer(action.BaseAction):
                                     if scConnection != rigScaleOutput:
                                         itemAttrToFixList.append(node+"."+attrDqs)
                         # check deltaMush nodes and connections
-                        elif nodeType == "deltaMush":
+                        elif node_type == "deltaMush":
                             for attr in ["scaleX", "scaleY", "scaleZ"]:
                                 dmConnection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
                                 if dmConnection != rigScaleOutput:

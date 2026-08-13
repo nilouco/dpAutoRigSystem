@@ -28,7 +28,7 @@ class CustomAttr(base.BaseLibrary):
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
         self.idWindowName = "dpIDCustomAttributesWindow"
         self.doNotDisplayList = []
-        self.ignoreList = DEFAULTIGNORE_LIST.copy()
+        self.ignores = DEFAULTIGNORE_LIST.copy()
         self.typeList = DEFAULTTYPE_LIST.copy()
 
 
@@ -49,7 +49,7 @@ class CustomAttr(base.BaseLibrary):
         """
         self.itemSC = cmds.selectionConnection(activeList=True)
         self.itemF = cmds.itemFilter(byType=self.typeList)
-        for ignoreIt in self.ignoreList:
+        for ignoreIt in self.ignores:
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
         for suffix in self.doNotDisplayList:
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName="*"+suffix)))
@@ -193,7 +193,7 @@ class CustomAttr(base.BaseLibrary):
             currentItemList = cmds.selectionConnection(self.itemSC, query=True, object=True)
             if currentItemList:
                 filteredItemList = self.ar.utils.filterName(filterName, currentItemList, " ")
-                filteredItemList = list(set(filteredItemList) - set(self.ignoreList))
+                filteredItemList = list(set(filteredItemList) - set(self.ignores))
                 filteredItemList.sort()
                 cmds.selectionConnection(self.itemSC, edit=True, clear=True)
                 for item in filteredItemList:
@@ -223,18 +223,18 @@ class CustomAttr(base.BaseLibrary):
     def getDescendentsList(self, items, shapes=True, *args):
         """ Returns the children nodes or shapes from given item list.
         """
-        resultList = []
+        results = []
         for item in items:
             if cmds.objExists(item):
                 children = cmds.listRelatives(item, allDescendents=True, children=True)
                 if shapes:
                     children = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
                 if children:
-                    resultList.extend(children)
-        return resultList
+                    results.extend(children)
+        return results
 
 
-    def addAttr(self, attrIndex, items=None, attrName=None, shapes=True, descendents=False, *args):
+    def addAttr(self, attrIndex, items=None, attr_name=None, shapes=True, descendents=False, *args):
         """ Create attributes in the selected node if they don't exists yet.
             Return a list of created dpID.
         """
@@ -251,8 +251,8 @@ class CustomAttr(base.BaseLibrary):
             for item in items:
                 if cmds.objExists(item):
                     if attrIndex == "custom":
-                        if attrName:
-                            attr = attrName
+                        if attr_name:
+                            attr = attr_name
                         elif self.ar.data.ui_state:
                             attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
                             if attr:
@@ -360,7 +360,7 @@ class CustomAttr(base.BaseLibrary):
         """
         idDic = {}
         if not items:
-            items = [node for node in cmds.ls(selection=True) for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignoreList]
+            items = [node for node in cmds.ls(selection=True) for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignores]
         if items:
             for item in items:
                 decomposedIDList = self.ar.utils.decomposeID(item)

@@ -15,7 +15,7 @@ class ImportReference(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -31,8 +31,8 @@ class ImportReference(action.BaseAction):
         
         # ---
         # --- validator code --- beginning
-        if objList:
-            referenceList = objList
+        if inputs:
+            referenceList = inputs
         else:
             referenceList = cmds.file(query=True, reference=True)
         if referenceList:

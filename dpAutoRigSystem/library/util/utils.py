@@ -333,17 +333,17 @@ class Utils(object):
         return zeroList
 
 
-    def addCustomAttr(self, nodes, attrName, attrType="bool", keyableAttr=True, defaultValueAttr=True, *args):
+    def addCustomAttr(self, nodes, attr_name, attrType="bool", keyableAttr=True, defaultValueAttr=True, *args):
         """ Useful method to add the same attribute and values to a list of given nodes.
         """
-        if nodes and attrName:
+        if nodes and attr_name:
             for node in nodes:
-                if not attrName in cmds.listAttr(node):
-                    cmds.addAttr(node, longName=attrName, attributeType=attrType, keyable=keyableAttr, defaultValue=defaultValueAttr)
+                if not attr_name in cmds.listAttr(node):
+                    cmds.addAttr(node, longName=attr_name, attributeType=attrType, keyable=keyableAttr, defaultValue=defaultValueAttr)
 
 
     def originedFrom(self, objName="", attrString=""):
-        """ Add attribute as string and set is as attrName got.
+        """ Add attribute as string and set is as attr_name got.
         """
         if objName != "" and attrString != "":
             if not cmds.objExists(objName+".originedFrom"):
@@ -638,7 +638,7 @@ class Utils(object):
         """ Duplicate the joints, parent as zeroOut.
             Returns the father joints (zeroOuted).
         """
-        resultList = []
+        results = []
         zeroOutJntSuffix = "_Jzt"
         if jntList:
             for jnt in jntList:
@@ -654,8 +654,8 @@ class Utils(object):
                     if not displayBone:
                         cmds.setAttr(dup+".drawStyle", 2) #none
                     self.ar.custom_attr.addAttr(0, [dup]) #dpID
-                    resultList.append(dup)
-        return resultList
+                    results.append(dup)
+        return results
 
 
     def clearDpArAttr(self, items):
@@ -894,7 +894,7 @@ class Utils(object):
         return cmds.getAttr(item+"."+self.ar.data.master_attr)
     
 
-    def getNodeByMessage(self, attrName, node=None, *args):
+    def getNodeByMessage(self, attr_name, node=None, *args):
         """ Get connected node in the given attribute searching as message.
             If there isn't a given node, try to use All_Grp.
             Return the found node name or False if it wasn't found.
@@ -903,8 +903,8 @@ class Utils(object):
         if not node:
             node = self.getAllGrp()
         if node:
-            if cmds.objExists(node+"."+attrName):
-                foundNodeList = cmds.listConnections(node+"."+attrName, source=True, destination=False)
+            if cmds.objExists(node+"."+attr_name):
+                foundNodeList = cmds.listConnections(node+"."+attr_name, source=True, destination=False)
                 if foundNodeList:
                     result = foundNodeList[0]
         return result
@@ -1050,7 +1050,7 @@ class Utils(object):
                     cmds.setAttr(node+"."+attr, lock=False)
 
 
-    def exportLogDicToJson(self, dic, name=None, path=None, sub_folder=None):
+    def exportLogDicToJson(self, data, name=None, path=None, sub_folder=None):
         """ Save to path the given dictionary as a json file.
         """
         currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
@@ -1069,7 +1069,7 @@ class Utils(object):
             return False
         print("Log file", pathFile)
         outFile = open(pathFile, "w")
-        json.dump(dic, outFile, indent=4)
+        json.dump(data, outFile, indent=4)
         outFile.close()
         return pathFile
 
@@ -1175,16 +1175,16 @@ class Utils(object):
                     cmds.setAttr(jnt+".type", 0)
 
 
-    def createJointBlend(self, jointListA, jointListB, jointListC, attrName, attrStartName, worldRef, storeName=True):
+    def createJointBlend(self, jointListA, jointListB, jointListC, attr_name, attrStartName, worldRef, storeName=True):
         """ Create an Ik Fk Blend setup for joint chain.
             Return the created reverse node.
         """
-        attrCompName = attrStartName[0].lower()+attrStartName[1:]+attrName
+        attrCompName = attrStartName[0].lower()+attrStartName[1:]+attr_name
         for n in range(len(jointListA)):
-            parentConst = cmds.parentConstraint(jointListA[n], jointListB[n], jointListC[n], maintainOffset=True, name=jointListC[n]+"_"+attrName+"_PaC")[0]
+            parentConst = cmds.parentConstraint(jointListA[n], jointListB[n], jointListC[n], maintainOffset=True, name=jointListC[n]+"_"+attr_name+"_PaC")[0]
             cmds.setAttr(parentConst+".interpType", 2) #shortest
             if n == 0:
-                revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
+                revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attr_name+"_Rev")
                 self.ar.custom_attr.addAttr(0, [revNode]) #dpID
                 cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
@@ -1249,7 +1249,7 @@ class Utils(object):
         """
         if items:
             cameraList = ["|persp", "|top", "|side", "|front"]
-            constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "poleVectorConstraint"]
+            constraints = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "poleVectorConstraint"]
             toRemoveList = []
             for item in items:
                 if verbose:
@@ -1260,7 +1260,7 @@ class Utils(object):
                         if item.endswith(cameraName):
                             toRemoveList.append(item)
                 if filterConstraint:
-                    if itemType in constraintList:
+                    if itemType in constraints:
                         toRemoveList.append(item)
                 if filterFollicle:
                     if cmds.listRelatives(item, children=True, type="follicle"):
@@ -1340,13 +1340,13 @@ class Utils(object):
         return resultDic
 
 
-    def nodeRenamingTreatment(self, items=None, nodeType="unitConversion", suffix="_UC", *args):
+    def nodeRenamingTreatment(self, items=None, node_type="unitConversion", suffix="_UC", *args):
         """ Rename unitConversion nodes to something like this:
             [IN]capitals+#+attr+_+[OUT]capitals+#+attr+"_UC"
-            or the given nodeType and suffix.
+            or the given node_type and suffix.
         """
         if not items:
-            items = cmds.ls(selection=False, type=nodeType)
+            items = cmds.ls(selection=False, type=node_type)
         if items:
             self.ar.custom_attr.addAttr(0, items) #dpID
             for item in items:

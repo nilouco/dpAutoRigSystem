@@ -15,7 +15,7 @@ class FreezeTransform(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         ''' Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -36,8 +36,8 @@ class FreezeTransform(action.BaseAction):
                 if not cmds.file(query=True, reference=True):
                     allObjectList = []
                     toFixList = []
-                    if objList:
-                        allObjectList = list(filter(lambda obj: cmds.objectType(obj) == 'transform', objList))
+                    if inputs:
+                        allObjectList = list(filter(lambda obj: cmds.objectType(obj) == 'transform', inputs))
                     if len(allObjectList) == 0:
                         allObjectList = cmds.ls(selection=False, type='transform', long=True)
                     # analisys transformations

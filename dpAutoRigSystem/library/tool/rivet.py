@@ -162,11 +162,11 @@ class Rivet(base.BaseLibrary):
         cmds.select(selectionList)
 
 
-    def removeRivetFromList(self, indexList, items):
+    def removeRivetFromList(self, indexes, items):
         """ Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
         """
-        self.disablePac(indexList)
-        for i, index in enumerate(indexList):
+        self.disablePac(indexes)
+        for i, index in enumerate(indexes):
             self.ar.utils.setProgress(self.ar.data.lang['i315_removing'])
             netNode = self.rivetNetNodeList[index]
             if netNode:

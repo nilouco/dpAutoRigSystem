@@ -109,7 +109,7 @@ class ControllersHierarchy(action.BaseAction):
             return True
 
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It"s in verify mode by default.
             If first_mode parameter is False, it"ll run in fix mode.
@@ -130,8 +130,8 @@ class ControllersHierarchy(action.BaseAction):
             
             globalCtrl = self.ar.utils.getNodeByMessage("globalCtrl")
             # Verify if another Ctrl was sent via code to check hierarchy from.
-            if objList and cmds.objExists(objList[0]) and self.checkNurbs(objList[0]):
-                rootNode = objList[0]
+            if inputs and cmds.objExists(inputs[0]) and self.checkNurbs(inputs[0]):
+                rootNode = inputs[0]
             elif cmds.objExists(globalCtrl) and self.checkNurbs(globalCtrl):
                 rootNode = globalCtrl
             else:

@@ -16,10 +16,10 @@ class OffsetMatrixIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_offsetMatrixIO"
         self.start_name = "dpOffsetMatrix"
-        self.offsetMatrixAttr = "offsetParentMatrix"
+        self.offset_matrix_attr = "offsetParentMatrix"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -40,18 +40,18 @@ class OffsetMatrixIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     nodes = None
-                    if objList:
-                        nodes = objList
+                    if inputs:
+                        nodes = inputs
                     else:
                         nodes = cmds.ls(selection=False, type="transform")
                     if nodes:
                         if self.first_mode: #export
-                            toExportDataDic = self.getOffsetMatrixDataDic(nodes)
-                            self.export_json_file(toExportDataDic)
+                            to_export_data = self.get_offset_matrix_data(nodes)
+                            self.export_json_file(to_export_data)
                         else: #import
-                            toImportDic = self.import_latest_json_file(self.get_exported_items())
-                            if toImportDic:
-                                self.importOffsetMatrixData(toImportDic)
+                            to_import_data = self.import_latest_json_file(self.get_exported_items())
+                            if to_import_data:
+                                self.import_offset_matrix_data(to_import_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
@@ -73,45 +73,45 @@ class OffsetMatrixIO(action.BaseAction):
         return self.log_data
 
 
-    def getOffsetMatrixDataDic(self, items, *args):
+    def get_offset_matrix_data(self, items):
         """ Processes the given list to collect the info about their parent offset matrix connections to rebuild.
             Returns a dictionary to export.
         """
-        dic = {}
+        data = {}
         self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                inPlugList = cmds.listConnections(item+"."+self.offsetMatrixAttr, source=True, destination=False, plugs=True)
-                if inPlugList:
-                    dic[item] = inPlugList[0]
-        return dic
+                in_plugs = cmds.listConnections(item+"."+self.offset_matrix_attr, source=True, destination=False, plugs=True)
+                if in_plugs:
+                    data[item] = in_plugs[0]
+        return data
 
 
-    def importOffsetMatrixData(self, connectDic, *args):
+    def import_offset_matrix_data(self, connection_data):
         """ Import connection data.
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.ar.utils.setProgress(max=len(connectDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(connection_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in connectDic.keys():
-            notFoundNodesList = []
+        well_imported_items = []
+        for item in connection_data.keys():
+            not_found_nodes = []
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                omAttr = item+"."+self.offsetMatrixAttr
-                if not cmds.listConnections(omAttr, plugs=True, source=True, destination=False):
-                    isLocked = cmds.getAttr(omAttr, lock=True)
-                    cmds.setAttr(omAttr, lock=False)
-                    cmds.connectAttr(connectDic[item]+"[0]", omAttr, force=True)
-                    if isLocked:
-                        cmds.setAttr(omAttr, lock=True)
-                if not item in wellImportedList:
-                    wellImportedList.append(item)
+                om_attr = item+"."+self.offset_matrix_attr
+                if not cmds.listConnections(om_attr, plugs=True, source=True, destination=False):
+                    is_locked = cmds.getAttr(om_attr, lock=True)
+                    cmds.setAttr(om_attr, lock=False)
+                    cmds.connectAttr(connection_data[item]+"[0]", om_attr, force=True)
+                    if is_locked:
+                        cmds.setAttr(om_attr, lock=True)
+                if not item in well_imported_items:
+                    well_imported_items.append(item)
             else:
-                notFoundNodesList.append(item+"."+self.offsetMatrixAttr)
-        if notFoundNodesList:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
-        elif wellImportedList:
+                not_found_nodes.append(item+"."+self.offset_matrix_attr)
+        if not_found_nodes:
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+        elif well_imported_items:
             self.well_done_io(self.latest_data_file)

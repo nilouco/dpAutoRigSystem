@@ -19,7 +19,7 @@ class ShaderIO(action.BaseAction):
         self.mayaDefaultShader = "openPBRSurface"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -57,8 +57,8 @@ class ShaderIO(action.BaseAction):
                     self.changedTypeList = ["subsurfaceRadius", "subsurfaceRadiusScale"]
                     if self.first_mode: #export
                         shaderList = None
-                        if objList:
-                            shaderList = objList
+                        if inputs:
+                            shaderList = inputs
                         else:
                             shaderList = self.get_used_materials()
                         if shaderList:

@@ -17,7 +17,7 @@ class BlendshapeTarget(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -34,8 +34,8 @@ class BlendshapeTarget(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                check_items = objList
+            if inputs:
+                check_items = inputs
             else:
                 check_items = None
                 meshList = cmds.ls(selection=False, type='mesh')
@@ -113,12 +113,12 @@ class BlendshapeTarget(action.BaseAction):
     def keepGrp(self, grpList, *args):
         """ Check if there're some nodes in the given group to return them.
         """
-        resultList = []
+        results = []
         if grpList:
             for item in grpList:
                 nodeGrp = self.ar.utils.getNodeByMessage(item)
                 if nodeGrp:
                     nodes = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
                     if nodes:
-                        resultList.extend(nodes)
-        return resultList
+                        results.extend(nodes)
+        return results

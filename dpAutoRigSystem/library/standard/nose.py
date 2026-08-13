@@ -454,7 +454,7 @@ class Nose(standard.BaseStandard, layout.BaseLayout):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "ctrlList"        : self.aCtrls,
+                            "controllers"     : self.aCtrls,
                             "lCtrls"          : self.aLCtrls,
                             "rCtrls"          : self.aRCtrls,
                             "ctrlHookGrpList" : self.ctrlHookGrpList,

@@ -23,7 +23,7 @@ class ComponentTagIO(action.BaseAction):
         self.defWeights = weights.Weights(self.ar)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -44,8 +44,8 @@ class ComponentTagIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     nodes = None
-                    if objList:
-                        nodes = objList
+                    if inputs:
+                        nodes = inputs
                     else:
                         nodes = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
                     if self.first_mode: #export

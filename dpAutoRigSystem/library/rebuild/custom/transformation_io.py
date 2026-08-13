@@ -18,7 +18,7 @@ class TransformationIO(action.BaseAction):
         self.start_name = "dpTransformation"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -39,19 +39,19 @@ class TransformationIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     if self.first_mode: #export
-                        transformList = None
-                        if objList:
-                            transformList = objList
+                        items = None
+                        if inputs:
+                            items = inputs
                         else:
-                            transformList = cmds.ls(selection=False, long=True, type="transform")
-                        if transformList:
-                            self.export_json_file(self.getTransformDataDic(transformList))
+                            items = cmds.ls(selection=False, long=True, type="transform")
+                        if items:
+                            self.export_json_file(self.get_transform_data(items))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
-                        transformDic = self.import_latest_json_file(self.get_exported_items())
-                        if transformDic:
-                            self.importTransformation(transformDic)
+                        transform_data = self.import_latest_json_file(self.get_exported_items())
+                        if transform_data:
+                            self.import_transformation(transform_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -71,146 +71,146 @@ class TransformationIO(action.BaseAction):
         return self.log_data
 
 
-    def getTransformDataDic(self, items, *args):
+    def get_transform_data(self, items):
         """ Return the transform data info to export.
         """
         self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         # define dictionary to export
-        transformDic = {}
+        transform_data = {}
         items = self.ar.utils.filterTransformList(items, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            useThisTransform = True
+            use_this_transform = True
             if cmds.objExists(item+".dpNotTransformIO"):
                 if cmds.getAttr(item+".dpNotTransformIO") == 1:
-                    useThisTransform = False
-            if useThisTransform:
-                dataDic = self.getTransformation(item)
-                dataDic.update(self.getLimit(item))
-                if dataDic:
-                    transformDic[item] = dataDic
-        return transformDic
+                    use_this_transform = False
+            if use_this_transform:
+                data = self.get_transformation(item)
+                data.update(self.get_limit(item))
+                if data:
+                    transform_data[item] = data
+        return transform_data
 
 
-    def getTransformation(self, item, *args):
+    def get_transformation(self, item):
         """ Returns a dictionary with the transformation attribute values of the given transform node.
         """
-        dic = {}
-        needGetData = True
+        data = {}
+        need_run_get = True
         for attr, default in zip(["tx", "ty",  "tz",  "rx",  "ry",  "rz",  "sx",  "sy",  "sz"], [0, 0, 0, 0, 0, 0, 1, 1, 1]):
             value = cmds.getAttr(item+"."+attr)
             if not value == default:
                 if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                    if needGetData:
-                        dic = { 
+                    if need_run_get:
+                        data = { 
                                 "transform" : {},
                                 "matrix" : cmds.xform(item, query=True, worldSpace=False, matrix=True)
                                 }
-                        needGetData = False
-                    dic["transform"][attr] = cmds.getAttr(item+"."+attr)
-        return dic
+                        need_run_get = False
+                    data["transform"][attr] = cmds.getAttr(item+"."+attr)
+        return data
 
 
-    def getLimit(self, item, *args):
+    def get_limit(self, item):
         """ Returns a dictionary with the transformation limits if there are.
         """
-        dic = {}
-        enableList = []
-        enableAttrList = ["enableTranslationX", "enableTranslationY", "enableTranslationZ", "enableRotationX", "enableRotationY", "enableRotationZ", "enableScaleX", "enableScaleY", "enableScaleZ"]
-        enableList.append(cmds.transformLimits(item, enableTranslationX=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableTranslationY=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableTranslationZ=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableRotationX=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableRotationY=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableRotationZ=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableScaleX=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableScaleY=True, query=True))
-        enableList.append(cmds.transformLimits(item, enableScaleZ=True, query=True))
-        hasTrue = [i for i in enableList if True in i]
-        if hasTrue:
-            limitList = []
+        data = {}
+        enables = []
+        enable_attributes = ["enableTranslationX", "enableTranslationY", "enableTranslationZ", "enableRotationX", "enableRotationY", "enableRotationZ", "enableScaleX", "enableScaleY", "enableScaleZ"]
+        enables.append(cmds.transformLimits(item, enableTranslationX=True, query=True))
+        enables.append(cmds.transformLimits(item, enableTranslationY=True, query=True))
+        enables.append(cmds.transformLimits(item, enableTranslationZ=True, query=True))
+        enables.append(cmds.transformLimits(item, enableRotationX=True, query=True))
+        enables.append(cmds.transformLimits(item, enableRotationY=True, query=True))
+        enables.append(cmds.transformLimits(item, enableRotationZ=True, query=True))
+        enables.append(cmds.transformLimits(item, enableScaleX=True, query=True))
+        enables.append(cmds.transformLimits(item, enableScaleY=True, query=True))
+        enables.append(cmds.transformLimits(item, enableScaleZ=True, query=True))
+        has_true = [i for i in enables if True in i]
+        if has_true:
+            limits = []
             #limitAttrList = ["translationX", "translationY", "translationZ", "rotationX", "rotationY", "rotationZ", "scaleX", "scaleY", "scaleZ"]
-            limitList.append(cmds.transformLimits(item, translationX=True, query=True))
-            limitList.append(cmds.transformLimits(item, translationY=True, query=True))
-            limitList.append(cmds.transformLimits(item, translationZ=True, query=True))
-            limitList.append(cmds.transformLimits(item, rotationX=True, query=True))
-            limitList.append(cmds.transformLimits(item, rotationY=True, query=True))
-            limitList.append(cmds.transformLimits(item, rotationZ=True, query=True))
-            limitList.append(cmds.transformLimits(item, scaleX=True, query=True))
-            limitList.append(cmds.transformLimits(item, scaleY=True, query=True))
-            limitList.append(cmds.transformLimits(item, scaleZ=True, query=True))
-            dic = {"limit" : {}}
-            for e, enableAttr in enumerate(enableAttrList):
-                if True in enableList[e]:
-                    dic["limit"][enableAttr] = [
-                                                int(enableList[e][0]), #minEnable
-                                                int(enableList[e][1]), #maxEnable
-                                                limitList[e][0], #minValue
-                                                limitList[e][1] #maxValue
+            limits.append(cmds.transformLimits(item, translationX=True, query=True))
+            limits.append(cmds.transformLimits(item, translationY=True, query=True))
+            limits.append(cmds.transformLimits(item, translationZ=True, query=True))
+            limits.append(cmds.transformLimits(item, rotationX=True, query=True))
+            limits.append(cmds.transformLimits(item, rotationY=True, query=True))
+            limits.append(cmds.transformLimits(item, rotationZ=True, query=True))
+            limits.append(cmds.transformLimits(item, scaleX=True, query=True))
+            limits.append(cmds.transformLimits(item, scaleY=True, query=True))
+            limits.append(cmds.transformLimits(item, scaleZ=True, query=True))
+            data = {"limit" : {}}
+            for e, enable_attr in enumerate(enable_attributes):
+                if True in enables[e]:
+                    data["limit"][enable_attr] = [
+                                                int(enables[e][0]), #minEnable
+                                                int(enables[e][1]), #maxEnable
+                                                limits[e][0], #minValue
+                                                limits[e][1] #maxValue
                                             ]
-        return dic
+        return data
 
 
-    def importTransformation(self, transformDic, *args):
+    def import_transformation(self, transform_data):
         """ Import transfomation data from given dictionary.
         """
-        self.ar.utils.setProgress(max=len(transformDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(transform_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in transformDic.keys():
+        well_imported_items = []
+        for item in transform_data.keys():
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            notFoundNodesList = []
+            not_found_nodes = []
             # check transform
             #if not cmds.objExists(item):
             #    item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
                 ran = False
-                if "transform" in transformDic[item].keys():
+                if "transform" in transform_data[item].keys():
                     ran = True
-                    for attr in transformDic[item]["transform"].keys():
+                    for attr in transform_data[item]["transform"].keys():
                         if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                             # unlock attribute
-                            wasLocked = cmds.getAttr(item+"."+attr, lock=True)
+                            was_locked = cmds.getAttr(item+"."+attr, lock=True)
                             cmds.setAttr(item+"."+attr, lock=False)
                             try:
                                 # set transformation value
-                                cmds.setAttr(item+"."+attr, transformDic[item]["transform"][attr])
+                                cmds.setAttr(item+"."+attr, transform_data[item]["transform"][attr])
                                 # lock attribute again if it was locked
-                                cmds.setAttr(item+"."+attr, lock=wasLocked)
-                                if not item in wellImportedList:
-                                    wellImportedList.append(item)
+                                cmds.setAttr(item+"."+attr, lock=was_locked)
+                                if not item in well_imported_items:
+                                    well_imported_items.append(item)
                             except Exception as e:
                                 self.fail_io(item+" - "+str(e))
-                    cmds.xform(item, worldSpace=False, matrix=transformDic[item]["matrix"])
-                if "limit" in transformDic[item].keys():
+                    cmds.xform(item, worldSpace=False, matrix=transform_data[item]["matrix"])
+                if "limit" in transform_data[item].keys():
                     ran = True
-                    for limitAttr in transformDic[item]["limit"].keys():
+                    for limit_attr in transform_data[item]["limit"].keys():
                         try:
-                            if limitAttr == "enableTranslationX":
-                                cmds.transformLimits(item, enableTranslationX=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], translationX=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableTranslationY":
-                                cmds.transformLimits(item, enableTranslationY=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], translationY=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableTranslationZ":
-                                cmds.transformLimits(item, enableTranslationZ=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], translationZ=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableRotationX":
-                                cmds.transformLimits(item, enableRotationX=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], rotationX=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableRotationY":
-                                cmds.transformLimits(item, enableRotationY=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], rotationY=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableRotationZ":
-                                cmds.transformLimits(item, enableRotationZ=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], rotationZ=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableScaleX":
-                                cmds.transformLimits(item, enableScaleX=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], scaleX=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableScaleY":
-                                cmds.transformLimits(item, enableScaleY=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], scaleY=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
-                            elif limitAttr == "enableScaleZ":
-                                cmds.transformLimits(item, enableScaleZ=[transformDic[item]["limit"][limitAttr][0], transformDic[item]["limit"][limitAttr][1]], scaleZ=[transformDic[item]["limit"][limitAttr][2], transformDic[item]["limit"][limitAttr][3]])
+                            if limit_attr == "enableTranslationX":
+                                cmds.transformLimits(item, enableTranslationX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableTranslationY":
+                                cmds.transformLimits(item, enableTranslationY=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationY=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableTranslationZ":
+                                cmds.transformLimits(item, enableTranslationZ=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationZ=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableRotationX":
+                                cmds.transformLimits(item, enableRotationX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], rotationX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableRotationY":
+                                cmds.transformLimits(item, enableRotationY=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], rotationY=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableRotationZ":
+                                cmds.transformLimits(item, enableRotationZ=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], rotationZ=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableScaleX":
+                                cmds.transformLimits(item, enableScaleX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], scaleX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableScaleY":
+                                cmds.transformLimits(item, enableScaleY=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], scaleY=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
+                            elif limit_attr == "enableScaleZ":
+                                cmds.transformLimits(item, enableScaleZ=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], scaleZ=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])
                         except Exception as e:
                             self.fail_io(item+" - "+str(e))
                 if not ran:
                     self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
             else:
-                notFoundNodesList.append(item)
-        if wellImportedList:
+                not_found_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))

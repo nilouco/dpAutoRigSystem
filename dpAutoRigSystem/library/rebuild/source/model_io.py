@@ -18,7 +18,7 @@ class ModelIO(action.BaseAction):
         self.start_name = "dpModel"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -42,8 +42,8 @@ class ModelIO(action.BaseAction):
                     if self.io_path:
                         if self.first_mode: #export
                             meshList = None
-                            if objList:
-                                meshList = objList
+                            if inputs:
+                                meshList = inputs
                             else:
                                 meshList = self.ar.utils.filterTransformList(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
                             if meshList:

@@ -324,7 +324,7 @@ class Controllers(object):
     def renameShape(self, transformList, *args):
         """Find shapes, rename them to #Shapes and return the results.
         """
-        resultList = []
+        results = []
         for transform in transformList:
             # list all children shapes:
             childShapeList = cmds.listRelatives(transform, shapes=True, children=True, fullPath=True)
@@ -332,11 +332,11 @@ class Controllers(object):
                 for i, child in enumerate(childShapeList):
                     shapeName = transform+str(i)+"Shape"
                     shape = cmds.rename(child, shapeName)
-                    resultList.append(shape)
+                    results.append(shape)
                 cmds.select(clear=True)
             else:
                 print("There are not children shape to rename inside of:", transform)
-        return resultList
+        return results
 
 
     def directConnect(self, fromObj, toObj, attributes=['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], f=True, *args):
@@ -470,13 +470,13 @@ class Controllers(object):
     def getControlNodeById(self, ctrlType, *args):
         """ Find and return node list with ctrlType in its attribute.
         """
-        ctrlList = []
+        controllers = []
         allTransformList = cmds.ls(selection=False, type="transform")
         for item in allTransformList:
             if "controlID" in cmds.listAttr(item):
                 if cmds.getAttr(item+".controlID") == ctrlType:
-                    ctrlList.append(item)
-        return ctrlList
+                    controllers.append(item)
+        return controllers
 
 
     def getControlModuleById(self, ctrlType, *args):
@@ -690,10 +690,10 @@ class Controllers(object):
             attrNameList  = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
             attrValueList = [tx, ty, tz, rx, ry, rz, sx, sy, sz]
             # setting attribute values:
-            for v, attrValue in enumerate(attrValueList):
-                if attrValue:
+            for v, attr_value in enumerate(attrValueList):
+                if attr_value:
                     try:
-                        cmds.setAttr(nodeName+'.'+attrNameList[v], attrValue)
+                        cmds.setAttr(nodeName+'.'+attrNameList[v], attr_value)
                     except:
                         pass
             # looking the need of freeze:
@@ -733,7 +733,7 @@ class Controllers(object):
                     currentAttrList = cmds.listAttr(sourceItem, visible=True, keyable=True)
                 attributes = currentAttrList
             if attributes:
-                # store attribute values in a dic:
+                # store attribute values in a data:
                 self.attrValueDic = {}
                 for attr in attributes:
                     if attr in cmds.listAttr(sourceItem):
@@ -751,7 +751,7 @@ class Controllers(object):
         if not destinations:
             destinations = cmds.ls(selection=True, long=True)
         if destinations and self.attrValueDic:
-            # set dic values to destinations:
+            # set data values to destinations:
             for destItem in destinations:
                 for attr in self.attrValueDic:
                     try:
@@ -970,13 +970,13 @@ class Controllers(object):
         """
         print("calling here 0000")
         resultString = None
-        ctrlList, ctrlIDList = [], []
+        controllers, ctrlIDList = [], []
         allTransformList = cmds.ls(selection=False, type='transform')
         for item in allTransformList:
             if DPCONTROL in cmds.listAttr(item):
                 if cmds.getAttr(item+"."+DPCONTROL) == 1:
-                    ctrlList.append(item)
-        if ctrlList:
+                    controllers.append(item)
+        if controllers:
             resultDialog = cmds.promptDialog(
                                             title=self.ar.data.lang['i129_createPreset'],
                                             message=self.ar.data.lang['i130_presetName'],
@@ -1000,7 +1000,7 @@ class Controllers(object):
                     ctrlIDList.append("_date")
                     ctrlIDList.append("_updated")
                     # get all existing controls info
-                    for ctrlNode in ctrlList:
+                    for ctrlNode in controllers:
                         ctrl_ID = cmds.getAttr(ctrlNode+".controlID")
                         if ctrl_ID.startswith("id_"):
                             if not ctrl_ID in ctrlIDList:
@@ -1198,7 +1198,7 @@ class Controllers(object):
             print(self.ar.data.lang['i042_notSelection'])
 
 
-    def setStringAttrFromList(self, nodeName, attributes, attrName="calibrationList", *args):
+    def setStringAttrFromList(self, nodeName, attributes, attr_name="calibrationList", *args):
         """ Set the given attribute that contains a list of the given list.
             Add a string attribute if it doesn't exists.
             Useful for calibrationList attribute.
@@ -1206,17 +1206,17 @@ class Controllers(object):
         if cmds.objExists(nodeName):
             if attributes:
                 calibrationAttr = ';'.join(attributes)
-                if not attrName in cmds.listAttr(nodeName):
-                    cmds.addAttr(nodeName, longName=attrName, dataType="string")
-                cmds.setAttr(nodeName+"."+attrName, calibrationAttr, type="string")
+                if not attr_name in cmds.listAttr(nodeName):
+                    cmds.addAttr(nodeName, longName=attr_name, dataType="string")
+                cmds.setAttr(nodeName+"."+attr_name, calibrationAttr, type="string")
 
 
-    def getListFromStringAttr(self, nodeName, attrName="calibrationList", *args):
+    def getListFromStringAttr(self, nodeName, attr_name="calibrationList", *args):
         """ Return the list from a string if it exists in the given nodeName.
             Useful to ready calibrationList attributes by default.
         """
-        if attrName in cmds.listAttr(nodeName):
-            return list(cmds.getAttr(nodeName+"."+attrName).split(";"))
+        if attr_name in cmds.listAttr(nodeName):
+            return list(cmds.getAttr(nodeName+"."+attr_name).split(";"))
 
 
     def getControlList(self, attr=None, *args):
@@ -1446,11 +1446,11 @@ class Controllers(object):
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
 
 
-    def displayRotateOrderAttr(self, ctrlList, *args):
+    def displayRotateOrderAttr(self, controllers, *args):
         """ Set display a non keyable rotateOrder attribute in the channelBox.
         """
-        if ctrlList:
-            for ctrl in ctrlList:
+        if controllers:
+            for ctrl in controllers:
                 if "rotateOrder" in cmds.listAttr(ctrl):
                     cmds.setAttr(ctrl+".rotateOrder", keyable=False, channelBox=True)
 
@@ -1514,12 +1514,12 @@ class Controllers(object):
             print(self.ar.data.lang['i198_mirrorPrefix'])
 
 
-    def setupDefaultValues(self, resetMode=True, ctrlList=None, *args):
+    def setupDefaultValues(self, resetMode=True, controllers=None, *args):
         """ Set or Reset control attributes to their default values.
             Ask user to run for all nodes if there aren't any selected nodes.
             Settings argument calls the window to setup each default value for selected nodes.
         """
-        if not ctrlList:
+        if not controllers:
             nodeToRunList = self.getSelectedControls()
             if not nodeToRunList:
                 # ask to run for all nodes:
@@ -1530,7 +1530,7 @@ class Controllers(object):
         if nodeToRunList:
             if resetMode:
                 self.resetPose.verbose = False
-                self.resetPose.runAction(False, nodeToRunList)
+                self.resetPose.run_action(False, nodeToRunList)
                 self.resetPose.verbose = True
                 self.ar.utils.setProgress(endIt=True)
             else: #set default values
@@ -1586,10 +1586,10 @@ class Controllers(object):
         except:
             pass
         self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
-        ctrlList = self.getSelectedControls()
-        if ctrlList:
-            ctrlList.sort()
-            for c, ctrl in enumerate(ctrlList):
+        controllers = self.getSelectedControls()
+        if controllers:
+            controllers.sort()
+            for c, ctrl in enumerate(controllers):
                 attributes = self.resetPose.getSetupAttrList(ctrl, self.ignoreDefaultValuesAttrList)
                 if attributes:
                     for a, attr in enumerate(attributes):
@@ -1620,9 +1620,9 @@ class Controllers(object):
         """ Select all dpAR controllers in the scene.
             Populate the defaultValueEditor if True.
         """
-        ctrlList = self.getControlList()
-        if ctrlList:
-            cmds.select(ctrlList)
+        controllers = self.getControlList()
+        if controllers:
+            cmds.select(controllers)
         if refreshUI:
             self.populateSelectedControls()
 
@@ -1642,17 +1642,17 @@ class Controllers(object):
     def resetMirrorShape(self, *args):
         """ Call reset all controls before run mirrorShape script.
         """
-        self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
+        self.setupDefaultValues(resetMode=True, controllers=self.getControlList())
         self.mirrorShape()
 
         
-    def setControllerScaleCompensate(self, value, ctrlList=None, *args):
+    def setControllerScaleCompensate(self, value, controllers=None, *args):
         """ Set the controllers scaleCompensate value.
         """
-        if not ctrlList:
-            ctrlList = [c for c in self.getControlList() if "scaleCompensate" in cmds.listAttr(c)]
-        if ctrlList:
-            for ctrl in ctrlList:
+        if not controllers:
+            controllers = [c for c in self.getControlList() if "scaleCompensate" in cmds.listAttr(c)]
+        if controllers:
+            for ctrl in controllers:
                 cmds.setAttr(ctrl+".scaleCompensate", value)
                 
 

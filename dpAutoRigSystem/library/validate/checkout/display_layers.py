@@ -15,7 +15,7 @@ class DisplayLayers(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -32,8 +32,8 @@ class DisplayLayers(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                ctrlsGeometryList = objList
+            if inputs:
+                ctrlsGeometryList = inputs
             else:
                 # List all controls
                 ctrlsGeometryList = None
@@ -168,7 +168,7 @@ class DisplayLayers(action.BaseAction):
 
     def verifyFixMode(self, items, *args):
         """ This function will check if the item is a list or not.
-            If it's a list it will append the items in the dic and run the main function once.
+            If it's a list it will append the items in the data and run the main function once.
             If it's not a list it will append the obj and run the main function.
         """
         if items:

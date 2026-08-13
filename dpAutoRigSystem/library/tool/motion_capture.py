@@ -556,9 +556,9 @@ class MotionCapture(base.BaseLibrary):
     def getAutoRotateCtrlList(self, *args):
         """ Get and return the clavicle and neck controllers.
         """
-        ctrlList = self.ar.ctrls.getControlNodeById("id_030_LimbClavicle")
-        ctrlList.extend(self.ar.ctrls.getControlNodeById("id_022_HeadNeck"))
-        return ctrlList
+        controllers = self.ar.ctrls.getControlNodeById("id_030_LimbClavicle")
+        controllers.extend(self.ar.ctrls.getControlNodeById("id_022_HeadNeck"))
+        return controllers
 
 
     def lockAutoRotateAttr(self, ctrl, value, *args):
@@ -572,14 +572,14 @@ class MotionCapture(base.BaseLibrary):
     def muteAutoRotate(self, *args):
         """ Mute clavicle and neck autoRotate behavior.
         """
-        ctrlList = self.getAutoRotateCtrlList()
-        if ctrlList:
-            for ctrl in ctrlList:
+        controllers = self.getAutoRotateCtrlList()
+        if controllers:
+            for ctrl in controllers:
                 self.lockAutoRotateAttr(ctrl, True)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.ar.data.axis:
                     cmds.mute(zeroGrp+".rotate"+axis, force=True)
-        print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
+        print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
 
 
     def getOrderedByTimeID(self, items, *args):
@@ -791,14 +791,14 @@ class MotionCapture(base.BaseLibrary):
     def unmuteAutoRotate(self, *args):
         """ Reaply the clavicle and neck autoRotate behavior unmuting it.
         """
-        ctrlList = self.getAutoRotateCtrlList()
-        if ctrlList:
-            for ctrl in ctrlList:
+        controllers = self.getAutoRotateCtrlList()
+        if controllers:
+            for ctrl in controllers:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.ar.data.axis:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
-            print(self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(ctrlList))
+            print(self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
 
 
     def resetDefaultPose(self, *args):
@@ -806,7 +806,7 @@ class MotionCapture(base.BaseLibrary):
         """
         reset_pose = self.ar.config.get_instance("ResetPose", [self.ar.data.checkout_folder])
         reset_pose.verbose = False
-        reset_pose.runAction(False) #fix
+        reset_pose.run_action(False) #fix
         reset_pose.end_progress()
         self.ar.utils.setProgress(endIt=True)
 
@@ -884,10 +884,10 @@ from maya import cmds
 DP_MOTIONCAPTURE_VERSION = '''+str(self.ar.data.version)+'''
 
 class HumanIKCleaner(object):
-    def __init__(self, hikNode, sn, ctrlList, attributes, *args):
+    def __init__(self, hikNode, sn, controllers, attributes, *args):
         self.hikNode = hikNode
         self.myself = sn
-        self.ctrlList = ctrlList
+        self.controllers = controllers
         self.attributes = attributes
         cmds.scriptJob(nodeDeleted=(self.hikNode, self.jobDeletedMocap), killWithScene=False, compressUndo=True)
 
@@ -903,13 +903,13 @@ class HumanIKCleaner(object):
     def unmuteAutoRotate(self, *args):
         """ Reaply the clavicle and neck autoRotate behavior unmuting it.
         """
-        if self.ctrlList:
-            for ctrl in self.ctrlList:
+        if self.controllers:
+            for ctrl in self.controllers:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.ar.data.axis:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
-            print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' "+", ".join(self.ctrlList))
+            print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' "+", ".join(self.controllers))
 
     def lockAutoRotateAttr(self, ctrl, value, *args):
         """ Lock or unlock the autoRotate attribute for the given controller.

@@ -247,7 +247,7 @@ class UIManager(object):
                 if action_instance.active:
                     self.ar.utils.setProgress(action_instance.name)
                     action_instance.verbose = False
-                    action_result_data[action_instance.name] = action_instance.runAction(first_mode)
+                    action_result_data[action_instance.name] = action_instance.run_action(first_mode)
                     action_instance.verbose = True
                     if stop_if_found_block:
                         if True in action_instance.found_issues:

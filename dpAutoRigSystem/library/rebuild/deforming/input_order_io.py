@@ -18,7 +18,7 @@ class InputOrderIO(action.BaseAction):
         self.start_name = "dpInputOrder"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -40,8 +40,8 @@ class InputOrderIO(action.BaseAction):
                 if self.io_path:
                     if self.first_mode: #export
                         deformedList = None
-                        if objList:
-                            deformedList = objList
+                        if inputs:
+                            deformedList = inputs
                         else:
                             deformedList = self.ar.skin.getDeformedItemList(deformerTypeList=self.ar.skin.getAllDeformerTypeList(), ignoreAttr=self.ar.skin.ignoreSkinningAttr)
                         if deformedList:

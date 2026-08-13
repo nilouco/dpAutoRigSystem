@@ -24,7 +24,7 @@ class DeformationIO(action.BaseAction):
         self.defWeights = weights.Weights(self.ar)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -46,8 +46,8 @@ class DeformationIO(action.BaseAction):
                 if self.io_path:
                     if self.first_mode: #export
                         items = None
-                        if objList:
-                            items = objList
+                        if inputs:
+                            items = inputs
                         else:
                             items = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True) or []
                             items.extend(cmds.listRelatives(cmds.ls(selection=False, type="nurbsCurve"), parent=True) or [])
@@ -105,10 +105,10 @@ class DeformationIO(action.BaseAction):
                         # get the attributes and values for this deformer node
                         deformerDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
                         # Get shape indexes for the deformer so we can query the deformer weights
-                        shapeList, indexList, shapeToIndexDic = self.defWeights.getShapeToIndexData(deformerNode)
+                        shapeList, indexes, shapeToIndexDic = self.defWeights.getShapeToIndexData(deformerNode)
                         # update dictionary
                         deformerDic[deformerNode]["shapeList"] = shapeList
-                        deformerDic[deformerNode]["indexList"] = indexList
+                        deformerDic[deformerNode]["indexes"] = indexes
                         deformerDic[deformerNode]["shapeToIndexDic"] = shapeToIndexDic
                         deformerDic[deformerNode]["weights"] = {}
                         for shape in shapeList:
@@ -237,7 +237,7 @@ class DeformationIO(action.BaseAction):
         # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
         weightsDic = deformerDic[deformerNode]["weights"]
         if weightsDic:
-            for index in deformerDic[deformerNode]["indexList"]:
+            for index in deformerDic[deformerNode]["indexes"]:
                 currentIndex = self.defWeights.getCurrentDeformedIndex(deformerNode, deformerDic[deformerNode]["shapeToIndexDic"], index)
                 if weightsDic[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle

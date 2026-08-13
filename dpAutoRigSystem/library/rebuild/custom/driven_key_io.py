@@ -16,10 +16,9 @@ class DrivenKeyIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_drivenKeyIO"
         self.start_name = "dpDrivenKey"
-        self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
 
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -40,19 +39,19 @@ class DrivenKeyIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     nodes = None
-                    if objList:
-                        nodes = objList
+                    if inputs:
+                        nodes = inputs
                     else:
-                        nodes = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+                        nodes = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
                     if self.first_mode: #export
                         if nodes:
-                            self.export_json_file(self.getDrivenKeyDataDic(nodes))
+                            self.export_json_file(self.get_drivenkey_data(nodes))
                         else:
                             self.maybe_done_io("Set Driven Keys")
                     else: #import
-                        drivenKeyDic = self.import_latest_json_file(self.get_exported_items())
-                        if drivenKeyDic:
-                            self.importDrivenKeyData(drivenKeyDic)
+                        drivenkey_data = self.import_latest_json_file(self.get_exported_items())
+                        if drivenkey_data:
+                            self.import_drivenkey_data(drivenkey_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -72,20 +71,20 @@ class DrivenKeyIO(action.BaseAction):
         return self.log_data
 
 
-    def getDrivenKeyDataDic(self, nodes, *args):
+    def get_drivenkey_data(self, nodes):
         """ Processes the given set driven key node list to collect and mount the info data.
             Returns the dictionary to export.
         """
-        dic = {}
+        data = {}
         attributes = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
-        keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
-        keyTimeAttrList = ["keyTime", "keyValue"]
+        key_attributes = ["keyBreakdown", "keyTickDrawSpecial"]
+        key_time_attributes = ["keyTime", "keyValue"]
         self.ar.utils.setProgress(max=len(nodes), add_one=False, add_number=False)
         for item in nodes:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
                 # getting attributes if they exists
-                dic[item] = { "attributes"     : {},
+                data[item] = { "attributes"     : {},
                             "keys"             : {},
                             "keyTimeValue"     : {},
                             "keyTanInType"     : {},
@@ -110,88 +109,87 @@ class DrivenKeyIO(action.BaseAction):
                             }
                 for attr in attributes:
                     if cmds.objExists(item+"."+attr):
-                        dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
+                        data[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                 # storage the keys
                 if cmds.getAttr(item+".keyTimeValue", multiIndices=True):
                     for i, index in enumerate(cmds.getAttr(item+".keyTimeValue", multiIndices=True)):
-                        dic[item]["keyTimeValue"][index] = {}
-                        dic[item]["keys"][index] = {}
-                        for ktAttr in keyTimeAttrList:
-                            dic[item]["keyTimeValue"][index][ktAttr] = cmds.getAttr(item+".keyTimeValue["+str(i)+"]."+ktAttr)
-                        for kAttr in keyAttrList:
-                            dic[item]["keys"][index][kAttr] = cmds.getAttr(item+"."+kAttr+"["+str(i)+"]")
-                        dic[item]["keyTanInType"][index]    = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
-                        dic[item]["keyTanOutType"][index]   = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
-                        dic[item]["keyTanInX"][index]       = cmds.keyTangent(item, query=True, index=(i, i), ix=True)[0]
-                        dic[item]["keyTanInY"][index]       = cmds.keyTangent(item, query=True, index=(i, i), iy=True)[0]
-                        dic[item]["keyTanOutX"][index]      = cmds.keyTangent(item, query=True, index=(i, i), ox=True)[0]
-                        dic[item]["keyTanOutY"][index]      = cmds.keyTangent(item, query=True, index=(i, i), oy=True)[0]
-                        dic[item]["keyTanLocked"][index]    = cmds.keyTangent(item, query=True, index=(i, i), lock=True)[0]
-                        dic[item]["keyWeightLocked"][index] = cmds.keyTangent(item, query=True, index=(i, i), weightLock=True)[0]
-                        dic[item]["inAngle"][index]         = cmds.keyTangent(item, query=True, index=(i, i), inAngle=True)[0]
-                        dic[item]["inWeight"][index]        = cmds.keyTangent(item, query=True, index=(i, i), inWeight=True)[0]
-                        dic[item]["outAngle"][index]        = cmds.keyTangent(item, query=True, index=(i, i), outAngle=True)[0]
-                        dic[item]["outWeight"][index]       = cmds.keyTangent(item, query=True, index=(i, i), outWeight=True)[0]
-        return dic
+                        data[item]["keyTimeValue"][index] = {}
+                        data[item]["keys"][index] = {}
+                        for kt_attr in key_time_attributes:
+                            data[item]["keyTimeValue"][index][kt_attr] = cmds.getAttr(item+".keyTimeValue["+str(i)+"]."+kt_attr)
+                        for k_attr in key_attributes:
+                            data[item]["keys"][index][k_attr] = cmds.getAttr(item+"."+k_attr+"["+str(i)+"]")
+                        data[item]["keyTanInType"][index]    = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
+                        data[item]["keyTanOutType"][index]   = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
+                        data[item]["keyTanInX"][index]       = cmds.keyTangent(item, query=True, index=(i, i), ix=True)[0]
+                        data[item]["keyTanInY"][index]       = cmds.keyTangent(item, query=True, index=(i, i), iy=True)[0]
+                        data[item]["keyTanOutX"][index]      = cmds.keyTangent(item, query=True, index=(i, i), ox=True)[0]
+                        data[item]["keyTanOutY"][index]      = cmds.keyTangent(item, query=True, index=(i, i), oy=True)[0]
+                        data[item]["keyTanLocked"][index]    = cmds.keyTangent(item, query=True, index=(i, i), lock=True)[0]
+                        data[item]["keyWeightLocked"][index] = cmds.keyTangent(item, query=True, index=(i, i), weightLock=True)[0]
+                        data[item]["inAngle"][index]         = cmds.keyTangent(item, query=True, index=(i, i), inAngle=True)[0]
+                        data[item]["inWeight"][index]        = cmds.keyTangent(item, query=True, index=(i, i), inWeight=True)[0]
+                        data[item]["outAngle"][index]        = cmds.keyTangent(item, query=True, index=(i, i), outAngle=True)[0]
+                        data[item]["outWeight"][index]       = cmds.keyTangent(item, query=True, index=(i, i), outWeight=True)[0]
+        return data
 
 
-    def importDrivenKeyData(self, drivenKeyDic, *args):
+    def import_drivenkey_data(self, drivenkey_data):
         """ Import set driven key nodes from exported dictionary.
             Create missing set driven key nodes and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(drivenKeyDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(drivenkey_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in drivenKeyDic.keys():
-            existingNodesList = []
+        well_imported_items = []
+        for item in drivenkey_data.keys():
+            existing_nodes = []
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # create set driven key node if it needs
             if not cmds.objExists(item):
-                drivenKeyType = drivenKeyDic[item]["type"]
-                node = cmds.createNode(drivenKeyType, name=drivenKeyDic[item]["name"])
+                node = cmds.createNode(drivenkey_data[item]["type"], name=drivenkey_data[item]["name"])
                 # set attribute values
-                for attr in drivenKeyDic[item]["attributes"].keys():
+                for attr in drivenkey_data[item]["attributes"].keys():
                     if cmds.objExists(node+"."+attr):
-                        cmds.setAttr(node+"."+attr, drivenKeyDic[item]["attributes"][attr])
-                cmds.setAttr(node+".curveColor", drivenKeyDic[item]["curveColor"][0], drivenKeyDic[item]["curveColor"][1], drivenKeyDic[item]["curveColor"][2], type="double3")
-                cmds.keyTangent(node, edit=True, weightedTangents=drivenKeyDic[item]["weightedTangents"])
+                        cmds.setAttr(node+"."+attr, drivenkey_data[item]["attributes"][attr])
+                cmds.setAttr(node+".curveColor", drivenkey_data[item]["curveColor"][0], drivenkey_data[item]["curveColor"][1], drivenkey_data[item]["curveColor"][2], type="double3")
+                cmds.keyTangent(node, edit=True, weightedTangents=drivenkey_data[item]["weightedTangents"])
                 # set driven keys
-                for i in range(0, drivenKeyDic[item]["size"]):
-                    cmds.setKeyframe(item, float=drivenKeyDic[item]["keyTimeValue"][str(i)]["keyTime"], value=drivenKeyDic[item]["keyTimeValue"][str(i)]["keyValue"])
-                    for kAttr in drivenKeyDic[item]["keys"][str(i)].keys():
-                        cmds.setAttr(item+"."+kAttr+"["+str(i)+"]", drivenKeyDic[item]["keys"][str(i)][kAttr])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inTangentType=drivenKeyDic[item]["keyTanInType"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outTangentType=drivenKeyDic[item]["keyTanOutType"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ix=drivenKeyDic[item]["keyTanInX"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), iy=drivenKeyDic[item]["keyTanInY"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ox=drivenKeyDic[item]["keyTanOutX"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), oy=drivenKeyDic[item]["keyTanOutX"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), lock=drivenKeyDic[item]["keyTanLocked"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inAngle=drivenKeyDic[item]["inAngle"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inWeight=drivenKeyDic[item]["inWeight"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outAngle=drivenKeyDic[item]["outAngle"][str(i)])
-                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outWeight=drivenKeyDic[item]["outWeight"][str(i)])
-                    if drivenKeyDic[item]["weightedTangents"]:
-                        cmds.keyTangent(node, edit=True, index=(int(i), int(i)), weightLock=drivenKeyDic[item]["keyWeightLocked"][str(i)])
+                for i in range(0, drivenkey_data[item]["size"]):
+                    cmds.setKeyframe(item, float=drivenkey_data[item]["keyTimeValue"][str(i)]["keyTime"], value=drivenkey_data[item]["keyTimeValue"][str(i)]["keyValue"])
+                    for k_attr in drivenkey_data[item]["keys"][str(i)].keys():
+                        cmds.setAttr(item+"."+k_attr+"["+str(i)+"]", drivenkey_data[item]["keys"][str(i)][k_attr])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inTangentType=drivenkey_data[item]["keyTanInType"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outTangentType=drivenkey_data[item]["keyTanOutType"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ix=drivenkey_data[item]["keyTanInX"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), iy=drivenkey_data[item]["keyTanInY"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ox=drivenkey_data[item]["keyTanOutX"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), oy=drivenkey_data[item]["keyTanOutX"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), lock=drivenkey_data[item]["keyTanLocked"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inAngle=drivenkey_data[item]["inAngle"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inWeight=drivenkey_data[item]["inWeight"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outAngle=drivenkey_data[item]["outAngle"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outWeight=drivenkey_data[item]["outWeight"][str(i)])
+                    if drivenkey_data[item]["weightedTangents"]:
+                        cmds.keyTangent(node, edit=True, index=(int(i), int(i)), weightLock=drivenkey_data[item]["keyWeightLocked"][str(i)])
                 # reconnect node
-                if drivenKeyDic[item]["input"]:
-                    if cmds.objExists(drivenKeyDic[item]["input"][0]):
-                        cmds.connectAttr(drivenKeyDic[item]["input"][0], node+".input", force=True)
-                if drivenKeyDic[item]["output"]:
-                    for c, outputNode in enumerate(drivenKeyDic[item]["output"]):
-                        if cmds.objExists(drivenKeyDic[item]["output"][c]):
-                            lockedStatus = cmds.getAttr(drivenKeyDic[item]["output"][c], lock=True)
-                            cmds.setAttr(drivenKeyDic[item]["output"][c], lock=False)
-                            cmds.connectAttr(node+".output", drivenKeyDic[item]["output"][c], force=True)
-                            if lockedStatus:
-                                cmds.setAttr(drivenKeyDic[item]["output"][c], lock=True)
-                wellImportedList.append(node)
+                if drivenkey_data[item]["input"]:
+                    if cmds.objExists(drivenkey_data[item]["input"][0]):
+                        cmds.connectAttr(drivenkey_data[item]["input"][0], node+".input", force=True)
+                if drivenkey_data[item]["output"]:
+                    for c, output_node in enumerate(drivenkey_data[item]["output"]):
+                        if cmds.objExists(drivenkey_data[item]["output"][c]):
+                            is_locked = cmds.getAttr(drivenkey_data[item]["output"][c], lock=True)
+                            cmds.setAttr(drivenkey_data[item]["output"][c], lock=False)
+                            cmds.connectAttr(node+".output", drivenkey_data[item]["output"][c], force=True)
+                            if is_locked:
+                                cmds.setAttr(drivenkey_data[item]["output"][c], lock=True)
+                well_imported_items.append(node)
             else:
-                existingNodesList.append(item)
-        if wellImportedList:
+                existing_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            if existingNodesList:
+            if existing_nodes:
                 self.well_done_io(self.ar.data.lang['r032_notImportedData'])
             else:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
+                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existing_nodes))

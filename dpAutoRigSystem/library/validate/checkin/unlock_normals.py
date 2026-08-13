@@ -22,7 +22,7 @@ class UnlockNormals(action.BaseAction):
         self.softHardEdges = edge_normals.ConvertNormals(self.ar)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -39,8 +39,8 @@ class UnlockNormals(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                allMeshList = objList
+            if inputs:
+                allMeshList = inputs
             else:
                 allMeshList = cmds.ls(selection=False, type='mesh')
             if allMeshList:

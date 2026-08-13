@@ -19,7 +19,7 @@ class CheckinIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -42,7 +42,7 @@ class CheckinIO(action.BaseAction):
                 try:
                     # clean up geometries
                     validatorToRunList = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.run_actions_in_silence(validatorToRunList, self.ar.data.lib[self.ar.data.checkin_folder]["instances"], False, objList) #fix
+                    self.run_actions_in_silence(validatorToRunList, self.ar.data.lib[self.ar.data.checkin_folder]["instances"], False, inputs) #fix
                     self.well_done_io(", ".join(validatorToRunList))
                 except Exception as e:
                     self.fail_io(str(e))

@@ -18,7 +18,7 @@ class ConstraintIO(action.BaseAction):
         self.start_name = "dpConstraint"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -38,20 +38,20 @@ class ConstraintIO(action.BaseAction):
             if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    constraintList = None
-                    if objList:
-                        constraintList = objList
+                    constraints = None
+                    if inputs:
+                        constraints = inputs
                     else:
-                        constraintList = cmds.ls(selection=False, type=self.constraint_types)
+                        constraints = cmds.ls(selection=False, type=self.constraint_types)
                     if self.first_mode: #export
-                        if constraintList:
-                            self.export_json_file(self.get_constraint_data(constraintList))
+                        if constraints:
+                            self.export_json_file(self.get_constraint_data(constraints))
                         else:
                             self.maybe_done_io("Constraints")
                     else: #import
-                        constDic = self.import_latest_json_file(self.get_exported_items())
-                        if constDic:
-                            self.import_constraint_data(constDic)
+                        constraint_data = self.import_latest_json_file(self.get_exported_items())
+                        if constraint_data:
+                            self.import_constraint_data(constraint_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:

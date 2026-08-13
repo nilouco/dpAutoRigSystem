@@ -16,10 +16,10 @@ class VisibilityIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_visibilityIO"
         self.start_name = "dpVisibility"
-        self.ignoreList = ["defaultLayer"]
+        self.ignores = ["defaultLayer"]
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -40,17 +40,17 @@ class VisibilityIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     items = None
-                    if objList:
-                        items = objList
+                    if inputs:
+                        items = inputs
                     else:
                         items = cmds.ls(selection=False)#, type="transform")
                     if items:
                         if self.first_mode: #export
-                            self.export_json_file(self.getVisibilityDataDic(items))
+                            self.export_json_file(self.get_visibility_data(items))
                         else: #import
-                            visDic = self.import_latest_json_file(self.get_exported_items())
-                            if visDic:
-                                self.importVisibilityData(visDic)
+                            vis_data = self.import_latest_json_file(self.get_exported_items())
+                            if vis_data:
+                                self.import_visibility_data(vis_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
@@ -72,45 +72,45 @@ class VisibilityIO(action.BaseAction):
         return self.log_data
 
 
-    def getVisibilityDataDic(self, items, *args):
+    def get_visibility_data(self, items):
         """ Processes the given item list to check the visibility value if it doesn't have input connection.
             Returns the dictionary to export.
         """
-        dic = {}
+        data = {}
         self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if "visibility" in cmds.listAttr(item):
                     if not cmds.listConnections(item+".visibility", source=True, destination=False):
-                        dic[item] = cmds.getAttr(item+".visibility")
-        return dic
+                        data[item] = cmds.getAttr(item+".visibility")
+        return data
 
 
-    def importVisibilityData(self, visDic, *args):
+    def import_visibility_data(self, vis_data):
         """ Import visibility attribute values from exported dictionary.
         """
-        self.ar.utils.setProgress(max=len(visDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(vis_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in visDic.keys():
-            notFoundNodesList = []
+        well_imported_items = []
+        for item in vis_data.keys():
+            not_found_nodes = []
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # check attribute
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
                 if not cmds.getAttr(item+".visibility", lock=True):
-                    if not item in self.ignoreList:
+                    if not item in self.ignores:
                         try:
-                            cmds.setAttr(item+".visibility", visDic[item])
-                            if not item in wellImportedList:
-                                wellImportedList.append(item)
+                            cmds.setAttr(item+".visibility", vis_data[item])
+                            if not item in well_imported_items:
+                                well_imported_items.append(item)
                         except Exception as e:
                             self.fail_io(item+" - "+str(e))
             else:
-                notFoundNodesList.append(item)
-        if wellImportedList:
+                not_found_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))

@@ -102,23 +102,23 @@ class UpdateGuides(base.BaseLibrary):
         """ Remove objects different from transform and nurbsCurve from list.
             Returns cleaned list.
         """
-        resultList = []
+        results = []
         for obj in mayaObjList:
             objType = cmds.objectType(obj)
             if objType == 'nurbsCurve' or objType == 'transform':
-                resultList.append(obj)
-        return resultList
+                results.append(obj)
+        return results
     
 
     def filterAnotation(self, dpArTransformsList):
         """ Remove _Ant(Anotations) items from list of transforms.
             Return cleaned list.
         """
-        resultList = []
+        results = []
         for obj in dpArTransformsList:
             if not '_Ant' in obj:
-                resultList.append(obj)
-        return resultList
+                results.append(obj)
+        return results
 
 
     def getAttrValue(self, guide, attr, locked=False):
@@ -228,8 +228,8 @@ class UpdateGuides(base.BaseLibrary):
         """ Verify if we have specific attribute cases to work with each kind of module guides.
             Ignore known attributes.
         """
-        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
-        if attr not in ignoreList:
+        ignores = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
+        if attr not in ignores:
             if attr == 'nJoints':
                 currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.changeJointNumber(value)

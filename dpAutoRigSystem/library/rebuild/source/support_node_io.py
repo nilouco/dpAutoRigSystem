@@ -18,7 +18,7 @@ class SupportNodeIO(action.BaseAction):
         self.start_name = "dpSupportNode"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -42,8 +42,8 @@ class SupportNodeIO(action.BaseAction):
                     if self.io_path:
                         if self.first_mode: #export
                             items = None
-                            if objList:
-                                items = objList
+                            if inputs:
+                                items = inputs
                             else:
                                 items = self.getNodeToExportList()
                             if items:

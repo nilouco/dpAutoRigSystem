@@ -18,7 +18,7 @@ class UtilityIO(action.BaseAction):
         self.start_name = "dpUtility"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -38,20 +38,20 @@ class UtilityIO(action.BaseAction):
             if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    utilityList = None
-                    if objList:
-                        utilityList = objList
+                    utilities = None
+                    if inputs:
+                        utilities = inputs
                     else:
-                        utilityList = cmds.ls(selection=False, type=self.ar.utils.utilityTypeList)
+                        utilities = cmds.ls(selection=False, type=self.ar.utils.utilityTypeList)
                     if self.first_mode: #export
-                        if utilityList:
-                            self.export_json_file(self.getUtilityDataDic(utilityList))
+                        if utilities:
+                            self.export_json_file(self.get_utility_data(utilities))
                         else:
                             self.maybe_done_io("Utility nodes.")
                     else: #import
-                        utilityDic = self.import_latest_json_file(self.get_exported_items())
-                        if utilityDic:
-                            self.importUtilityData(utilityDic)
+                        utility_data = self.import_latest_json_file(self.get_exported_items())
+                        if utility_data:
+                            self.import_utility_data(utility_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -71,72 +71,72 @@ class UtilityIO(action.BaseAction):
         return self.log_data
 
 
-    def getUtilityDataDic(self, utilityList, *args):
+    def get_utility_data(self, utilities):
         """ Processes the given utility list to collect and mount the info data.
             Returns the dictionary to export.
         """
-        dic = {}
-        self.ar.utils.setProgress(max=len(utilityList), add_one=False, add_number=False)
-        for item in utilityList:
+        data = {}
+        self.ar.utils.setProgress(max=len(utilities), add_one=False, add_number=False)
+        for item in utilities:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
                 # getting attributes values
-                nodeType = cmds.objectType(item)
-                dic[item] = {"attributes" : {},
-                                "type"       : nodeType,
+                node_type = cmds.objectType(item)
+                data[item] = {"attributes" : {},
+                                "type"       : node_type,
                                 "name"       : item
                             }
-                for attr in self.ar.utils.typeAttrDic[nodeType]:
+                for attr in self.ar.utils.typeAttrDic[node_type]:
                     if cmds.attributeQuery(attr, node=item, exists=True):
-                        dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
+                        data[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                 # compound attributes
-                if nodeType in self.ar.utils.typeMultiAttrDic.keys():
-                    for multiAttr in self.ar.utils.typeMultiAttrDic[nodeType].keys():
-                        indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
-                        if indexList:
+                if node_type in self.ar.utils.typeMultiAttrDic.keys():
+                    for multi_attr in self.ar.utils.typeMultiAttrDic[node_type].keys():
+                        indexes = cmds.getAttr(item+"."+multi_attr, multiIndices=True)
+                        if indexes:
                             dot = ""
                             attributes = [""]
-                            if self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]:
+                            if self.ar.utils.typeMultiAttrDic[node_type][multi_attr]:
                                 dot = "."
-                                attributes = self.ar.utils.typeMultiAttrDic[nodeType][multiAttr]
-                            for i in indexList:
+                                attributes = self.ar.utils.typeMultiAttrDic[node_type][multi_attr]
+                            for i in indexes:
                                 for attr in attributes:
-                                    attrName = multiAttr+"["+str(i)+"]"+dot+attr
-                                    attrValue = cmds.getAttr(item+"."+attrName)
-                                    dic[item]["attributes"][attrName] = attrValue
-                                    if isinstance(attrValue, list):
-                                        dic[item]["attributes"][attrName] = attrValue[0]
-        return dic
+                                    attr_name = multi_attr+"["+str(i)+"]"+dot+attr
+                                    attr_value = cmds.getAttr(item+"."+attr_name)
+                                    data[item]["attributes"][attr_name] = attr_value
+                                    if isinstance(attr_value, list):
+                                        data[item]["attributes"][attr_name] = attr_value[0]
+        return data
 
 
-    def importUtilityData(self, utilityDic, *args):
+    def import_utility_data(self, utility_data):
         """ Import utility nodes from exported dictionary.
             Create missing utility nodes and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(utilityDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(utility_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in utilityDic.keys():
-            existingNodesList = []
+        well_imported_items = []
+        for item in utility_data.keys():
+            existing_nodes = []
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # create utility node if it needs
             if not cmds.objExists(item):
-                cmds.createNode(utilityDic[item]["type"], name=utilityDic[item]["name"])
+                cmds.createNode(utility_data[item]["type"], name=utility_data[item]["name"])
                 # set attribute values
-                if utilityDic[item]["attributes"]:
-                    for attr in utilityDic[item]["attributes"].keys():
+                if utility_data[item]["attributes"]:
+                    for attr in utility_data[item]["attributes"].keys():
                         #if isinstance(attr, list): 
-                        if str(utilityDic[item]["attributes"][attr]).count(",") > 1: #support vector attributes like color_Color
-                            cmds.setAttr(item+"."+attr, utilityDic[item]["attributes"][attr][0], utilityDic[item]["attributes"][attr][1], utilityDic[item]["attributes"][attr][2], type="double3")
+                        if str(utility_data[item]["attributes"][attr]).count(",") > 1: #support vector attributes like color_Color
+                            cmds.setAttr(item+"."+attr, utility_data[item]["attributes"][attr][0], utility_data[item]["attributes"][attr][1], utility_data[item]["attributes"][attr][2], type="double3")
                         else:
-                            cmds.setAttr(item+"."+attr, utilityDic[item]["attributes"][attr])
-                wellImportedList.append(item)
+                            cmds.setAttr(item+"."+attr, utility_data[item]["attributes"][attr])
+                well_imported_items.append(item)
             else:
-                existingNodesList.append(item)
-        if wellImportedList:
+                existing_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            if existingNodesList:
+            if existing_nodes:
                 self.well_done_io(self.ar.data.lang['r032_notImportedData'])
             else:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
+                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(existing_nodes))

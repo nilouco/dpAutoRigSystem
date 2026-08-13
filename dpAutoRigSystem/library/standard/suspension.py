@@ -88,7 +88,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                 self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
                 self.dist = self.ar.utils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
-                self.jointList, self.mainCtrlList, self.ctrlZeroList, self.ctrlList, self.aimLocList, self.upLocList = [], [], [], [], [], []
+                self.jointList, self.mainCtrlList, self.ctrlZeroList, self.controllers, self.aimLocList, self.upLocList = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
                     cmds.select(clear=True)
@@ -111,7 +111,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                     cmds.parent(ctrl, upLocCtrl, mainCtrl)
                     cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
                     cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScC")
-                    self.ctrlList.append(ctrl)
+                    self.controllers.append(ctrl)
                     # zeroOut controls:
                     zeroOutCtrlGrp = self.ar.utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
                     self.mainCtrlList.append(zeroOutCtrlGrp[0])
@@ -154,10 +154,10 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                 # aim constraints:
                 # B to A:
                 aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True, name=self.ctrlZeroList[0]+"_AiC")[0]
-                cmds.connectAttr(self.ctrlList[0]+"."+self.ar.data.lang['c118_active'], aAimConst+"."+self.aimLocList[1]+"W0", force=True)
+                cmds.connectAttr(self.controllers[0]+"."+self.ar.data.lang['c118_active'], aAimConst+"."+self.aimLocList[1]+"W0", force=True)
                 # A to B:
                 bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[1]+"_AiC")[0]
-                cmds.connectAttr(self.ctrlList[1]+"."+self.ar.data.lang['c118_active'], bAimConst+"."+self.aimLocList[0]+"W0", force=True)
+                cmds.connectAttr(self.controllers[1]+"."+self.ar.data.lang['c118_active'], bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
                 # integrating data:
                 self.loadedFatherB = cmds.getAttr(self.guide_base+".fatherB")

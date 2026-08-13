@@ -24,7 +24,6 @@ class LimbSpaceSwitch(base.BaseLibrary):
         if allGrp:
             self.rootCtrl = self.ar.utils.getNodeByMessage("ctrlsVisibilityGrp", allGrp)
             self.globalCtrl = self.ar.utils.getNodeByMessage("globalCtrl", allGrp)
-            self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
             self.to_ids = []
 
             self.globalName = "Global"
@@ -81,7 +80,7 @@ class LimbSpaceSwitch(base.BaseLibrary):
     def dpDoAddHandFollow(self, *args):
         """ Set attributes and call setDrivenKey method.
         """
-        oldDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+        oldDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
         sideList = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
         limbList = [
                     self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem'],
@@ -150,7 +149,7 @@ class LimbSpaceSwitch(base.BaseLibrary):
 
                         cmds.setAttr(ikCtrl+"."+self.followAttr, followValue)
 
-        currentDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+        currentDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
         newDrivenKeyList = currentDrivenKeyList
         if oldDrivenKeyList:
             newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))

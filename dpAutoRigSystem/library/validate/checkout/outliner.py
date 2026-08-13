@@ -15,7 +15,7 @@ class Outliner(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -38,13 +38,13 @@ class Outliner(action.BaseAction):
             #TODO = get node by attribute (dpTemp)
 
 
-            if not objList:
-                objList = cmds.ls(selection=False, type="transform")
-            if objList:
+            if not inputs:
+                inputs = cmds.ls(selection=False, type="transform")
+            if inputs:
                 self.ar.utils.setProgress(max=len(hiddenList), add_one=False, add_number=False)
                 for item in hiddenList:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                    if item in objList:
+                    if item in inputs:
                         self.checked_items.append(item)
                         if cmds.objExists(item):
                             self.found_issues.append(True)

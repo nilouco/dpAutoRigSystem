@@ -24,7 +24,7 @@ class RivetIO(action.BaseAction):
         self.start_name = "dpRivet"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -46,8 +46,8 @@ class RivetIO(action.BaseAction):
                 if self.io_path:
                     if self.first_mode: #export
                         netList = None
-                        if objList:
-                            netList = objList
+                        if inputs:
+                            netList = inputs
                         else:
                             netList = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
                         if netList:
@@ -83,25 +83,25 @@ class RivetIO(action.BaseAction):
         """ Processes the given rivet network list and mount the right info pack to rebuild the module.
             Returns the dictionary to export.
         """
-        dic = {}
+        data = {}
         self.ar.utils.setProgress(max=len(netList), add_one=False, add_number=False)
         i = 0
         for n, net in enumerate(netList):
             if self.ar.data.verbose:
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            # mount a dic
+            # mount a data
             if cmds.objExists(net+".rivetData"):
                 data = json.loads(cmds.getAttr(net+".rivetData"))
                 addIt = True
                 if n > 0:
                     for x in range(0, i):
-                        if data["itemNode"] in dic[x]["items"]:
+                        if data["itemNode"] in data[x]["items"]:
                             addIt = False
                             break
                 if addIt:
-                    dic[i] = data
+                    data[i] = data
                     i += 1
-        return dic
+        return data
 
 
     def importRivet(self, rivetDic, *args):

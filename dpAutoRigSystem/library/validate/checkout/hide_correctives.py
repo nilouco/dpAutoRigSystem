@@ -15,7 +15,7 @@ class HideCorrectives(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -34,8 +34,8 @@ class HideCorrectives(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
             if optionCtrl:
-                if objList:
-                    check_items = cmds.attributeQuery('correctiveCtrls', node=objList[0], exists=True)
+                if inputs:
+                    check_items = cmds.attributeQuery('correctiveCtrls', node=inputs[0], exists=True)
                 else:
                     check_items = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
                 if check_items:

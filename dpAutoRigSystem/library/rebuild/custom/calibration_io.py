@@ -18,7 +18,7 @@ class CalibrationIO(action.BaseAction):
         self.start_name = "dpCalibration"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -38,18 +38,18 @@ class CalibrationIO(action.BaseAction):
             if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    ctrlList = None
-                    if objList:
-                        ctrlList = objList
+                    controllers = None
+                    if inputs:
+                        controllers = inputs
                     else:
-                        ctrlList = self.ar.ctrls.getControlList()
-                    if ctrlList:
+                        controllers = self.ar.ctrls.getControlList()
+                    if controllers:
                         if self.first_mode: #export
-                            self.export_json_file(self.getCalibrationDataDic(ctrlList))
+                            self.export_json_file(self.get_calibration_data(controllers))
                         else: #import
-                            calibrationDic = self.import_latest_json_file(self.get_exported_items())
-                            if calibrationDic:
-                                self.importCalibrationData(calibrationDic)
+                            calibration_data = self.import_latest_json_file(self.get_exported_items())
+                            if calibration_data:
+                                self.import_calibration_data(calibration_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
@@ -71,52 +71,52 @@ class CalibrationIO(action.BaseAction):
         return self.log_data
 
 
-    def getCalibrationDataDic(self, ctrlList, *args):
+    def get_calibration_data(self, controllers):
         """ Processes the given controller list to collect and mount the calibration data.
             Returns the dictionary to export.
         """
-        dic = {}
-        self.ar.utils.setProgress(max=len(ctrlList), add_one=False, add_number=False)
-        for ctrl in ctrlList:
+        data = {}
+        self.ar.utils.setProgress(max=len(controllers), add_one=False, add_number=False)
+        for ctrl in controllers:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            calibrationList = self.ar.ctrls.getListFromStringAttr(ctrl)
-            if calibrationList:
-                dic[ctrl] = {}
-                for attr in calibrationList:
-                    dic[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
-        return dic
+            calibrations = self.ar.ctrls.getListFromStringAttr(ctrl)
+            if calibrations:
+                data[ctrl] = {}
+                for attr in calibrations:
+                    data[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
+        return data
 
 
-    def importCalibrationData(self, calibrationDic, *args):
+    def import_calibration_data(self, calibration_data):
         """ Import the calibration setup from the given calibration data dictionary.
         """
-        self.ar.utils.setProgress(max=len(calibrationDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(calibration_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in calibrationDic.keys():
+        well_imported_items = []
+        for item in calibration_data.keys():
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            notFoundNodesList = []
+            not_found_nodes = []
             # check transformations
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
-                for attr in calibrationDic[item].keys():
+                for attr in calibration_data[item].keys():
                     if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                         # unlock attribute
-                        wasLocked = cmds.getAttr(item+"."+attr, lock=True)
+                        was_locked = cmds.getAttr(item+"."+attr, lock=True)
                         cmds.setAttr(item+"."+attr, lock=False)
                         try:
                             # set calibration value
-                            cmds.setAttr(item+"."+attr, calibrationDic[item][attr])
+                            cmds.setAttr(item+"."+attr, calibration_data[item][attr])
                             # lock attribute again if it was locked
-                            cmds.setAttr(item+"."+attr, lock=wasLocked)
-                            if not item in wellImportedList:
-                                wellImportedList.append(item)
+                            cmds.setAttr(item+"."+attr, lock=was_locked)
+                            if not item in well_imported_items:
+                                well_imported_items.append(item)
                         except Exception as e:
                             self.fail_io(item+" - "+str(e))
             else:
-                notFoundNodesList.append(item)
-        if wellImportedList:
+                not_found_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))

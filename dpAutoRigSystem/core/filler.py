@@ -85,8 +85,8 @@ class UIFiller(object):
             # validators and rebuilders
             else:
                 item.action_cb = cmds.checkBox(label=self.ar.data.lang[item.title], value=item.active, changeCommand=item.change_active, parent=module_layout)
-                item.first_bt = cmds.button(label=item.first_bt_label, width=45, command=partial(item.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.first_bt_enable, parent=module_layout)
-                item.second_bt = cmds.button(label=item.second_bt_label.capitalize(), width=45, command=partial(item.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.second_bt_enable, parent=module_layout)
+                item.first_bt = cmds.button(label=item.first_bt_label, width=45, command=partial(item.run_action, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.first_bt_enable, parent=module_layout)
+                item.second_bt = cmds.button(label=item.second_bt_label.capitalize(), width=45, command=partial(item.run_action, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.second_bt_enable, parent=module_layout)
                 # validators
                 if folder == "" or folder in self.validator_folders:
                     if item.custom_name:

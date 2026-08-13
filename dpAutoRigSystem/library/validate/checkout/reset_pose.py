@@ -33,7 +33,7 @@ class ResetPose(action.BaseAction):
         self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -50,8 +50,8 @@ class ResetPose(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                check_items = objList
+            if inputs:
+                check_items = inputs
             else:
                 check_items = self.ar.ctrls.getControlList()
             if check_items:
@@ -128,9 +128,9 @@ class ResetPose(action.BaseAction):
         if not attributes:
             attributes = []
         if attributes:
-            for attrName in attributes:
-                if not cmds.attributeQuery(attrName, node=item, attributeType=True) == "bool":
-                    cleanAttrList.append(attrName)
+            for attr_name in attributes:
+                if not cmds.attributeQuery(attr_name, node=item, attributeType=True) == "bool":
+                    cleanAttrList.append(attr_name)
         allAttrList = cmds.listAttr(item)
         animAttrList = cmds.listAnimatable(item)
         if allAttrList and animAttrList:

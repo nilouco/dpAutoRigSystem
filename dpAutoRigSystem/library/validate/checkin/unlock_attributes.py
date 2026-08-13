@@ -15,7 +15,7 @@ class UnlockAttributes(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         ''' Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -35,8 +35,8 @@ class UnlockAttributes(action.BaseAction):
             if not self.ar.utils.getNetworkNodeByAttr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
                     nodes = cmds.ls(selection=False)
-                    if objList:
-                        nodes = objList
+                    if inputs:
+                        nodes = inputs
                     if nodes:
                         lockedAttrDic = {}
                         self.ar.utils.setProgress(max=len(nodes), add_one=False, add_number=False)

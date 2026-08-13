@@ -15,7 +15,7 @@ class Cycle(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -35,9 +35,9 @@ class Cycle(action.BaseAction):
             self.ar.utils.setProgress(max=1, add_one=False, add_number=False)
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             cycles = None
-            if objList:
-                cycles = cmds.cycleCheck(objList, list=True)
-                self.checked_items.append(objList)
+            if inputs:
+                cycles = cmds.cycleCheck(inputs, list=True)
+                self.checked_items.append(inputs)
             else:
                 cycles = cmds.cycleCheck(all=False, list=True)
                 if cycles:

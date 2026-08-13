@@ -672,14 +672,14 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
     def correctiveCornerRename(self, s, side, jntList, number, name, *args):
         """ Rename corner corrective joints and return a list of them.
         """
-        resultList = []
+        results = []
         jcrList = cmds.listRelatives(jntList, children=True, allDescendents=True)
         if jcrList:
             for j, jcr in enumerate(jcrList):
                 self.ar.utils.setJointLabel(jcr, s+self.joint_label_add, 18, self.userGuideName+"_"+number+"_"+name+"_"+str(j))
                 renamedJcr = cmds.rename(jcr, side+self.userGuideName+"_"+number+"_"+name+"_"+str(j)+"_Jcr")
-                resultList.append(renamedJcr)
-        return resultList
+                results.append(renamedJcr)
+        return results
 
 
     def getCalibratePresetList(self, s, isLeg, first, main, corner, kneeB, extrem, *args):
@@ -744,7 +744,7 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
 
-                # getting names from dic:
+                # getting names from data:
                 if self.limbTypeName == self.armName:
                     beforeName = self.ar.data.lang['c000_arm_before']
                     mainName = self.ar.data.lang['c001_arm_main']
@@ -1498,8 +1498,8 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                             cmds.connectAttr(self.worldRef+".bends", bendGrpNode+".visibility", force=True)
                         for extraBendGrp in self.extraBendList:
                             cmds.connectAttr(self.worldRef+".extraBends", extraBendGrp+".visibility", force=True)
-                    if self.bendGrps['ctrlList']:
-                        for offsetCtrl in self.bendGrps['ctrlList']:
+                    if self.bendGrps['controllers']:
+                        for offsetCtrl in self.bendGrps['controllers']:
                             cmds.connectAttr(self.fkCtrlList[0]+".message", offsetCtrl+".parentTag", force=True)
 
                     # correct joint skin naming:
@@ -1523,10 +1523,10 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                     
                     # fix autoRotate flipping issue:
                     if s == 0: #left
-                        cmds.setAttr(self.bendGrps['ctrlList'][0]+".invert", 1) #upCtrl
-                        cmds.setAttr(self.bendGrps['ctrlList'][1]+".invert", 1) #downCtrl
+                        cmds.setAttr(self.bendGrps['controllers'][0]+".invert", 1) #upCtrl
+                        cmds.setAttr(self.bendGrps['controllers'][1]+".invert", 1) #downCtrl
                         if quadruped:
-                            cmds.setAttr(self.bendGrps['ctrlList'][3]+".invert", 1) #downBCtrl
+                            cmds.setAttr(self.bendGrps['controllers'][3]+".invert", 1) #downBCtrl
 
                 # orient controller nodes
                 if self.limbTypeName == self.armName:
@@ -1751,9 +1751,9 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                                 if quadruped:
                                     self.cornerBJntList.extend(self.correctiveCornerRename(s, side, self.cornerBJntList[0], cornerBNumber, cornerBName))
                             if toCornerBendList:
-                                self.ar.utils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
+                                self.ar.utils.originedFrom(objName=self.bendGrps['controllers'][2], attrString=";".join(toCornerBendList))
                                 cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
-                                cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                                cmds.parentConstraint(self.bendGrps['controllers'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
                 else:
                     if self.corrective:
                         self.cornerJntList = self.ar.utils.articulationJoint(self.skinJointList[1], self.skinJointList[2], 3, [(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
@@ -1843,9 +1843,9 @@ class Limb(standard.BaseStandard, layout.BaseLayout):
                 self.correctiveCtrl = self.toParentExtremCtrl
                 self.correctiveBCtrl = self.toParentExtremCtrl
                 if self.getHasBend():
-                    self.correctiveCtrl = self.bendGrps['ctrlList'][2]
+                    self.correctiveCtrl = self.bendGrps['controllers'][2]
                     if quadruped:
-                        self.correctiveBCtrl = self.bendGrps['ctrlList'][3]
+                        self.correctiveBCtrl = self.bendGrps['controllers'][3]
                 self.cornerCorrectiveNet = self.setup_corrective_net(self.correctiveCtrl, self.skinJointList[1], self.skinJointList[2], side+self.userGuideName+"_"+self.jNameList[2]+"_YawRight", 0, 0, -110, isLeg, [side+self.userGuideName+"_"+self.jNameList[2]+"_YawLeft", 1, 1, -110])
                 correctionNetInputValue = cmds.getAttr(self.cornerCorrectiveNet+".inputValue")
                 if correctionNetInputValue > 0:

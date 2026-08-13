@@ -265,13 +265,13 @@ class IkFkSnap(object):
                     cmds.setKeyframe(toCtrl, attribute=attr)
 
 
-    def resetShear(self, ctrlList, *args):
+    def resetShear(self, controllers, *args):
         """ Set zero to all shear attributes in main controllers affected by possible stretch.
         """
         startLength = cmds.getAttr(self.ikExtremCtrl+".startChainLength")
         currentLength = self.getChainPosition()[3] #chainLen
         if currentLength == startLength:
-            for ctrl in ctrlList:
+            for ctrl in controllers:
                 cmds.setAttr(ctrl+".shearXY", 0)
                 cmds.setAttr(ctrl+".shearXZ", 0)
                 cmds.setAttr(ctrl+".shearYZ", 0)
@@ -481,13 +481,13 @@ class IkFkSnap(object):
                     cmds.setAttr(toCtrl+"."+attr, fromValue)
                     cmds.setKeyframe(toCtrl, attribute=attr)
 
-    def resetShear(self, ctrlList, *args):
+    def resetShear(self, controllers, *args):
         """ Set zero to all shear attributes in main controllers affected by possible stretch.
         """
         startLength = cmds.getAttr(self.ikExtremCtrl+".startChainLength")
         currentLength = self.getChainPosition()[3] #chainLen
         if currentLength == startLength:
-            for ctrl in ctrlList:
+            for ctrl in controllers:
                 cmds.setAttr(ctrl+".shearXY", 0)
                 cmds.setAttr(ctrl+".shearXZ", 0)
                 cmds.setAttr(ctrl+".shearYZ", 0)

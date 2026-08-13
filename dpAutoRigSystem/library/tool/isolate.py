@@ -71,7 +71,7 @@ class Isolate(base.BaseLibrary):
         self.dpIsolate(self.isolateName, nodes)
         
         
-    def dpIsolate(self, attrName, nodes, *args):
+    def dpIsolate(self, attr_name, nodes, *args):
         """ Function to run isolate setup.
         """
         # get father zero out transform node
@@ -80,12 +80,12 @@ class Isolate(base.BaseLibrary):
         pConst = cmds.parentConstraint(nodes[0], nodes[1], zeroGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zeroGrp+"_PaC")[0]
         cmds.setAttr(pConst+".interpType", 0) #noFlip
         # add isolate attribute to selected control
-        cmds.addAttr(nodes[2], longName=attrName, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
+        cmds.addAttr(nodes[2], longName=attr_name, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
         # create reverse node
-        reverseNode = cmds.createNode('reverse', name=nodes[2]+"_"+attrName.capitalize()+"_Rev")
+        reverseNode = cmds.createNode('reverse', name=nodes[2]+"_"+attr_name.capitalize()+"_Rev")
         self.ar.custom_attr.addAttr(0, [pConst, reverseNode]) #dpID
         # do isolate connections
-        cmds.connectAttr(nodes[2]+"."+attrName, pConst+"."+nodes[0]+"W0", force=True)
-        cmds.connectAttr(nodes[2]+"."+attrName, reverseNode+".inputX", force=True)
+        cmds.connectAttr(nodes[2]+"."+attr_name, pConst+"."+nodes[0]+"W0", force=True)
+        cmds.connectAttr(nodes[2]+"."+attr_name, reverseNode+".inputX", force=True)
         cmds.connectAttr(reverseNode+".outputX", pConst+"."+nodes[1]+"W1", force=True)
         cmds.select(nodes[2])

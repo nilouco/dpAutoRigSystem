@@ -18,7 +18,7 @@ class ControllerShapeIO(action.BaseAction):
         self.start_name = "dpControlShape"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -38,31 +38,31 @@ class ControllerShapeIO(action.BaseAction):
             if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    ctrlList = None
-                    if objList:
-                        ctrlList = objList
+                    controllers = None
+                    if inputs:
+                        controllers = inputs
                     else:
-                        ctrlList = self.ar.ctrls.getControlList()
-                    if ctrlList:
-                        self.ar.utils.setProgress(max=len(ctrlList), add_one=False, add_number=False)
+                        controllers = self.ar.ctrls.getControlList()
+                    if controllers:
+                        self.ar.utils.setProgress(max=len(controllers), add_one=False, add_number=False)
                         if self.first_mode: #export
                             try:
                                 self.ar.pipeliner.make_dir_if_not_exists(self.io_path)
-                                ctrlFileName = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".ma"
-                                self.ar.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
-                                self.well_done_io(ctrlFileName)
+                                ctrl_filename = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".ma"
+                                self.ar.ctrls.exportShape(controllers, ctrl_filename, ui=False, verbose=True)
+                                self.well_done_io(ctrl_filename)
                             except Exception as e:
-                                self.fail_io(', '.join(ctrlList)+": "+str(e))
+                                self.fail_io(', '.join(controllers)+": "+str(e))
                         else: #import
-                            exportedList = self.get_exported_items()
-                            if exportedList:
+                            exported_items = self.get_exported_items()
+                            if exported_items:
                                 try:
-                                    exportedList.sort()
-                                    ctrlsToImport = self.io_path+"/"+exportedList[-1]
-                                    self.ar.ctrls.importShape(ctrlList, ctrlsToImport, ui=False, verbose=True)
-                                    self.well_done_io(exportedList[-1])
+                                    exported_items.sort()
+                                    to_import_ctrls = self.io_path+"/"+exported_items[-1]
+                                    self.ar.ctrls.importShape(controllers, to_import_ctrls, ui=False, verbose=True)
+                                    self.well_done_io(exported_items[-1])
                                 except Exception as e:
-                                    self.fail_io(exportedList[-1]+": "+str(e))
+                                    self.fail_io(exported_items[-1]+": "+str(e))
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:

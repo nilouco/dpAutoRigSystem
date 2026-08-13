@@ -19,7 +19,7 @@ class BorderGap(action.BaseAction):
             reload(action)
 
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -36,8 +36,8 @@ class BorderGap(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                check_items = cmds.ls(objList, type="mesh")
+            if inputs:
+                check_items = cmds.ls(inputs, type="mesh")
             else:
                 check_items = cmds.ls(selection=False, type="mesh")
             if check_items:

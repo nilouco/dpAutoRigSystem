@@ -173,7 +173,7 @@ class FacialConnection(base.BaseLibrary):
                         fromMesh = fromMeshList[n]
                         break
         if fromMesh:
-            geoList, resultList = [], []
+            geoList, results = [], []
             for geoBase in fromMeshList:
                 prefix = baseName
                 if self.ar.data.ui_state:
@@ -235,8 +235,8 @@ class FacialConnection(base.BaseLibrary):
                 # if createBsNode is checked, it will create the blendShape node connecting combination if needed
                 if createBsNode:
                     self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=combinationTargets)
-            if self.ar.data.ui_state and resultList:
-                self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(resultList), 'center', 200, 350)
+            if self.ar.data.ui_state and results:
+                self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(results), 'center', 200, 350)
         else:
             mel.eval("warning \""+self.ar.data.lang["i042_notSelection"]+"\";")
         self.ar.utils.close_ui('dpFacialConnectionWindow')
@@ -256,21 +256,21 @@ class FacialConnection(base.BaseLibrary):
         return newTgt
 
 
-    def dpGetFacialCtrlDic(self, ctrlList, *args):
-        """ Return the facial control dic with facialList attributes.
+    def dpGetFacialCtrlDic(self, controllers, *args):
+        """ Return the facial control data with facialList attributes.
         """
         resultDic = {}
-        if not ctrlList:
-            ctrlList = self.ar.ctrls.getControlList()
-        if ctrlList:
-            for ctrl in ctrlList:
+        if not controllers:
+            controllers = self.ar.ctrls.getControlList()
+        if controllers:
+            for ctrl in controllers:
                 if cmds.objExists(ctrl+".facialList"):
                     resultDic[ctrl] = self.ar.ctrls.getListFromStringAttr(ctrl, "facialList")
         return resultDic
     
 
     def dpGetBsNodeDic(self, bsList):
-        """ Return the blendShape nodes dic with their target.
+        """ Return the blendShape nodes data with their target.
         """        
         bsDic = {}
         if bsList:
@@ -281,12 +281,12 @@ class FacialConnection(base.BaseLibrary):
         return bsDic
 
 
-    def dpConnectToBlendShape(self, ctrlList=None, bsList=None, *args):
+    def dpConnectToBlendShape(self, controllers=None, bsList=None, *args):
         """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
         """
-        resultList = []
+        results = []
         # get facialList attr from found dpAR controls
-        facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
+        facialCtrlDic = self.dpGetFacialCtrlDic(controllers)
         # get target list from existing blendShape nodes
         if not bsList:
             bsList = cmds.ls(selection=False, type="blendShape")
@@ -309,29 +309,29 @@ class FacialConnection(base.BaseLibrary):
                                 if connectIt:
                                     cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
                                     print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
-                                    resultList.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
+                                    results.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
             for bsNode in list(bsDic.keys()):
                 # check and connect combination targets if any
                 combinationsDic = self.dpFindCombinationTgtRelationship(bsNode)
                 combResultList = self.connectCombinationTargets(bsNode, combinationsDic)
                 if combResultList:
                     for result in combResultList:
-                        resultList.append(result)
-        if self.ar.data.ui_state and resultList:
-            self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
+                        results.append(result)
+        if self.ar.data.ui_state and results:
+            self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
         self.ar.utils.close_ui('dpFacialConnectionWindow')
     
 
-    def dpConnectToJoints(self, ctrlList=None, *args):
+    def dpConnectToJoints(self, controllers=None, *args):
         """ Connect the facial controllers attributes to the stored facial tweakers data.
         """
-        self.to_ids, resultList = [], []
+        self.to_ids, results = [], []
         # redefining Tweaks variables to get the tweaks name list
         self.dpInitTweaksVariables()
         # get joint target list
         self.jntTargetList = self.dpGetJointNodeList(self.tweaksNameList)
         if self.jntTargetList:
-            facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
+            facialCtrlDic = self.dpGetFacialCtrlDic(controllers)
             if facialCtrlDic:
                 # declaring gaming dictionary:
                 self.tweaksDic = self.dpInitTweaksDic()
@@ -350,13 +350,13 @@ class FacialConnection(base.BaseLibrary):
                                 if middleOrSided == MIDDLE:
                                     nodeDataList.append(self.tweaksDic[sidedAttr][middleOrSided])
                                 elif middleOrSided == SIDED:
-                                    dic = {}
+                                    data = {}
                                     for s in ["L", "R"]:
                                         if sidePrefix == None or sidePrefix == s:
                                             for n in list(self.tweaksDic[sidedAttr][middleOrSided].keys()):
                                                 # add prefix to the destination joint target node
-                                                dic[s+"_"+n] = self.tweaksDic[sidedAttr][middleOrSided][n]
-                                    nodeDataList.append(dic)
+                                                data[s+"_"+n] = self.tweaksDic[sidedAttr][middleOrSided][n]
+                                    nodeDataList.append(data)
                                 else:
                                     for s in ["L", "R"]:
                                         if middleOrSided == s+"_"+MIDDLE:
@@ -380,10 +380,10 @@ class FacialConnection(base.BaseLibrary):
                                                             self.dpCreateRemapNode(facialCtrl, facialAttr, jntTarget, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
                                                             self.RmVNumber = self.RmVNumber+1
                                                         print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
-                                                        resultList.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
+                                                        results.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
                     self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
-                    if self.ar.data.ui_state and resultList:
-                        self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(resultList), 'center', 200, 350)
+                    if self.ar.data.ui_state and results:
+                        self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
         self.ar.utils.close_ui('dpFacialConnectionWindow')
 
     
@@ -572,7 +572,7 @@ class FacialConnection(base.BaseLibrary):
     def connectCombinationTargets(self, bsNode, combinationsDic, *args):
         """ Connect combination targets in the given blendShape node using the combinationsDic information.
         """
-        resultList = []
+        results = []
         if combinationsDic:
             for combTgt, drivers in combinationsDic.items():
                 combIndex = self.getBlendShapeTargetIndex(bsNode, combTgt)
@@ -587,8 +587,8 @@ class FacialConnection(base.BaseLibrary):
                     if not cmds.getAttr(bsNode+"."+combTgt, lock=True):
                         cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
                         print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
-                        resultList.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
-        return resultList
+                        results.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
+        return results
 
 
     def decomposeTgtName(self, tgtName, prefix, *args):

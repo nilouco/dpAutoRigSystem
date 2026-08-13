@@ -18,7 +18,7 @@ class ChannelIO(action.BaseAction):
         self.start_name = "dpChannel"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -39,17 +39,17 @@ class ChannelIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     items = None
-                    if objList:
-                        items = objList
+                    if inputs:
+                        items = inputs
                     else:
                         items = cmds.ls(selection=False, type="transform")
                     if items:
                         if self.first_mode: #export
-                            self.export_json_file(self.getChannelDataDic(items))
+                            self.export_json_file(self.get_channel_data(items))
                         else: #import
-                            attrDic = self.import_latest_json_file(self.get_exported_items())
-                            if attrDic:
-                                self.importChannelData(attrDic)
+                            attr_data = self.import_latest_json_file(self.get_exported_items())
+                            if attr_data:
+                                self.import_channel_data(attr_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
@@ -71,34 +71,34 @@ class ChannelIO(action.BaseAction):
         return self.log_data
 
 
-    def getChannelDataDic(self, items, *args):
+    def get_channel_data(self, items):
         """ Processes the given item list to collect and mount the tranform attributes data.
             Returns the dictionary to export.
         """
-        dic = {}
+        data = {}
         self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                dic[item] = {}
+                data[item] = {}
                 for attr in self.ar.data.transform_attrs:
-                    dic[item][attr] = {
+                    data[item][attr] = {
                                         "locked" : cmds.getAttr(item+"."+attr, lock=True),
                                         "keyable" : cmds.getAttr(item+"."+attr, keyable=True),
                                         "channelBox" : cmds.getAttr(item+"."+attr, channelBox=True)
                                         }
-        return dic
+        return data
 
 
-    def importChannelData(self, attrDic, *args):
+    def import_channel_data(self, attr_data):
         """ Import tranform attributes states from exported dictionary.
             Just set them as locked, hidden, non keyable or not.
         """
-        self.ar.utils.setProgress(max=len(attrDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(attr_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        for item in attrDic.keys():
-            notFoundNodesList = []
+        well_imported_items = []
+        for item in attr_data.keys():
+            not_found_nodes = []
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
@@ -106,17 +106,17 @@ class ChannelIO(action.BaseAction):
             if cmds.objExists(item):
                 for attr in self.ar.data.transform_attrs:
                     try:
-                        cmds.setAttr(item+"."+attr, keyable=attrDic[item][attr]['keyable'])
-                        if not attrDic[item][attr]['keyable']:
-                            cmds.setAttr(item+"."+attr, channelBox=attrDic[item][attr]['channelBox'])
-                        cmds.setAttr(item+"."+attr, lock=attrDic[item][attr]['locked'])
-                        if not item in wellImportedList:
-                            wellImportedList.append(item)
+                        cmds.setAttr(item+"."+attr, keyable=attr_data[item][attr]['keyable'])
+                        if not attr_data[item][attr]['keyable']:
+                            cmds.setAttr(item+"."+attr, channelBox=attr_data[item][attr]['channelBox'])
+                        cmds.setAttr(item+"."+attr, lock=attr_data[item][attr]['locked'])
+                        if not item in well_imported_items:
+                            well_imported_items.append(item)
                     except Exception as e:
                         self.fail_io(item+" - "+str(e))
             else:
-                notFoundNodesList.append(item)
-        if wellImportedList:
+                not_found_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))

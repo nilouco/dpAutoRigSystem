@@ -18,7 +18,7 @@ class RenameIO(action.BaseAction):
         self.start_name = "dpRename"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -39,17 +39,17 @@ class RenameIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     items = None
-                    if objList:
-                        items = objList
+                    if inputs:
+                        items = inputs
                     else:
                         items = [n for n in cmds.ls(selection=False, noIntermediate=True) if cmds.attributeQuery(self.ar.data.dp_id, node=n, exists=True)]
                     if items:
                         if self.first_mode: #export
-                            self.export_json_file(self.getNodeIDDataDic(items))
+                            self.export_json_file(self.get_node_id_data(items))
                         else: #import
-                            nodeIDDic = self.import_latest_json_file(self.get_exported_items())
-                            if nodeIDDic:
-                                self.importNodeIDData(nodeIDDic)
+                            node_id_data = self.import_latest_json_file(self.get_exported_items())
+                            if node_id_data:
+                                self.import_node_id_data(node_id_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
@@ -71,46 +71,46 @@ class RenameIO(action.BaseAction):
         return self.log_data
 
 
-    def getNodeIDDataDic(self, items, *args):
+    def get_node_id_data(self, items):
         """ Processes the given item list to collect and mount the dpID attribute dictionary.
             Returns the dictionary to export.
         """
-        dic = {}
+        data = {}
         self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                dic[item] = cmds.getAttr(item+"."+self.ar.data.dp_id)
-        return dic
+                data[item] = cmds.getAttr(item+"."+self.ar.data.dp_id)
+        return data
 
 
-    def importNodeIDData(self, nodeIDDic, *args):
+    def import_node_id_data(self, node_id_data):
         """ Import data from exported dictionary.
             Check if nodes exist in the scene, otherwise try to find in the dpID if it was probably renamed.
         """
-        self.ar.utils.setProgress(max=len(nodeIDDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(node_id_data.keys()), add_one=False, add_number=False)
         # define lists to check result
-        wellImportedList = []
-        notFoundNodesList = []
-        maybeList = []
-        for item in nodeIDDic.keys():
+        well_imported_items = []
+        not_found_nodes = []
+        maybe_items = []
+        for item in node_id_data.keys():
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             # check item
             if not cmds.objExists(item):
-                oldIDList = self.ar.utils.getDecomposedIDList(nodeIDDic[item])
-                if oldIDList:
-                    if cmds.objExists(oldIDList[1]):
-                        cmds.rename(oldIDList[1], item)
-                        wellImportedList.append(item)
+                old_id_data = self.ar.utils.getDecomposedIDList(node_id_data[item])
+                if old_id_data:
+                    if cmds.objExists(old_id_data[1]):
+                        cmds.rename(old_id_data[1], item)
+                        well_imported_items.append(item)
                     elif item.endswith("Shape"):
-                        maybeList.append(item)
+                        maybe_items.append(item)
                     else:
-                        notFoundNodesList.append(item)
-        if wellImportedList:
+                        not_found_nodes.append(item)
+        if well_imported_items:
             self.well_done_io(self.latest_data_file)
-        elif notFoundNodesList:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
-        elif maybeList:
-            self.maybe_done_io(self.ar.data.lang['r066_shapeToReplace']+" "+', '.join(maybeList))
+        elif not_found_nodes:
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+": "+', '.join(not_found_nodes))
+        elif maybe_items:
+            self.maybe_done_io(self.ar.data.lang['r066_shapeToReplace']+" "+', '.join(maybe_items))
         else:
             self.maybe_done_io(self.ar.data.lang['r032_notImportedData'])

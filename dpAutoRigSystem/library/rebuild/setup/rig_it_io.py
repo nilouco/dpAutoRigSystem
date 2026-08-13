@@ -19,7 +19,7 @@ class RigItIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.

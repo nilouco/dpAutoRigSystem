@@ -27,7 +27,7 @@ class GuideIO(action.BaseAction):
         self.head_deformer.ui = False
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -50,8 +50,8 @@ class GuideIO(action.BaseAction):
                     self.ar.ui_manager.refresh_ui(reset_buttons=False)
                     if self.first_mode: #export
                         netList = None
-                        if objList:
-                            netList = objList
+                        if inputs:
+                            netList = inputs
                         else:
                             netList = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
                             netList.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
@@ -110,11 +110,11 @@ class GuideIO(action.BaseAction):
     def getGuideDataDic(self, netList, *args):
         """ Return a dictionary of the guide data to export it.
         """
-        toExportDataDic = {}
+        to_export_data = {}
         self.ar.utils.setProgress(max=len(netList), add_one=False, add_number=False)
         for net in netList:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            # mount a dic with all data 
+            # mount a data with all data 
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
                     # get data from not rendered guide (rawGuide status on)
@@ -122,11 +122,11 @@ class GuideIO(action.BaseAction):
                     for moduleInstance in self.ar.data.guide_instances:
                         if str(moduleInstance) == moduleInstanceInfoString:
                             moduleInstance.serialize_guide(False) #serialize it without build it
-                toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
+                to_export_data[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
             elif "dpHeadDeformerNet" in cmds.listAttr(net):
                 if not cmds.listConnections(net+".guideNet", source=True, destination=False):
-                    toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".netData"))
-        return toExportDataDic
+                    to_export_data[net] = ast.literal_eval(cmds.getAttr(net+".netData"))
+        return to_export_data
 
 
     def setupInstanceChanges(self, rebuilding=True, *args):

@@ -22,7 +22,7 @@ class BlendshapeIO(action.BaseAction):
         self.extention = "shp"
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in export mode by default.
             If first_mode parameter is False, it'll run in import mode.
@@ -48,8 +48,8 @@ class BlendshapeIO(action.BaseAction):
                     if self.io_path:
                         if self.first_mode: #export
                             bsList = None
-                            if objList:
-                                bsList = objList
+                            if inputs:
+                                bsList = inputs
                             else:
                                 bsList = [n for n in cmds.ls(selection=False, type="blendShape") if cmds.blendShape(n, query=True, geometry=True)]
                             if bsList:
@@ -102,8 +102,8 @@ class BlendshapeIO(action.BaseAction):
             targetList = cmds.listAttr("{}.weight".format(bsNode), multi=True)
             if targetList:
                 # prepare index to deleted targets
-                indexList = cmds.getAttr("{}.weight".format(bsNode), multiIndices=True)
-                bsDic[bsNode]["indexTargetDic"] = dict(zip(indexList, targetList))
+                indexes = cmds.getAttr("{}.weight".format(bsNode), multiIndices=True)
+                bsDic[bsNode]["indexTargetDic"] = dict(zip(indexes, targetList))
                 deletedIndexList = []
                 i = 0 #workaround to avoid deleted target index when importing data
                 for t, target in enumerate(targetList):
@@ -129,7 +129,7 @@ class BlendshapeIO(action.BaseAction):
                     # getting vertex weights if not equal to 1
                     for s, shapeNode in enumerate(bsDic[bsNode]["geometry"]):
                         # write deleted target to compose a clear target list to avoid Maya's garbage issue
-                        while not i == indexList[t]:
+                        while not i == indexes[t]:
                             bsDic[bsNode]["targets"][i] = {"deleted" : True}
                             deletedIndexList.append(i)
                             i += 1

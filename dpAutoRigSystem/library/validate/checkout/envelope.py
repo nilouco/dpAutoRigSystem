@@ -31,7 +31,7 @@ class Envelope(action.BaseAction):
         return envelopeValue < 1
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -48,8 +48,8 @@ class Envelope(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            if objList:
-                allNodesList = objList
+            if inputs:
+                allNodesList = inputs
             else:
                 allNodesList = cmds.ls()
             allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))

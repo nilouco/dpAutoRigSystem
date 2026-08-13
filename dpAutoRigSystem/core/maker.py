@@ -1110,8 +1110,8 @@ class Composer(object):
             world_ref = head.composed['worldRefList'][s]
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=world_ref+"_PaC"))
             if self.ar.data.colorize_curve:
-                if head.composed['ctrlList']:
-                    self.ar.ctrls.colorShape(head.composed['ctrlList'][s], "yellow")
+                if head.composed['controllers']:
+                    self.ar.ctrls.colorShape(head.composed['controllers'][s], "yellow")
                 if head.composed['InnerCtrls']:
                     self.ar.ctrls.colorShape(head.composed['InnerCtrls'][s], "cyan")
                 if head.composed['lCtrls']:
@@ -1247,11 +1247,11 @@ class Composer(object):
                 suspension_b_ctrl_grp = suspension.composed['suspensionBCtrlGrpList'][s]
                 # find the correct fatherB node in order to parent the B_Ctrl:
                 if "__" in loaded_father_b and ":" in loaded_father_b: # means we need to parent to a rigged guide
-                    # find fatherB module dic:
+                    # find fatherB module data:
                     father_b_namespace = loaded_father_b[:loaded_father_b.find(":")]
                     for hook_item in self.ar.maker.hook:
                         if self.ar.maker.hook[hook_item]['guideModuleNamespace'] == father_b_namespace:
-                            # got wheel module dic:
+                            # got wheel module data:
                             father_b_module_data = hook_item
                             father_b_mirror_axis = self.ar.maker.hook[father_b_module_data]['guideMirrorAxis']
                             father_b_guide_mirror_names = self.ar.maker.hook[father_b_module_data]['guideMirrorName']
@@ -1293,7 +1293,7 @@ class Composer(object):
         # compose the nose control colors:
         if self.ar.maker.hook[nose.guide_base]['guideMirrorAxis'] == "off":
             if self.ar.data.colorize_curve:
-                self.ar.ctrls.colorShape(nose.composed['ctrlList'][0], "yellow")
+                self.ar.ctrls.colorShape(nose.composed['controllers'][0], "yellow")
                 self.ar.ctrls.colorShape(nose.composed['lCtrls'][0], "red")
                 self.ar.ctrls.colorShape(nose.composed['rCtrls'][0], "blue")
         

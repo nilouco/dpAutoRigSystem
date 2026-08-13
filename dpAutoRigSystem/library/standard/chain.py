@@ -400,8 +400,8 @@ class Chain(standard.BaseStandard, layout.BaseLayout):
                             cmds.setAttr(self.fkZeroGrpList[0]+".scaleZ", -1)
                             attributes = ["tx", "ty", "tz", "rx", "ry", "rz"]
                             for attr in attributes:
-                                attrValue = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
-                                cmds.setAttr(self.fkZeroGrpList[f]+"."+attr, -1*attrValue)
+                                attr_value = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
+                                cmds.setAttr(self.fkZeroGrpList[f]+"."+attr, -1*attr_value)
                 
                 # working with position, orientation of joints and make an orientConstraint for Fk controls:
                 for n in range(0, self.nJoints):

@@ -16,8 +16,7 @@ class FingerHandPose(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
-        self.oldDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+        self.oldDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
         self.sides = ["", self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
         self.armName = self.ar.data.lang['c037_arm']
         self.wristName = self.ar.data.lang['c004_arm_extrem']
@@ -100,7 +99,7 @@ class FingerHandPose(base.BaseLibrary):
                             cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=0, value=0)
                             cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=1, value=-10)
                 if handCtrlList:
-                    currentDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+                    currentDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
                     newDrivenKeyList = currentDrivenKeyList
                     if self.oldDrivenKeyList:
                         newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))

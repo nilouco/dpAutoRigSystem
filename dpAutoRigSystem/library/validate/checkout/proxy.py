@@ -19,7 +19,7 @@ class Proxy(action.BaseAction):
         self.repeatedNameList = []
     
 
-    def runAction(self, first_mode=True, objList=None, *args):
+    def run_action(self, first_mode=True, inputs=None, *args):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If first_mode parameter is False, it'll run in fix mode.
@@ -38,8 +38,8 @@ class Proxy(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             self.skinClusterList = []
             proxyGrp = None
-            if objList:
-                proxyGrp = objList[0]
+            if inputs:
+                proxyGrp = inputs[0]
             else:
                 proxyGrp = self.ar.utils.getNodeByMessage("proxyGrp")
                 if not proxyGrp:
@@ -122,7 +122,7 @@ class Proxy(action.BaseAction):
             self.skinClusterList.append(skinClusterNode)
             weightedInfluenceList = cmds.skinCluster(skinClusterNode, query=True, weightedInfluence=True)
             if weightedInfluenceList:
-                # get data and store it into a dic
+                # get data and store it into a data
                 indexJointDic = {}
                 sourceFaceList = cmds.ls(source+".f[*]", flatten=True, long=True)
                 for i, idx in enumerate(sourceFaceList):

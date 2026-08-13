@@ -86,7 +86,7 @@ class BaseAction(base.BaseLibrary):
     def cleanup_to_start(self, rebuilding=False):
         """ Just redeclare variables and close openned window to run the code properly.
         """
-        print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.get_title()} IO")
+        print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.get_title()}")
         if self.verbose:
             self.ar.utils.setProgress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
         # redeclare variables
@@ -333,7 +333,7 @@ class BaseAction(base.BaseLibrary):
                 for action_instance in action_instances:
                     if action_name in str(action_instance):
                         action_instance.verbose = False
-                        action_instance.runAction(first_mode, items)
+                        action_instance.run_action(first_mode, items)
                         action_instance.verbose = True
 
 
@@ -346,7 +346,7 @@ class BaseAction(base.BaseLibrary):
         cmds.select(clear=True)
 
 
-    def change_node_state(self, items, find_deform=True, state=None, dic=None):
+    def change_node_state(self, items, find_deform=True, state=None, data=None):
         """ Useful for rebuilder to set deformer node state as has no effect before export a not edited mesh.
             Returns the current node state dictionary of the given node list and all descendent hierarchy too.
         """
@@ -369,16 +369,16 @@ class BaseAction(base.BaseLibrary):
                         for deformer_node in input_deformers:
                             if not deformer_node in to_change_items:
                                 to_change_items.append(deformer_node)
-        elif dic:
-            to_change_items = dic.keys()
+        elif data:
+            to_change_items = data.keys()
         else:
             to_change_items = items
         if to_change_items:
             for node in to_change_items:
                 if not cmds.listConnections(node+".nodeState", source=True, destination=False):
                     value = state
-                    if dic:
-                        value = dic[node]
+                    if data:
+                        value = data[node]
                     result_data[node] = cmds.getAttr(node+".nodeState")
                     lock_attr_status = cmds.getAttr(node+".nodeState", lock=True)
                     lock_node_status = cmds.lockNode(node, query=True, lock=True)[0]
@@ -395,7 +395,7 @@ class BaseAction(base.BaseLibrary):
     def get_broken_id_data(self, check_items=None):
         """ Return a dictionary with the broken ID nodes as keys and them father nodes as values.
         """
-        dic = {"BrokenID" : {}}
+        data = {"BrokenID" : {}}
         if not check_items:
             check_items = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
         if check_items:
@@ -407,17 +407,17 @@ class BaseAction(base.BaseLibrary):
                     short_name = item[item.rfind("|")+1:]
                     if not self.ar.utils.validateID(short_name):
                         item_type = cmds.objectType(item)
-                        if not item_type in dic["BrokenID"].keys():
-                            dic["BrokenID"][item_type] = {}
-                        dic["BrokenID"][item_type][short_name] = None
+                        if not item_type in data["BrokenID"].keys():
+                            data["BrokenID"][item_type] = {}
+                        data["BrokenID"][item_type][short_name] = None
                         fathers = cmds.listRelatives(item, parent=True, fullPath=True)
                         if fathers:
-                            dic["BrokenID"][item_type][short_name] = fathers[0]
-        return dic
+                            data["BrokenID"][item_type][short_name] = fathers[0]
+        return data
 
 
     def end_progress(self, update_guides=False):
-        print(f"{self.ar.data.lang['m184_end']}: {self.get_title()} IO\n----------")
+        print(f"{self.ar.data.lang['m184_end']}: {self.get_title()}\n----------")
         if self.verbose:
             self.ar.utils.setProgress(endIt=True)
         if update_guides:
@@ -426,15 +426,15 @@ class BaseAction(base.BaseLibrary):
         self.ar.data.rebuilding = False
 
 
-    def export_json_file(self, dic):
+    def export_json_file(self, data):
         """ Export given dictionary to json file using ioPath and startName as prefix of the current file name.
         """
-        if dic:
+        if data:
             try:
                 # export json file
                 self.ar.pipeliner.make_dir_if_not_exists(self.io_path)
                 json_name = self.io_path+"/"+self.start_name+"_"+self.ar.pipeliner.pipe_data['currentFileName']+".json"
-                self.ar.pipeliner.save_json_file(dic, json_name)
+                self.ar.pipeliner.save_json_file(data, json_name)
                 self.well_done_io(json_name)
             except Exception as e:
                 self.fail_io(json_name+": "+str(e))
@@ -471,7 +471,7 @@ class BaseAction(base.BaseLibrary):
             abc_name = path+"/"+start_name+"_"+file_name+".abc"
             cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+io_items+attributes+" -file "+abc_name)
             if node_state_data:
-                self.change_node_state(items, find_deform=False, dic=node_state_data) #back deformer as before
+                self.change_node_state(items, find_deform=False, data=node_state_data) #back deformer as before
             self.well_done_io(abc_name)
         except Exception as e:
             self.fail_io(', '.join(items)+": "+str(e))
@@ -612,7 +612,7 @@ class BaseAction(base.BaseLibrary):
         """ Processes the given constraint list to collect and mount the info data.
             Returns the dictionary to export.
         """
-        dic = {}
+        data = {}
         attributes = ["interpType", "constraintOffsetPolarity", "aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
         output_attributes = ["constraintTranslateX", "constraintTranslateY",  "constraintTranslateZ",  "constraintRotateX",  "constraintRotateY",  "constraintRotateZ",  "constraintScaleX",  "constraintScaleY",  "constraintScaleZ"]
         #typeAttrDic = {
@@ -627,18 +627,18 @@ class BaseAction(base.BaseLibrary):
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=const, exists=True):
                 # getting attributes if they exists
-                dic[const] = {"attributes" : {},
+                data[const] = {"attributes" : {},
                               "output"     : {},
                               "type"       : cmds.objectType(const)
                             }
                 for attr in attributes:
                     if attr in cmds.listAttr(const):
-                        dic[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
-                dic[const]["worldUpMatrix"] = []
+                        data[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
+                data[const]["worldUpMatrix"] = []
                 if "worldUpMatrix" in cmds.listAttr(const):
-                    dic[const]["worldUpMatrix"] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
-                dic[const]["constraintParentInverseMatrix"] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
-                dic[const]["target"] = {}
+                    data[const]["worldUpMatrix"] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
+                data[const]["constraintParentInverseMatrix"] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
+                data[const]["target"] = {}
                 if "target" in cmds.listAttr(const):
                     target_attr = None
                     if cmds.objExists(const+".target[0].targetParentMatrix"):
@@ -648,18 +648,18 @@ class BaseAction(base.BaseLibrary):
                     elif cmds.objExists(const+".target[0].targetMesh"):
                         target_attr = "targetMesh"
                     if target_attr:
-                        dic[const]["target"][target_attr] = {}
+                        data[const]["target"][target_attr] = {}
                         for target in cmds.getAttr(const+".target", multiIndices=True):
-                            dic[const]["target"][target_attr][target] = [cmds.listConnections(const+".target["+str(target)+"]."+target_attr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(target)+"].targetWeight")]
+                            data[const]["target"][target_attr][target] = [cmds.listConnections(const+".target["+str(target)+"]."+target_attr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(target)+"].targetWeight")]
                 # store connection info to disconnect when import if need to skip the constraint driving
                 for output_attr in output_attributes:
-                    dic[const]["output"][output_attr] = None
+                    data[const]["output"][output_attr] = None
                     if output_attr in cmds.listAttr(const):
                         if cmds.listConnections(const+"."+output_attr, source=False, destination=True):
-                            dic[const]["output"][output_attr] = True
+                            data[const]["output"][output_attr] = True
                         else:
-                            dic[const]["output"][output_attr] = False
-        return dic
+                            data[const]["output"][output_attr] = False
+        return data
 
 
     def import_constraint_data(self, constraint_data, verbose=True):

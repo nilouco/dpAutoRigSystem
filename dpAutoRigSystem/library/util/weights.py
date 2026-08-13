@@ -257,25 +257,25 @@ class Weights(object):
             nodes = cmds.ls(selection=False, type=list(falloffTypeAttrDic.keys()))
         if nodes:
             for node in nodes:
-                nodeType = cmds.objectType(node)
+                node_type = cmds.objectType(node)
                 falloffDic[node] = { "name" : node,
-                                     "type" : nodeType,
+                                     "type" : node_type,
                                      "outputWeightFunction" : cmds.listConnections(node+".outputWeightFunction", source=False, destination=True, plugs=True),
                                      "attributes" : {}
                                     }
                 # node attributes and common
-                if falloffTypeAttrDic[nodeType]:
-                    for attr in (falloffTypeAttrDic[nodeType] + commonAttrList):
+                if falloffTypeAttrDic[node_type]:
+                    for attr in (falloffTypeAttrDic[node_type] + commonAttrList):
                         if cmds.objExists(node+"."+attr):
                             falloffDic[node]["attributes"][attr] = cmds.getAttr(node+"."+attr)
                 # specific multiIndices attributes
-                for multiAttr in multiAttrDic.keys():
-                    if cmds.objExists(node+"."+multiAttr):
-                        if cmds.getAttr(node+"."+multiAttr, multiIndices=True):
-                            for i, index in enumerate(cmds.getAttr(node+"."+multiAttr, multiIndices=True)):
-                                for name in multiAttrDic[multiAttr]:
-                                    attrName = multiAttr+"["+str(index)+"]."+name
-                                    falloffDic[node]["attributes"][attrName] = cmds.getAttr(node+"."+attrName)
+                for multi_attr in multiAttrDic.keys():
+                    if cmds.objExists(node+"."+multi_attr):
+                        if cmds.getAttr(node+"."+multi_attr, multiIndices=True):
+                            for i, index in enumerate(cmds.getAttr(node+"."+multi_attr, multiIndices=True)):
+                                for name in multiAttrDic[multi_attr]:
+                                    attr_name = multi_attr+"["+str(index)+"]."+name
+                                    falloffDic[node]["attributes"][attr_name] = cmds.getAttr(node+"."+attr_name)
         return falloffDic
     
 
@@ -286,9 +286,9 @@ class Weights(object):
         """
         wellImported = True
         index = 0
-        indexList = cmds.getAttr(taggedNode+".componentTags", multiIndices=True)
-        if indexList:
-            index = len(indexList)+1
+        indexes = cmds.getAttr(taggedNode+".componentTags", multiIndices=True)
+        if indexes:
+            index = len(indexes)+1
         contents = " ".join(componentList)
         try:
             cmds.setAttr(injestNode+".componentTags["+str(index)+"].componentTagName", tagName, type="string")
@@ -462,15 +462,15 @@ class Weights(object):
     def getOrderList(self, node, *args):
         """ Return a list of deformer order of the given node.
         """
-        resultList = []
+        results = []
         deformerList = self.getAllDeformerTypeList()
         inputDeformerList = cmds.listHistory(node, pruneDagObjects=True, interestLevel=True)
         if inputDeformerList:
             for item in inputDeformerList:
                 if cmds.objectType(item) in deformerList:
-                    if not item in resultList:
-                      resultList.append(item)
-        return resultList
+                    if not item in results:
+                      results.append(item)
+        return results
 
 
     def setOrderList(self, node, desiredList, *args):
@@ -490,11 +490,11 @@ class Weights(object):
     def getPairsFromList(self, lst, *args):
         """ Returns pairs like 1-2, 2-3, 3-4, 4-5, etc...
         """
-        resultList = []
+        results = []
         for i, item in enumerate(lst):
             if i < len(lst)-1:
-                resultList.append([item, lst[i+1]])
-        return resultList
+                results.append([item, lst[i+1]])
+        return results
 
 
     def assignDeformer(self, deformerNode, items, *args):
@@ -516,11 +516,11 @@ class Weights(object):
 
 
     def getShapeToIndexData(self, deformerNode, *args):
-        """ Return a shapeList, a indexList and a dictionary with the shape name as keys and deformer index as values.
+        """ Return a shapeList, a indexes and a dictionary with the shape name as keys and deformer index as values.
         """
         shapeList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
-        indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
-        return shapeList, indexList, dict(zip(shapeList, indexList))
+        indexes = cmds.deformer(deformerNode, query=True, geometryIndices=True)
+        return shapeList, indexes, dict(zip(shapeList, indexes))
     
 
     def getCurrentDeformedIndex(self, deformerNode, shapeToIndexDic, index, *args):

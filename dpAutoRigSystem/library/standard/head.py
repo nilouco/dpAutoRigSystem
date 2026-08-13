@@ -1392,7 +1392,7 @@ for net in cmds.ls(type="network"):
         return fCtrl, fCtrlGrp
     
     
-    def dpLockLimitAttr(self, fCtrl, ctrlName, lockList, limitList, limitMinY, *args):
+    def dpLockLimitAttr(self, fCtrl, ctrlName, lockList, limits, limitMinY, *args):
         """ Lock or limit attributes for XYZ.
         """
         for i, axis in enumerate(self.ar.data.axis):
@@ -1401,7 +1401,7 @@ for net in cmds.ls(type="network"):
             else:
                 # add calibrate attributes:
                 cmds.addAttr(fCtrl, longName=self.calibrateName+"T"+axis, attributeType="float", defaultValue=1, minValue=0.001)
-                if limitList[i]:
+                if limits[i]:
                     if i == 0: #X
                         cmds.transformLimits(fCtrl, enableTranslationX=(1, 1))
                         self.dpLimitTranslate(fCtrl, ctrlName, axis)
@@ -1448,7 +1448,7 @@ for net in cmds.ls(type="network"):
     def getDeformedByList(self, s, *args):
         """ Returns the defomedBy list for this Head module based in the integrated hook dictionary.
         """
-        guideList, resultList = [], []
+        guideList, results = [], []
         hook = self.ar.utils.get_hook()
         for item in hook.keys():
             if self.name_guide in hook[item]['fatherGuide']:
@@ -1464,13 +1464,13 @@ for net in cmds.ls(type="network"):
                 if "guideSource" in cmds.listAttr(node):
                     guideSource = cmds.getAttr(node+".guideSource")
                     if guideSource.split(":")[0] in guideList:
-                        if not node in resultList:
+                        if not node in results:
                             if self.mirror_axis != 'off':
                                 if node.startswith(self.sides[s]):
-                                    resultList.append(node)
+                                    results.append(node)
                             else:
-                                resultList.append(node)
-        return resultList
+                                results.append(node)
+        return results
 
 
     def composing_info(self):
@@ -1479,7 +1479,7 @@ for net in cmds.ls(type="network"):
         self.composed = {
                             "worldRefList"         : self.worldRefList,
                             "upperCtrlList"        : self.upperCtrlList,
-                            "ctrlList"             : self.aCtrls,
+                            "controllers"          : self.aCtrls,
                             "InnerCtrls"           : self.aInnerCtrls,
                             "lCtrls"               : self.aLCtrls,
                             "rCtrls"               : self.aRCtrls,

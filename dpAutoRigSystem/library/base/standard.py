@@ -369,7 +369,7 @@ class BaseStandard(base.BaseLibrary):
         self.enable_main_ctrls(value)
 
 
-    def add_fk_main_ctrls(self, side, ctrlList):
+    def add_fk_main_ctrls(self, side, controllers):
         """ Implement the fk main controllers.
         """
         main_ctrls = []
@@ -385,7 +385,7 @@ class BaseStandard(base.BaseLibrary):
             if m == self.n_main-1:
                 end = self.nJoints
             for n in range(start, end):
-                current_ctrl = ctrlList[n]
+                current_ctrl = controllers[n]
                 current_ctrl_zero = cmds.listRelatives(current_ctrl, parent=True)[0]
                 if n == start:
                     # create a main controller
@@ -516,12 +516,12 @@ class BaseStandard(base.BaseLibrary):
             self.flip = self.get_guide_attr("flip")
     
 
-    def create_hook_setup(self, side, ctrlList, scalableList=None, staticList=None, *args):
+    def create_hook_setup(self, side, controllers, scalableList=None, staticList=None, *args):
         """ Generate the hook setup to find lists of controllers, scalable and static groups.
             Add message attributes to map hooked groups for the rigged module.
         """
         # create a masterModuleGrp to be checked if this rig exists:
-        self.ctrl_hook_grp = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
+        self.ctrl_hook_grp = cmds.group(controllers, name=side+self.userGuideName+"_Control_Grp")
         self.scalable_hook_grp = cmds.group(empty=True, name=side+self.userGuideName+"_Scalable_Grp")
         self.static_hook_grp = cmds.group(self.ctrl_hook_grp, self.scalable_hook_grp, name=side+self.userGuideName+"_Static_Grp")
         if staticList:

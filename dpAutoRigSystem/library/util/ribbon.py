@@ -384,7 +384,7 @@ class Ribbon(object):
                 'staticGrp'     : staticGrp,
                 'ctrlsGrp'      : ctrlsGrp,
                 'bendGrpList'   : resultBendGrpList,
-                'ctrlList'      : resultCtrlList,
+                'controllers'   : resultCtrlList,
                 'extraBendGrp'  : resultExtraBendGrp,
                 'extraCtrlList' : extraCtrlList,
                 'twistBoneMD'   : upLimb['twistBoneMD'],

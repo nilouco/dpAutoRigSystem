@@ -123,6 +123,7 @@ class Data:
 
     transform_attrs: list = field(default_factory=lambda: ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"])
     rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
+    drivenkey_types: list = field(default_factory=lambda: ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"])
     axis: list = field(default_factory=lambda: ['X', 'Y', 'Z'])
     degrees: list = field(default_factory=lambda: ['Preset_0', 'Linear_1', 'Cubic_3'])
     booleans: list = field(default_factory=lambda: [0, 1])

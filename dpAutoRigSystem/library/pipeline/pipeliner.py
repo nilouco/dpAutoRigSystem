@@ -54,9 +54,9 @@ class Pipeliner(object):
         """ Open, read, close and return the json file content.
         """
         try:
-            dic = open(json_path, "r", encoding='utf-8')
-            content = json.loads(dic.read())
-            dic.close()
+            data = open(json_path, "r", encoding='utf-8')
+            content = json.loads(data.read())
+            data.close()
         except:
             content = None
         return content
@@ -627,7 +627,7 @@ class Pipeliner(object):
 
 
     def save_json_file(self, data, filename_path, indentation=4, to_sort_keys=True):
-        """ Save the json file with the given data dic in the given file name path.
+        """ Save the json file with the given data data in the given file name path.
         """
         # write json file in the HD:
         with open(filename_path, 'w') as json_file:
