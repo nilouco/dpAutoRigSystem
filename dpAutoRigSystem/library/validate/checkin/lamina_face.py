@@ -46,8 +46,8 @@ class LaminaFace(action.BaseAction):
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shapeNode    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shapeNode)
+                        shape    = iter.thisNode()
+                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
                         shapeName    = fnShapeNode.name()
                         parentNode   = fnShapeNode.parent(0)
                         fnParentNode = OpenMaya.MFnDagNode(parentNode)
@@ -57,8 +57,8 @@ class LaminaFace(action.BaseAction):
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 # get faces
-                                faceIter   = OpenMaya.MItMeshPolygon(shapeNode)
-                                conFacesIt = OpenMaya.MItMeshPolygon(shapeNode)
+                                faceIter   = OpenMaya.MItMeshPolygon(shape)
+                                conFacesIt = OpenMaya.MItMeshPolygon(shape)
                                 # run in faces listing edges
                                 while not faceIter.isDone():
                                     # list vertices from this face

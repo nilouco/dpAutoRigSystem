@@ -399,9 +399,9 @@ class Controllers(object):
                 # verify if the object is a transform type:
                 elif objType == "transform":
                     # find all shapes children of the transform object:
-                    shapeList = cmds.listRelatives(item, shapes=True, children=True)
-                    if shapeList:
-                        for shape in shapeList:
+                    shapes = cmds.listRelatives(item, shapes=True, children=True)
+                    if shapes:
+                        for shape in shapes:
                             # set attributes as not renderable:
                             for attr in renderAttrList:
                                 try:
@@ -613,7 +613,7 @@ class Controllers(object):
                     for i in curveCVList :
                         cvPointPosition = cmds.xform(shape+'.cp['+str(i)+']', query=True, translation=True, worldSpace=True) 
                         vtxWorldPosition.append(cvPointPosition)
-                    # parent the shapeNode :
+                    # parent the shape :
                     cmds.parent(shape, optCtrlTxt, r=True, s=True)
                     # restore the shape world position
                     for i in curveCVList:

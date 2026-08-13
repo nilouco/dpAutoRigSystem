@@ -45,8 +45,8 @@ class InvertedNormals(action.BaseAction):
                     nextGeom = False
                     useThisObj = False
                     # get mesh data
-                    shapeNode = geomIter.thisNode()
-                    fnShapeNode = OpenMaya.MFnDagNode(shapeNode)
+                    shape = geomIter.thisNode()
+                    fnShapeNode = OpenMaya.MFnDagNode(shape)
                     shapeName = fnShapeNode.name()
                     parentNode = fnShapeNode.parent(0)
                     fnParentNode = OpenMaya.MFnDagNode(parentNode)
@@ -59,8 +59,8 @@ class InvertedNormals(action.BaseAction):
                             break
                     if useThisObj:
                         # get faces
-                        faceIter   = OpenMaya.MItMeshPolygon(shapeNode)
-                        conFacesIt = OpenMaya.MItMeshPolygon(shapeNode)
+                        faceIter   = OpenMaya.MItMeshPolygon(shape)
+                        conFacesIt = OpenMaya.MItMeshPolygon(shape)
                         # run in faces listing vertices
                         while not faceIter.isDone() and not nextGeom:
                             # list vertices from this face

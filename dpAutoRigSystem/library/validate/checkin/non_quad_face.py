@@ -45,8 +45,8 @@ class NonQuadFace(action.BaseAction):
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shapeNode    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shapeNode)
+                        shape    = iter.thisNode()
+                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
                         shapeName    = fnShapeNode.name()
                         parentNode   = fnShapeNode.parent(0)
                         fnParentNode = OpenMaya.MFnDagNode(parentNode)
@@ -55,7 +55,7 @@ class NonQuadFace(action.BaseAction):
                         for obj in check_items:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                iterPolys = OpenMaya.MItMeshPolygon(shapeNode)
+                                iterPolys = OpenMaya.MItMeshPolygon(shape)
                                 # Iterate through polys on current mesh
                                 while not iterPolys.isDone():
                                     nVertex = iterPolys.polygonVertexCount()

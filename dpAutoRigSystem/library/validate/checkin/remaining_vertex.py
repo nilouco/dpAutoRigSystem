@@ -45,8 +45,8 @@ class RemainingVertex(action.BaseAction):
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shapeNode    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shapeNode)
+                        shape    = iter.thisNode()
+                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
                         shapeName    = fnShapeNode.name()
                         parentNode   = fnShapeNode.parent(0)
                         fnParentNode = OpenMaya.MFnDagNode(parentNode)
@@ -55,8 +55,8 @@ class RemainingVertex(action.BaseAction):
                         for obj in check_items:
                             self.ar.utils.setProgress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                vertexIter = OpenMaya.MItMeshVertex(shapeNode)
-                                iterEdges  = OpenMaya.MItMeshEdge(shapeNode)
+                                vertexIter = OpenMaya.MItMeshVertex(shape)
+                                iterEdges  = OpenMaya.MItMeshEdge(shape)
                                 # Iterate through edges on current mesh
                                 while not iterEdges.isDone():
                                     # Get current polygons connected faces

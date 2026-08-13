@@ -109,14 +109,14 @@ class Proxy(action.BaseAction):
         """ Creates a proxy setup from the given source transform and put it into the given grp group.
         """
         try:
-            inputDeformerList = cmds.findDeformers(source)
+            input_deformers = cmds.findDeformers(source)
         except:
             return
         skinClusterNode = None
-        if inputDeformerList:
-            for deformerNode in inputDeformerList:
-                if cmds.objectType(deformerNode) == "skinCluster":
-                    skinClusterNode = deformerNode
+        if input_deformers:
+            for deformer_node in input_deformers:
+                if cmds.objectType(deformer_node) == "skinCluster":
+                    skinClusterNode = deformer_node
                     break
         if skinClusterNode:
             self.skinClusterList.append(skinClusterNode)
@@ -198,12 +198,12 @@ class Proxy(action.BaseAction):
             proxyRev = cmds.createNode("reverse", name="Proxy_Rev")
             cmds.connectAttr(optionCtrl+".proxy", proxyRev+".inputX", force=True)
             cmds.connectAttr(proxyRev+".outputX", optionCtrl+".proxyRevOutput", force=True)
-            deformerList = self.skinClusterList
+            deformers = self.skinClusterList
             defList = ["blendShape", "wrap", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             for deform in defList:
-                deformerList.extend(cmds.ls(type=deform) or [])
-            if deformerList:
-                for deformNode in deformerList:
+                deformers.extend(cmds.ls(type=deform) or [])
+            if deformers:
+                for deformNode in deformers:
                     try:
                         cmds.connectAttr(optionCtrl+".proxy", deformNode+".nodeState") #don't force it please
                     except:

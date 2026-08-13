@@ -737,7 +737,7 @@ class Rivet(base.BaseLibrary):
                 cmds.addAttr(self.net, longName="invTGrp", attributeType="message")
                 cmds.addAttr(self.net, longName="invRGrp", attributeType="message")
                 cmds.addAttr(self.net, longName="deformerGeo", attributeType="message")
-                cmds.addAttr(self.net, longName="deformerNode", attributeType="message")
+                cmds.addAttr(self.net, longName="deformer_node", attributeType="message")
                 cmds.addAttr(self.net, longName="pacNode", attributeType="message")
                 cmds.addAttr(self.net, longName="rivetData", dataType="string")
                 # set
@@ -750,7 +750,7 @@ class Rivet(base.BaseLibrary):
                 
                 if faceToRivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
-                    cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformerNode", force=True)
+                    cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformer_node", force=True)
                 if len(items) == len(self.rivetList):
                     if cmds.objExists(items[r]):
                         cmds.connectAttr(items[r]+".message", self.net+".itemNode", force=True)
@@ -823,11 +823,11 @@ class Rivet(base.BaseLibrary):
         if not cmds.objExists(faceToRivetGeoName):
             # Get the history to turn off envelopes if exists
             histList = cmds.listHistory(geo)
-            shapeList = cmds.listRelatives(geo, shapes=True)
-            if shapeList:
+            shapes = cmds.listRelatives(geo, shapes=True)
+            if shapes:
                 # check if there's a skinCluster node connected to the first selected item
-                checkSkin = self.dpCheckNodeExists(shapeList, "skinCluster")
-                checkBS = self.dpCheckNodeExists(shapeList, "blendShape")
+                checkSkin = self.dpCheckNodeExists(shapes, "skinCluster")
+                checkBS = self.dpCheckNodeExists(shapes, "blendShape")
                 if checkSkin == 1:
                     skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
                     cmds.setAttr(skinClusterNode+".envelope", 0)
@@ -938,16 +938,16 @@ class Rivet(base.BaseLibrary):
                 self.deformerNodeList = self.applyWrapDeformer(geometry, origGeo)
 
 
-    def dpCheckNodeExists(self, shapeList, type, *args):
+    def dpCheckNodeExists(self, shapes, type, *args):
         """ Verify if there's a skinCluster or blendShape node in the list of history of the shape.
             Return 1 if there's skinCluster.
             Return 2 if there's blendShape node
             Return -1 if there's another node with the same name.
         """
-        for shapeNode in shapeList:
-            if not shapeNode.endswith("Orig"):
+        for shape in shapes:
+            if not shape.endswith("Orig"):
                 try:
-                    histList = cmds.listHistory(shapeNode)
+                    histList = cmds.listHistory(shape)
                     if histList:
                         for histItem in histList:
                             if type == "skinCluster":
@@ -1006,12 +1006,12 @@ class Rivet(base.BaseLibrary):
         cmds.select([wrapGeo, targetGeo])
         mel.eval("CreateWrap;")
         hist = cmds.listHistory(wrapGeo)
-        wrapList = cmds.ls(hist, type="wrap")[0]
+        wrap_items = cmds.ls(hist, type="wrap")[0]
         # Renaming
         toRivetName = self.ar.utils.extractSuffix(wrapGeo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
-        wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
+        wrapNode = cmds.rename(wrap_items, toRivetName+"_Wrp")
         baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
         baseShape = cmds.rename(baseShape, toRivetName+"_Base")
         self.ar.ctrls.setLockHide([baseShape], self.ar.data.transform_attrs[:-1], True, False, True)
@@ -1037,7 +1037,7 @@ class Rivet(base.BaseLibrary):
 
 
     def findOrig(self, geoList, *args):
-        """ Return the orig of the shapeList
+        """ Return the orig of the shapes
         """
         #TODO maybe use this command instead?
         #cmds.deformableShape(item, originalGeometry=True)

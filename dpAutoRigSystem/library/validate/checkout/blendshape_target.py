@@ -55,19 +55,19 @@ class BlendshapeTarget(action.BaseAction):
                             exceptionList.append(item)
                         else:
                             try:
-                                inputDeformerList = cmds.findDeformers(item)
+                                input_deformers = cmds.findDeformers(item)
                             except:
                                 self.messages.append(self.ar.data.lang['i075_moreOne']+": "+item)
-                                inputDeformerList = False
-                            if inputDeformerList:
-                                for deformerNode in inputDeformerList:
-                                    if cmds.objectType(deformerNode) in deformersToKeepList:
+                                input_deformers = False
+                            if input_deformers:
+                                for deformer_node in input_deformers:
+                                    if cmds.objectType(deformer_node) in deformersToKeepList:
                                         if not item in exceptionList:
                                             exceptionList.append(item)
-                                        if cmds.objectType(deformerNode) == "wrap":
+                                        if cmds.objectType(deformer_node) == "wrap":
                                             wrapAttrList = ["basePoints", "driverPoints"]
                                             for wrapAttr in wrapAttrList:
-                                                wrapConnectedList = cmds.listConnections(deformerNode+"."+wrapAttr, source=True, destination=False)
+                                                wrapConnectedList = cmds.listConnections(deformer_node+"."+wrapAttr, source=True, destination=False)
                                                 if wrapConnectedList:
                                                     exceptionList.append(wrapConnectedList[0])
                                             

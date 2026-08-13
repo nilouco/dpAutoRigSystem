@@ -33,10 +33,10 @@ class Skinning(weights.Weights):
                     return False
                 elif not mode:
                     try:
-                        inputDeformerList = cmds.findDeformers(item)
-                        if inputDeformerList:
-                            for deformerNode in inputDeformerList:
-                                if cmds.objectType(deformerNode) == "skinCluster":
+                        input_deformers = cmds.findDeformers(item)
+                        if input_deformers:
+                            for deformer_node in input_deformers:
+                                if cmds.objectType(deformer_node) == "skinCluster":
                                     self.ar.logger.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
                                     return False
                     except:
@@ -210,10 +210,10 @@ class Skinning(weights.Weights):
             sourceItem = items[0]
             # get other selected items
             destinations = items[1:]
-            shapeList = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
-            if shapeList:
+            shapes = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
+            if shapes:
                 # check if there's a skinCluster node connected to the first selected item
-                if self.checkExistingDeformerNode(shapeList):
+                if self.checkExistingDeformerNode(shapes):
                     if ui:
                         byUVs = self.getByUVsFromUI()
                     # call copySkin function

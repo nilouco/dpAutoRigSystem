@@ -107,7 +107,7 @@ class RivetIO(action.BaseAction):
     def importRivet(self, rivetDic, *args):
         """ Import rivet data creating new instances with exported attribute values.
         """
-        wellImported = True
+        well_imported = True
         self.ar.utils.setProgress(max=len(rivetDic.keys()), add_one=False, add_number=False)
         for net in rivetDic.keys():
             try:
@@ -120,11 +120,11 @@ class RivetIO(action.BaseAction):
                 rivetList = self.rivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['items'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
                 self.ar.data.ui_state = old_ui_state
                 if not rivetList:
-                    wellImported = False
+                    well_imported = False
                     self.fail_io(net+": "+self.ar.data.lang['r032_notImportedData'])
             except Exception as e:
-                wellImported = False
+                well_imported = False
                 self.fail_io(net+": "+str(e))
                 break
-        if wellImported:
+        if well_imported:
             self.well_done_io(self.latest_data_file)

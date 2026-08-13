@@ -160,7 +160,7 @@ class ShaderIO(action.BaseAction):
         """ Import the shaders from given shader dictionary.
         """
         mayaVersion = cmds.about(version=True)
-        notFoundMeshList = []
+        not_found_meshs = []
         # rebuild shaders
         for item in shaderDic.keys():
             if not cmds.objExists(item):
@@ -198,9 +198,9 @@ class ShaderIO(action.BaseAction):
                         cmds.select(mesh)
                         cmds.hyperShade(assign=item)
                 else:
-                    notFoundMeshList.append(mesh)
+                    not_found_meshs.append(mesh)
         cmds.select(clear=True)
-        if notFoundMeshList:
-            self.fail_io(self.ar.data.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
+        if not_found_meshs:
+            self.fail_io(self.ar.data.lang['r011_notFoundMesh']+", ".join(not_found_meshs))
         else:
             self.well_done_io(self.latest_data_file)

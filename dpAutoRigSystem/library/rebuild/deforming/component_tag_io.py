@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ....library.base import action
-from ....library.util import weights
-from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "ComponentTagIO"
@@ -18,9 +16,6 @@ class ComponentTagIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_componentTagIO"
         self.start_name = "dpComponentTag"
-        if self.ar.dev:
-            reload(weights)
-        self.defWeights = weights.Weights(self.ar)
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -51,26 +46,26 @@ class ComponentTagIO(action.BaseAction):
                     if self.first_mode: #export
                         if nodes:
                             # finding tags
-                            hasTag = False
+                            has_tag = False
                             for node in nodes:
                                 if cmds.geometryAttrInfo(node+"."+cmds.deformableShape(node, localShapeOutAttr=True)[0], componentTagHistory=True):
-                                    hasTag = True
+                                    has_tag = True
                                     break
-                            if hasTag:
+                            if has_tag:
                                 # Declaring the data dictionary to export it
-                                self.tagDataDic = { "tagged"     : self.defWeights.getComponentTagInfo(nodes),
-                                                    "influencer" : self.defWeights.getComponentTagInfluencer(),
-                                                    "falloff"    : self.defWeights.getComponentTagFalloff()
+                                self.tag_data = { "tagged"     : self.ar.skin.getComponentTagInfo(nodes),
+                                                    "influencer" : self.ar.skin.getComponentTagInfluencer(),
+                                                    "falloff"    : self.ar.skin.getComponentTagFalloff()
                                                 }
-                                self.export_json_file(self.tagDataDic)
+                                self.export_json_file(self.tag_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" componentTag")
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" mesh, lattice")
                     else: #import
-                        tagDataDic = self.import_latest_json_file(self.get_exported_items())
-                        if tagDataDic:
-                            self.importTag(tagDataDic, nodes)
+                        tag_data = self.import_latest_json_file(self.get_exported_items())
+                        if tag_data:
+                            self.import_tag(tag_data, nodes)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -91,24 +86,24 @@ class ComponentTagIO(action.BaseAction):
         return self.log_data
 
 
-    def importTag(self, tagDataDic, nodes, *args):
+    def import_tag(self, tag_data, nodes):
         """ Import componentTag data.
         """
         fail = False
         # import tagged (tag info into the received deformed mesh)
-        if tagDataDic["tagged"]:
-            if not self.defWeights.importComponentTagInfo(tagDataDic["tagged"], nodes):
-                self.fail_io(self.latest_data_file+": tagged - "+", ".join(self.defWeights.notWorkWellInfoList))
+        if tag_data["tagged"]:
+            if not self.ar.skin.importComponentTagInfo(tag_data["tagged"], nodes):
+                self.fail_io(self.latest_data_file+": tagged - "+", ".join(self.ar.skin.notWorkWellInfoList))
                 fail = True
         # import influencers (tag info into the deformer node)
-        if tagDataDic["influencer"]:
-            if not self.defWeights.importComponentTagInfluencer(tagDataDic["influencer"]):
-                self.fail_io(self.latest_data_file+": influencer - "+", ".join(self.defWeights.notWorkWellInfoList))
+        if tag_data["influencer"]:
+            if not self.ar.skin.importComponentTagInfluencer(tag_data["influencer"]):
+                self.fail_io(self.latest_data_file+": influencer - "+", ".join(self.ar.skin.notWorkWellInfoList))
                 fail = True
         # import falloffs
-        if tagDataDic["falloff"]:
-            if not self.defWeights.importComponentTagFalloff(tagDataDic["falloff"]):
-                self.fail_io(self.latest_data_file+": falloff - "+", ".join(self.defWeights.notWorkWellInfoList))
+        if tag_data["falloff"]:
+            if not self.ar.skin.importComponentTagFalloff(tag_data["falloff"]):
+                self.fail_io(self.latest_data_file+": falloff - "+", ".join(self.ar.skin.notWorkWellInfoList))
                 fail = True
         if not fail:
             self.well_done_io(self.latest_data_file)

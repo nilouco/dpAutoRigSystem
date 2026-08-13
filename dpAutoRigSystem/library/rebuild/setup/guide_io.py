@@ -68,18 +68,18 @@ class GuideIO(action.BaseAction):
                             cmds.modelEditor(mp, edit=True, xray=True)
                         guideDic = self.import_latest_json_file(self.get_exported_items())
                         if guideDic:
-                            wellImported = False
+                            well_imported = False
                             try:
                                 guide_data = self.parse_repeated_nets(guideDic)
-                                wellImported = self.importGuide(guide_data)
+                                well_imported = self.importGuide(guide_data)
                                 self.setupGuideBaseParenting(guide_data)
                             except Exception as e:
-                                if not wellImported: #guide initialization issue
+                                if not well_imported: #guide initialization issue
                                     self.fail_io(self.ar.data.lang['m195_couldNotBeSet']+": "+str(e))
                                 else: #parenting issue
                                     self.fail_io(self.ar.data.lang['m197_notPossibleParent']+": "+str(e))
-                                wellImported = False
-                            if wellImported:
+                                well_imported = False
+                            if well_imported:
                                 self.well_done_io(self.latest_data_file)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
@@ -275,7 +275,7 @@ class GuideIO(action.BaseAction):
     def importGuide(self, guideDic, rebuilding=True, *args):
         """ Import guide info and initialize guide setting it attribute values.
         """
-        wellImported = True
+        well_imported = True
         toInitializeGuide = True
         ask_again = True
         self.correlations = {}
@@ -286,7 +286,7 @@ class GuideIO(action.BaseAction):
         for net in guideDic.keys():
             if "moduleType" in guideDic[net].keys():
                 if guideDic[net]["moduleType"] == self.head_deformer.headDeformerName:
-                    wellImported = self.importHeadDeformer(guideDic[net])
+                    well_imported = self.importHeadDeformer(guideDic[net])
             else:
                 if rebuilding:
                     if cmds.objExists(net):
@@ -328,12 +328,12 @@ class GuideIO(action.BaseAction):
                         self.setupGuideTransformations()
                         cmds.select(clear=True)
                     except Exception as e:
-                        wellImported = False
+                        well_imported = False
                         self.fail_io(net+": "+str(e))
                         break
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = False
-        return wellImported
+        return well_imported
 
 
     def importHeadDeformer(self, hdNet, *args):

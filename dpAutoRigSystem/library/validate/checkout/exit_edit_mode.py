@@ -52,10 +52,10 @@ class ExitEditMode(action.BaseAction):
                                     # delete the corrective script job
                                     self.ar.job.delete_old_job(item)
                                     # remove color override
-                                    shapeList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
-                                    if shapeList:
-                                        for shapeNode in shapeList:
-                                            cmds.setAttr(shapeNode+".overrideRGBColors", 0)
+                                    shapes = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
+                                    if shapes:
+                                        for shape in shapes:
+                                            cmds.setAttr(shape+".overrideRGBColors", 0)
                                     # set edit mode off
                                     cmds.setAttr(item+".editMode", 0)
                                     self.good_results.append(True)

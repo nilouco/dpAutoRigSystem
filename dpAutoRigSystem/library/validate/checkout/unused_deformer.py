@@ -36,17 +36,17 @@ class UnusedDeformer(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             unusedList = []
             #cmds.findDeformers("*")
-            deformerList = cmds.ls(type="geometryFilter") #deformers
+            deformers = cmds.ls(type="geometryFilter") #deformers
             intermedList = cmds.ls(type="controlPoint", intermediateObjects=True)
             if inputs:
                 check_items = inputs
             else:
-                check_items = deformerList.copy()
+                check_items = deformers.copy()
                 check_items.extend(intermedList.copy())
             if check_items:
                 self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
-                if deformerList:
-                    for defNode in deformerList:
+                if deformers:
+                    for defNode in deformers:
                         self.ar.utils.setProgress(self.ar.data.lang[self.title])
                         hasTags = False
                         indicesList = cmds.getAttr(defNode+".input", multiIndices=True)

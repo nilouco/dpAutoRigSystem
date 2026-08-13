@@ -338,12 +338,12 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                                             pass
                 
                 # lattice:
-                latticeList = cmds.lattice(self.geoHolder, divisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, position=(0, 0, 0), scale=(self.radius*2, self.radius*2, self.radius*2), name=side+self.userGuideName+"_FFD") #[deformer, lattice, base]
-                cmds.scale(self.radius*2, self.radius*2, self.radius*2, latticeList[2])
+                lattice_items = cmds.lattice(self.geoHolder, divisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, position=(0, 0, 0), scale=(self.radius*2, self.radius*2, self.radius*2), name=side+self.userGuideName+"_FFD") #[deformer, lattice, base]
+                cmds.scale(self.radius*2, self.radius*2, self.radius*2, lattice_items[2])
                 # clusters:
-                upperClusterList = cmds.cluster(latticeList[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Cls") #[deform, handle]
-                middleClusterList = cmds.cluster(latticeList[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Cls") #[deform, handle]
-                lowerClusterList = cmds.cluster(latticeList[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Cls") #[deform, handle]                
+                upperClusterList = cmds.cluster(lattice_items[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c044_upper']+"_Cls") #[deform, handle]
+                middleClusterList = cmds.cluster(lattice_items[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['m033_middle']+"_Cls") #[deform, handle]
+                lowerClusterList = cmds.cluster(lattice_items[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c045_lower']+"_Cls") #[deform, handle]                
                 clusterGrpList = self.ar.utils.zeroOut([upperClusterList[1], middleClusterList[1], lowerClusterList[1]])
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
@@ -362,8 +362,8 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                     if cmds.getAttr(self.guide_base+".flip") == 1:
                         self.ar.utils.unlockAttr([self.cvCenterLoc])
                         cmds.parent(self.cvCenterLoc, world=True)
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[1], maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[2], maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, lattice_items[1], maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, lattice_items[2], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, clustersGrp, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, defCtrlGrp, maintainOffset=False))
                 outsideDist = cmds.getAttr(self.cvOutsideLoc+".tz")
@@ -378,8 +378,8 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 # grouping deformers:
                 if self.loadedGeo:
                     if cmds.objExists(self.loadedGeo):
-                        cmds.lattice(latticeList[0], edit=True, geometry=self.loadedGeo)
-                defGrp = cmds.group(latticeList[1], latticeList[2], clustersGrp, name=side+self.userGuideName+"_Deform_Grp")
+                        cmds.lattice(lattice_items[0], edit=True, geometry=self.loadedGeo)
+                defGrp = cmds.group(lattice_items[1], lattice_items[2], clustersGrp, name=side+self.userGuideName+"_Deform_Grp")
                 cmds.parentConstraint(self.mainCtrl, defGrp, maintainOffset=True, name=defGrp+"_PaC")
                 cmds.scaleConstraint(self.mainCtrl, defGrp, maintainOffset=True, name=defGrp+"_ScC")
                 cmds.parent(defCtrlGrp, self.mainCtrl)
@@ -390,10 +390,10 @@ class Wheel(standard.BaseStandard, layout.BaseLayout):
                 self.ctrlHookGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
-                self.ar.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, latticeList[1], latticeList[2], self.geoHolder], self.ar.utils.ignoreTransformIOAttr)
+                self.ar.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, lattice_items[1], lattice_items[2], self.geoHolder], self.ar.utils.ignoreTransformIOAttr)
                 
                 self.to_ids.extend([receptSteeringMD, inverseSteeringMD, steeringInvCnd, expNode, self.geoHolder, scNode, side+self.userGuideName+"_"+self.ar.data.lang['c046_holder']+"_BP"])
-                for idList in [latticeList, upperClusterList, middleClusterList, lowerClusterList]:
+                for idList in [lattice_items, upperClusterList, middleClusterList, lowerClusterList]:
                     self.to_ids.extend(idList)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:

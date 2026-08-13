@@ -127,14 +127,14 @@ class BlendshapeIO(action.BaseAction):
                             unitConversionFactor = cmds.getAttr(plugNode+".conversionFactor")
                             unitConversionInputPlug = cmds.listConnections(plugNode+".input", destination=False, source=True, plugs=True)[0]
                     # getting vertex weights if not equal to 1
-                    for s, shapeNode in enumerate(bsDic[bsNode]["geometry"]):
+                    for s, shape in enumerate(bsDic[bsNode]["geometry"]):
                         # write deleted target to compose a clear target list to avoid Maya's garbage issue
                         while not i == indexes[t]:
                             bsDic[bsNode]["targets"][i] = {"deleted" : True}
                             deletedIndexList.append(i)
                             i += 1
                         # continue writing relevant or just info data
-                        vertices = cmds.polyEvaluate(shapeNode, vertex=True)
+                        vertices = cmds.polyEvaluate(shape, vertex=True)
                         if type(vertices) == "int": #to accept non polygon blendShapes like curves by Zipper
                             rawWeightList = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bsNode, s, t, vertices-1))
                             if not len(rawWeightList) == rawWeightList.count(1.0):
@@ -173,7 +173,7 @@ class BlendshapeIO(action.BaseAction):
     def importBlendShapes(self, bsDic, *args):
         """ Import blendShapes from given exported list getting the latest file.
         """
-        wellImported = True
+        well_imported = True
         # not working scriptEditor suppress command...
         suppressWarningsState = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
         suppressInfoState = cmds.scriptEditorInfo(query=True, suppressInfo=True)
@@ -191,7 +191,7 @@ class BlendshapeIO(action.BaseAction):
                         mel.eval("AbcImport -mode import \""+abcToImport+"\";")
                     except:
                         self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.originalName+"_"+bsNode+".abc")
-                        wellImported = False
+                        well_imported = False
             if not cmds.objExists(bsNode):
                 # create an empty blendShape node
                 cmds.blendShape(originalShapeList, name=bsNode)
@@ -206,7 +206,7 @@ class BlendshapeIO(action.BaseAction):
                     print("--------------------------------\nEnding Autodesk not suppressed messages, sorry!\n--------------------------------\n")
                 except Exception as e:
                     self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
-                    wellImported = False
+                    well_imported = False
             for i in list(bsDic[bsNode]["indexTargetDic"].keys()):
                 target = bsDic[bsNode]["indexTargetDic"][i]
                 # set target value
@@ -215,7 +215,7 @@ class BlendshapeIO(action.BaseAction):
                 except:
                     pass #connected combination target
                 # set target weights
-                for s, shapeNode in enumerate(bsDic[bsNode]["geometry"]):
+                for s, shape in enumerate(bsDic[bsNode]["geometry"]):
                     for idx in list(bsDic[bsNode]["targets"][i]["weightDic"].keys()):
                         cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bsNode, s, i, idx), bsDic[bsNode]["targets"][i]["weightDic"][idx])
                 # regenerate target
@@ -240,5 +240,5 @@ class BlendshapeIO(action.BaseAction):
             for d in bsDic[bsNode]["deletedIndexList"]:
                 cmds.removeMultiInstance("{}.weight[{}]".format(bsNode, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
         cmds.scriptEditorInfo(suppressWarnings=suppressWarningsState, suppressInfo=suppressInfoState, suppressErrors=suppressErrorsState, suppressResults=suppressResultsState)
-        if wellImported:
+        if well_imported:
             self.well_done_io(self.latest_data_file)

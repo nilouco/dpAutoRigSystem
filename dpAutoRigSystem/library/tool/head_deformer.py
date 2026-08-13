@@ -423,8 +423,8 @@ class HeadDeformer(base.BaseLibrary):
             self.ar.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, arrowCtrlGrp], self.ar.utils.ignoreTransformIOAttr)
             # add dpID attributes
             self.to_ids.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
-            for deformerList in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:
-                self.to_ids.extend(deformerList)
+            for deformers in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:
+                self.to_ids.extend(deformers)
             self.ar.custom_attr.addAttr(0, self.to_ids, descendents=True) #dpID
             # finish selection the arrow control
             cmds.select(arrowCtrl)

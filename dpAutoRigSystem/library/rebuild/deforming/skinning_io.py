@@ -98,8 +98,8 @@ class SkinningIO(action.BaseAction):
     def importSkinning(self, skinWeightDic, *args):
         """ Import the skinning from exported skin weight dictionary.
         """
-        wellImported = True
-        toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
+        well_imported = True
+        to_import_items, not_found_meshs, changedTopoMeshList, changed_shape_meshes = [], [], [], []
         
         # reference old wip rig version to compare meshes changes
         #refNodeList = self.referOldWipFile()
@@ -111,32 +111,32 @@ class SkinningIO(action.BaseAction):
                     for refNodeName in refNodeList:
                         if refNodeName[refNodeName.rfind(":")+1:] == self.ar.skin.getIOFileName(item):
                             if cmds.polyCompare(item, refNodeName, vertices=True) > 0 or cmds.polyCompare(item, refNodeName, edges=True) > 0: #check if shape changes
-                                changedShapeMeshList.append(item)
-                                wellImported = False
+                                changed_shape_meshes.append(item)
+                                well_imported = False
                             elif not len(cmds.ls(item+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
                                 changedTopoMeshList.append(item)
-                                wellImported = False
+                                well_imported = False
                             else:
-                                toImportList.append(item)
+                                to_import_items.append(item)
                 else:
-                    toImportList.append(item)
+                    to_import_items.append(item)
             else:
-                notFoundMeshList.append(item)
+                not_found_meshs.append(item)
         if refNodeList:
             cmds.file(self.refPathName, removeReference=True)
-        if toImportList:
+        if to_import_items:
             try:
                 # import skin weights
-                self.ar.skin.importSkinWeightsFromFile(toImportList, self.io_path, self.latest_data_file, False)
+                self.ar.skin.importSkinWeightsFromFile(to_import_items, self.io_path, self.latest_data_file, False)
                 self.well_done_io(self.latest_data_file)
             except Exception as e:
                 self.fail_io(self.latest_data_file+": "+str(e))
         else:
             self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
-        if not wellImported:
-            if changedShapeMeshList:
-                self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+        if not well_imported:
+            if changed_shape_meshes:
+                self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changed_shape_meshes)))
             elif changedTopoMeshList:
                 self.fail_io(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
-            elif notFoundMeshList:
-                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+            elif not_found_meshs:
+                self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(not_found_meshs)))

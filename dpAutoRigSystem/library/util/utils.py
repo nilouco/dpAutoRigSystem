@@ -1223,10 +1223,10 @@ class Utils(object):
         """
         if item and defList:
             if cmds.objExists(item):
-                for deformerNode in defList:
-                    if cmds.objExists(deformerNode):
-                        if not cmds.objectType(deformerNode) == "tweak":
-                            cmds.deformer(deformerNode, edit=True, geometry=item)
+                for deformer_node in defList:
+                    if cmds.objExists(deformer_node):
+                        if not cmds.objectType(deformer_node) == "tweak":
+                            cmds.deformer(deformer_node, edit=True, geometry=item)
 
 
     def getNetworkNodeByAttr(self, netAttr, *args):
@@ -1319,10 +1319,10 @@ class Utils(object):
         """ Reapply the given deformer list to the destination given item except the tweak node.
         """
         if cmds.objExists(item):
-            for deformerNode in defList:
-                if cmds.objExists(deformerNode):
-                    if not cmds.objectType(deformerNode) == "tweak":
-                        cmds.deformer(deformerNode, edit=True, geometry=item)
+            for deformer_node in defList:
+                if cmds.objExists(deformer_node):
+                    if not cmds.objectType(deformer_node) == "tweak":
+                        cmds.deformer(deformer_node, edit=True, geometry=item)
 
 
     def getTransformData(self, item, t=True, r=True, s=True, useWorldSpace=True, *args):

@@ -86,30 +86,30 @@ class InputOrderIO(action.BaseAction):
         """ Import the input order data from given dictionary.
         """
         self.ar.utils.setProgress(max=len(orderDic.keys()), add_one=False, add_number=False)
-        wellImported = True
-        toImportList, notFoundMeshList, = [], []
+        well_imported = True
+        to_import_items, not_found_meshs, = [], []
         for item in orderDic.keys():
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
-                toImportList.append(item)
+                to_import_items.append(item)
             else:
-                notFoundMeshList.append(item)
-        if toImportList:
+                not_found_meshs.append(item)
+        if to_import_items:
             warningStatus = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
             cmds.scriptEditorInfo(edit=True, suppressWarnings=True)
-            for item in toImportList:
+            for item in to_import_items:
                 try:
                     # reorder deformers
-                    deformerList = orderDic[item]
-                    if deformerList:
-                        if len(deformerList) > 1:
-                            self.ar.skin.setOrderList(item, deformerList)
+                    deformers = orderDic[item]
+                    if deformers:
+                        if len(deformers) > 1:
+                            self.ar.skin.setOrderList(item, deformers)
                 except Exception as e:
-                    wellImported = False
+                    well_imported = False
                     print(e)
                     self.fail_io(self.latest_data_file)
             cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
-            if wellImported:
+            if well_imported:
                 self.well_done_io(self.latest_data_file)
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(not_found_meshs)))

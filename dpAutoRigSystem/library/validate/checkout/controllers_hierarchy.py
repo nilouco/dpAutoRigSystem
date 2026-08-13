@@ -19,13 +19,13 @@ class ControllersHierarchy(action.BaseAction):
 
     def checkNurbs(self, transform):
         try:
-            shapeList = cmds.listRelatives(transform, shapes=True)
+            shapes = cmds.listRelatives(transform, shapes=True)
         except Exception as e:
             print(e)
             self.messages.append(f"{self.ar.data.lang['v070_duplicateName']} {transform}")
             return False
-        if shapeList:
-            for shape in shapeList:
+        if shapes:
+            for shape in shapes:
                 if "nurbsCurve" not in cmds.objectType(shape):
                     return False
         else:

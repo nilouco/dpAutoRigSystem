@@ -54,16 +54,16 @@ class Weights(object):
         return 0
 
 
-    def getDeformerWeights(self, deformerNode, idx, infList=False, *args):
+    def getDeformerWeights(self, deformer_node, idx, infList=False, *args):
         """ Read the deformer information to return a dictionary with influence index or connected matrix nodes as keys and the weight as values.
         """
-        weightPlug = deformerNode+".weightList["+str(idx)+"].weights"
+        weightPlug = deformer_node+".weightList["+str(idx)+"].weights"
         if cmds.objExists(weightPlug):
             weightKeyList = cmds.getAttr(weightPlug, multiIndices=True)
             if infList:
                 matrixList = []
                 for item in weightKeyList:
-                    sourceList = cmds.listConnections(deformerNode+".matrix["+str(item)+"]", source=True, destination=False)
+                    sourceList = cmds.listConnections(deformer_node+".matrix["+str(item)+"]", source=True, destination=False)
                     if sourceList:
                         matrixList.append(sourceList[0])
                 weightKeyList = matrixList
@@ -127,13 +127,13 @@ class Weights(object):
                             else:
                                 print(self.ar.data.lang['i299_notUniqueName'], childNode)
                             for desiredType in deformerTypeList:
-                                if self.checkExistingDeformerNode(childNode, deformerType=desiredType)[0]:
+                                if self.checkExistingDeformerNode(childNode, deformer_type=desiredType)[0]:
                                     if not childNode in deformedItemList:
                                         deformedItemList.append(childNode)
         return deformedItemList
 
 
-    def checkExistingDeformerNode(self, item, deleteIt=False, deformerType="skinCluster", *args):
+    def checkExistingDeformerNode(self, item, deleteIt=False, deformer_type="skinCluster", *args):
         """ Return a list with:
                 True/False if there's/not a deformer.
                 The current deformer list by default.
@@ -141,22 +141,22 @@ class Weights(object):
             Delete existing deformer node if there's one using the deleteIt parametter as True.
         """
         result = [False, None, None]
-        inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
-        if inputDeformerList:
-            defList = cmds.ls(inputDeformerList, type=deformerType)
+        input_deformers = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
+        if input_deformers:
+            defList = cmds.ls(input_deformers, type=deformer_type)
             if defList:
                 if deleteIt:
                     cmds.delete(defList)
-                result = [True, inputDeformerList, defList]
+                result = [True, input_deformers, defList]
         return result
 
 
-    def getDeformerInfo(self, deformerNode, *args):
+    def getDeformerInfo(self, deformer_node, *args):
         """ Return the dictionary with attributes and values.
         """
         defDic = {"attributes" : {}}
-        if deformerNode:
-            defType = cmds.objectType(deformerNode)
+        if deformer_node:
+            defType = cmds.objectType(deformer_node)
             defDic["type"] = defType
             for n, attr in enumerate(list(self.typeAttrDic[defType])):
                 if n == 0:
@@ -166,27 +166,27 @@ class Weights(object):
                     defDic["divisions"] = None
                     if attr:
                         connectedNodeList = None
-                        connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
+                        connectedNodeList = cmds.listConnections(deformer_node+"."+attr, destination=False, source=True)
                         if attr == "deformerData": #nonLinear
-                            connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=True, source=False)
+                            connectedNodeList = cmds.listConnections(deformer_node+"."+attr, destination=True, source=False)
                             if connectedNodeList:
-                                defDic["relatedData"] = cmds.listRelatives(deformerNode, parent=True, type="transform")[0]
-                                deformerNode = connectedNodeList[0]
+                                defDic["relatedData"] = cmds.listRelatives(deformer_node, parent=True, type="transform")[0]
+                                deformer_node = connectedNodeList[0]
                                 defDic["nonLinear"] = defType.replace("deform", "").lower()
                         if defType == "ffd": #lattice
-                            defDic["relatedData"] = self.getLatticeInfo(connectedNodeList[0], deformerNode)
-                            defDic["divisions"] = cmds.lattice(deformerNode, query=True, divisions=True)
+                            defDic["relatedData"] = self.getLatticeInfo(connectedNodeList[0], deformer_node)
+                            defDic["divisions"] = cmds.lattice(deformer_node, query=True, divisions=True)
                         elif defType == "wire":
                             defDic["relatedData"] = self.getCurveInfo(connectedNodeList[0])
                         if connectedNodeList:
                             defDic["relatedNode"] = connectedNodeList[0]
                     if defType == "sculpt":
-                        defDic["relatedData"] = self.getSculptInfo(deformerNode)
+                        defDic["relatedData"] = self.getSculptInfo(deformer_node)
                     elif defType == "morph":
-                        defDic["relatedNode"] = cmds.listConnections(deformerNode+".morphTarget[0]", destination=False, source=True)[0]
+                        defDic["relatedNode"] = cmds.listConnections(deformer_node+".morphTarget[0]", destination=False, source=True)[0]
                 else:
-                    defDic["attributes"][attr] = cmds.getAttr(deformerNode+"."+attr)
-            defDic["name"] = deformerNode
+                    defDic["attributes"][attr] = cmds.getAttr(deformer_node+"."+attr)
+            defDic["name"] = deformer_node
         return defDic
 
 
@@ -208,30 +208,30 @@ class Weights(object):
         return tagInfoDic
 
 
-    def getComponentTagInfluencer(self, deformerList=None, *args):
+    def getComponentTagInfluencer(self, deformers=None, *args):
         """ Return the dictionary with the componentTag influencer info.
         """
-        if not deformerList:
-            deformerList = []
-            for deformerType in self.typeAttrDic.keys():
-                defList = cmds.ls(selection=False, type=deformerType)
+        if not deformers:
+            deformers = []
+            for deformer_type in self.typeAttrDic.keys():
+                defList = cmds.ls(selection=False, type=deformer_type)
                 if defList:
-                    deformerList.extend(defList)
+                    deformers.extend(defList)
         tagInfluenceDic = {}
-        if deformerList:
-            for deformerNode in deformerList:
-                if cmds.objExists(deformerNode+".originalGeometry"):
-                    origGeomList = cmds.getAttr(deformerNode+".originalGeometry", multiIndices=True)
+        if deformers:
+            for deformer_node in deformers:
+                if cmds.objExists(deformer_node+".originalGeometry"):
+                    origGeomList = cmds.getAttr(deformer_node+".originalGeometry", multiIndices=True)
                     if origGeomList:
                         hasTag = False
                         for index in origGeomList:
-                            if not cmds.getAttr(deformerNode+".input["+str(index)+"].componentTagExpression") == "*":
+                            if not cmds.getAttr(deformer_node+".input["+str(index)+"].componentTagExpression") == "*":
                                 hasTag = True
                                 break
                         if hasTag:
-                            tagInfluenceDic[deformerNode] = {"expression" : {}}
+                            tagInfluenceDic[deformer_node] = {"expression" : {}}
                             for index in origGeomList:
-                                tagInfluenceDic[deformerNode]["expression"][index] = cmds.getAttr(deformerNode+".input["+str(index)+"].componentTagExpression")
+                                tagInfluenceDic[deformer_node]["expression"][index] = cmds.getAttr(deformer_node+".input["+str(index)+"].componentTagExpression")
         return tagInfluenceDic
     
 
@@ -284,7 +284,7 @@ class Weights(object):
             Import componentList to the tagged node using the injestNode as injestLocation parameter.
             Need to eval a MEL command because seems the Python command isn't implemented properly in Maya2022.
         """
-        wellImported = True
+        well_imported = True
         index = 0
         indexes = cmds.getAttr(taggedNode+".componentTags", multiIndices=True)
         if indexes:
@@ -295,46 +295,46 @@ class Weights(object):
             #cmds.setAttr(tagList[0]+".componentTags["+str(index)+"].componentTagContents", len(componentList), contents, type="componentList")
             mel.eval('setAttr '+injestNode+'.componentTags['+str(index)+'].componentTagContents -type componentList '+str(len(componentList))+' '+contents+';')
         except:
-            wellImported = False
-        return wellImported
+            well_imported = False
+        return well_imported
 
 
     def importComponentTagInfo(self, taggedDic, nodes, *args):
         """ Import component tag tagged "nodes" as "tag" info.
         """
-        wellImported = True
-        toImportList, self.notWorkWellInfoList = [], []
+        well_imported = True
+        to_import_items, self.notWorkWellInfoList = [], []
         currentTaggedDic = self.getComponentTagInfo(nodes)
         for taggedNode in taggedDic.keys():
             # check mesh existing
             if cmds.objExists(taggedNode):
                 for tag in taggedDic[taggedNode].keys():
                     if not currentTaggedDic:
-                        toImportList.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
+                        to_import_items.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
                     elif taggedNode in currentTaggedDic.keys():
                         if not tag in currentTaggedDic[taggedNode]:
-                            if not [taggedNode, tag, taggedDic[taggedNode][tag]["node"]] in toImportList:
-                                toImportList.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
+                            if not [taggedNode, tag, taggedDic[taggedNode][tag]["node"]] in to_import_items:
+                                to_import_items.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
                     else:
-                        if not [taggedNode, tag, taggedDic[taggedNode][tag]["node"]] in toImportList:
-                            toImportList.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
+                        if not [taggedNode, tag, taggedDic[taggedNode][tag]["node"]] in to_import_items:
+                            to_import_items.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
             else:
                 self.notWorkWellInfoList.append(taggedNode)
-                wellImported = False
-        if toImportList:
-            for tagList in toImportList:
+                well_imported = False
+        if to_import_items:
+            for tagList in to_import_items:
                 try:
-                    wellImported = self.importComponentTag(tagList[0], tagList[1], tagList[2], taggedDic[tagList[0]][tagList[1]]["components"], wellImported)
+                    well_imported = self.importComponentTag(tagList[0], tagList[1], tagList[2], taggedDic[tagList[0]][tagList[1]]["components"], well_imported)
                 except Exception as e:
                     self.notWorkWellInfoList.append(", ".join(tagList)+" - "+str(e))
-                    wellImported = False
-        return wellImported
+                    well_imported = False
+        return well_imported
 
 
     def importComponentTagInfluencer(self, infDic, *args):
         """ Import component tag influencer info from deformer nodes.
         """
-        wellImported = True
+        well_imported = True
         self.notWorkWellInfoList = []
         for infNode in infDic.keys():
             # check deformer node existing
@@ -345,8 +345,8 @@ class Weights(object):
                             cmds.setAttr(infNode+".input["+str(infIndex)+"].componentTagExpression", infDic[infNode]["expression"][infIndex], type="string")
                         except Exception as e:
                             self.notWorkWellInfoList.append(infNode+" - "+str(e))
-                            wellImported = False
-        return wellImported
+                            well_imported = False
+        return well_imported
 
 
     def importComponentTagFalloff(self, falloffDic, *args):
@@ -355,7 +355,7 @@ class Weights(object):
             Connect node attributes.
             Set all specific node attributes for each falloff type.
         """
-        wellImported = True
+        well_imported = True
         self.notWorkWellInfoList = []
         for falloffNode in falloffDic.keys():
             # check falloff node existing
@@ -363,7 +363,7 @@ class Weights(object):
                 falloffNode = cmds.createNode(falloffDic[falloffNode]["type"], name=falloffDic[falloffNode]["name"])
             if not falloffNode:
                 self.notWorkWellInfoList.append(falloffNode)
-                wellImported = False
+                well_imported = False
             else:
                 # connect falloff
                 if falloffDic[falloffNode]["outputWeightFunction"]:
@@ -373,7 +373,7 @@ class Weights(object):
                                 cmds.connectAttr(falloffNode+".outputWeightFunction", plug, force=True)
                             except:
                                 self.notWorkWellInfoList.append(falloffNode+".outputWeightFunction -> "+plug)
-                                wellImported = False
+                                well_imported = False
                 # set falloff attributes
                 for attr in falloffDic[falloffNode]["attributes"].keys():
                     try:
@@ -383,15 +383,15 @@ class Weights(object):
                             cmds.setAttr(falloffNode+"."+attr, falloffDic[falloffNode]["attributes"][attr], type="string")
                         except:
                             self.notWorkWellInfoList.append(falloffNode+"."+attr)
-                            wellImported = False
-        return wellImported
+                            well_imported = False
+        return well_imported
 
 
-    def setDeformerWeights(self, deformerNode, weightsDic, idx=0, *args):
+    def setDeformerWeights(self, deformer_node, weights_data, idx=0, *args):
         """ Set the deformer weights to the given node for the indexed shape.
         """
-        for vtx in weightsDic.keys():
-            cmds.setAttr(deformerNode+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weightsDic[vtx])
+        for vtx in weights_data.keys():
+            cmds.setAttr(deformer_node+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weights_data[vtx])
 
 
     def getLatticePoints(self, latticeNode, *args):
@@ -417,12 +417,12 @@ class Weights(object):
                     i += 1
 
 
-    def getLatticeInfo(self, connectedNode, deformerNode, *args):
+    def getLatticeInfo(self, connectedNode, deformer_node, *args):
         """
         """
         return {
                 "pointList" : self.getLatticePoints(connectedNode),
-                "baseLatticeMatrix" : cmds.listConnections(deformerNode+".baseLatticeMatrix", destination=False, source=True)[0]
+                "baseLatticeMatrix" : cmds.listConnections(deformer_node+".baseLatticeMatrix", destination=False, source=True)[0]
                }
 
 
@@ -442,39 +442,39 @@ class Weights(object):
         return resultDic
 
 
-    def getSculptInfo(self, deformerNode, *args):
+    def getSculptInfo(self, deformer_node, *args):
         """ Return a dictionary of the connected nodes on sculptObjectGeometry and startPosition of the given sculpt deformer node.
         """
         return {
-                "sculptor"      : cmds.listConnections(deformerNode+".sculptObjectGeometry", destination=False, source=True)[0],
-                "originLocator" : cmds.listConnections(deformerNode+".startPosition", destination=False, source=True)[0]
+                "sculptor"      : cmds.listConnections(deformer_node+".sculptObjectGeometry", destination=False, source=True)[0],
+                "originLocator" : cmds.listConnections(deformer_node+".startPosition", destination=False, source=True)[0]
                 }
 
 
     def getAllDeformerTypeList(self, *args):
         """ Return a list of all current supported deformer types.
         """
-        deformerList = list(self.typeAttrDic.keys())
-        deformerList.extend(["skinCluster", "blendShape", "nonLinear"])
-        return deformerList
+        deformers = list(self.typeAttrDic.keys())
+        deformers.extend(["skinCluster", "blendShape", "nonLinear"])
+        return deformers
 
 
     def getOrderList(self, node, *args):
         """ Return a list of deformer order of the given node.
         """
         results = []
-        deformerList = self.getAllDeformerTypeList()
-        inputDeformerList = cmds.listHistory(node, pruneDagObjects=True, interestLevel=True)
-        if inputDeformerList:
-            for item in inputDeformerList:
-                if cmds.objectType(item) in deformerList:
+        deformers = self.getAllDeformerTypeList()
+        input_deformers = cmds.listHistory(node, pruneDagObjects=True, interestLevel=True)
+        if input_deformers:
+            for item in input_deformers:
+                if cmds.objectType(item) in deformers:
                     if not item in results:
                       results.append(item)
         return results
 
 
     def setOrderList(self, node, desiredList, *args):
-        """ Set the deformer order in the given node using the deformerList argument.
+        """ Set the deformer order in the given node using the deformers argument.
         """
         currentOrderList = self.getOrderList(node)
         if not currentOrderList == desiredList:
@@ -497,44 +497,44 @@ class Weights(object):
         return results
 
 
-    def assignDeformer(self, deformerNode, items, *args):
+    def assignDeformer(self, deformer_node, items, *args):
         """ Assign the deformer node to the given item list if it isn't assigned yet.
         """
-        if deformerNode and items:
+        if deformer_node and items:
             for item in items:
                 needToAddDef = True
-                inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
-                if inputDeformerList:
-                    if deformerNode in inputDeformerList:
+                input_deformers = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
+                if input_deformers:
+                    if deformer_node in input_deformers:
                         needToAddDef = False
                     else:
-                        for inputDef in inputDeformerList:
-                            if deformerNode == inputDef+"HandleShape": #hack to check if it's a nonLinear handle shape
+                        for inputDef in input_deformers:
+                            if deformer_node == inputDef+"HandleShape": #hack to check if it's a nonLinear handle shape
                                 needToAddDef = False
                 if needToAddDef:
-                    cmds.deformer(deformerNode, edit=True, geometry=item)
+                    cmds.deformer(deformer_node, edit=True, geometry=item)
 
 
-    def getShapeToIndexData(self, deformerNode, *args):
-        """ Return a shapeList, a indexes and a dictionary with the shape name as keys and deformer index as values.
+    def getShapeToIndexData(self, deformer_node, *args):
+        """ Return a shapes, a indexes and a dictionary with the shape name as keys and deformer index as values.
         """
-        shapeList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
-        indexes = cmds.deformer(deformerNode, query=True, geometryIndices=True)
-        return shapeList, indexes, dict(zip(shapeList, indexes))
+        shapes = cmds.ls(cmds.deformer(deformer_node, query=True, geometry=True), long=True)
+        indexes = cmds.deformer(deformer_node, query=True, geometryIndices=True)
+        return shapes, indexes, dict(zip(shapes, indexes))
     
 
-    def getCurrentDeformedIndex(self, deformerNode, shapeToIndexDic, index, *args):
+    def getCurrentDeformedIndex(self, deformer_node, shape_to_index_data, index, *args):
         """ Returns the current deformer index based on the shape and current deformer index list.
         """
         currentIndex = index
-        if deformerNode and shapeToIndexDic:
+        if deformer_node and shape_to_index_data:
             shapeName = None
-            for node in shapeToIndexDic.keys():
-                if shapeToIndexDic[node] == index:
+            for node in shape_to_index_data.keys():
+                if shape_to_index_data[node] == index:
                     shapeName = node
                     break
             if shapeName:
-                currentShapeToIndexDic = self.getShapeToIndexData(deformerNode)[2]
+                currentShapeToIndexDic = self.getShapeToIndexData(deformer_node)[2]
                 if currentShapeToIndexDic:
                     for item in currentShapeToIndexDic.keys():
                         if item == shapeName:
@@ -542,12 +542,12 @@ class Weights(object):
         return currentIndex
 
 
-    def checkUseComponentTag(self, deformerNode, *args):
+    def checkUseComponentTag(self, deformer_node, *args):
         """ Returns False if found an object set node in the deformer node given message output connections.
         """
         hasTag = True
-        if deformerNode:
-            messageOutputList = cmds.listConnections(deformerNode+".message", destination=True, source=False)
+        if deformer_node:
+            messageOutputList = cmds.listConnections(deformer_node+".message", destination=True, source=False)
             if messageOutputList:
                 for item in messageOutputList:
                     if cmds.objectType(item) == "objectSet":
