@@ -39,19 +39,19 @@ class InputOrderIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     if self.first_mode: #export
-                        deformedList = None
+                        deformed_items = None
                         if inputs:
-                            deformedList = inputs
+                            deformed_items = inputs
                         else:
-                            deformedList = self.ar.skin.getDeformedItemList(deformerTypeList=self.ar.skin.getAllDeformerTypeList(), ignoreAttr=self.ar.skin.ignoreSkinningAttr)
-                        if deformedList:
-                            self.export_json_file(self.getOrderDataDic(deformedList))
+                            deformed_items = self.ar.skin.getDeformedItemList(deformerTypeList=self.ar.skin.getAllDeformerTypeList(), ignoreAttr=self.ar.skin.ignoreSkinningAttr)
+                        if deformed_items:
+                            self.export_json_file(self.get_order_data(deformed_items))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes']+" - meshes")
                     else: #import
-                        orderDic = self.import_latest_json_file(self.get_exported_items())
-                        if orderDic:
-                            self.importInputOrder(orderDic)
+                        order_data = self.import_latest_json_file(self.get_exported_items())
+                        if order_data:
+                            self.import_input_order(order_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -71,36 +71,36 @@ class InputOrderIO(action.BaseAction):
         return self.log_data
 
 
-    def getOrderDataDic(self, deformedList, *args):
+    def get_order_data(self, deformed_items):
         """ Return the deformer order data dictionary to export.
         """
-        orderDic = {}
-        self.ar.utils.setProgress(max=len(deformedList), add_one=False, add_number=False)
-        for item in deformedList:
+        order_data = {}
+        self.ar.utils.setProgress(max=len(deformed_items), add_one=False, add_number=False)
+        for item in deformed_items:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            orderDic[item] = self.ar.skin.getOrderList(item)
-        return orderDic
+            order_data[item] = self.ar.skin.getOrderList(item)
+        return order_data
     
 
-    def importInputOrder(self, orderDic, *args):
+    def import_input_order(self, order_data):
         """ Import the input order data from given dictionary.
         """
-        self.ar.utils.setProgress(max=len(orderDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.setProgress(max=len(order_data.keys()), add_one=False, add_number=False)
         well_imported = True
         to_import_items, not_found_meshs, = [], []
-        for item in orderDic.keys():
+        for item in order_data.keys():
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 to_import_items.append(item)
             else:
                 not_found_meshs.append(item)
         if to_import_items:
-            warningStatus = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
+            warning_status = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
             cmds.scriptEditorInfo(edit=True, suppressWarnings=True)
             for item in to_import_items:
                 try:
                     # reorder deformers
-                    deformers = orderDic[item]
+                    deformers = order_data[item]
                     if deformers:
                         if len(deformers) > 1:
                             self.ar.skin.setOrderList(item, deformers)
@@ -108,7 +108,7 @@ class InputOrderIO(action.BaseAction):
                     well_imported = False
                     print(e)
                     self.fail_io(self.latest_data_file)
-            cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
+            cmds.scriptEditorInfo(edit=True, suppressWarnings=warning_status)
             if well_imported:
                 self.well_done_io(self.latest_data_file)
         else:

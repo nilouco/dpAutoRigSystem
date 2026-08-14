@@ -141,7 +141,7 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
             self.serialize_guide()
             self.composing_info()
             cmds.select(clear=True)
-        # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
+        # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID

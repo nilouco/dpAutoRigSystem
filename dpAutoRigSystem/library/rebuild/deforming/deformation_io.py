@@ -102,7 +102,7 @@ class DeformationIO(action.BaseAction):
                         # Get shape indexes for the deformer so we can query the deformer weights
                         shapes, indexes, shape_to_index_data = self.ar.skin.getShapeToIndexData(deformer_node)
                         # update dictionary
-                        deformer_data[deformer_node]["shapes"] = shapes
+                        deformer_data[deformer_node]["shapeList"] = shapes
                         deformer_data[deformer_node]["indexes"] = indexes
                         deformer_data[deformer_node]["shape_to_index_data"] = shape_to_index_data
                         deformer_data[deformer_node]["weights"] = {}
@@ -128,7 +128,7 @@ class DeformationIO(action.BaseAction):
     def import_deformation(self, deformer_node, deformer_data, well_imported):
         """ Import deformer data creating a new deformer node, set values and weights.
         """
-        self.existShapeList = [s for s in deformer_data[deformer_node]["shapes"] if cmds.objExists(s)]
+        self.existShapeList = [s for s in deformer_data[deformer_node]["shapeList"] if cmds.objExists(s)]
         new_def_node = None
         # verify if the deformer node exists to don't recreate it and import data
         if cmds.objExists(deformer_node):
@@ -247,7 +247,7 @@ class DeformationIO(action.BaseAction):
         to_import_items, not_found_meshs, changed_shape_meshes = [], [], []
         for deformer_node in deformer_data.keys():
             # check mesh existing
-            for shape in deformer_data[deformer_node]["shapes"]:
+            for shape in deformer_data[deformer_node]["shapeList"]:
                 if cmds.objExists(shape):
                     if not deformer_node in to_import_items:
                         to_import_items.append(deformer_node)
@@ -263,7 +263,7 @@ class DeformationIO(action.BaseAction):
                     self.fail_io(self.latest_data_file+": "+deformer_node+" - "+str(e))
             if not_found_meshs: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
                 for deformer_node in not_found_meshs:
-                    for shape in deformer_data[deformer_node]["shapes"]:
+                    for shape in deformer_data[deformer_node]["shapeList"]:
                         if cmds.objExists(shape):
                             try:
                                 well_imported = self.import_deformation(deformer_node, deformer_data, well_imported)

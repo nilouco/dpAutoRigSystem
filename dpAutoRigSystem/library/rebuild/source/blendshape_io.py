@@ -17,8 +17,8 @@ class BlendshapeIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_blendShapeIO"
         self.start_name = "dpBlendShape"
-        self.targetName = "dpTarget"
-        self.originalName = "dpOriginal"
+        self.target_name = "dpTarget"
+        self.original_name = "dpOriginal"
         self.extention = "shp"
     
 
@@ -43,28 +43,28 @@ class BlendshapeIO(action.BaseAction):
                 # load alembic plugin
                 if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
                     self.io_path = self.get_io_path(self.io_folder)
-                    self.targetPath = self.io_path+"/"+self.targetName
-                    self.originalPath = self.io_path+"/"+self.originalName
+                    self.target_path = self.io_path+"/"+self.target_name
+                    self.original_path = self.io_path+"/"+self.original_name
                     if self.io_path:
                         if self.first_mode: #export
-                            bsList = None
+                            bs_items = None
                             if inputs:
-                                bsList = inputs
+                                bs_items = inputs
                             else:
-                                bsList = [n for n in cmds.ls(selection=False, type="blendShape") if cmds.blendShape(n, query=True, geometry=True)]
-                            if bsList:
-                                bsDic = self.getBSDataDic(bsList)
-                                for bsNode in bsList:
-                                    self.exportTargetFile(bsNode)
-                                    transformList = [cmds.listRelatives(geoShape, parent=True, type="transform")[0] for geoShape in bsDic[bsNode]["geometry"]]
-                                    self.export_alembic_file(transformList, self.originalPath, self.originalName, bsNode, False)
-                                self.export_json_file(bsDic)
+                                bs_items = [n for n in cmds.ls(selection=False, type="blendShape") if cmds.blendShape(n, query=True, geometry=True)]
+                            if bs_items:
+                                bs_data = self.get_bs_data(bs_items)
+                                for bs_node in bs_items:
+                                    self.export_target_file(bs_node)
+                                    transforms = [cmds.listRelatives(geoShape, parent=True, type="transform")[0] for geoShape in bs_data[bs_node]["geometry"]]
+                                    self.export_alembic_file(transforms, self.original_path, self.original_name, bs_node, False)
+                                self.export_json_file(bs_data)
                             else:
                                 self.maybe_done_io("BlendShapes_Grp")
                         else: #import
-                            bsDic = self.import_latest_json_file(self.get_exported_items())
-                            if bsDic:
-                                self.importBlendShapes(bsDic)
+                            bs_data = self.import_latest_json_file(self.get_exported_items())
+                            if bs_data:
+                                self.import_blendshapes(bs_data)
                             else:
                                 self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                     else:
@@ -86,159 +86,159 @@ class BlendshapeIO(action.BaseAction):
         return self.log_data
 
 
-    def getBSDataDic(self, bsList, *args):
+    def get_bs_data(self, bs_items):
         """ Return the blendShape data dictionary to export info.
         """
-        bsDic = {}
-        self.ar.utils.setProgress(max=len(bsList), add_one=False, add_number=False)
-        for bsNode in bsList:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+bsNode)
-            bsDic[bsNode] = {}
-            bsDic[bsNode]["targets"] = {}
+        bs_data = {}
+        self.ar.utils.setProgress(max=len(bs_items), add_one=False, add_number=False)
+        for bs_node in bs_items:
+            self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+bs_node)
+            bs_data[bs_node] = {}
+            bs_data[bs_node]["targets"] = {}
             # get blendShape node info
-            bsDic[bsNode]['geometry'] = cmds.blendShape(bsNode, query=True, geometry=True)
-            bsDic[bsNode]['envelope'] = cmds.getAttr(bsNode+".envelope")
-            bsDic[bsNode]['supportNegativeWeights'] = cmds.getAttr(bsNode+".supportNegativeWeights")
-            targetList = cmds.listAttr("{}.weight".format(bsNode), multi=True)
-            if targetList:
+            bs_data[bs_node]['geometry'] = cmds.blendShape(bs_node, query=True, geometry=True)
+            bs_data[bs_node]['envelope'] = cmds.getAttr(bs_node+".envelope")
+            bs_data[bs_node]['supportNegativeWeights'] = cmds.getAttr(bs_node+".supportNegativeWeights")
+            targets = cmds.listAttr("{}.weight".format(bs_node), multi=True)
+            if targets:
                 # prepare index to deleted targets
-                indexes = cmds.getAttr("{}.weight".format(bsNode), multiIndices=True)
-                bsDic[bsNode]["indexTargetDic"] = dict(zip(indexes, targetList))
-                deletedIndexList = []
+                indexes = cmds.getAttr("{}.weight".format(bs_node), multiIndices=True)
+                bs_data[bs_node]["indexTargetDic"] = dict(zip(indexes, targets))
+                deleted_indexes = []
                 i = 0 #workaround to avoid deleted target index when importing data
-                for t, target in enumerate(targetList):
-                    weightDic = {}
+                for t, target in enumerate(targets):
+                    weight_data = {}
                     combination = False
-                    combinationMethod = None
-                    combinationList = []
-                    unitConversionFactor = None
-                    unitConversionInputPlug = None
-                    plug = cmds.listConnections(bsNode+"."+target, destination=False, source=True, plugs=True)
+                    combination_method = None
+                    combinations = []
+                    unit_conversion_factor = None
+                    unit_conversion_input_plug = None
+                    plug = cmds.listConnections(bs_node+"."+target, destination=False, source=True, plugs=True)
                     if plug:
-                        plugNode = plug[0][:plug[0].find(".")]
-                        if cmds.objectType(plugNode) == "combinationShape":
+                        plug_node = plug[0][:plug[0].find(".")]
+                        if cmds.objectType(plug_node) == "combinationShape":
                             combination = True
-                            combinationMethod = cmds.getAttr(plugNode+".combinationMethod")
-                            inputWeightList = cmds.listAttr(plugNode+".inputWeight", multi=True)
-                            if inputWeightList:
-                                for inputWeight in inputWeightList:
-                                    combinationList.append(cmds.listConnections(plugNode+"."+inputWeight, destination=False, source=True, plugs=True)[0])
-                        elif cmds.objectType(plugNode) == "unitConversion":
-                            unitConversionFactor = cmds.getAttr(plugNode+".conversionFactor")
-                            unitConversionInputPlug = cmds.listConnections(plugNode+".input", destination=False, source=True, plugs=True)[0]
+                            combination_method = cmds.getAttr(plug_node+".combinationMethod")
+                            input_weights = cmds.listAttr(plug_node+".inputWeight", multi=True)
+                            if input_weights:
+                                for input_weight in input_weights:
+                                    combinations.append(cmds.listConnections(plug_node+"."+input_weight, destination=False, source=True, plugs=True)[0])
+                        elif cmds.objectType(plug_node) == "unitConversion":
+                            unit_conversion_factor = cmds.getAttr(plug_node+".conversionFactor")
+                            unit_conversion_input_plug = cmds.listConnections(plug_node+".input", destination=False, source=True, plugs=True)[0]
                     # getting vertex weights if not equal to 1
-                    for s, shape in enumerate(bsDic[bsNode]["geometry"]):
+                    for s, shape in enumerate(bs_data[bs_node]["geometry"]):
                         # write deleted target to compose a clear target list to avoid Maya's garbage issue
                         while not i == indexes[t]:
-                            bsDic[bsNode]["targets"][i] = {"deleted" : True}
-                            deletedIndexList.append(i)
+                            bs_data[bs_node]["targets"][i] = {"deleted" : True}
+                            deleted_indexes.append(i)
                             i += 1
                         # continue writing relevant or just info data
                         vertices = cmds.polyEvaluate(shape, vertex=True)
                         if type(vertices) == "int": #to accept non polygon blendShapes like curves by Zipper
-                            rawWeightList = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bsNode, s, t, vertices-1))
-                            if not len(rawWeightList) == rawWeightList.count(1.0):
-                                for w, weight in enumerate(rawWeightList):
+                            raw_weights = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bs_node, s, t, vertices-1))
+                            if not len(raw_weights) == raw_weights.count(1.0):
+                                for w, weight in enumerate(raw_weights):
                                     if not weight == 1.0:
-                                        weightDic[w] = weight
+                                        weight_data[w] = weight
                     # data dictionary to export
-                    bsDic[bsNode]["targets"][i] = { "name"           : target,
+                    bs_data[bs_node]["targets"][i] = { "name"           : target,
                                                     "deleted"        : False,
                                                     "regenerate"     : cmds.objExists(target),
-                                                    "value"          : cmds.getAttr(bsNode+"."+target),
+                                                    "value"          : cmds.getAttr(bs_node+"."+target),
                                                     "plug"           : plug,
                                                     "comb"           : combination,
-                                                    "combMethod"     : combinationMethod,
-                                                    "combList"       : combinationList,
-                                                    "unitConvFactor" : unitConversionFactor,
-                                                    "unitConvInput"  : unitConversionInputPlug,
-                                                    "weightDic"      : weightDic
+                                                    "combMethod"     : combination_method,
+                                                    "combList"       : combinations,
+                                                    "unitConvFactor" : unit_conversion_factor,
+                                                    "unitConvInput"  : unit_conversion_input_plug,
+                                                    "weightDic"      : weight_data
                                                     }
-                    bsDic[bsNode]["deletedIndexList"] = deletedIndexList
+                    bs_data[bs_node]["deletedIndexList"] = deleted_indexes
                     i += 1
-        return bsDic
+        return bs_data
 
 
-    def exportTargetFile(self, bsNode, *args):
+    def export_target_file(self, bs_node):
         """ Export the given blendShape target.
         """
         try:
-            self.ar.pipeliner.make_dir_if_not_exists(self.targetPath)
+            self.ar.pipeliner.make_dir_if_not_exists(self.target_path)
             # export blendShape targets as compiled maya file
-            cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
+            cmds.blendShape(bs_node, edit=True, export=self.target_path+"/"+self.target_name+"_"+bs_node+"."+self.extention)
         except Exception as e:
             self.fail_io(str(e))
 
 
-    def importBlendShapes(self, bsDic, *args):
+    def import_blendshapes(self, bs_data):
         """ Import blendShapes from given exported list getting the latest file.
         """
         well_imported = True
         # not working scriptEditor suppress command...
-        suppressWarningsState = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
-        suppressInfoState = cmds.scriptEditorInfo(query=True, suppressInfo=True)
-        suppressErrorsState = cmds.scriptEditorInfo(query=True, suppressErrors=True)
-        suppressResultsState = cmds.scriptEditorInfo(query=True, suppressResults=True)
+        suppress_warnings_state = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
+        suppress_info_state = cmds.scriptEditorInfo(query=True, suppressInfo=True)
+        suppress_errors_state = cmds.scriptEditorInfo(query=True, suppressErrors=True)
+        suppress_results_state = cmds.scriptEditorInfo(query=True, suppressResults=True)
         cmds.scriptEditorInfo(suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
         # rebuild blendShapes
-        for bsNode in bsDic.keys():
+        for bs_node in bs_data.keys():
             # import alembic original mesh if it doesn't exists
-            originalShapeList = bsDic[bsNode]["geometry"]
-            for originalShape in originalShapeList:
-                if not cmds.objExists(originalShape):
+            original_shapes = bs_data[bs_node]["geometry"]
+            for original_shape in original_shapes:
+                if not cmds.objExists(original_shape):
                     try:
-                        abcToImport = self.originalPath+"/"+self.originalName+"_"+bsNode+".abc"
-                        mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                        abc_to_import = self.original_path+"/"+self.original_name+"_"+bs_node+".abc"
+                        mel.eval("AbcImport -mode import \""+abc_to_import+"\";")
                     except:
-                        self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.originalName+"_"+bsNode+".abc")
+                        self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.original_name+"_"+bs_node+".abc")
                         well_imported = False
-            if not cmds.objExists(bsNode):
+            if not cmds.objExists(bs_node):
                 # create an empty blendShape node
-                cmds.blendShape(originalShapeList, name=bsNode)
-                cmds.setAttr(bsNode+".envelope", bsDic[bsNode]["envelope"])
-                cmds.setAttr(bsNode+".supportNegativeWeights", bsDic[bsNode]["supportNegativeWeights"])
+                cmds.blendShape(original_shapes, name=bs_node)
+                cmds.setAttr(bs_node+".envelope", bs_data[bs_node]["envelope"])
+                cmds.setAttr(bs_node+".supportNegativeWeights", bs_data[bs_node]["supportNegativeWeights"])
                 # import targets
                 try:
                     # OMG!
                     print("--------------------------------\nStarting Autodesk not suppressed messages, sorry!\n--------------------------------\n")
-                    cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
-                    #mel.eval('catchQuiet(`blendShape -edit -ip "'+self.targetPath+'/'+self.targetName+'_'+bsNode+'.'+self.extention+'" '+bsNode+'`);')
+                    cmds.blendShape(bs_node, edit=True, ip=self.target_path+"/"+self.target_name+"_"+bs_node+"."+self.extention)
+                    #mel.eval('catchQuiet(`blendShape -edit -ip "'+self.target_path+'/'+self.target_name+'_'+bs_node+'.'+self.extention+'" '+bs_node+'`);')
                     print("--------------------------------\nEnding Autodesk not suppressed messages, sorry!\n--------------------------------\n")
                 except Exception as e:
-                    self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
+                    self.fail_io(self.ar.data.lang["r032_notImportedData"]+": "+self.target_name+"_"+bs_node+"."+self.extention+" - "+str(e))
                     well_imported = False
-            for i in list(bsDic[bsNode]["indexTargetDic"].keys()):
-                target = bsDic[bsNode]["indexTargetDic"][i]
+            for i in list(bs_data[bs_node]["indexTargetDic"].keys()):
+                target = bs_data[bs_node]["indexTargetDic"][i]
                 # set target value
                 try:
-                    cmds.setAttr(bsNode+"."+target, bsDic[bsNode]["targets"][i]["value"])
+                    cmds.setAttr(bs_node+"."+target, bs_data[bs_node]["targets"][i]["value"])
                 except:
                     pass #connected combination target
                 # set target weights
-                for s, shape in enumerate(bsDic[bsNode]["geometry"]):
-                    for idx in list(bsDic[bsNode]["targets"][i]["weightDic"].keys()):
-                        cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bsNode, s, i, idx), bsDic[bsNode]["targets"][i]["weightDic"][idx])
+                for s, shape in enumerate(bs_data[bs_node]["geometry"]):
+                    for idx in list(bs_data[bs_node]["targets"][i]["weightDic"].keys()):
+                        cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bs_node, s, i, idx), bs_data[bs_node]["targets"][i]["weightDic"][idx])
                 # regenerate target
-                if bsDic[bsNode]["targets"][i]["regenerate"]:
-                    tgtAlreadyExists = cmds.objExists(target)
-                    tgt = cmds.sculptTarget(bsNode, edit=True, regenerate=True, target=int(i))[0]
-                    if tgtAlreadyExists:
+                if bs_data[bs_node]["targets"][i]["regenerate"]:
+                    tgt_already_exists = cmds.objExists(target)
+                    tgt = cmds.sculptTarget(bs_node, edit=True, regenerate=True, target=int(i))[0]
+                    if tgt_already_exists:
                         tgt = cmds.rename("|"+tgt, "dpTemp_"+tgt)
                         if cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")):
-                            plugOut = cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")[0]+".worldMesh[0]", destination=True, source=False, plugs=True)[0]
-                            cmds.connectAttr(cmds.listRelatives(target, children=True, type="mesh")[0]+".worldMesh[0]", plugOut, force=True)
+                            plug_out = cmds.listConnections(cmds.listRelatives(tgt, children=True, type="mesh")[0]+".worldMesh[0]", destination=True, source=False, plugs=True)[0]
+                            cmds.connectAttr(cmds.listRelatives(target, children=True, type="mesh")[0]+".worldMesh[0]", plug_out, force=True)
                         #elif cmds.listConnections(cmds.listRelatives(tgt, children=True, type="shape")):
                             #TODO edit to accept nurbsShape blendShapes like Zipper
                         cmds.delete(tgt)
                     else:
-                        cmds.rename(cmds.listRelatives(tgt, children=True, type="mesh")[0], bsDic[bsNode]["targets"][i]["name"]+"Shape")
+                        cmds.rename(cmds.listRelatives(tgt, children=True, type="mesh")[0], bs_data[bs_node]["targets"][i]["name"]+"Shape")
 
                 # TODO
                     # fix double original mesh / import double targets by group issue = Maya 2024 bug, supposed fixed on Maya 2025
                     # remove script editor messages from import targets
 
-            for d in bsDic[bsNode]["deletedIndexList"]:
-                cmds.removeMultiInstance("{}.weight[{}]".format(bsNode, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
-        cmds.scriptEditorInfo(suppressWarnings=suppressWarningsState, suppressInfo=suppressInfoState, suppressErrors=suppressErrorsState, suppressResults=suppressResultsState)
+            for d in bs_data[bs_node]["deletedIndexList"]:
+                cmds.removeMultiInstance("{}.weight[{}]".format(bs_node, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
+        cmds.scriptEditorInfo(suppressWarnings=suppress_warnings_state, suppressInfo=suppress_info_state, suppressErrors=suppress_errors_state, suppressResults=suppress_results_state)
         if well_imported:
             self.well_done_io(self.latest_data_file)

@@ -139,9 +139,9 @@ class Zipper(base.BaseLibrary):
     def dpDeleteOldCurve(self, zipperId, *args):
         """ Check if exist the same old curve to delete it.
         """
-        transformList = cmds.ls(selection=False, type="transform")
-        if transformList:
-            for node in transformList:
+        transforms = cmds.ls(selection=False, type="transform")
+        if transforms:
+            for node in transforms:
                 if cmds.objExists(node+"."+ZIPPER_ATTR):
                     if cmds.getAttr(node+"."+ZIPPER_ATTR) == 1:
                         if cmds.getAttr(node+"."+ZIPPER_ID) == zipperId:
@@ -158,9 +158,9 @@ class Zipper(base.BaseLibrary):
         else:
             cmds.textField(self.first_TF, edit=True, text="")
             cmds.textField(self.second_TF, edit=True, text="")
-            transformList = cmds.ls(selection=False, type="transform")
-            if transformList:
-                for node in transformList:
+            transforms = cmds.ls(selection=False, type="transform")
+            if transforms:
+                for node in transforms:
                     if cmds.objExists(node+"."+ZIPPER_ATTR):
                         if cmds.getAttr(node+"."+ZIPPER_ATTR) == 1:
                             zipperId = cmds.getAttr(node+"."+ZIPPER_ID)

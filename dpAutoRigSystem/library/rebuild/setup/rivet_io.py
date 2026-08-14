@@ -45,20 +45,20 @@ class RivetIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     if self.first_mode: #export
-                        netList = None
+                        nets = None
                         if inputs:
-                            netList = inputs
+                            nets = inputs
                         else:
-                            netList = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
-                        if netList:
-                            self.export_json_file(self.getRivetDataDic(netList))
+                            nets = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
+                        if nets:
+                            self.export_json_file(self.get_rivet_data(nets))
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                             cmds.select(clear=True)
                     else: #import
-                        rivetDic = self.import_latest_json_file(self.get_exported_items())
-                        if rivetDic:
-                            self.importRivet(rivetDic)
+                        rivet_data = self.import_latest_json_file(self.get_exported_items())
+                        if rivet_data:
+                            self.import_rivet(rivet_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                         cmds.select(clear=True)
@@ -79,47 +79,47 @@ class RivetIO(action.BaseAction):
         return self.log_data
 
 
-    def getRivetDataDic(self, netList, *args):
+    def get_rivet_data(self, nets):
         """ Processes the given rivet network list and mount the right info pack to rebuild the module.
             Returns the dictionary to export.
         """
-        data = {}
-        self.ar.utils.setProgress(max=len(netList), add_one=False, add_number=False)
+        result_data = {}
+        self.ar.utils.setProgress(max=len(nets), add_one=False, add_number=False)
         i = 0
-        for n, net in enumerate(netList):
+        for n, net in enumerate(nets):
             if self.ar.data.verbose:
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            # mount a data
+            # mount a rivet data dictionary
             if cmds.objExists(net+".rivetData"):
                 data = json.loads(cmds.getAttr(net+".rivetData"))
-                addIt = True
+                add_it = True
                 if n > 0:
                     for x in range(0, i):
-                        if data["itemNode"] in data[x]["items"]:
-                            addIt = False
+                        if data["itemNode"] in result_data[x]["itemList"]:
+                            add_it = False
                             break
-                if addIt:
-                    data[i] = data
+                if add_it:
+                    result_data[i] = data
                     i += 1
-        return data
+        return result_data
 
 
-    def importRivet(self, rivetDic, *args):
+    def import_rivet(self, rivet_data):
         """ Import rivet data creating new instances with exported attribute values.
         """
         well_imported = True
-        self.ar.utils.setProgress(max=len(rivetDic.keys()), add_one=False, add_number=False)
-        for net in rivetDic.keys():
+        self.ar.utils.setProgress(max=len(rivet_data.keys()), add_one=False, add_number=False)
+        for net in rivet_data.keys():
             try:
-                netDic = rivetDic[net]
-                self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+netDic['geoToAttach'])
+                net_data = rivet_data[net]
+                self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+net_data['geoToAttach'])
                 old_ui_state = self.ar.data.ui_state
                 self.ar.data.ui_state = False
                 # recreate rivet:
-                self.rivet.deformerToUse = netDic['deformerToUse']
-                rivetList = self.rivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['items'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
+                self.rivet.deformerToUse = net_data['deformerToUse']
+                rivets = self.rivet.dpCreateRivet(net_data['geoToAttach'], net_data['uvSetName'], net_data['itemList'], net_data['attachTranslate'], net_data['attachRotate'], net_data['addFatherGrp'], net_data['addInvert'], net_data['invT'], net_data['invR'], net_data['faceToRivet'], net_data['rivetGrpName'], net_data['askComponent'], net_data['useOffset'], net_data['reuseFaceToRivet'])
                 self.ar.data.ui_state = old_ui_state
-                if not rivetList:
+                if not rivets:
                     well_imported = False
                     self.fail_io(net+": "+self.ar.data.lang['r032_notImportedData'])
             except Exception as e:

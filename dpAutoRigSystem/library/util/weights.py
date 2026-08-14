@@ -115,12 +115,12 @@ class Weights(object):
                 transformNode = item[:item[1:].find("|")+1]
                 if not transformNode in ranList:
                     ranList.append(transformNode)
-                    transformList = cmds.listRelatives(transformNode, allDescendents=True, children=True, fullPath=True, type="transform")
-                    if transformList:
-                        transformList.append(transformNode)
+                    transforms = cmds.listRelatives(transformNode, allDescendents=True, children=True, fullPath=True, type="transform")
+                    if transforms:
+                        transforms.append(transformNode)
                     else:
-                        transformList = [transformNode]
-                    for childNode in transformList:
+                        transforms = [transformNode]
+                    for childNode in transforms:
                         if not cmds.objExists(childNode+"."+ignoreAttr):
                             if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
                                 childNode = childNode[childNode.rfind("|")+1:] #unique name

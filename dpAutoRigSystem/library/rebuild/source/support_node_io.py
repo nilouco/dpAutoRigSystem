@@ -45,7 +45,7 @@ class SupportNodeIO(action.BaseAction):
                             if inputs:
                                 items = inputs
                             else:
-                                items = self.getNodeToExportList()
+                                items = self.get_support_nodes()
                             if items:
                                 self.ar.utils.setProgress(self.ar.data.lang[self.title], add_one=False, add_number=False)
                                 self.export_alembic_file(items, attr=False, curve=True)
@@ -72,18 +72,18 @@ class SupportNodeIO(action.BaseAction):
         return self.log_data
 
 
-    def getNodeToExportList(self, *args):
+    def get_support_nodes(self):
         """ Returns a list of the first children node in base groups.
         """
-        geoList = []
-        geoGrpList = ["supportGrp", "blendShapesGrp", "wipGrp", "fxGrp"]
-        for geoGrp in geoGrpList:
-            grp = self.ar.utils.getNodeByMessage(geoGrp)
+        geos = []
+        geo_grps = ["supportGrp", "blendShapesGrp", "wipGrp", "fxGrp"]
+        for geo_grp in geo_grps:
+            grp = self.ar.utils.getNodeByMessage(geo_grp)
             if grp:
                 items = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
                 items.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
                 if items:
-                    geoList.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.ar.utils.getSuffixNumberList(n)[1].endswith("Base")] or [])
+                    geos.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.ar.utils.getSuffixNumberList(n)[1].endswith("Base")] or [])
         if cmds.objExists("Zipper_Curves_Grp"):
-            geoList.extend(cmds.listRelatives("Zipper_Curves_Grp", children=True))
-        return geoList
+            geos.extend(cmds.listRelatives("Zipper_Curves_Grp", children=True))
+        return geos

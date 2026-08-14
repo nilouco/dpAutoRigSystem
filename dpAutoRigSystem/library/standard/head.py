@@ -1186,10 +1186,10 @@ class Head(standard.BaseStandard, layout.BaseLayout):
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
 
-                    hdNet = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guide_net, ui=False)
+                    hd_net = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.userGuideName+"_"+self.ar.data.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList, self.guide_net, ui=False)
 
-                    self.add_node_to_guide_net([hdNet], ["hdNet"])
-                    cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hdNet+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
+                    self.add_node_to_guide_net([hd_net], ["hdNet"])
+                    cmds.connectAttr(self.headSubCtrl+".message", cmds.listConnections(hd_net+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
                 elif cmds.objExists(self.name_guide+"_DeformerCube_MD"):
                     cmds.delete(self.name_guide+"_DeformerCube_MD")
 
@@ -1214,7 +1214,7 @@ class Head(standard.BaseStandard, layout.BaseLayout):
             self.serialize_guide()
             self.composing_info()
             cmds.select(clear=True)
-        # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
+        # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID

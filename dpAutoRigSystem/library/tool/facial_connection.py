@@ -173,7 +173,7 @@ class FacialConnection(base.BaseLibrary):
                         fromMesh = fromMeshList[n]
                         break
         if fromMesh:
-            geoList, results = [], []
+            geos, results = [], []
             for geoBase in fromMeshList:
                 prefix = baseName
                 if self.ar.data.ui_state:
@@ -218,13 +218,13 @@ class FacialConnection(base.BaseLibrary):
                     createdTgts.append(newGeo)
                     if t == 0: # base target
                         cmds.setAttr(newGeo+".visibility", 0)
-                        geoList.append(newGeo)
+                        geos.append(newGeo)
                         cmds.parent(newGeo, tgtGrp)
                     elif t == 1: # recept target
-                        geoList.append(newGeo)
+                        geos.append(newGeo)
                         cmds.parent(newGeo, tgtGrp)
                     elif t == 2: # tweak target
-                        geoList.append(newGeo)
+                        geos.append(newGeo)
                         cmds.parent(newGeo, tgtGrp)
                     else: # facial targets
                         cmds.parent(newGeo, facialTgtGrp)
@@ -269,35 +269,35 @@ class FacialConnection(base.BaseLibrary):
         return resultDic
     
 
-    def dpGetBsNodeDic(self, bsList):
+    def dpGetBsNodeDic(self, bs_items):
         """ Return the blendShape nodes data with their target.
         """        
-        bsDic = {}
-        if bsList:
-            for bsNode in bsList:
-                targetList = cmds.listAttr(bsNode+".w", multi=True)
-                if targetList:
-                    bsDic[bsNode] = targetList
-        return bsDic
+        bs_data = {}
+        if bs_items:
+            for bs_node in bs_items:
+                targets = cmds.listAttr(bs_node+".w", multi=True)
+                if targets:
+                    bs_data[bs_node] = targets
+        return bs_data
 
 
-    def dpConnectToBlendShape(self, controllers=None, bsList=None, *args):
+    def dpConnectToBlendShape(self, controllers=None, bs_items=None, *args):
         """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
         """
         results = []
         # get facialList attr from found dpAR controls
         facialCtrlDic = self.dpGetFacialCtrlDic(controllers)
         # get target list from existing blendShape nodes
-        if not bsList:
-            bsList = cmds.ls(selection=False, type="blendShape")
-        bsDic = self.dpGetBsNodeDic(bsList)
+        if not bs_items:
+            bs_items = cmds.ls(selection=False, type="blendShape")
+        bs_data = self.dpGetBsNodeDic(bs_items)
         # connect them
-        if bsDic:
-            if facialCtrlDic and bsDic:
+        if bs_data:
+            if facialCtrlDic and bs_data:
                 for facialCtrl in list(facialCtrlDic.keys()):
-                    for bsNode in list(bsDic.keys()):
+                    for bs_node in list(bs_data.keys()):
                         for facialAttr in facialCtrlDic[facialCtrl]:
-                            for targetAttr in bsDic[bsNode]:
+                            for targetAttr in bs_data[bs_node]:
                                 connectIt = False
                                 if targetAttr.endswith(facialAttr+"_Tgt"):
                                     connectIt = True
@@ -307,18 +307,19 @@ class FacialConnection(base.BaseLibrary):
                                     connectIt = True
                                 # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
                                 if connectIt:
-                                    cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
-                                    print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
-                                    results.append(facialCtrl+"."+facialAttr+" -> "+bsNode+"."+targetAttr)
-            for bsNode in list(bsDic.keys()):
+                                    cmds.connectAttr(facialCtrl+"."+facialAttr, bs_node+"."+targetAttr, force=True)
+                                    print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bs_node+"."+targetAttr)
+                                    results.append(facialCtrl+"."+facialAttr+" -> "+bs_node+"."+targetAttr)
+            for bs_node in list(bs_data.keys()):
                 # check and connect combination targets if any
-                combinationsDic = self.dpFindCombinationTgtRelationship(bsNode)
-                combResultList = self.connectCombinationTargets(bsNode, combinationsDic)
+                combinationsDic = self.dpFindCombinationTgtRelationship(bs_node)
+                combResultList = self.connectCombinationTargets(bs_node, combinationsDic)
                 if combResultList:
                     for result in combResultList:
                         results.append(result)
-        if self.ar.data.ui_state and results:
-            self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
+        if not self.ar.data.rebuilding:
+            if self.ar.data.ui_state and results:
+                self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
         self.ar.utils.close_ui('dpFacialConnectionWindow')
     
 
@@ -521,20 +522,20 @@ class FacialConnection(base.BaseLibrary):
             self.connectCombinationTargets(bsRecept, combinationsDic)
 
 
-    def dpFindCombinationTgtRelationship(self, bsNode, *args):
+    def dpFindCombinationTgtRelationship(self, bs_node, *args):
         """ Find combination targets in the given blendShape node and their respective driver targets.
         """
         prefix = None
         combinationTargetRelationship = {}
-        if bsNode:
-            targetList = cmds.listAttr(bsNode+".w", multi=True) or []
-            if "dpPrefix" in cmds.listAttr(bsNode):
-                prefix = cmds.getAttr(bsNode+".dpPrefix")
+        if bs_node:
+            targets = cmds.listAttr(bs_node+".w", multi=True) or []
+            if "dpPrefix" in cmds.listAttr(bs_node):
+                prefix = cmds.getAttr(bs_node+".dpPrefix")
         if prefix: #only pass if the blendShape node was created by this current tool version
             baseTargets = []
             comboTargets = []
             # separate in lists between base or combination target to further classification
-            for target in targetList:
+            for target in targets:
                 targetCheck = self.decomposeTgtName(target, prefix)
                 if targetCheck[0] == True:
                     comboTargets.append(target)
@@ -559,33 +560,33 @@ class FacialConnection(base.BaseLibrary):
             return combinationTargetRelationship
     
 
-    def getBlendShapeTargetIndex(self, bsNode, targetName, *args):
+    def getBlendShapeTargetIndex(self, bs_node, target_name, *args):
         """ Get the blendShape target index from its name.
         """         
-        aliasList = cmds.aliasAttr(bsNode, q=True) or []
-        for i in range(0, len(aliasList), 2):
-            if aliasList[i] == targetName:
-                return int(aliasList[i+1].split("[")[-1][:-1])
+        alias = cmds.aliasAttr(bs_node, q=True) or []
+        for i in range(0, len(alias), 2):
+            if alias[i] == target_name:
+                return int(alias[i+1].split("[")[-1][:-1])
         return None
     
 
-    def connectCombinationTargets(self, bsNode, combinationsDic, *args):
+    def connectCombinationTargets(self, bs_node, combinationsDic, *args):
         """ Connect combination targets in the given blendShape node using the combinationsDic information.
         """
         results = []
         if combinationsDic:
             for combTgt, drivers in combinationsDic.items():
-                combIndex = self.getBlendShapeTargetIndex(bsNode, combTgt)
+                combIndex = self.getBlendShapeTargetIndex(bs_node, combTgt)
                 driverIdxList = []
                 for driverTgt in drivers:
-                    driverIndex = self.getBlendShapeTargetIndex(bsNode, driverTgt)
+                    driverIndex = self.getBlendShapeTargetIndex(bs_node, driverTgt)
                     driverIdxList.append(driverIndex) 
-                inputWeights = cmds.combinationShape(query=True, blendShape=bsNode, combinationTargetIndex=combIndex, exist=True)    
+                inputWeights = cmds.combinationShape(query=True, blendShape=bs_node, combinationTargetIndex=combIndex, exist=True)    
                 # check if combination target is already connected
                 if not inputWeights:
                     # add combination only if the target is not locked
-                    if not cmds.getAttr(bsNode+"."+combTgt, lock=True):
-                        cmds.combinationShape(blendShape=bsNode, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
+                    if not cmds.getAttr(bs_node+"."+combTgt, lock=True):
+                        cmds.combinationShape(blendShape=bs_node, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
                         print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
                         results.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
         return results
@@ -627,15 +628,15 @@ class FacialConnection(base.BaseLibrary):
             if self.ar.utils.dpCheckGeometry(selectionList[0]) and self.ar.utils.dpCheckGeometry(selectionList[1]):
                 oldMesh = selectionList[0]
                 newMesh = selectionList[1]
-                bsNode = cmds.ls(cmds.listHistory(oldMesh), type="blendShape")
-                if bsNode:
-                    targetList = cmds.listAttr(bsNode[0]+".w", multi=True)
-                    if targetList:
+                bs_node = cmds.ls(cmds.listHistory(oldMesh), type="blendShape")
+                if bs_node:
+                    targets = cmds.listAttr(bs_node[0]+".w", multi=True)
+                    if targets:
                         # progress window
                         progressAmount = 0
-                        self.ar.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targetList), add_one=False, add_number=False)
+                        self.ar.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targets), add_one=False, add_number=False)
                         cancelled = False
-                        nbTarget = len(targetList)
+                        nbTarget = len(targets)
                         reconnectList = []
                         cmds.select([newMesh, oldMesh])
                         mel.eval("CreateWrap;")
@@ -643,7 +644,7 @@ class FacialConnection(base.BaseLibrary):
                         # clear selection
                         cmds.select(clear=True)
                         newTgtList = []
-                        for item in targetList:
+                        for item in targets:
                             # update progress window
                             progressAmount += 1
                             # check if the dialog has been cancelled
@@ -652,31 +653,31 @@ class FacialConnection(base.BaseLibrary):
                                 break
                             cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
                             if not item == oldMesh:
-                                hasConnection = cmds.listConnections(bsNode[0]+"."+item, source=True, destination=False, plugs=True)
+                                hasConnection = cmds.listConnections(bs_node[0]+"."+item, source=True, destination=False, plugs=True)
                                 if hasConnection:
-                                    cmds.disconnectAttr(hasConnection[0], bsNode[0]+"."+item)
+                                    cmds.disconnectAttr(hasConnection[0], bs_node[0]+"."+item)
                                     reconnectList.append(hasConnection[0])
                                 else:
                                     reconnectList.append(None)
                                 # set blendShape slider as 1
-                                cmds.setAttr(bsNode[0]+"."+item, 1)
+                                cmds.setAttr(bs_node[0]+"."+item, 1)
                                 # renaming old target
                                 cmds.rename(item, item+"_Old")
                                 tgt = cmds.duplicate(newMesh, name=item)[0]
                                 cmds.parent(tgt, tgtGrp)
                                 newTgtList.append(tgt)
                                 # back to zero
-                                cmds.setAttr(bsNode[0]+"."+item, 0)
+                                cmds.setAttr(bs_node[0]+"."+item, 0)
                                 if hasConnection:
-                                    cmds.connectAttr(hasConnection[0], bsNode[0]+"."+item)
+                                    cmds.connectAttr(hasConnection[0], bs_node[0]+"."+item)
                                 # clear undo
                                 mel.eval("flushUndo;")
                         cmds.delete(newMesh, constructionHistory=True)
-                        cmds.rename(bsNode[0], bsNode[0]+"_Old")
-                        cmds.blendShape(newTgtList, newMesh, topologyCheck=False, name=bsNode[0])
+                        cmds.rename(bs_node[0], bs_node[0]+"_Old")
+                        cmds.blendShape(newTgtList, newMesh, topologyCheck=False, name=bs_node[0])
                         for p, plug in enumerate(reconnectList):
                             if plug:
-                                cmds.connectAttr(plug, bsNode[0]+"."+newTgtList[p], force=True)
+                                cmds.connectAttr(plug, bs_node[0]+"."+newTgtList[p], force=True)
                         if cmds.objExists(oldMesh+"Base"):
                             cmds.delete(oldMesh+"Base")
                         cmds.progressWindow(endPogress=True)

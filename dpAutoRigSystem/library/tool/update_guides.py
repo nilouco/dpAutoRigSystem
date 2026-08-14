@@ -135,7 +135,7 @@ class UpdateGuides(base.BaseLibrary):
     
 
     def getNewGuideInstance(self, newGuideName):
-        newGuidesNamesList = list(map(lambda moduleInstance : moduleInstance.guide_base, self.newGuidesInstanceList))
+        newGuidesNamesList = list(map(lambda module_instance : module_instance.guide_base, self.newGuidesInstanceList))
         currentGuideInstanceIdx = newGuidesNamesList.index(newGuideName)
         return self.newGuidesInstanceList[currentGuideInstanceIdx]
     

@@ -42,14 +42,14 @@ class PruneSkinWeights(action.BaseAction):
                 self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for skinClusterNode in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                    meshList = cmds.skinCluster(skinClusterNode, query=True, geometry=True)
-                    if meshList:
-                        weightsList = self.ar.skin.getSkinWeights(meshList[0], skinClusterNode)
+                    meshes = cmds.skinCluster(skinClusterNode, query=True, geometry=True)
+                    if meshes:
+                        weightsList = self.ar.skin.getSkinWeights(meshes[0], skinClusterNode)
                         toPruneList = []
                         # check low weights
-                        for v, weightDic in enumerate(weightsList):
-                            for w in weightDic.keys():
-                                if weightDic[w] < self.pruneMinValue:
+                        for v, weight_data in enumerate(weightsList):
+                            for w in weight_data.keys():
+                                if weight_data[w] < self.pruneMinValue:
                                     toPruneList.append(v)
                                     break
                         # conditional to check here
@@ -64,7 +64,7 @@ class PruneSkinWeights(action.BaseAction):
                                     influenceList = cmds.skinCluster(skinClusterNode, query=True, influence=True)
                                     for jnt in influenceList:
                                         cmds.setAttr(jnt+".liw", 0) #unlock
-                                    cmds.select(meshList[0])
+                                    cmds.select(meshes[0])
                                     mel.eval('doPruneSkinClusterWeightsArgList 2 { "'+str(self.pruneMinValue)+'", "1" };')
                                     self.good_results.append(True)
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+skinClusterNode+" = "+str(len(toPruneList))+" vertices")

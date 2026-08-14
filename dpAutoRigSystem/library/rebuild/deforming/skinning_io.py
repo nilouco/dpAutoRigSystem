@@ -17,7 +17,7 @@ class SkinningIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_skinningIO"
         self.start_name = "skinning"
-        self.importRefName = "dpSkinningIO_Import"
+        self.import_ref_name = "dpSkinningIO_Import"
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -51,9 +51,9 @@ class SkinningIO(action.BaseAction):
                         else:
                             self.maybe_done_io("Render_Grp")
                     else: #import
-                        skinWeightDic = self.import_latest_json_file(self.get_exported_items())
-                        if skinWeightDic:
-                            self.importSkinning(skinWeightDic)
+                        skin_weight_data = self.import_latest_json_file(self.get_exported_items())
+                        if skin_weight_data:
+                            self.import_skinning(skin_weight_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['r007_notExportedData'])
                 else:
@@ -73,48 +73,52 @@ class SkinningIO(action.BaseAction):
         return self.log_data
 
 
-    def referOldWipFile(self, *args):
+    def ref_old_wip_file(self, *args):
         """ Reference the latest wip rig file before the current, and return it's tranform elements, if there.
         """
-        refNodeList = []
-        wipFilesList = next(os.walk(self.ar.pipeliner.pipe_data['assetPath']))[2]
-        if len(wipFilesList) > 1:
-            wipFilesList.sort()
+        #
+        # UNUSED
+        # TODO: waiting needing continue developing this method or delete it further.
+        #
+        ref_nodes = []
+        wip_files = next(os.walk(self.ar.pipeliner.pipe_data['assetPath']))[2]
+        if len(wip_files) > 1:
+            wip_files.sort()
             if len(self.exported_items) > 1:
-                self.refPathName = self.exported_items[-2][len(self.start_name)+1:-5]
-                if os.path.isfile(self.ar.pipeliner.pipe_data['assetPath']+"/"+self.refPathName+".ma"):
-                    self.refPathName = self.refPathName+".ma"
+                self.ref_path_name = self.exported_items[-2][len(self.start_name)+1:-5]
+                if os.path.isfile(self.ar.pipeliner.pipe_data['assetPath']+"/"+self.ref_path_name+".ma"):
+                    self.ref_path_name = self.ref_path_name+".ma"
                 else:
-                    self.refPathName = self.refPathName+".mb"
-                self.refPathName = self.ar.pipeliner.pipe_data['assetPath']+"/"+wipFilesList[-2]
-                cmds.file(self.refPathName, reference=True, namespace=self.importRefName)
-                refNode = cmds.file(self.refPathName, referenceNode=True, query=True)
-                refNodeList = cmds.referenceQuery(refNode, nodes=True)
-                if refNodeList:
-                    refNodeList = cmds.ls(refNodeList, type="transform")
-        return refNodeList
+                    self.ref_path_name = self.ref_path_name+".mb"
+                self.ref_path_name = self.ar.pipeliner.pipe_data['assetPath']+"/"+wip_files[-2]
+                cmds.file(self.ref_path_name, reference=True, namespace=self.import_ref_name)
+                ref_node = cmds.file(self.ref_path_name, referenceNode=True, query=True)
+                ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
+                if ref_nodes:
+                    ref_nodes = cmds.ls(ref_nodes, type="transform")
+        return ref_nodes
 
 
-    def importSkinning(self, skinWeightDic, *args):
+    def import_skinning(self, skin_weight_data):
         """ Import the skinning from exported skin weight dictionary.
         """
         well_imported = True
-        to_import_items, not_found_meshs, changedTopoMeshList, changed_shape_meshes = [], [], [], []
+        to_import_items, not_found_meshs, changed_topo_meshes, changed_shape_meshes = [], [], [], []
         
-        # reference old wip rig version to compare meshes changes
-        #refNodeList = self.referOldWipFile()
-        refNodeList = None
+        # TODO: reference old wip rig version to compare meshes changes
+        #ref_nodes = self.ref_old_wip_file()
+        ref_nodes = None
 
-        for item in skinWeightDic.keys():
+        for item in skin_weight_data.keys():
             if cmds.objExists(item):
-                if refNodeList: #disable at the momment
-                    for refNodeName in refNodeList:
-                        if refNodeName[refNodeName.rfind(":")+1:] == self.ar.skin.getIOFileName(item):
-                            if cmds.polyCompare(item, refNodeName, vertices=True) > 0 or cmds.polyCompare(item, refNodeName, edges=True) > 0: #check if shape changes
+                if ref_nodes: #disable at the momment
+                    for ref_node_name in ref_nodes:
+                        if ref_node_name[ref_node_name.rfind(":")+1:] == self.ar.skin.getIOFileName(item):
+                            if cmds.polyCompare(item, ref_node_name, vertices=True) > 0 or cmds.polyCompare(item, ref_node_name, edges=True) > 0: #check if shape changes
                                 changed_shape_meshes.append(item)
                                 well_imported = False
-                            elif not len(cmds.ls(item+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
-                                changedTopoMeshList.append(item)
+                            elif not len(cmds.ls(item+".vtx[*]", flatten=True)) == len(cmds.ls(ref_node_name+".vtx[*]", flatten=True)): #check if poly count changes
+                                changed_topo_meshes.append(item)
                                 well_imported = False
                             else:
                                 to_import_items.append(item)
@@ -122,8 +126,8 @@ class SkinningIO(action.BaseAction):
                     to_import_items.append(item)
             else:
                 not_found_meshs.append(item)
-        if refNodeList:
-            cmds.file(self.refPathName, removeReference=True)
+        if ref_nodes:
+            cmds.file(self.ref_path_name, removeReference=True)
         if to_import_items:
             try:
                 # import skin weights
@@ -132,11 +136,11 @@ class SkinningIO(action.BaseAction):
             except Exception as e:
                 self.fail_io(self.latest_data_file+": "+str(e))
         else:
-            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
+            self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(skin_weight_data.keys())))
         if not well_imported:
             if changed_shape_meshes:
                 self.fail_io(self.ar.data.lang['r018_changedMesh']+" shape "+str(', '.join(changed_shape_meshes)))
-            elif changedTopoMeshList:
-                self.fail_io(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
+            elif changed_topo_meshes:
+                self.fail_io(self.ar.data.lang['r018_changedMesh']+" topology "+str(', '.join(changed_topo_meshes)))
             elif not_found_meshs:
                 self.fail_io(self.ar.data.lang['v014_notFoundNodes']+" "+str(', '.join(not_found_meshs)))

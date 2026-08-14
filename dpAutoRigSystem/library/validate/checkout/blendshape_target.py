@@ -38,9 +38,9 @@ class BlendshapeTarget(action.BaseAction):
                 check_items = inputs
             else:
                 check_items = None
-                meshList = cmds.ls(selection=False, type='mesh')
-                if meshList:
-                    check_items = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
+                meshes = cmds.ls(selection=False, type='mesh')
+                if meshes:
+                    check_items = list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=False)))
             if check_items:
                 self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 # get exception list to keep nodes in the scene

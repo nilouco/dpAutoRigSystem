@@ -55,7 +55,7 @@ class Controllers(object):
 
     def declareColors(self, *args):
         """ Just declare color lists and dictionary to use as override color data.
-        self.colorList = [  [0.627, 0.627, 0.627],
+        self.colors = [  [0.627, 0.627, 0.627],
                             [0, 0, 0],
                             [0.247, 0.247, 0.247],
                             [0.498, 0.498, 0.498],
@@ -88,7 +88,7 @@ class Controllers(object):
                             [0.435, 0.188, 0.627],
                             [0.627, 0.188, 0.412] ]
         """
-        self.colorList = self.getColorList()
+        self.colors = self.getColorList()
         self.dic_colors = {
                             "none": 0,
                             "yellow": 17,
@@ -109,10 +109,10 @@ class Controllers(object):
         """ Return a list of Maya's colors.
         """
         #Manually add the "none" color
-        colorList = [[0.627, 0.627, 0.627]]
+        colors = [[0.627, 0.627, 0.627]]
         #WARNING --> color index in maya start to 1
-        colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
-        return colorList
+        colors += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
+        return colors
 
 
     def getGuideListByAttr(self, item, attr="guideColorIndex", *args):
@@ -166,9 +166,9 @@ class Controllers(object):
                                 cmds.setAttr(item+".guideColorB", color[2])
                             else:
                                 cmds.setAttr(item+".guideColorIndex", iColorIdx)
-                                cmds.setAttr(item+".guideColorR", self.colorList[iColorIdx][0])
-                                cmds.setAttr(item+".guideColorG", self.colorList[iColorIdx][1])
-                                cmds.setAttr(item+".guideColorB", self.colorList[iColorIdx][2])
+                                cmds.setAttr(item+".guideColorR", self.colors[iColorIdx][0])
+                                cmds.setAttr(item+".guideColorG", self.colors[iColorIdx][1])
+                                cmds.setAttr(item+".guideColorB", self.colors[iColorIdx][2])
                         else:
                             # find all shapes children of the transform object:
                             items = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
@@ -204,9 +204,9 @@ class Controllers(object):
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
                 if instance:
-                    cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
+                    cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
                     if not instance.guide_base in cmds.ls(selection=True):
-                        cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colorList[iColorIdx][0], self.colorList[iColorIdx][1], self.colorList[iColorIdx][2]])
+                        cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
 
 
     def removeColor(self, items, *args):
@@ -241,9 +241,9 @@ class Controllers(object):
                         cmds.setAttr(node+".useOutlinerColor", 0)
                 if "guideColorIndex" in cmds.listAttr(item):
                     cmds.setAttr(item+".guideColorIndex", 0)
-                    cmds.setAttr(item+".guideColorR", self.colorList[0][0])
-                    cmds.setAttr(item+".guideColorG", self.colorList[0][1])
-                    cmds.setAttr(item+".guideColorB", self.colorList[0][2])
+                    cmds.setAttr(item+".guideColorR", self.colors[0][0])
+                    cmds.setAttr(item+".guideColorG", self.colors[0][1])
+                    cmds.setAttr(item+".guideColorB", self.colors[0][2])
 
 
     def getCurrentRGBColor(self, item, outliner=False, *args):
@@ -303,7 +303,7 @@ class Controllers(object):
         # Index layout:
         colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20), parent=colorTabLayout)
         # creating buttons
-        for color_index, color_values in enumerate(self.colorList):
+        for color_index, color_values in enumerate(self.colors):
             cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.colorShape, [instance.guide_base], color_index, instance=instance), parent=colorIndexLayout)
         # RGB layout:
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
@@ -321,11 +321,11 @@ class Controllers(object):
         cmds.showWindow(dpColorOverrideWin)
 
 
-    def renameShape(self, transformList, *args):
+    def renameShape(self, transforms, *args):
         """Find shapes, rename them to #Shapes and return the results.
         """
         results = []
-        for transform in transformList:
+        for transform in transforms:
             # list all children shapes:
             childShapeList = cmds.listRelatives(transform, shapes=True, children=True, fullPath=True)
             if childShapeList:
@@ -901,33 +901,33 @@ class Controllers(object):
         """ Check if there's a colorOverride for destination shapes
             and try to set it to source shapes.
         """
-        colorList = []
+        colors = []
         for item in destinations:
             childShapeList = cmds.listRelatives(item, shapes=True, type="nurbsCurve", fullPath=True)
             if childShapeList:
                 for childShape in childShapeList:
                     if cmds.getAttr(childShape+".overrideEnabled") == 1:
                         if cmds.getAttr(childShape+".overrideRGBColors") == 1:
-                            colorList.append(cmds.getAttr(childShape+".overrideColorR"))
-                            colorList.append(cmds.getAttr(childShape+".overrideColorG"))
-                            colorList.append(cmds.getAttr(childShape+".overrideColorB"))
-                            self.colorShape([sourceItem], colorList, True)
+                            colors.append(cmds.getAttr(childShape+".overrideColorR"))
+                            colors.append(cmds.getAttr(childShape+".overrideColorG"))
+                            colors.append(cmds.getAttr(childShape+".overrideColorB"))
+                            self.colorShape([sourceItem], colors, True)
                         else:
-                            colorList.append(cmds.getAttr(childShape+".overrideColor"))
-                            self.colorShape([sourceItem], colorList[0])
+                            colors.append(cmds.getAttr(childShape+".overrideColor"))
+                            self.colorShape([sourceItem], colors[0])
                         break
 
 
-    def resetCurve(self, changeDegree=False, transformList=False, *args):
+    def resetCurve(self, changeDegree=False, transforms=False, *args):
         """ Read the current curve degree of selected curve controls and change it to another one.
             1 to 3
             or
             3 to 1.
         """
-        if not transformList:
-            transformList = cmds.ls(selection=True, type="transform")
-        if transformList:
-            for item in transformList:
+        if not transforms:
+            transforms = cmds.ls(selection=True, type="transform")
+        if transforms:
+            for item in transforms:
                 if DPCONTROL in cmds.listAttr(item) and cmds.getAttr(item+"."+DPCONTROL) == 1:
                     # getting current control values from stored attributes:
                     curType = cmds.getAttr(item+".className")
@@ -946,7 +946,7 @@ class Controllers(object):
                         cmds.setAttr(item+".degree", curDegree)
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
                     self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinations=[item], keepColor=True)
-            cmds.select(transformList)
+            cmds.select(transforms)
 
 
     def confirmAskUser(self, titleText, messageText, *args):
@@ -1043,10 +1043,10 @@ class Controllers(object):
     #        newRadius = origRadius*0.010936
         # adapt radius to geometry meshes size
         if boundingBox:
-            meshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-            if meshList:
+            meshes = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            if meshes:
                 tempList = []
-                for item in meshList:
+                for item in meshes:
                     if not "_DeformerCube_Geo" in item:
                         fatherNode = item[:item[1:].find("|")+1]
                         if fatherNode:
@@ -1124,11 +1124,11 @@ class Controllers(object):
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
-        refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
-        refNodeList = cmds.referenceQuery(refNode, nodes=True)
-        if refNodeList:
-            for item in refNodeList:
-                self.ar.utils.setProgress(max=len(refNodeList), add_one=False, add_number=False)
+        ref_node = cmds.file(importCalibrationPath, referenceNode=True, query=True)
+        ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
+        if ref_nodes:
+            for item in ref_nodes:
+                self.ar.utils.setProgress(max=len(ref_nodes), add_one=False, add_number=False)
                 self.ar.utils.setProgress(self.ar.data.lang['i215_setAttr'], add_one=True)
                 if "calibrationList" in cmds.listAttr(item):
                     sourceRefNodeList.append(item)
@@ -1356,12 +1356,12 @@ class Controllers(object):
                 else:
                     # create a file reference:
                     cmds.file(path, reference=True, namespace=importShapeNamespace)
-                    refNode = cmds.file(path, referenceNode=True, query=True)
-                    refNodeList = cmds.referenceQuery(refNode, nodes=True)
-                    if refNodeList:
+                    ref_node = cmds.file(path, referenceNode=True, query=True)
+                    ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
+                    if ref_nodes:
                         if ui:
-                            self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(refNodeList), add_one=False, add_number=False)
-                        for sourceRefNode in refNodeList:
+                            self.ar.utils.setProgress(self.doingName+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(ref_nodes), add_one=False, add_number=False)
+                        for sourceRefNode in ref_nodes:
                             if ui or verbose:
                                 self.ar.utils.setProgress(self.doingName+': Shape')
                             if cmds.objectType(sourceRefNode) == "transform":

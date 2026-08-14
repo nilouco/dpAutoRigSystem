@@ -591,10 +591,10 @@ class BaseLayout(base.BaseLibrary):
                         # set values to guide base:
                         cmds.setAttr(guideChild+".mirrorAxis", self.mirror_axis, type='string')
                         cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
-                        for moduleInstance in self.ar.data.guide_instances:
-                            if cmds.objExists(moduleInstance.guide_base):
-                                if cmds.getAttr(moduleInstance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
-                                    moduleInstance.create_mirror_preview()
+                        for module_instance in self.ar.data.guide_instances:
+                            if cmds.objExists(module_instance.guide_base):
+                                if cmds.getAttr(module_instance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
+                                    module_instance.create_mirror_preview()
                 
                 # duplicating the moduleGuide
                 duplicated = cmds.duplicate(self.guide_base, returnRootsOnly=True)[0]

@@ -39,27 +39,27 @@ class ParentingIO(action.BaseAction):
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
                     if self.first_mode: #export
-                        transformList = None
+                        transforms = None
                         if inputs:
-                            transformList = inputs
+                            transforms = inputs
                         else:
-                            transformList = cmds.ls(selection=False, long=True, type="transform")
-                        if transformList:
-                            self.ar.utils.setProgress(max=len(transformList), add_one=False, add_number=False)
+                            transforms = cmds.ls(selection=False, long=True, type="transform")
+                        if transforms:
+                            self.ar.utils.setProgress(max=len(transforms), add_one=False, add_number=False)
                             # define data to export
-                            parentDic = self.getParentingDataDic(transformList)
-                            parentDic.update(self.get_broken_id_data())
-                            parentDic.update(self.getModelDataDic())
-                            self.export_json_file(parentDic)
+                            parent_data = self.get_parenting_data(transforms)
+                            parent_data.update(self.get_broken_id_data())
+                            parent_data.update(self.get_model_data())
+                            self.export_json_file(parent_data)
                         else:
                             self.maybe_done_io(self.ar.data.lang['v014_notFoundNodes'])
                     else: #import
-                        parentDic = self.import_latest_json_file(self.get_exported_items())
-                        if parentDic:
+                        parent_data = self.import_latest_json_file(self.get_exported_items())
+                        if parent_data:
                             try:
-                                if self.importBrokenIDData(parentDic):
-                                    self.importParentingData(parentDic) #double run to first put broken nodes in place
-                                self.importParentingData(parentDic)
+                                if self.import_broken_id(parent_data):
+                                    self.import_parenting_data(parent_data) #double run to first put broken nodes in place
+                                self.import_parenting_data(parent_data)
                             except Exception as e:
                                 self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+str(e))
                         else:
@@ -81,96 +81,96 @@ class ParentingIO(action.BaseAction):
         return self.log_data
 
 
-    def getParentingDataDic(self, transformList=None, *args):
+    def get_parenting_data(self, transforms=None):
         """ Return a filtered dictionary of parenting hierarchy of current scene nodes.
         """
-        if not transformList:
-            transformList = cmds.ls(selection=False, long=True, type="transform")
-        filtered_items = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        if not transforms:
+            transforms = cmds.ls(selection=False, long=True, type="transform")
+        filtered_items = self.ar.utils.filterTransformList(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filtered_items = self.reorder_list(filtered_items)
         return {"Parent" : filtered_items}
 
 
-    def getModelDataDic(self, *args):
+    def get_model_data(self, *args):
         """ Check if there's a model list to include in the dictionary data to avoid change parenting from them.
         """
-        modelDataDic = {}
-        modelList = self.get_models_to_export()
-        if modelList:
-            modelDataDic["ModelList"] = modelList
-        return modelDataDic
+        model_data = {}
+        models = self.get_models_to_export()
+        if models:
+            model_data["ModelList"] = models
+        return model_data
 
 
-    def importBrokenIDData(self, parentDic, *args):
+    def import_broken_id(self, parent_data):
         """ If there are broken nodes, we try to recreate them if needed.
             Return True if there are broken nodes.
         """
-        if "BrokenID" in parentDic.keys():
-            self.ar.utils.setProgress(max=len(parentDic["BrokenID"]), add_one=False, add_number=False)
-            for node_type in parentDic["BrokenID"].keys():
+        if "BrokenID" in parent_data.keys():
+            self.ar.utils.setProgress(max=len(parent_data["BrokenID"]), add_one=False, add_number=False)
+            for node_type in parent_data["BrokenID"].keys():
                 if node_type == "transform":
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                    for item in parentDic["BrokenID"][node_type].keys():
+                    for item in parent_data["BrokenID"][node_type].keys():
                         if not cmds.objExists(item):
-                            if not self.checkIsFromModeling(parentDic, node_type, item):
+                            if not self.check_its_from_modeling(parent_data, node_type, item):
                                 cmds.createNode(node_type, name=item)
-                                if parentDic["BrokenID"][node_type][item]:
-                                    if cmds.objExists(parentDic["BrokenID"][node_type][item]):
-                                        cmds.parent(item, parentDic["BrokenID"][node_type][item])
+                                if parent_data["BrokenID"][node_type][item]:
+                                    if cmds.objExists(parent_data["BrokenID"][node_type][item]):
+                                        cmds.parent(item, parent_data["BrokenID"][node_type][item])
                                 cmds.select(clear=True)
             return True
 
 
-    def importParentingData(self, parentDic, *args):
+    def import_parenting_data(self, parent_data):
         """ Import parenting data and put the nodes as the correct hierarchy if needed.
         """
-        if not self.getParentingDataDic()["Parent"] == parentDic["Parent"]:
-            self.ar.utils.setProgress(max=len(parentDic["Parent"]), add_one=False, add_number=False)
+        if not self.get_parenting_data()["Parent"] == parent_data["Parent"]:
+            self.ar.utils.setProgress(max=len(parent_data["Parent"]), add_one=False, add_number=False)
             # define lists to check result
             well_imported_items = []
-            parentIssueList = []
+            parent_issues = []
             not_found_nodes = []
-            modelChangedList = []
+            model_changed_items = []
             # check parenting shaders
-            for item in parentDic["Parent"]:
+            for item in parent_data["Parent"]:
                 self.ar.utils.setProgress(self.ar.data.lang[self.title])
                 if not cmds.objExists(item):
-                    parentIssueList.append(item)
-                    shortItem = item[item.rfind("|")+1:]
-                    if cmds.objExists(shortItem):
-                        if len(cmds.ls(shortItem)) == 1:
-                            if not self.checkIsFromModeling(parentDic, "transform", item):
+                    parent_issues.append(item)
+                    short_item = item[item.rfind("|")+1:]
+                    if cmds.objExists(short_item):
+                        if len(cmds.ls(short_item)) == 1:
+                            if not self.check_its_from_modeling(parent_data, "transform", item):
                                 # get father name
-                                longFatherNode = item[:item.rfind("|")]
-                                shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
-                                currentFatherList = cmds.listRelatives(shortItem, parent=True)
-                                if cmds.objExists(longFatherNode):
+                                long_father_node = item[:item.rfind("|")]
+                                short_father_node = long_father_node[long_father_node.rfind("|")+1:]
+                                current_fathers = cmds.listRelatives(short_item, parent=True)
+                                if cmds.objExists(long_father_node):
                                     # simple parent to existing old father node in the ancient hierarchy
-                                    cmds.parent(shortItem, longFatherNode)
-                                    well_imported_items.append(shortItem)
-                                elif currentFatherList:
-                                    if currentFatherList[0] == shortFatherNode:
+                                    cmds.parent(short_item, long_father_node)
+                                    well_imported_items.append(short_item)
+                                elif current_fathers:
+                                    if current_fathers[0] == short_father_node:
                                         # already child of the father node
-                                        well_imported_items.append(shortItem)
-                                elif cmds.objExists(shortFatherNode):
-                                    if len(cmds.ls(shortFatherNode)) == 1:
+                                        well_imported_items.append(short_item)
+                                elif cmds.objExists(short_father_node):
+                                    if len(cmds.ls(short_father_node)) == 1:
                                         # found unique father node in another hierarchy to parent
-                                        cmds.parent(shortItem, shortFatherNode)
-                                        well_imported_items.append(shortItem)
+                                        cmds.parent(short_item, short_father_node)
+                                        well_imported_items.append(short_item)
                                     else:
-                                        self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortFatherNode)
+                                        self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+short_father_node)
                             else: #root here
-                                modelChangedList.append(item)
+                                model_changed_items.append(item)
                         else:
-                            self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+shortItem)
+                            self.fail_io(self.ar.data.lang['i075_moreOne']+" "+self.ar.data.lang['i076_sameName']+" "+short_item)
                     else:
-                        if not self.checkIsFromModeling(parentDic, "transform", item):
-                            modelChangedList.append(item)
+                        if not self.check_its_from_modeling(parent_data, "transform", item):
+                            model_changed_items.append(item)
                         else:
-                            not_found_nodes.append(shortItem)
-            if parentIssueList:
-                if modelChangedList:
-                    self.maybe_done_io(', '.join(modelChangedList))
+                            not_found_nodes.append(short_item)
+            if parent_issues:
+                if model_changed_items:
+                    self.maybe_done_io(', '.join(model_changed_items))
                 elif well_imported_items:
                     self.well_done_io(self.latest_data_file)
                 else:
@@ -181,11 +181,11 @@ class ParentingIO(action.BaseAction):
             self.well_done_io(self.latest_data_file)
 
 
-    def checkIsFromModeling(self, parentDic, node_type, item, *args):
+    def check_its_from_modeling(self, parent_data, node_type, item):
         """ Returns True if the item is from modeling.
         """
-        if "ModelList" in parentDic.keys():
-            for modelNode in parentDic["ModelList"]:
-                if "BrokenID" in parentDic.keys() and node_type in parentDic["BrokenID"].keys() and item in parentDic["BrokenID"][node_type].keys():
-                    if modelNode in parentDic["BrokenID"][node_type][item]:
+        if "ModelList" in parent_data.keys():
+            for model_node in parent_data["ModelList"]:
+                if "BrokenID" in parent_data.keys() and node_type in parent_data["BrokenID"].keys() and item in parent_data["BrokenID"][node_type].keys():
+                    if model_node in parent_data["BrokenID"][node_type][item]:
                         return True

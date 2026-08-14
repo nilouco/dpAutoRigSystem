@@ -16,7 +16,7 @@ class ShaderIO(action.BaseAction):
         self.set_action_type("r000_rebuilder")
         self.io_folder = "s_shaderIO"
         self.start_name = "dpShader"
-        self.mayaDefaultShader = "openPBRSurface"
+        self.maya_default_shader = "openPBRSurface"
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -39,7 +39,7 @@ class ShaderIO(action.BaseAction):
             if self.ar.pipeliner.check_asset_context():
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    self.customAttrList = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
+                    self.custom_attributes = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
                                             "longitudinalWidthR", "longitudinalShiftR", "intensityR", "longitudinalWidthTT", "intensityTT", "longitudinalShiftTT", "azimuthalWidthTT",
                                             "longitudinalWidthTT", "angle", "spreadX", "spreadY", "fresnelRefractiveIndex", "specularShift", "scatter", "scatterPower", 
                                             "tubeDirection", "highlightSize", "roughness", "refractions", "refractiveIndex", "refractionLimit", "reflectionLimit", "reflectivity",
@@ -51,25 +51,25 @@ class ShaderIO(action.BaseAction):
                                             "baseWeight", "baseDiffuseRoughness", "baseMetalness", "specularWeight", "specularRoughnessAnisotropy", "transmissionWeight",
                                             "transmissionDispersionScale", "transmissionDispersionAbbeNumber", "subsurfaceWeight", "subsurfaceScatterAnisotropy", "fuzzWeight",
                                             "fuzzRoughness", "coatWeight", "coatRoughnessAnisotropy", "coatDarkening", "thinFilmWeight", "emissionLuminance", "geometryThinWalled"]
-                    self.vectorColorList = ["outColor", "outTransparency", "outGlowColor", "outMatteOpacity", "colorTT", "colorTRT", "tipColorD", "rootColorD", "whiteness", "reflectedColor",
+                    self.vector_colors = ["outColor", "outTransparency", "outGlowColor", "outMatteOpacity", "colorTT", "colorTRT", "tipColorD", "rootColorD", "whiteness", "reflectedColor",
                                             "specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "coatColor", "sheenColor", "emissionColor",
                                             "ambientColor", "incandescence", "baseColor", "fuzzColor"]
-                    self.changedTypeList = ["subsurfaceRadius", "subsurfaceRadiusScale"]
+                    self.changed_types = ["subsurfaceRadius", "subsurfaceRadiusScale"]
                     if self.first_mode: #export
-                        shaderList = None
+                        shaders = None
                         if inputs:
-                            shaderList = inputs
+                            shaders = inputs
                         else:
-                            shaderList = self.get_used_materials()
-                        if shaderList:
-                            self.export_json_file(self.getShaderDataDic(shaderList))
+                            shaders = self.get_used_materials()
+                        if shaders:
+                            self.export_json_file(self.get_shader_data(shaders))
                         else:
                             self.maybe_done_io("Shading")
                     else: #import
-                        shaderDic = self.import_latest_json_file(self.get_exported_items())
-                        if shaderDic:
+                        shader_data = self.import_latest_json_file(self.get_exported_items())
+                        if shader_data:
                             try:
-                                self.importShader(shaderDic)
+                                self.import_shader(shader_data)
                             except Exception as e:
                                 self.fail_io(self.ar.data.lang['r032_notImportedData']+": "+str(e))
                         else:
@@ -91,108 +91,107 @@ class ShaderIO(action.BaseAction):
         return self.log_data
 
 
-    def getShaderDataDic(self, shaderList, *args):
+    def get_shader_data(self, shaders):
         """ Return shader data dictionary to export.
         """
-        shaderDic = {}
-        self.ar.utils.setProgress(max=len(shaderList), add_one=False, add_number=False)
-        for shader in shaderList:
+        shader_data = {}
+        self.ar.utils.setProgress(max=len(shaders), add_one=False, add_number=False)
+        for shader in shaders:
             self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+shader)
-            fileNode = None
+            file_node = None
             texture = None
             color = None
             cmds.hyperShade(objects=shader)
-            assignedList = cmds.ls(selection=True)
-            if assignedList:
+            assigned_items = cmds.ls(selection=True)
+            if assigned_items:
                 # color
-                colorAttr = "color"
-                if not colorAttr in cmds.listAttr(shader): #support standardShader
-                    colorAttr = "baseColor"
-                if colorAttr in cmds.listAttr(shader):
-                    shaderConnectionList = cmds.listConnections(shader+"."+colorAttr, destination=False, source=True)
-                    if shaderConnectionList:
-                        fileNode = shaderConnectionList[0]
-                        texture = cmds.getAttr(fileNode+".fileTextureName")
+                color_attr = "color"
+                if not color_attr in cmds.listAttr(shader): #support standardShader
+                    color_attr = "baseColor"
+                if color_attr in cmds.listAttr(shader):
+                    shader_connections = cmds.listConnections(shader+"."+color_attr, destination=False, source=True)
+                    if shader_connections:
+                        file_node = shader_connections[0]
+                        texture = cmds.getAttr(file_node+".fileTextureName")
                     else:
-                        color = cmds.getAttr(shader+"."+colorAttr)[0]
+                        color = cmds.getAttr(shader+"."+color_attr)[0]
                 # transparency
-                transparencyAttr = "transparency"
-                if not transparencyAttr in cmds.listAttr(shader): #support standardShader
-                    transparencyAttr = "opacity"
-                    if not transparencyAttr in cmds.listAttr(shader): #support openPBRShader
-                        transparencyAttr = "geometryOpacity"
-                        if not transparencyAttr in cmds.listAttr(shader): #support surfaceShader
-                            transparencyAttr = "outTransparency"
-                            transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                transparency_attr = "transparency"
+                if not transparency_attr in cmds.listAttr(shader): #support standardShader
+                    transparency_attr = "opacity"
+                    if not transparency_attr in cmds.listAttr(shader): #support openPBRShader
+                        transparency_attr = "geometryOpacity"
+                        if not transparency_attr in cmds.listAttr(shader): #support surfaceShader
+                            transparency_attr = "outTransparency"
+                            transparency = cmds.getAttr(shader+"."+transparency_attr)[0]
                         else:
-                            transparency = cmds.getAttr(shader+"."+transparencyAttr)
+                            transparency = cmds.getAttr(shader+"."+transparency_attr)
                     else:
-                        transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                        transparency = cmds.getAttr(shader+"."+transparency_attr)[0]
                 else:
-                    transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                    transparency = cmds.getAttr(shader+"."+transparency_attr)[0]
                 # data dictionary to export
-                shaderDic[shader] = {"assigned"        : assignedList,
+                shader_data[shader] = {"assigned"        : assigned_items,
                                     "color"            : color,
-                                    "colorAttr"        : colorAttr,
-                                    "fileNode"         : fileNode,
+                                    "colorAttr"        : color_attr,
+                                    "fileNode"         : file_node,
                                     "material"         : cmds.objectType(shader),
                                     "texture"          : texture,
                                     "transparency"     : transparency,
-                                    "transparencyAttr" : transparencyAttr
+                                    "transparencyAttr" : transparency_attr
                                     }
                 # custom shader attributes
-                for attr in self.customAttrList:
+                for attr in self.custom_attributes:
                     if attr in cmds.listAttr(shader):
-                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
+                        shader_data[shader][attr] = cmds.getAttr(shader+"."+attr)
                 # custom vector color attributes
-                for attr in self.vectorColorList:
+                for attr in self.vector_colors:
                     if attr in cmds.listAttr(shader):
-                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
+                        shader_data[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
                 # changed type shader attributes
-                for attr in self.changedTypeList:
+                for attr in self.changed_types:
                     if attr in cmds.listAttr(shader):
-                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
+                        shader_data[shader][attr] = cmds.getAttr(shader+"."+attr)
             cmds.select(clear=True)
-        return shaderDic
+        return shader_data
 
 
-    def importShader(self, shaderDic, *args):
+    def import_shader(self, shader_data):
         """ Import the shaders from given shader dictionary.
         """
-        mayaVersion = cmds.about(version=True)
         not_found_meshs = []
         # rebuild shaders
-        for item in shaderDic.keys():
+        for item in shader_data.keys():
             if not cmds.objExists(item):
-                shader = cmds.shadingNode(shaderDic[item]['material'], asShader=True, name=item)
-                if shaderDic[item]['fileNode']:
-                    fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=shaderDic[item]['fileNode'])
-                    cmds.connectAttr(fileNode+".outColor", shader+"."+shaderDic[item]['colorAttr'], force=True)
-                    cmds.setAttr(fileNode+".fileTextureName", shaderDic[item]['texture'], type="string")
+                shader = cmds.shadingNode(shader_data[item]['material'], asShader=True, name=item)
+                if shader_data[item]['fileNode']:
+                    file_node = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=shader_data[item]['file_node'])
+                    cmds.connectAttr(file_node+".outColor", shader+"."+shader_data[item]['colorAttr'], force=True)
+                    cmds.setAttr(file_node+".fileTextureName", shader_data[item]['texture'], type="string")
                 else:
-                    colorList = shaderDic[item]['color']
-                    cmds.setAttr(shader+"."+shaderDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
-                transparencyList = shaderDic[item]['transparency']
-                if shaderDic[item]['transparencyAttr'] == "geometryOpacity": #support OpenPBRShader
-                    cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList)
+                    colors = shader_data[item]['color']
+                    cmds.setAttr(shader+"."+shader_data[item]['colorAttr'], colors[0], colors[1], colors[2], type="double3")
+                transparencies = shader_data[item]['transparency']
+                if shader_data[item]['transparencyAttr'] == "geometryOpacity": #support OpenPBRShader
+                    cmds.setAttr(shader+"."+shader_data[item]['transparencyAttr'], transparencies)
                 else:
-                    cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
-                for attr in self.customAttrList:
-                    if attr in cmds.listAttr(shader) and shaderDic[item][attr]:
-                        cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
-                for attr in self.vectorColorList:
-                    if attr in cmds.listAttr(shader) and shaderDic[item][attr]:
-                        cmds.setAttr(shader+"."+attr, shaderDic[item][attr][0], shaderDic[item][attr][1], shaderDic[item][attr][2], type="double3")
-                for attr in self.changedTypeList: #exception to conform Maya2024 standardSurface and Maya2026 openPBRshader - float or vector attribute types
-                    if attr in cmds.listAttr(shader) and shaderDic[item][attr]:
+                    cmds.setAttr(shader+"."+shader_data[item]['transparencyAttr'], transparencies[0], transparencies[1], transparencies[2], type="double3")
+                for attr in self.custom_attributes:
+                    if attr in cmds.listAttr(shader) and shader_data[item][attr]:
+                        cmds.setAttr(shader+"."+attr, shader_data[item][attr])
+                for attr in self.vector_colors:
+                    if attr in cmds.listAttr(shader) and shader_data[item][attr]:
+                        cmds.setAttr(shader+"."+attr, shader_data[item][attr][0], shader_data[item][attr][1], shader_data[item][attr][2], type="double3")
+                for attr in self.changed_types: #exception to conform Maya2024 standardSurface and Maya2026 openPBRshader - float or vector attribute types
+                    if attr in cmds.listAttr(shader) and shader_data[item][attr]:
                         try:
-                            cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
+                            cmds.setAttr(shader+"."+attr, shader_data[item][attr])
                         except:
-                            cmds.setAttr(shader+"."+attr, shaderDic[item][attr][0][0], shaderDic[item][attr][0][1], shaderDic[item][attr][0][2], type="double3")
+                            cmds.setAttr(shader+"."+attr, shader_data[item][attr][0][0], shader_data[item][attr][0][1], shader_data[item][attr][0][2], type="double3")
             # apply shader to meshes
-            for mesh in shaderDic[item]['assigned']:
+            for mesh in shader_data[item]['assigned']:
                 if cmds.objExists(mesh):
-                    if mayaVersion >= "2024":
+                    if cmds.about(version=True) >= "2024": #Maya version
                         cmds.hyperShade(assign=item, geometries=mesh)
                     else:
                         cmds.select(mesh)

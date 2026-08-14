@@ -129,7 +129,7 @@ class BaseStandard(base.BaseLibrary):
             cmds.addAttr(self.guide_base, longName=int_long_attr, attributeType='long')
         for c, guide_color_attr in enumerate(['guideColorR', 'guideColorG', 'guideColorB']):
             cmds.addAttr(self.guide_base, longName=guide_color_attr, attributeType='float')
-            cmds.setAttr(self.guide_base+"."+guide_color_attr, self.ar.ctrls.colorList[0][c])
+            cmds.setAttr(self.guide_base+"."+guide_color_attr, self.ar.ctrls.colors[0][c])
 
 
     def create_guide_annotation(self):

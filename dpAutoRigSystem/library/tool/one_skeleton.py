@@ -207,21 +207,21 @@ class OneSkeleton(base.BaseLibrary):
         if self.ar.utils.getAllGrp():
             renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
             if renderGrp:
-                meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
-                if meshList:
-                    return meshList
+                meshes = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
+                if meshes:
+                    return meshes
         return cmds.ls(type="mesh")
     
     
-    def getInfList(self, meshList, *args):
-        """ Returns the influenceList of a given meshList.
+    def getInfList(self, meshes, *args):
+        """ Returns the influenceList of a given meshes.
         """
         uniqueInfList = []
         skinClusterList = []
-        if not cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True):
+        if not cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True):
             mel.eval('warning \"'+self.ar.data.lang['i041_meshConnEmpty']+'\";')
             return
-        for transformNode in list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=True))):
+        for transformNode in list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True))):
             skinClusterList.extend(self.ar.skin.checkExistingDeformerNode(transformNode)[2] or [])
         if skinClusterList:
             for skinClusterNode in skinClusterList:

@@ -82,8 +82,8 @@ class MatchMesh(base.BaseLibrary):
                 # get list of mesh vertices proccess
                 # selecting meshes
                 cmds.select([fromMesh, toMesh])
-                meshList = OpenMaya.MSelectionList()
-                OpenMaya.MGlobal.getActiveSelectionList(meshList)
+                meshes = OpenMaya.MSelectionList()
+                OpenMaya.MGlobal.getActiveSelectionList(meshes)
                 
                 # declaring from and to objects, dagPaths and vertice lists
                 fromObject = OpenMaya.MObject()
@@ -94,8 +94,8 @@ class MatchMesh(base.BaseLibrary):
                 toVerticeList = OpenMaya.MPointArray()
                 
                 # getting dagPaths
-                meshList.getDagPath(0, fromDagPath, fromObject)
-                meshList.getDagPath(1, toDagPath, toObject)
+                meshes.getDagPath(0, fromDagPath, fromObject)
+                meshes.getDagPath(1, toDagPath, toObject)
                 # getting open maya API mesh
                 fromMeshFn = OpenMaya.MFnMesh(fromDagPath)
                 toMeshFn = OpenMaya.MFnMesh(toDagPath)

@@ -47,18 +47,18 @@ class Proxy(action.BaseAction):
                         proxyGrp = "Proxy_Grp"
             if proxyGrp:
                 if not PROXIED in cmds.listAttr(proxyGrp):
-                    meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
-                    if not meshList:
+                    meshes = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
+                    if not meshes:
                         renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
                         if not renderGrp:
                             if cmds.objExists("Render_Grp"):
                                 renderGrp = "Render_Grp"
                         if renderGrp:
-                            meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, fullPath=True, type="mesh")
-                    if meshList:
+                            meshes = cmds.listRelatives(renderGrp, children=True, allDescendents=True, fullPath=True, type="mesh")
+                    if meshes:
                         # find meshes to generate proxy
                         toProxyList = []
-                        for mesh in meshList:
+                        for mesh in meshes:
                             if len(cmds.ls(mesh)) == 1:
                                 meshTransform = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
                                 if meshTransform:

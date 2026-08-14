@@ -51,7 +51,7 @@ class Rivet(base.BaseLibrary):
         self.wrapDeformer = WRAP
         self.mayaMinimalVersion = 2022.3
         self.mayaVersionRequired = self.checkMayaVersion()
-        self.netList = []
+        self.nets = []
         
 
     def build_tool(self, *args):
@@ -532,7 +532,7 @@ class Rivet(base.BaseLibrary):
         self.shapeToAttachList = None
         self.shapeToAttach = None
         self.cpNode = None
-        self.rivetList, togetherList = [], []
+        rivets, togetherList = [], []
         isComponent = None
         self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
 
@@ -584,7 +584,7 @@ class Rivet(base.BaseLibrary):
                                 if isComponent == "Individually":
                                     cls = cmds.cluster(item, name=item[:item.rfind(".")]+"_"+str(i)+"_Cls")[0]+"Handle"
                                     clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                                    self.rivetList.append(clsToRivet)
+                                    rivets.append(clsToRivet)
                                 elif isComponent == "Together":
                                     togetherList.append(item)
                                 elif isComponent == "Ignore":
@@ -596,24 +596,24 @@ class Rivet(base.BaseLibrary):
                             else: #Individually
                                 cls = cmds.cluster(item, name=item[:item.rfind(".")]+"_"+str(i)+"_Cls")[0]+"Handle"
                                 clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                                self.rivetList.append(clsToRivet)
+                                rivets.append(clsToRivet)
                         else: #Individually
                             cls = cmds.cluster(item, name=item[:item.rfind(".")]+"_"+str(i)+"_Cls")[0]+"Handle"
                             clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                            self.rivetList.append(clsToRivet)
+                            rivets.append(clsToRivet)
                     elif cmds.objExists(item):
-                        self.rivetList.append(item)
+                        rivets.append(item)
             else:
                 mel.eval("error \"Select and add at least one item to be attached as a Rivet, please.\";")
             if isComponent == "Together":
                 cls = cmds.cluster(togetherList, name="dpRivet_Cls")[0]+"Handle"
                 clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                self.rivetList.append(clsToRivet)
+                rivets.append(clsToRivet)
             
             # check about locked or animated attributes on items:
             if not addFatherGrp:
                 cancelProcess = False
-                for rivet in self.rivetList:
+                for rivet in rivets:
                     # locked:
                     if cmds.listAttr(rivet, locked=True):
                         cancelProcess = True
@@ -627,7 +627,7 @@ class Rivet(base.BaseLibrary):
                     if createdRivetGrp:
                         cmds.delete(self.rivetGrp)
                     else:
-                        for rivet in self.rivetList:
+                        for rivet in rivets:
                             if not rivet in items:
                                 # clear created clusters:
                                 cmds.delete(rivet)
@@ -674,7 +674,7 @@ class Rivet(base.BaseLibrary):
             self.to_ids.append(self.cpNode)
                 
             # working with follicles and attaches
-            for r, rivet in enumerate(self.rivetList):
+            for r, rivet in enumerate(rivets):
                 self.ar.utils.setProgress(self.ar.data.lang['i317_creatingRivet'])
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
@@ -726,7 +726,7 @@ class Rivet(base.BaseLibrary):
                 # serialize network node
                 self.net = cmds.createNode("network", name=rivet+"_Net")
                 self.to_ids.append(self.net)
-                self.netList.append(self.net)
+                self.nets.append(self.net)
                 # add
                 cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool", defaultValue=1)
                 cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool", defaultValue=1)
@@ -751,7 +751,7 @@ class Rivet(base.BaseLibrary):
                 if faceToRivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
                     cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformer_node", force=True)
-                if len(items) == len(self.rivetList):
+                if len(items) == len(rivets):
                     if cmds.objExists(items[r]):
                         cmds.connectAttr(items[r]+".message", self.net+".itemNode", force=True)
                         if not cmds.objExists(f"{items[r]}.rivetNet"):
@@ -772,7 +772,7 @@ class Rivet(base.BaseLibrary):
             
             # check invert group (back) in order to avoid double transformations:
             if addInvert:
-                for rivet, netNode in zip(self.rivetList, self.netList):
+                for rivet, netNode in zip(rivets, self.nets):
                     invTGrp, invRGrp = self.dpInvertAttrTranformation(rivet, invT, invR)
                     if invTGrp:
                         cmds.connectAttr(invTGrp+".message", netNode+".invTGrp", force=True)
@@ -786,7 +786,7 @@ class Rivet(base.BaseLibrary):
         self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
         self.ar.custom_attr.addAttr(0, self.to_ids, descendents=True) #dpID
         cmds.select(clear=True)
-        return self.netList
+        return self.nets
     
 
     def getRivetData(self, itemNode, geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset, *args):
@@ -966,13 +966,13 @@ class Rivet(base.BaseLibrary):
             Rename and Parent to Support_Grp
             Return morph geometry and deformer node
         """
-        targetList = cmds.ls(targetGeo, dag=True, shapes=True)
-        targetShape = targetList[0]
-        targetOrig = self.findOrig(targetList)
+        targets = cmds.ls(targetGeo, dag=True, shapes=True)
+        targetShape = targets[0]
+        targetOrig = self.findOrig(targets)
         if not targetOrig:
             cmds.delete(cmds.cluster(targetGeo, name="ToOrig_ClsTemp"))
-            targetList = cmds.ls(targetGeo, dag=True, shapes=True)
-            targetOrig = self.findOrig(targetList)
+            targets = cmds.ls(targetGeo, dag=True, shapes=True)
+            targetOrig = self.findOrig(targets)
         morphDeformer = cmds.deformer(morphGeo, type="morph")[0]
         cmds.setAttr(morphDeformer+".morphMode", 1)
         cmds.setAttr(morphDeformer+".useComponentLookup", 1)
@@ -1036,13 +1036,13 @@ class Rivet(base.BaseLibrary):
                         cmds.parent(item, destParent)
 
 
-    def findOrig(self, geoList, *args):
+    def findOrig(self, geos, *args):
         """ Return the orig of the shapes
         """
         #TODO maybe use this command instead?
         #cmds.deformableShape(item, originalGeometry=True)
-        if geoList:
-            for item in geoList:
+        if geos:
+            for item in geos:
                 if item.endswith("Orig"):
                     return item
                 
@@ -1051,9 +1051,9 @@ class Rivet(base.BaseLibrary):
         """ Get Maya's version installed to compare with the minimalVersionRequired (2022.3)
             If the installed version is above the minimal it returns True, otherwise False
         """ 
-        mayaVersion = cmds.about(installedVersion=True)
-        mayaVersion = mayaVersion.split(" ")[-1]
-        if mayaVersion.count(".") > 1:
-            mayaVersion = mayaVersion[:mayaVersion.rfind(".")]
-        installedVersion = float(mayaVersion)
+        maya_version = cmds.about(installedVersion=True)
+        maya_version = maya_version.split(" ")[-1]
+        if maya_version.count(".") > 1:
+            maya_version = maya_version[:maya_version.rfind(".")]
+        installedVersion = float(maya_version)
         return installedVersion > self.mayaMinimalVersion

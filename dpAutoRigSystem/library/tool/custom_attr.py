@@ -324,19 +324,19 @@ class CustomAttr(base.BaseLibrary):
     def getCustomAttrList(self, items=None, *args):
         """ Return all boolean attributes starting with "dp".
         """
-        customAttrList = []
+        custom_attributes = []
         items = self.getItemList(items)
         if items:    
             for item in items:
                 currentItemAttrList = cmds.listAttr(item)
                 if currentItemAttrList:
                     if ATTR_DPID in currentItemAttrList:
-                        customAttrList.append(ATTR_DPID)
+                        custom_attributes.append(ATTR_DPID)
                     for attr in currentItemAttrList:
                         if attr.startswith(ATTR_START):
                             if cmds.getAttr(item+"."+attr, type=True) == "bool":
-                                customAttrList.append(attr)
-        return customAttrList
+                                custom_attributes.append(attr)
+        return custom_attributes
 
 
     def getItemList(self, items=None, *args):

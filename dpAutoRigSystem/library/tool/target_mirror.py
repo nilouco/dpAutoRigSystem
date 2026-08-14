@@ -179,9 +179,9 @@ class TargetMirror(base.BaseLibrary):
         origNode = cmds.textField(self.originalModelTextField, query=True, text=True)
         if self.dpCheckGeometry(origNode):
             # get target list:
-            targetList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
-            if targetList:
-                self.ar.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targetList), add_one=False, add_number=False)
+            targets = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
+            if targets:
+                self.ar.utils.setProgress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targets), add_one=False, add_number=False)
                 cancelled = False
                 self.to_ids = []
                 # get mirror information from UI
@@ -190,7 +190,7 @@ class TargetMirror(base.BaseLibrary):
                 clearUndo = cmds.checkBox(self.cleanUndoCB, query=True, value=True)
                 # clear selection
                 cmds.select(clear=True)
-                for item in targetList:
+                for item in targets:
                     # check if the dialog has been cancelled
                     if cmds.progressWindow(query=True, isCancelled=True):
                         cancelled = True

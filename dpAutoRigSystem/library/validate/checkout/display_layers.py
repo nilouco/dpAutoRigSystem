@@ -104,9 +104,9 @@ class DisplayLayers(action.BaseAction):
         """ Call functions to create Geo_Lyr and Ctrl_Lyr
             If there's no geometry on the groups Render_Grp and Proxy_Grp, it will delete the Geo_Lyr
         """ 
-        geoList = self.getGeometryTranform()
-        if geoList:
-            self.createNewLayer(geoList, self.geoLayerName)
+        geos = self.getGeometryTranform()
+        if geos:
+            self.createNewLayer(geos, self.geoLayerName)
         else:
             if cmds.objExists(self.geoLayerName):
                 cmds.delete(self.geoLayerName)
@@ -159,10 +159,10 @@ class DisplayLayers(action.BaseAction):
             allGeoList = []
             if allShapesList:
                 for shape in allShapesList:
-                    transformList = cmds.listRelatives(shape, fullPath=True, parent=True)
-                    if transformList:
+                    transforms = cmds.listRelatives(shape, fullPath=True, parent=True)
+                    if transforms:
                         # Get the transform only
-                        allGeoList.append(transformList[0])
+                        allGeoList.append(transforms[0])
             return allGeoList
     
 

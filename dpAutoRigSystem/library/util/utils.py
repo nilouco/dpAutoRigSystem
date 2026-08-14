@@ -289,17 +289,17 @@ class Utils(object):
                         pass
 
 
-    def zeroOut(self, transformList=[], offset=False, notTransformIO=True):
+    def zeroOut(self, transforms=[], offset=False, notTransformIO=True):
         """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
-            If don't have a transformList given, try to get the current selection.
+            If don't have a transforms given, try to get the current selection.
             If want to create with offset, it'll be an offset group between zeroGrp and transform.
             Return a list of names of the zeroOut groups.
         """
         zeroList = []
-        if not transformList:
-            transformList = cmds.ls(selection=True)
-        if transformList:
-            for transform in transformList:
+        if not transforms:
+            transforms = cmds.ls(selection=True)
+        if transforms:
+            for transform in transforms:
                 suffix = "_Zero_0_Grp"
                 transformName = transform
                 if transformName.endswith("_Grp"):
@@ -1232,7 +1232,7 @@ class Utils(object):
     def getNetworkNodeByAttr(self, netAttr, *args):
         """ Returns a list of network nodes with the boolean given net attribute active.
         """
-        netList = []
+        nets = []
         allNetList = cmds.ls(selection=False, type="network")
         if allNetList:
             for item in allNetList:
@@ -1240,8 +1240,8 @@ class Utils(object):
                     if cmds.getAttr(item+".dpNetwork") == 1:
                         if cmds.objExists(item+"."+netAttr):
                             if cmds.getAttr(item+"."+netAttr) == 1:
-                                netList.append(item)
-        return netList
+                                nets.append(item)
+        return nets
 
 
     def filterTransformList(self, items=None, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, filterBaseNode=True, filterBaseName=True, filterLattice=True, verbose=True, title="Rigging", *args):

@@ -30,7 +30,7 @@ class CorrectionManager(base.BaseLibrary):
         self.distanceName = DISTANCE
         self.netSuffix = "Net"
         self.correctionManagerDataGrp = "CorrectionManager_Data_Grp"
-        self.netList = []
+        self.nets = []
         self.net = None
 
     
@@ -321,7 +321,7 @@ class CorrectionManager(base.BaseLibrary):
             cmds.textScrollList(self.existingNetTSL, edit=True, removeAll=True)
             currentNetList = cmds.ls(selection=False, type="network")
             if currentNetList:
-                self.netList = []
+                self.nets = []
                 filterName = cmds.textField(self.filterNameTF, query=True, text=True)
                 if filterName:
                     self.net = None
@@ -333,9 +333,9 @@ class CorrectionManager(base.BaseLibrary):
                             if "dpCorrectionManager" in cmds.listAttr(item):
                                 if cmds.getAttr(item+".dpCorrectionManager") == 1:
                                     #TODO validate correctionManager node integrity here
-                                    self.netList.append(item)
-                if self.netList:
-                    cmds.textScrollList(self.existingNetTSL, edit=True, append=self.netList)
+                                    self.nets.append(item)
+                if self.nets:
+                    cmds.textScrollList(self.existingNetTSL, edit=True, append=self.nets)
                     if self.net:
                         if cmds.objExists(self.net):
                             cmds.textScrollList(self.existingNetTSL, edit=True, selectItem=self.net)

@@ -41,9 +41,9 @@ class CheckinIO(action.BaseAction):
             else: #import
                 try:
                     # clean up geometries
-                    validatorToRunList = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.run_actions_in_silence(validatorToRunList, self.ar.data.lib[self.ar.data.checkin_folder]["instances"], False, inputs) #fix
-                    self.well_done_io(", ".join(validatorToRunList))
+                    validators = ["dpUnlockNormals", "dpFreezeTransform", "dpGeometryHistory"]
+                    self.run_actions_in_silence(validators, self.ar.data.lib[self.ar.data.checkin_folder]["instances"], False, inputs) #fix
+                    self.well_done_io(", ".join(validators))
                 except Exception as e:
                     self.fail_io(str(e))
         else:

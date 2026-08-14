@@ -41,8 +41,8 @@ class UnusedSkin(action.BaseAction):
                 for item in check_items:
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
                     # conditional 1 to check here if there's an influenced node, otherwise delete the unused skinCluster
-                    meshList = cmds.skinCluster(item, query=True, geometry=True)
-                    if meshList:
+                    meshes = cmds.skinCluster(item, query=True, geometry=True)
+                    if meshes:
                         # conditional 2 to check here if there's weighted vertices by influencer
                         influenceList = cmds.skinCluster(item, query=True, influence=True)
                         weightedInfluenceList = cmds.skinCluster(item, query=True, weightedInfluence=True)

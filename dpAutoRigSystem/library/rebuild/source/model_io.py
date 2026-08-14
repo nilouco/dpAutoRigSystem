@@ -41,17 +41,17 @@ class ModelIO(action.BaseAction):
                     self.io_path = self.get_io_path(self.io_folder)
                     if self.io_path:
                         if self.first_mode: #export
-                            meshList = None
+                            meshes = None
                             if inputs:
-                                meshList = inputs
+                                meshes = inputs
                             else:
-                                meshList = self.ar.utils.filterTransformList(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
-                            if meshList:
-                                self.ar.utils.setProgress(max=len(meshList), add_one=False, add_number=False)
-                                constraintDataDic = self.remove_constraints(meshList)
-                                self.export_alembic_file(meshList)
-                                if constraintDataDic:
-                                    self.import_constraint_data(constraintDataDic, False)
+                                meshes = self.ar.utils.filterTransformList(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+                            if meshes:
+                                self.ar.utils.setProgress(max=len(meshes), add_one=False, add_number=False)
+                                constraint_data = self.remove_constraints(meshes)
+                                self.export_alembic_file(meshes)
+                                if constraint_data:
+                                    self.import_constraint_data(constraint_data, False)
                             else:
                                 self.maybe_done_io("Render_Grp")
                         else: #import

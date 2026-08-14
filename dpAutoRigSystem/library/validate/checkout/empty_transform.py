@@ -74,11 +74,11 @@ class EmptyTransform(action.BaseAction):
         return self.log_data
     
     
-    def filterEmptyTransformList(self, transformList=None, connected=False, *args):
+    def filterEmptyTransformList(self, transforms=None, connected=False, *args):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
-        filtered_items = self.ar.utils.filterTransformList(transformList, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filtered_items = self.ar.utils.filterTransformList(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filtered_items = self.reorder_list(filtered_items)
         emptyTransforms = []
         for transform in filtered_items:

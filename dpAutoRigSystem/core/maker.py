@@ -78,7 +78,7 @@ class Maker(object):
         if nets:
             self.ar.job.unpin_guide(force=True)
             guide_io = self.ar.config.get_instance("GuideIO", [self.ar.data.setup_folder])
-            guides_data = guide_io.getGuideDataDic(nets)
+            guides_data = guide_io.get_guide_data(nets)
             if not name:
                 if self.ar.data.ui_state:
                     if self.ar.data.ui_state:

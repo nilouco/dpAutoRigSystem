@@ -38,10 +38,10 @@ class GeometryHistory(action.BaseAction):
                     if inputs:
                         geoToCleanList = inputs
                     else:
-                        geoList = []
-                        transformList = self.get_mesh_transforms()
-                        if transformList:
-                            for transform in transformList:
+                        geos = []
+                        transforms = self.get_mesh_transforms()
+                        if transforms:
+                            for transform in transforms:
                                 # Filter which geometry has deformer history and groupLevels to pass through sets and shader
                                 historyList = cmds.listHistory(transform, pruneDagObjects=True, groupLevels=True)
                                 if historyList:
@@ -49,9 +49,9 @@ class GeometryHistory(action.BaseAction):
                                         # Pass through tweak and initialShading nodes
                                         if not cmds.nodeType(history) in ignoreTypeList: 
                                             if history != "initialShadingGroup":
-                                                geoList.append(transform)
+                                                geos.append(transform)
                         # Merge duplicated names
-                        geoToCleanFullPathList = list(set(geoList))
+                        geoToCleanFullPathList = list(set(geos))
                         # Get shortName to better reading in display log
                         geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
                     if geoToCleanList:

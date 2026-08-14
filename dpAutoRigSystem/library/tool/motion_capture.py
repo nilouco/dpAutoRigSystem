@@ -521,9 +521,9 @@ class MotionCapture(base.BaseLibrary):
         """ Execute the ikFkSnap script nodes.
             It's very usefull to transfer baked fk animation to ik controllers.
         """
-        netList = self.ar.utils.getNetworkNodeByAttr("dpIkFkSnapNet")
-        if netList:
-            for net in netList:
+        nets = self.ar.utils.getNetworkNodeByAttr("dpIkFkSnapNet")
+        if nets:
+            for net in nets:
                 # declare needed variables:
                 worldRef = cmds.listConnections(net+".worldRef")[0]
                 fkCtrlList = cmds.listConnections(net+".fkCtrlList")

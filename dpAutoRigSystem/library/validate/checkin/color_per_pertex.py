@@ -46,20 +46,20 @@ class ColorPerVertex(action.BaseAction):
                         self.good_results.append(False)
                     else: #fix
                         try:
-                            meshList = cmds.ls(cmds.listHistory(item, future=True), long=True, type="mesh")
+                            meshes = cmds.ls(cmds.listHistory(item, future=True), long=True, type="mesh")
                             cmds.lockNode(item, lock=False)
                             cmds.delete(item)
-                            if meshList:
-                                for mesh in meshList:
+                            if meshes:
+                                for mesh in meshes:
                                     cmds.setAttr(mesh+".displayColors", 0)
                             else:
-                                meshList = ["None"]
+                                meshes = ["None"]
                             cmds.select(clear=True)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Mesh: "+", ".join(meshList))
+                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Mesh: "+", ".join(meshes))
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Mesh: "+", ".join(meshList))
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Mesh: "+", ".join(meshes))
             else:
                 self.not_found_node()
         else:
