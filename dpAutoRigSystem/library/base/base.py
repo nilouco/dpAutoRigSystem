@@ -7,3 +7,4 @@ class BaseLibrary(object):
         self.title = TITLE
         self.description = DESCRIPTION
         self.wiki = WIKI
+        self.custom_name = None

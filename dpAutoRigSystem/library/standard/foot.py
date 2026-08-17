@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ..base import standard
-from ..base import layout
 
 # global variables to this module:
 CLASS_NAME = "Foot"
@@ -11,7 +10,7 @@ WIKI = "03-‐-Guides#-foot"
 
 
 
-class Foot(standard.BaseStandard, layout.BaseLayout):
+class Foot(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         # declare variables
@@ -27,9 +26,8 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
         self.aScalableGrp = []
 
 
-    def create_module_layout(self):
-        standard.BaseStandard.create_module_layout(self)
-        layout.BaseLayout.basicModuleLayout(self)
+#    def create_module_layout(self):
+#        standard.BaseStandard.create_module_layout(self)
 
 
     def create_guide(self, *args):
@@ -126,16 +124,16 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
             # run for all sides
             for s, side in enumerate(self.sides):
                 # redeclaring variables:
-                self.base = side+self.userGuideName+"_Guide_Base"
-                self.cvFootLoc = side+self.userGuideName+"_Guide_Foot"
-                self.cvRFALoc = side+self.userGuideName+"_Guide_RfA"
-                self.cvRFBLoc = side+self.userGuideName+"_Guide_RfB"
-                self.cvRFCLoc = side+self.userGuideName+"_Guide_RfC"
-                self.cvRFDLoc = side+self.userGuideName+"_Guide_RfD"
-                self.cvRFELoc = side+self.userGuideName+"_Guide_RfE"
-                self.cvRFFLoc = side+self.userGuideName+"_Guide_RfF"
-                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                self.base = side+self.number_name+"_Guide_Base"
+                self.cvFootLoc = side+self.number_name+"_Guide_Foot"
+                self.cvRFALoc = side+self.number_name+"_Guide_RfA"
+                self.cvRFBLoc = side+self.number_name+"_Guide_RfB"
+                self.cvRFCLoc = side+self.number_name+"_Guide_RfC"
+                self.cvRFDLoc = side+self.number_name+"_Guide_RfD"
+                self.cvRFELoc = side+self.number_name+"_Guide_RfE"
+                self.cvRFFLoc = side+self.number_name+"_Guide_RfF"
+                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
+                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
 
                 # declaring attributes reading from dictionary:
                 ankleRFAttr = self.ar.data.lang['c009_leg_extrem']
@@ -157,14 +155,14 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
 
                 # creating joints:
                 cmds.select(clear=True)
-                self.footJnt = cmds.joint(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_Jnt")
-                self.ar.utils.setJointLabel(self.footJnt, s+self.joint_label_add, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
-                self.middleFootJxt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jxt")
-                self.endJnt = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
+                self.footJnt = cmds.joint(name=side+self.number_name+"_"+ankleRFAttr.capitalize()+"_Jnt")
+                self.ar.utils.setJointLabel(self.footJnt, s+self.joint_label_add, 18, self.number_name+ "_"+ankleRFAttr.capitalize())
+                self.middleFootJxt = cmds.joint(name=side+self.number_name+"_"+middleRFAttr.capitalize()+"_Jxt")
+                self.endJnt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 cmds.select(clear=True)
-                self.middleFootJnt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jnt")
-                self.ar.utils.setJointLabel(self.middleFootJnt, s+self.joint_label_add, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
-                self.endBJnt = cmds.joint(name=side+self.userGuideName+"B_"+self.ar.data.joint_end_attr, radius=0.5)
+                self.middleFootJnt = cmds.joint(name=side+self.number_name+"_"+middleRFAttr.capitalize()+"_Jnt")
+                self.ar.utils.setJointLabel(self.middleFootJnt, s+self.joint_label_add, 18, self.number_name+"_"+middleRFAttr.capitalize())
+                self.endBJnt = cmds.joint(name=side+self.number_name+"B_"+self.ar.data.joint_end_attr, radius=0.5)
                 cmds.parent(self.middleFootJnt, self.middleFootJxt)
                 cmds.addAttr(self.footJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.addAttr(self.middleFootJnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -178,11 +176,11 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
                 # creating Fk controls:
-                self.footCtrl = self.ar.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_Foot")
+                self.footCtrl = self.ar.ctrls.cvControl("id_020_FootFk", side+self.number_name+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_Foot")
                 self.footCtrlList.append(self.footCtrl)
                 cmds.setAttr(self.footCtrl+".rotateOrder", 1)
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
-                self.middleFootCtrl = self.ar.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, guideSource=self.name_guide+"_RfF")
+                self.middleFootCtrl = self.ar.ctrls.cvControl("id_021_FootMiddle", side+self.number_name+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, guideSource=self.name_guide+"_RfF")
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
                 cmds.matchTransform(self.footCtrl, self.cvFootLoc, position=True, rotation=True)
@@ -194,12 +192,12 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 self.footCtrlZeroList = self.ar.utils.zeroOut([self.footCtrl, self.middleFootCtrl])
 
                 # reverse foot controls:
-                self.RFACtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parentTag=self.middleFootCtrl)
-                self.RFBCtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parentTag=self.middleFootCtrl)
-                self.RFCCtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
-                self.RFDCtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
-                self.RFECtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+bottomRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
-                self.RFFCtrl = self.ar.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, rot=(0, 90, 0), parentTag=self.footCtrl)
+                self.RFACtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parentTag=self.middleFootCtrl)
+                self.RFBCtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parentTag=self.middleFootCtrl)
+                self.RFCCtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
+                self.RFDCtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
+                self.RFECtrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+bottomRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=self.middleFootCtrl)
+                self.RFFCtrl = self.ar.ctrls.cvControl("id_019_FootReverseE", side+self.number_name+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, rot=(0, 90, 0), parentTag=self.footCtrl)
                 self.ballRFList.append(self.RFFCtrl)
                 cmds.connectAttr(self.RFFCtrl+".message", self.middleFootCtrl+".parentTag", force=True)
                 
@@ -257,10 +255,10 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.setAttr(self.RFBZero+".rotateOrder", 5)
                 
                 # creating ikHandles:
-                ikHandleAnkleList = cmds.ikHandle(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_IKH", startJoint=self.footJnt, endEffector=self.middleFootJxt, solver='ikRPsolver')
+                ikHandleAnkleList = cmds.ikHandle(name=side+self.number_name+"_"+ankleRFAttr.capitalize()+"_IKH", startJoint=self.footJnt, endEffector=self.middleFootJxt, solver='ikRPsolver')
                 # match transformations again to avoid ikHandle rotate plane solver issue:
                 cmds.matchTransform(self.middleFootJxt, self.cvRFFLoc, position=True, rotation=True)
-                ikHandleMiddleList = cmds.ikHandle(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_IKH", startJoint=self.middleFootJxt, endEffector=self.endJnt, solver='ikRPsolver')
+                ikHandleMiddleList = cmds.ikHandle(name=side+self.number_name+"_"+middleRFAttr.capitalize()+"_IKH", startJoint=self.middleFootJxt, endEffector=self.endJnt, solver='ikRPsolver')
                 cmds.rename(ikHandleAnkleList[1], ikHandleAnkleList[0]+"_Eff")
                 cmds.rename(ikHandleMiddleList[1], ikHandleMiddleList[0]+"_Eff")
                 cmds.setAttr(ikHandleAnkleList[0]+'.visibility', 0)
@@ -269,7 +267,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 # mount hierarchy:
                 cmds.parent(self.footCtrlZeroList[1], self.RFECtrl, absolute=True)
                 cmds.parent(ikHandleMiddleList[0], self.middleFootCtrl, absolute=True)
-                self.toLimbIkHandleGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.ar.data.lang['c009_leg_extrem']+"_Grp")
+                self.toLimbIkHandleGrp = cmds.group(empty=True, name=side+self.number_name+"_"+self.ar.data.lang['c009_leg_extrem']+"_Grp")
                 self.toLimbIkHandleGrpList.append(self.toLimbIkHandleGrp)
                 cmds.parent(ikHandleAnkleList[0], self.toLimbIkHandleGrp, self.RFFCtrl, absolute=True)
                 cmds.makeIdentity(self.toLimbIkHandleGrp, apply=True, translate=True, rotate=True, scale=True)
@@ -320,13 +318,13 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.setAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, channelBox=True)
 
                 # create clampNodes in order to limit the side rotations:
-                sideClamp = cmds.createNode("clamp", name=side+self.userGuideName+"_Side_Clp")
+                sideClamp = cmds.createNode("clamp", name=side+self.number_name+"_Side_Clp")
                 # outside values in R
                 cmds.setAttr(sideClamp+".minR", -360)
                 # inside values in G
                 cmds.setAttr(sideClamp+".maxG", 360)
                 # inverting sideRoll values:
-                sideMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Side_MD")
+                sideMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_Side_MD")
                 cmds.setAttr(sideMD+".input2X", -1)
                 # connections:
                 cmds.connectAttr(self.footCtrl+"."+sideRFAttr+rfRoll, sideMD+".input1X", force=True)
@@ -336,15 +334,15 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.connectAttr(sideClamp+".outputG", self.RFBZero+".rotateZ", force=True)
 
                 # for footRoll:
-                footHeelClp = cmds.createNode("clamp", name=side+self.userGuideName+"_Roll_Heel_Clp")
+                footHeelClp = cmds.createNode("clamp", name=side+self.number_name+"_Roll_Heel_Clp")
                 # heel values in R
                 cmds.setAttr(footHeelClp+".minR", -360)
                 cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, footHeelClp+".inputR", force=True)
                 cmds.connectAttr(footHeelClp+".outputR", self.RFCZero+".rotateX", force=True)
                 
                 # footRoll with angle limit:
-                footPMA = cmds.createNode("plusMinusAverage", name=side+self.userGuideName+"_Roll_PMA")
-                footSR = cmds.createNode("setRange", name=side+self.userGuideName+"_Roll_SR")
+                footPMA = cmds.createNode("plusMinusAverage", name=side+self.number_name+"_Roll_PMA")
+                footSR = cmds.createNode("setRange", name=side+self.number_name+"_Roll_SR")
                 cmds.setAttr(footSR+".oldMaxY", 180)
                 cmds.setAttr(footPMA+".input1D[0]", 180)
                 cmds.setAttr(footPMA+".operation", 2) #substract
@@ -357,8 +355,8 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.connectAttr(footPMA+".output1D", footSR+".maxY", force=True)
                 
                 # plant angle for foot roll:
-                footPlantClp = cmds.createNode("clamp", name=side+self.userGuideName+"_Roll_Plant_Clp")
-                footPlantCnd = cmds.createNode("condition", name=side+self.userGuideName+"_Roll_Plant_Cnd")
+                footPlantClp = cmds.createNode("clamp", name=side+self.number_name+"_Roll_Plant_Clp")
+                footPlantCnd = cmds.createNode("condition", name=side+self.number_name+"_Roll_Plant_Cnd")
                 cmds.setAttr(footPlantCnd+".operation", 4) #less than
                 cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, footPlantClp+".inputR", force=True)
                 cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, footPlantClp+".maxR", force=True)
@@ -368,10 +366,10 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, footPlantCnd+".colorIfFalseR", force=True)
                 
                 # back to zero footRoll when greather then angle plus plant values:
-                anglePlantPMA = cmds.createNode("plusMinusAverage", name=side+self.userGuideName+"_AnglePlant_PMA")
-                anglePlantMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AnglePlant_MD")
-                anglePlantRmV = cmds.createNode("remapValue", name=side+self.userGuideName+"_AnglePlant_RmV")
-                anglePlantCnd = cmds.createNode("condition", name=side+self.userGuideName+"_AnglePlant_Cnd")
+                anglePlantPMA = cmds.createNode("plusMinusAverage", name=side+self.number_name+"_AnglePlant_PMA")
+                anglePlantMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_AnglePlant_MD")
+                anglePlantRmV = cmds.createNode("remapValue", name=side+self.number_name+"_AnglePlant_RmV")
+                anglePlantCnd = cmds.createNode("condition", name=side+self.number_name+"_AnglePlant_Cnd")
                 cmds.setAttr(anglePlantMD+".input2X", -1)
                 cmds.setAttr(anglePlantRmV+".inputMax", 90)
                 cmds.setAttr(anglePlantRmV+".value[0].value_Interp", 3) #spline
@@ -394,7 +392,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 if s == 0: #left
                     cmds.connectAttr(footPlantCnd+".outColorR", self.footCtrlZeroList[1]+".rotateX", force=True)
                 else: #fix right side mirror
-                    footPlantInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Plant_Inv_MD")
+                    footPlantInvMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_Plant_Inv_MD")
                     cmds.setAttr(footPlantInvMD+".input2X", -1)
                     cmds.connectAttr(footPlantCnd+".outColorR", footPlantInvMD+".input1X", force=True)
                     cmds.connectAttr(footPlantInvMD+".outputX", self.footCtrlZeroList[1]+".rotateX", force=True)
@@ -416,7 +414,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='short', minValue=0, defaultValue=1, maxValue=1)
                 cmds.setAttr(self.footCtrl+"."+showCtrlsAttr, keyable=False, channelBox=True)
                 cmds.addAttr(self.footCtrl, longName="visIkFk", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=False)
-                mdNode = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Vis_MD")
+                mdNode = cmds.createNode("multiplyDivide", name=side+self.number_name+"_Vis_MD")
                 cmds.connectAttr(self.footCtrl+".visIkFk", mdNode+".input2X", force=True)
                 cmds.connectAttr(self.footCtrl+"."+showCtrlsAttr, mdNode+".input1X", force=True)
                 showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl, self.RFECtrl, self.RFFCtrl]
@@ -424,7 +422,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                     rfCtrlShape = cmds.listRelatives(rfCtrl, children=True, type='nurbsCurve')[0]
                     cmds.connectAttr(mdNode+".outputX", rfCtrlShape+".visibility", force=True)
                 # create a masterModuleGrp to be checked if this rig exists:
-                tempScalableHookGrp = cmds.createNode("transform", name=side+self.userGuideName+"_TEMP_Grp")
+                tempScalableHookGrp = cmds.createNode("transform", name=side+self.number_name+"_TEMP_Grp")
                 self.create_hook_setup(side, [self.footCtrlZeroList[0]], [tempScalableHookGrp])
                 cmds.delete(tempScalableHookGrp)
                 mWorldFoot = cmds.getAttr(self.footJnt+".worldMatrix")
@@ -437,7 +435,7 @@ class Foot(standard.BaseStandard, layout.BaseLayout):
                 self.aScalableGrp.append(self.scalable_hook_grp)
                 self.revFootCtrlGrpFinalList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.utils.addCustomAttr([self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp], self.ar.utils.ignoreTransformIOAttr)
                 self.to_ids.extend([sideClamp, sideMD, footHeelClp, footPMA, footSR, footPlantClp, footPlantCnd, anglePlantPMA, anglePlantMD, anglePlantRmV, anglePlantCnd, footBallRevNode, mdNode])
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID

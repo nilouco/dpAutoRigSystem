@@ -608,8 +608,8 @@ class Utils(object):
             if guideModule.check_guide_integrity():
                 guideNamespaceName = guideModule.guide_namespace
                 if guideNamespaceName in cmds.namespaceInfo(listOnlyNamespaces=True):
-                    userGuideName = guideModule.userGuideName
-                    if not cmds.objExists(userGuideName+'_Static_Grp'):
+                    number_name = guideModule.number_name
+                    if not cmds.objExists(number_name+'_Static_Grp'):
                         if not "dpHead" in str(guideModule):
                             guides_to_rig.append(guideModule)
                         else:
@@ -1533,12 +1533,12 @@ class Utils(object):
         isGeometry = False
         if item:
             if cmds.objExists(item):
-                childList = cmds.listRelatives(item, children=True)
-                if childList:
-                    self.itemType = cmds.objectType(childList[0])
+                children = cmds.listRelatives(item, children=True)
+                if children:
+                    self.itemType = cmds.objectType(children[0])
                     if self.itemType == "mesh" or self.itemType == "nurbsSurface":
                         if self.itemType == "mesh":
-                            self.meshNode = childList[0]
+                            self.meshNode = children[0]
                         isGeometry = True
                     else:
                         mel.eval("warning \""+item+" is not a geometry.\";")

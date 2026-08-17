@@ -142,13 +142,13 @@ class TargetMirror(base.BaseLibrary):
         isGeometry = False
         if item:
             if cmds.objExists(item):
-                childList = cmds.listRelatives(item, children=True)
-                if childList:
+                children = cmds.listRelatives(item, children=True)
+                if children:
                     try:
-                        itemType = cmds.objectType(childList[0])
+                        itemType = cmds.objectType(children[0])
                         if itemType == "mesh" or itemType == "nurbsSurface" or itemType == "subdiv":
                             if cmds.checkBox(self.checkHistoryCB, query=True, value=True):
-                                historyList = cmds.listHistory(childList[0])
+                                historyList = cmds.listHistory(children[0])
                                 if len(historyList) > 1:
                                     dialogReturn = cmds.confirmDialog(title=self.ar.data.lang["i159_historyFound"], message=self.ar.data.lang["i160_historyDesc"]+"\n\n"+item+"\n\n"+self.ar.data.lang["i161_historyMessage"], button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
                                     if dialogReturn == "Yes":

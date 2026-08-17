@@ -197,16 +197,18 @@ class Controllers(object):
                 cmds.setAttr(item+".overrideColorG", color[1])
                 cmds.setAttr(item+".overrideColorB", color[2])
                 if instance:
-                    cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
-                    if not instance.guide_base in cmds.ls(selection=True):
-                        cmds.button(instance.selectButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
+                    if self.ar.data.ui_state:
+                        cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
+                        if not instance.guide_base in cmds.ls(selection=True):
+                            cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", iColorIdx)
                 if instance:
-                    cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
-                    if not instance.guide_base in cmds.ls(selection=True):
-                        cmds.button(instance.selectButton, edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
+                    if self.ar.data.ui_state:
+                        cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
+                        if not instance.guide_base in cmds.ls(selection=True):
+                            cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
 
 
     def removeColor(self, items, *args):

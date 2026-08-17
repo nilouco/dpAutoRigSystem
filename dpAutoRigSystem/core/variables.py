@@ -127,6 +127,14 @@ class Data:
     axis: list = field(default_factory=lambda: ['X', 'Y', 'Z'])
     degrees: list = field(default_factory=lambda: ['Preset_0', 'Linear_1', 'Cubic_3'])
     booleans: list = field(default_factory=lambda: [0, 1])
+    facial_brow_targets: list = field(default_factory=lambda: ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"])
+    facial_eyelid_targets: list = field(default_factory=lambda: [None, None, "EyelidsClose", "EyelidsOpen"])
+    facial_mouth_targets: list = field(default_factory=lambda: ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"])
+    facial_lips_targets: list = field(default_factory=lambda: ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"])
+    facial_sneer_targets: list = field(default_factory=lambda: ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"])
+    facial_grimace_targets: list = field(default_factory=lambda: ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"])
+    facial_face_targets: list = field(default_factory=lambda: ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"])
+    mirror_menus: list = field(default_factory=lambda: ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ'])
     
     to_ids: list = field(default_factory=list)
     

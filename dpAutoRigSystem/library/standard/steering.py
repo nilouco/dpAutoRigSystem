@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ..base import standard
-from ..base import layout
 
 # global variables to this module:    
 CLASS_NAME = "Steering"
@@ -11,14 +10,13 @@ WIKI = "03-‐-Guides#-steering"
 
 
 
-class Steering(standard.BaseStandard, layout.BaseLayout):
+class Steering(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-    def create_module_layout(self):
-        standard.BaseStandard.create_module_layout(self)
-        layout.BaseLayout.basicModuleLayout(self)
+#    def create_module_layout(self):
+#        standard.BaseStandard.create_module_layout(self)
     
     
     def create_guide(self, *args):
@@ -58,23 +56,23 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
             self.steeringCtrlList = []
             # run for all sides
             for s, side in enumerate(self.sides):
-                self.base = side+self.userGuideName+'_Guide_Base'
+                self.base = side+self.number_name+'_Guide_Base'
                 
                 cmds.select(clear=True)
                 # declare guide:
-                self.guide = side+self.userGuideName+"_Guide_JointLoc1"
-                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                self.guide = side+self.number_name+"_Guide_JointLoc1"
+                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
+                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # create a joint:
-                self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
+                self.jnt = cmds.joint(name=side+self.number_name+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.ar.utils.addJointEndAttr([self.endJoint])
                 # joint labelling:
-                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName+"_1")
+                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
-                self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
-                self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.steeringCtrl)
+                self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
+                self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.steeringCtrl)
                 self.ar.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
                 self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
                 self.steeringCtrlList.append(self.steeringCtrl)
@@ -103,9 +101,9 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
                 cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c070_steering'], attributeType="float", keyable=False)
                 cmds.setAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], 500, channelBox=True)
                 cmds.setAttr(self.steeringCtrl+"."+self.ar.data.lang['c049_intensity'], 0.8, channelBox=True)
-                self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Unit_MD")
-                self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rotate_MD")
-                self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_MD")
+                self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Unit_MD")
+                self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Rotate_MD")
+                self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_MD")
                 self.to_ids.extend([self.steeringUnitMD, self.steeringInvertMD, self.steeringMD])
                 cmds.setAttr(self.steeringInvertMD+".input2X", 0.1)
                 cmds.setAttr(self.steeringUnitMD+".input2X", -1)
@@ -133,9 +131,9 @@ class Steering(standard.BaseStandard, layout.BaseLayout):
                 cmds.scaleConstraint(self.steeringCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.create_hook_setup(side, [zeroOutCtrlGrpList[1]], [side+self.userGuideName+"_1_Jnt"])
+                self.create_hook_setup(side, [zeroOutCtrlGrpList[1]], [side+self.number_name+"_1_Jnt"])
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

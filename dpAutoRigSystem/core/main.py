@@ -24,7 +24,6 @@ from ..library.util import utils
 from ..library.util import controllers
 from ..library.util import skinning
 from ..library.base import standard
-from ..library.base import layout
 from ..library.base import curve
 from ..library.tool import update_guides
 from ..library.tool import custom_attr
@@ -47,6 +46,7 @@ from ..ui import update
 from ..ui import donate
 from ..ui import pipeline
 from ..ui import publish
+from ..ui import guide
 from .. import version
 
 
@@ -79,7 +79,6 @@ class Start(object):
             reload(controllers)
             reload(skinning)
             reload(standard)
-            reload(layout)
             reload(curve)
             reload(update_guides)
             reload(custom_attr)
@@ -104,6 +103,7 @@ class Start(object):
             reload(donate)
             reload(pipeline)
             reload(publish)
+            reload(guide)
             print("Reloaded imported modules")
 
 
@@ -147,6 +147,7 @@ class Start(object):
         self.donate_ui = donate.DonateUI(self)
         self.pipeline_ui = pipeline.PipelineUI(self)
         self.publish_ui = publish.PublishUI(self)
+        self.guide_ui = guide.GuideUI(self)
 
 
     def ui(self):

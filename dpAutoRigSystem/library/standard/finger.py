@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ..base import standard
-from ..base import layout
 
 # global variables to this module:
 CLASS_NAME = "Finger"
@@ -11,15 +10,14 @@ WIKI = "03-‐-Guides#-finger"
 
 
 
-class Finger(standard.BaseStandard, layout.BaseLayout):
+class Finger(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.correctiveCtrlGrpList = []
 
 
-    def create_module_layout(self):
-        standard.BaseStandard.create_module_layout(self)
-        layout.BaseLayout.basicModuleLayout(self)
+#    def create_module_layout(self):
+#        standard.BaseStandard.create_module_layout(self)
 
 
     def create_guide(self, *args):
@@ -80,9 +78,9 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
         self.ar.opt.check_use_default_render_layer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
-            try:
-                self.enteredNJoints = cmds.intField(self.nJointsIF, query=True, value=True)
-            except:
+            if self.ar.data.ui_state:
+                self.enteredNJoints = cmds.intField("edit_guide_n_joints_if", query=True, value=True)
+            else:
                 return
         else:
             self.enteredNJoints = enteredNJoints
@@ -161,11 +159,11 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
             # run for all sides
             for s, side in enumerate(self.sides):
                 self.skinJointList, self.controllers = [], []
-                self.base = side+self.userGuideName+'_Guide_Base'
+                self.base = side+self.number_name+'_Guide_Base'
                 if self.articulation:
                     if self.corrective:
                         # corrective controls group
-                        self.corrective_ctrls_grp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
+                        self.corrective_ctrls_grp = cmds.group(name=side+self.number_name+"_Corrective_Grp", empty=True)
                         self.correctiveCtrlGrpList.append(self.corrective_ctrls_grp)
                         phalangeCalibratePresetList, invertList = self.getCalibratePresetList(s)
                 # get the number of joints to be created:
@@ -173,17 +171,17 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                 for n in range(0, self.nJoints+1):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n)
-                    self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                    self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                    self.guide = side+self.number_name+"_Guide_JointLoc"+str(n)
+                    self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
+                    self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
                     # create a joint:
-                    self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
+                    self.jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName+"_%02d"%(n))
+                    self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     # create a control:
                     if n == 1:
-                        self.fingerCtrl = self.ar.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.radius * 2.0), d=self.curve_degree, rot=(0, 0, -90), guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.controllers[0])
+                        self.fingerCtrl = self.ar.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.number_name+"_%02d_Ctrl"%(n), r=(self.radius * 2.0), d=self.curve_degree, rot=(0, 0, -90), guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.controllers[0])
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         self.ar.utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
@@ -202,14 +200,14 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                         # scale compensate attribute:
                         if not cmds.objExists(self.fingerCtrl+'.ikFkBlend'):
                             cmds.addAttr(self.fingerCtrl, longName="ikFkBlend", attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
-                            self.ikFkRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_ikFk_Rev")
+                            self.ikFkRevNode = cmds.createNode("reverse", name=side+self.number_name+"_ikFk_Rev")
                             self.to_ids.append(self.ikFkRevNode)
                             cmds.connectAttr(self.fingerCtrl+".ikFkBlend", self.ikFkRevNode+".inputX", force=True)
                         if not cmds.objExists(self.fingerCtrl+'.scaleCompensate'):
                             cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=False)
                             cmds.setAttr(self.fingerCtrl+".scaleCompensate", channelBox=True)
-                            scaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_%02d_ScaleCompensate_MD"%(n))
-                            self.scaleCompensateCond = cmds.createNode("condition", name=side+self.userGuideName+"_%02d_ScaleCompensate_Cnd"%(n))
+                            scaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_%02d_ScaleCompensate_MD"%(n))
+                            self.scaleCompensateCond = cmds.createNode("condition", name=side+self.number_name+"_%02d_ScaleCompensate_Cnd"%(n))
                             self.to_ids.extend([scaleCompensateMD, self.scaleCompensateCond])
                             cmds.connectAttr(self.fingerCtrl+".scaleCompensate", scaleCompensateMD+".input1X", force=True)
                             cmds.connectAttr(self.ikFkRevNode+".outputX", scaleCompensateMD+".input2X", force=True)
@@ -220,7 +218,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.skinJointList[0]+".segmentScaleCompensate", force=True)
                     else:
-                        self.fingerCtrl = self.ar.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.get_parent_to_tag(self.controllers))
+                        self.fingerCtrl = self.ar.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.get_parent_to_tag(self.controllers))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         if n == self.nJoints:
                             self.ar.utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
@@ -244,8 +242,8 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                     # hide visibility attribute:
                     cmds.setAttr(self.fingerCtrl+'.visibility', keyable=False)
                     # put another group over the control in order to use this to connect values from mainFingerCtrl:
-                    self.poseGrp = cmds.group(self.fingerCtrl, name=side+self.userGuideName+"_%02d_Pose_Grp"%(n))
-                    self.sdkGrp = cmds.group(self.poseGrp, name=side+self.userGuideName+"_%02d_SDK_Grp"%(n))
+                    self.poseGrp = cmds.group(self.fingerCtrl, name=side+self.number_name+"_%02d_Pose_Grp"%(n))
+                    self.sdkGrp = cmds.group(self.poseGrp, name=side+self.number_name+"_%02d_SDK_Grp"%(n))
                     self.ar.utils.addCustomAttr([self.poseGrp, self.sdkGrp], self.ar.utils.ignoreTransformIOAttr)
                     if n == 1:
                         # change pivot of those groups to control pivot:
@@ -267,16 +265,16 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                         if n == 1:
                             if not cmds.objExists(self.fingerCtrl+'.'+self.ar.data.lang['c021_showControls']):
                                 cmds.addAttr(self.fingerCtrl, longName=self.ar.data.lang['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
-                                self.ctrlShape0 = cmds.listRelatives(side+self.userGuideName+"_00_Ctrl", children=True, type='nurbsCurve')[0]
+                                self.ctrlShape0 = cmds.listRelatives(side+self.number_name+"_00_Ctrl", children=True, type='nurbsCurve')[0]
                                 cmds.connectAttr(self.fingerCtrl+"."+self.ar.data.lang['c021_showControls'], self.ctrlShape0+".visibility", force=True)
                                 cmds.setAttr(self.fingerCtrl+'.'+self.ar.data.lang['c021_showControls'], keyable=False, channelBox=True)
                             for j in range(1, self.nJoints+1):
                                 cmds.addAttr(self.fingerCtrl, longName=self.ar.data.lang['c022_phalange']+str(j), attributeType='float', keyable=True)
                         # parent joints as a simple chain (line)
-                        self.fatherJnt = side+self.userGuideName+"_%02d_Jnt"%(n-1)
+                        self.fatherJnt = side+self.number_name+"_%02d_Jnt"%(n-1)
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
                         # parent zeroGrp Group to the before ctrl:
-                        self.fatherCtrl = side+self.userGuideName+"_%02d_Ctrl"%(n-1)
+                        self.fatherCtrl = side+self.number_name+"_%02d_Ctrl"%(n-1)
                         cmds.parent(self.zeroGrp, self.fatherCtrl, absolute=True)
                     # freeze joints rotation
                     cmds.makeIdentity(self.jnt, apply=True)
@@ -288,9 +286,9 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                         if self.articulation:
                             if self.corrective:
                                 correctiveNetList = [None]
-                                correctiveNetList.append(self.setup_corrective_net(side+self.userGuideName+"_01_Ctrl", self.skinJointList[n-1], self.skinJointList[n], side+self.userGuideName+"_"+str(n)+"_PitchDown", 1, 1, -90))
+                                correctiveNetList.append(self.setup_corrective_net(side+self.number_name+"_01_Ctrl", self.skinJointList[n-1], self.skinJointList[n], side+self.number_name+"_"+str(n)+"_PitchDown", 1, 1, -90))
                                 articJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.radius, 0, 0)])
-                                self.setup_corrective_controllers(articJntList, s, self.userGuideName+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
+                                self.setup_corrective_controllers(articJntList, s, self.number_name+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
                                 if s == 1:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
                                     cmds.setAttr(articJntList[0]+".scaleY", -1)
@@ -298,28 +296,28 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                             else:
                                 articJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt)
                                 cmds.connectAttr(self.scaleCompensateCond+".outColorR", articJntList[0]+".segmentScaleCompensate", force=True)
-                            self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     
                     if n == self.nJoints:
                         # create end joint:
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
+                        self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                         self.ar.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 
                 # make first phalange be leads from base finger control:
-                cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.userGuideName+"_01_SDK_Zero_0_Grp"+"_PaC")
-                cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.userGuideName+"_01_SDK_Zero_0_Grp"+"_ScC")
+                cmds.parentConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.number_name+"_01_SDK_Zero_0_Grp"+"_PaC")
+                cmds.scaleConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.number_name+"_01_SDK_Zero_0_Grp"+"_ScC")
                 if self.nJoints != 2:
-                    cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Jnt", maintainOffset=True, name=side+self.userGuideName+"_PaC")
-                    cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Jnt", maintainOffset=True, name=side+self.userGuideName+"_ScC")
+                    cmds.parentConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_00_Jnt", maintainOffset=True, name=side+self.number_name+"_PaC")
+                    cmds.scaleConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_00_Jnt", maintainOffset=True, name=side+self.number_name+"_ScC")
                 # connecting the attributes from control 1 to phalanges rotate:
                 for n in range(1, self.nJoints+1):
-                    self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
-                    self.sdkGrp = side+self.userGuideName+"_%02d_SDK_Grp"%(n)
+                    self.fingerCtrl = side+self.number_name+"_01_Ctrl"
+                    self.sdkGrp = side+self.number_name+"_%02d_SDK_Grp"%(n)
                     cmds.connectAttr(self.fingerCtrl+"."+self.ar.data.lang['c022_phalange']+str(n), self.sdkGrp+".rotateY", force=True)
                     if n > 1:
-                        self.ctrlShape = cmds.listRelatives(side+self.userGuideName+"_%02d_Ctrl"%(n), children=True, type='nurbsCurve')[0]
+                        self.ctrlShape = cmds.listRelatives(side+self.number_name+"_%02d_Ctrl"%(n), children=True, type='nurbsCurve')[0]
                         cmds.connectAttr(self.fingerCtrl+"."+self.ar.data.lang['c021_showControls'], self.ctrlShape+".visibility", force=True)
 
                 # ik and Fk setup
@@ -389,13 +387,13 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                 # ik handle
                 if self.nJoints >= 2:
                     if self.nJoints == 2:
-                        ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_00_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IKH")
+                        ikHandleList = cmds.ikHandle(startJoint=side+self.number_name+"_00_Ik_Jxt", endEffector=side+self.number_name+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.number_name+"_IKH")
                     else:
-                        ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_01_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IKH")
-                    cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
-                    endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_"+self.ar.data.joint_end_attr, solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
-                    cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
-                    self.ikCtrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.radius * 0.3), d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.controllers[1])
+                        ikHandleList = cmds.ikHandle(startJoint=side+self.number_name+"_01_Ik_Jxt", endEffector=side+self.number_name+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.number_name+"_IKH")
+                    cmds.rename(ikHandleList[1], side+self.number_name+"_Eff")
+                    endIkHandleList = cmds.ikHandle(startJoint=side+self.number_name+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.number_name+"_Ik_"+self.ar.data.joint_end_attr, solver="ikSCsolver", name=side+self.number_name+"_EndIkHandle")
+                    cmds.rename(endIkHandleList[1], side+self.number_name+"_End_Eff")
+                    self.ikCtrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.number_name+"_Ik_Ctrl", r=(self.radius * 0.3), d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.controllers[1])
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
@@ -405,34 +403,34 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                     cmds.delete(cmds.pointConstraint(self.cvEndJoint, self.ikCtrlZero, maintainOffset=False))
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ikCtrlZero+".visibility", force=True)
                     for q in range(2, self.nJoints+1):
-                        cmds.connectAttr(side+self.userGuideName+"_01_Ctrl.ikFkBlend", side+self.userGuideName+"_%02d_Ctrl.visibility"%(q), force=True)
-                    cmds.parentConstraint(self.ikCtrl, ikHandleList[0], name=side+self.userGuideName+"_IKH_PaC", maintainOffset=True)
-                    cmds.parentConstraint(self.ikCtrl, endIkHandleList[0], name=side+self.userGuideName+"_EndIkHandle_PaC", maintainOffset=True)
-                    ikHandleGrp = cmds.group(ikHandleList[0], endIkHandleList[0], name=side+self.userGuideName+"_IKH_Grp")
+                        cmds.connectAttr(side+self.number_name+"_01_Ctrl.ikFkBlend", side+self.number_name+"_%02d_Ctrl.visibility"%(q), force=True)
+                    cmds.parentConstraint(self.ikCtrl, ikHandleList[0], name=side+self.number_name+"_IKH_PaC", maintainOffset=True)
+                    cmds.parentConstraint(self.ikCtrl, endIkHandleList[0], name=side+self.number_name+"_EndIkHandle_PaC", maintainOffset=True)
+                    ikHandleGrp = cmds.group(ikHandleList[0], endIkHandleList[0], name=side+self.number_name+"_IKH_Grp")
                     cmds.setAttr(ikHandleGrp+".visibility", 0)
                     self.ar.ctrls.setLockHide([self.ikCtrl], ['sx', 'sy', 'sz', 'v'])
 
                     if self.nJoints == 2:
-                        cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_PaC")
-                        cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_ScC")
+                        cmds.parentConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_00_Ik_Jxt", maintainOffset=True, name=side+self.number_name+"_00_Ik_Jxt_PaC")
+                        cmds.scaleConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_00_Ik_Jxt", maintainOffset=True, name=side+self.number_name+"_00_Ik_Jxt_ScC")
 
                 # ik stretch
                 cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchNormalize_MD")
+                stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_StretchNormalize_MD")
                 cmds.setAttr(stretchNormMD+".operation", 2)
-                distBetweenList = self.ar.utils.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
+                distBetweenList = self.ar.utils.distanceBet(side+self.number_name+"_01_Ctrl", self.ikCtrl, name=side+self.number_name+"_DistBet", keep=True)
                 cmds.connectAttr(self.ikFkRevNode+".outputX", distBetweenList[5]+"."+self.ikCtrl+"W0", force=True)
                 cmds.connectAttr(self.fingerCtrl+".ikFkBlend", distBetweenList[5]+"."+distBetweenList[4]+"W1", force=True)
                 cmds.connectAttr(distBetweenList[1]+".distance", stretchNormMD+".input1X", force=True)
                 # TO DO? stretch compensate to ik Z axis
-                ikStretchZUniformScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_IkStretchZ_MD")
+                ikStretchZUniformScaleMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_IkStretchZ_MD")
                 cmds.setAttr(ikStretchZUniformScaleMD+".input2X", distBetweenList[0])
                 cmds.connectAttr(self.skinJointList[0]+".scaleZ", ikStretchZUniformScaleMD+".input1X", force=True)
                 cmds.connectAttr(ikStretchZUniformScaleMD+".outputX", stretchNormMD+".input2X", force=True)
-                stretchScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchScale_MD")
+                stretchScaleMD = cmds.createNode("multiplyDivide", name=side+self.number_name+"_StretchScale_MD")
                 cmds.connectAttr(stretchNormMD+".outputX", stretchScaleMD+".input1X", force=True)
                 cmds.connectAttr(self.ikCtrl+".stretchable", stretchScaleMD+".input2X", force=True)
-                self.stretchCond = cmds.createNode("condition", name=side+self.userGuideName+"_Stretch_Cnd")
+                self.stretchCond = cmds.createNode("condition", name=side+self.number_name+"_Stretch_Cnd")
                 cmds.connectAttr(stretchScaleMD+".outputX", self.stretchCond+".firstTerm", force=True)
                 cmds.setAttr(self.stretchCond+".secondTerm", 1)
                 cmds.setAttr(self.stretchCond+".operation", 2)
@@ -445,7 +443,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                         self.ar.utils.clearDpArAttr([ikJoint])
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
-                        self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
+                        self.fingerCtrl = side+self.number_name+"_01_Ctrl"
                         self.scaleCompensateCond = ikJoint.replace("_Ik_Jxt", "_ScaleCompensate_Cnd")
                         ikFkParentConst = cmds.parentConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_PaC")[0]
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
@@ -477,7 +475,7 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                                 cmds.connectAttr(self.skinJointList[0]+".scaleX", ikJointList[i]+".scaleX", force=True)
                                 cmds.connectAttr(self.skinJointList[0]+".scaleY", ikJointList[i]+".scaleY", force=True)
                 # create a masterModuleGrp to be checked if this rig exists:
-                ctrlHookList = [side+self.userGuideName+"_00_SDK_Zero_0_Grp", side+self.userGuideName+"_01_SDK_Zero_0_Grp"]
+                ctrlHookList = [side+self.number_name+"_00_SDK_Zero_0_Grp", side+self.number_name+"_01_SDK_Zero_0_Grp"]
                 if self.nJoints >= 2:
                     if self.nJoints == 2:
                         scalableHookList = [self.skinJointList[0], ikBaseJoint, fkBaseJoint, ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4]]
@@ -485,13 +483,13 @@ class Finger(standard.BaseStandard, layout.BaseLayout):
                         scalableHookList = [self.skinJointList[0], ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4]]
                 else:
                     ctrlHookList.append(self.ikCtrlZero)
-                    scalableHookList = [side+self.userGuideName+"_00_Jnt"]
+                    scalableHookList = [side+self.number_name+"_00_Jnt"]
                 self.create_hook_setup(side, ctrlHookList, scalableHookList)
                 if self.corrective:
                     cmds.parent(self.corrective_ctrls_grp, self.ctrl_hook_grp)
                 self.scalableGrpList.append(self.scalable_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

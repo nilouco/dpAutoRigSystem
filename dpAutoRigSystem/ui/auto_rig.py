@@ -53,7 +53,6 @@ class MainUI(object):
         print("dpAutoRigSystem "+self.ar.data.lang['i346_loadedSuccess'])
 
 
-
     def create_main_ui(self):
         """ Create the layouts inside of the mainLayout. Here will be the entire User Interface.
         """

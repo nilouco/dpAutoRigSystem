@@ -74,27 +74,14 @@ class Job(object):
                 self.ar.ui_manager.refresh_ui()
                 cmds.select(updated_guide_nodes)
         # update UI
-        for m, module_instance in enumerate(self.ar.data.guide_instances):
-            if cmds.objExists(module_instance.guide_base):
-                if module_instance.selectButton:
-                    current_colors = self.ar.ctrls.getGuideRGBColorList(module_instance)
-                    if current_colors:
-                        cmds.button(module_instance.selectButton, edit=True, label=" ", backgroundColor=current_colors)
-                    if selected_guides:
-                        for selected_guide in selected_guides:
-                            if str(module_instance) == cmds.getAttr(selected_guide+"."+self.ar.data.module_instance_info_attr):
-                                cmds.button(module_instance.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
-                                self.selected_instances.append(module_instance)
+        if self.ar.data.ui_state:
+            self.selected_instances = self.ar.guide_ui.update_select_button(selected_guides)
         # delete module layout:
         if not selected_guides:
-            if self.ar.data.ui_state:
-                if cmds.frameLayout("rig_edit_selected_module_fl", query=True, exists=True):
-                    cmds.frameLayout("rig_edit_selected_module_fl", edit=True, label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i143_module'])
-                if cmds.columnLayout("rig_selected_module_cl", query=True, exists=True):
-                    cmds.deleteUI("rig_selected_module_cl")
+            self.ar.guide_ui.delete_module_layout()
         # re-create module layout:
         if self.selected_instances:
-            self.selected_instances[-1].reCreateEditSelectedModuleLayout(bSelect=False)
+            self.ar.guide_ui.update_edit_selected_module_ui(self.selected_instances[-1], select=False)
         # call reload the geometries in skin UI:
         self.ar.filler.populate_geometries()
 

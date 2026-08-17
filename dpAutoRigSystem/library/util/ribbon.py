@@ -250,11 +250,9 @@ class Ribbon(object):
             oldName = limbJoints[i][:-4]
             limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+articNumber)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
             if not self.ar.data.lang['c043_corner'] in oldName:
-                childList = cmds.listRelatives(limbJoints[i], allDescendents=True)
-                if childList:
-                    for childNode in childList:
-                        if oldName in childNode:
-                            cmds.rename(childNode, childNode.replace(oldName, prefix+myName+'_%02d'%(i+articNumber)))
+                for childNode in cmds.listRelatives(limbJoints[i], allDescendents=True) or []:
+                    if oldName in childNode:
+                        cmds.rename(childNode, childNode.replace(oldName, prefix+myName+'_%02d'%(i+articNumber)))
         
         scaleGrp = cmds.group(upLimb['scaleGrp'], downLimb['scaleGrp'], jntGrp, n=prefix+myName+'_Ribbon_Scale_Grp')
         cmds.setAttr(upLimb['scaleGrp']+'.v', cmds.getAttr(upLimb['finalGrp']+'.v'))

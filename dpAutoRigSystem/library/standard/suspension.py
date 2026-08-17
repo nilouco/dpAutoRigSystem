@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ..base import standard
-from ..base import layout
 
 # global variables to this module:    
 CLASS_NAME = "Suspension"
@@ -11,14 +10,13 @@ WIKI = "03-‐-Guides#-suspension"
 
 
 
-class Suspension(standard.BaseStandard, layout.BaseLayout):
+class Suspension(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-    def create_module_layout(self):
-        standard.BaseStandard.create_module_layout(self)
-        layout.BaseLayout.basicModuleLayout(self)
+#    def create_module_layout(self):
+#        standard.BaseStandard.create_module_layout(self)
     
     
     def get_guide_attr(self, moduleAttr, *args):
@@ -81,30 +79,30 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
             # run for all sides
             for s, side in enumerate(self.sides):
                 # declare guide:
-                self.base = side+self.userGuideName+'_Guide_Base'
-                self.cvALoc = side+self.userGuideName+"_Guide_JointLocA"
-                self.cvBLoc = side+self.userGuideName+"_Guide_JointLocB"
-                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
-                self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
+                self.base = side+self.number_name+'_Guide_Base'
+                self.cvALoc = side+self.number_name+"_Guide_JointLocA"
+                self.cvBLoc = side+self.number_name+"_Guide_JointLocB"
+                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.locatorsGrp = cmds.group(name=side+self.number_name+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
                 self.dist = self.ar.utils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
                 self.jointList, self.mainCtrlList, self.ctrlZeroList, self.controllers, self.aimLocList, self.upLocList = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
                     cmds.select(clear=True)
-                    jnt = cmds.joint(name=side+self.userGuideName+"_"+letter+"_1_Jnt", scaleCompensate=False)
-                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
+                    jnt = cmds.joint(name=side+self.number_name+"_"+letter+"_1_Jnt", scaleCompensate=False)
+                    endJoint = cmds.joint(name=side+self.number_name+"_"+letter+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
                     self.ar.utils.addJointEndAttr([endJoint])
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:
-                    self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.userGuideName+"_"+letter)
+                    self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name+"_"+letter)
                     self.jointList.append(jnt)
                     
                     # create a control:
-                    mainCtrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter)
-                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=mainCtrl)
-                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=ctrl)
+                    mainCtrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.number_name+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter)
+                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.number_name+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=mainCtrl)
+                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.number_name+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=ctrl)
                     self.ar.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
                     self.ar.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:
@@ -140,9 +138,9 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                     
                     # working with aim setup:
                     cmds.addAttr(ctrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
-                    aimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+letter+"_Aim_Loc")[0]
-                    upLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+letter+"_Up_Loc")[0]
-                    locGrp = cmds.group(aimLoc, upLoc, name=side+self.userGuideName+"_"+letter+"_Loc_Grp")
+                    aimLoc = cmds.spaceLocator(name=side+self.number_name+"_"+letter+"_Aim_Loc")[0]
+                    upLoc = cmds.spaceLocator(name=side+self.number_name+"_"+letter+"_Up_Loc")[0]
+                    locGrp = cmds.group(aimLoc, upLoc, name=side+self.number_name+"_"+letter+"_Loc_Grp")
                     cmds.parent(locGrp, self.locatorsGrp, relative=True)
                     cmds.delete(cmds.parentConstraint(ctrl, locGrp, maintainOffset=False))
                     cmds.parentConstraint(upLocCtrl, upLoc, maintainOffset=False, name=upLoc+"_PaC")
@@ -170,7 +168,7 @@ class Suspension(standard.BaseStandard, layout.BaseLayout):
                 self.create_hook_setup(side, self.mainCtrlList, self.jointList, [self.locatorsGrp])
                 self.ctrlHookGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

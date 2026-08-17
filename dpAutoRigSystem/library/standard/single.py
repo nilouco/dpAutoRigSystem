@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ..base import standard
-from ..base import layout
 
 # global variables to this module:    
 CLASS_NAME = "Single"
@@ -11,7 +10,7 @@ WIKI = "03-‐-Guides#-single"
 
 
 
-class Single(standard.BaseStandard, layout.BaseLayout):
+class Single(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         # returned data from the dictionary
@@ -20,9 +19,8 @@ class Single(standard.BaseStandard, layout.BaseLayout):
         self.aCtrlGrpList = []
     
     
-    def create_module_layout(self):
-        standard.BaseStandard.create_module_layout(self)
-        layout.BaseLayout.basicModuleLayout(self)
+#    def create_module_layout(self):
+#        standard.BaseStandard.create_module_layout(self)
     
     
     def getHasIndirectSkin(self):
@@ -101,39 +99,39 @@ class Single(standard.BaseStandard, layout.BaseLayout):
         if cmds.objExists(self.guide_base):
             # run for all sides
             for s, side in enumerate(self.sides):
-                self.base = side+self.userGuideName+'_Guide_Base'
+                self.base = side+self.number_name+'_Guide_Base'
                 cmds.select(clear=True)
                 # declare guide:
-                self.guide = side+self.userGuideName+"_Guide_JointLoc1"
-                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                self.guide = side+self.number_name+"_Guide_JointLoc1"
+                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
+                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # create a joint:
-                self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
+                self.jnt = cmds.joint(name=side+self.number_name+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName)
+                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name)
                 # create a control:
                 if not self.getHasIndirectSkin():
                     if self.curve_degree == 0:
                         self.curve_degree = 1
                 # work with curve shape and rotation cases:
                 indirectSkinRot = (0, 0, 0)
-                if self.ar.data.lang['c058_main'] in self.userGuideName:
+                if self.ar.data.lang['c058_main'] in self.number_name:
                     ctrlTypeID = "id_054_SingleMain"
                     if len(self.sides) > 1:
-                        if self.ar.data.lang['c041_eyebrow'] in self.userGuideName:
+                        if self.ar.data.lang['c041_eyebrow'] in self.number_name:
                             indirectSkinRot = (0, 0, -90)
                         else:
                             indirectSkinRot = (0, 0, 90)
                 else:
                     ctrlTypeID = "id_029_SingleIndSkin"
-                    if self.ar.data.lang['c045_lower'] in self.userGuideName:
+                    if self.ar.data.lang['c045_lower'] in self.number_name:
                         indirectSkinRot=(0, 0, 180)
-                    elif self.ar.data.lang['c043_corner'] in self.userGuideName:
-                        if "00" in self.userGuideName:
+                    elif self.ar.data.lang['c043_corner'] in self.number_name:
+                        if "00" in self.number_name:
                             indirectSkinRot=(0, 0, 90)
                         else:
                             indirectSkinRot=(0, 0, -90)
-                self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
+                self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
                 self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
@@ -182,7 +180,7 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                         self.ar.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.getHasSDKLocator():
-                            if not self.ar.data.lang['c058_main'] in self.userGuideName:
+                            if not self.ar.data.lang['c058_main'] in self.number_name:
                                 # this one will be used to receive inputs from sdk locator:
                                 sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
                                 sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
@@ -223,19 +221,19 @@ class Single(standard.BaseStandard, layout.BaseLayout):
                     cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 # create end joint:
                 cmds.select(self.jnt)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
+                self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.ar.utils.addJointEndAttr([self.endJoint])
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.getHasIndirectSkin():
-                    self.create_hook_setup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], staticList=[side+self.userGuideName+"_Jxt"])
+                    self.create_hook_setup(side, [side+self.number_name+"_Ctrl_Zero_0_Grp"], staticList=[side+self.number_name+"_Jxt"])
                 else:
-                    self.create_hook_setup(side, [side+self.userGuideName+"_Ctrl_Zero_0_Grp"], [side+self.userGuideName+"_Jnt"])
+                    self.create_hook_setup(side, [side+self.number_name+"_Ctrl_Zero_0_Grp"], [side+self.number_name+"_Jnt"])
                 self.aStaticGrpList.append(self.static_hook_grp)
                 self.aCtrlGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

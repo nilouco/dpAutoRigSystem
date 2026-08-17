@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from ..base import standard
-from ..base import layout
 
 # global variables to this module:
 CLASS_NAME = "FkLine"
@@ -11,15 +10,14 @@ WIKI = "03-‐-Guides#-fk-line"
 
 
 
-class FkLine(standard.BaseStandard, layout.BaseLayout):
+class FkLine(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         self.currentNJoints = 1
     
     
-    def create_module_layout(self):
-        standard.BaseStandard.create_module_layout(self)
-        layout.BaseLayout.basicModuleLayout(self)
+#    def create_module_layout(self):
+#        standard.BaseStandard.create_module_layout(self)
     
     
     def create_guide(self, *args):
@@ -32,6 +30,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
         cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
         cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
@@ -60,9 +59,9 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
         self.ar.opt.check_use_default_render_layer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
-            try:
-                self.enteredNJoints = cmds.intField(self.nJointsIF, query=True, value=True)
-            except:
+            if self.ar.data.ui_state:
+                self.enteredNJoints = cmds.intField("edit_guide_n_joints_if", query=True, value=True)
+            else:
                 return
         else:
             self.enteredNJoints = enteredNJoints
@@ -203,22 +202,14 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
             self.reOrientFkLine(self.jointLocList, self.upVectorObject, self.guide_base, self.cvEndJoint)
 
 
-    def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
-        layout.BaseLayout.reCreateEditSelectedModuleLayout(self, bSelect)
-        if self.ar.data.ui_state:
-            # Create the reOrient button in the flip layout:
-            if cmds.rowLayout("flipLayout", query=True, exists=True):
-                self.reOrientBT = cmds.button(label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=self.reOrientGuideButton, parent="flipLayout")
-
-
     def rig_me(self, *args):
         standard.BaseStandard.rig_me(self)
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             # run for all sides
             for s, side in enumerate(self.sides):
-                self.base = side+self.userGuideName+'_Guide_Base'
-                self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
+                self.base = side+self.number_name+'_Guide_Base'
+                self.ctrlZeroGrp = side+self.number_name+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []
                 self.fkCtrlList = []
                 # get the number of joints to be created:
@@ -226,17 +217,17 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                 for n in range(0, self.nJoints):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n+1)
-                    self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                    self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                    self.guide = side+self.number_name+"_Guide_JointLoc"+str(n+1)
+                    self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
+                    self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
                     # create a joint:
-                    self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
+                    self.jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.userGuideName+"_%02d"%(n))
+                    self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-                    self.jntCtrl = self.ar.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc"+str(n+1), parentTag=self.get_parent_to_tag(self.fkCtrlList))
+                    self.jntCtrl = self.ar.ctrls.cvControl("id_007_FkLine", side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc"+str(n+1), parentTag=self.get_parent_to_tag(self.fkCtrlList))
                     self.fkCtrlList.append(self.jntCtrl)
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.ar.utils.zeroOut([self.jntCtrl])[0]
@@ -264,10 +255,10 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                     # grouping:
                     if n > 0:
                         # parent joints as a simple chain (line)
-                        self.fatherJnt = side+self.userGuideName+"_%02d_Jnt"%(n-1)
+                        self.fatherJnt = side+self.number_name+"_%02d_Jnt"%(n-1)
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
                         # parent zeroCtrl Group to the before jntCtrl:
-                        self.fatherCtrl = side+self.userGuideName+"_%02d_Ctrl"%(n-1)
+                        self.fatherCtrl = side+self.number_name+"_%02d_Ctrl"%(n-1)
                         cmds.parent(self.zeroOutCtrlGrp, self.fatherCtrl, absolute=True)
                     # control drives joint:
                     cmds.parentConstraint(self.jntCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
@@ -276,12 +267,12 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                     if n > 0:
                         if self.articulation:
                             artJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.utils.setJointLabel(artJntList[0], s+self.joint_label_add, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            self.ar.utils.setJointLabel(artJntList[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     # end chain:
                     if n == self.nJoints-1:
                         # create end joint:
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.ar.data.joint_end_attr, radius=0.5)
+                        self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                         self.ar.utils.addJointEndAttr([self.endJoint])
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # work with main fk controllers
@@ -290,7 +281,7 @@ class FkLine(standard.BaseStandard, layout.BaseLayout):
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.create_hook_setup(side, [self.ctrlZeroGrp], [self.skinJointList[0]])
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirror_grp)
+                cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

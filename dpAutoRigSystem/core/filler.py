@@ -147,7 +147,7 @@ class UIFiller(object):
                 mod = self.ar.lib.initialize_library(module[0], self.ar.data.standard_folder)[0]
                 self.ar.data.guide_instances.append(mod)
                 mod.get_namespace_for_it(module[1])
-                mod.load_raw_guide(mod.userGuideName)
+                mod.load_raw_guide(mod.number_name)
                 # reload pinGuide scriptJob:
                 self.ar.job.start_pin_guide(mod.guide_base)
 

@@ -162,7 +162,7 @@ class UIManager(object):
         if modules:
             for item in modules:
                 if layout == 0:
-                    cmds.frameLayout(item.module_fl, edit=True, collapse=collapse_value)
+                    cmds.frameLayout(f"{item.number_name}_fl", edit=True, collapse=collapse_value)
                 else:
                     cmds.frameLayout(item, edit=True, collapse=collapse_value)
         cmds.iconTextButton(iconTB, edit=True, image=icon)
