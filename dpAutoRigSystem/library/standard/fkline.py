@@ -147,7 +147,7 @@ class FkLine(standard.BaseStandard):
         """ Aim the target towards the aimed object using the upObject(RadiusCtrl) for orientation.
         """ 
         # If it's JointEnd, unlock translateX and translateY attributes to allow unparenting to world with no translation issues.
-        # The JointEnd will be unlocked after pressing the reOrient button only.
+        # The JointEnd will be unlocked after pressing the reorient button only.
         if target == self.cvEndJoint:
             cmds.setAttr(target + ".translateX", lock=False, keyable=True)
             cmds.setAttr(target + ".translateY", lock=False, keyable=True)
@@ -188,7 +188,7 @@ class FkLine(standard.BaseStandard):
 
 
     def reOrientGuideButton(self, *args):
-        """ reOrient dpFkLine button. 
+        """ reorient dpFkLine button. 
             Each guide will point to the next guide using Radius_Ctrl position as a Object Rotation Up Vector.
         """
         # re-declaring guides names:

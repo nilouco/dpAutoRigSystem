@@ -554,7 +554,7 @@
     "m019_limb"                  : "Membro",
     "m020_limbDesc"              : "Descrição do Módulo Membro:\n\nEsse módulo cria um rig de membro\ncom clavícula+cotovelo+punho para o tipo braço\nou anca+joelho+tornozelo para o tipo perna.\nExiste a opção de reOrientar os controles\nque é útil para apontar a clavícula para o ombro e\nalinhar o punho com o cotovelo.\n\nEsse módulo funciona bem em IK e FK com stretch.\nEle também tem uma boa integração com o módulo Pé.",
     "m021_type"                  : "Tipo",
-    "m022_reOrient"              : "reOrientar",
+    "m022_reOrient"              : "Reorientar",
     "m023_reOrientDesc"          : "Recriar orientação das guias.",
     "m024_foot"                  : "Pé",
     "m025_footDesc"              : "Descrição do Módulo Pé:\n\nEsse módulo cria um rig de pé\ncom sistema reverso (reverse foot).\nEle funciona bem quando integrado com um módulo membro do tipo perna.",

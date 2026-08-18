@@ -83,8 +83,7 @@ class Limb(standard.BaseStandard):
     def getHasAdditional(self):
         if cmds.objExists(self.guide_base+".additional"):
             return cmds.getAttr(self.guide_base+".additional")
-        else:
-            return 0
+        return 0
 
 
     def addFollowAttrName(self, ctrl, attr, *args):
@@ -110,6 +109,7 @@ class Limb(standard.BaseStandard):
         cmds.addAttr(self.guide_base, longName="softIk", attributeType='bool')
         cmds.setAttr(self.guide_base+".softIk", 1)
         cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Before", r=0.3, d=1, guide=True)
@@ -374,7 +374,7 @@ class Limb(standard.BaseStandard):
 
 
     def reOrientGuide(self, *args):
-        """ This function reOrient guides orientations, creating temporary aimConstraints for them.
+        """ This function reorient guides orientations, creating temporary aimConstraints for them.
         """
         # re-declaring guide names:
         self.cvBeforeLoc = self.name_guide+"_Before"
@@ -408,7 +408,7 @@ class Limb(standard.BaseStandard):
         
 
     def reOrientGuideButton(self, *args):
-        """ New functions when the button reOrient is pressed. For Arm, the extrem will point to the corner. For legs, the extrem will point to the ground.
+        """ New functions when the button reorient is pressed. For Arm, the extrem will point to the corner. For legs, the extrem will point to the ground.
         """
         # re-declaring guides names:
         self.mainAic = self.name_guide+"_Main_Zero_0_Grp_AiC"
@@ -420,7 +420,7 @@ class Limb(standard.BaseStandard):
         
         # re-orient extremLoc to align with cornerLoc if the clavicle and wrist aren't pinned.
         if not cmds.getAttr(self.cvExtremLoc+".pinGuide") and not cmds.getAttr(self.cvBeforeLoc+".pinGuide"):
-            # reOrient guides first
+            # reorient guides first
             self.reOrientGuide()
             # do guide alignment
             if self.getLimbType()==self.armName:
@@ -473,48 +473,6 @@ class Limb(standard.BaseStandard):
         cmds.select(self.guide_base)
 
 
-    def update_edit_selected_module_ui(self, select=False, *args):
-        self.ar.guide_ui.update_edit_selected_module_ui(self, select)
-        if self.ar.data.ui_state:
-            # if there is a type attribute:
-            self.typeLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
-            cmds.text(self.ar.data.lang['m021_type'], parent=self.typeLayout)
-            self.typeMenu = cmds.optionMenu("typeMenu", label='', changeCommand=self.changeType, parent=self.typeLayout)
-            typeMenuItemList = [self.ar.data.lang['m028_arm'], self.ar.data.lang['m030_leg']]
-            for item in typeMenuItemList:
-                cmds.menuItem(label=item, parent=self.typeMenu)
-            # read from guide attribute the current value to type:
-            currentType = cmds.getAttr(self.guide_base+".type")
-            cmds.optionMenu(self.typeMenu, edit=True, select=int(currentType+1))
-            self.reOrientBT = cmds.button(label=self.ar.data.lang['m022_reOrient'], annotation=self.ar.data.lang['m023_reOrientDesc'], command=self.reOrientGuideButton, parent=self.typeLayout)
-
-            # bend layout:
-            self.bendMainLayout = cmds.rowColumnLayout("bendMainLayout", numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="rig_selected_module_cl")
-            self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent=self.bendMainLayout)
-            cmds.text(label=self.ar.data.lang['m044_addBend'], visible=True, parent=self.bendLayout)
-            self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', changeCommand=self.changeBend, parent=self.bendLayout)
-            self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
-            bendNumMenuItemList = [3, 5, 7]
-            for item in bendNumMenuItemList:
-                cmds.menuItem(label=item, parent=self.bendNumJointsMenu)
-            # read from guide attribute the current value to number of joints for bend:
-            currentNumberBendJoints = cmds.getAttr(self.guide_base+".numBendJoints")
-            for i, item in enumerate(bendNumMenuItemList):
-                if currentNumberBendJoints == item:
-                    cmds.optionMenu(self.bendNumJointsMenu, edit=True, select=i+1)
-                    break
-            # additional ribbon joint:
-            self.hasAdditional = self.getHasAdditional()
-            self.additionalCB = cmds.checkBox("additionalCB", label=self.ar.data.lang['m180_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
-            
-            # align world layout:
-            self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="rig_selected_module_cl")
-            cmds.text(label=self.ar.data.lang['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
-            self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
-
-        
-    def setAlignWorld(self, value, *args):
-        cmds.setAttr(self.guide_base+".alignWorld", value)
 
 
     def changeBend(self, value, *args):
@@ -523,8 +481,8 @@ class Limb(standard.BaseStandard):
         self.hasBend = value
         cmds.setAttr(self.guide_base+".hasBend", value)
         if self.ar.data.ui_state:
-            cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=value)
-            cmds.checkBox(self.additionalCB, edit=True, enable=value)
+            cmds.optionMenu('edit_guide_bend_num_om', edit=True, enable=value)
+            cmds.checkBox('edit_guide_additional_cb', edit=True, enable=value)
 
 
     def changeNumBend(self, numberBendJoints, *args):
@@ -532,11 +490,6 @@ class Limb(standard.BaseStandard):
         """
         cmds.setAttr(self.guide_base+".numBendJoints", int(numberBendJoints))
 
-
-    def changeAdditional(self, *args):
-        self.hasAdditional = cmds.checkBox(self.additionalCB, query=True, value=True)
-        cmds.setAttr(self.guide_base+".additional", self.hasAdditional)
-        
 
     def changeType(self, type, *args):
         """ This function will modify the names of the rigged module to Arm or Leg options
@@ -1464,15 +1417,15 @@ class Limb(standard.BaseStandard):
                         cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                     if self.limbTypeName == self.armName: #biped arm
-                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, cornerJxt, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.hasAdditional, addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
+                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, cornerJxt, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.getHasAdditional(), addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
                     elif quadruped:
                         locB = cmds.spaceLocator(n=side+self.number_name+'_auxBOriLoc', p=(0, 0, 0))[0]
                         cmds.delete(cmds.parentConstraint(cornerB, locB, mo=False, w=1))
                         cmds.delete(cmds.aimConstraint(cmds.listRelatives(cornerB, children=True)[0], locB, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
-                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.hasAdditional, addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)], oriBLoc=locB)
+                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.getHasAdditional(), addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)], oriBLoc=locB)
                         cmds.delete(locB)
                     else: #biped leg
-                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.hasAdditional, addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
+                        self.bendGrps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, iniJoint, 'x', num, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.getHasAdditional(), addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
                     cmds.delete(loc)
 
                     if self.limbTypeName == self.armName:
