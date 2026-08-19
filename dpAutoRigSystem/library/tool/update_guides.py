@@ -246,13 +246,13 @@ class UpdateGuides(base.BaseLibrary):
                 currentInstance.changeType(expectedValue)
             elif attr == 'mirrorAxis':
                 currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.changeMirror(value)
+                currentInstance.change_mirror(value)
             elif attr == 'mirrorName':
                 currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.changeMirrorName(value)
+                currentInstance.change_mirror_name(value)
             elif attr == 'displayAnnotation':
                 currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.displayAnnotation(value)
+                currentInstance.display_annotation(value)
             elif attr == 'rigType':
                 currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.rigType = value

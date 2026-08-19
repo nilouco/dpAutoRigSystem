@@ -16,10 +16,6 @@ class FkLine(standard.BaseStandard):
         self.currentNJoints = 1
     
     
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
-    
-    
     def create_guide(self, *args):
         self.create_guide_base()
         # Custom GUIDE:
@@ -177,7 +173,7 @@ class FkLine(standard.BaseStandard):
                     self.aimFunction(nJoint2, guideBase, upVectorObject)
                     # Parenting nJoint to world and reset jointLoc position
                     cmds.parent(nJoint2, world=True)
-                    for axis in self.ar.data.axis:
+                    for axis in self.ar.data.axes:
                         cmds.setAttr(jointLoc + ".translate" + axis, 0)
                         cmds.setAttr(jointLoc + ".rotate" + axis, 0)
                     cmds.parent(nJoint2, jointLoc)

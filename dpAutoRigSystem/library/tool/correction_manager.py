@@ -377,9 +377,9 @@ class CorrectionManager(base.BaseLibrary):
             Returns the created network node.
         """
         # loading Maya matrix node
-        loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-        if loadedQuatNode and loadedMatrixPlugin:
+        loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        if loaded_quaternion_plugin and loaded_matrix_plugin:
             if not nodes:
                 nodes = cmds.ls(selection=True, flatten=True)
             if nodes:

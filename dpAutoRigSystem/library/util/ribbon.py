@@ -293,9 +293,9 @@ class Ribbon(object):
                 cmds.setAttr(pac+"."+iniJxt+"W1", 0.3)
 
         # corner autoRotate setup
-        loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-        if loadedQuatNode and loadedMatrixPlugin:
+        loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        if loaded_quaternion_plugin and loaded_matrix_plugin:
             cornerAutoRotateMD = cmds.createNode("multiplyDivide", name=prefix+myName+"_"+cornerName+"_AutoRotate_MD")
             cornerAutoRotateMM = cmds.createNode("multMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_MM")
             cornerAutoRotateDM = cmds.createNode("decomposeMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_DM")
@@ -311,7 +311,7 @@ class Ribbon(object):
             cmds.delete(cmds.parentConstraint(lista[idx], extremLoc, maintainOffset=False))
             cornerAutoRotGrp = cmds.group(extremLoc, name=extremLoc+"_Grp")
             extremOrigLoc = cmds.duplicate(extremLoc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
-            for axis in self.ar.data.axis:
+            for axis in self.ar.data.axes:
                 cmds.connectAttr(lista[idx]+".rotate"+axis, extremLoc+".rotate"+axis, force=True)
                 cmds.setAttr(extremOrigLoc+".rotate"+axis, cmds.getAttr(extremLoc+".rotate"+axis))
             cmds.setAttr(cornerAutoRotGrp+".inheritsTransform", 0)
@@ -926,9 +926,9 @@ class Ribbon(object):
             retDict['twistBoneMD'] = twistBoneMD
         
         # autoRotate:
-        loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-        if loadedQuatNode and loadedMatrixPlugin:
+        loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        if loaded_quaternion_plugin and loaded_matrix_plugin:
             upTwistBoneMD = self.ar.utils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
             bottomTwistBoneMD = self.ar.utils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")
             twistBonePMA = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")

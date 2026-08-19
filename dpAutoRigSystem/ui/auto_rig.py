@@ -383,7 +383,7 @@ class MainUI(object):
         cmds.frameLayout('ctr_mirror_shape_fl', label=self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['m067_shape'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent="ctr_shape_io_fl")
         cmds.rowColumnLayout('ctr_mirror_shape_rcl', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="ctr_shape_io_fl")
         cmds.optionMenu("ctr_mirror_shape_axis_om", label='', parent="ctr_mirror_shape_rcl")
-        for x in self.ar.data.axis:
+        for x in self.ar.data.axes:
             cmds.menuItem('ctr_mirror_axis_'+x+'_mi', label=x, parent="ctr_mirror_shape_axis_om")
         cmds.text("ctr_mirror_shape_from_prefix_txt", label=self.ar.data.lang['i036_from'], parent="ctr_mirror_shape_rcl")
         cmds.textField('ctr_mirror_shape_from_prefix_tf', text=self.ar.data.lang['p002_left']+"_", parent="ctr_mirror_shape_rcl")

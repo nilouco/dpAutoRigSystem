@@ -12,10 +12,6 @@ class GuideUI(object):
     def basic_module_layout(self, standard, *args):
         """ Create a Basic Module layout.
         """
-
-        # declaring facial variables
-        self.jointsType = "jointsType"
-
         cmds.rowLayout(f"{standard.number_name}_rl", numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=f"{standard.number_name}_top_cl")
         cmds.button(f"{standard.number_name}_select_bt", label=" ", annotation=self.ar.data.lang['m004_select'], command=partial(self.update_edit_selected_module_ui, standard, True), backgroundColor=(0.5, 0.5, 0.5), dragCallback=partial(self.select_button_callback, standard), parent=f"{standard.number_name}_rl")
         cmds.textField(f"{standard.number_name}_custom_name_tf", annotation=self.ar.data.lang['i101_customName'], text=cmds.getAttr(standard.guide_base+".customName"), changeCommand=standard.set_guide_custom_name, parent=f"{standard.number_name}_rl")
@@ -115,7 +111,7 @@ class GuideUI(object):
 
     def mirror_layout(self, standard):
         cmds.text('edit_guide_mirror_txt', label=self.ar.data.lang['m010_mirror'], parent='edit_guide_mirror_rl')
-        cmds.optionMenu("edit_mirror_om", label='', changeCommand=standard.changeMirror, parent='edit_guide_mirror_rl')
+        cmds.optionMenu("edit_mirror_om", label='', changeCommand=standard.change_mirror, parent='edit_guide_mirror_rl')
         for item in self.ar.data.mirror_menus:
             cmds.menuItem(f"{item}_mi", label=item, parent='edit_mirror_om')
         # verify if there are a list of mirrorNames to menuOption:
@@ -131,7 +127,7 @@ class GuideUI(object):
             K = self.ar.data.lang['p007_back']
             mirror_names = [L+' --> '+R, R+' --> '+L, T+' --> '+B, B+' --> '+T, F+' --> '+K, K+' --> '+F]
         # create items for mirrorName menu:
-        cmds.optionMenu("edit_mirror_name_om", label='', changeCommand=standard.changeMirrorName, parent='edit_guide_mirror_rl')
+        cmds.optionMenu("edit_mirror_name_om", label='', changeCommand=standard.change_mirror_name, parent='edit_guide_mirror_rl')
         menu_name_item_text = ""
         for item in mirror_names:
             if item != "":
@@ -296,7 +292,7 @@ class GuideUI(object):
         if 'articulation' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_articulation_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
             cmds.text('edit_guide_articulation_rl', label=self.ar.data.lang['m173_articulation'], parent='edit_guide_articulation_rl')
-            cmds.checkBox('edit_guide_articulation_cb', label="", value=cmds.getAttr(standard.guide_base+".articulation"), changeCommand=standard.changeArticulation, parent='edit_guide_articulation_rl')
+            cmds.checkBox('edit_guide_articulation_cb', label="", value=cmds.getAttr(standard.guide_base+".articulation"), changeCommand=standard.change_articulation, parent='edit_guide_articulation_rl')
 
 
     def nostril_layout(self, standard):
@@ -377,8 +373,8 @@ class GuideUI(object):
             cmds.columnLayout('edit_guide_facial_type_cl', parent="edit_guide_facial_fl")
             current_type = cmds.getAttr(standard.guide_base+".connectUserType")
             cmds.radioCollection('edit_guide_facial_type_rc', parent='edit_guide_facial_type_cl')
-            cmds.radioButton('edit_guide_facial_type_bs_rb', label=self.ar.data.lang['m170_blendShapes']+" - "+self.ar.data.lang['i185_animation']+": #_Recept_BS", annotation=standard.bsType, onCommand=standard.dpChangeType)
-            cmds.radioButton('edit_guide_facial_type_jnt_rb', label=self.ar.data.lang['i181_facialJoint']+" - "+self.ar.data.lang['i186_gaming'], annotation=self.jointsType, onCommand=standard.dpChangeType)
+            cmds.radioButton('edit_guide_facial_type_bs_rb', label=self.ar.data.lang['m170_blendShapes']+" - "+self.ar.data.lang['i185_animation']+": #_Recept_BS", annotation=self.ar.data.facial_connect_types[0], onCommand=standard.change_facial_connect_type)
+            cmds.radioButton('edit_guide_facial_type_jnt_rb', label=self.ar.data.lang['i181_facialJoint']+" - "+self.ar.data.lang['i186_gaming'], annotation=self.ar.data.facial_connect_types[1], onCommand=standard.change_facial_connect_type)
             cmds.radioCollection('edit_guide_facial_type_rc', edit=True, select='edit_guide_facial_type_bs_rb')
             if current_type:
                 cmds.radioCollection('edit_guide_facial_type_rc', edit=True, select='edit_guide_facial_type_jnt_rb')
@@ -400,10 +396,8 @@ class GuideUI(object):
                     break
             # additional ribbon joint:
             cmds.checkBox("edit_guide_additional_cb", label=self.ar.data.lang['m180_additional'], value=cmds.getAttr(standard.guide_base+".additional"), changeCommand=partial(standard.set_guide_attr, 'additional'), parent='edit_guide_bend_rcl')
-        
                 
 
-    
     def align_world_layout(self, standard):
         if 'alignWorld' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_align_world_rl', numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="rig_selected_module_cl")
@@ -436,10 +430,7 @@ class GuideUI(object):
         else:
             cmds.checkBox('edit_guide_indirectskin_holder_cb', edit=True, enable=True)
             cmds.checkBox('edit_guide_indirectskin_sdk_locator_cb', edit=True, enable=True)
-
-
     
-
 
     def plus_info_ui(self, instance=None, *args):
         """ Open plus info attributes to each module

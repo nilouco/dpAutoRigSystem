@@ -23,17 +23,6 @@ class Chain(standard.BaseStandard):
         self.currentNJoints = 5
     
     
-    # def create_module_layout(self):
-    #     standard.BaseStandard.create_module_layout(self)
-    #     # Custom MODULE LAYOUT:
-    #     # verify if we are creating or re-loading this module instance:
-    #     firstTime = cmds.getAttr(self.guide_base+'.nJoints')
-    #     if firstTime == 1:
-    #         if self.ar.data.ui_state:
-    #             cmds.intField("edit_guide_n_joints_if", edit=True, value=5, minValue=5)
-    #         self.changeJointNumber(5)
-    
-    
     def create_guide(self, *args):
         self.create_guide_base()
         # Custom GUIDE:
@@ -43,7 +32,6 @@ class Chain(standard.BaseStandard):
         cmds.addAttr(self.guide_base, longName="dynamic", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
-#        cmds.setAttr(self.guide_base+".nMain", 1)
         cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
@@ -478,9 +466,9 @@ class Chain(standard.BaseStandard):
                         self.fixMirrorFlipping(ikCtrlMainZero, s, -1)
 
                         # loading Maya matrix node
-                        loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-                        if loadedQuatNode and loadedMatrixPlugin:
+                        loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+                        loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                        if loaded_quaternion_plugin and loaded_matrix_plugin:
                             # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
                             ikMainLoc = cmds.spaceLocator(name=side+self.number_name+"_Ik_Main_Loc")[0]
                             ikMainLocGrp = cmds.group(ikMainLoc, name=side+self.number_name+"_Ik_MainLoc_Grp")

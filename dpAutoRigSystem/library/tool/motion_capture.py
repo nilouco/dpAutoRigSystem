@@ -577,7 +577,7 @@ class MotionCapture(base.BaseLibrary):
             for ctrl in controllers:
                 self.lockAutoRotateAttr(ctrl, True)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.ar.data.axis:
+                for axis in self.ar.data.axes:
                     cmds.mute(zeroGrp+".rotate"+axis, force=True)
         print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
 
@@ -610,7 +610,7 @@ class MotionCapture(base.BaseLibrary):
             hipList = self.getOrderedByTimeID(hipList)
             cmds.xform(clavList[0], rotation=(90, 0, 90), worldSpace=True) #left clavicle
             cmds.xform(hipList[0], rotation=(90, 0, 0), worldSpace=True) #left hips
-            for axis in self.ar.data.axis:
+            for axis in self.ar.data.axes:
                 cmds.setAttr(clavList[1]+".rotate"+axis, cmds.getAttr(clavList[0]+".rotate"+axis)) #right clavicle
                 cmds.setAttr(hipList[1]+".rotate"+axis, cmds.getAttr(hipList[0]+".rotate"+axis)) #right hips
         # arm/leg
@@ -796,7 +796,7 @@ class MotionCapture(base.BaseLibrary):
             for ctrl in controllers:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.ar.data.axis:
+                for axis in self.ar.data.axes:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
             print(self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
 
@@ -907,7 +907,7 @@ class HumanIKCleaner(object):
             for ctrl in self.controllers:
                 self.lockAutoRotateAttr(ctrl, False)
                 zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
-                for axis in self.ar.data.axis:
+                for axis in self.ar.data.axes:
                     cmds.mute(zeroGrp+".rotate"+axis, disable=True)
             print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' "+", ".join(self.controllers))
 

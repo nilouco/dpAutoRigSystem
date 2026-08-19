@@ -30,10 +30,6 @@ class Spine(standard.BaseStandard):
         self.aRbnJointList = []
         self.aClusterGrp = []
         self.shapeVisAttrList = []
-
-
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
     
 
     def create_guide(self, *args):
@@ -524,7 +520,7 @@ class Spine(standard.BaseStandard):
     def connectSizeAxis(self, fromNode, toNode, *args):
         """ Just connect sizeXYZ to scaleXYZ of given nodes.
         """
-        for axis in self.ar.data.axis:
+        for axis in self.ar.data.axes:
             if not cmds.objExists(fromNode+".size"+axis):
                 cmds.addAttr(fromNode, longName="size"+axis, attributeType="float", defaultValue=1, keyable=True)
             cmds.connectAttr(fromNode+".size"+axis, toNode+".scale"+axis, force=True)

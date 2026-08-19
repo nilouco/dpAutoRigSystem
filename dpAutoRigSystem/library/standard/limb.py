@@ -64,10 +64,6 @@ class Limb(standard.BaseStandard):
         self.ankleCorrectiveList = []
 
 
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
-
-
     def getHasBend(self):
         return cmds.getAttr(self.guide_base+".hasBend")
 
@@ -252,7 +248,7 @@ class Limb(standard.BaseStandard):
                         cmds.delete(connection)
         
         # connecting guides transform to the null groups:
-        for axis in self.ar.data.axis:
+        for axis in self.ar.data.axes:
             cmds.connectAttr(self.cvMainLoc+".translate"+axis, self.guideMainDrvNull+".translate"+axis)
             cmds.connectAttr(self.cvMainLoc+".rotate"+axis, self.guideMainDrvNull+".rotate"+axis)
             cmds.connectAttr(self.cvCornerLoc+".translate"+axis, self.cornerDrvNull+".translate"+axis)
@@ -294,7 +290,7 @@ class Limb(standard.BaseStandard):
         cmds.delete(self.cornerPoc, self.cornerDrvNullAic, self.cornerPoc, self.cornerUpVectorPoc, self.cornerNullPoc)
 
         # disconnecting direct connections:
-        for axis in self.ar.data.axis:
+        for axis in self.ar.data.axes:
             cmds.disconnectAttr(self.cvMainLoc+".translate"+axis, self.guideMainDrvNull+".translate"+axis)
             cmds.disconnectAttr(self.cvMainLoc+".rotate"+axis, self.guideMainDrvNull+".rotate"+axis)
             cmds.disconnectAttr(self.cvCornerLoc+".translate"+axis, self.cornerDrvNull+".translate"+axis)
@@ -828,7 +824,7 @@ class Limb(standard.BaseStandard):
                     if n == 0:
                         clavicleJointList = [self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0]]
                         for clavicleJoint in clavicleJointList:
-                            for axis in self.ar.data.axis:
+                            for axis in self.ar.data.axes:
                                 cmds.connectAttr(self.fkCtrlList[0]+".scale"+axis, clavicleJoint+".scale"+axis, force=True)
                     elif n == 1 or n == 2: #shoulder/elbow
                         self.ar.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy'])
@@ -1052,7 +1048,7 @@ class Limb(standard.BaseStandard):
                         if self.limbTypeName == self.armName:
                             # get right side to alignWorld. It'll be a little glitch, but it seems be accordilly with the mirror using arm default setting. Recommended use biped limbStyle instead.
                             self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
-                    for a, axis in enumerate(self.ar.data.axis):
+                    for a, axis in enumerate(self.ar.data.axes):
                         cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotate"+axis, 0)
                         cmds.setAttr(self.ikExtremCtrlZero+".rotate"+axis, 0)
                         # store original rotation values for initial default pose
@@ -1177,7 +1173,7 @@ class Limb(standard.BaseStandard):
                     cmds.setAttr(poleVectorUpLoc+".translateZ", -self.radius)
                 cmds.delete(cmds.pointConstraint(self.cvMainLoc, poleVectorAimLoc, maintainOffset=False))
                 cmds.pointConstraint(self.ikExtremSubCtrl, poleVectorUpLocGrp, maintainOffset=False, name=poleVectorUpLocGrp+"_PoC")
-                for axis in self.ar.data.axis:
+                for axis in self.ar.data.axes:
                     cmds.connectAttr(self.worldRef+".scaleX", poleVectorLocatorsGrp+".scale"+axis, force=True)
                 
                 # working with autoOrient of poleVector:
@@ -1458,9 +1454,9 @@ class Limb(standard.BaseStandard):
                     
                     # implementing auto rotate twist bones:
                     # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
-                    loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                    loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-                    if loadedQuatNode and loadedMatrixPlugin:
+                    loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+                    loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                    if loaded_quaternion_plugin and loaded_matrix_plugin:
                         twistBoneMD = self.bendGrps['twistBoneMD']
                         shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
                         shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
@@ -1495,9 +1491,9 @@ class Limb(standard.BaseStandard):
 
                 # auto clavicle:
                 # loading Maya matrix node
-                loadedQuatNode = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-                if loadedQuatNode and loadedMatrixPlugin:
+                loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+                loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                if loaded_quaternion_plugin and loaded_matrix_plugin:
                     # create auto clavicle group:
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
                     cmds.delete(cmds.parentConstraint(self.zeroFkCtrlList[0], self.clavicleCtrlGrp, maintainOffset=False))

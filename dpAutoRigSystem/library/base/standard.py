@@ -31,7 +31,6 @@ class BaseStandard(base.BaseLibrary):
         self.rigType = "biped"
         # defining namespace:
         self.guide_namespace = self.name+"__"+self.number_name
-        # defining guideNamespace:
         cmds.namespace(setNamespace=":")
         self.name_guide = self.guide_namespace+":Guide"
         self.guide_base = self.name_guide+"_Base"
@@ -40,20 +39,10 @@ class BaseStandard(base.BaseLibrary):
 
 
     def build_raw_guide(self, number_name=None, *args):
-        #
-        #
-        #self.number = number
-        #
-        # WIP TODO: get new number_name by findLastNumber in utils
-        #
-
         self.get_namespace_for_it(number_name)
-        # starting module:
         if not cmds.namespace(exists=self.guide_namespace):
             cmds.namespace(add=self.guide_namespace)
-            # create GUIDE for this module:
             self.create_guide()
-        
         self.load_raw_guide()
         return self.guide_base
     
@@ -63,7 +52,6 @@ class BaseStandard(base.BaseLibrary):
             self.number_name = number_name
         if self.ar.data.ui_state:
             self.create_module_layout()
-        # update module instance info:
         self.update_module_instance_info()
         self.guide_net = self.ar.utils.getNodeByMessage("net", self.guide_base)
         if self.guide_net:
@@ -79,25 +67,12 @@ class BaseStandard(base.BaseLibrary):
         if not layout_name:
             layout_name = self.number_name
         self.module_layout_name = self.ar.data.lang[self.title]+" - "+layout_name
-
-
         if self.ar.data.ui_state:
-
             if cmds.columnLayout("rig_guides_inst_cl", query=True, exists=True):
                 cmds.frameLayout(f"{self.number_name}_fl", label=self.module_layout_name, collapsable=True, collapse=False, parent="rig_guides_inst_cl")
                 cmds.columnLayout(f"{self.number_name}_top_cl", adjustableColumn=True, parent=f"{self.number_name}_fl")
             # rig_guides_inst_cl -> here we have just the column layouts to be populated by modules.
-    
             self.ar.guide_ui.basic_module_layout(self)            
-
-
-    # def declare_guide_elements(self):
-    #     """ Placeholder to re-declare standard guide elements.
-    #     """
-    #     print("MMMMEEEEE ", self.name)
-
-    #     pass
-    
 
     
     def create_guide_base(self):
@@ -371,9 +346,6 @@ class BaseStandard(base.BaseLibrary):
             cmds.setAttr(self.guide_base+".style", 2)
 
 
-    
-
-
     def set_main_ctrls(self, value, *args):
         """ Just store the main controllers checkBox value and enable the int field.
         """
@@ -412,7 +384,7 @@ class BaseStandard(base.BaseLibrary):
                     # intensity utilities
                     r_intensity_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_R_Main_MD")
                     self.to_ids.append(r_intensity_md)
-                    for axis in self.ar.data.axis:
+                    for axis in self.ar.data.axes:
                         cmds.connectAttr(main_ctrl+".rotate"+axis, r_intensity_md+".input1"+axis, force=True)
                         cmds.connectAttr(main_ctrl+"."+self.ar.data.lang['c049_intensity'], r_intensity_md+".input2"+axis, force=True)
                 else:
@@ -421,7 +393,7 @@ class BaseStandard(base.BaseLibrary):
                     cmds.parent(offset_grp, current_ctrl_zero)
                     cmds.makeIdentity(offset_grp, apply=False, translate=True, rotate=True, scale=True)
                     cmds.parent(current_ctrl, offset_grp)
-                    for axis in self.ar.data.axis:
+                    for axis in self.ar.data.axes:
                         cmds.connectAttr(r_intensity_md+".output"+axis, offset_grp+".rotate"+axis, force=True)
                 # display sub controllers shapes
                 self.ar.ctrls.setSubControlDisplay(main_ctrl, current_ctrl, 0)
@@ -734,7 +706,7 @@ class BaseStandard(base.BaseLibrary):
         """ Create a null transform and use it as worldSize reference setup to scale the main by offsetTransformMatrix.
         """
         world_size_ref = cmds.createNode("transform", name=self.guide_namespace+":Guide_Base_WorldSize_Ref")
-        for attr in self.ar.data.axis:
+        for attr in self.ar.data.axes:
             cmds.connectAttr(self.guide_base+".worldSize", world_size_ref+".scale"+attr)
         cmds.connectAttr(world_size_ref+".worldMatrix[0]", self.guide_base+".offsetParentMatrix", force=True)
         cmds.setAttr(world_size_ref+".visibility", False)
@@ -750,27 +722,13 @@ class BaseStandard(base.BaseLibrary):
         return return_item
 
 
-    # Getters:
-    #
-    def get_guide_attr(self, attr):
-        if attr in cmds.listAttr(self.guide_base):
-            return cmds.getAttr(self.guide_base+"."+attr)
-    
-    
-    # Setters:
-    #
-    def set_articulation(self, value):
-        self.articulation = value
-        cmds.setAttr(self.guide_base+".articulation", value)
-
-
-    def displayAnnotation(self, value, *args):
-            """ Get the current display setting from interface to show or hide the Annotation for this module.
-            """
-            if self.check_guide_integrity():
-                self.annotation = self.guide_base+"_Ant"
-                cmds.setAttr(self.annotation+'.visibility', value)
-                cmds.setAttr(self.guide_base+'.displayAnnotation', value)
+    def display_annotation(self, value, *args):
+        """ Get the current display setting from interface to show or hide the Annotation for this module.
+        """
+        if self.check_guide_integrity():
+            self.annotation = self.guide_base+"_Ant"
+            cmds.setAttr(self.annotation+'.visibility', value)
+            cmds.setAttr(self.guide_base+'.displayAnnotation', value)
     
     
     def check_father_mirror(self, *args):
@@ -806,159 +764,150 @@ class BaseStandard(base.BaseLibrary):
                 return "stopIt"
 
 
-
     def create_mirror_preview(self):
         """ Just create the mirror preview nodes.
             It runs recursively.
         """
-        selList = cmds.ls(selection=True)
+        selection = cmds.ls(selection=True)
         # re-declaring guideMirror and previewMirror groups:
-        self.previewMirrorGrpName = self.guide_base[:self.guide_base.find(":")]+'_MirrorGrp'
-        if cmds.objExists(self.previewMirrorGrpName):
-            cmds.delete(self.previewMirrorGrpName)
+        preview_mirror_grp = self.guide_base[:self.guide_base.find(":")]+'_MirrorGrp'
+        if cmds.objExists(preview_mirror_grp):
+            cmds.delete(preview_mirror_grp)
         # get children, verifying if there are children guides:
-        guideChildrenList = self.ar.utils.getGuideChildrenList(self.guide_base)
+        guide_children = self.ar.utils.getGuideChildrenList(self.guide_base)
         self.mirror_axis = cmds.getAttr(self.guide_base+".mirrorAxis")
         if self.mirror_axis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
                 hidden = not self.ar.data.display_temp_grp #invert to apply
-                self.ar.data.guide_mirror_grp = cmds.group(name=self.ar.data.guide_mirror_grp, empty=True)
+                self.ar.data.guide_mirror_grp = cmds.createNode('transform', name=self.ar.data.guide_mirror_grp)
                 cmds.addAttr(self.ar.data.guide_mirror_grp, longName="selectionChanges", defaultValue=0, attributeType="byte")
                 cmds.setAttr(self.ar.data.guide_mirror_grp+".template", 1)
                 cmds.setAttr(self.ar.data.guide_mirror_grp+".hiddenInOutliner", hidden)
                 for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v']:
                     cmds.setAttr(self.ar.data.guide_mirror_grp+"."+attr, lock=True, keyable=False)
-                        
-            if not cmds.objExists(self.previewMirrorGrpName):
-                if guideChildrenList:
-                    guideFatherNameList = []
-                    for guideChild in guideChildrenList:
-                        # get guide father name:
-                        guideFatherName = cmds.listRelatives(guideChild, parent=True)
-                        guideFatherNameList.append(guideFatherName)
+            
+            if not cmds.objExists(preview_mirror_grp):
+                if guide_children:
+                    guide_father_names = []
+                    for guide_child in guide_children:
+                        guide_father_names.append(cmds.listRelatives(guide_child, parent=True))
                         # unparent this child guide in order to make the mirror and after return it to the parent:
-                        cmds.parent(guideChild, world=True)
+                        cmds.parent(guide_child, world=True)
                         # set child guide as not mirrorable:
-                        cmds.setAttr(guideChild+".mirrorEnable", 0)
-                        # get initial values from father guide base:
-                        fatherMirrorName = cmds.getAttr(self.guide_base+".mirrorName")
+                        cmds.setAttr(guide_child+".mirrorEnable", 0)
                         # set values to guide base:
-                        cmds.setAttr(guideChild+".mirrorAxis", self.mirror_axis, type='string')
-                        cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
+                        cmds.setAttr(guide_child+".mirrorAxis", self.mirror_axis, type='string')
+                        cmds.setAttr(guide_child+".mirrorName", cmds.getAttr(self.guide_base+".mirrorName"), type='string') #fatherMirrorName
                         for instance in self.ar.data.guide_instances:
                             if cmds.objExists(instance.guide_base):
-                                if cmds.getAttr(instance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guideChild+".moduleInstanceInfo"):
+                                if cmds.getAttr(instance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guide_child+".moduleInstanceInfo"):
                                     instance.create_mirror_preview()
                 
                 # duplicating the moduleGuide
                 duplicated = cmds.duplicate(self.guide_base, returnRootsOnly=True)[0]
-                duplicatedList = cmds.listRelatives(duplicated, allDescendents=True, fullPath=True)
                 # renaming  and reShaping all its children nodes:
-                if duplicatedList:
-                    for dup in duplicatedList:
-                        if cmds.objExists(dup):
-                            if "_RadiusCtrl" in dup or "_Ant" in dup:
+                for dup in cmds.listRelatives(duplicated, allDescendents=True, fullPath=True) or []:
+                    if cmds.objExists(dup):
+                        if "_RadiusCtrl" in dup or "_Ant" in dup:
+                            cmds.delete(dup)
+                        else:
+                            if cmds.objectType(dup) == 'transform' or cmds.objectType(dup) == 'joint':
+                                # rename duplicated node:
+                                dup_renamed = cmds.rename(dup, self.guide_base[:self.guide_base.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
+                                original_guide = self.guide_base[:self.guide_base.find(":")+1]+dup[dup.rfind("|")+1:]
+                                # unlock and unhide all attributes and connect original guide node transformations to the mirror guide node:
+                                for attr in self.ar.data.transform_attrs:
+                                    cmds.setAttr(dup_renamed+"."+attr, lock=False, keyable=True)
+                                    cmds.connectAttr(original_guide+'.'+attr, dup_renamed+'.'+attr, force=True)
+                                
+                                # rebuild the shape as a nurbsSphere:
+                                if cmds.objectType(dup_renamed) == 'transform':
+                                    # make this previewMirrorGuide as not skinable from dpAR_UI:
+                                    self.ar.utils.addCustomAttr([dup_renamed], self.ar.skin.ignoreSkinningAttr)
+                                    children_shapes = cmds.listRelatives(dup_renamed, shapes=True, children=True)
+                                    if children_shapes:
+                                        cmds.delete(children_shapes)
+                                        new_sphere = cmds.sphere(name=dup_renamed+"Sphere", radius=0.1, constructionHistory=True)
+                                        cmds.parent(cmds.listRelatives(new_sphere, shapes=True, children=True)[0], dup_renamed, shape=True, relative=True) #newSphereShape
+                                        cmds.delete(new_sphere[0]) #transform
+                                        sz_md = cmds.createNode("multiplyDivide", name=dup_renamed+"_MD")
+                                        sz_clp = cmds.createNode("clamp", name=dup_renamed+"_Clp")
+                                        cmds.connectAttr(self.guide_base+".shapeSize", sz_md+".input1X", force=True)
+                                        cmds.connectAttr(sz_md+".outputX", sz_clp+".inputR", force=True)
+                                        cmds.connectAttr(sz_clp+".outputR", new_sphere[1]+".radius", force=True)
+                                        cmds.setAttr(sz_md+".input2X", 0.1)
+                                        cmds.setAttr(sz_clp+".minR", 0.001)
+                                        cmds.setAttr(sz_clp+".maxR", 1000)
+                                        cmds.rename(new_sphere[1], dup_renamed+"_MNS")
+                            elif cmds.objectType(dup) != 'nurbsCurve':
                                 cmds.delete(dup)
-                            else:
-                                if cmds.objectType(dup) == 'transform' or cmds.objectType(dup) == 'joint':
-                                    # rename duplicated node:
-                                    dupRenamed = cmds.rename(dup, self.guide_base[:self.guide_base.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
-                                    originalGuide = self.guide_base[:self.guide_base.find(":")+1]+dup[dup.rfind("|")+1:]
-                                    # unlock and unhide all attributes and connect original guide node transformations to the mirror guide node:
-                                    for attr in self.ar.data.transform_attrs:
-                                        cmds.setAttr(dupRenamed+"."+attr, lock=False, keyable=True)
-                                        cmds.connectAttr(originalGuide+'.'+attr, dupRenamed+'.'+attr, force=True)
-                                    
-                                    # rebuild the shape as a nurbsSphere:
-                                    if cmds.objectType(dupRenamed) == 'transform':
-                                        # make this previewMirrorGuide as not skinable from dpAR_UI:
-                                        self.ar.utils.addCustomAttr([dupRenamed], self.ar.skin.ignoreSkinningAttr)
-                                        childrenShapeList = cmds.listRelatives(dupRenamed, shapes=True, children=True)
-                                        if childrenShapeList:
-                                            cmds.delete(childrenShapeList)
-                                            newSphere = cmds.sphere(name=dupRenamed+"Sphere", radius=0.1, constructionHistory=True)
-                                            newSphereShape = cmds.listRelatives(newSphere, shapes=True, children=True)[0]
-                                            cmds.parent(newSphereShape, dupRenamed, shape=True, relative=True)
-                                            cmds.delete(newSphere[0]) #transform
-                                            szMD = cmds.createNode("multiplyDivide", name=dupRenamed+"_MD")
-                                            szClp = cmds.createNode("clamp", name=dupRenamed+"_Clp")
-                                            cmds.connectAttr(self.guide_base+".shapeSize", szMD+".input1X", force=True)
-                                            cmds.connectAttr(szMD+".outputX", szClp+".inputR", force=True)
-                                            cmds.connectAttr(szClp+".outputR", newSphere[1]+".radius", force=True)
-                                            cmds.setAttr(szMD+".input2X", 0.1)
-                                            cmds.setAttr(szClp+".minR", 0.001)
-                                            cmds.setAttr(szClp+".maxR", 1000)
-                                            cmds.rename(newSphere[1], dupRenamed+"_MNS")
-                                elif cmds.objectType(dup) != 'nurbsCurve':
-                                    cmds.delete(dup)
                 
                 # renaming the previewMirrorGuide:
-                self.previewMirrorGuide = cmds.rename(duplicated, self.guide_base.replace(":", "_")+'_Mirror')
-                cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
-                cmds.delete(cmds.listRelatives(self.previewMirrorGuide, shapes=True, type="nurbsCurve"))
-                self.ar.utils.unlockAttr([self.previewMirrorGuide])
+                preview_mirror_guide = cmds.rename(duplicated, self.guide_base.replace(":", "_")+'_Mirror')
+                cmds.deleteAttr(preview_mirror_guide+".guideBase")
+                cmds.delete(cmds.listRelatives(preview_mirror_guide, shapes=True, type="nurbsCurve"))
+                self.ar.utils.unlockAttr([preview_mirror_guide])
                 
                 # clean up old module attributes in order to avoid numbering issue:
-                if cmds.objExists(self.previewMirrorGuide+".customName"):
-                    customNameMirror = "_Mirror"
-                    currentCustomName = cmds.getAttr(self.previewMirrorGuide+".customName")
-                    if currentCustomName:
-                        customNameMirror = currentCustomName+"_Mirror"
-                    cmds.setAttr(self.previewMirrorGuide+".customName", customNameMirror, type="string")
+                if cmds.objExists(preview_mirror_guide+".customName"):
+                    custom_name_mirror = "_Mirror"
+                    current_custom_name = cmds.getAttr(preview_mirror_guide+".customName")
+                    if current_custom_name:
+                        custom_name_mirror = current_custom_name+"_Mirror"
+                    cmds.setAttr(preview_mirror_guide+".customName", custom_name_mirror, type="string")
                 
                 # create a decomposeMatrix node in order to get the worldSpace transformations (like using xform):
-                decomposeMatrix = cmds.createNode('decomposeMatrix', name=self.previewMirrorGuide+"_dm")
-                cmds.connectAttr(self.guide_base+'.worldMatrix', decomposeMatrix+'.inputMatrix', force=True)
+                preview_mirror_dm = cmds.createNode('decomposeMatrix', name=preview_mirror_guide+"_dm")
+                cmds.connectAttr(self.guide_base+'.worldMatrix', preview_mirror_dm+'.inputMatrix', force=True)
                 
                 # connect original guide base decomposeMatrix node output transformations to the mirror guide base node:
-                axisList = self.ar.data.axis
-                for axis in axisList:
-                    cmds.connectAttr(decomposeMatrix+'.outputTranslate'+axis, self.previewMirrorGuide+'.translate'+axis, force=True)
-                    cmds.connectAttr(decomposeMatrix+'.outputRotate'+axis, self.previewMirrorGuide+'.rotate'+axis, force=True)
-                    cmds.connectAttr(decomposeMatrix+'.outputScale'+axis, self.previewMirrorGuide+'.scale'+axis, force=True)
+                for axis in self.ar.data.axes:
+                    cmds.connectAttr(preview_mirror_dm+'.outputTranslate'+axis, preview_mirror_guide+'.translate'+axis, force=True)
+                    cmds.connectAttr(preview_mirror_dm+'.outputRotate'+axis, preview_mirror_guide+'.rotate'+axis, force=True)
+                    cmds.connectAttr(preview_mirror_dm+'.outputScale'+axis, preview_mirror_guide+'.scale'+axis, force=True)
                 
                 # analysis if there were children guides for this guide in order to re-parent them:
-                if guideChildrenList:
-                    for p, guideChild in enumerate(guideChildrenList):
+                if guide_children:
+                    for p, guide_child in enumerate(guide_children):
                         # re-parent this child guide to the correct guideFatherName:
-                        cmds.parent(guideChild, guideFatherNameList[p])
+                        cmds.parent(guide_child, guide_father_names[p])
                 
                 # create previewMirror group:
-                self.previewMirrorGrp = cmds.group(name=self.previewMirrorGrpName, empty=True)
-                cmds.parent(self.previewMirrorGuide, self.previewMirrorGrpName, absolute=True)
+                preview_mirror_grp = cmds.createNode('transform', name=preview_mirror_grp)
+                cmds.parent(preview_mirror_guide, preview_mirror_grp, absolute=True)
                 # parent the previewMirror group to the guideMirror group:
-                cmds.parent(self.previewMirrorGrp, self.ar.data.guide_mirror_grp, relative=True)
+                cmds.parent(preview_mirror_grp, self.ar.data.guide_mirror_grp, relative=True)
                 
                 # add attributes to be read as mirror guide when re-creating this module:
-                cmds.addAttr(self.previewMirrorGrp, longName='guideBaseMirror', attributeType='bool')
-                cmds.setAttr(self.previewMirrorGrp+".guideBaseMirror", 1)
+                cmds.addAttr(preview_mirror_grp, longName='guideBaseMirror', attributeType='bool')
+                cmds.setAttr(preview_mirror_grp+".guideBaseMirror", 1)
             
             # reset all scale values to 1:
-            cmds.setAttr(self.previewMirrorGrp+'.scaleX', 1)
-            cmds.setAttr(self.previewMirrorGrp+'.scaleY', 1)
-            cmds.setAttr(self.previewMirrorGrp+'.scaleZ', 1)
+            cmds.setAttr(preview_mirror_grp+'.scaleX', 1)
+            cmds.setAttr(preview_mirror_grp+'.scaleY', 1)
+            cmds.setAttr(preview_mirror_grp+'.scaleZ', 1)
             # set a negative value to the scale mirror axis:
             for axis in self.mirror_axis:
-                cmds.setAttr(self.previewMirrorGrp+'.scale'+axis, -1)
-        cmds.select(selList)
+                cmds.setAttr(preview_mirror_grp+'.scale'+axis, -1)
+        cmds.select(selection)
 
-    def changeMirror(self, item, *args):
+
+    def change_mirror(self, item, *args):
         """ This function receives the mirror menu item and set it as a string in the guide base (main).
             Also, call the builder of the preview mirror (for the viewport).
         """
         if self.check_guide_integrity():
             # check if the father guide is in X=0 in order to permit mirror:
-            stopMirrorOperation = self.check_father_mirror()
-            if not stopMirrorOperation:
+            if not self.check_father_mirror(): #stopMirrorOperation
                 # loading Maya matrix node (for mirror porpuses)
-                loadedMatrixPlugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-                if loadedMatrixPlugin:
+                loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                if loaded_matrix_plugin:
                     self.mirror_axis = item
                     cmds.setAttr(self.guide_base+".mirrorAxis", self.mirror_axis, type='string')
                     self.create_mirror_preview()
     
     
-    def changeMirrorName(self, item, *args):
+    def change_mirror_name(self, item, *args):
         """ This function receives the mirror menu name item and set it as a string in the guide base (main).
         """
         if self.check_guide_integrity():
@@ -972,7 +921,7 @@ class BaseStandard(base.BaseLibrary):
             cmds.setAttr(self.guide_base+".deformedBy", int(item[0]))
 
 
-    def changeArticulation(self, value, *args):
+    def change_articulation(self, value, *args):
         """ Set the attribute value for articulation.
         """
         cmds.setAttr(self.guide_base+".articulation", value)
@@ -986,7 +935,21 @@ class BaseStandard(base.BaseLibrary):
         cmds.setAttr(self.radius_ctrl+".translateX", value)
 
 
+    # Getters:
+    #
+    def get_guide_attr(self, attr):
+        if attr in cmds.listAttr(self.guide_base):
+            return cmds.getAttr(self.guide_base+"."+attr)
+    
+    
+    # Setters:
+    #
     def set_guide_attr(self, attr, value, *args):
         """ Set guide_base simple attribute value.
         """
         cmds.setAttr(f"{self.guide_base}.{attr}", value)
+
+
+    def set_articulation(self, value):
+        self.articulation = value
+        cmds.setAttr(self.guide_base+".articulation", value)

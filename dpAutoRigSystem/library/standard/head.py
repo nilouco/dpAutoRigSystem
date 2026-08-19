@@ -29,11 +29,6 @@ class Head(standard.BaseStandard):
         self.correctiveCtrlGrpList = []
         self.aInnerCtrls = []
         self.facialFactor = 0.15
-        self.bsType = "bsType"
-
-    
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
     
     
     def create_guide(self, *args):
@@ -215,7 +210,7 @@ class Head(standard.BaseStandard):
         cmds.setAttr(self.deformerCube+".translateZ", 0.5)
         cmds.parent(self.deformerCube, self.cvDeformerCenterLoc)
         self.defRadiusMD = cmds.createNode("multiplyDivide", name=self.name_guide+"_DeformerCube_MD")
-        for axis, attr in zip(self.ar.data.axis, ["width", "height", "depth"]):
+        for axis, attr in zip(self.ar.data.axes, ["width", "height", "depth"]):
             cmds.setAttr(self.defRadiusMD+".input2"+axis, 2)
             cmds.connectAttr(self.cvDeformerRadiusLoc+".translate"+axis, self.defRadiusMD+".input1"+axis)
             cmds.connectAttr(self.defRadiusMD+".output"+axis, defPolyCube+"."+attr)
@@ -569,7 +564,7 @@ class Head(standard.BaseStandard):
             for s, side in enumerate(self.sides):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
                 # redeclaring variables:
-#                self.redeclareVariables(self.number_name, side, "_Guide")
+                self.declare_guide_elements(self.number_name, side, "_Guide")
                 
                 # generating naming:
                 headJntName = side+self.number_name+"_01_"+self.ar.data.lang['c024_head']+"_Jnt"
@@ -600,11 +595,8 @@ class Head(standard.BaseStandard):
                 lowerLipCtrlName = side+self.number_name+"_"+self.ar.data.lang['c045_lower']+self.ar.data.lang['c039_lip']+"_Ctrl"
                 self.calibrateName = self.ar.data.lang["c111_calibrate"].lower()
                 
-                # connect facial controllers to blendShape node or tweakers:
-                self.connectUserType = self.bsType
-                userType = cmds.getAttr(self.guide_base+".connectUserType")
-                if userType == 1:
-                    self.connectUserType = self.jointsType
+                # connect facial controllers to blendShape node or joints based tweakers:
+                self.facial_connect_type = self.ar.data.facial_connect_types[cmds.getAttr(self.guide_base+".connectUserType")]
 
                 # get the number of joints to be created for the neck:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
@@ -710,7 +702,7 @@ class Head(standard.BaseStandard):
                         self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c060_brow"], "id_046_FacialBrow", self.ar.data.facial_brow_targets, (0, 0, 0), False, False, True, True, True, True, False, "blue", True, False)
                         facialCtrlList.extend([self.lBrowCtrl, self.rBrowCtrl])
                     if cmds.getAttr(self.guide_base+".facialEyelid"):
-                        if self.connectUserType == self.bsType:
+                        if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
                             self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.ar.data.facial_eyelid_targets, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
                             self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.ar.data.facial_eyelid_targets, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
                             facialCtrlList.extend([self.lEyelidCtrl, self.rEyelidCtrl])
@@ -1111,7 +1103,7 @@ class Head(standard.BaseStandard):
                         cmds.setAttr(rBrowCtrlGrp+".translateX", (-1*cmds.getAttr(rBrowCtrlGrp+".translateX")))
                         cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
                     if cmds.getAttr(self.guide_base+".facialEyelid"):
-                        if self.connectUserType == self.bsType:
+                        if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
                             cmds.parent(lEyelidCtrlGrp, rEyelidCtrlGrp, self.upperHeadCtrl)
                             cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, lEyelidCtrlGrp, maintainOffset=False))
                             cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, rEyelidCtrlGrp, maintainOffset=False))
@@ -1198,7 +1190,7 @@ class Head(standard.BaseStandard):
                 
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.guide_base+".facial"):
-                if self.connectUserType == self.bsType:
+                if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
                     self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).dpConnectToBlendShape()
                 else:
                     self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).dpConnectToJoints()
@@ -1388,7 +1380,7 @@ for net in cmds.ls(type="network"):
     def dpLockLimitAttr(self, fCtrl, ctrlName, lockList, limits, limitMinY, *args):
         """ Lock or limit attributes for XYZ.
         """
-        for i, axis in enumerate(self.ar.data.axis):
+        for i, axis in enumerate(self.ar.data.axes):
             if lockList[i]:
                 cmds.setAttr(fCtrl+".translate"+axis, lock=True, keyable=False)
             else:
@@ -1426,15 +1418,15 @@ for net in cmds.ls(type="network"):
             cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
     
 
-    def dpChangeType(self, *args):
+    def change_facial_connect_type(self, *args):
         """ Get and return the user selected type of controls.
             Change interface to be more clear.
         """
         typeSelectedRadioButton = cmds.radioCollection('edit_guide_facial_type_rc', query=True, select=True)
-        self.connectUserType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
-        if self.connectUserType == self.bsType:
+        self.facial_connect_type = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
+        if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
             cmds.setAttr(self.guide_base+".connectUserType", 0)
-        elif self.connectUserType == self.jointsType:
+        elif self.facial_connect_type == self.ar.data.facial_connect_types[1]: #joints
             cmds.setAttr(self.guide_base+".connectUserType", 1)
     
     

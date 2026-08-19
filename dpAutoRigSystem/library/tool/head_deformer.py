@@ -87,7 +87,6 @@ class HeadDeformer(base.BaseLibrary):
         middleCtrlName = clusterName+self.ar.data.lang["m033_middle"]
         topCtrlName = clusterName+self.ar.data.lang["c099_top"]
         calibrateName = self.ar.data.lang["c111_calibrate"].lower()
-        axisList = self.ar.data.axis
         position = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
@@ -127,7 +126,7 @@ class HeadDeformer(base.BaseLibrary):
             initialSizeY = bBoxMaxY-bBoxMinY
             
             # force rotate zero to lattice in order to avoid selected non froozen transformations
-            for axis in axisList:
+            for axis in self.ar.data.axes:
                 cmds.setAttr(latticeDefList[1]+".rotate"+axis, 0)
                 cmds.setAttr(latticeDefList[2]+".rotate"+axis, 0)
             cmds.setAttr(latticeDefList[1]+".scaleY", initialSizeY)
@@ -167,7 +166,7 @@ class HeadDeformer(base.BaseLibrary):
             # fix deform transforms scale to 1
             defHandleList = [twistDefList[1], squashDefList[1], sideBendDefList[1], frontBendDefList[1]]
             for defHandle in defHandleList:
-                for axis in axisList:
+                for axis in self.ar.data.axes:
                     cmds.setAttr(defHandle+".scale"+axis, 1)
             
             # arrow control curve
@@ -178,7 +177,7 @@ class HeadDeformer(base.BaseLibrary):
             mainCtrlShape = cmds.listRelatives(mainCtrl, shapes=True)[0]
             
             # add control intensity and calibrate attributes
-            for axis in axisList:
+            for axis in self.ar.data.axes:
                 cmds.addAttr(arrowCtrl, longName=intensityName+axis, attributeType='float', defaultValue=1)
                 cmds.setAttr(arrowCtrl+"."+intensityName+axis, edit=True, keyable=False, channelBox=True)
             cmds.addAttr(arrowCtrl, longName=expandName, attributeType='float', min=0, defaultValue=1, max=10, keyable=True)
@@ -213,7 +212,7 @@ class HeadDeformer(base.BaseLibrary):
                 cmds.setAttr(remapV+".value["+str(v)+"].value_Interp", 3) #spline
             
             # connections
-            for axis in axisList:
+            for axis in self.ar.data.axes:
                 cmds.connectAttr(arrowCtrl+"."+intensityName+axis, calibrateMD+".input1"+axis, force=True)
                 cmds.connectAttr(arrowCtrl+"."+calibrateName+axis, calibrateReduceMD+".input1"+axis, force=True)
                 cmds.connectAttr(arrowCtrl+"."+calibrateName+"Reduce", calibrateReduceMD+".input2"+axis, force=True)
@@ -230,7 +229,7 @@ class HeadDeformer(base.BaseLibrary):
             cmds.connectAttr(remapV+".outValue", squashDefList[0]+".lowBound", force=True)
             cmds.connectAttr(arrowCtrl+"."+expandName, squashDefList[0]+".expand", force=True)
             # fix side values
-            for axis in axisList:
+            for axis in self.ar.data.axes:
                 unitConvNode = cmds.listConnections(intensityMD+".output"+axis, destination=True)[0]
                 if unitConvNode:
                     if cmds.objectType(unitConvNode) == "unitConversion":
@@ -250,7 +249,7 @@ class HeadDeformer(base.BaseLibrary):
             centerSymmetryCtrl = self.ar.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90), parentTag=arrowCtrl)
             topSymmetryCtrl = self.ar.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0), parentTag=arrowCtrl)
             symmetryCtrlZeroList = self.ar.utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
-            for axis in axisList:
+            for axis in self.ar.data.axes:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
                 cmds.connectAttr(centerSymmetryCtrl+".rotate"+axis, centerClusterList[1]+".rotate"+axis, force=True)
                 cmds.connectAttr(centerSymmetryCtrl+".scale"+axis, centerClusterList[1]+".scale"+axis, force=True)
@@ -275,7 +274,7 @@ class HeadDeformer(base.BaseLibrary):
                 cmds.matchTransform(ctrlSubZeroList, subClusterList[1], pos=True)
                 # connect atributes
                 cmds.connectAttr(arrowCtrl+"."+self.ar.data.lang["c021_showControls"], ctrlSubZeroList+".visibility")
-                for axis in axisList:
+                for axis in self.ar.data.axes:
                     cmds.connectAttr(subCtrl+".translate"+axis, subClusterList[1]+".translate"+axis, force=True)
                     cmds.connectAttr(subCtrl+".rotate"+axis, subClusterList[1]+".rotate"+axis, force=True)
                     cmds.connectAttr(subCtrl+".scale"+axis, subClusterList[1]+".scale"+axis, force=True)

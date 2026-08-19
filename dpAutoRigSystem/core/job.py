@@ -128,7 +128,7 @@ class Job(object):
             duplicated_temp = cmds.duplicate(item, name=item+"_TEMP")[0]
             cmds.parent(duplicated_temp, item+"_Zero_1_Grp")
             for attr in ["T", "R", "S"]:
-                for axis in self.ar.data.axis:
+                for axis in self.ar.data.axes:
                     new_value = cmds.getAttr(duplicated_temp+"."+attr.lower()+axis.lower())
                     if attr == "S":
                         cmds.setAttr(item+"."+attr.lower()+axis.lower(), 1) #scale

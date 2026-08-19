@@ -15,10 +15,6 @@ class Suspension(standard.BaseStandard):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
-    
-    
     def get_guide_attr(self, moduleAttr, *args):
         return cmds.getAttr(self.guide_base + "." + moduleAttr)
         

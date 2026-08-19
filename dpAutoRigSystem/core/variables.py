@@ -124,7 +124,7 @@ class Data:
     transform_attrs: list = field(default_factory=lambda: ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"])
     rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
     drivenkey_types: list = field(default_factory=lambda: ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"])
-    axis: list = field(default_factory=lambda: ['X', 'Y', 'Z'])
+    axes: list = field(default_factory=lambda: ['X', 'Y', 'Z'])
     degrees: list = field(default_factory=lambda: ['preset_0', 'linear_1', 'cubic_3'])
     booleans: list = field(default_factory=lambda: [0, 1])
     facial_brow_targets: list = field(default_factory=lambda: ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"])
@@ -135,6 +135,7 @@ class Data:
     facial_grimace_targets: list = field(default_factory=lambda: ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"])
     facial_face_targets: list = field(default_factory=lambda: ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"])
     mirror_menus: list = field(default_factory=lambda: ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ'])
+    facial_connect_types: list = field(default_factory=lambda: ['bsType', 'jointsType'])
     
     to_ids: list = field(default_factory=list)
     

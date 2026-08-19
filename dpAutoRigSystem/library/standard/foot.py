@@ -26,10 +26,6 @@ class Foot(standard.BaseStandard):
         self.aScalableGrp = []
 
 
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
-
-
     def create_guide(self, *args):
         self.create_guide_base()
         # Custom GUIDE:

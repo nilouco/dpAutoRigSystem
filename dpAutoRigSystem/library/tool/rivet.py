@@ -492,7 +492,6 @@ class Rivet(base.BaseLibrary):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
             Return inverted groups.
         """
-        axisList = self.ar.data.axis
         invTGrp = None
         invRGrp = None
         if cmds.objExists(nodeName):
@@ -505,7 +504,7 @@ class Rivet(base.BaseLibrary):
                 cmds.setAttr(tMD+'.input2X', -1)
                 cmds.setAttr(tMD+'.input2Y', -1)
                 cmds.setAttr(tMD+'.input2Z', -1)
-                for axis in axisList:
+                for axis in self.ar.data.axes:
                     cmds.connectAttr(nodeName+'.translate'+axis, tMD+'.input1'+axis, force=True)
                     cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
             if invR:
@@ -516,7 +515,7 @@ class Rivet(base.BaseLibrary):
                 cmds.setAttr(rMD+'.input2X', -1)
                 cmds.setAttr(rMD+'.input2Y', -1)
                 cmds.setAttr(rMD+'.input2Z', -1)
-                for axis in axisList:
+                for axis in self.ar.data.axes:
                     cmds.connectAttr(nodeName+'.rotate'+axis, rMD+'.input1'+axis, force=True)
                     cmds.connectAttr(rMD+'.output'+axis, invRGrp+'.rotate'+axis, force=True)
         return invTGrp, invRGrp

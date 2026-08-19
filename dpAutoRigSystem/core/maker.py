@@ -47,7 +47,7 @@ class Maker(object):
         cmds.setAttr(guide+".scaleZ", s[2])
         cmds.setAttr(guide+".shapeSize", size)
         if mirror:
-            mod.changeMirror(mirror)
+            mod.change_mirror(mirror)
             cmds.setAttr(guide+".flip", flip)
         if deformed:
             cmds.setAttr(guide+".deformedBy", deformed)
@@ -149,10 +149,10 @@ class Maker(object):
         if mirror_axis_attr in current_attrs:
             mirror_axis_value = cmds.getAttr(selected_item+'.'+mirror_axis_attr)
             if mirror_axis_value != "off":
-                new_guide_instance.changeMirror(mirror_axis_value)
+                new_guide_instance.change_mirror(mirror_axis_value)
         if display_annotation_attr in current_attrs:
             to_set_attrs.remove(display_annotation_attr)
-            new_guide_instance.displayAnnotation(cmds.getAttr(selected_item+'.'+display_annotation_attr))
+            new_guide_instance.display_annotation(cmds.getAttr(selected_item+'.'+display_annotation_attr))
         if net_attr in current_attrs:
             to_set_attrs.remove(net_attr)
         
@@ -382,7 +382,7 @@ class Maker(object):
 
 
     def set_root_pivot_attr(self):
-        for axis in self.ar.data.axis:
+        for axis in self.ar.data.axes:
             cmds.connectAttr(self.root_pivot_ctrl+".translate"+axis, self.root_ctrl+".rotatePivot"+axis, force=True)
             cmds.connectAttr(self.root_pivot_ctrl+".translate"+axis, self.root_ctrl+".scalePivot"+axis, force=True)
 
@@ -932,7 +932,7 @@ class Composer(object):
                         cmds.connectAttr(extract_angle_dm+".outputQuatY", extract_angle_qte+".inputQuatY", force=True)
                         cmds.connectAttr(extract_angle_dm+".outputQuatZ", extract_angle_qte+".inputQuatZ", force=True)
                         cmds.connectAttr(extract_angle_dm+".outputQuatW", extract_angle_qte+".inputQuatW", force=True)
-                        for axis in self.ar.data.axis:
+                        for axis in self.ar.data.axes:
                             cmds.setAttr(extract_angle_md+".input2"+axis, 0.5)
                             cmds.connectAttr(extract_angle_qte+".outputRotate"+axis, ankle_articulations[0]+".rotate"+axis, force=True)
                         self.to_ids.extend([extract_angle_mm, extract_angle_dm, extract_angle_qte, orig_loc, action_loc])

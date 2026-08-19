@@ -19,10 +19,6 @@ class Single(standard.BaseStandard):
         self.aCtrlGrpList = []
     
     
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
-    
-    
     def getHasIndirectSkin(self):
         return cmds.getAttr(self.guide_base + ".indirectSkin")
     
@@ -151,7 +147,7 @@ class Single(standard.BaseStandard):
                     if s == 1:
                         if cmds.getAttr(self.guide_base+".flip") == 1:
                             invMD = cmds.createNode("multiplyDivide", name=jxtName.replace("_Jxt", "_Inv_MD"))
-                            for sAxis in self.ar.data.axis:
+                            for sAxis in self.ar.data.axes:
                                 cmds.setAttr(invMD+".input2"+sAxis, -1)
                                 cmds.connectAttr(self.singleCtrl+'.translate'+sAxis, invMD+'.input1'+sAxis, force=True)
                                 cmds.connectAttr(invMD+'.output'+sAxis, self.jnt+'.translate'+sAxis, force=True)

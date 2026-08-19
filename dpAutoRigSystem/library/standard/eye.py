@@ -23,10 +23,6 @@ class Eye(standard.BaseStandard):
         self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
     
     
-#    def create_module_layout(self):
-#        standard.BaseStandard.create_module_layout(self)
-    
-    
     def create_guide(self, *args):
         self.create_guide_base()
         # Custom GUIDE:

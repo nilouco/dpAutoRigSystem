@@ -441,7 +441,7 @@ class Zipper(base.BaseLibrary):
         """ Change the controller position to be more rigger and animator friendly.
         """
         basePos = cmds.xform(curveName+".cv["+str(self.curveLength-1)+"]", query=True, worldSpace=True, translation=True)
-        for a, axis in enumerate(self.ar.data.axis):
+        for a, axis in enumerate(self.ar.data.axes):
             factor = 1
             if axis == self.curveDirection:
                 factor = 2.5

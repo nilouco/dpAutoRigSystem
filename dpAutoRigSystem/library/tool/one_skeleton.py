@@ -174,14 +174,14 @@ class OneSkeleton(base.BaseLibrary):
             parentList = cmds.listRelatives(sourceNode, parent=True)
             if parentList:
                 if not "_Jar" in parentList[0]:
-                    for axis in self.ar.data.axis:
+                    for axis in self.ar.data.axes:
                         if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
-                            for a in self.ar.data.axis:
+                            for a in self.ar.data.axes:
                                 if not a == axis:
                                     cmds.setAttr(scc+".offset"+a, -1)
             # corrective joints
             if "_Jcr" in newJoint:
-                for axis in self.ar.data.axis:
+                for axis in self.ar.data.axes:
                     if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
                         cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
                     cmds.setAttr(scc+".offset"+axis, 1)

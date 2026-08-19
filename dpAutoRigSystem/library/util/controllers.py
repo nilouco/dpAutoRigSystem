@@ -604,7 +604,7 @@ class Controllers(object):
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
             cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="OPTIONS", constructionHistory=False)[0]
-            for attr in self.ar.data.axis:
+            for attr in self.ar.data.axes:
                 cmds.setAttr(cvText+".scale"+attr, 0.3*r)
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
             if txtShapeList:
@@ -1387,7 +1387,7 @@ class Controllers(object):
         """
         to_ids = []
         calibrateAttrList = ["T", "R", "S"]
-        calibrateAxisList = self.ar.data.axis
+        calibrateAxisList = self.ar.data.axes
         toCalibrationList = []
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
         jcrGrp0 = self.ar.utils.zeroOut([jcrCtrl])[0]
