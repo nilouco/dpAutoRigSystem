@@ -22,14 +22,9 @@ class Wheel(standard.BaseStandard):
     
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="geo", dataType='string')
-        cmds.addAttr(self.guide_base, longName="startFrame", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="showControls", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="steering", attributeType='bool')
-        cmds.setAttr(self.guide_base+".showControls", 1)
-        cmds.setAttr(self.guide_base+".steering", 0)
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
+        
         
         self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
         self.jGuideCenter = cmds.joint(name=self.name_guide+"_JGuideCenter", radius=0.001)
@@ -79,7 +74,27 @@ class Wheel(standard.BaseStandard):
         cmds.parentConstraint(self.cvOutsideLoc, self.jGuideOutside, maintainOffset=False, name=self.cvOutsideLoc+"_PaC")
         # include nodes into net
         self.add_node_to_guide_net([self.cvCenterLoc, self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc], ["CenterLoc", "FrontLoc", "InsideLoc", "OutsideLoc"])
-    
+
+
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="geo", dataType='string')
+        cmds.addAttr(self.guide_base, longName="startFrame", attributeType='long', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="showControls", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="steering", attributeType='bool')
+        
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
     
     def set_start_frame(self, value, *args):
         """ Update main startFrame attribute from UI.

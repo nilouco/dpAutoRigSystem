@@ -90,22 +90,9 @@ class Limb(standard.BaseStandard):
     # @utils.profiler
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="type", attributeType='enum', enumName=self.ar.data.lang['m028_arm']+':'+self.ar.data.lang['m030_leg'])
-        cmds.addAttr(self.guide_base, longName="hasBend", attributeType='bool')
-        cmds.setAttr(self.guide_base+".hasBend", 1)
-        cmds.addAttr(self.guide_base, longName="numBendJoints", attributeType='long')
-        cmds.setAttr(self.guide_base+".numBendJoints", 5)
-        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+':'+self.ar.data.lang['m037_quadruped'])
-        cmds.addAttr(self.guide_base, longName="alignWorld", attributeType='bool')
-        cmds.setAttr(self.guide_base+".alignWorld", 1)
-        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.guide_base+".articulation", 1)
-        cmds.addAttr(self.guide_base, longName="additional", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="softIk", attributeType='bool')
-        cmds.setAttr(self.guide_base+".softIk", 1)
-        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
+        
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Before", r=0.3, d=1, guide=True)
@@ -173,9 +160,6 @@ class Limb(standard.BaseStandard):
         cmds.setAttr(self.cvBeforeLoc+".translateZ", -2)
         cmds.setAttr(self.cvExtremLoc+".translateZ", 10)
         cmds.setAttr(self.cornerGrp+".translateY", -0.75)
-        cmds.setAttr(self.guide_base+".translateX", 4)
-        cmds.setAttr(self.guide_base+".rotateX", 90)
-        cmds.setAttr(self.guide_base+".rotateZ", 90)
 
         # editing cornerUpVector:
         self.cvUpVectorGrp = cmds.group(self.cvUpVectorLoc, name=self.cvUpVectorLoc+"_Grp")
@@ -214,7 +198,40 @@ class Limb(standard.BaseStandard):
         # autoAim main function:
         self.createAutoAim()
 
+        cmds.setAttr(self.guide_base+".translateX", 4)
+        cmds.setAttr(self.guide_base+".rotateX", 90)
+        cmds.setAttr(self.guide_base+".rotateZ", 90)
 
+
+
+
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="type", attributeType='enum', enumName=self.ar.data.lang['m028_arm']+':'+self.ar.data.lang['m030_leg'])
+        cmds.addAttr(self.guide_base, longName="hasBend", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="numBendJoints", defaultValue=5, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+':'+self.ar.data.lang['m037_quadruped'])
+        cmds.addAttr(self.guide_base, longName="alignWorld", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="additional", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="softIk", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
+
+
+        
     def createAutoAim(self, *args):
         """ AimConstraint setup in order to auto orient mainGuide with CornerGuide
         """ 

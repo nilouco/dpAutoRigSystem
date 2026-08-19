@@ -18,15 +18,10 @@ class FkLine(standard.BaseStandard):
     
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.guide_base+".nJoints", 1)
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
-        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
-        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
+        
+        
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
@@ -47,6 +42,29 @@ class FkLine(standard.BaseStandard):
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
         # include nodes into net
         self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
+
+
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="nJoints", defaultValue=1, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="reorient", attributeType='bool')
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
 
 
     def changeJointNumber(self, enteredNJoints, *args):

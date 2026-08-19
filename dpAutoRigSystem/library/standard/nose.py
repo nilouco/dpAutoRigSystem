@@ -19,14 +19,9 @@ class Nose(standard.BaseStandard):
     
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.guide_base+".nJoints", 1)
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="nostril", attributeType='bool')
-        cmds.setAttr(self.guide_base+".nostril", 1)
-        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
+        
         # create cvJointLoc and cvLocators:
         self.cvTopLoc      = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_cvTopLoc1", r=0.3, d=1, guide=True)
         self.cvMiddleLoc   = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_cvMiddleLoc", r=0.2, d=1, guide=True)
@@ -125,7 +120,28 @@ class Nose(standard.BaseStandard):
         cmds.setAttr(self.nostrilRMD+".input2Z", -1)
         # include nodes into net
         self.add_node_to_guide_net([self.cvTopLoc, self.cvMiddleLoc, self.cvTipLoc, self.cvLSideLoc, self.cvRSideLoc, self.cvLNostrilLoc, self.cvBottomLoc, self.cvEndJoint], ["cvTopLoc1", "cvMiddleLoc", "cvTipLoc", "cvLSideLoc", "cvRSideLoc", "cvLNostrilLoc", "cvBottomLoc", "JointEnd"])
-        
+
+
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="nJoints", defaultValue=1, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="nostril", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
+
         
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.

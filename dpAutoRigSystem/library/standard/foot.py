@@ -28,7 +28,10 @@ class Foot(standard.BaseStandard):
 
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
+        self.create_guide_elements()
+        
+
+
         # create cvJointLoc and cvLocators:
         self.cvFootLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Foot", r=0.3, d=1, guide=True)
         self.cvRFALoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfA", r=0.3, d=1, guide=True)
@@ -102,15 +105,28 @@ class Foot(standard.BaseStandard):
         cmds.setAttr(self.cvRFDLoc+".translateX", -3.5)
         cmds.setAttr(self.cvRFDLoc+".rotateX", 90)
         cmds.setAttr(self.cvRFDLoc+".rotateZ", -90)
-        cmds.setAttr(self.guide_base+".rotateX", -90)
-        cmds.setAttr(self.guide_base+".rotateY", 90)
+
+
         # include nodes into net
         self.add_node_to_guide_net([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.cvEndJoint], ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
+        cmds.setAttr(self.guide_base+".rotateX", -90)
+        cmds.setAttr(self.guide_base+".rotateY", 90)
 
         # bottom setup
         cvRFEZeroOut = self.ar.utils.zeroOut([self.cvRFELoc], True)
         cvRFEOffsetGrp = cmds.listRelatives(cvRFEZeroOut, children=True)[0]
         cmds.parentConstraint(self.cvRFFLoc, cvRFEOffsetGrp, maintainOffset=True, skipTranslate="y", name=cvRFEOffsetGrp+"_PaC")
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
         
 
     def rig_me(self, *args):

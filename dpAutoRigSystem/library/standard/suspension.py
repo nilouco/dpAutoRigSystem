@@ -14,16 +14,13 @@ class Suspension(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
-    
-    def get_guide_attr(self, moduleAttr, *args):
-        return cmds.getAttr(self.guide_base + "." + moduleAttr)
-        
+       
     
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="fatherB", dataType='string')
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
+        
         
         self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
         self.jAGuide = cmds.joint(name=self.name_guide+"_jAGuide", radius=0.001)
@@ -47,7 +44,27 @@ class Suspension(standard.BaseStandard):
         cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScC")
         # include nodes into net
         self.add_node_to_guide_net([self.cvALoc, self.cvBLoc], ["JointLocA", "JointLocB"])
-    
+
+
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="fatherB", dataType='string')
+
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
+
+        
     
     def loadFatherB(self, *args):
         """ Loads the selected node to fatherBTextField in selectedModuleLayout.

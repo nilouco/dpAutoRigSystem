@@ -33,22 +33,8 @@ class Head(standard.BaseStandard):
     
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.guide_base+".nJoints", 1)
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="deformer", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="facial", attributeType='bool')
-        for attr in self.facialAttrList:
-            cmds.addAttr(self.guide_base, longName=attr, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="connectUserType", attributeType='long', defaultValue=0) #bs
-        cmds.addAttr(self.guide_base, longName=JAW, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName=CHIN, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName=LIPS, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
         
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
@@ -219,7 +205,39 @@ class Head(standard.BaseStandard):
         # include nodes into net
         self.add_node_to_guide_net([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
                                 ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "DeformerCenter", "DeformerRadius", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
+
     
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="nJoints", defaultValue=1, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="deformer", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="facial", attributeType='bool')
+        for attr in self.facialAttrList:
+            cmds.addAttr(self.guide_base, longName=attr, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="connectUserType", attributeType='long', defaultValue=0) #bs
+        cmds.addAttr(self.guide_base, longName=JAW, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=CHIN, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=LIPS, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        # joints
+        # setup
+        # parenting
+        # edit
+        print("WIP....", self.name)
+        
+
 
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.

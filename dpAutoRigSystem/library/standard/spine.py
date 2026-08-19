@@ -34,25 +34,43 @@ class Spine(standard.BaseStandard):
 
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.5, d=1, guide=True)
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvJointLoc)
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        cmds.parent(self.cvJointLoc, self.guide_base)
-        # Edit GUIDE:
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
+        self.changeJointNumber(3)
+        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], 
+                                   ["JointLoc1", "JointEnd"])
         cmds.setAttr(self.guide_base+".rx", -90)
         cmds.setAttr(self.guide_base+".ry", -90)
         cmds.setAttr(self.radius_ctrl+".tx", 4)
-        self.changeJointNumber(3)
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
 
 
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.5, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        # joints
+        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        # setup
+        cmds.setAttr(self.jGuide1+".template", 1)
+        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+        # parenting
+        cmds.parent(self.jGuide1, self.cvJointLoc, self.guide_base)
+        cmds.parent(self.cvEndJoint, self.cvJointLoc)
+        # edit
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+
+        
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
@@ -81,12 +99,16 @@ class Spine(standard.BaseStandard):
                     for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                         # create another N cvLocator:
                         self.cvLocator = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                        self.jGuide = cmds.joint(name=self.name_guide+"_JGuide"+str(n), radius=0.001)
                         # set its nJoint value as n:
+                        cmds.setAttr(self.jGuide+".template", 1)
                         cmds.setAttr(self.cvLocator+".nJoint", n)
                         # parent its group to the first cvJointLocator:
                         self.cvLocGrp = cmds.group(self.cvLocator, name=self.cvLocator+"_Grp")
                         cmds.parent(self.cvLocGrp, self.name_guide+"_JointLoc"+str(n-1), relative=True)
+                        cmds.parent(self.jGuide, self.name_guide+"_JGuide"+str(n-1), relative=True)
                         cmds.setAttr(self.cvLocGrp+".translateZ", 2)
+                        cmds.parentConstraint(self.cvLocator, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
                         if n > 2:
                             cmds.parent(self.cvLocGrp, self.name_guide+"_JointLoc1", absolute=True)
                         self.add_node_to_guide_net([self.cvLocator], ["JointLoc"+str(n)])
@@ -103,6 +125,7 @@ class Spine(standard.BaseStandard):
                                 cmds.parent(childGuide, self.cvLocator)
                         cmds.delete(self.name_guide+"_JointLoc"+str(n+1)+"_Grp")
                         self.remove_attr_from_guide_net(["JointLoc"+str(n+1)])
+                    cmds.delete(self.name_guide+"_JGuide"+str(self.enteredNJoints+1))
                 # re-parent cvEndJoint:
                 cmds.parent(self.cvEndJoint, self.cvLocator)
                 cmds.setAttr(self.cvEndJoint+".tz", 1.3)

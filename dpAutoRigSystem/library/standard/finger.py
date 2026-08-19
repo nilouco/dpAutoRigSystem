@@ -18,55 +18,64 @@ class Finger(standard.BaseStandard):
 
     def create_guide(self, *args):
         self.create_guide_base()
-        # Custom GUIDE:
-        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
-        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.guide_base+".articulation", 1)
-        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
-
-        self.cvJointLoc1 = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.guide_base, relative=True)
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc2", r=0.25, d=1, guide=True)
-        cmds.parent(self.cvJointLoc, self.cvJointLoc1, relative=True)
-        cmds.setAttr(self.cvJointLoc+".translateZ", 1)
-        cmds.setAttr(self.cvJointLoc+".translateX", -0.01)
-        cmds.setAttr(self.cvJointLoc+".rotateY", -1)
-        self.jGuide = cmds.joint(name=self.name_guide+"_JGuide2", radius=0.001)
-        cmds.setAttr(self.jGuide+".template", 1)
-        cmds.parent(self.jGuide, self.jGuide1)
-        self.ar.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.2, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvJointLoc)
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-
-        cmds.parent(self.cvJointLoc1, self.guide_base)
-        cmds.parent(self.jGuideEnd, self.jGuide1)
-        self.ar.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointLoc2", "JointEnd"])
-
-        # change the number of phalanges to 3:
+        self.create_guide_custom_attr()
+        self.create_guide_elements()
         self.changeJointNumber(3)
-
-        # create a base cvLoc to start the finger joints:
-        self.cvBaseJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointLoc0", r=0.2, d=1, guide=True)
-        cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
-        cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
-        cmds.parent(self.cvBaseJoint, self.guide_base)
-        self.add_node_to_guide_net([self.cvBaseJoint], ["JointLoc0"])
-
-        # transform cvLocs in order to put as a good finger guide:
+        self.add_node_to_guide_net([self.cvBaseJoint, self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc0", "JointLoc1", "JointLoc2", "JointEnd"])
         cmds.setAttr(self.guide_base+".rotateX", 90)
         cmds.setAttr(self.guide_base+".rotateZ", 90)
 
+
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
+        cmds.addAttr(self.guide_base, longName="articulation", defaultValue=1, attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
+        self.cvBaseJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointLoc0", r=0.2, d=1, guide=True)
+        self.cvJointLoc1 = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc2", r=0.25, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.2, d=1, guide=True)
+        # joints
+        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        self.jGuide0 = cmds.joint(name=self.name_guide+"_JGuide0", radius=0.001)
+        self.jGuide = cmds.joint(name=self.name_guide+"_JGuide2", radius=0.001)
+        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        # setup
+        cmds.setAttr(self.jGuide0+".template", 1)
+        cmds.setAttr(self.jGuide1+".template", 1)
+        cmds.setAttr(self.jGuide+".template", 1)
+        cmds.setAttr(self.jGuideEnd+".template", 1)
+        cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
+        cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
+        cmds.setAttr(self.cvJointLoc+".translateZ", 1)
+        cmds.setAttr(self.cvJointLoc+".translateX", -0.01)
+        cmds.setAttr(self.cvJointLoc+".rotateY", -1)
+        cmds.setAttr(self.cvEndJoint+".translateZ", 1.3)
+        # parenting
+        cmds.parent(self.jGuide1, self.cvBaseJoint, self.cvJointLoc1, self.guide_base, relative=True)
+        cmds.parent(self.cvJointLoc, self.cvJointLoc1, relative=True)
+        cmds.parent(self.jGuide, self.jGuideEnd, self.jGuide1)
+        cmds.parent(self.cvEndJoint, self.cvJointLoc)
+        # edit
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        cmds.parentConstraint(self.cvBaseJoint, self.jGuide0, maintainOffset=False, name=self.jGuide0+"_PaC")
+        self.ar.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+
+
+
+
+
+        
 
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
