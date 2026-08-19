@@ -42,8 +42,8 @@ class Chain(standard.BaseStandard):
         cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="dynamic", attributeType='bool')
         cmds.addAttr(self.guide_base, longName="mainControls", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="nMain", minValue=1, attributeType='long')
-        cmds.setAttr(self.guide_base+".nMain", 1)
+        cmds.addAttr(self.guide_base, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
+#        cmds.setAttr(self.guide_base+".nMain", 1)
         cmds.addAttr(self.guide_base, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)

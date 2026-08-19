@@ -198,7 +198,7 @@ class Controllers(object):
                 cmds.setAttr(item+".overrideColorB", color[2])
                 if instance:
                     if self.ar.data.ui_state:
-                        cmds.button(instance.colorButton, edit=True, backgroundColor=[color[0], color[1], color[2]])
+                        cmds.button(f"{instance.number_name}_plus_color_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
                         if not instance.guide_base in cmds.ls(selection=True):
                             cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
@@ -206,7 +206,7 @@ class Controllers(object):
                 cmds.setAttr(item+".overrideColor", iColorIdx)
                 if instance:
                     if self.ar.data.ui_state:
-                        cmds.button(instance.colorButton, edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
+                        cmds.button(f"{instance.number_name}_plus_color_bt", edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
                         if not instance.guide_base in cmds.ls(selection=True):
                             cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[self.colors[iColorIdx][0], self.colors[iColorIdx][1], self.colors[iColorIdx][2]])
 

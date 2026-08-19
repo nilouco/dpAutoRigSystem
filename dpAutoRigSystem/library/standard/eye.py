@@ -127,7 +127,7 @@ class Eye(standard.BaseStandard):
         self.jUpperEyelid = self.name_guide+"_JUpperEyelid"
         self.jLowerEyelid = self.name_guide+"_JLowerEyelid"
         # getting value:
-        currentEyelidValue = cmds.checkBox(self.eyelidCB, query=True, value=True)
+        currentEyelidValue = cmds.checkBox('edit_guide_eyelid_cb', query=True, value=True)
         # setting values:
         cmds.setAttr(self.guide_base+".eyelid", currentEyelidValue)
         cmds.setAttr(self.cvUpperEyelidLoc+".visibility", currentEyelidValue)
@@ -135,7 +135,7 @@ class Eye(standard.BaseStandard):
         cmds.setAttr(self.jEyelid+".visibility", currentEyelidValue)
         cmds.setAttr(self.jUpperEyelid+".visibility", currentEyelidValue)
         cmds.setAttr(self.jLowerEyelid+".visibility", currentEyelidValue)
-        cmds.checkBox(self.lidPivotCB, edit=True, value=currentEyelidValue)
+        cmds.checkBox('edit_guide_eyelid_pivot_cb', edit=True, value=currentEyelidValue)
         self.changeLidPivot()
         
         
@@ -143,38 +143,37 @@ class Eye(standard.BaseStandard):
         """ Set the attribute value for specular.
         """
         self.cvSpecularLoc = self.name_guide+"_SpecularLoc"
-        cmds.setAttr(self.guide_base+".specular", cmds.checkBox(self.specCB, query=True, value=True))
-        cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox(self.specCB, query=True, value=False))
+        cmds.setAttr(self.guide_base+".specular", cmds.checkBox('edit_guide_eyelid_specular_cb', query=True, value=True))
+        cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox('edit_guide_eyelid_specular_cb', query=True, value=False))
 
 
     def changeLidPivot(self, *args):
         """ Set the attribute value for eyelid center pivot.
         """
         self.cvLidPivotLoc = self.name_guide+"_LidPivotLoc"
-        cmds.setAttr(self.guide_base+".lidPivot", cmds.checkBox(self.lidPivotCB, query=True, value=True))
-        cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", cmds.checkBox(self.lidPivotCB, query=True, value=False))
+        cmds.setAttr(self.guide_base+".lidPivot", cmds.checkBox('edit_guide_eyelid_pivot_cb', query=True, value=True))
+        cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", cmds.checkBox('edit_guide_eyelid_pivot_cb', query=True, value=False))
 
 
     def changeIris(self, *args):
         """ Set the attribute value for iris.
         """
         self.cvIrisLoc = self.name_guide+"_IrisLoc"
-        cmds.setAttr(self.guide_base+".iris", cmds.checkBox(self.irisCB, query=True, value=True))
-        cmds.setAttr(self.cvIrisLoc+".visibility", cmds.checkBox(self.irisCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".iris", cmds.checkBox('edit_guide_eyelid_iris_cb', query=True, value=True))
+        cmds.setAttr(self.cvIrisLoc+".visibility", cmds.checkBox('edit_guide_eyelid_iris_cb', query=True, value=True))
         
     
     def changePupil(self, *args):
         """ Set the attribute value for pupil.
         """
         self.cvPupilLoc = self.name_guide+"_PupilLoc"
-        cmds.setAttr(self.guide_base+".pupil", cmds.checkBox(self.pupilCB, query=True, value=True))
-        cmds.setAttr(self.cvPupilLoc+".visibility", cmds.checkBox(self.pupilCB, query=True, value=True))
+        cmds.setAttr(self.guide_base+".pupil", cmds.checkBox('edit_guide_eyelid_pupil_cb', query=True, value=True))
+        cmds.setAttr(self.cvPupilLoc+".visibility", cmds.checkBox('edit_guide_eyelid_pupil_cb', query=True, value=True))
         
     
     def changeAimDirection(self, item, *args):
         """ Set the good direction for Eye look at Aim setup.
         """
-        # verify integrity of the guideModule:
         if self.check_guide_integrity():
             # re-declaring variables:
             self.jGuideEnd = self.name_guide+"_JGuideEnd"

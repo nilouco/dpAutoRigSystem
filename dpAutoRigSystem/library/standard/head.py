@@ -25,10 +25,9 @@ class Head(standard.BaseStandard):
     def load_variables(self, *args):
         """ Just load class variables here.
         """
-        # declare variable
+        self.declare_guide_elements(self.name_guide)
         self.correctiveCtrlGrpList = []
         self.aInnerCtrls = []
-        self.redeclareVariables(self.name_guide)
         self.facialFactor = 0.15
         self.bsType = "bsType"
 
@@ -286,12 +285,11 @@ class Head(standard.BaseStandard):
             # re-build the preview mirror:
             self.create_mirror_preview()
         cmds.select(self.guide_base)
-    
+
 
     def changeDeformer(self, deformerValue, *args):
         """ Set the attribute value for deformer and show or hide guide locators.
         """
-        #deformerValue = cmds.checkBox(self.deformerCB, query=True, value=True)
         cmds.setAttr(self.guide_base+".deformer", deformerValue)
         cmds.setAttr(self.cvDeformerCenterLoc+".visibility", deformerValue)
 
@@ -306,7 +304,6 @@ class Head(standard.BaseStandard):
         if self.ar.data.ui_state:
             cmds.frameLayout("edit_guide_facial_fl", edit=True, collapse=collapsed, enable=value)
         cmds.setAttr(self.guide_base+".facial", value)
-        self.redeclareVariables(self.name_guide)
         for item in list(self.facialLocDic.keys()):
             cmds.setAttr(self.facialLocDic[item]+".visibility", False)
             if value:
@@ -317,18 +314,17 @@ class Head(standard.BaseStandard):
         """ Activate or disactivate the facial elements by the given value.
         """
         cmds.setAttr(self.guide_base+"."+attr, value)
-        self.redeclareVariables(self.guide_namespace, "", ":Guide")
         cmds.setAttr(self.facialLocDic[attr]+".visibility", value)
 
 
     def setChangeFacial(self, value, *args):
         """ Set display of facial controllers.
         """
-        cmds.checkBox(self.facialCB, edit=True, enable=value)
-        cmds.text(self.facialTxt, edit=True, enable=value)
+        cmds.checkBox('edit_guide_facial_cb', edit=True, enable=value)
+        cmds.text('edit_guide_facial_txt', edit=True, enable=value)
         if not value:
             self.changeFacial(value)
-            cmds.checkBox(self.facialCB, edit=True, value=False)
+            cmds.checkBox('edit_guide_facial_cb', edit=True, value=False)
 
 
     def changeJaw(self, value, *args):
@@ -339,8 +335,8 @@ class Head(standard.BaseStandard):
         cmds.setAttr(self.jGuideHead+".visibility", value)
         self.changeLips(value)
         self.changeChin(value)
-        cmds.checkBox(self.lipsCB, edit=True, value=value, enable=value)
-        cmds.checkBox(self.chinCB, edit=True, value=value, enable=value)
+        cmds.checkBox('edit_guide_head_lips_cb', edit=True, value=value, enable=value)
+        cmds.checkBox('edit_guide_head_chin_cb', edit=True, value=value, enable=value)
         cmds.setAttr(self.guide_base+"."+JAW, value)
         self.setChangeFacial(value)
         self.ar.utils.parentChildrenGuideTo(self.cvJawLoc, self.cvHeadLoc)
@@ -382,13 +378,13 @@ class Head(standard.BaseStandard):
         """
         cmds.setAttr(self.cvUpperJawLoc+".visibility", value)
         cmds.setAttr(self.jGuideUpperJaw+".visibility", value)
-        cmds.checkBox(self.deformerCB, edit=True, enable=value)
-        cmds.text(self.deformerTxt, edit=True, enable=value)
+        cmds.checkBox('edit_guide_deformer_cb', edit=True, enable=value)
+        cmds.text('edit_guide_deformer_txt', edit=True, enable=value)
         cmds.setAttr(self.guide_base+"."+UPPERHEAD, value)
         self.setChangeFacial(value)
         if not value:
             self.changeDeformer(value)
-            cmds.checkBox(self.deformerCB, edit=True, value=False)
+            cmds.checkBox('edit_guide_deformer_cb', edit=True, value=False)
         self.ar.utils.parentChildrenGuideTo(self.cvUpperJawLoc, self.cvHeadLoc)
         self.ar.utils.parentChildrenGuideTo(self.cvUpperHeadLoc, self.cvHeadLoc)
         cmds.select(self.guide_base)
@@ -521,7 +517,7 @@ class Head(standard.BaseStandard):
                 return (2**(n/self.nJoints))-(1-(1/self.nJoints))
 
     
-    def redeclareVariables(self, middle, side="", guide="", *args):
+    def declare_guide_elements(self, middle, side="", guide="", *args):
         """ Just redeclare main locators and dictionary to use it again after reloading code.
         """
         self.base            = side+middle+guide+"_Base"
@@ -573,7 +569,7 @@ class Head(standard.BaseStandard):
             for s, side in enumerate(self.sides):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
                 # redeclaring variables:
-                self.redeclareVariables(self.number_name, side, "_Guide")
+#                self.redeclareVariables(self.number_name, side, "_Guide")
                 
                 # generating naming:
                 headJntName = side+self.number_name+"_01_"+self.ar.data.lang['c024_head']+"_Jnt"
@@ -1434,7 +1430,7 @@ for net in cmds.ls(type="network"):
         """ Get and return the user selected type of controls.
             Change interface to be more clear.
         """
-        typeSelectedRadioButton = cmds.radioCollection(self.ar.guide_ui.facialTypeRC, query=True, select=True)
+        typeSelectedRadioButton = cmds.radioCollection('edit_guide_facial_type_rc', query=True, select=True)
         self.connectUserType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
         if self.connectUserType == self.bsType:
             cmds.setAttr(self.guide_base+".connectUserType", 0)

@@ -91,7 +91,12 @@ class BaseStandard(base.BaseLibrary):
             self.ar.guide_ui.basic_module_layout(self)            
 
 
+    # def declare_guide_elements(self):
+    #     """ Placeholder to re-declare standard guide elements.
+    #     """
+    #     print("MMMMEEEEE ", self.name)
 
+    #     pass
     
 
     
@@ -203,7 +208,6 @@ class BaseStandard(base.BaseLibrary):
     def set_guide_custom_name(self, check_text=None, pad=1, *args):
         """ Edit the number_name to set the user custom name from module UI.
         """
-        # verify integrity of the guideModule:
         if self.check_guide_integrity():
             if check_text:
                 inputted_text = check_text
@@ -348,8 +352,10 @@ class BaseStandard(base.BaseLibrary):
             main_number = self.currentNJoints - 1
             if main_number == 0:
                 main_number = 1
-                cmds.checkBox("edit_guide_main_ctrl_cb", edit=True, editable=False)
-            cmds.intField("edit_guide_main_ctrl_if", edit=True, value=main_number)
+                if cmds.checkBox("edit_guide_main_ctrl_cb", query=True, exists=True):
+                    cmds.checkBox("edit_guide_main_ctrl_cb", edit=True, editable=False)
+            if cmds.intField("edit_guide_main_ctrl_if", query=True, exists=True):
+                cmds.intField("edit_guide_main_ctrl_if", edit=True, value=main_number)
         cmds.setAttr(self.guide_base+".nMain", main_number)
 
 
@@ -513,9 +519,9 @@ class BaseStandard(base.BaseLibrary):
                 self.number_name = self.ar.data.prefix + self.number_name
             cmds.select(clear=True)
             self.get_mirror_sides()
-            self.articulation = self.get_guide_attr("articulation")
-            self.corrective = self.get_guide_attr("corrective")
-            self.flip = self.get_guide_attr("flip")
+            self.articulation = self.get_guide_attr('articulation')
+            self.corrective = self.get_guide_attr('corrective')
+            self.flip = self.get_guide_attr('flip')
     
 
     def create_hook_setup(self, side, controllers, scalableList=None, staticList=None, *args):
@@ -761,7 +767,6 @@ class BaseStandard(base.BaseLibrary):
     def displayAnnotation(self, value, *args):
             """ Get the current display setting from interface to show or hide the Annotation for this module.
             """
-            # verify integrity of the guideModule:
             if self.check_guide_integrity():
                 self.annotation = self.guide_base+"_Ant"
                 cmds.setAttr(self.annotation+'.visibility', value)
@@ -774,7 +779,6 @@ class BaseStandard(base.BaseLibrary):
             Return "stopIt" if there's a father guide mirror.
         """
         self.father_flip_exists = None
-        # verify integrity of the guideModule:
         if self.check_guide_integrity():
             mirroredGuideFather = self.ar.utils.mirroredGuideFather(self.guide_base)
             if mirroredGuideFather:
@@ -801,11 +805,6 @@ class BaseStandard(base.BaseLibrary):
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
 
-    def changeFlip(self, flipValue, *args):
-        """ Set the attribute value for flip.
-        """
-        #flipValue = cmds.checkBox(self.flipCB, query=True, value=True)
-        cmds.setAttr(self.guide_base+".flip", flipValue)
 
 
     def create_mirror_preview(self):
@@ -947,7 +946,6 @@ class BaseStandard(base.BaseLibrary):
         """ This function receives the mirror menu item and set it as a string in the guide base (main).
             Also, call the builder of the preview mirror (for the viewport).
         """
-        # verify integrity of the guideModule:
         if self.check_guide_integrity():
             # check if the father guide is in X=0 in order to permit mirror:
             stopMirrorOperation = self.check_father_mirror()
@@ -963,9 +961,15 @@ class BaseStandard(base.BaseLibrary):
     def changeMirrorName(self, item, *args):
         """ This function receives the mirror menu name item and set it as a string in the guide base (main).
         """
-        # verify integrity of the guideModule:
         if self.check_guide_integrity():
             cmds.setAttr(self.guide_base+".mirrorName", item, type='string')
+
+
+    def change_deformed_by(self, item, *args):
+        """ This function receives the deformedBy menu name item and set it as a integer value in the guide base (main).
+        """
+        if self.check_guide_integrity():
+            cmds.setAttr(self.guide_base+".deformedBy", int(item[0]))
 
 
     def changeArticulation(self, value, *args):

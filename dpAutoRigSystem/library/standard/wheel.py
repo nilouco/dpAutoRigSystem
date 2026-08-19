@@ -100,14 +100,14 @@ class Wheel(standard.BaseStandard):
     def changeShowControls(self, *args):
         """ Update main showControls attribute from UI.
         """
-        newShowControlsValue = cmds.checkBox(self.showControlsCB, query=True, value=True)
+        newShowControlsValue = cmds.checkBox('edit_guide_start_frame_cb', query=True, value=True)
         cmds.setAttr(self.guide_base+".showControls", newShowControlsValue)
     
     
     def changeGeo(self, *args):
         """ Update main geo attribute from UI textField.
         """
-        newGeoValue = cmds.textField(self.geoTF, query=True, text=True)
+        newGeoValue = cmds.textField('edit_guide_geo_tf', query=True, text=True)
         cmds.setAttr(self.guide_base+".geo", newGeoValue, type='string')
     
         

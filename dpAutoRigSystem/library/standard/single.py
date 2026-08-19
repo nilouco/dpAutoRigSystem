@@ -67,31 +67,18 @@ class Single(standard.BaseStandard):
         self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
     
     
-    def changeIndirectSkin(self, *args):
+    def changeIndirectSkin(self, value, *args):
         """ Set the attribute value for indirectSkin.
         """
-        indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
-        cmds.setAttr(self.guide_base+".indirectSkin", indSkinValue)
-        if indSkinValue == 0:
+        cmds.setAttr(self.guide_base+".indirectSkin", value)
+        if value == 0:
             cmds.setAttr(self.guide_base+".holder", 0)
-            cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
-            cmds.checkBox(self.sdkLocatorCB, edit=True, enable=False)
-        else:
-            cmds.checkBox(self.holderCB, edit=True, enable=True)
-            cmds.checkBox(self.sdkLocatorCB, edit=True, enable=True)
+            cmds.setAttr(self.guide_base+".sdkLocator", 0)
+        if self.ar.data.ui_state:
+            self.ar.guide_ui.change_indirectskin_ui(value)
+            
             
 
-    def changeHolder(self, *args):
-        """ Set the attribute value for holder.
-        """
-        cmds.setAttr(self.guide_base+".holder", cmds.checkBox(self.holderCB, query=True, value=True))
-    
-    
-    def changeSDKLocator(self, *args):
-        """ Set the attribute value for sdkLocator.
-        """
-        cmds.setAttr(self.guide_base+".sdkLocator", cmds.checkBox(self.sdkLocatorCB, query=True, value=True))
-    
     
     def rig_me(self, *args):
         standard.BaseStandard.rig_me(self)

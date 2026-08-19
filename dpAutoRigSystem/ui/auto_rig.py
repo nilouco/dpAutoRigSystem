@@ -82,7 +82,7 @@ class MainUI(object):
         self.create_radio_menu("language", "settings_menu", self.ar.data.lang["_preset"].lower(), self.ar.data.lang_preset_data, self.ar.data.language_option_var)
         self.create_radio_menu("validator_preset", "settings_menu", self.ar.data.validator_preset["_preset"].lower(), self.ar.data.validator_preset_data, self.ar.data.validator_option_var)
         self.create_radio_menu("curve_preset", "settings_menu", self.ar.data.curve_preset["_preset"].lower(), self.ar.data.curve_preset_data, self.ar.data.curve_option_var)
-        self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {d:0 for d in self.ar.data.degrees}, self.ar.data.degree_option_var)
+        self.create_radio_menu("curve_degree", "settings_menu", self.ar.data.degree, {degree:n for n, degree in enumerate(self.ar.data.degrees)}, self.ar.data.degree_option_var)
         # options
         cmds.menuItem("options_mi", label=self.ar.data.lang['i002_options'], subMenu=True, parent="settings_menu")
         cmds.menuItem("opt_colorize_curve_mi", label=self.ar.data.lang['i065_colorizeCtrl'], checkBox=self.ar.data.colorize_curve, command=self.ar.opt.set_colorize_curve, parent="options_mi")

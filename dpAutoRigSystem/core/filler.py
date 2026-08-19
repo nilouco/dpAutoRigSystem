@@ -150,6 +150,8 @@ class UIFiller(object):
                 mod.load_raw_guide(mod.number_name)
                 # reload pinGuide scriptJob:
                 self.ar.job.start_pin_guide(mod.guide_base)
+                if hasattr(mod, 'declare_guide_elements') and callable(getattr(mod, 'declare_guide_elements')):
+                    mod.declare_guide_elements(mod.name_guide)
 
 
     def populate_joints(self, *args):

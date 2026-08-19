@@ -604,7 +604,6 @@ class Utils(object):
         guides_to_rig = []
         headModuleList = []
         for guideModule in self.ar.data.guide_instances:
-            # verify integrity of the guideModule:
             if guideModule.check_guide_integrity():
                 guideNamespaceName = guideModule.guide_namespace
                 if guideNamespaceName in cmds.namespaceInfo(listOnlyNamespaces=True):

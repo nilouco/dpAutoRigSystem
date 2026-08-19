@@ -59,14 +59,14 @@ class Suspension(standard.BaseStandard):
         selList = cmds.ls(selection=True)
         if selList:
             if cmds.objExists(selList[0]):
-                cmds.textField(self.fatherBTF, edit=True, text=selList[0])
+                cmds.textField('edit_guide_fatherb_tf', edit=True, text=selList[0])
                 cmds.setAttr(self.guide_base+".fatherB", selList[0], type='string')
     
     
     def changeFatherB(self, *args):
         """ Update main fatherB attribute from UI textField.
         """
-        newFatherBValue = cmds.textField(self.fatherBTF, query=True, text=True)
+        newFatherBValue = cmds.textField('edit_guide_fatherb_tf', query=True, text=True)
         cmds.setAttr(self.guide_base+".fatherB", newFatherBValue, type='string')
     
     

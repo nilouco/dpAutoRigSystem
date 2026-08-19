@@ -125,7 +125,7 @@ class Data:
     rebuilder_layouts: list = field(default_factory=lambda: ["rebuilder_start_fl", "rebuilder_source_fl", "rebuilder_setup_fl", "rebuilder_deforming_fl", "rebuilder_custom_fl"])
     drivenkey_types: list = field(default_factory=lambda: ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"])
     axis: list = field(default_factory=lambda: ['X', 'Y', 'Z'])
-    degrees: list = field(default_factory=lambda: ['Preset_0', 'Linear_1', 'Cubic_3'])
+    degrees: list = field(default_factory=lambda: ['preset_0', 'linear_1', 'cubic_3'])
     booleans: list = field(default_factory=lambda: [0, 1])
     facial_brow_targets: list = field(default_factory=lambda: ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"])
     facial_eyelid_targets: list = field(default_factory=lambda: [None, None, "EyelidsClose", "EyelidsOpen"])
