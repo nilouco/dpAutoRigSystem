@@ -24,56 +24,8 @@ class Wheel(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        
-        
-        self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
-        self.jGuideCenter = cmds.joint(name=self.name_guide+"_JGuideCenter", radius=0.001)
-        cmds.setAttr(self.jGuideCenter+".template", 1)
-        cmds.parent(self.jGuideCenter, self.guide_base, relative=True)
-        
-        self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
-        self.ar.ctrls.colorShape([self.cvFrontLoc], "blue")
-        self.ar.ctrls.shapeSizeSetup(self.cvFrontLoc)
-        cmds.parent(self.cvFrontLoc, self.cvCenterLoc)
-        cmds.setAttr(self.cvFrontLoc+".tx", 1.3)
-        self.jGuideFront = cmds.joint(name=self.name_guide+"_JGuideFront", radius=0.001)
-        cmds.setAttr(self.jGuideFront+".template", 1)
-        cmds.transformLimits(self.cvFrontLoc, translationX=(1, 1), enableTranslationX=(True, False))
-        cvFrontLocPosNode = cmds.createNode("plusMinusAverage", name=self.cvFrontLoc+"_Pos_PMA")
-        cmds.setAttr(cvFrontLocPosNode+".input1D[0]", -0.5)
-        cmds.connectAttr(self.radius_ctrl+".translateX", cvFrontLocPosNode+".input1D[1]")
-        cmds.connectAttr(cvFrontLocPosNode+".output1D", self.cvFrontLoc+".tx")
-        self.ar.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        
-        self.cvInsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_InsideLoc", r=0.2, d=1, guide=True)
-        cmds.parent(self.cvInsideLoc, self.cvCenterLoc)
-        cmds.setAttr(self.cvInsideLoc+".tz", 0.3)
-        self.jGuideInside = cmds.joint(name=self.name_guide+"_JGuideInside", radius=0.001)
-        cmds.setAttr(self.jGuideInside+".template", 1)
-        cmds.transformLimits(self.cvInsideLoc, tz=(0.01, 1), etz=(True, False))
-        inverseRadius = cmds.createNode("multiplyDivide", name=self.guide_base+"_Radius_Inv_MD")
-        cmds.setAttr(inverseRadius+".input2X", -1)
-        cmds.connectAttr(self.radius_ctrl+".translateX", inverseRadius+".input1X")
-        cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
-        self.ar.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        
-        self.cvOutsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_OutsideLoc", r=0.2, d=1, guide=True)
-        cmds.parent(self.cvOutsideLoc, self.cvCenterLoc)
-        cmds.setAttr(self.cvOutsideLoc+".tz", -0.3)
-        self.jGuideOutside = cmds.joint(name=self.name_guide+"_JGuideOutside", radius=0.001)
-        cmds.setAttr(self.jGuideOutside+".template", 1)
-        cmds.transformLimits(self.cvOutsideLoc, tz=(-1, 0.01), etz=(False, True))
-        cmds.connectAttr(inverseRadius+".outputX", self.cvOutsideLoc+".translateY")
-        self.ar.ctrls.setLockHide([self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        
-        cmds.parent(self.cvCenterLoc, self.guide_base)
-        cmds.parent(self.jGuideFront, self.jGuideInside, self.jGuideOutside, self.jGuideCenter)
-        cmds.parentConstraint(self.cvCenterLoc, self.jGuideCenter, maintainOffset=False, name=self.jGuideCenter+"_PaC")
-        cmds.parentConstraint(self.cvFrontLoc, self.jGuideFront, maintainOffset=False, name=self.jGuideFront+"_PaC")
-        cmds.parentConstraint(self.cvInsideLoc, self.jGuideInside, maintainOffset=False, name=self.cvInsideLoc+"_PaC")
-        cmds.parentConstraint(self.cvOutsideLoc, self.jGuideOutside, maintainOffset=False, name=self.cvOutsideLoc+"_PaC")
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvCenterLoc, self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc], ["CenterLoc", "FrontLoc", "InsideLoc", "OutsideLoc"])
+        self.add_node_to_guide_net([self.cvCenterLoc, self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc], 
+                                   ["CenterLoc", "FrontLoc", "InsideLoc", "OutsideLoc"])
 
 
     def create_guide_custom_attr(self):
@@ -90,29 +42,45 @@ class Wheel(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
+        self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
+        self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
+        self.cvInsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_InsideLoc", r=0.2, d=1, guide=True)
+        self.cvOutsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_OutsideLoc", r=0.2, d=1, guide=True)
         # joints
+        self.jGuideCenter = cmds.joint(name=self.name_guide+"_JGuideCenter", radius=0.001)
+        self.jGuideFront = cmds.joint(name=self.name_guide+"_JGuideFront", radius=0.001)
+        self.jGuideInside = cmds.joint(name=self.name_guide+"_JGuideInside", radius=0.001)
+        self.jGuideOutside = cmds.joint(name=self.name_guide+"_JGuideOutside", radius=0.001)
         # setup
+        self.ar.utils.set_template([self.jGuideCenter, self.jGuideFront, self.jGuideInside, self.jGuideOutside])
+        cvFrontLocPosNode = cmds.createNode("plusMinusAverage", name=self.cvFrontLoc+"_Pos_PMA")
+        inverseRadius = cmds.createNode("multiplyDivide", name=self.guide_base+"_Radius_Inv_MD")
+        cmds.setAttr(self.cvFrontLoc+".tx", 1.3)
+        cmds.setAttr(self.cvInsideLoc+".tz", 0.3)
+        cmds.setAttr(self.cvOutsideLoc+".tz", -0.3)
+        cmds.setAttr(cvFrontLocPosNode+".input1D[0]", -0.5)
+        cmds.setAttr(inverseRadius+".input2X", -1)
         # parenting
+        cmds.parent(self.jGuideCenter, self.cvCenterLoc, self.guide_base, relative=True)
+        cmds.parent(self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc, self.cvCenterLoc)
+        cmds.parent(self.jGuideInside, self.jGuideOutside, self.jGuideCenter)
         # edit
-        print("WIP....", self.name)
-    
-    def set_start_frame(self, value, *args):
-        """ Update main startFrame attribute from UI.
-        """
-        cmds.setAttr(self.guide_base+".startFrame", value)
-    
-    
-    def set_wheel_steering(self, value, *args):
-        """ Update main steering attribute from UI.
-        """
-        cmds.setAttr(self.guide_base+".steering", value)
-        
-        
-    def changeShowControls(self, *args):
-        """ Update main showControls attribute from UI.
-        """
-        newShowControlsValue = cmds.checkBox('edit_guide_start_frame_cb', query=True, value=True)
-        cmds.setAttr(self.guide_base+".showControls", newShowControlsValue)
+        cmds.connectAttr(self.radius_ctrl+".translateX", cvFrontLocPosNode+".input1D[1]")
+        cmds.connectAttr(cvFrontLocPosNode+".output1D", self.cvFrontLoc+".tx")
+        cmds.connectAttr(self.radius_ctrl+".translateX", inverseRadius+".input1X")
+        cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
+        cmds.connectAttr(inverseRadius+".outputX", self.cvOutsideLoc+".translateY")
+        cmds.transformLimits(self.cvFrontLoc, translationX=(1, 1), enableTranslationX=(True, False))
+        cmds.transformLimits(self.cvInsideLoc, tz=(0.01, 1), etz=(True, False))
+        cmds.transformLimits(self.cvOutsideLoc, tz=(-1, 0.01), etz=(False, True))
+        self.ar.ctrls.colorShape([self.cvFrontLoc], "blue")
+        self.ar.ctrls.shapeSizeSetup(self.cvFrontLoc)
+        self.ar.ctrls.setLockHide([self.cvInsideLoc, self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.parentConstraint(self.cvCenterLoc, self.jGuideCenter, maintainOffset=False, name=self.jGuideCenter+"_PaC")
+        cmds.parentConstraint(self.cvFrontLoc, self.jGuideFront, maintainOffset=False, name=self.jGuideFront+"_PaC")
+        cmds.parentConstraint(self.cvInsideLoc, self.jGuideInside, maintainOffset=False, name=self.cvInsideLoc+"_PaC")
+        cmds.parentConstraint(self.cvOutsideLoc, self.jGuideOutside, maintainOffset=False, name=self.cvOutsideLoc+"_PaC")
     
     
     def changeGeo(self, *args):

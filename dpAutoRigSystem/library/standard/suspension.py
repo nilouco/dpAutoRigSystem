@@ -14,36 +14,14 @@ class Suspension(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
-       
+    
     
     def create_guide(self, *args):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        
-        
-        self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
-        self.jAGuide = cmds.joint(name=self.name_guide+"_jAGuide", radius=0.001)
-        cmds.setAttr(self.jAGuide+".template", 1)
-        cmds.parent(self.jAGuide, self.guide_base, relative=True)
-        
-        self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
-        cmds.parent(self.cvBLoc, self.cvALoc)
-        cmds.setAttr(self.cvBLoc+".tz", 3)
-        cmds.setAttr(self.cvBLoc+".rotateX", 180)
-        self.jBGuide = cmds.joint(name=self.name_guide+"_jBGuide", radius=0.001)
-        cmds.setAttr(self.jBGuide+".template", 1)
-        cmds.transformLimits(self.cvBLoc, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvBLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        
-        cmds.parent(self.cvALoc, self.guide_base)
-        cmds.parent(self.jBGuide, self.jAGuide)
-        cmds.parentConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_PaC")
-        cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_PaC")
-        cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScC")
-        cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScC")
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvALoc, self.cvBLoc], ["JointLocA", "JointLocB"])
+        self.add_node_to_guide_net([self.cvALoc, self.cvBLoc], 
+                                   ["JointLocA", "JointLocB"])
 
 
     def create_guide_custom_attr(self):
@@ -53,17 +31,29 @@ class Suspension(standard.BaseStandard):
         cmds.addAttr(self.guide_base, longName="fatherB", dataType='string')
 
 
-
     def create_guide_elements(self):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
+        self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
+        self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
         # joints
+        self.jAGuide = cmds.joint(name=self.name_guide+"_jAGuide", radius=0.001)
+        self.jBGuide = cmds.joint(name=self.name_guide+"_jBGuide", radius=0.001)
         # setup
+        self.ar.utils.set_template([self.jAGuide, self.jBGuide])
+        cmds.setAttr(self.cvBLoc+".tz", 3)
+        cmds.setAttr(self.cvBLoc+".rotateX", 180)
         # parenting
+        cmds.parent(self.jAGuide, self.cvALoc, self.guide_base, relative=True)
+        cmds.parent(self.cvBLoc, self.cvALoc)
         # edit
-        print("WIP....", self.name)
-
+        cmds.parentConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_PaC")
+        cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_PaC")
+        cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScC")
+        cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScC")
+        cmds.transformLimits(self.cvBLoc, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.cvBLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
     
     def loadFatherB(self, *args):

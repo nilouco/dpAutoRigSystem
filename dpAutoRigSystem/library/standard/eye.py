@@ -27,22 +27,8 @@ class Eye(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.add_node_to_guide_net([self.cvJointLoc, 
-                                    self.cvEndJoint, 
-                                    self.cvLidPivotLoc, 
-                                    self.cvUpperEyelidLoc, 
-                                    self.cvLowerEyelidLoc, 
-                                    self.cvIrisLoc, 
-                                    self.cvPupilLoc, 
-                                    self.cvSpecularLoc], 
-                                    ["JointLoc1", 
-                                     "JointEnd", 
-                                     "_LidPivotLoc", 
-                                     "_UpperEyelidLoc", 
-                                     "_LowerEyelidLoc", 
-                                     "_IrisLoc", 
-                                     "_PupilLoc", 
-                                     "_SpecularLoc"])
+        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint, self.cvLidPivotLoc, self.cvUpperEyelidLoc, self.cvLowerEyelidLoc, self.cvIrisLoc, self.cvPupilLoc, self.cvSpecularLoc], 
+                                    ["JointLoc1", "JointEnd", "_LidPivotLoc", "_UpperEyelidLoc", "_LowerEyelidLoc", "_IrisLoc", "_PupilLoc", "_SpecularLoc"])
 
     
     def create_guide_custom_attr(self):
@@ -83,10 +69,7 @@ class Eye(standard.BaseStandard):
         self.jUpperEyelid = cmds.joint(name=self.name_guide+"_JUpperEyelid", radius=0.001)
         self.jLowerEyelid = cmds.joint(name=self.name_guide+"_JLowerEyelid", radius=0.001)
         # setup
-        cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.setAttr(self.jUpperEyelid+".template", 1)
-        cmds.setAttr(self.jLowerEyelid+".template", 1)
+        self.ar.utils.set_template([self.jGuide1, self.jGuideEnd, self.jUpperEyelid, self.jLowerEyelid])
         cmds.setAttr(self.cvEndJoint+".tz", 13)
         cmds.setAttr(self.cvUpLocGuide+".ty", 13)
         cmds.setAttr(self.cvUpperEyelidLoc+".ty", 0.5)

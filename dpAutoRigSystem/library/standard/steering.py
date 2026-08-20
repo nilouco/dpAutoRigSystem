@@ -19,30 +19,9 @@ class Steering(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        
-        
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.parent(self.jGuide1, self.guide_base, relative=True)
-        
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvJointLoc)
-        cmds.setAttr(self.cvEndJoint+".tz", 3)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        
-        cmds.parent(self.cvJointLoc, self.guide_base)
-        cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
-        
-        cmds.setAttr(self.guide_base+".translateY", 3)
-        cmds.setAttr(self.guide_base+".rotateX", 45)
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
+        self.set_guide_base_initial_position()
+        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], 
+                                   ["JointLoc1", "JointEnd"])
     
 
     def create_guide_custom_attr(self):
@@ -55,11 +34,28 @@ class Steering(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
+        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
+        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
+        self.ar.utils.set_template([self.jGuide1, self.jGuideEnd])
+        cmds.setAttr(self.cvEndJoint+".tz", 3)
         # parenting
+        cmds.parent(self.jGuide1, self.cvJointLoc, self.guide_base, relative=True)
+        cmds.parent(self.cvEndJoint, self.cvJointLoc)
         # edit
-        print("WIP....", self.name)
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
+        
+
+    def set_guide_base_initial_position(self):
+        cmds.setAttr(self.guide_base+".translateY", 3)
+        cmds.setAttr(self.guide_base+".rotateX", 45)
+
 
         
     def rig_me(self, *args):

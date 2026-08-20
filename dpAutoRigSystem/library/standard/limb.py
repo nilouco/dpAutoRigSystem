@@ -35,7 +35,7 @@ class Limb(standard.BaseStandard):
         """ Just load class variables here.
         """
         # declare variable
-        self.composed = {}
+#        self.composed = {}
         self.bendGrps = None
         # returned data from the dictionary
         self.ikExtremCtrlList = []
@@ -92,115 +92,15 @@ class Limb(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        
-
-        # create cvJointLoc and cvLocators:
-        self.cvBeforeLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Before", r=0.3, d=1, guide=True)
-        self.cvMainLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Main", r=0.5, d=1, guide=True, pin=False)
-        self.cvCornerLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_Corner", r=0.3, d=1, guide=True)
-        self.cvCornerBLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_CornerB", r=0.5, d=1, guide=True)
-        self.cvExtremLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Extrem", r=0.5, d=1, guide=True)
-        self.cvUpVectorLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_CornerUpVector", r=0.5, d=1, guide=True)
-        
-        # set quadruped locator config:
-        cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
-        cmds.setAttr(self.cvCornerBLoc+".translateZ", 2)
-        cmds.setAttr(self.cvCornerBLoc+".visibility", 0)
-
-        # create jointGuides:
-        cmds.select(clear=True)
-        self.jGuideBefore = cmds.joint(name=self.name_guide+"_JGuideBefore", radius=0.001)
-        self.jGuideMain = cmds.joint(name=self.name_guide+"_JGuideMain", radius=0.001)
-        self.jGuideCorner = cmds.joint(name=self.name_guide+"_JGuideCorner", radius=0.001)
-        self.jGuideExtrem = cmds.joint(name=self.name_guide+"_JGuideExtrem", radius=0.001)
-
-        # create cornerGroups:
-        self.cornerGrp = cmds.group(self.cvCornerLoc, name=self.cvCornerLoc+"_Grp")
-
-        # set jointGuides as templates:
-        cmds.setAttr(self.jGuideBefore+".template", 1)
-        cmds.setAttr(self.jGuideMain+".template", 1)
-        cmds.setAttr(self.jGuideCorner+".template", 1)
-        cmds.setAttr(self.jGuideExtrem+".template", 1)
-        cmds.parent(self.jGuideBefore, self.guide_base, relative=True)
-
-        # create cvEnd:
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvExtremLoc)
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.parent(self.jGuideEnd, self.jGuideExtrem)
-
-        # make parents between cvLocs:
-        cmds.parent(self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvExtremLoc, self.cvUpVectorLoc, self.guide_base)
-
-        # connect cvLocs in jointGuides:
-        self.ar.ctrls.directConnect(self.cvBeforeLoc, self.jGuideBefore, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        cmds.parentConstraint(self.cvMainLoc, self.jGuideMain, maintainOffset=False, name=self.jGuideMain+"_PaC")
-        cmds.parentConstraint(self.cvCornerLoc, self.jGuideCorner, maintainOffset=False, name=self.jGuideCorner+"_PaC")
-        cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem+"_PaC")
-
-        # align cornerLocs:
-        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
-
-        # limit, lock and hide cvEnd:
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-
-        # creating relationship of corner:
-        self.cornerPointGrp = cmds.group(self.cornerGrp, name=self.cornerGrp+"_Zero_0_Grp")
-        self.cornerPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cornerPointGrp, maintainOffset=False, name=self.cornerPointGrp+"_PoC")[0]
-        cmds.setAttr(self.cornerPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
-        cmds.setAttr(self.cornerPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
-
-        # transform cvLocs in order to put as a good limb guide:
-        cmds.setAttr(self.cvBeforeLoc+".translateX", -0.5)
-        cmds.setAttr(self.cvBeforeLoc+".translateZ", -2)
-        cmds.setAttr(self.cvExtremLoc+".translateZ", 10)
-        cmds.setAttr(self.cornerGrp+".translateY", -0.75)
-
-        # editing cornerUpVector:
-        self.cvUpVectorGrp = cmds.group(self.cvUpVectorLoc, name=self.cvUpVectorLoc+"_Grp")
-        cornerPositionList = cmds.xform(self.cvCornerLoc, query=True, worldSpace=True, rotatePivot=True)
-        cmds.move(cornerPositionList[0], cornerPositionList[1], cornerPositionList[2], self.cvUpVectorGrp)
-        self.cornerUpVectorPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp+"_PoC")[0]
-        cmds.setAttr(self.cornerUpVectorPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
-        cmds.setAttr(self.cornerUpVectorPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
-        cmds.setAttr(self.cvUpVectorLoc+".translateY", -10)
-
-        # display cornerUpVector:
-        cmds.addAttr(self.cvCornerLoc, longName="displayUpVector", attributeType="bool")
-        cmds.setAttr(self.cvCornerLoc+".displayUpVector", keyable=False, channelBox=True)
-        cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc+".visibility", force=True)
-
-        # lock undesirable translate and rotate axis for corner guides:
-        self.setLockCornerAttr(self.armName)
-
-        # re orient guides:
-        self.reOrientGuide()
-        cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvBeforeLoc, self.cvMainLoc, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc, self.cvUpVectorLoc, self.cvEndJoint], ["Before", "Main", "Corner", "CornerB", "Extrem", "CornerUpVector", "JointEnd"])
-
-        # create autoAim null groups:
-        self.guideMainDrvNull = cmds.group(empty=True, name=self.cvMainLoc+"_Drv_Null")
-        self.cornerDrvNull = cmds.group(empty=True, name=self.cvCornerLoc+"_Drv_Null")
-        self.cornerDrvNullGrp = cmds.group(self.cornerDrvNull, name=self.cornerDrvNull+"_Grp")
-        cmds.parent(self.guideMainDrvNull, self.cornerDrvNullGrp, self.guide_base)
-        cmds.matchTransform(self.guideMainDrvNull, self.cvMainLoc)
-        cmds.matchTransform(self.cornerDrvNullGrp, self.cvCornerLoc)
-        cmds.setAttr(self.guideMainDrvNull+".visibility", 0)
-        cmds.setAttr(self.cornerDrvNull+".visibility", 0)
-        cmds.setAttr(self.cornerDrvNullGrp+".visibility", 0)
-        
-        # autoAim main function:
-        self.createAutoAim()
-
-        cmds.setAttr(self.guide_base+".translateX", 4)
-        cmds.setAttr(self.guide_base+".rotateX", 90)
-        cmds.setAttr(self.guide_base+".rotateZ", 90)
+        self.align_guide_corner()
+        self.corner_guide_up_vector()
+        self.set_lock_corner_attr(self.armName)
+        self.re_orient_guide()
+        self.prepare_auto_aim_setup()
+        self.create_guide_auto_aim()
+        self.set_guide_base_initial_position()
+        self.add_node_to_guide_net([self.cvBeforeLoc, self.cvMainLoc, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc, self.cvUpVectorLoc, self.cvEndJoint], 
+                                   ["Before", "Main", "Corner", "CornerB", "Extrem", "CornerUpVector", "JointEnd"])
 
 
 
@@ -224,15 +124,132 @@ class Limb(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
+        self.cvBeforeLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Before", r=0.3, d=1, guide=True)
+        self.cvMainLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Main", r=0.5, d=1, guide=True, pin=False)
+        self.cvCornerLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_Corner", r=0.3, d=1, guide=True)
+        self.cvCornerBLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_CornerB", r=0.5, d=1, guide=True)
+        self.cvExtremLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Extrem", r=0.5, d=1, guide=True)
+        self.cvUpVectorLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_CornerUpVector", r=0.5, d=1, guide=True)
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
+        self.jGuideBefore = cmds.joint(name=self.name_guide+"_JGuideBefore", radius=0.001)
+        self.jGuideMain = cmds.joint(name=self.name_guide+"_JGuideMain", radius=0.001)
+        self.jGuideCorner = cmds.joint(name=self.name_guide+"_JGuideCorner", radius=0.001)
+        self.jGuideExtrem = cmds.joint(name=self.name_guide+"_JGuideExtrem", radius=0.001)
+        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
+        self.ar.utils.set_template([self.jGuideBefore, self.jGuideMain, self.jGuideCorner, self.jGuideExtrem, self.jGuideEnd])
+        cmds.setAttr(self.cvCornerBLoc+".translateZ", 2)
+        cmds.setAttr(self.cvCornerBLoc+".visibility", 0)
+        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         # parenting
+        self.cornerGrp = cmds.group(self.cvCornerLoc, name=self.cvCornerLoc+"_Grp")
+        cmds.parent(self.jGuideBefore, self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvExtremLoc, self.cvUpVectorLoc, self.guide_base, relative=True)
+        cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
+        cmds.parent(self.cvEndJoint, self.cvExtremLoc)
         # edit
-        print("WIP....", self.name)
+        self.ar.ctrls.directConnect(self.cvBeforeLoc, self.jGuideBefore, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        cmds.parentConstraint(self.cvMainLoc, self.jGuideMain, maintainOffset=False, name=self.jGuideMain+"_PaC")
+        cmds.parentConstraint(self.cvCornerLoc, self.jGuideCorner, maintainOffset=False, name=self.jGuideCorner+"_PaC")
+        cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem+"_PaC")
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
 
 
+    def align_guide_corner(self):
+        # align cornerLocs:
+        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
+        self.cornerPointGrp = cmds.group(self.cornerGrp, name=self.cornerGrp+"_Zero_0_Grp")
+        self.cornerPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cornerPointGrp, maintainOffset=False, name=self.cornerPointGrp+"_PoC")[0]
+        cmds.setAttr(self.cornerPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
+        cmds.setAttr(self.cornerPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
+        cmds.setAttr(self.cvBeforeLoc+".translateX", -0.5)
+        cmds.setAttr(self.cvBeforeLoc+".translateZ", -2)
+        cmds.setAttr(self.cvExtremLoc+".translateZ", 10)
+        cmds.setAttr(self.cornerGrp+".translateY", -0.75)
+
+
+    def corner_guide_up_vector(self):
+        # editing cornerUpVector:
+        self.cvUpVectorGrp = cmds.group(self.cvUpVectorLoc, name=self.cvUpVectorLoc+"_Grp")
+        cornerPositionList = cmds.xform(self.cvCornerLoc, query=True, worldSpace=True, rotatePivot=True)
+        cmds.move(cornerPositionList[0], cornerPositionList[1], cornerPositionList[2], self.cvUpVectorGrp)
+        self.cornerUpVectorPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp+"_PoC")[0]
+        cmds.setAttr(self.cornerUpVectorPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
+        cmds.setAttr(self.cornerUpVectorPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
+        cmds.setAttr(self.cvUpVectorLoc+".translateY", -10)
+        # display cornerUpVector:
+        cmds.addAttr(self.cvCornerLoc, longName="displayUpVector", attributeType="bool")
+        cmds.setAttr(self.cvCornerLoc+".displayUpVector", keyable=False, channelBox=True)
+        cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc+".visibility", force=True)
+
+
+    def set_lock_corner_attr(self, limbType, *args):
+        """ Set corner guide lock attributes to specific limb type (arm or leg).
+        """
+        trAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']
+        cornerAttrList = ['tx', 'ry', 'rz'] #arm
+        if limbType == self.legName:
+            cornerAttrList = ['ty', 'rx', 'rz'] #leg
+        for attr in trAttrList:
+            if attr in cornerAttrList:
+                cmds.setAttr(self.cvCornerLoc+"."+attr, 0, lock=True)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, 0, lock=True)
+            else:
+                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=False)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
+
+
+    def re_orient_guide(self, *args):
+        """ This function reorient guides orientations, creating temporary aimConstraints for them.
+        """
+        # re-declaring guide names:
+        self.cvBeforeLoc = self.name_guide+"_Before"
+        self.cvMainLoc = self.name_guide+"_Main"
+        self.cvCornerLoc = self.name_guide+"_Corner"
+        self.cvExtremLoc = self.name_guide+"_Extrem"
+        self.cvUpVectorLoc = self.name_guide+"_CornerUpVector"
+
+        # Adjust offset when it's arm or leg. Using diferent axis for arm or leg.
+        if self.getLimbType()==self.armName:
+            beforeTranslateAxis = ".translateY"
+        if self.getLimbType()==self.legName:
+            beforeTranslateAxis = ".translateX"
+
+        # re-orient clavicle rotations:
+        tempToDelBeforeUpVector = cmds.group(empty=True, name=self.cvBeforeLoc+"_UpVector_Tmp")
+        cmds.matchTransform(tempToDelBeforeUpVector, self.cvBeforeLoc, position=True)
+        beforeUpVectorTranslate = cmds.getAttr(tempToDelBeforeUpVector+beforeTranslateAxis)
+        cmds.setAttr(tempToDelBeforeUpVector+beforeTranslateAxis, beforeUpVectorTranslate+10)
+        tempToDelBeforeAic = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelBeforeUpVector, name=self.cvBeforeLoc+"_Tmp_AiC")[0]
+        cmds.delete(tempToDelBeforeAic, tempToDelBeforeUpVector)
         
-    def createAutoAim(self, *args):
+        # re-orient main shoulder guide
+        tempToDelMainUpVector = cmds.group(empty=True, parent=self.guide_base, relative=True, name=self.cvMainLoc+"_UpVector_Tmp")
+        cmds.setAttr(tempToDelMainUpVector+".translateX", 10)
+        tempToDelMainAic = cmds.aimConstraint(self.cvCornerLoc, self.cvMainLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelMainUpVector, name=self.cvMainLoc+"_Tmp_AiC")[0]
+        
+        # aim offset for aimConstraint depending on limbType
+        self.setAimConstraintOffset(tempToDelMainAic)
+        cmds.delete(tempToDelMainAic, tempToDelMainUpVector)
+
+
+    def prepare_auto_aim_setup(self):
+        # create autoAim null groups:
+        self.guideMainDrvNull = cmds.group(empty=True, name=self.cvMainLoc+"_Drv_Null")
+        self.cornerDrvNull = cmds.group(empty=True, name=self.cvCornerLoc+"_Drv_Null")
+        self.cornerDrvNullGrp = cmds.group(self.cornerDrvNull, name=self.cornerDrvNull+"_Grp")
+        cmds.parent(self.guideMainDrvNull, self.cornerDrvNullGrp, self.guide_base)
+        cmds.matchTransform(self.guideMainDrvNull, self.cvMainLoc)
+        cmds.matchTransform(self.cornerDrvNullGrp, self.cvCornerLoc)
+        cmds.setAttr(self.guideMainDrvNull+".visibility", 0)
+        cmds.setAttr(self.cornerDrvNull+".visibility", 0)
+        cmds.setAttr(self.cornerDrvNullGrp+".visibility", 0)
+
+
+    def create_guide_auto_aim(self, *args):
         """ AimConstraint setup in order to auto orient mainGuide with CornerGuide
         """ 
         # re-declaring guide names:
@@ -290,6 +307,33 @@ class Limb(standard.BaseStandard):
         cmds.select(self.guide_base)
 
 
+    def set_guide_base_initial_position(self):
+        cmds.setAttr(self.guide_base+".translateX", 4)
+        cmds.setAttr(self.guide_base+".rotateX", 90)
+        cmds.setAttr(self.guide_base+".rotateZ", 90)
+
+
+
+
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
     def recreateAutoAim(self, *args):
         """ Need to delete the previous setup in order to autoAim works with different type of limb
         """
@@ -322,10 +366,10 @@ class Limb(standard.BaseStandard):
         cmds.matchTransform(self.cornerDrvNullGrp, self.cvCornerLoc)
 
         # re-orient guides:
-        self.reOrientGuide()
+        self.re_orient_guide()
 
         # autoAim main function:
-        self.createAutoAim()
+        self.create_guide_auto_aim()
 
 
     def crossProduct(self, limbType, *args):
@@ -386,38 +430,7 @@ class Limb(standard.BaseStandard):
         cmds.setAttr(aimConstraint+offsetAxis, offsetValue)
 
 
-    def reOrientGuide(self, *args):
-        """ This function reorient guides orientations, creating temporary aimConstraints for them.
-        """
-        # re-declaring guide names:
-        self.cvBeforeLoc = self.name_guide+"_Before"
-        self.cvMainLoc = self.name_guide+"_Main"
-        self.cvCornerLoc = self.name_guide+"_Corner"
-        self.cvExtremLoc = self.name_guide+"_Extrem"
-        self.cvUpVectorLoc = self.name_guide+"_CornerUpVector"
 
-        # Adjust offset when it's arm or leg. Using diferent axis for arm or leg.
-        if self.getLimbType()==self.armName:
-            beforeTranslateAxis = ".translateY"
-        if self.getLimbType()==self.legName:
-            beforeTranslateAxis = ".translateX"
-
-        # re-orient clavicle rotations:
-        tempToDelBeforeUpVector = cmds.group(empty=True, name=self.cvBeforeLoc+"_UpVector_Tmp")
-        cmds.matchTransform(tempToDelBeforeUpVector, self.cvBeforeLoc, position=True)
-        beforeUpVectorTranslate = cmds.getAttr(tempToDelBeforeUpVector+beforeTranslateAxis)
-        cmds.setAttr(tempToDelBeforeUpVector+beforeTranslateAxis, beforeUpVectorTranslate+10)
-        tempToDelBeforeAic = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelBeforeUpVector, name=self.cvBeforeLoc+"_Tmp_AiC")[0]
-        cmds.delete(tempToDelBeforeAic, tempToDelBeforeUpVector)
-        
-        # re-orient main shoulder guide
-        tempToDelMainUpVector = cmds.group(empty=True, parent=self.guide_base, relative=True, name=self.cvMainLoc+"_UpVector_Tmp")
-        cmds.setAttr(tempToDelMainUpVector+".translateX", 10)
-        tempToDelMainAic = cmds.aimConstraint(self.cvCornerLoc, self.cvMainLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelMainUpVector, name=self.cvMainLoc+"_Tmp_AiC")[0]
-        
-        # aim offset for aimConstraint depending on limbType
-        self.setAimConstraintOffset(tempToDelMainAic)
-        cmds.delete(tempToDelMainAic, tempToDelMainUpVector)
         
 
     def reOrientGuideButton(self, *args):
@@ -434,7 +447,7 @@ class Limb(standard.BaseStandard):
         # re-orient extremLoc to align with cornerLoc if the clavicle and wrist aren't pinned.
         if not cmds.getAttr(self.cvExtremLoc+".pinGuide") and not cmds.getAttr(self.cvBeforeLoc+".pinGuide"):
             # reorient guides first
-            self.reOrientGuide()
+            self.re_orient_guide()
             # do guide alignment
             if self.getLimbType()==self.armName:
                 extremChildrenGrpTemp = False
@@ -545,7 +558,7 @@ class Limb(standard.BaseStandard):
             cmds.setAttr(self.cvUpVectorLoc+".translateY", -10)
             cmds.delete(self.cornerAIC)
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
-            self.setLockCornerAttr(self.armName)
+            self.set_lock_corner_attr(self.armName)
             self.recreateAutoAim()
             
         # for Leg type:
@@ -565,7 +578,7 @@ class Limb(standard.BaseStandard):
             cmds.setAttr(self.cvUpVectorLoc+".translateY", 0.75)
             cmds.delete(self.cornerAIC)
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
-            self.setLockCornerAttr(self.legName)
+            self.set_lock_corner_attr(self.legName)
             self.recreateAutoAim()
     
     
@@ -607,20 +620,7 @@ class Limb(standard.BaseStandard):
         return self.limbStyle
      
 
-    def setLockCornerAttr(self, limbType, *args):
-        """ Set corner guide lock attributes to specific limb type (arm or leg).
-        """
-        trAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']
-        cornerAttrList = ['tx', 'ry', 'rz'] #arm
-        if limbType == self.legName:
-            cornerAttrList = ['ty', 'rx', 'rz'] #leg
-        for attr in trAttrList:
-            if attr in cornerAttrList:
-                cmds.setAttr(self.cvCornerLoc+"."+attr, 0, lock=True)
-                cmds.setAttr(self.cvCornerBLoc+"."+attr, 0, lock=True)
-            else:
-                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=False)
-                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
+
 
 
     def getOriginalRotate(self, ctrl, *args):

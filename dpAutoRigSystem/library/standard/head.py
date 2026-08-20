@@ -35,8 +35,35 @@ class Head(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        
-        # create cvJointLoc and cvLocators:
+        self.create_guide_deformer_cube()
+        self.add_node_to_guide_net([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
+                                ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "DeformerCenter", "DeformerRadius", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
+
+    
+    def create_guide_custom_attr(self):
+        """ Add guide_base attributes and set them.
+        """
+        cmds.addAttr(self.guide_base, longName="nJoints", defaultValue=1, attributeType='long')
+        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="deformer", attributeType='bool')
+        cmds.addAttr(self.guide_base, longName="facial", attributeType='bool')
+        for attr in self.facialAttrList:
+            cmds.addAttr(self.guide_base, longName=attr, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="connectUserType", attributeType='long', defaultValue=0) #bs
+        cmds.addAttr(self.guide_base, longName=JAW, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=CHIN, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=LIPS, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+
+
+
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
         self.cvNeckLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
         self.cvHeadLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_Head", r=0.4, d=1, guide=True)
         self.cvJawLoc  = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_Jaw", r=0.3, d=1, guide=True)
@@ -57,8 +84,8 @@ class Head(standard.BaseStandard):
         self.cvFaceLoc    = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_Face", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_052_FacialFace"))
         self.cvDeformerCenterLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_DeformerCenter", r=0.6, d=1, guide=True, color="cyan")
         self.cvDeformerRadiusLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_DeformerRadius", r=0.3, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_100_HeadDeformerRadius"))
-
-        # create jointGuides:
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        # joints
         self.jGuideNeck0 = cmds.joint(name=self.name_guide+"_JGuideNeck0", radius=0.001)
         self.jGuideHead = cmds.joint(name=self.name_guide+"_JGuideHead", radius=0.001)
         self.jGuideUpperJaw = cmds.joint(name=self.name_guide+"_JGuideUpperJaw", radius=0.001)
@@ -73,34 +100,11 @@ class Head(standard.BaseStandard):
         self.jGuideLowerLip = cmds.joint(name=self.name_guide+"_JGuideLowerLip", radius=0.001)
         cmds.select(self.jGuideJaw)
         self.jGuideLLip = cmds.joint(name=self.name_guide+"_JGuideLLip", radius=0.001)
-        # set jointGuides as templates:
-        jGuideList = [self.jGuideNeck0, self.jGuideHead, self.jGuideUpperJaw, self.jGuideUpperHead, self.jGuideJaw, self.jGuideChin, self.jGuideChew, self.jGuideUpperLip, self.jGuideLowerLip]
-        for jGuide in jGuideList:
-            cmds.setAttr(jGuide+".template", 1)
-        cmds.parent(self.jGuideNeck0, self.guide_base, relative=True)
-        # create cvEnd:
         cmds.select(self.jGuideChew)
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvChewLoc)
-        cmds.setAttr(self.cvEndJoint+".tz", self.ar.ctrls.dpCheckLinearUnit(0.6, boundingBox=False))
         self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.parent(self.jGuideEnd, self.jGuideChew)
-        # connect cvLocs in jointGuides:
-        self.ar.ctrls.directConnect(self.cvNeckLoc, self.jGuideNeck0, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvHeadLoc, self.jGuideHead, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvUpperJawLoc, self.jGuideUpperJaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvUpperHeadLoc, self.jGuideUpperHead, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvJawLoc, self.jGuideJaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvChinLoc, self.jGuideChin, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvChewLoc, self.jGuideChew, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvUpperLipLoc, self.jGuideUpperLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvLowerLipLoc, self.jGuideLowerLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvLCornerLipLoc, self.jGuideLLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        # limit, lock and hide cvEnd:
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        # setup
+        self.ar.utils.set_template([self.jGuideNeck0, self.jGuideHead, self.jGuideUpperJaw, self.jGuideUpperHead, self.jGuideJaw, self.jGuideChin, self.jGuideChew, self.jGuideUpperLip, self.jGuideLowerLip, self.jGuideEnd])
+        cmds.setAttr(self.cvEndJoint+".tz", self.ar.ctrls.dpCheckLinearUnit(0.6, boundingBox=False))
         # transform cvLocs in order to put as a good head guide:
         cmds.setAttr(self.guide_base+".rotateX", -90)
         cmds.setAttr(self.guide_base+".rotateY", 90)
@@ -172,7 +176,9 @@ class Head(standard.BaseStandard):
         cmds.setAttr(self.cvFaceLoc+".translateZ", 0.7)
         for facialLoc in [self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvDeformerCenterLoc]:
             cmds.setAttr(facialLoc+".visibility", 0)
-        # make parenting between cvLocs:
+        # parenting
+        cmds.parent(self.jGuideNeck0, self.guide_base, relative=True)
+        cmds.parent(self.cvEndJoint, self.cvChewLoc, relative=True)
         cmds.parent(self.cvNeckLoc, self.guide_base)
         cmds.parent(self.cvHeadLoc, self.cvNeckLoc)
         cmds.parent(self.cvUpperJawLoc, self.cvJawLoc, self.cvHeadLoc)
@@ -188,6 +194,23 @@ class Head(standard.BaseStandard):
         cmds.parent(self.cvFaceLoc, self.cvHeadLoc)
         cmds.parent(self.cvDeformerCenterLoc, self.cvUpperHeadLoc)
         cmds.parent(self.cvDeformerRadiusLoc, self.cvDeformerCenterLoc)
+        # edit
+        self.ar.ctrls.directConnect(self.cvNeckLoc, self.jGuideNeck0, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvHeadLoc, self.jGuideHead, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvUpperJawLoc, self.jGuideUpperJaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvUpperHeadLoc, self.jGuideUpperHead, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvJawLoc, self.jGuideJaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvChinLoc, self.jGuideChin, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvChewLoc, self.jGuideChew, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvUpperLipLoc, self.jGuideUpperLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvLowerLipLoc, self.jGuideLowerLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvLCornerLipLoc, self.jGuideLLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+
+
+    def create_guide_deformer_cube(self):
         # deformer cube setup
         defCubeList = cmds.polyCube(name=self.name_guide+"_DeformerCube_Geo", constructionHistory=True)
         self.deformerCube = defCubeList[0]
@@ -202,40 +225,6 @@ class Head(standard.BaseStandard):
             cmds.connectAttr(self.defRadiusMD+".output"+axis, defPolyCube+"."+attr)
         cmds.setAttr(self.deformerCube+".template", 1)
         self.ar.utils.addCustomAttr([self.deformerCube], self.ar.skin.ignoreSkinningAttr)
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
-                                ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "DeformerCenter", "DeformerRadius", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
-
-    
-    def create_guide_custom_attr(self):
-        """ Add guide_base attributes and set them.
-        """
-        cmds.addAttr(self.guide_base, longName="nJoints", defaultValue=1, attributeType='long')
-        cmds.addAttr(self.guide_base, longName="flip", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="articulation", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="corrective", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="deformer", attributeType='bool')
-        cmds.addAttr(self.guide_base, longName="facial", attributeType='bool')
-        for attr in self.facialAttrList:
-            cmds.addAttr(self.guide_base, longName=attr, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="connectUserType", attributeType='long', defaultValue=0) #bs
-        cmds.addAttr(self.guide_base, longName=JAW, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName=CHIN, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName=LIPS, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName=UPPERHEAD, attributeType='bool', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
-
-
-
-    def create_guide_elements(self):
-        """ Creates the controller locators of the standard module guide.
-        """
-        # locators
-        # joints
-        # setup
-        # parenting
-        # edit
-        print("WIP....", self.name)
         
 
 

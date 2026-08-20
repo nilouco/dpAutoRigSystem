@@ -14,7 +14,7 @@ class Spine(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         # declare variable
-        self.composed = {}
+#        self.composed = {}
         self.cvJointLoc = None
         self.shapeSizeCH = None
         self.currentNJoints = 3
@@ -37,11 +37,9 @@ class Spine(standard.BaseStandard):
         self.create_guide_custom_attr()
         self.create_guide_elements()
         self.changeJointNumber(3)
+        self.set_guide_base_initial_position()
         self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], 
                                    ["JointLoc1", "JointEnd"])
-        cmds.setAttr(self.guide_base+".rx", -90)
-        cmds.setAttr(self.guide_base+".ry", -90)
-        cmds.setAttr(self.radius_ctrl+".tx", 4)
 
 
     def create_guide_custom_attr(self):
@@ -70,6 +68,13 @@ class Spine(standard.BaseStandard):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
+
+    def set_guide_base_initial_position(self):
+        cmds.setAttr(self.guide_base+".rx", -90)
+        cmds.setAttr(self.guide_base+".ry", -90)
+        cmds.setAttr(self.radius_ctrl+".tx", 4)
+
+        
         
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.

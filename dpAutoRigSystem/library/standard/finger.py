@@ -21,9 +21,9 @@ class Finger(standard.BaseStandard):
         self.create_guide_custom_attr()
         self.create_guide_elements()
         self.changeJointNumber(3)
-        self.add_node_to_guide_net([self.cvBaseJoint, self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc0", "JointLoc1", "JointLoc2", "JointEnd"])
-        cmds.setAttr(self.guide_base+".rotateX", 90)
-        cmds.setAttr(self.guide_base+".rotateZ", 90)
+        self.set_guide_base_initial_position()
+        self.add_node_to_guide_net([self.cvBaseJoint, self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], 
+                                   ["JointLoc0", "JointLoc1", "JointLoc2", "JointEnd"])
 
 
     def create_guide_custom_attr(self):
@@ -48,10 +48,7 @@ class Finger(standard.BaseStandard):
         self.jGuide = cmds.joint(name=self.name_guide+"_JGuide2", radius=0.001)
         self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
-        cmds.setAttr(self.jGuide0+".template", 1)
-        cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.setAttr(self.jGuide+".template", 1)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
+        self.ar.utils.set_template([self.jGuide0, self.jGuide1, self.jGuide, self.jGuideEnd])
         cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
         cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
         cmds.setAttr(self.cvJointLoc+".translateZ", 1)
@@ -72,7 +69,9 @@ class Finger(standard.BaseStandard):
         self.ar.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
-
+    def set_guide_base_initial_position(self):
+        cmds.setAttr(self.guide_base+".rotateX", 90)
+        cmds.setAttr(self.guide_base+".rotateZ", 90)
 
 
         

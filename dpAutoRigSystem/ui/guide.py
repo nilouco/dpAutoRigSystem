@@ -260,15 +260,15 @@ class GuideUI(object):
         if 'startFrame' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_start_frame_rl', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
             cmds.text('edit_guide_start_frame_txt', label=self.ar.data.lang["i169_startFrame"], parent='edit_guide_start_frame_rl')
-            cmds.intField('edit_guide_start_frame_if', value=cmds.getAttr(standard.guide_base+".startFrame"), changeCommand=standard.set_start_frame, parent='edit_guide_start_frame_rl')
+            cmds.intField('edit_guide_start_frame_if', value=cmds.getAttr(standard.guide_base+".startFrame"), changeCommand=partial(standard.set_guide_attr, 'startFrame'), parent='edit_guide_start_frame_rl')
 
 
     def steering_layout(self, standard):
         if 'steering' in cmds.listAttr(standard.guide_base):
             if not 'startFrame' in cmds.listAttr(standard.guide_base):
                 cmds.rowLayout('edit_guide_start_frame_rl', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
-            cmds.checkBox('edit_guide_steering_cb', label=self.ar.data.lang['m158_steering'], value=cmds.getAttr(standard.guide_base+".steering"), changeCommand=standard.set_wheel_steering, parent='edit_guide_start_frame_rl')
-            cmds.checkBox('edit_guide_show_ctrls_cb', label=self.ar.data.lang['i170_showControls'], value=cmds.getAttr(standard.guide_base+".showControls"), changeCommand=standard.changeShowControls, parent='edit_guide_start_frame_rl')
+            cmds.checkBox('edit_guide_steering_cb', label=self.ar.data.lang['m158_steering'], value=cmds.getAttr(standard.guide_base+".steering"), changeCommand=partial(standard.set_guide_attr, 'steering'), parent='edit_guide_start_frame_rl')
+            cmds.checkBox('edit_guide_show_ctrls_cb', label=self.ar.data.lang['i170_showControls'], value=cmds.getAttr(standard.guide_base+".showControls"), changeCommand=partial(standard.set_guide_attr, 'showControls'), parent='edit_guide_start_frame_rl')
 
 
     def fatherb_layout(self, standard):

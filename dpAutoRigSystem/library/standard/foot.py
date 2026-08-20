@@ -29,10 +29,17 @@ class Foot(standard.BaseStandard):
     def create_guide(self, *args):
         self.create_guide_base()
         self.create_guide_elements()
-        
+        self.set_guide_base_initial_position()
+        self.add_node_to_guide_net([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.cvEndJoint], 
+                                   ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
+
+    
 
 
-        # create cvJointLoc and cvLocators:
+    def create_guide_elements(self):
+        """ Creates the controller locators of the standard module guide.
+        """
+        # locators
         self.cvFootLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_Foot", r=0.3, d=1, guide=True)
         self.cvRFALoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfA", r=0.3, d=1, guide=True)
         self.cvRFBLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfB", r=0.3, d=1, guide=True)
@@ -40,7 +47,8 @@ class Foot(standard.BaseStandard):
         self.cvRFDLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfD", r=0.3, d=1, guide=True)
         self.cvRFELoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfE", r=0.3, d=1, guide=True)
         self.cvRFFLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfF", r=0.3, d=1, guide=True)
-        # create jointGuides:
+        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        # joints
         self.jGuideFoot = cmds.joint(name=self.name_guide+"_JGuideFoot", radius=0.001)
         self.jGuideRFF = cmds.joint(name=self.name_guide+"_JGuideRfF", radius=0.001)
         self.jGuideRFE = cmds.joint(name=self.name_guide+"_JGuideRfE", radius=0.001)
@@ -50,39 +58,11 @@ class Foot(standard.BaseStandard):
         self.jGuideRFB = cmds.joint(name=self.name_guide+"_JGuideRfB", radius=0.001)
         self.jGuideRFC = cmds.joint(name=self.name_guide+"_JGuideRfC", radius=0.001)
         self.jGuideRFAC = cmds.joint(name=self.name_guide+"_JGuideRfAC", radius=0.001)
-        # set jointGuides as templates:
-        cmds.setAttr(self.jGuideFoot+".template", 1)
-        cmds.setAttr(self.jGuideRFA+".template", 1)
-        cmds.setAttr(self.jGuideRFB+".template", 1)
-        cmds.setAttr(self.jGuideRFC+".template", 1)
-        cmds.setAttr(self.jGuideRFD+".template", 1)
-        cmds.setAttr(self.jGuideRFE+".template", 1)
-        cmds.setAttr(self.jGuideRFF+".template", 1)
-        cmds.parent(self.jGuideFoot, self.jGuideRFA, self.guide_base, relative=True)
-        # create cvEnd:
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvRFFLoc)
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+        cmds.select(clear=True)
         self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.parent(self.jGuideEnd, self.jGuideRFF)
-        # make parents between cvLocs:
-        cmds.parent(self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.guide_base)
-        cmds.parent(self.cvRFFLoc, self.cvFootLoc)
-        # connect cvLocs in jointGuides:
-        self.ar.ctrls.directConnect(self.cvFootLoc, self.jGuideFoot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFA, maintainOffset=False, name=self.jGuideRFA+"_PaC")
-        cmds.parentConstraint(self.cvRFBLoc, self.jGuideRFB, maintainOffset=False, name=self.jGuideRFB+"_PaC")
-        cmds.parentConstraint(self.cvRFCLoc, self.jGuideRFC, maintainOffset=False, name=self.jGuideRFC+"_PaC")
-        cmds.parentConstraint(self.cvRFDLoc, self.jGuideRFD, maintainOffset=False, name=self.jGuideRFD+"_PaC")
-        cmds.parentConstraint(self.cvRFELoc, self.jGuideRFE, maintainOffset=False, name=self.jGuideRFE+"_PaC")
-        cmds.parentConstraint(self.cvRFFLoc, self.jGuideRFF, maintainOffset=False, name=self.jGuideRFF+"_PaC")
-        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFAC, maintainOffset=False, name=self.jGuideRFAC+"_PaC")
-        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        # limit, lock and hide cvEnd:
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        # transform cvLocs in order to put as a good foot guide:
+        # setup
+        self.ar.utils.set_template([self.jGuideFoot, self.jGuideRFA, self.jGuideRFB, self.jGuideRFC, self.jGuideRFD, self.jGuideRFE, self.jGuideRFF, self.jGuideEnd])
+        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         cmds.setAttr(self.cvFootLoc+".translateZ", 2)
         cmds.setAttr(self.cvFootLoc+".rotateX", 90)
         cmds.setAttr(self.cvFootLoc+".rotateZ", -90)
@@ -105,29 +85,32 @@ class Foot(standard.BaseStandard):
         cmds.setAttr(self.cvRFDLoc+".translateX", -3.5)
         cmds.setAttr(self.cvRFDLoc+".rotateX", 90)
         cmds.setAttr(self.cvRFDLoc+".rotateZ", -90)
-
-
-        # include nodes into net
-        self.add_node_to_guide_net([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.cvEndJoint], ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
-        cmds.setAttr(self.guide_base+".rotateX", -90)
-        cmds.setAttr(self.guide_base+".rotateY", 90)
-
-        # bottom setup
+        # parenting
+        cmds.parent(self.jGuideFoot, self.jGuideRFA, self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.guide_base, relative=True)
+        cmds.parent(self.cvEndJoint, self.cvRFFLoc, relative=True)
+        cmds.parent(self.cvRFFLoc, self.cvFootLoc, relative=True)
+        cmds.parent(self.jGuideEnd, self.jGuideRFF)
         cvRFEZeroOut = self.ar.utils.zeroOut([self.cvRFELoc], True)
+        # edit
         cvRFEOffsetGrp = cmds.listRelatives(cvRFEZeroOut, children=True)[0]
         cmds.parentConstraint(self.cvRFFLoc, cvRFEOffsetGrp, maintainOffset=True, skipTranslate="y", name=cvRFEOffsetGrp+"_PaC")
+        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFA, maintainOffset=False, name=self.jGuideRFA+"_PaC")
+        cmds.parentConstraint(self.cvRFBLoc, self.jGuideRFB, maintainOffset=False, name=self.jGuideRFB+"_PaC")
+        cmds.parentConstraint(self.cvRFCLoc, self.jGuideRFC, maintainOffset=False, name=self.jGuideRFC+"_PaC")
+        cmds.parentConstraint(self.cvRFDLoc, self.jGuideRFD, maintainOffset=False, name=self.jGuideRFD+"_PaC")
+        cmds.parentConstraint(self.cvRFELoc, self.jGuideRFE, maintainOffset=False, name=self.jGuideRFE+"_PaC")
+        cmds.parentConstraint(self.cvRFFLoc, self.jGuideRFF, maintainOffset=False, name=self.jGuideRFF+"_PaC")
+        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFAC, maintainOffset=False, name=self.jGuideRFAC+"_PaC")
+        self.ar.ctrls.directConnect(self.cvFootLoc, self.jGuideFoot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
 
+ 
+    def set_guide_base_initial_position(self):
+         cmds.setAttr(self.guide_base+".rotateX", -90)
+         cmds.setAttr(self.guide_base+".rotateY", 90)
 
-    def create_guide_elements(self):
-        """ Creates the controller locators of the standard module guide.
-        """
-        # locators
-        # joints
-        # setup
-        # parenting
-        # edit
-        print("WIP....", self.name)
-        
 
     def rig_me(self, *args):
         standard.BaseStandard.rig_me(self)

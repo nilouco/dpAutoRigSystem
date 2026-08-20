@@ -1598,3 +1598,8 @@ class Utils(object):
         # Inserts an underscore before any capital letter if preceded by a lowercase letter or number
         s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1)
         return s2.lower()
+
+
+    def set_template(self, items, value=1):
+        for item in items:
+            cmds.setAttr(f"{item}.template", value)

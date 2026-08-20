@@ -27,9 +27,9 @@ class Chain(standard.BaseStandard):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
+        self.changeJointNumber(5)
         self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], 
                                    ["JointLoc1", "JointEnd"])
-        self.changeJointNumber(5)
 
 
     def create_guide_custom_attr(self):
@@ -53,8 +53,7 @@ class Chain(standard.BaseStandard):
         self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
-        cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.setAttr(self.jGuideEnd+".template", 1)
+        self.ar.utils.set_template([self.jGuide1, self.jGuideEnd])
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         # parenting
         cmds.parent(self.jGuide1, self.guide_base, relative=True)
