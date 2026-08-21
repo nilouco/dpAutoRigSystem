@@ -31,11 +31,11 @@ class Single(standard.BaseStandard):
         return cmds.getAttr(self.guide_base + ".sdkLocator")
     
     
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
+        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc], ["JointLoc1", "JointEnd"])
 
 
     def create_guide_custom_attr(self):
@@ -52,24 +52,24 @@ class Single(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
-        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.jGuide1, self.jGuideEnd])
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+        self.ar.utils.set_template([self.line, self.line_end])
+        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
         # parenting
-        cmds.parent(self.jGuide1, self.cvJointLoc, self.guide_base, relative=True)
-        cmds.parent(self.cvEndJoint, self.cvJointLoc)
+        cmds.parent(self.line, self.guide_loc, self.guide_base, relative=True)
+        cmds.parent(self.guide_end_loc, self.guide_loc)
         # edit
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
-        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScC")
-        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScC")
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
+        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
+        cmds.scaleConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_ScC")
+        cmds.scaleConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_ScC")
+        cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
 
     
@@ -96,8 +96,8 @@ class Single(standard.BaseStandard):
                 cmds.select(clear=True)
                 # declare guide:
                 self.guide = side+self.number_name+"_Guide_JointLoc1"
-                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.number_name+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -125,7 +125,7 @@ class Single(standard.BaseStandard):
                         else:
                             indirectSkinRot=(0, 0, -90)
                 self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
-                self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
@@ -216,7 +216,7 @@ class Single(standard.BaseStandard):
                 cmds.select(self.jnt)
                 self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.ar.utils.addJointEndAttr([self.endJoint])
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.getHasIndirectSkin():

@@ -32,16 +32,16 @@ class HideCorrectives(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
-            if optionCtrl:
+            option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+            if option_ctrl:
                 if inputs:
                     check_items = cmds.attributeQuery('correctiveCtrls', node=inputs[0], exists=True)
                 else:
-                    check_items = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
+                    check_items = cmds.attributeQuery('correctiveCtrls', node=option_ctrl, exists=True)
                 if check_items:
                     self.ar.utils.setProgress(max=1)
                     self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                    item = optionCtrl+".correctiveCtrls"
+                    item = option_ctrl+".correctiveCtrls"
                     # conditional to check here
                     checkChannelBox = cmds.getAttr(item, channelBox=True)
                     if checkChannelBox:

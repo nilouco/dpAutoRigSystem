@@ -15,12 +15,12 @@ class Steering(standard.BaseStandard):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
         self.set_guide_base_initial_position()
-        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], 
+        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc], 
                                    ["JointLoc1", "JointEnd"])
     
 
@@ -34,22 +34,22 @@ class Steering(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
-        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.jGuide1, self.jGuideEnd])
-        cmds.setAttr(self.cvEndJoint+".tz", 3)
+        self.ar.utils.set_template([self.line, self.line_end])
+        cmds.setAttr(self.guide_end_loc+".tz", 3)
         # parenting
-        cmds.parent(self.jGuide1, self.cvJointLoc, self.guide_base, relative=True)
-        cmds.parent(self.cvEndJoint, self.cvJointLoc)
+        cmds.parent(self.line, self.guide_loc, self.guide_base, relative=True)
+        cmds.parent(self.guide_end_loc, self.guide_loc)
         # edit
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
+        cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
+        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
         
 
     def set_guide_base_initial_position(self):
@@ -71,8 +71,8 @@ class Steering(standard.BaseStandard):
                 cmds.select(clear=True)
                 # declare guide:
                 self.guide = side+self.number_name+"_Guide_JointLoc1"
-                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.number_name+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -84,13 +84,13 @@ class Steering(standard.BaseStandard):
                 self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
                 self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.steeringCtrl)
                 self.ar.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
-                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide_end_loc+";"+self.guide_radius)
                 self.steeringCtrlList.append(self.steeringCtrl)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.steeringCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.mainCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.mainCtrl, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
                 cmds.setAttr(self.endJoint+".translateY", 1)
                 # zeroOut controls:
                 zeroOutCtrlGrpList = self.ar.utils.zeroOut([self.steeringCtrl, self.mainCtrl])

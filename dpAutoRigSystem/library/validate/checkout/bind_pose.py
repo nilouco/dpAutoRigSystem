@@ -51,9 +51,9 @@ class BindPose(action.BaseAction):
                             for item in check_items:
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
-                            jntList = self.ar.skin.getSkinnedJointList()
-                            if jntList:
-                                cmds.dagPose(jntList, save=True, bindPose=True, name=self.bindPoseName)
+                            joints = self.ar.skin.getSkinnedJointList()
+                            if joints:
+                                cmds.dagPose(joints, save=True, bindPose=True, name=self.bindPoseName)
                             self.good_results.append(True)
                             self.messages.append(self.ar.data.lang['v004_fixed']+": "+self.bindPoseName)
                         except:

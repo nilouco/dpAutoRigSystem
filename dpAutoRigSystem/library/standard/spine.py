@@ -15,9 +15,9 @@ class Spine(standard.BaseStandard):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         # declare variable
 #        self.composed = {}
-        self.cvJointLoc = None
+        self.guide_loc = None
         self.shapeSizeCH = None
-        self.currentNJoints = 3
+        self.current_joint_number = 3
         # list of returned data:
         self.aHipsAList = []
         self.tipList = []
@@ -32,13 +32,13 @@ class Spine(standard.BaseStandard):
         self.shapeVisAttrList = []
     
 
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.changeJointNumber(3)
+        self.change_joint_number(3)
         self.set_guide_base_initial_position()
-        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint], 
+        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc], 
                                    ["JointLoc1", "JointEnd"])
 
 
@@ -53,20 +53,20 @@ class Spine(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.5, d=1, guide=True)
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.5, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
-        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         # setup
-        cmds.setAttr(self.jGuide1+".template", 1)
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+        cmds.setAttr(self.line+".template", 1)
+        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
         # parenting
-        cmds.parent(self.jGuide1, self.cvJointLoc, self.guide_base)
-        cmds.parent(self.cvEndJoint, self.cvJointLoc)
+        cmds.parent(self.line, self.guide_loc, self.guide_base)
+        cmds.parent(self.guide_end_loc, self.guide_loc)
         # edit
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
+        cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
     def set_guide_base_initial_position(self):
@@ -76,53 +76,44 @@ class Spine(standard.BaseStandard):
 
         
         
-    def changeJointNumber(self, enteredNJoints, *args):
+    def change_joint_number(self, inputted, *args):
         """ Edit the number of joints in the guide.
         """
-        self.ar.opt.check_use_default_render_layer()
-        # get the number of joints entered by user:
-        if enteredNJoints == 0:
-            if self.ar.data.ui_state:
-                self.enteredNJoints = cmds.intField("edit_guide_n_joints_if", query=True, value=True)
-            else:
-                return
-        else:
-            self.enteredNJoints = enteredNJoints
-        if self.enteredNJoints >= 3:
-            # get the number of joints existing:
-            self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
-            # start analisys the difference between values:
-            if self.enteredNJoints != self.currentNJoints:
-                self.cvEndJoint = self.name_guide+"_JointEnd"
-                if self.currentNJoints > 1:
+        joint_number = self.parse_inputted_joint_number(inputted)
+        if joint_number and joint_number >= 3:
+            self.ar.opt.check_use_default_render_layer()
+            self.current_joint_number = cmds.getAttr(self.guide_base+".nJoints")
+            if joint_number != self.current_joint_number:
+                self.guide_end_loc = self.name_guide+"_JointEnd"
+                if self.current_joint_number > 1:
                     # delete current point constraints:
-                    for n in range(2, self.currentNJoints):
+                    for n in range(2, self.current_joint_number):
                         cmds.delete(self.name_guide+"_PaC"+str(n))
                 # verify if the nJoints is greather or less than the current
-                if self.enteredNJoints > self.currentNJoints:
+                if joint_number > self.current_joint_number:
                     # add the new cvLocators:
-                    for n in range(self.currentNJoints+1, self.enteredNJoints+1):
+                    for n in range(self.current_joint_number+1, joint_number+1):
                         # create another N cvLocator:
                         self.cvLocator = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
-                        self.jGuide = cmds.joint(name=self.name_guide+"_JGuide"+str(n), radius=0.001)
+                        self.line = cmds.joint(name=self.name_guide+"_JGuide"+str(n), radius=0.001)
                         # set its nJoint value as n:
-                        cmds.setAttr(self.jGuide+".template", 1)
+                        cmds.setAttr(self.line+".template", 1)
                         cmds.setAttr(self.cvLocator+".nJoint", n)
                         # parent its group to the first cvJointLocator:
                         self.cvLocGrp = cmds.group(self.cvLocator, name=self.cvLocator+"_Grp")
                         cmds.parent(self.cvLocGrp, self.name_guide+"_JointLoc"+str(n-1), relative=True)
-                        cmds.parent(self.jGuide, self.name_guide+"_JGuide"+str(n-1), relative=True)
+                        cmds.parent(self.line, self.name_guide+"_JGuide"+str(n-1), relative=True)
                         cmds.setAttr(self.cvLocGrp+".translateZ", 2)
-                        cmds.parentConstraint(self.cvLocator, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
+                        cmds.parentConstraint(self.cvLocator, self.line, maintainOffset=False, name=self.line+"_PaC")
                         if n > 2:
                             cmds.parent(self.cvLocGrp, self.name_guide+"_JointLoc1", absolute=True)
                         self.add_node_to_guide_net([self.cvLocator], ["JointLoc"+str(n)])
-                elif self.enteredNJoints < self.currentNJoints:
+                elif joint_number < self.current_joint_number:
                     # re-parent cvEndJoint:
-                    self.cvLocator = self.name_guide+"_JointLoc" + str(self.enteredNJoints)
-                    cmds.parent(self.cvEndJoint, world=True)
+                    self.cvLocator = self.name_guide+"_JointLoc" + str(joint_number)
+                    cmds.parent(self.guide_end_loc, world=True)
                     # delete difference of nJoints:
-                    for n in range(self.enteredNJoints, self.currentNJoints):
+                    for n in range(joint_number, self.current_joint_number):
                         # re-parent the children guides:
                         childrenGuideBellowList = self.ar.utils.getGuideChildrenList(self.name_guide+"_JointLoc"+str(n+1)+"_Grp")
                         if childrenGuideBellowList:
@@ -130,27 +121,27 @@ class Spine(standard.BaseStandard):
                                 cmds.parent(childGuide, self.cvLocator)
                         cmds.delete(self.name_guide+"_JointLoc"+str(n+1)+"_Grp")
                         self.remove_attr_from_guide_net(["JointLoc"+str(n+1)])
-                    cmds.delete(self.name_guide+"_JGuide"+str(self.enteredNJoints+1))
+                    cmds.delete(self.name_guide+"_JGuide"+str(joint_number+1))
                 # re-parent cvEndJoint:
-                cmds.parent(self.cvEndJoint, self.cvLocator)
-                cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-                cmds.setAttr(self.cvEndJoint+".visibility", 0)
+                cmds.parent(self.guide_end_loc, self.cvLocator)
+                cmds.setAttr(self.guide_end_loc+".tz", 1.3)
+                cmds.setAttr(self.guide_end_loc+".visibility", 0)
                 # re-create parentConstraints:
-                if self.enteredNJoints > 1:
-                    for n in range(2, self.enteredNJoints):
-                        self.parentConst = cmds.parentConstraint(self.name_guide+"_JointLoc1", self.cvEndJoint, self.name_guide+"_JointLoc"+str(n)+"_Grp", name=self.name_guide+"_PaC"+str(n), maintainOffset=True)[0]
-                        nParentValue = (n-1) / float(self.enteredNJoints-1)
+                if joint_number > 1:
+                    for n in range(2, joint_number):
+                        self.parentConst = cmds.parentConstraint(self.name_guide+"_JointLoc1", self.guide_end_loc, self.name_guide+"_JointLoc"+str(n)+"_Grp", name=self.name_guide+"_PaC"+str(n), maintainOffset=True)[0]
+                        nParentValue = (n-1) / float(joint_number-1)
                         cmds.setAttr(self.parentConst+".Guide_JointLoc1W0", 1-nParentValue)
                         cmds.setAttr(self.parentConst+".Guide_JointEndW1", nParentValue)
                         self.ar.ctrls.setLockHide([self.name_guide+"_JointLoc"+ str(n)], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                 # actualise the nJoints in the main:
-                cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
-                self.currentNJoints = self.enteredNJoints
-                # re-build the preview mirror:
+                cmds.setAttr(self.guide_base+".nJoints", joint_number)
+                self.current_joint_number = joint_number
+                # re-create the preview mirror:
                 self.create_mirror_preview()
             cmds.select(self.guide_base)
         else:
-            self.changeJointNumber(3)
+            self.change_joint_number(3)
 
 
     def rig_me(self, *args):
@@ -168,17 +159,17 @@ class Spine(standard.BaseStandard):
                 chestName = self.ar.data.lang['c028_chest']
             # run for all sides
             for s, side in enumerate(self.sides):
-                attrNameLower = self.ar.utils.getAttrNameLower(side, self.number_name)
+                attr_name_lower = self.ar.utils.getAttrNameLower(side, self.number_name)
                 self.base = side+self.number_name+'_Guide_Base'
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # get the number of joints to be created:
-                self.nJoints = cmds.getAttr(self.base+".nJoints")
+                self.n_joints = cmds.getAttr(self.base+".nJoints")
                 # create controls:
                 self.hipsACtrl = self.ar.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.number_name+"_"+hipsName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
-                self.chestACtrl = self.ar.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.number_name+"_"+chestName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(self.nJoints))
+                self.chestACtrl = self.ar.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.number_name+"_"+chestName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
                 # create start and end Fk controls:
                 self.hipsFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.number_name+"_"+hipsName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc1")
-                self.chestFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.number_name+"_"+chestName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc"+str(self.nJoints))
+                self.chestFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.number_name+"_"+chestName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
                 # optimize controls CV shapes:
                 tempHipsACluster = cmds.cluster(self.hipsACtrl)[1]
                 cmds.setAttr(tempHipsACluster+".scaleY", 0.25)
@@ -192,20 +183,20 @@ class Spine(standard.BaseStandard):
                 cmds.move(0, hipsFkCtrlCVPos, 0, self.hipsFkCtrl+"0Shape.cv[0:5]", relative=True, worldSpace=True, worldSpaceDistance=True)
                 
                 self.hipsBCtrl = self.ar.ctrls.cvControl("id_042_SpineHipsB", side+self.number_name+"_"+hipsName+"B_Ctrl", r=self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_Base")
-                self.chestBCtrl = self.ar.ctrls.cvControl("id_045_SpineChestB", side+self.number_name+"_"+chestName+"B_Ctrl", r=self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc"+str(self.nJoints))
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Active_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Fk_ikFkBlend', attributeType="float", min=0, max=1, defaultValue=1, keyable=True)
+                self.chestBCtrl = self.ar.ctrls.cvControl("id_045_SpineChestB", side+self.number_name+"_"+chestName+"B_Ctrl", r=self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+'_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+'Active_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+'Fk_ikFkBlend', attributeType="float", min=0, max=1, defaultValue=1, keyable=True)
                 self.aHipsAList.append(self.hipsACtrl)
-                self.aVolVariationAttrList.append(attrNameLower+'_'+self.ar.data.lang['c031_volumeVariation'])
-                self.aActVolVariationAttrList.append(attrNameLower+'Active_'+self.ar.data.lang['c031_volumeVariation'])
-                self.aMScaleVolVariationAttrList.append(attrNameLower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'])
-                self.aIkFkBlendAttrList.append(attrNameLower+'Fk_ikFkBlend')
+                self.aVolVariationAttrList.append(attr_name_lower+'_'+self.ar.data.lang['c031_volumeVariation'])
+                self.aActVolVariationAttrList.append(attr_name_lower+'Active_'+self.ar.data.lang['c031_volumeVariation'])
+                self.aMScaleVolVariationAttrList.append(attr_name_lower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'])
+                self.aIkFkBlendAttrList.append(attr_name_lower+'Fk_ikFkBlend')
                 
                 # base and end controls:
                 self.baseCtrl = self.ar.ctrls.cvControl("id_089_SpineBase", side+self.number_name+"_"+baseName+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc1")
-                self.tipCtrl = self.ar.ctrls.cvControl("id_090_SpineTip", side+self.number_name+"_"+endName+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc"+str(self.nJoints))
+                self.tipCtrl = self.ar.ctrls.cvControl("id_090_SpineTip", side+self.number_name+"_"+endName+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
                 self.tipList.append(self.tipCtrl)
                 # optimize control CV shapes:
                 tempBaseCluster = cmds.cluster(self.baseCtrl)[1]
@@ -218,12 +209,12 @@ class Spine(standard.BaseStandard):
                     cmds.setAttr(tempTipCluster+".translateY", 0.2*self.radius)
                 cmds.delete([self.baseCtrl, self.tipCtrl], constructionHistory=True)
                 # shape visibility
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+endName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+baseName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+endName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+baseName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
-                self.shapeVisAttrList.append(attrNameLower+endName+self.ar.data.lang['c126_display'])
-                self.shapeVisAttrList.append(attrNameLower+baseName+self.ar.data.lang['c126_display'])
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+endName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+baseName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attr_name_lower+endName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attr_name_lower+baseName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                self.shapeVisAttrList.append(attr_name_lower+endName+self.ar.data.lang['c126_display'])
+                self.shapeVisAttrList.append(attr_name_lower+baseName+self.ar.data.lang['c126_display'])
 
                 # Setup axis order
                 if style == 2: #quadruped
@@ -263,7 +254,7 @@ class Spine(standard.BaseStandard):
                     cmds.makeIdentity(self.hipsACtrl, self.chestACtrl, apply=True, rotate=True)
                 # position of controls:
                 bottomLocGuide = side+self.number_name+"_Guide_JointLoc1"
-                topLocGuide = side+self.number_name+"_Guide_JointLoc"+str(self.nJoints)
+                topLocGuide = side+self.number_name+"_Guide_JointLoc"+str(self.n_joints)
                 # snap controls to guideLocators:
                 cmds.delete(cmds.parentConstraint(bottomLocGuide, self.hipsACtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(topLocGuide, self.chestACtrl, maintainOffset=False))
@@ -282,11 +273,11 @@ class Spine(standard.BaseStandard):
                 self.tipCtrlZero = self.ar.utils.zeroOut([self.tipCtrl])[0]
                 self.ar.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['v'], l=False)
                 # modify the pivots of chest controls:
-                upPivotPos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.nJoints-1), query=True, worldSpace=True, translation=True)
+                upPivotPos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints-1), query=True, worldSpace=True, translation=True)
                 cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestACtrl+".scalePivot", self.chestACtrl+".rotatePivot")
                 
                 # add originedFrom attributes to hipsA, hipsB and chestB:
-                self.ar.utils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.guide_radius)
                 self.ar.utils.originedFrom(objName=self.baseCtrl, attrString=bottomLocGuide)
                 self.ar.utils.originedFrom(objName=self.tipCtrl, attrString=topLocGuide)
 
@@ -295,7 +286,7 @@ class Spine(standard.BaseStandard):
                 baseJnt = cmds.joint(name=side+self.number_name+"_00_"+self.ar.data.lang['c106_base']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(baseJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(clear=True)
-                tipJnt = cmds.joint(name=side+self.number_name+"_"+str(self.nJoints+1).zfill(2)+"_"+self.ar.data.lang['c120_tip']+"_Jnt", scaleCompensate=False)
+                tipJnt = cmds.joint(name=side+self.number_name+"_"+str(self.n_joints+1).zfill(2)+"_"+self.ar.data.lang['c120_tip']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(tipJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 self.ar.utils.setJointLabel(baseJnt, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c106_base'])
@@ -307,7 +298,7 @@ class Spine(standard.BaseStandard):
                 cmds.scaleConstraint(self.tipCtrl, tipJnt, maintainOffset=True, name=tipJnt+"_ScC")
 
                 # create a simple spine ribbon:
-                returnedRibbonList = self.ar.ctrls.createSimpleRibbon(name=side+self.number_name, totalJoints=(self.nJoints-1), jointLabelNumber=(s+self.joint_label_add), jointLabelName=self.number_name)
+                returnedRibbonList = self.ar.ctrls.createSimpleRibbon(name=side+self.number_name, totalJoints=(self.n_joints-1), jointLabelNumber=(s+self.joint_label_add), jointLabelName=self.number_name)
                 rbnNurbsPlane = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
                 rbnJointGrpList = returnedRibbonList[2]
@@ -318,17 +309,17 @@ class Spine(standard.BaseStandard):
                 cmds.rotate(90, 90, 0, rbnNurbsPlane)
                 cmds.makeIdentity(rbnNurbsPlane, apply=True, translate=True, rotate=True)
                 downLocPos = cmds.xform(side+self.number_name+"_Guide_JointLoc1", query=True, worldSpace=True, translation=True)
-                upLocPos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.nJoints), query=True, worldSpace=True, translation=True)
+                upLocPos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints), query=True, worldSpace=True, translation=True)
                 cmds.move(downLocPos[0], downLocPos[1], downLocPos[2], rbnNurbsPlane)
                 # create up and down clusters:
                 downClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3][0:1]", name=side+self.number_name+'_Down_Cls')
-                upClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(self.nJoints)+":"+str(self.nJoints+1)+"]", name=side+self.number_name+'_Up_Cls')
+                upClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(self.n_joints)+":"+str(self.n_joints+1)+"]", name=side+self.number_name+'_Up_Cls')
                 downCluster = downClusterList[1]
                 upCluster = upClusterList[1]
                 self.to_ids.extend([downClusterList[0], upClusterList[0]])
                 # get positions of joints from ribbon nurbs plane:
                 startRbnJointPos = cmds.xform(side+self.number_name+"_01_Jnt", query=True, worldSpace=True, translation=True)
-                endRbnJointPos = cmds.xform(side+self.number_name+"_%02d_Jnt"%(self.nJoints), query=True, worldSpace=True, translation=True)
+                endRbnJointPos = cmds.xform(side+self.number_name+"_%02d_Jnt"%(self.n_joints), query=True, worldSpace=True, translation=True)
                 # move pivots of clusters to start and end positions:
                 cmds.move(startRbnJointPos[0], startRbnJointPos[1], startRbnJointPos[2], downCluster+".scalePivot", downCluster+".rotatePivot")
                 cmds.move(endRbnJointPos[0], endRbnJointPos[1], endRbnJointPos[2], upCluster+".scalePivot", upCluster+".rotatePivot")
@@ -343,7 +334,7 @@ class Spine(standard.BaseStandard):
                 cmds.xform(upCluster, worldSpace=True, rotation=(upClusterRot[0]+90, upClusterRot[1], upClusterRot[2]))
                 cmds.xform(downCluster, worldSpace=True, rotation=(downClusterRot[0]+90, downClusterRot[1], downClusterRot[2]))
                 # scaleY of the clusters in order to avoid great extremity deforms:
-                rbnHeight = self.ar.utils.distanceBet(side+self.number_name+"_Guide_JointLoc"+str(self.nJoints), side+self.number_name+"_Guide_JointLoc1", keep=False)[0]
+                rbnHeight = self.ar.utils.distanceBet(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints), side+self.number_name+"_Guide_JointLoc1", keep=False)[0]
                 cmds.setAttr(upCluster+".sy", rbnHeight / 10)
                 cmds.setAttr(downCluster+".sy", rbnHeight / 10)
                 # parent clusters in controls (up and down):
@@ -388,19 +379,19 @@ class Spine(standard.BaseStandard):
                 cmds.setAttr(rbnMD+'.operation', 2)
                 # create a blendColor, a condition and a multiplyDivide in order to get the correct result value of volumeVariation:
                 rbnBlendColors = cmds.createNode('blendColors', name=side+self.number_name+"_Rbn_BC")
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_'+self.ar.data.lang['c031_volumeVariation'], rbnBlendColors+'.blender')
+                cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'_'+self.ar.data.lang['c031_volumeVariation'], rbnBlendColors+'.blender')
                 rbnCond = cmds.createNode('condition', name=side+self.number_name+'_Rbn_Cond')
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Active_'+self.ar.data.lang['c031_volumeVariation'], rbnCond+'.firstTerm')
+                cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Active_'+self.ar.data.lang['c031_volumeVariation'], rbnCond+'.firstTerm')
                 cmds.connectAttr(rbnBlendColors+'.outputR', rbnCond+'.colorIfTrueR')
                 cmds.connectAttr(rbnMD+'.outputX', rbnBlendColors+'.color1R')
                 rbnVVMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Rbn_VV_MD")
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'], rbnVVMD+'.input2X')
+                cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'_masterScale_'+self.ar.data.lang['c031_volumeVariation'], rbnVVMD+'.input2X')
                 cmds.connectAttr(rbnVVMD+'.outputX', rbnCond+'.colorIfFalseR')
                 cmds.setAttr(rbnVVMD+'.operation', 2)
                 cmds.setAttr(rbnBlendColors+'.color2R', 1)
                 cmds.setAttr(rbnCond+".secondTerm", 1)
                 # middle ribbon setup:
-                for n in range(1, self.nJoints - 1):
+                for n in range(1, self.n_joints - 1):
                     if style == 0: #default
                         self.middleCtrl = self.ar.ctrls.cvControl("id_043_SpineMiddle", side+self.number_name+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(n+1))
                         self.middleFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", side+self.number_name+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(n+1))
@@ -442,7 +433,7 @@ class Spine(standard.BaseStandard):
                     cmds.parentConstraint(self.middleCtrl, middleCluster, maintainOffset=True, name=middleCluster+"_PaC")
                     # parenting constraints like guide locators:
                     self.parentConst = cmds.parentConstraint(self.hipsBCtrl, self.chestBCtrl, self.middleCtrlZero, name=self.middleCtrl+"_PaC", maintainOffset=True)[0]
-                    nParentValue = (n) / float(self.nJoints-1)
+                    nParentValue = (n) / float(self.n_joints-1)
                     cmds.setAttr(self.parentConst+"."+self.hipsBCtrl+"W0", 1-nParentValue)
                     cmds.setAttr(self.parentConst+"."+self.chestBCtrl+"W1", nParentValue)
                     cmds.parent(middleCluster, spineClustersGrp, relative=True)
@@ -464,7 +455,7 @@ class Spine(standard.BaseStandard):
                     middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.ar.data.lang['c049_intensity'].capitalize()+"_PaC")[0]
                     cmds.connectAttr(self.middleFkCtrl+"."+self.ar.data.lang['c049_intensity'], middleIntBC+".color1R", force=True)
                     cmds.connectAttr(self.middleCtrl+"."+self.ar.data.lang['c049_intensity'], middleIntBC+".color2R", force=True)
-                    cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', middleIntBC+".blender", force=True)
+                    cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Fk_ikFkBlend', middleIntBC+".blender", force=True)
                     cmds.connectAttr(middleIntBC+".outputR", middleIntPC+"."+self.middleCtrl+"W0", force=True)
                     cmds.connectAttr(self.middleCtrl+"."+self.ar.data.lang['c049_intensity'], intRevNode+".inputX", force=True)
                     cmds.connectAttr(intRevNode+".outputX", middleIntPC+"."+jointFather+"W1", force=True)
@@ -478,9 +469,9 @@ class Spine(standard.BaseStandard):
                     if n == 1:
                         self.revNode = cmds.createNode('reverse', name=side+self.number_name+"_IkFkBlend_Rev")
                         self.to_ids.append(self.revNode)
-                        cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.revNode+".inputX", force=True)
+                        cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Fk_ikFkBlend', self.revNode+".inputX", force=True)
                     # connecting ikFkBlend using the reverse node:
-                    cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.middleCtrlGrpPC+"."+self.middleFkCtrl+"W1", force=True)
+                    cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Fk_ikFkBlend', self.middleCtrlGrpPC+"."+self.middleFkCtrl+"W1", force=True)
                     cmds.connectAttr(self.revNode+'.outputX', self.middleCtrlGrpPC+"."+self.middleCtrlZero+"W0", force=True)
                     # ikFkBlend visibility:
                     cmds.connectAttr(self.revNode+'.outputX', self.middleCtrlZero+".visibility", force=True)
@@ -490,12 +481,12 @@ class Spine(standard.BaseStandard):
                 chestBCtrlShape = cmds.listRelatives(self.chestBCtrl, children=True, type="shape")[0]
                 cmds.parent(self.chestFkCtrlZero, self.middleFkCtrl)
                 self.chestCtrlGrpPC = cmds.parentConstraint(self.chestBZero, self.chestFkCtrl, self.chestBGrp, maintainOffset=True, name=self.chestBGrp+"_IkFkBlend_PaC")[0]
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestCtrlGrpPC+"."+self.chestFkCtrl+"W1", force=True)
+                cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Fk_ikFkBlend', self.chestCtrlGrpPC+"."+self.chestFkCtrl+"W1", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', self.chestCtrlGrpPC+"."+self.chestBZero+"W0", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', chestACtrlShape+".visibility", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', chestBCtrlShape+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+'.'+attr_name_lower+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
                 
                 # parent tag
                 self.addParentTagInfo()

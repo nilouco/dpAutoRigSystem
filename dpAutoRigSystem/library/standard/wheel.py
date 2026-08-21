@@ -20,7 +20,7 @@ class Wheel(standard.BaseStandard):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
     
     
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
@@ -104,7 +104,7 @@ class Wheel(standard.BaseStandard):
                 self.cvFrontLoc = side+self.number_name+"_Guide_FrontLoc"
                 self.cvInsideLoc = side+self.number_name+"_Guide_InsideLoc"
                 self.cvOutsideLoc = side+self.number_name+"_Guide_OutsideLoc"
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 
                 # create a joint:
                 cmds.select(clear=True)
@@ -133,14 +133,10 @@ class Wheel(standard.BaseStandard):
                 self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.number_name+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 180) ), destinations=[self.wheelCtrl], keepColor=False)
                 self.ar.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ar.ctrls.cvControl("Clip", side+self.number_name+"_"+self.ar.data.lang['m106_clip']+"_Ctrl", r=self.radius*0.2, d=self.curve_degree, rot = (0, 0, 270) ), destinations=[self.wheelCtrl], keepColor=False)
                 # optimize control CV shapes:
-                clusterShape1 = cmds.cluster(self.wheelCtrl+"1Shape"+".cv[1:]")[1]
-                clusterShape2 = cmds.cluster(self.wheelCtrl+"2Shape"+".cv[1:]")[1]
-                clusterShape3 = cmds.cluster(self.wheelCtrl+"3Shape"+".cv[1:]")[1]
-                clusterShape4 = cmds.cluster(self.wheelCtrl+"4Shape"+".cv[1:]")[1]
-                cmds.setAttr(clusterShape1+".translateY", self.radius*0.9)
-                cmds.setAttr(clusterShape2+".translateX", -self.radius*0.9)
-                cmds.setAttr(clusterShape3+".translateY", -self.radius*0.9)
-                cmds.setAttr(clusterShape4+".translateX", self.radius*0.9)
+                cmds.setAttr(cmds.cluster(self.wheelCtrl+"1Shape"+".cv[1:]")[1]+".translateY", self.radius*0.9)
+                cmds.setAttr(cmds.cluster(self.wheelCtrl+"2Shape"+".cv[1:]")[1]+".translateX", -self.radius*0.9)
+                cmds.setAttr(cmds.cluster(self.wheelCtrl+"3Shape"+".cv[1:]")[1]+".translateY", -self.radius*0.9)
+                cmds.setAttr(cmds.cluster(self.wheelCtrl+"4Shape"+".cv[1:]")[1]+".translateX", self.radius*0.9)
                 cmds.delete(self.wheelCtrl, constructionHistory=True)
                 
                 # create defaults controls shape
@@ -151,7 +147,7 @@ class Wheel(standard.BaseStandard):
                 self.wheelCtrlList.append(self.wheelCtrl)
 
                 # origined from attributes:
-                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.guide_radius)
                 self.ar.utils.originedFrom(objName=self.insideCtrl, attrString=self.cvInsideLoc)
                 self.ar.utils.originedFrom(objName=self.outsideCtrl, attrString=self.cvOutsideLoc)
                 

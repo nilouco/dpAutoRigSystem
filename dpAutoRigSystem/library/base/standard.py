@@ -323,8 +323,8 @@ class BaseStandard(base.BaseLibrary):
         else:
             main_number = inputted_number
         # limit range
-        if main_number >= self.currentNJoints:
-            main_number = self.currentNJoints - 1
+        if main_number >= self.current_joint_number:
+            main_number = self.current_joint_number - 1
             if main_number == 0:
                 main_number = 1
                 if cmds.checkBox("edit_guide_main_ctrl_cb", query=True, exists=True):
@@ -361,13 +361,13 @@ class BaseStandard(base.BaseLibrary):
         total_to_add_main = 1
         self.n_main = cmds.getAttr(self.base+".nMain")
         if self.n_main > 1:
-            total_to_add_main = int(self.nJoints/self.n_main)
+            total_to_add_main = int(self.n_joints/self.n_main)
         # run throgh the chain
         for m in range(0, self.n_main):
             start = m*total_to_add_main
             end = (m+1)*total_to_add_main
             if m == self.n_main-1:
-                end = self.nJoints
+                end = self.n_joints
             for n in range(start, end):
                 current_ctrl = controllers[n]
                 current_ctrl_zero = cmds.listRelatives(current_ctrl, parent=True)[0]
@@ -729,8 +729,67 @@ class BaseStandard(base.BaseLibrary):
             self.annotation = self.guide_base+"_Ant"
             cmds.setAttr(self.annotation+'.visibility', value)
             cmds.setAttr(self.guide_base+'.displayAnnotation', value)
-    
-    
+
+
+    def parse_inputted_joint_number(self, inputted):
+        """ Check if we need to get the entered by UI.
+            Returns None if there isn't UI.
+        """
+        if inputted == 0:
+            if self.ar.data.ui_state:
+                return cmds.intField("edit_guide_n_joints_if", query=True, value=True)
+            else:
+                return None
+        else:
+            return inputted
+
+
+    def increment_joint_number(self, n):
+        # set its nJoint value as n:
+        cmds.setAttr(self.guide_loc+".nJoint", n)
+        # parent it to the lastGuide:
+        cmds.parent(self.guide_loc, self.name_guide+"_JointLoc"+str(n-1), relative=True)
+        cmds.setAttr(self.guide_loc+".translateZ", 2)
+        # create a joint to use like an arrowLine:
+        self.line = cmds.joint(name=self.name_guide+"_JGuide"+str(n), radius=0.001)
+        cmds.setAttr(self.line+".template", 1)
+        #Prevent a intermidiate node to be added
+        cmds.parent(self.line, self.name_guide+"_JGuide"+str(n-1), relative=True)
+        #Do not maintain offset and ensure cv will be at the same place than the joint
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
+        cmds.scaleConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_ScC")
+
+
+    def reduce_joint_number(self, joint_number, name='JointLoc', extra="", add=1, number=1):
+        # re-define cvEndJoint:
+        joint_loc = self.name_guide+"_"+name+str(joint_number)
+        # re-parent the children guides:
+        children = self.ar.utils.getGuideChildrenList(joint_loc)
+        if children:
+            for child in children:
+                cmds.parent(child, joint_loc)
+        # delete difference of nJoints:
+        cmds.delete(self.name_guide+"_"+name+str(joint_number+add))
+        cmds.delete(self.name_guide+"_JGuide"+extra+str(joint_number+add))
+        for j in range(joint_number+number, self.current_joint_number+add):
+            self.remove_attr_from_guide_net([name+str(j)])
+        return joint_loc
+
+
+    def re_parent_guide_end(self):
+        # re-parent cvEndJoint:
+        temp = cmds.listRelatives(self.guide_end_loc, parent=True)
+        cmds.parent(self.guide_end_loc, self.guide_loc)
+        #Ensure to remove temp parent from the unparenting done on the end joint
+        if temp:
+            cmds.delete(temp)
+        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
+        temp = cmds.listRelatives(self.line_end, parent=True)
+        cmds.parent(self.line_end, self.line, relative=True)
+        if temp:
+            cmds.delete(temp)
+
+
     def check_father_mirror(self, *args):
         """ Check all fathers and verify if there are mirror applied to father.
             Then, stop mirror for this guide or continue creating its mirror.
@@ -934,6 +993,11 @@ class BaseStandard(base.BaseLibrary):
         """
         cmds.setAttr(self.radius_ctrl+".translateX", value)
 
+
+    def create_end_joint(self, side):
+        end_joint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
+        self.ar.utils.addJointEndAttr([end_joint])
+        cmds.delete(cmds.parentConstraint(self.guide_end_loc, end_joint, maintainOffset=False))
 
     # Getters:
     #

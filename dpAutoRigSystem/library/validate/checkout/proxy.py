@@ -190,14 +190,14 @@ class Proxy(action.BaseAction):
         """
         if not PROXIED in cmds.listAttr(grp):
             cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
-        optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
-        if optionCtrl:
-            # prepare optionCtrl to deformers connections
-            cmds.setAttr(optionCtrl+".proxy", channelBox=True)
-            cmds.addAttr(optionCtrl, longName="proxyRevOutput", attributeType="bool")
+        option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+        if option_ctrl:
+            # prepare option_ctrl to deformers connections
+            cmds.setAttr(option_ctrl+".proxy", channelBox=True)
+            cmds.addAttr(option_ctrl, longName="proxyRevOutput", attributeType="bool")
             proxyRev = cmds.createNode("reverse", name="Proxy_Rev")
-            cmds.connectAttr(optionCtrl+".proxy", proxyRev+".inputX", force=True)
-            cmds.connectAttr(proxyRev+".outputX", optionCtrl+".proxyRevOutput", force=True)
+            cmds.connectAttr(option_ctrl+".proxy", proxyRev+".inputX", force=True)
+            cmds.connectAttr(proxyRev+".outputX", option_ctrl+".proxyRevOutput", force=True)
             deformers = self.skinClusterList
             defList = ["blendShape", "wrap", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             for deform in defList:
@@ -205,15 +205,15 @@ class Proxy(action.BaseAction):
             if deformers:
                 for deformNode in deformers:
                     try:
-                        cmds.connectAttr(optionCtrl+".proxy", deformNode+".nodeState") #don't force it please
+                        cmds.connectAttr(option_ctrl+".proxy", deformNode+".nodeState") #don't force it please
                     except:
                         pass #maybe it already has a connection from another node
             # hide controllers and meshes
-            self.connectProxyVis(optionCtrl, "mesh")
-            self.connectProxyVis(optionCtrl, "tweaks")
-            self.connectProxyVis(optionCtrl, "Tweaks") #fixed camelCase for earlier rig versions v4.03.32
-            self.connectProxyVis(optionCtrl, suffixName="Facial_Ctrls_Grp")
-            self.connectProxyVis(optionCtrl, suffixName="Deformer_Ctrl_Grp")
+            self.connectProxyVis(option_ctrl, "mesh")
+            self.connectProxyVis(option_ctrl, "tweaks")
+            self.connectProxyVis(option_ctrl, "Tweaks") #fixed camelCase for earlier rig versions v4.03.32
+            self.connectProxyVis(option_ctrl, suffixName="Facial_Ctrls_Grp")
+            self.connectProxyVis(option_ctrl, suffixName="Deformer_Ctrl_Grp")
         self.ar.ctrls.colorShape([grp], [1, 0.5, 0.5], outliner=True) #red
 
 

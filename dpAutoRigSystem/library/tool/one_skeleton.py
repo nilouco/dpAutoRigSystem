@@ -146,8 +146,8 @@ class OneSkeleton(base.BaseLibrary):
         for sourceNode in sourceList:
             self.ar.utils.setProgress("Joint")
             cmds.select(clear=True)
-            newJoint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
-            newJointList.append(newJoint)
+            new_joint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
+            newJointList.append(new_joint)
             # Transfer skinCluster + bindPose connection from the original
             connectionList = cmds.listConnections(sourceNode, destination=True, source=False, connections=True, plugs=True) or []
             for src, dest in self.grouper(connectionList, 2):
@@ -158,17 +158,17 @@ class OneSkeleton(base.BaseLibrary):
                     if not cmds.attributeQuery(sourceAttr, node=sourceNode, exists=True):
                         print(f"Attribute {sourceAttr} does not exist on {sourceNode}")
                         continue
-                    if sourceAttr in cmds.listAttr(newJoint):
+                    if sourceAttr in cmds.listAttr(new_joint):
                         # Transfer connection to the new node
                         cmds.disconnectAttr(src, dest)
-                        cmds.connectAttr(newJoint+"."+sourceAttr, dest, force=True)
+                        cmds.connectAttr(new_joint+"."+sourceAttr, dest, force=True)
             # Match joint orient
             for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
                 value = cmds.getAttr(f"{sourceNode}.{attr}")
-                cmds.setAttr(f"{newJoint}.{attr}", value)
+                cmds.setAttr(f"{new_joint}.{attr}", value)
             # Constraint to the original
-            pac = cmds.parentConstraint([sourceNode, newJoint], maintainOffset=False, name=newJoint+"_PaC")[0]
-            scc = cmds.scaleConstraint([sourceNode, newJoint], name=newJoint+"_ScC", maintainOffset=False)[0]
+            pac = cmds.parentConstraint([sourceNode, new_joint], maintainOffset=False, name=new_joint+"_PaC")[0]
+            scc = cmds.scaleConstraint([sourceNode, new_joint], name=new_joint+"_ScC", maintainOffset=False)[0]
             scale_constraints.append(scc)
             # fixes for negative scale joints
             parentList = cmds.listRelatives(sourceNode, parent=True)
@@ -180,22 +180,22 @@ class OneSkeleton(base.BaseLibrary):
                                 if not a == axis:
                                     cmds.setAttr(scc+".offset"+a, -1)
             # corrective joints
-            if "_Jcr" in newJoint:
+            if "_Jcr" in new_joint:
                 for axis in self.ar.data.axes:
-                    if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(newJoint+".scale"+axis) < 0:
+                    if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(new_joint+".scale"+axis) < 0:
                         cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
                     cmds.setAttr(scc+".offset"+axis, 1)
             # Ensure the new joint doesn't have segmentScaleCompensate enabled
             # But do allow the scale constraint to compensate
             cmds.refresh()
-            cmds.setAttr(f"{newJoint}.segmentScaleCompensate", False)
+            cmds.setAttr(f"{new_joint}.segmentScaleCompensate", False)
             try:
                 cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
             except:
                 pass
             cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
             # dpIDs
-            self.ar.custom_attr.addAttr(0, [newJoint, pac]) #dpID
+            self.ar.custom_attr.addAttr(0, [new_joint, pac]) #dpID
         if not scale:
             cmds.delete(scale_constraints)
         return newJointList

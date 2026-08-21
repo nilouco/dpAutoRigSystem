@@ -23,11 +23,11 @@ class Eye(standard.BaseStandard):
         self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
     
     
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.add_node_to_guide_net([self.cvJointLoc, self.cvEndJoint, self.cvLidPivotLoc, self.cvUpperEyelidLoc, self.cvLowerEyelidLoc, self.cvIrisLoc, self.cvPupilLoc, self.cvSpecularLoc], 
+        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc, self.cvLidPivotLoc, self.cvUpperEyelidLoc, self.cvLowerEyelidLoc, self.cvIrisLoc, self.cvPupilLoc, self.cvSpecularLoc], 
                                     ["JointLoc1", "JointEnd", "_LidPivotLoc", "_UpperEyelidLoc", "_LowerEyelidLoc", "_IrisLoc", "_PupilLoc", "_SpecularLoc"])
 
     
@@ -53,24 +53,24 @@ class Eye(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.cvJointLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.cvEndJoint = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_JointEnd", r=0.5, d=1, rot=(-90, 0, -90))
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_JointEnd", r=0.5, d=1, rot=(-90, 0, -90))
         self.cvLidPivotLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LidPivotLoc", r=0.5, d=1, guide=True)
         self.cvUpperEyelidLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_UpperEyelidLoc", r=0.2, d=1, guide=True)
         self.cvLowerEyelidLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LowerEyelidLoc", r=0.2, d=1, guide=True)
         self.cvIrisLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_IrisLoc", r=0.15, d=1, guide=True)
         self.cvPupilLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_PupilLoc", r=0.12, d=1, guide=True)
         self.cvSpecularLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_SpecularLoc", r=0.12, d=1, guide=True)
-        self.cvUpLocGuide = cmds.spaceLocator(name=self.cvEndJoint+"_UpLoc")[0]
+        self.cvUpLocGuide = cmds.spaceLocator(name=self.guide_end_loc+"_UpLoc")[0]
         # joints
-        self.jGuide1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
+        self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.jEyelid = cmds.joint(name=self.name_guide+"_JEyelid", radius=0.001)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         self.jUpperEyelid = cmds.joint(name=self.name_guide+"_JUpperEyelid", radius=0.001)
         self.jLowerEyelid = cmds.joint(name=self.name_guide+"_JLowerEyelid", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.jGuide1, self.jGuideEnd, self.jUpperEyelid, self.jLowerEyelid])
-        cmds.setAttr(self.cvEndJoint+".tz", 13)
+        self.ar.utils.set_template([self.line, self.line_end, self.jUpperEyelid, self.jLowerEyelid])
+        cmds.setAttr(self.guide_end_loc+".tz", 13)
         cmds.setAttr(self.cvUpLocGuide+".ty", 13)
         cmds.setAttr(self.cvUpperEyelidLoc+".ty", 0.5)
         cmds.setAttr(self.cvUpperEyelidLoc+".tz", 0.5)
@@ -83,26 +83,26 @@ class Eye(standard.BaseStandard):
         cmds.setAttr(self.cvSpecularLoc+".visibility", 0)
         cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", 0)
         # parenting
-        self.cvEndJointZero = cmds.group(self.cvEndJoint, self.cvUpLocGuide, name=self.cvEndJoint+"_Grp")
+        self.cvEndJointZero = cmds.group(self.guide_end_loc, self.cvUpLocGuide, name=self.guide_end_loc+"_Grp")
         self.cvEndBackRotGrp = cmds.group(self.cvEndJointZero, name=self.cvEndJointZero+"_Back_Grp")
-        cmds.parent(self.jGuide1, self.guide_base, relative=True)
-        cmds.parent(self.cvJointLoc, self.cvEndBackRotGrp, self.guide_base)
-        cmds.parent(self.cvLidPivotLoc, self.cvIrisLoc, self.cvPupilLoc, self.cvJointLoc)
+        cmds.parent(self.line, self.guide_base, relative=True)
+        cmds.parent(self.guide_loc, self.cvEndBackRotGrp, self.guide_base)
+        cmds.parent(self.cvLidPivotLoc, self.cvIrisLoc, self.cvPupilLoc, self.guide_loc)
         cmds.parent(self.cvUpperEyelidLoc, self.cvLowerEyelidLoc, self.cvLidPivotLoc)
-        cmds.parent(self.cvSpecularLoc, self.cvJointLoc)
+        cmds.parent(self.cvSpecularLoc, self.guide_loc)
         cmds.parent(self.jUpperEyelid, self.jLowerEyelid, self.jEyelid)
-        cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
+        cmds.parent(self.line_end, self.line)
+        cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
         cmds.parentConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=False, name=self.jUpperEyelid+"_PaC")
         cmds.parentConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=False, name=self.jLowerEyelid+"_PaC")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
+        cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
         cmds.parentConstraint(self.cvLidPivotLoc, self.jEyelid, maintainOffset=False, name=self.jEyelid+"_PaC")
         # edit
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         cmds.orientConstraint(self.ar.data.temp_grp, self.cvEndBackRotGrp, maintainOffset=False, name=self.cvEndBackRotGrp+"_OrC")
-        self.ar.ctrls.colorShape([self.cvEndJoint], "blue")
-        self.ar.ctrls.shapeSizeSetup(self.cvEndJoint)
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.colorShape([self.guide_end_loc], "blue")
+        self.ar.ctrls.shapeSizeSetup(self.guide_end_loc)
+        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         self.ar.ctrls.setLockHide([self.cvUpperEyelidLoc, self.cvLowerEyelidLoc], ['tx', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
@@ -167,7 +167,7 @@ class Eye(standard.BaseStandard):
         """
         if self.check_guide_integrity():
             # re-declaring variables:
-            self.jGuideEnd = self.name_guide+"_JGuideEnd"
+            self.line_end = self.name_guide+"_JGuideEnd"
             self.cvEndJointZero = self.name_guide+"_JointEnd_Grp"
             # setting attributes:
             cmds.setAttr(self.guide_base+".aimDirection", self.aimMenuItemList.index(item))
@@ -226,7 +226,7 @@ class Eye(standard.BaseStandard):
         # declating a concatenated name used for base to compose:
         baseName = side+self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']
         # creating eyelid control:
-        eyelidCtrl = self.ar.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.radius*0.4, d=self.curve_degree, rot=rotCtrl, headDef=self.headDefValue, guideSource=self.name_guide+"__"+cvEyelidLoc.replace("_Guide", ":Guide"), parentTag=self.fkEyeSubCtrl)
+        eyelidCtrl = self.ar.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.radius*0.4, d=self.curve_degree, rot=rotCtrl, headDef=self.head_def_value, guideSource=self.name_guide+"__"+cvEyelidLoc.replace("_Guide", ":Guide"), parentTag=self.fkEyeSubCtrl)
         self.ar.utils.originedFrom(objName=eyelidCtrl, attrString=cvEyelidLoc)
         eyelidCtrlZero = self.ar.utils.zeroOut([eyelidCtrl])[0]
         self.ar.ctrls.setLockHide([eyelidCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
@@ -432,7 +432,7 @@ class Eye(standard.BaseStandard):
         else:
             ctrlId = "id_013_EyePupil"
             radius = 0.2*self.radius
-        ctrl = self.ar.ctrls.cvControl(ctrlId, side+self.number_name+"_"+self.ar.data.lang[codeName]+"_1_Ctrl", r=radius, d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"__"+cvLoc.replace("_Guide", ":Guide"), parentTag=self.fkEyeSubCtrl)
+        ctrl = self.ar.ctrls.cvControl(ctrlId, side+self.number_name+"_"+self.ar.data.lang[codeName]+"_1_Ctrl", r=radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"__"+cvLoc.replace("_Guide", ":Guide"), parentTag=self.fkEyeSubCtrl)
         self.ar.utils.originedFrom(objName=ctrl, attrString=cvLoc)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
@@ -489,9 +489,9 @@ class Eye(standard.BaseStandard):
                 # declare guide:
                 self.guide = side+self.number_name+"_Guide_JointLoc1"
                 self.cvEndJointZero = side+self.number_name+"_Guide_JointEnd_Grp"
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 self.cvSpecularLoc = side+self.number_name+"_Guide_SpecularLoc"
-                self.headDefValue = cmds.getAttr(self.base+".deformedBy")
+                self.head_def_value = cmds.getAttr(self.base+".deformedBy")
                 # create a joint:
                 self.jxt = cmds.joint(name=side+self.number_name+"_1_Jxt", scaleCompensate=False)
                 self.subJnt = cmds.joint(name=side+self.number_name+"_1_Sub_Jxt", scaleCompensate=False)
@@ -500,10 +500,10 @@ class Eye(standard.BaseStandard):
                 self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 if s == 1:
                     lEyeFkCtrlData = self.ar.utils.getTransformData(self.fkEyeCtrl)
-                self.baseEyeCtrl = self.ar.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_JointLoc1")
-                self.fkEyeCtrl = self.ar.ctrls.cvControl("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_JointLoc1", parentTag=self.baseEyeCtrl)
-                self.fkEyeSubCtrl = self.ar.ctrls.cvControl("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_JointLoc1", parentTag=self.fkEyeCtrl)
-                self.ar.utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
+                self.baseEyeCtrl = self.ar.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1")
+                self.fkEyeCtrl = self.ar.ctrls.cvControl("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=self.baseEyeCtrl)
+                self.fkEyeSubCtrl = self.ar.ctrls.cvControl("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=self.fkEyeCtrl)
+                self.ar.utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
                 self.ar.utils.originedFrom(objName=self.baseEyeCtrl, attrString=self.base+";"+self.guide)
                 cmds.parent(self.fkEyeSubCtrl, self.fkEyeCtrl)
                 # position and orientation of joint and control:
@@ -533,9 +533,9 @@ class Eye(standard.BaseStandard):
                 cmds.setAttr(self.fkEyeCtrl+'.visibility', keyable=False)
                 self.ar.ctrls.setLockHide([self.fkEyeCtrl], ['tx', 'ty', 'tz'])
                 # create end joint:
-                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
+                self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
                 self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
                 cmds.parent(self.endJoint, self.jnt, absolute=True)
                 # create parent and scale constraint from ctrl to jxt:
                 cmds.parentConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=False, name=self.jxt+"_PaC")
@@ -546,7 +546,7 @@ class Eye(standard.BaseStandard):
                 
                 # lookAt control:
                 self.lookAtCtrl = self.ar.ctrls.cvControl("id_011_EyeLookAt", side+self.number_name+"_LookAt_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.eyeCtrl)
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.lookAtCtrl, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.lookAtCtrl, maintainOffset=False))
                 lookAtCtrlZeroGrp = self.ar.utils.zeroOut([self.lookAtCtrl])
                 cmds.parent(lookAtCtrlZeroGrp, self.eyeCtrl, relative=False)
                 cmds.addAttr(self.lookAtCtrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
@@ -610,7 +610,7 @@ class Eye(standard.BaseStandard):
                     cmds.setAttr(self.endSpecJoint+".translateZ", 0.2*self.radius)
                     cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)
                     # specular control:
-                    self.eyeSpecCtrl = self.ar.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.fkEyeSubCtrl)
+                    self.eyeSpecCtrl = self.ar.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.fkEyeSubCtrl)
                     cmds.delete(cmds.parentConstraint(self.guide, self.eyeSpecCtrl, maintainOffset=False))
                     eyeSpecZeroGrp = self.ar.utils.zeroOut([self.eyeSpecCtrl])[0]
                     cmds.parent(eyeSpecZeroGrp, self.baseEyeCtrl)
@@ -625,7 +625,7 @@ class Eye(standard.BaseStandard):
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.ar.data.lang['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
                     cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
                     # specular scale control:
-                    self.eyeSpecScaleCtrl = self.ar.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.eyeSpecCtrl)
+                    self.eyeSpecScaleCtrl = self.ar.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.eyeSpecCtrl)
                     cmds.delete(cmds.parentConstraint(self.cvSpecularLoc, self.eyeSpecScaleCtrl, maintainOffset=False))
                     if s == 1:
                         noWSLEyeSpecScaleZeroGrpData = self.ar.utils.getTransformData(self.eyeSpecScaleZeroGrp, useWorldSpace=False)

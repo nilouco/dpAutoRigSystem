@@ -235,10 +235,10 @@ class Renamer(base.BaseLibrary):
             for i, item in enumerate(self.originalList):
                 if cmds.objExists(item):
                     # new:
-                    newName = item
+                    new_name = item
                     if "|" in item:
-                        newName = item[item.rfind("|")+1:]
-                    previewDic[item] = newName
+                        new_name = item[item.rfind("|")+1:]
+                    previewDic[item] = new_name
                     # sequence
                     if self.addSequence:
                         previewDic[item] = self.sequenceName+str(self.start+i).zfill(self.padding)

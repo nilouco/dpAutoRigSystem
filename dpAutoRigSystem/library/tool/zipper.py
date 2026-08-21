@@ -296,10 +296,10 @@ class Zipper(base.BaseLibrary):
         cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, autoMaxCalibrateMD+".input2X", force=True)
         
         # auto distance:
-        initialDistance = cmds.getAttr(distDimShape+"."+distanceAttr)
-        cmds.setAttr(self.zipperCtrl+"."+initialDistanceAttr, initialDistance, lock=True)
-        cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, (-10)*initialDistance)
-        cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, (20)*initialDistance) #magic numbers, need to be calibrated
+        initial_distance = cmds.getAttr(distDimShape+"."+distanceAttr)
+        cmds.setAttr(self.zipperCtrl+"."+initialDistanceAttr, initial_distance, lock=True)
+        cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, (-10)*initial_distance)
+        cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, (20)*initial_distance) #magic numbers, need to be calibrated
         cmds.setAttr(autoMainSR+".minX", 1)
         cmds.setAttr(hyperboleScaleMD+".input1X", 1)
         cmds.setAttr(hyperboleScaleMD+".operation", 2) #divide
@@ -379,9 +379,9 @@ class Zipper(base.BaseLibrary):
         """
         # check if there's a dpAR Option_Ctrl:
         if self.goodToDPAR:
-            optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
-            if optionCtrl:
-                optCtrlRigScaleNode = cmds.listConnections(optionCtrl+"."+rigScaleAttr, source=False, destination=True)[0]
+            option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+            if option_ctrl:
+                optCtrlRigScaleNode = cmds.listConnections(option_ctrl+"."+rigScaleAttr, source=False, destination=True)[0]
                 cmds.connectAttr(optCtrlRigScaleNode+".outputX", self.zipperCtrl+"."+rigScaleAttr, force=True)
                 cmds.setAttr(self.zipperCtrl+"."+rigScaleAttr, lock=True)
             headSubCtrl = self.ar.ctrls.getControlNodeById("id_093_HeadSub")

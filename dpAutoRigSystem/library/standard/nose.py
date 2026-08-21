@@ -17,13 +17,13 @@ class Nose(standard.BaseStandard):
         self.cvRNostrilLoc = self.name_guide+"_cvRNostrilLoc"
     
     
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
         self.create_guide_nose_side("Side", self.cvLSideLoc, self.cvRSideLoc)
         self.create_guide_nose_side("Nostril", self.cvLNostrilLoc, self.cvRNostrilLoc)
-        self.add_node_to_guide_net([self.cvTopLoc, self.cvMiddleLoc, self.cvTipLoc, self.cvLSideLoc, self.cvRSideLoc, self.cvLNostrilLoc, self.cvBottomLoc, self.cvEndJoint], 
+        self.add_node_to_guide_net([self.cvTopLoc, self.cvMiddleLoc, self.cvTipLoc, self.cvLSideLoc, self.cvRSideLoc, self.cvLNostrilLoc, self.cvBottomLoc, self.guide_end_loc], 
                                    ["cvTopLoc1", "cvMiddleLoc", "cvTipLoc", "cvLSideLoc", "cvRSideLoc", "cvLNostrilLoc", "cvBottomLoc", "JointEnd"])
 
 
@@ -49,25 +49,25 @@ class Nose(standard.BaseStandard):
         self.cvLNostrilLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_cvLNostrilLoc", r=0.1, d=1, guide=True)
         self.cvRNostrilLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_cvRNostrilLoc", r=0.1, d=1, guide=True)
         self.cvBottomLoc   = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_cvBottomLoc", r=0.1, d=1, guide=True)
-        self.cvEndJoint    = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.05, d=1, guide=True)
+        self.guide_end_loc    = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.05, d=1, guide=True)
         # joints
         self.jGuideTop1   = cmds.joint(name=self.name_guide+"_JGuideTop1", radius=0.001)
         self.jGuideMiddle = cmds.joint(name=self.name_guide+"_JGuideMiddle", radius=0.001)
         self.jGuideTip    = cmds.joint(name=self.name_guide+"jGuideTip", radius=0.001)
-        self.jGuideEnd    = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line_end    = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         cmds.select(self.jGuideMiddle)
         self.jGuideSide    = cmds.joint(name=self.name_guide+"jGuideSide", radius=0.001)
         self.jGuideNostril = cmds.joint(name=self.name_guide+"jGuideNostril", radius=0.001)
         cmds.select(self.jGuideMiddle)
         self.jGuideBottom = cmds.joint(name=self.name_guide+"jGuideBottom", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.jGuideTop1, self.jGuideMiddle, self.jGuideTip, self.jGuideEnd, self.jGuideSide, self.jGuideNostril, self.jGuideBottom, self.cvRSideLoc, self.cvRNostrilLoc])
+        self.ar.utils.set_template([self.jGuideTop1, self.jGuideMiddle, self.jGuideTip, self.line_end, self.jGuideSide, self.jGuideNostril, self.jGuideBottom, self.cvRSideLoc, self.cvRNostrilLoc])
         cmds.setAttr(self.cvTopLoc+".rotateX", 60)
         cmds.setAttr(self.cvMiddleLoc+".translateY", -0.6)
         cmds.setAttr(self.cvMiddleLoc+".translateZ", 0.35)
         cmds.setAttr(self.cvTipLoc+".translateY", -0.4)
         cmds.setAttr(self.cvTipLoc+".translateZ", 0.55)
-        cmds.setAttr(self.cvEndJoint+".translateZ", 0.3)
+        cmds.setAttr(self.guide_end_loc+".translateZ", 0.3)
         cmds.setAttr(self.cvLSideLoc+".translateX", 0.35)
         cmds.setAttr(self.cvLSideLoc+".translateY", -0.55)
         cmds.setAttr(self.cvLSideLoc+".translateZ", 0.45)
@@ -80,7 +80,7 @@ class Nose(standard.BaseStandard):
         cmds.parent(self.jGuideTop1, self.cvTopLoc, self.guide_base, relative=True)
         cmds.parent(self.cvMiddleLoc, self.cvTopLoc, relative=False)
         cmds.parent(self.cvTipLoc, self.cvBottomLoc, self.cvMiddleLoc, relative=False)
-        cmds.parent(self.cvEndJoint, self.cvTipLoc, relative=True)
+        cmds.parent(self.guide_end_loc, self.cvTipLoc, relative=True)
         cmds.parent(self.cvLSideLoc, self.cvRSideLoc, self.cvMiddleLoc, relative=False)
         cmds.parent(self.cvLNostrilLoc, self.cvLSideLoc, relative=False)
         cmds.parent(self.cvRNostrilLoc, self.cvRSideLoc, relative=False)
@@ -91,9 +91,9 @@ class Nose(standard.BaseStandard):
         self.ar.ctrls.directConnect(self.cvLSideLoc, self.jGuideSide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ar.ctrls.directConnect(self.cvLNostrilLoc, self.jGuideNostril, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ar.ctrls.directConnect(self.cvBottomLoc, self.jGuideBottom, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.directConnect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
     def create_guide_nose_side(self, name, source, destination):
@@ -116,59 +116,30 @@ class Nose(standard.BaseStandard):
         cmds.setAttr(side_r_md+".input2Z", -1)
 
         
-    def changeJointNumber(self, enteredNJoints, *args):
+    def change_joint_number(self, inputted, *args):
         """ Edit the number of joints in the guide.
         """
-        self.ar.opt.check_use_default_render_layer()
-        # get the number of joints entered by user:
-        if enteredNJoints == 0:
-            if self.ar.data.ui_state:
-                self.enteredNJoints = cmds.intField("edit_guide_n_joints_if", query=True, value=True)
-            else:
-                return
-        else:
-            self.enteredNJoints = enteredNJoints
-        # get the number of joints existing:
-        self.currentNJoints = cmds.getAttr(self.guide_base+".nJoints")
-        # start analisys the difference between values:
-        if self.enteredNJoints != self.currentNJoints:
-            # verify if the nJoints is greather or less than the current
-            if self.enteredNJoints > self.currentNJoints:
-                for n in range(self.currentNJoints+1, self.enteredNJoints+1):
-                    # create another N cvTopLoc:
+        joint_number = self.parse_inputted_joint_number(inputted)
+        self.current_joint_number = cmds.getAttr(self.guide_base+".nJoints")
+        if joint_number and joint_number != self.current_joint_number:
+            self.ar.opt.check_use_default_render_layer()
+            if joint_number > self.current_joint_number:
+                for n in range(self.current_joint_number+1, joint_number+1):
                     self.cvTopLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_cvTopLoc"+str(n), r=0.3, d=1, guide=True)
-                    # set its nJoint value as n:
                     cmds.setAttr(self.cvTopLoc+".nJoint", n)
-                    # parent it to the lastGuide:
                     cmds.parent(self.cvTopLoc, self.name_guide+"_cvTopLoc"+str(n-1), relative=True)
-                    # translate new topLoc in the middle of distance of last top and middle guides:
                     dist = self.ar.utils.distanceBet(self.name_guide+"_cvTopLoc"+str(n-1), self.name_guide+"_cvMiddleLoc")[0]
                     cmds.setAttr(self.cvTopLoc+".translateZ", (0.5*dist))
-                    # create a joint to use like an arrowLine:
-                    self.jGuide = cmds.joint(name=self.name_guide+"_JGuideTop"+str(n), radius=0.001)
-                    cmds.setAttr(self.jGuide+".template", 1)
-                    #Prevent a intermidiate node to be added
-                    cmds.parent(self.jGuide, self.name_guide+"_JGuideTop"+str(n-1), relative=True)
-                    #Do not maintain offset and ensure cv will be at the same place than the joint
-                    cmds.parentConstraint(self.cvTopLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
-                    cmds.scaleConstraint(self.cvTopLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScC")
+                    self.line = cmds.joint(name=self.name_guide+"_JGuideTop"+str(n), radius=0.001)
+                    cmds.setAttr(self.line+".template", 1)
+                    cmds.parent(self.line, self.name_guide+"_JGuideTop"+str(n-1), relative=True)
+                    cmds.parentConstraint(self.cvTopLoc, self.line, maintainOffset=False, name=self.line+"_PaC")
+                    cmds.scaleConstraint(self.cvTopLoc, self.line, maintainOffset=False, name=self.line+"_ScC")
                     self.add_node_to_guide_net([self.cvTopLoc], ["cvTopLoc"+str(n)])
-            elif self.enteredNJoints < self.currentNJoints:
-                # re-define cvTopLoc:
-                self.cvTopLoc = self.name_guide+"_cvTopLoc"+str(self.enteredNJoints)
-                # re-parent the children guides:
-                childrenGuideBellowList = self.ar.utils.getGuideChildrenList(self.cvTopLoc)
-                if childrenGuideBellowList:
-                    for childGuide in childrenGuideBellowList:
-                        cmds.parent(childGuide, self.cvTopLoc)
-                # delete difference of nJoints:
-                cmds.delete(self.name_guide+"_cvTopLoc"+str(self.enteredNJoints+1))
-                cmds.delete(self.name_guide+"_JGuideTop"+str(self.enteredNJoints+1))
-                for j in range(self.enteredNJoints+1, self.currentNJoints+1):
-                    self.remove_attr_from_guide_net(["cvTopLoc"+str(j)])
-            cmds.setAttr(self.guide_base+".nJoints", self.enteredNJoints)
-            self.currentNJoints = self.enteredNJoints
-            # re-build the preview mirror:
+            elif joint_number < self.current_joint_number:
+                self.cvTopLoc = self.reduce_joint_number(joint_number, "cvTopLoc", "Top")
+            cmds.setAttr(self.guide_base+".nJoints", joint_number)
+            self.current_joint_number = joint_number
             self.create_mirror_preview()
         cmds.select(self.guide_base)
     
@@ -194,64 +165,63 @@ class Nose(standard.BaseStandard):
             # run for all sides
             for s, side in enumerate(self.sides):
                 self.base = side+self.number_name+'_Guide_Base'
-                self.ctrlZeroGrp = side+self.number_name+"_00_Ctrl_Zero_0_Grp"
-                self.skinJointList = []
+                ctrl_zero_grp = side+self.number_name+"_00_Ctrl_Zero_0_Grp"
+                skin_joints = []
                 self.centerList, self.leftList, self.rightList = [], [], []
                 # get the number of joints to be created:
-                self.nJoints = cmds.getAttr(self.base+".nJoints")
-                self.headDefValue = cmds.getAttr(self.base+".deformedBy")
+                self.n_joints = cmds.getAttr(self.base+".nJoints")
+                head_def_value = cmds.getAttr(self.base+".deformedBy")
                 # creating top nose controls and joints:
-                for n in range(0, self.nJoints):
+                for n in range(0, self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
                     self.cvTopLoc = side+self.number_name+"_Guide_cvTopLoc"+str(n+1)
-                    self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                    self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                     # create a joint:
                     self.jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
                     self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
-                    self.skinJointList.append(self.jnt)
+                    skin_joints.append(self.jnt)
                     # create a control:
-                    self.noseCtrl = self.ar.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_cvTopLoc1", parentTag=self.get_parent_to_tag(self.centerList))
+                    self.noseCtrl = self.ar.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, headDef=head_def_value, guideSource=self.name_guide+"_cvTopLoc1", parentTag=self.get_parent_to_tag(self.centerList))
                     self.centerList.append(self.noseCtrl)
                     # zeroOut controls:
-                    self.zeroOutCtrlGrp = self.ar.utils.zeroOut([self.noseCtrl])[0]
+                    ctrl_zero = self.ar.utils.zeroOut([self.noseCtrl])[0]
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.zeroOutCtrlGrp, maintainOffset=False))
+                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, ctrl_zero, maintainOffset=False))
                     # hide visibility attribute:
                     cmds.setAttr(self.noseCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
                     if s == 1:
                         if self.flip:
-                            cmds.setAttr(self.zeroOutCtrlGrp+".scaleX", -1)
-                            cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
-                            cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
+                            cmds.setAttr(ctrl_zero+".scaleX", -1)
+                            cmds.setAttr(ctrl_zero+".scaleY", -1)
+                            cmds.setAttr(ctrl_zero+".scaleZ", -1)
                     if n == 0:
                         self.mainCtrlList.append(self.noseCtrl)
-                        self.ar.utils.originedFrom(objName=self.noseCtrl, attrString=self.base+";"+self.cvTopLoc+";"+self.radiusGuide)
-                        self.ctrlZeroGrp = self.zeroOutCtrlGrp
+                        self.ar.utils.originedFrom(objName=self.noseCtrl, attrString=self.base+";"+self.cvTopLoc+";"+self.guide_radius)
+                        ctrl_zero_grp = ctrl_zero
                     else:
                         self.ar.utils.originedFrom(objName=self.noseCtrl, attrString=self.cvTopLoc)
                     # grouping:
                     if n > 0:
                         # parent joints as a simple chain (line)
-                        self.fatherJnt = side+self.number_name+"_%02d_Jnt"%(n-1)
-                        cmds.parent(self.jnt, self.fatherJnt, absolute=True)
+                        father_joint = side+self.number_name+"_%02d_Jnt"%(n-1)
+                        cmds.parent(self.jnt, father_joint, absolute=True)
                         # parent zeroCtrl Group to the before noseCtrl:
-                        self.fatherCtrl = side+self.number_name+"_%02d_Ctrl"%(n-1)
-                        cmds.parent(self.zeroOutCtrlGrp, self.fatherCtrl, absolute=True)
+                        cmds.parent(ctrl_zero, side+self.number_name+"_%02d_Ctrl"%(n-1), absolute=True)
                     # control drives joint:
                     cmds.parentConstraint(self.noseCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
                     cmds.scaleConstraint(self.noseCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                     # add articulationJoint:
                     if n == 1:
                         if self.articulation:
-                            artJntList = self.ar.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.utils.setJointLabel(artJntList[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
-                            cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
-                            cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
+                            articulation_joints = self.ar.utils.articulationJoint(father_joint, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            self.ar.utils.setJointLabel(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                            cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
+                            cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
                 
                 # declaring guides:
@@ -262,7 +232,7 @@ class Nose(standard.BaseStandard):
                 self.cvLNostrilLoc = side+self.number_name+"_Guide_cvLNostrilLoc"
                 self.cvRNostrilLoc = side+self.number_name+"_Guide_cvRNostrilLoc"
                 self.cvBottomLoc   = side+self.number_name+"_Guide_cvBottomLoc"
-                self.cvEndJoint    = side+self.number_name+"_Guide_JointEnd"
+                self.guide_end_loc    = side+self.number_name+"_Guide_JointEnd"
                 
                 # generating naming:
                 leftSideName  = self.ar.data.lang['p002_left']
@@ -315,14 +285,14 @@ class Nose(standard.BaseStandard):
                     self.ar.utils.setJointLabel(self.rNostrilJnt, 2, 18, self.number_name+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
                 
                 # creating controls:
-                self.middleCtrl = self.ar.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.radius), d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_cvMiddleLoc", parentTag=self.centerList[-1])
-                self.tipCtrl = self.ar.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.radius * 0.3), d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_cvTipLoc", parentTag=self.centerList[-1])
-                self.bottomCtrl = self.ar.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.radius * 0.5), d=self.curve_degree, dir="-Y", headDef=self.headDefValue, guideSource=self.name_guide+"_cvBottomLoc", parentTag=self.centerList[-1])
-                self.lSideCtrl = self.ar.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.name_guide+"_cvLSideLoc", parentTag=self.centerList[-1])
-                self.rSideCtrl = self.ar.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.name_guide+"_cvRSideLoc", parentTag=self.centerList[-1])
+                self.middleCtrl = self.ar.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.radius), d=self.curve_degree, headDef=head_def_value, guideSource=self.name_guide+"_cvMiddleLoc", parentTag=self.centerList[-1])
+                self.tipCtrl = self.ar.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.radius * 0.3), d=self.curve_degree, headDef=head_def_value, guideSource=self.name_guide+"_cvTipLoc", parentTag=self.centerList[-1])
+                self.bottomCtrl = self.ar.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.radius * 0.5), d=self.curve_degree, dir="-Y", headDef=head_def_value, guideSource=self.name_guide+"_cvBottomLoc", parentTag=self.centerList[-1])
+                self.lSideCtrl = self.ar.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), headDef=head_def_value, guideSource=self.name_guide+"_cvLSideLoc", parentTag=self.centerList[-1])
+                self.rSideCtrl = self.ar.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.radius * 0.5), d=self.curve_degree, rot=(0, 0, -90), headDef=head_def_value, guideSource=self.name_guide+"_cvRSideLoc", parentTag=self.centerList[-1])
                 if self.nostril:
-                    self.lNostrilCtrl = self.ar.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.radius * 0.2), d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_cvLNostrilLoc", parentTag=self.lSideCtrl)
-                    self.rNostrilCtrl = self.ar.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.radius * 0.2), d=self.curve_degree, headDef=self.headDefValue, guideSource=self.name_guide+"_cvRNostrilLoc", parentTag=self.rSideCtrl)
+                    self.lNostrilCtrl = self.ar.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.radius * 0.2), d=self.curve_degree, headDef=head_def_value, guideSource=self.name_guide+"_cvLNostrilLoc", parentTag=self.lSideCtrl)
+                    self.rNostrilCtrl = self.ar.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.radius * 0.2), d=self.curve_degree, headDef=head_def_value, guideSource=self.name_guide+"_cvRNostrilLoc", parentTag=self.rSideCtrl)
                     self.leftList.append(self.lNostrilCtrl)
                     self.rightList.append(self.rNostrilCtrl)
                 self.centerList.append(self.middleCtrl)
@@ -411,15 +381,15 @@ class Nose(standard.BaseStandard):
                 cmds.select(self.tipJnt)
                 self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 self.ar.utils.addJointEndAttr([self.endJoint])
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
 
                 # optimize control CV shapes:
                 tempTipCluster = cmds.cluster(self.tipCtrl)[1]
-                cmds.parentConstraint(self.cvEndJoint, tempTipCluster, maintainOffset=False)
+                cmds.parentConstraint(self.guide_end_loc, tempTipCluster, maintainOffset=False)
                 cmds.delete([self.tipCtrl], constructionHistory=True)
 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.create_hook_setup(side, [self.ctrlZeroGrp], [self.skinJointList[0]])
+                self.create_hook_setup(side, [ctrl_zero_grp], [skin_joints[0]])
                 self.ctrlHookGrpList.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)

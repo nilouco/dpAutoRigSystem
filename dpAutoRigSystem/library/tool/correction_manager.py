@@ -443,9 +443,9 @@ class CorrectionManager(base.BaseLibrary):
                     for message_attr in message_attrs:
                         cmds.addAttr(self.net, longName=message_attr, attributeType="message")
                     cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
-                    optionCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
-                    if optionCtrl:
-                        cmds.connectAttr(optionCtrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
+                    option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+                    if option_ctrl:
+                        cmds.connectAttr(option_ctrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
                     cmds.addAttr(self.net, longName="corrective", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
                     cmds.addAttr(self.net, longName="outputValue", attributeType="float")
                     cmds.setAttr(self.net+".dpNetwork", 1)

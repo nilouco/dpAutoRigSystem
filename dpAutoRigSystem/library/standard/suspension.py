@@ -16,7 +16,7 @@ class Suspension(standard.BaseStandard):
     
     
     
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
@@ -85,7 +85,7 @@ class Suspension(standard.BaseStandard):
                 self.base = side+self.number_name+'_Guide_Base'
                 self.cvALoc = side+self.number_name+"_Guide_JointLocA"
                 self.cvBLoc = side+self.number_name+"_Guide_JointLocB"
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 self.locatorsGrp = cmds.group(name=side+self.number_name+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
                 self.dist = self.ar.utils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
@@ -120,7 +120,7 @@ class Suspension(standard.BaseStandard):
                     cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
-                        self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
+                        self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.guide_radius)
                         cmds.delete(cmds.parentConstraint(self.cvALoc, zeroOutCtrlGrp[0], maintainOffset=False))
                     else:
                         self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)

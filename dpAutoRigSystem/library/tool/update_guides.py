@@ -232,7 +232,7 @@ class UpdateGuides(base.BaseLibrary):
         if attr not in ignores:
             if attr == 'nJoints':
                 currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.changeJointNumber(value)
+                currentInstance.change_joint_number(value)
             elif attr == 'style':
                 currentInstance = self.getNewGuideInstance(guide)
                 if currentInstance.name == 'Limb':

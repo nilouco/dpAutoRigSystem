@@ -26,11 +26,11 @@ class Foot(standard.BaseStandard):
         self.aScalableGrp = []
 
 
-    def create_guide(self, *args):
+    def create_guide(self):
         self.create_guide_base()
         self.create_guide_elements()
         self.set_guide_base_initial_position()
-        self.add_node_to_guide_net([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.cvEndJoint], 
+        self.add_node_to_guide_net([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.guide_end_loc], 
                                    ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
 
     
@@ -47,7 +47,7 @@ class Foot(standard.BaseStandard):
         self.cvRFDLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfD", r=0.3, d=1, guide=True)
         self.cvRFELoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfE", r=0.3, d=1, guide=True)
         self.cvRFFLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_RfF", r=0.3, d=1, guide=True)
-        self.cvEndJoint = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.jGuideFoot = cmds.joint(name=self.name_guide+"_JGuideFoot", radius=0.001)
         self.jGuideRFF = cmds.joint(name=self.name_guide+"_JGuideRfF", radius=0.001)
@@ -59,10 +59,10 @@ class Foot(standard.BaseStandard):
         self.jGuideRFC = cmds.joint(name=self.name_guide+"_JGuideRfC", radius=0.001)
         self.jGuideRFAC = cmds.joint(name=self.name_guide+"_JGuideRfAC", radius=0.001)
         cmds.select(clear=True)
-        self.jGuideEnd = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
+        self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.jGuideFoot, self.jGuideRFA, self.jGuideRFB, self.jGuideRFC, self.jGuideRFD, self.jGuideRFE, self.jGuideRFF, self.jGuideEnd])
-        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+        self.ar.utils.set_template([self.jGuideFoot, self.jGuideRFA, self.jGuideRFB, self.jGuideRFC, self.jGuideRFD, self.jGuideRFE, self.jGuideRFF, self.line_end])
+        cmds.setAttr(self.guide_end_loc+".tz", 1.3)
         cmds.setAttr(self.cvFootLoc+".translateZ", 2)
         cmds.setAttr(self.cvFootLoc+".rotateX", 90)
         cmds.setAttr(self.cvFootLoc+".rotateZ", -90)
@@ -87,9 +87,9 @@ class Foot(standard.BaseStandard):
         cmds.setAttr(self.cvRFDLoc+".rotateZ", -90)
         # parenting
         cmds.parent(self.jGuideFoot, self.jGuideRFA, self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.guide_base, relative=True)
-        cmds.parent(self.cvEndJoint, self.cvRFFLoc, relative=True)
+        cmds.parent(self.guide_end_loc, self.cvRFFLoc, relative=True)
         cmds.parent(self.cvRFFLoc, self.cvFootLoc, relative=True)
-        cmds.parent(self.jGuideEnd, self.jGuideRFF)
+        cmds.parent(self.line_end, self.jGuideRFF)
         cvRFEZeroOut = self.ar.utils.zeroOut([self.cvRFELoc], True)
         # edit
         cvRFEOffsetGrp = cmds.listRelatives(cvRFEZeroOut, children=True)[0]
@@ -102,9 +102,9 @@ class Foot(standard.BaseStandard):
         cmds.parentConstraint(self.cvRFFLoc, self.jGuideRFF, maintainOffset=False, name=self.jGuideRFF+"_PaC")
         cmds.parentConstraint(self.cvRFALoc, self.jGuideRFAC, maintainOffset=False, name=self.jGuideRFAC+"_PaC")
         self.ar.ctrls.directConnect(self.cvFootLoc, self.jGuideFoot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        self.ar.ctrls.directConnect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
 
  
     def set_guide_base_initial_position(self):
@@ -127,8 +127,8 @@ class Foot(standard.BaseStandard):
                 self.cvRFDLoc = side+self.number_name+"_Guide_RfD"
                 self.cvRFELoc = side+self.number_name+"_Guide_RfE"
                 self.cvRFFLoc = side+self.number_name+"_Guide_RfF"
-                self.cvEndJoint = side+self.number_name+"_Guide_JointEnd"
-                self.radiusGuide = side+self.number_name+"_Guide_Base_RadiusCtrl"
+                self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
+                self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
 
                 # declaring attributes reading from dictionary:
                 ankleRFAttr = self.ar.data.lang['c009_leg_extrem']
@@ -208,8 +208,8 @@ class Foot(standard.BaseStandard):
                 # putting groups in the correct place:
                 cmds.matchTransform(self.footJnt, self.cvFootLoc, position=True, rotation=True)
                 cmds.matchTransform(self.middleFootJxt, self.cvRFFLoc, position=True, rotation=True)
-                cmds.matchTransform(self.endJnt, self.cvEndJoint, position=True, rotation=True)
-                cmds.matchTransform(self.endBJnt, self.cvEndJoint, position=True, rotation=True)
+                cmds.matchTransform(self.endJnt, self.guide_end_loc, position=True, rotation=True)
+                cmds.matchTransform(self.endBJnt, self.guide_end_loc, position=True, rotation=True)
                 cmds.matchTransform(self.RFAGrp, self.cvRFALoc, position=True, rotation=True)
                 cmds.matchTransform(self.RFBGrp, self.cvRFBLoc, position=True, rotation=True)
                 cmds.matchTransform(self.RFCGrp, self.cvRFCLoc, position=True, rotation=True)
@@ -296,13 +296,13 @@ class Foot(standard.BaseStandard):
                             cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateY", force=True)
                 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                self.ar.utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
+                self.ar.utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.guide_radius)
                 self.ar.utils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
                 self.ar.utils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
                 self.ar.utils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
                 self.ar.utils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
                 self.ar.utils.originedFrom(objName=self.RFECtrl, attrString=self.cvRFELoc)
-                self.ar.utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFFLoc+";"+self.cvEndJoint)
+                self.ar.utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFFLoc+";"+self.guide_end_loc)
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
                 cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll, attributeType='float', keyable=True)

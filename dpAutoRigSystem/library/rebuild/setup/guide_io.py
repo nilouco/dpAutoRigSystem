@@ -194,7 +194,7 @@ class GuideIO(action.BaseAction):
                         elif base_attr == "articulation":
                             self.instance.set_articulation(self.net_data["GuideData"][item]["articulation"])
                         elif base_attr == "nJoints":
-                            self.instance.changeJointNumber(self.net_data["GuideData"][item]["nJoints"])
+                            self.instance.change_joint_number(self.net_data["GuideData"][item]["nJoints"])
                         elif base_attr == "type": #limb
                             self.instance.changeType(self.net_data["GuideData"][item]["type"])
                         elif base_attr == "hasBend": #limb

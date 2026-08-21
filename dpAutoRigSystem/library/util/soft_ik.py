@@ -36,7 +36,7 @@ class SoftIk(object):
         self.ar = ar
 
 
-    def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, axis="Z", *args):
+    def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skin_joints, distBetween, world_ref, stretch=True, axis="Z", *args):
         """ Create the softIk setup for given parameters.
             Just a general function edited from Nick Miller code.
             Returns the softIk calibrate multiplyDivide node to receive the Option_Ctrl.rigScale output.
@@ -112,7 +112,7 @@ class SoftIk(object):
         cmds.connectAttr(distBetween+".distance", distDiffPMA+".input1D[1]", force=True)        
         cmds.connectAttr(distDiffPMA+".output1D", softIkRigScaleClp+".inputR", force=True)
         cmds.connectAttr(softIkRigScaleClp+".outputR", softIkRigScaleMD+".input1X", force=True)
-        cmds.connectAttr(worldRef+".scaleX", softIkRigScaleMD+".input2X", force=True)
+        cmds.connectAttr(world_ref+".scaleX", softIkRigScaleMD+".input2X", force=True)
         cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
 
         self.ar.ctrls.setLockHide([ctrlName], ["softDistance"])
@@ -121,25 +121,25 @@ class SoftIk(object):
         if stretch:
             softRatioMD = cmds.createNode("multiplyDivide", name=userName+"_Soft_Ratio_MD")
             disableFkStretchMD = cmds.createNode("multiplyDivide", name=userName+"_DisableFkStretch_MD")
-            stretchBC = cmds.createNode("blendColors", name=userName+"_Stretch_BC")
-            self.to_ids.extend([softRatioMD, disableFkStretchMD, stretchBC])
+            stretch_bc = cmds.createNode("blendColors", name=userName+"_Stretch_BC")
+            self.to_ids.extend([softRatioMD, disableFkStretchMD, stretch_bc])
             cmds.setAttr(softRatioMD+".operation", 2) #divide
-            cmds.setAttr(stretchBC+".color2R", 1)
+            cmds.setAttr(stretch_bc+".color2R", 1)
             cmds.connectAttr(ctrlName+".stretchable", disableFkStretchMD+".input1X", force=True)
             cmds.connectAttr(ctrlName+".disableIkFkRevOutputX", disableFkStretchMD+".input2X", force=True)
-            cmds.connectAttr(disableFkStretchMD+".outputX", stretchBC+".blender", force=True)
+            cmds.connectAttr(disableFkStretchMD+".outputX", stretch_bc+".blender", force=True)
             cmds.connectAttr(distBetween+".distance", softRatioMD+".input1X", force=True)
             cmds.connectAttr(daCnd+".outColorR", softRatioMD+".input2X", force=True)
-            cmds.connectAttr(distDiffPMA+".output1D", stretchBC+".color2G", force=True)
-            cmds.connectAttr(softRatioMD+".outputX", stretchBC+".color1R", force=True)
-            cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
+            cmds.connectAttr(distDiffPMA+".output1D", stretch_bc+".color2G", force=True)
+            cmds.connectAttr(softRatioMD+".outputX", stretch_bc+".color1R", force=True)
+            cmds.connectAttr(stretch_bc+".outputR", lenghtOutputMD+".input1X", force=True)
             cmds.connectAttr(ctrlName+"."+self.ar.data.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
-            cmds.connectAttr(stretchBC+".outputG", softIkRigScaleClp+".inputR", force=True)
+            cmds.connectAttr(stretch_bc+".outputG", softIkRigScaleClp+".inputR", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
                 for k in self.ar.data.axes:
                     cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+k, force=True)
-                    cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+k, force=True)
+                    cmds.connectAttr(lenghtOutputMD+".outputX", skin_joints[i]+".scale"+k, force=True)
                 i += 1
         
         self.ar.custom_attr.addAttr(0, self.to_ids) #dpID

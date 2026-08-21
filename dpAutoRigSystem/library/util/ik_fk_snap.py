@@ -18,16 +18,16 @@ import math
 
 
 class IkFkSnap(object):
-    def __init__(self, ar, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, creation=True, *args):
+    def __init__(self, ar, netName, world_ref, fkCtrlList, ik_ctrls, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, creation=True, *args):
         # defining variables:
         self.ar = ar
         self.netName = netName
-        self.worldRef = worldRef
-        self.ikFkBlendAttr = cmds.getAttr(self.worldRef+".ikFkBlendAttrName")
+        self.world_ref = world_ref
+        self.ikFkBlendAttr = cmds.getAttr(self.world_ref+".ikFkBlendAttrName")
         self.ikBeforeCtrl = fkCtrlList[0]
-        self.ikPoleVectorCtrl = ikCtrlList[0]
-        self.ikExtremCtrl = ikCtrlList[1]
-        self.ikExtremSubCtrl = ikCtrlList[2]
+        self.ikPoleVectorCtrl = ik_ctrls[0]
+        self.ikExtremCtrl = ik_ctrls[1]
+        self.ikExtremSubCtrl = ik_ctrls[2]
         self.fkCtrlList = fkCtrlList
         self.ikJointList = ikJointList
         self.revFootAttrList = revFootAttrList
@@ -38,13 +38,13 @@ class IkFkSnap(object):
             # calculate the initial ikFk extrem offset
             self.extremOffsetMatrix = self.getOffsetMatrix(self.ikExtremCtrl, self.fkCtrlList[-1])
             # store data
-            self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
+            self.ikFkState = round(cmds.getAttr(self.world_ref+"."+self.ikFkBlendAttr), 0)
             self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
             self.ar.custom_attr.addAttr(0, [self.ikFkSnapNet]) #dpID
             self.id = cmds.getAttr(self.ikFkSnapNet+"."+self.ar.data.dp_id)
             self.storeIkFkSnapData()
             if dpDev:
-                cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
+                cmds.scriptJob(attributeChange=(self.world_ref+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
             self.generateScriptNode()
         else:
             self.ikBeforeCtrl = cmds.listConnections(netName+".ikBeforeCtrl")[0]
@@ -83,7 +83,7 @@ class IkFkSnap(object):
         cmds.addAttr(self.ikFkSnapNet, longName="uniformScaleAttr", dataType="string")
         cmds.addAttr(self.ikFkSnapNet, longName="ikFkBlendAttr", dataType="string")
         cmds.addAttr(self.ikFkSnapNet, longName="extremOffset", attributeType="matrix")
-        cmds.addAttr(self.worldRef, longName="ikFkSnapNet", attributeType="message")
+        cmds.addAttr(self.world_ref, longName="ikFkSnapNet", attributeType="message")
         # set
         cmds.setAttr(self.ikFkSnapNet+".dpNetwork", 1)
         cmds.setAttr(self.ikFkSnapNet+".dpIkFkSnapNet", 1)
@@ -94,8 +94,8 @@ class IkFkSnap(object):
         cmds.setAttr(self.ikFkSnapNet+".revFootAttrList", ';'.join(self.revFootAttrList), type="string")
         cmds.setAttr(self.ikFkSnapNet+".uniformScaleAttr", self.uniformScaleAttr, type="string")
         # connect
-        cmds.connectAttr(self.ikFkSnapNet+".message", self.worldRef+".ikFkSnapNet", force=True)
-        cmds.connectAttr(self.worldRef+".message", self.ikFkSnapNet+".worldRef", force=True)
+        cmds.connectAttr(self.ikFkSnapNet+".message", self.world_ref+".ikFkSnapNet", force=True)
+        cmds.connectAttr(self.world_ref+".message", self.ikFkSnapNet+".worldRef", force=True)
         cmds.connectAttr(self.ikBeforeCtrl+".message", self.ikFkSnapNet+".ikBeforeCtrl", force=True)
         cmds.connectAttr(self.ikPoleVectorCtrl+".message", self.ikFkSnapNet+".ikPoleVectorCtrl", force=True)
         cmds.connectAttr(self.ikExtremCtrl+".message", self.ikFkSnapNet+".ikExtremCtrl", force=True)
@@ -114,9 +114,9 @@ class IkFkSnap(object):
     def jobChangedIkFk(self, *args):
         """ Just call snap function to set as well or update the ikFkState.
         """
-        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
-        currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
-        if cmds.getAttr(self.worldRef+".ikFkSnap"):
+        self.world_ref = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        currentValue = cmds.getAttr(self.world_ref+"."+self.ikFkBlendAttr)
+        if cmds.getAttr(self.world_ref+".ikFkSnap"):
             self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
             if self.ikFkState == 0: #ik
                 if currentValue >= 0.001:
@@ -140,11 +140,11 @@ class IkFkSnap(object):
         """ 0 = ik
             1 = fk
         """
-        plugged = cmds.listConnections(self.worldRef+"."+self.ikFkBlendAttr, source=True, destination=False, plugs=True)
+        plugged = cmds.listConnections(self.world_ref+"."+self.ikFkBlendAttr, source=True, destination=False, plugs=True)
         if plugged:
             cmds.setAttr(plugged[0], ikFkValue)
         else:
-            cmds.setAttr(self.worldRef+"."+self.ikFkBlendAttr, ikFkValue)
+            cmds.setAttr(self.world_ref+"."+self.ikFkBlendAttr, ikFkValue)
         if setState:
             self.ikFkState = ikFkValue
             cmds.setAttr(self.ikFkSnapNet+".ikFkState", ikFkValue)
@@ -322,12 +322,12 @@ class IkFkSnap(object):
     def __init__(self, ikFkSnapNet, *args):
         self.ikFkSnapNet = ikFkSnapNet
         self.reloadNetData()
-        cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
+        cmds.scriptJob(attributeChange=(self.world_ref+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=False, compressUndo=True)
 
     def reloadNetData(self):
-        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        self.world_ref = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
         self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
-        self.ikFkBlendAttr = cmds.getAttr(self.worldRef+".ikFkBlendAttrName")
+        self.ikFkBlendAttr = cmds.getAttr(self.world_ref+".ikFkBlendAttrName")
         self.uniformScaleAttr = cmds.getAttr(self.ikFkSnapNet+".uniformScaleAttr")
         self.ikBeforeCtrl = cmds.listConnections(self.ikFkSnapNet+".ikBeforeCtrl")[0]
         self.ikPoleVectorCtrl = cmds.listConnections(self.ikFkSnapNet+".ikPoleVectorCtrl")[0]
@@ -341,9 +341,9 @@ class IkFkSnap(object):
     def jobChangedIkFk(self, *args):
         """ Just call snap function to set as well or update the ikFkState.
         """
-        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
-        currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
-        if cmds.getAttr(self.worldRef+".ikFkSnap"):
+        self.world_ref = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        currentValue = cmds.getAttr(self.world_ref+"."+self.ikFkBlendAttr)
+        if cmds.getAttr(self.world_ref+".ikFkSnap"):
             self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
             if self.ikFkState == 0: #ik
                 if currentValue >= 0.001:
@@ -366,11 +366,11 @@ class IkFkSnap(object):
         """ 0 = ik
             1 = fk
         """
-        plugged = cmds.listConnections(self.worldRef+"."+self.ikFkBlendAttr, source=True, destination=False, plugs=True)
+        plugged = cmds.listConnections(self.world_ref+"."+self.ikFkBlendAttr, source=True, destination=False, plugs=True)
         if plugged:
             cmds.setAttr(plugged[0], ikFkValue)
         else:
-            cmds.setAttr(self.worldRef+"."+self.ikFkBlendAttr, ikFkValue)
+            cmds.setAttr(self.world_ref+"."+self.ikFkBlendAttr, ikFkValue)
         if setState:
             self.ikFkState = ikFkValue
             cmds.setAttr(self.ikFkSnapNet+".ikFkState", ikFkValue)

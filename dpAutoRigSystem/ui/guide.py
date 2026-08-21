@@ -85,7 +85,7 @@ class GuideUI(object):
         if 'nJoints' in cmds.listAttr(standard.guide_base):
             cmds.text('edit_segments_txt', label=self.ar.data.lang['m003_segments'], parent='edit_seg_del_dup_rl')
             if cmds.getAttr(standard.guide_base+".nJoints") > 0:
-                cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(standard.guide_base+".nJoints"), minValue=1, changeCommand=partial(standard.changeJointNumber, 0), parent='edit_seg_del_dup_rl')
+                cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(standard.guide_base+".nJoints"), minValue=1, changeCommand=partial(standard.change_joint_number, 0), parent='edit_seg_del_dup_rl')
             else:
                 cmds.intField('edit_guide_n_joints_if', value=cmds.getAttr(standard.guide_base+".nJoints"), minValue=0, editable=False, parent='edit_seg_del_dup_rl')
         else:

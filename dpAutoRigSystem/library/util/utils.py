@@ -633,14 +633,14 @@ class Utils(object):
         return radius
 
 
-    def zeroOutJoints(self, jntList=None, displayBone=False):
+    def zeroOutJoints(self, joints=None, displayBone=False):
         """ Duplicate the joints, parent as zeroOut.
             Returns the father joints (zeroOuted).
         """
         results = []
         zeroOutJntSuffix = "_Jzt"
-        if jntList:
-            for jnt in jntList:
+        if joints:
+            for jnt in joints:
                 if cmds.objExists(jnt):
                     jxtName = jnt.replace("_Jnt", "").replace("_"+zeroOutJntSuffix, "")
                     if not zeroOutJntSuffix in jxtName:
@@ -1174,7 +1174,7 @@ class Utils(object):
                     cmds.setAttr(jnt+".type", 0)
 
 
-    def createJointBlend(self, jointListA, jointListB, jointListC, attr_name, attrStartName, worldRef, storeName=True):
+    def createJointBlend(self, jointListA, jointListB, jointListC, attr_name, attrStartName, world_ref, storeName=True):
         """ Create an Ik Fk Blend setup for joint chain.
             Return the created reverse node.
         """
@@ -1185,27 +1185,27 @@ class Utils(object):
             if n == 0:
                 revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attr_name+"_Rev")
                 self.ar.custom_attr.addAttr(0, [revNode]) #dpID
-                cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
+                cmds.addAttr(world_ref, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(world_ref, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
                 if storeName:
-                    cmds.addAttr(worldRef, longName="ikFkBlendAttrName", dataType="string")
-                    cmds.setAttr(worldRef+".ikFkBlendAttrName", attrCompName, type="string")
-                cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
-                cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
+                    cmds.addAttr(world_ref, longName="ikFkBlendAttrName", dataType="string")
+                    cmds.setAttr(world_ref+".ikFkBlendAttrName", attrCompName, type="string")
+                cmds.connectAttr(world_ref+"."+attrCompName, revNode+".inputX", force=True)
+                cmds.connectAttr(revNode+".outputX", world_ref+"."+attrCompName+"RevOutputX", force=True)
             # connecting ikFkBlend using the reverse node:
-            cmds.connectAttr(worldRef+"."+attrCompName, parentConst+"."+jointListB[n]+"W1", force=True)
-            cmds.connectAttr(worldRef+"."+attrCompName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
+            cmds.connectAttr(world_ref+"."+attrCompName, parentConst+"."+jointListB[n]+"W1", force=True)
+            cmds.connectAttr(world_ref+"."+attrCompName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
         return revNode
 
 
     def getAttrNameLower(self, side, name):
         """ Return the composed name for attributes starting with lower case.
         """
-        attrNameLower = name
+        attr_name_lower = name
         if side:
-            attrNameLower = side[0]+name
-        attrNameLower = attrNameLower[0].lower()+attrNameLower[1:]
-        return attrNameLower
+            attr_name_lower = side[0]+name
+        attr_name_lower = attr_name_lower[0].lower()+attr_name_lower[1:]
+        return attr_name_lower
 
 
     def setAttrValues(self, items, attributes, valueList):
@@ -1351,14 +1351,14 @@ class Utils(object):
             for item in items:
                 if not item.endswith(suffix):
                     if cmds.attributeQuery("input", node=item, exists=True):
-                        newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
+                        new_name = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
                     elif cmds.attributeQuery("input1", node=item, exists=True):
-                        newName = self.getCapitalsName(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
-                    newName += "_"
+                        new_name = self.getCapitalsName(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
+                    new_name += "_"
                     if cmds.listConnections(item+".output", plugs=True, source=False, destination=True):
-                        newName += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
-                    newName += suffix
-                    cmds.rename(item, newName)
+                        new_name += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
+                    new_name += suffix
+                    cmds.rename(item, new_name)
 
 
     def getCapitalsName(self, plug, *args):

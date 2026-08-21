@@ -139,7 +139,7 @@ class Maker(object):
             to_set_attrs.remove(segments_attr)
             segments_value = cmds.getAttr(selected_item+'.'+segments_attr)
             if segments_value > 0:
-                new_guide_instance.changeJointNumber(segments_value)
+                new_guide_instance.change_joint_number(segments_value)
         self.ar.utils.setProgress(self.ar.data.lang['i067_duplicating'])
         if custom_name_attr in current_attrs:
             custom_name_value = cmds.getAttr(selected_item+'.'+custom_name_attr)

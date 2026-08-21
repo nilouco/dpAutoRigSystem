@@ -202,10 +202,10 @@ class TargetMirror(base.BaseLibrary):
                             # naming
                             newTargetName = item+"_Mirror"+axis
                             if cmds.checkBox(self.autoRenameCB, query=True, value=True):
-                                fromName = cmds.textField(self.fromNameTF, query=True, text=True)
-                                toName = cmds.textField(self.toNameTF, query=True, text=True)
-                                if fromName in item:
-                                    newTargetName = item.replace(fromName, toName)
+                                from_name = cmds.textField(self.fromNameTF, query=True, text=True)
+                                to_name = cmds.textField(self.toNameTF, query=True, text=True)
+                                if from_name in item:
+                                    newTargetName = item.replace(from_name, to_name)
                             # duplicate original model
                             tempDup = cmds.duplicate(origNode, name="temp_dupOrig")[0]
                             # create a temporary blendShape node
