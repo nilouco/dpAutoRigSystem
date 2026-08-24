@@ -94,10 +94,8 @@ class Suspension(standard.BaseStandard):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.number_name+"_"+letter+"_1_Jnt", scaleCompensate=False)
-                    endJoint = cmds.joint(name=side+self.number_name+"_"+letter+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
-                    self.ar.utils.addJointEndAttr([endJoint])
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    cmds.setAttr(endJoint+".translateZ", self.dist)
+                    self.create_end_joint(side+self.number_name+"_"+letter, jnt, tz=self.dist)
                     # joint labelling:
                     self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name+"_"+letter)
                     self.jointList.append(jnt)
@@ -121,10 +119,10 @@ class Suspension(standard.BaseStandard):
                     # origined from data:
                     if p == 0:
                         self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.guide_radius)
-                        cmds.delete(cmds.parentConstraint(self.cvALoc, zeroOutCtrlGrp[0], maintainOffset=False))
+                        cmds.matchTransform(zeroOutCtrlGrp[0], self.cvALoc, position=True, rotation=True)
                     else:
                         self.ar.utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
-                        cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
+                        cmds.matchTransform(zeroOutCtrlGrp[0], self.cvBLoc, position=True, rotation=True)
                         # integrating data:
                         self.suspensionBCtrlGrpList.append(zeroOutCtrlGrp[0])
                     # hide visibility attribute:
@@ -145,7 +143,7 @@ class Suspension(standard.BaseStandard):
                     upLoc = cmds.spaceLocator(name=side+self.number_name+"_"+letter+"_Up_Loc")[0]
                     locGrp = cmds.group(aimLoc, upLoc, name=side+self.number_name+"_"+letter+"_Loc_Grp")
                     cmds.parent(locGrp, self.locatorsGrp, relative=True)
-                    cmds.delete(cmds.parentConstraint(ctrl, locGrp, maintainOffset=False))
+                    cmds.matchTransform(locGrp, ctrl, position=True, rotation=True)
                     cmds.parentConstraint(upLocCtrl, upLoc, maintainOffset=False, name=upLoc+"_PaC")
                     cmds.parentConstraint(mainCtrl, locGrp, maintainOffset=True, name=locGrp+"_PaC")
                     cmds.setAttr(locGrp+".visibility", 0)

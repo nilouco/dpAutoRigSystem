@@ -167,7 +167,7 @@ class GuideUI(object):
 
     def reorient_layout(self, standard):
         if 'reorient' in cmds.listAttr(standard.guide_base):
-            cmds.button('edit_reorient_bt', label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=standard.reOrientGuideButton, backgroundColor=(0.5, 0.7, 0.8), parent="edit_guide_degree_rl")
+            cmds.button('edit_reorient_bt', label=self.ar.data.lang["m022_reOrient"], annotation=self.ar.data.lang["m023_reOrientDesc"], command=standard.run_re_orient_guide, backgroundColor=(0.5, 0.7, 0.8), parent="edit_guide_degree_rl")
 
 
     def style_layout(self, standard):

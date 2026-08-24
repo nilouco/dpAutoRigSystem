@@ -994,10 +994,17 @@ class BaseStandard(base.BaseLibrary):
         cmds.setAttr(self.radius_ctrl+".translateX", value)
 
 
-    def create_end_joint(self, side):
-        end_joint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
+    def create_end_joint(self, name, match_node=None, tx=None, ty=None, tz=None):
+        if not match_node:
+            match_node = self.guide_end_loc
+        end_joint = cmds.joint(name=name+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
         self.ar.utils.addJointEndAttr([end_joint])
-        cmds.delete(cmds.parentConstraint(self.guide_end_loc, end_joint, maintainOffset=False))
+        cmds.matchTransform(end_joint, match_node, position=True, rotation=True)
+        for attr, value in zip(['tx', 'ty', 'tz'], [tx, ty, tz]):
+            if value:
+                cmds.setAttr(f"{end_joint}.{attr}", value)
+        return end_joint
+
 
     # Getters:
     #

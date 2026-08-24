@@ -113,17 +113,14 @@ class Wheel(standard.BaseStandard):
                 cmds.addAttr(self.centerJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 self.ar.utils.setJointLabel(self.centerJoint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['m156_wheel'])
-                # create end joint:
-                self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_"+self.ar.data.joint_end_attr, radius=0.5)
+                self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang['m156_wheel'], self.cvFrontLoc)
                 # main joint:
                 cmds.select(clear=True)
                 self.mainJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.mainJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 self.ar.utils.setJointLabel(self.mainJoint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c058_main'])
-                # create end joint:
-                self.mainEndJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.ar.utils.addJointEndAttr([self.endJoint, self.mainEndJoint])
+                self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang['c058_main'], self.cvFrontLoc)
                 
                 # create controls:
                 self.wheelCtrl = self.ar.ctrls.cvControl("id_060_WheelCenter", side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_CenterLoc")
@@ -159,19 +156,17 @@ class Wheel(standard.BaseStandard):
                 self.steeringGrpList.append(self.toSteeringGrp)
                 
                 # position and orientation of joint and control:
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.centerJoint, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.endJoint, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.wheelCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.mainCtrl, maintainOffset=False))
+                cmds.matchTransform(self.centerJoint, self.cvCenterLoc, position=True, rotation=True)
+                cmds.matchTransform(self.wheelCtrl, self.cvCenterLoc, position=True, rotation=True)
+                cmds.matchTransform(self.mainCtrl, self.cvCenterLoc, position=True, rotation=True)
                 cmds.parentConstraint(self.mainCtrl, self.mainJoint, maintainOffset=False, name=self.mainJoint+"_PaC")
                 cmds.scaleConstraint(self.mainCtrl, self.mainJoint, maintainOffset=True, name=self.mainJoint+"_ScC")
-                cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.mainEndJoint, maintainOffset=False))
                 if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
                     cmds.move(self.radius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 else:
                     cmds.move(-self.radius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
-                cmds.delete(cmds.parentConstraint(self.cvInsideLoc, self.toSteeringGrp, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvOutsideLoc, self.outsideCtrl, maintainOffset=False))
+                cmds.matchTransform(self.toSteeringGrp, self.cvInsideLoc, position=True, rotation=True)
+                cmds.matchTransform(self.outsideCtrl, self.cvOutsideLoc, position=True, rotation=True)
                 
                 # zeroOut controls:
                 zeroGrpList = self.ar.utils.zeroOut([self.mainCtrl, self.wheelCtrl, self.toSteeringGrp, self.outsideCtrl])
@@ -249,9 +244,9 @@ class Wheel(standard.BaseStandard):
                 # create locators (frontLoc to get direction and oldLoc to store wheel old position):
                 self.frontLoc = cmds.spaceLocator(name=side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Front_Loc")[0]
                 self.oldLoc = cmds.spaceLocator(name=side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Old_Loc")[0]
-                cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.frontLoc, maintainOffset=False))
+                cmds.matchTransform(self.frontLoc, self.cvFrontLoc, position=True, rotation=True)
                 cmds.parent(self.frontLoc, self.mainCtrl)
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.oldLoc, maintainOffset=False))
+                cmds.matchTransform(self.oldLoc, self.cvCenterLoc, position=True, rotation=True)
                 cmds.setAttr(self.frontLoc+".visibility", 0, lock=True)
                 cmds.setAttr(self.oldLoc+".visibility", 0, lock=True)
                 # this wheel auto group locator could be replaced by a decomposeMatrix to get the translation in world space of the Wheel_Auto_Ctrl_Grp instead:
@@ -281,7 +276,7 @@ class Wheel(standard.BaseStandard):
                 
                 # geometry holder:
                 self.geoHolder = cmds.polyCube(name=side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_Geo", constructionHistory=False)[0]
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.geoHolder, maintainOffset=False))
+                cmds.matchTransform(self.geoHolder, self.cvCenterLoc, position=True, rotation=True)
                 cmds.setAttr(self.geoHolder+".visibility", 0, lock=True)
                 
                 # skinning:
@@ -324,17 +319,17 @@ class Wheel(standard.BaseStandard):
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.number_name+"_Ctrl_Grp")
                 
                 # positions:
-                cmds.delete(cmds.parentConstraint(upperClusterList[1], defCtrlGrpList[0], maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(middleClusterList[1], defCtrlGrpList[1], maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(lowerClusterList[1], defCtrlGrpList[2], maintainOffset=False))
+                cmds.matchTransform(defCtrlGrpList[0], upperClusterList[1], position=True, rotation=True)
+                cmds.matchTransform(defCtrlGrpList[1], middleClusterList[1], position=True, rotation=True)
+                cmds.matchTransform(defCtrlGrpList[2], lowerClusterList[1], position=True, rotation=True)
                 if s == 1: #fix right side controllers upper/lower flipping - workaround
                     if cmds.getAttr(self.guide_base+".flip") == 1:
                         self.ar.utils.unlockAttr([self.cvCenterLoc])
                         cmds.parent(self.cvCenterLoc, world=True)
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, lattice_items[1], maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, lattice_items[2], maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, clustersGrp, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvCenterLoc, defCtrlGrp, maintainOffset=False))
+                cmds.matchTransform(lattice_items[1], self.cvCenterLoc, position=True, rotation=True)
+                cmds.matchTransform(lattice_items[2], self.cvCenterLoc, position=True, rotation=True)
+                cmds.matchTransform(clustersGrp, self.cvCenterLoc, position=True, rotation=True)
+                cmds.matchTransform(defCtrlGrp, self.cvCenterLoc, position=True, rotation=True)
                 outsideDist = cmds.getAttr(self.cvOutsideLoc+".tz")
                 if s == 1:
                     if cmds.getAttr(self.guide_base+".flip") == 1:

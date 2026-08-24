@@ -127,8 +127,8 @@ class Single(standard.BaseStandard):
                 self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
                 self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
                 # position and orientation of joint and control:
-                cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
+                cmds.matchTransform(self.jnt, self.guide, position=True, rotation=True)
+                cmds.matchTransform(self.singleCtrl, self.guide, position=True, rotation=True)
                 # zeroOut controls:
                 zeroOutCtrlGrp = self.ar.utils.zeroOut([self.singleCtrl], offset=True)[0]
                 # hide visibility attribute:
@@ -180,7 +180,7 @@ class Single(standard.BaseStandard):
                                 # sdk locator:
                                 sdkLoc = cmds.spaceLocator(name=sdkJis.replace("_Jis", "_Loc"))[0]
                                 sdkLocGrp = cmds.group(sdkLoc, name=sdkLoc+"_Grp")
-                                cmds.delete(cmds.parentConstraint(self.singleCtrl, sdkLocGrp, maintainOffset=False))
+                                cmds.matchTransform(sdkLocGrp, self.singleCtrl, position=True, rotation=True)
                                 cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
                                 sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
                                 self.to_ids.append(sdkLocMD)
@@ -214,9 +214,7 @@ class Single(standard.BaseStandard):
                     cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 # create end joint:
                 cmds.select(self.jnt)
-                self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.ar.utils.addJointEndAttr([self.endJoint])
-                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
+                self.create_end_joint(side+self.number_name)
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.getHasIndirectSkin():

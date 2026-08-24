@@ -256,8 +256,8 @@ class Spine(standard.BaseStandard):
                 bottomLocGuide = side+self.number_name+"_Guide_JointLoc1"
                 topLocGuide = side+self.number_name+"_Guide_JointLoc"+str(self.n_joints)
                 # snap controls to guideLocators:
-                cmds.delete(cmds.parentConstraint(bottomLocGuide, self.hipsACtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(topLocGuide, self.chestACtrl, maintainOffset=False))
+                cmds.matchTransform(self.hipsACtrl, bottomLocGuide, position=True, rotation=True)
+                cmds.matchTransform(self.chestACtrl, topLocGuide, position=True, rotation=True)
                 
                 # change axis orientation for biped style
                 if style == 1: #biped
@@ -411,8 +411,8 @@ class Spine(standard.BaseStandard):
                     cmds.setAttr(self.middleFkCtrl+'.visibility', keyable=False)
                     cmds.parent(self.middleCtrl, self.hipsACtrl)
                     middleLocGuide = side+self.number_name+"_Guide_JointLoc"+str(n + 1)
-                    cmds.delete(cmds.parentConstraint(middleLocGuide, self.middleCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(middleLocGuide, self.middleFkCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.middleCtrl, middleLocGuide, position=True, rotation=True)
+                    cmds.matchTransform(self.middleFkCtrl, middleLocGuide, position=True, rotation=True)
                     if style == 1: #biped
                         cmds.rotate(0, 0, 0, self.middleCtrl, self.middleFkCtrl)
                     elif style == 2: #quadruped

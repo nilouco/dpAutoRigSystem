@@ -1392,7 +1392,7 @@ class Controllers(object):
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
         jcrGrp0 = self.ar.utils.zeroOut([jcrCtrl])[0]
         jcrGrp1 = self.ar.utils.zeroOut([jcrGrp0])[0]
-        cmds.delete(cmds.parentConstraint(jcrName, jcrGrp1, maintainOffset=False))
+        cmds.matchTransform(jcrGrp1, jcrName, position=True, rotation=True)
         cmds.parentConstraint(cmds.listRelatives(jcrName, parent=True)[0], jcrGrp1, maintainOffset=True, name=jcrGrp1+"_PaC")
         cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
         cmds.scaleConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_ScC")

@@ -124,7 +124,7 @@ class Finger(standard.BaseStandard):
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             # declaring lists to send information for integration:
-            self.scalableGrpList, self.ikCtrlZeroList = [], []
+            self.scalableGrpList, self.ik_ctrl_zeros = [], []
             # run for all sides
             for s, side in enumerate(self.sides):
                 skin_joints, self.controllers = [], []
@@ -247,7 +247,7 @@ class Finger(standard.BaseStandard):
                     # freeze joints rotation
                     cmds.makeIdentity(self.jnt, apply=True)
                     # create parent and scale constraints from ctrl to jnt:
-                    cmds.delete(cmds.parentConstraint(self.fingerCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC"))
+                    cmds.matchTransform(self.jnt, self.fingerCtrl, position=True, rotation=True)
                     
                     # add articulationJoint:
                     if n > 0:
@@ -268,7 +268,7 @@ class Finger(standard.BaseStandard):
                     cmds.select(self.jnt)
                     
                     if n == self.n_joints:
-                        self.create_end_joint(side)
+                        self.create_end_joint(side+self.number_name)
                 
                 # make first phalange be leads from base finger control:
                 cmds.parentConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.number_name+"_01_SDK_Zero_0_Grp"+"_PaC")
@@ -363,8 +363,8 @@ class Finger(standard.BaseStandard):
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
                     self.ik_ctrl_zero = self.ar.utils.zeroOut([self.ikCtrl])[0]
-                    self.ikCtrlZeroList.append(self.ik_ctrl_zero)
-                    cmds.delete(cmds.parentConstraint(skin_joints[-1], self.ik_ctrl_zero, maintainOffset=False))
+                    self.ik_ctrl_zeros.append(self.ik_ctrl_zero)
+                    cmds.matchTransform(self.ik_ctrl_zero, skin_joints[-1], position=True, rotation=True)
                     cmds.delete(cmds.pointConstraint(self.guide_end_loc, self.ik_ctrl_zero, maintainOffset=False))
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ik_ctrl_zero+".visibility", force=True)
                     for q in range(2, self.n_joints+1):
@@ -471,6 +471,6 @@ class Finger(standard.BaseStandard):
         """
         self.composed = {
                             "scalableGrpList": self.scalableGrpList,
-                            "ikCtrlZeroList": self.ikCtrlZeroList,
+                            "ikCtrlZeroList": self.ik_ctrl_zeros,
                             "correctiveCtrlGrpList": self.correctiveCtrlGrpList
                         }

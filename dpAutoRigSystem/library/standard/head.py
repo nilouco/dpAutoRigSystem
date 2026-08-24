@@ -803,22 +803,22 @@ class Head(standard.BaseStandard):
                 
                 # temporary parentConstraints:
                 for n in range(0, self.n_joints):
-                    cmds.delete(cmds.parentConstraint(self.neckLocList[n], self.neckCtrlList[n], maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvHeadLoc, self.headCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvHeadLoc, self.headSubCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.neckCtrlList[n], self.neckLocList[n], position=True, rotation=True)
+                cmds.matchTransform(self.headCtrl, self.cvHeadLoc, position=True, rotation=True)
+                cmds.matchTransform(self.headSubCtrl, self.cvHeadLoc, position=True, rotation=True)
                 if hasUpperHead:
-                    cmds.delete(cmds.parentConstraint(self.cvUpperJawLoc, self.upperJawCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvUpperHeadLoc, self.upperHeadCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.upperJawCtrl, self.cvUpperJawLoc, position=True, rotation=True)
+                    cmds.matchTransform(self.upperHeadCtrl, self.cvUpperHeadLoc, position=True, rotation=True)
                 if hasJaw:
-                    cmds.delete(cmds.parentConstraint(self.cvJawLoc, self.jawCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.jawCtrl, self.cvJawLoc, position=True, rotation=True)
                 if hasChin:
-                    cmds.delete(cmds.parentConstraint(self.cvChinLoc, self.chinCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvChewLoc, self.chewCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.chinCtrl, self.cvChinLoc, position=True, rotation=True)
+                    cmds.matchTransform(self.chewCtrl, self.cvChewLoc, position=True, rotation=True)
                 if hasLips:
-                    cmds.delete(cmds.parentConstraint(self.cvLCornerLipLoc, self.lCornerLipCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvRCornerLipLoc, self.rCornerLipCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvUpperLipLoc, self.upperLipCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvLowerLipLoc, self.lowerLipCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.lCornerLipCtrl, self.cvLCornerLipLoc, position=True, rotation=True)
+                    cmds.matchTransform(self.rCornerLipCtrl, self.cvRCornerLipLoc, position=True, rotation=True)
+                    cmds.matchTransform(self.upperLipCtrl, self.cvUpperLipLoc, position=True, rotation=True)
+                    cmds.matchTransform(self.lowerLipCtrl, self.cvLowerLipLoc, position=True, rotation=True)
 
                 # edit the mirror shape to a good direction of controls:
                 # fixing flip mirror:
@@ -884,7 +884,7 @@ class Head(standard.BaseStandard):
                     cmds.parentConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_PaC")
                     cmds.scaleConstraint(self.chinCtrl, self.chinJnt, maintainOffset=True, name=self.chinJnt+"_ScC")
                     cmds.scaleConstraint(self.chewCtrl, self.chewJnt, maintainOffset=True, name=self.chewJnt+"_ScC")
-                    cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJnt, maintainOffset=False))
+                    cmds.matchTransform(self.endJnt, self.guide_end_loc, position=True, rotation=True)
                 if hasLips:
                     cmds.parentConstraint(self.lCornerLipCtrl, self.lCornerLipJnt, maintainOffset=False, name=self.lCornerLipJnt+"_PaC")
                     cmds.parentConstraint(self.rCornerLipCtrl, self.rCornerLipJnt, maintainOffset=False, name=self.rCornerLipJnt+"_PaC")
@@ -903,8 +903,8 @@ class Head(standard.BaseStandard):
                 cmds.parent(self.zeroHeadGrp, self.neckCtrlList[-1])
                 world_ref = cmds.group(empty=True, name=side+self.number_name+"_WorldRef_Grp")
                 self.world_refs.append(world_ref)
-                cmds.delete(cmds.parentConstraint(self.neckCtrlList[0], world_ref, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(zeroHead, self.zeroHeadGrp, maintainOffset=False))
+                cmds.matchTransform(world_ref, self.neckCtrlList[0], position=True, rotation=True)
+                cmds.matchTransform(self.zeroHeadGrp, zeroHead, position=True, rotation=True)
                 cmds.parent(zeroHead, self.headOrientGrp, absolute=True)
                 headRotateParentConst = cmds.parentConstraint(self.neckCtrlList[-1], world_ref, self.headOrientGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.headOrientGrp+"_PaC")[0]
                 cmds.setAttr(headRotateParentConst+".interpType", 2) #shortest
@@ -1077,35 +1077,35 @@ class Head(standard.BaseStandard):
                 if cmds.getAttr(self.guide_base+".facial"):
                     if cmds.getAttr(self.guide_base+".facialBrow"):
                         cmds.parent(lBrowCtrlGrp, rBrowCtrlGrp, self.upperHeadCtrl)
-                        cmds.delete(cmds.parentConstraint(self.cvBrowLoc, lBrowCtrlGrp, maintainOffset=False))
-                        cmds.delete(cmds.parentConstraint(self.cvBrowLoc, rBrowCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(lBrowCtrlGrp, self.cvBrowLoc, position=True, rotation=True)
+                        cmds.matchTransform(rBrowCtrlGrp, self.cvBrowLoc, position=True, rotation=True)
                         cmds.setAttr(rBrowCtrlGrp+".translateX", (-1*cmds.getAttr(rBrowCtrlGrp+".translateX")))
                         cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
                     if cmds.getAttr(self.guide_base+".facialEyelid"):
                         if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
                             cmds.parent(lEyelidCtrlGrp, rEyelidCtrlGrp, self.upperHeadCtrl)
-                            cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, lEyelidCtrlGrp, maintainOffset=False))
-                            cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, rEyelidCtrlGrp, maintainOffset=False))
+                            cmds.matchTransform(lEyelidCtrlGrp, self.cvEyelidLoc, position=True, rotation=True)
+                            cmds.matchTransform(rEyelidCtrlGrp, self.cvEyelidLoc, position=True, rotation=True)
                             cmds.setAttr(rEyelidCtrlGrp+".translateX", (-1*cmds.getAttr(rEyelidCtrlGrp+".translateX")))
                     if cmds.getAttr(self.guide_base+".facialMouth"):
                         cmds.parent(lMouthCtrlGrp, rMouthCtrlGrp, self.upperJawCtrl)
-                        cmds.delete(cmds.parentConstraint(self.cvMouthLoc, lMouthCtrlGrp, maintainOffset=False))
-                        cmds.delete(cmds.parentConstraint(self.cvMouthLoc, rMouthCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(lMouthCtrlGrp, self.cvMouthLoc, position=True, rotation=True)
+                        cmds.matchTransform(rMouthCtrlGrp, self.cvMouthLoc, position=True, rotation=True)
                         cmds.setAttr(rMouthCtrlGrp+".translateX", (-1*cmds.getAttr(rMouthCtrlGrp+".translateX")))
                         cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
                     if cmds.getAttr(self.guide_base+".facialLips"):
                         cmds.parent(lipsCtrlGrp, self.upperJawCtrl)
-                        cmds.delete(cmds.parentConstraint(self.cvLipsLoc, lipsCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(lipsCtrlGrp, self.cvLipsLoc, position=True, rotation=True)
                     if cmds.getAttr(self.guide_base+".facialSneer"):
                         cmds.parent(sneerCtrlGrp, self.upperJawCtrl)
-                        cmds.delete(cmds.parentConstraint(self.cvSneerLoc, sneerCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(sneerCtrlGrp, self.cvSneerLoc, position=True, rotation=True)
                     if cmds.getAttr(self.guide_base+".facialGrimace"):
                         cmds.parent(grimaceCtrlGrp, self.chinCtrl)
-                        cmds.delete(cmds.parentConstraint(self.cvGrimaceLoc, grimaceCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(grimaceCtrlGrp, self.cvGrimaceLoc, position=True, rotation=True)
                         cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
                     if cmds.getAttr(self.guide_base+".facialFace"):
                         cmds.parent(faceCtrlGrp, self.headSubCtrl)
-                        cmds.delete(cmds.parentConstraint(self.cvFaceLoc, faceCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(faceCtrlGrp, self.cvFaceLoc, position=True, rotation=True)
                 
                 # calibration attributes:
                 neckCalibrationList = [self.ar.data.lang['c047_autoRotate']]

@@ -76,8 +76,7 @@ class Steering(standard.BaseStandard):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.number_name+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.ar.utils.addJointEndAttr([self.endJoint])
+                self.create_end_joint(side+self.number_name, ty=1)
                 # joint labelling:
                 self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
@@ -87,11 +86,9 @@ class Steering(standard.BaseStandard):
                 self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide_end_loc+";"+self.guide_radius)
                 self.steeringCtrlList.append(self.steeringCtrl)
                 # position and orientation of joint and control:
-                cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.guide, self.steeringCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.mainCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
-                cmds.setAttr(self.endJoint+".translateY", 1)
+                cmds.matchTransform(self.jnt, self.guide, position=True, rotation=True)
+                cmds.matchTransform(self.steeringCtrl, self.guide, position=True, rotation=True)
+                cmds.matchTransform(self.mainCtrl, self.guide_end_loc, position=True, rotation=True)
                 # zeroOut controls:
                 zeroOutCtrlGrpList = self.ar.utils.zeroOut([self.steeringCtrl, self.mainCtrl])
                 # hide visibility attribute:

@@ -61,11 +61,11 @@ class Ribbon(object):
         auxLoc = cmds.duplicate(oriLoc, rr=True)
         midLoc = cmds.duplicate(oriLoc, rr=True)
 
-        cmds.delete(cmds.parentConstraint(lista[1], auxLoc, mo=False, w=1))
+        cmds.matchTransform(auxLoc, lista[1], position=True, rotation=True)
         cmds.delete(cmds.aimConstraint(lista[2], auxLoc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
         cmds.delete(cmds.orientConstraint(oriLoc, auxLoc, mo=False, skip=skipa, weight=1))
 
-        cmds.delete(cmds.parentConstraint(lista[1], midLoc, mo=False, w=1))
+        cmds.matchTransform(midLoc, lista[1], position=True, rotation=True)
 
         cmds.delete(cmds.orientConstraint(oriLoc, midLoc, mo=False, skip=skipa, weight=1))
         
@@ -95,10 +95,10 @@ class Ribbon(object):
             lista.append(cmds.listRelatives(lista[2], c=True)[0])
             auxBLoc = cmds.duplicate(oriBLoc, rr=True)
             midBLoc = cmds.duplicate(oriBLoc, rr=True)
-            cmds.delete(cmds.parentConstraint(lista[2], auxBLoc, mo=False, w=1))
+            cmds.matchTransform(auxBLoc, lista[2], position=True, rotation=True)
             cmds.delete(cmds.aimConstraint(lista[3], auxBLoc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
             cmds.delete(cmds.orientConstraint(oriBLoc, auxBLoc, mo=False, skip=skipa, weight=1))
-            cmds.delete(cmds.parentConstraint(lista[2], midBLoc, mo=False, w=1))
+            cmds.matchTransform(midBLoc, lista[2], position=True, rotation=True)
             cmds.delete(cmds.orientConstraint(oriBLoc, midBLoc, mo=False, skip=skipa, weight=1))
             downBctrlList = self.createBendCtrl(prefix+myName+'_DownB_Offset_Ctrl', r=self.radius)
             downBctrl = downBctrlList[0]
@@ -161,20 +161,20 @@ class Ribbon(object):
         cmds.connectAttr(upctrlCtrl+".message", upLimb['extraCtrlList'][0]+".parentTag", force=True)
         cmds.connectAttr(downctrlCtrl+".message", downLimb['extraCtrlList'][0]+".parentTag", force=True)
 
-        cmds.delete(cmds.parentConstraint(oriLoc, upctrl, mo=False, w=1))
+        cmds.matchTransform(upctrl, oriLoc, position=True, rotation=True)
         cmds.delete(cmds.pointConstraint(upLimb['middleCtrl'], upctrl, mo=False, w=1))
         
-        cmds.delete(cmds.parentConstraint(auxLoc, downctrl, mo=False, w=1))
+        cmds.matchTransform(downctrl, auxLoc, position=True, rotation=True)
         cmds.delete(cmds.pointConstraint(downLimb['middleCtrl'], downctrl, mo=False, w=1))
         if oriBLoc:
-            cmds.delete(cmds.parentConstraint(auxBLoc, downBctrl, mo=False, w=1))
+            cmds.matchTransform(downBctrl, auxBLoc, position=True, rotation=True)
             cmds.delete(cmds.pointConstraint(downBLimb['middleCtrl'], downBctrl, mo=False, w=1))
 
-        cmds.delete(cmds.parentConstraint(midLoc, elbowctrl, mo=False, w=1))
+        cmds.matchTransform(elbowctrl, midLoc, position=True, rotation=True)
         orientConst = cmds.orientConstraint(lista[0], lista[1], elbowctrl, mo=False, w=1, name=elbowctrl+"_OrC")[0]
         cmds.setAttr(orientConst+".interpType", 2)
         if oriBLoc:
-            cmds.delete(cmds.parentConstraint(midBLoc, elbowBctrl, mo=False, w=1))
+            cmds.matchTransform(elbowBctrl, midBLoc, position=True, rotation=True)
             orientBConst = cmds.orientConstraint(lista[1], lista[2], elbowBctrl, mo=False, w=1, name=elbowBctrl+"_OrC")[0]
             cmds.setAttr(orientBConst+".interpType", 2)
 
@@ -308,7 +308,7 @@ class Ribbon(object):
             if oriBLoc:
                 idx = 3
             extremLoc = cmds.spaceLocator(name=lista[idx].replace("Jnt", "AutoRotate_Loc"))[0]
-            cmds.delete(cmds.parentConstraint(lista[idx], extremLoc, maintainOffset=False))
+            cmds.matchTransform(extremLoc, lista[idx], position=True, rotation=True)
             cornerAutoRotGrp = cmds.group(extremLoc, name=extremLoc+"_Grp")
             extremOrigLoc = cmds.duplicate(extremLoc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
             for axis in self.ar.data.axes:
@@ -638,7 +638,7 @@ class Ribbon(object):
         self.ar.utils.removeUserDefinedAttr(mid_Ctrl, True)
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
-        cmds.delete(cmds.parentConstraint(midCtrl, mid_Ctrl, mo=0))
+        cmds.matchTransform(mid_Ctrl, midCtrl, position=True, rotation=True)
         cmds.parent(midCtrl, mid_Ctrl)
         
         #adjust the relationship between the locators
@@ -770,7 +770,7 @@ class Ribbon(object):
                         addCtrl = self.ar.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guideSource=self.limbInstance.guide_base)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = self.ar.utils.zeroOut([addCtrl])[0]
-                        cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))
+                        cmds.matchTransform(addCtrlGrp, jad, position=True, rotation=True)
                         cmds.parentConstraint(addCtrl, jad, maintainOffset=True, name=jad+"_PaC")
                         cmds.scaleConstraint(addCtrl, jad, maintainOffset=True, name=jad+"_ScC")
                         cmds.parent(addCtrlGrp, extraCtrl, absolute=True)
@@ -884,8 +884,8 @@ class Ribbon(object):
             bottom = guides[1]
             constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_PaC"))
             constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_PaC")) #to integrate jxt after
-            cmds.delete(cmds.parentConstraint(top, bttm_Loc[3], mo=False))
-            cmds.delete(cmds.parentConstraint(bottom, top_Loc[3], mo=False))
+            cmds.matchTransform(bttm_Loc[3], top, position=True, rotation=True)
+            cmds.matchTransform(top_Loc[3], bottom, position=True, rotation=True)
             constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PoC"))
             constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PoC"))
             # this is an important constraint to avoid Ribbon flipping and follow correctely the hierarchy:
@@ -895,8 +895,8 @@ class Ribbon(object):
             from math import sqrt, pow
             auxLoc1 = cmds.spaceLocator(name='auxLoc1')[0]
             auxLoc2 = cmds.spaceLocator(name='auxLoc2')[0]
-            cmds.delete(cmds.parentConstraint(top, auxLoc1, mo=False, w=1))
-            cmds.delete(cmds.parentConstraint(bottom, auxLoc2, mo=False, w=1))
+            cmds.matchTransform(auxLoc1, top, position=True, rotation=True)
+            cmds.matchTransform(auxLoc2, bottom, position=True, rotation=True)
             a = cmds.xform(auxLoc1, ws=True, translation=True, q=True)
             b = cmds.xform(auxLoc2, ws=True, translation=True, q=True)
             

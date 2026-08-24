@@ -92,65 +92,65 @@ class FkLine(standard.BaseStandard):
         cmds.select(self.guide_base)
 
 
-    def getJointLocList(self, guideBase, *args):
+    def get_joint_locs(self):
         """ Get the list of jointLocators from the guideBase.
         """
-        if cmds.objExists(guideBase):
-            children = cmds.listRelatives(guideBase, allDescendents=True, type="transform")
-            upVectorObject = self.ar.utils.createLocatorInItemPosition(self.guide_radius)  # using locator to avoid cycle error
-            jointLocList = []
+        if cmds.objExists(self.guide_base):
+            children = cmds.listRelatives(self.guide_base, allDescendents=True, type="transform")
+            up_vector = self.ar.utils.createLocatorInItemPosition(self.guide_radius)  # using locator to avoid cycle error
+            locs = []
             for child in children:
                 # Check if the child is a joint locator, with nJoint attribute
                 if cmds.attributeQuery("nJoint", node=child, exists=True):
-                    jointLocList.append(child)
-            return jointLocList, upVectorObject
+                    locs.append(child)
+            return locs, up_vector
 
 
-    def aimFunction(self, target, aimed, upObject, *args):
-        """ Aim the target towards the aimed object using the upObject(RadiusCtrl) for orientation.
+    def aim_to_target(self, node, target, up_object):
+        """ Aim the target towards the node object using the up_object(RadiusCtrl) for orientation.
         """ 
         # If it's JointEnd, unlock translateX and translateY attributes to allow unparenting to world with no translation issues.
         # The JointEnd will be unlocked after pressing the reorient button only.
         if target == self.guide_end_loc:
             cmds.setAttr(target + ".translateX", lock=False, keyable=True)
             cmds.setAttr(target + ".translateY", lock=False, keyable=True)
-        fatherJointLoc = cmds.listRelatives(target, parent=True, type="transform")[0]
+        father_loc = cmds.listRelatives(target, parent=True, type="transform")[0]
         cmds.parent(target, world=True)
         # Aim Constraint without maintain offset
-        cmds.delete(cmds.aimConstraint(target, aimed, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="objectrotation", worldUpVector=(0, 1, 0), worldUpObject=upObject, maintainOffset=False))
+        cmds.delete(cmds.aimConstraint(target, node, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="objectrotation", worldUpVector=(0, 1, 0), worldUpObject=up_object, maintainOffset=False))
         # Get back to the original parent
-        cmds.parent(target, fatherJointLoc)
+        cmds.parent(target, father_loc)
 
 
-    def reOrientFkLine(self, jointLocList, upVectorObject, guideBase, *args):
-        """ Reorient the FK line based on the jointLocList and upVectorObject.
+    def re_orient_fkline(self, locs, up_vector):
+        """ Reorient the FK line based on the locs and up_vector.
         """ 
-        if jointLocList:
-            for jointLoc in jointLocList:
-                # jointLocPos = createLocatorInPosition(jointLoc)
-                backGuide = cmds.listRelatives(jointLoc, parent=True)[0]
-                # Check if the backGuide is not the guideBase
-                if not backGuide == guideBase:
-                    self.aimFunction(jointLoc, backGuide, upVectorObject)
-                # If the backGuide is the guideBase, align the jointLoc1 to the guideBase
-                if backGuide == guideBase:
-                    nJoint2 = cmds.listRelatives(jointLoc, children=True, type="transform")[0]
-                    posTempLoc = self.ar.utils.createLocatorInItemPosition(nJoint2)
-                    # Aim guideBase and jointLoc to nJoint2
-                    self.aimFunction(nJoint2, guideBase, upVectorObject)
-                    # Parenting nJoint to world and reset jointLoc position
-                    cmds.parent(nJoint2, world=True)
+        if locs:
+            for joint_loc in locs:
+                # jointLocPos = createLocatorInPosition(joint_loc)
+                father = cmds.listRelatives(joint_loc, parent=True)[0]
+                # Check if the father is not the guideBase
+                if not father == self.guide_base:
+                    self.aim_to_target(father, joint_loc, up_vector)
+                # If the father is the guideBase, align the jointLoc1 to the guideBase
+                if father == self.guide_base:
+                    child = cmds.listRelatives(joint_loc, children=True, type="transform")[0]
+                    temp_pos_loc = self.ar.utils.createLocatorInItemPosition(child)
+                    # Aim guideBase and joint_loc to child
+                    self.aim_to_target(self.guide_base, child, up_vector)
+                    # Parenting nJoint to world and reset joint_loc position
+                    cmds.parent(child, world=True)
                     for axis in self.ar.data.axes:
-                        cmds.setAttr(jointLoc + ".translate" + axis, 0)
-                        cmds.setAttr(jointLoc + ".rotate" + axis, 0)
-                    cmds.parent(nJoint2, jointLoc)
+                        cmds.setAttr(joint_loc + ".translate" + axis, 0)
+                        cmds.setAttr(joint_loc + ".rotate" + axis, 0)
+                    cmds.parent(child, joint_loc)
                     # Delete the temporary locators
-                    cmds.delete(upVectorObject)
-                    cmds.delete(posTempLoc)
-                cmds.select(guideBase)
+                    cmds.delete(up_vector)
+                    cmds.delete(temp_pos_loc)
+                cmds.select(self.guide_base)
 
 
-    def reOrientGuideButton(self, *args):
+    def run_re_orient_guide(self, *args):
         """ reorient dpFkLine button. 
             Each guide will point to the next guide using Radius_Ctrl position as a Object Rotation Up Vector.
         """
@@ -159,10 +159,10 @@ class FkLine(standard.BaseStandard):
         self.guide_end_loc = self.name_guide + "_JointEnd"
         # Check if the guideBase exists:
         if cmds.attributeQuery("guideBase", node=self.guide_base, exists=True):
-            # Get the jointLocList and upVectorObject:
-            self.jointLocList, self.upVectorObject = self.getJointLocList(self.guide_base)
+            # Get the locs and up_vector:
+            locs, up_vector = self.get_joint_locs()
             # Reorient the FK line:
-            self.reOrientFkLine(self.jointLocList, self.upVectorObject, self.guide_base, self.guide_end_loc)
+            self.re_orient_fkline(locs, up_vector)
 
 
     def rig_me(self, *args):
@@ -184,19 +184,19 @@ class FkLine(standard.BaseStandard):
                     self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
                     self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                     # create a joint:
-                    self.jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
-                    cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                    jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
+                    cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
-                    skin_joints.append(self.jnt)
+                    self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
+                    skin_joints.append(jnt)
                     # create a control:
                     ctrl = self.ar.ctrls.cvControl("id_007_FkLine", side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc"+str(n+1), parentTag=self.get_parent_to_tag(fk_ctrls))
                     fk_ctrls.append(ctrl)
                     # zeroOut controls:
                     ctrl_zero = self.ar.utils.zeroOut([ctrl])[0]
                     # position and orientation of joint and control:
-                    cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.guide, ctrl_zero, maintainOffset=False))
+                    cmds.matchTransform(jnt, self.guide, position=True, rotation=True)
+                    cmds.matchTransform(ctrl_zero, self.guide, position=True, rotation=True)
                     # hide visibility attribute:
                     cmds.setAttr(ctrl+'.visibility', keyable=False)
                     # fixing flip mirror:
@@ -207,7 +207,7 @@ class FkLine(standard.BaseStandard):
                             cmds.setAttr(ctrl_zero+".scaleZ", -1)
                     cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=False)
                     cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
-                    cmds.connectAttr(ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                    cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
                         self.ar.utils.originedFrom(objName=ctrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
                         ctrl_zero_grp = ctrl_zero
@@ -219,21 +219,21 @@ class FkLine(standard.BaseStandard):
                     if n > 0:
                         # parent joints as a simple chain (line)
                         father_joint = side+self.number_name+"_%02d_Jnt"%(n-1)
-                        cmds.parent(self.jnt, father_joint, absolute=True)
+                        cmds.parent(jnt, father_joint, absolute=True)
                         # parent zeroCtrl Group to the before jntCtrl:
                         cmds.parent(ctrl_zero, side+self.number_name+"_%02d_Ctrl"%(n-1), absolute=True)
                     # control drives joint:
-                    cmds.parentConstraint(ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
-                    cmds.scaleConstraint(ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
+                    cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
+                    cmds.scaleConstraint(ctrl, jnt, maintainOffset=True, name=jnt+"_ScC")
                     # add articulationJoint:
                     if n > 0:
                         if self.articulation:
-                            articulation_joints = self.ar.utils.articulationJoint(father_joint, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            articulation_joints = self.ar.utils.articulationJoint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
                             self.ar.utils.setJointLabel(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
-                    cmds.select(self.jnt)
+                    cmds.select(jnt)
                     # end chain:
                     if n == self.n_joints-1:
-                        self.create_end_joint(side)
+                        self.create_end_joint(side+self.number_name)
                 # work with main fk controllers
                 if cmds.getAttr(self.base+".mainControls"):
                     self.add_fk_main_ctrls(side, fk_ctrls)

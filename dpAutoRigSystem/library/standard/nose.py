@@ -189,8 +189,8 @@ class Nose(standard.BaseStandard):
                     # zeroOut controls:
                     ctrl_zero = self.ar.utils.zeroOut([self.noseCtrl])[0]
                     # position and orientation of joint and control:
-                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, ctrl_zero, maintainOffset=False))
+                    cmds.matchTransform(self.jnt, self.cvTopLoc, position=True, rotation=True)
+                    cmds.matchTransform(ctrl_zero, self.cvTopLoc, position=True, rotation=True)
                     # hide visibility attribute:
                     cmds.setAttr(self.noseCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
@@ -314,14 +314,14 @@ class Nose(standard.BaseStandard):
                     self.ar.utils.originedFrom(objName=self.rNostrilCtrl, attrString=self.cvRNostrilLoc)
 
                 # temporary parentConstraints:
-                cmds.delete(cmds.parentConstraint(self.cvMiddleLoc, self.middleCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvTipLoc, self.tipCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvBottomLoc, self.bottomCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvLSideLoc, self.lSideCtrl, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.cvRSideLoc, self.rSideCtrl, maintainOffset=False))
+                cmds.matchTransform(self.middleCtrl, self.cvMiddleLoc, position=True, rotation=True)
+                cmds.matchTransform(self.tipCtrl, self.cvTipLoc, position=True, rotation=True)
+                cmds.matchTransform(self.bottomCtrl, self.cvBottomLoc, position=True, rotation=True)
+                cmds.matchTransform(self.lSideCtrl, self.cvLSideLoc, position=True, rotation=True)
+                cmds.matchTransform(self.rSideCtrl, self.cvRSideLoc, position=True, rotation=True)
                 if self.nostril:
-                    cmds.delete(cmds.parentConstraint(self.cvLNostrilLoc, self.lNostrilCtrl, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvRNostrilLoc, self.rNostrilCtrl, maintainOffset=False))
+                    cmds.matchTransform(self.lNostrilCtrl, self.cvLNostrilLoc, position=True, rotation=True)
+                    cmds.matchTransform(self.rNostrilCtrl, self.cvRNostrilLoc, position=True, rotation=True)
                 
                 # fixing flip mirror:
                 if s == 1:
@@ -379,9 +379,7 @@ class Nose(standard.BaseStandard):
 
                 # create end joint:
                 cmds.select(self.tipJnt)
-                self.endJoint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
-                self.ar.utils.addJointEndAttr([self.endJoint])
-                cmds.delete(cmds.parentConstraint(self.guide_end_loc, self.endJoint, maintainOffset=False))
+                self.create_end_joint(side+self.number_name)
 
                 # optimize control CV shapes:
                 tempTipCluster = cmds.cluster(self.tipCtrl)[1]

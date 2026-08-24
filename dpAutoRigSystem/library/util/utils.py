@@ -833,7 +833,7 @@ class Utils(object):
                 jax = cmds.joint(name=jaxName, radius=0.5*jarRadius)
                 jar = cmds.joint(name=jarName, radius=jarRadius)
                 cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
-                cmds.delete(cmds.parentConstraint(brotherNode, jax, maintainOffset=0))
+                cmds.matchTransform(jax, brotherNode, position=True, rotation=True)
                 cmds.parent(jax, fatherNode)
                 cmds.makeIdentity(jax, apply=True)
                 cmds.setAttr(jax+".segmentScaleCompensate", 0)
