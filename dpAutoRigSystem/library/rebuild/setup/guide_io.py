@@ -132,7 +132,6 @@ class GuideIO(action.BaseAction):
     def setup_instance_changes(self, rebuilding=True):
         """ Run instance code to Guide_Base node configuration or just set the simple attributes.
         """
-        directions = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
         custom_attributes = ["flip",
                           "mainControls",
                           "nMain",
@@ -200,7 +199,7 @@ class GuideIO(action.BaseAction):
                         elif base_attr == "hasBend": #limb
                             self.instance.changeBend(self.net_data["GuideData"][item]["hasBend"])
                         elif base_attr == "aimDirection": #eye
-                            self.instance.changeAimDirection(directions[(int(self.net_data["GuideData"][item]["aimDirection"]))])
+                            self.instance.change_aim_direction(self.ar.data.directions[(int(self.net_data["GuideData"][item]["aimDirection"]))])
                         elif base_attr == "fatherB": #suspention
                             father_b_data = self.net_data["GuideData"][item]["fatherB"]
                             if father_b_data:

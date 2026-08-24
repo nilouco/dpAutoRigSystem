@@ -147,7 +147,7 @@ class FacialConnection(base.BaseLibrary):
         combinationTgt = cmds.checkBox(self.combinationTgtCB, query=True, value=True)
         tweakTgtOnly = cmds.checkBox(self.tweakTgtOnlyCB, query=True, value=True)
         # call run function
-        self.dpCreateTargets(fromMesh=None, baseName="Head", createBsNode=createBsNode, combinationTargets=combinationTgt,  tweakTgtOnly=tweakTgtOnly)
+        self.dpCreateTargets(fromMesh=None, base_name="Head", createBsNode=createBsNode, combinationTargets=combinationTgt,  tweakTgtOnly=tweakTgtOnly)
  
    
     def dpDisableCombination(self, value, *args):
@@ -161,7 +161,7 @@ class FacialConnection(base.BaseLibrary):
             cmds.checkBox(self.combinationTgtCB, edit=True, enable=True)
         
 
-    def dpCreateTargets(self, fromMesh=None, baseName="Head", createBsNode=None, combinationTargets=None, tweakTgtOnly=None, *args):
+    def dpCreateTargets(self, fromMesh=None, base_name="Head", createBsNode=None, combinationTargets=None, tweakTgtOnly=None, *args):
         """ Creates the default blendShape targets used in the system by default.
         """
         if not fromMesh:
@@ -175,7 +175,7 @@ class FacialConnection(base.BaseLibrary):
         if fromMesh:
             geos, results = [], []
             for geoBase in fromMeshList:
-                prefix = baseName
+                prefix = base_name
                 if self.ar.data.ui_state:
                     btContinue = self.ar.data.lang['i174_continue']
                     btCancel = self.ar.data.lang['i132_cancel']
@@ -547,14 +547,14 @@ class FacialConnection(base.BaseLibrary):
                 # splitting using "comb_" to get beforeComb name e.g: l_mouth and combination part e.g. smilewide
                 beforeComb, combPart = combLower.split("comb_")
                 drivers = []
-                for baseName in baseTargets:
-                    baseNameAttr = self.decomposeTgtName(baseName, prefix)[-1]
+                for base_name in baseTargets:
+                    baseNameAttr = self.decomposeTgtName(base_name, prefix)[-1]
                     baseLower = baseNameAttr.lower()
                     # when the base target match the combination part prefix, it will replace same prefix for blank
                     # it will be remained only the suffix to compare e.g smile
                     baseSuffix = baseLower.replace(beforeComb, "")
                     if baseSuffix and baseSuffix in combPart: # if it finds the suffix in the combination part, it's a driver
-                        drivers.append(baseName)
+                        drivers.append(base_name)
                     if len(drivers) >= 2: # its necessary more than two drivers per combination target
                         combinationTargetRelationship[combName] = drivers
             return combinationTargetRelationship

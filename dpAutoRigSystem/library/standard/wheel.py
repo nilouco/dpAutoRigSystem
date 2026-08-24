@@ -285,8 +285,8 @@ class Wheel(standard.BaseStandard):
                 cmds.rename(scBindPose, side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_BP")
                 if self.loadedGeo:
                     if cmds.objExists(self.loadedGeo):
-                        baseName = self.ar.utils.extractSuffix(self.loadedGeo)
-                        skinClusterName = baseName+"_SC"
+                        base_name = self.ar.utils.extractSuffix(self.loadedGeo)
+                        skinClusterName = base_name+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         try:

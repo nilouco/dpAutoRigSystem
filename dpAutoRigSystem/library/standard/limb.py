@@ -59,7 +59,7 @@ class Limb(standard.BaseStandard):
         self.masterCtrlRefList = []
         self.rootCtrlRefList = []
         self.softIkCalibrateList = []
-        self.correctiveCtrlGrpList = []
+        self.corrective_ctrl_grps = []
         self.ankleArticList = []
         self.ankleCorrectiveList = []
 
@@ -644,38 +644,38 @@ class Limb(standard.BaseStandard):
         return results
 
 
-    def getCalibratePresetList(self, s, isLeg, first, main, corner, kneeB, extrem, *args):
+    def get_calibrate_presets(self, s, isLeg, first, main, corner, kneeB, extrem):
         """ Returns the calibration preset and invert lists for the asked limb joint.
         """
-        presetList = None
-        invertList = None
+        presets = None
+        inverts = None
         if first: #clavicle/hips
-            presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
+            presets = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
             if s ==  1:
-                invertList = [[], ["invertTX", "invertRY"]]
+                inverts = [[], ["invertTX", "invertRY"]]
         elif main: #shoulder/leg
             if isLeg:
-                presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
+                presets = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
             else:
-                presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
+                presets = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
             if s == 1:
-                invertList = [[], [], ["invertTX", "invertRY"]]
+                inverts = [[], [], ["invertTX", "invertRY"]]
         elif corner: #elbow/knee
-            presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            presets = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
             if not isLeg:
-                invertList = [[], ["invertRY"], [], []]
+                inverts = [[], ["invertRY"], [], []]
                 if s == 1:
                     if self.getHasBend():
-                        invertList = [[], ["invertTX", "invertTZ", "invertRY"], ["invertTX", "invertTZ"], ["invertTX", "invertTZ"]]
+                        inverts = [[], ["invertTX", "invertTZ", "invertRY"], ["invertTX", "invertTZ"], ["invertTX", "invertTZ"]]
                     else:
-                        invertList = [[], ["invertRY"], [], []]
+                        inverts = [[], ["invertRY"], [], []]
         elif kneeB: #kneeB
-            presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            presets = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
         elif extrem: #wrist/ankle
-            presetList = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
+            presets = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
             if s == 1:
-                invertList = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
-        return presetList, invertList
+                inverts = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
+        return presets, inverts
 
 
     def rig_me(self, *args):
@@ -1827,34 +1827,34 @@ class Limb(standard.BaseStandard):
                     if self.corrective:
                         # corrective controls group
                         self.corrective_ctrls_grp = cmds.group(name=side+self.number_name+"_Corrective_Grp", empty=True)
-                        self.correctiveCtrlGrpList.append(self.corrective_ctrls_grp)
+                        self.corrective_ctrl_grps.append(self.corrective_ctrls_grp)
                         cmds.parent(self.corrective_ctrls_grp, self.ctrl_hook_grp)
                         
                         # clavicle / hips
                         beforeCorrectiveNetList = [None]
                         beforeCorrectiveNetList.append(self.setup_corrective_net(fk_ctrls[0], self.scalable_hook_grp, skin_joints[0], side+self.number_name+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [side+self.number_name+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60]))
-                        beforeCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, True, False, False, False, False)
+                        beforeCalibratePresetList, inverts = self.get_calibrate_presets(s, isLeg, True, False, False, False, False)
                         beforeJntList = self.ar.utils.articulationJoint(beforeJxt, skin_joints[0], 1, [(0.3*self.radius, 0, 0.3*self.radius)])
-                        self.setup_corrective_controllers(beforeJntList, s, self.number_name+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(beforeJntList, s, self.number_name+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList, inverts)
 
                         # shoulder / leg
                         mainCorrectiveNetList = [None]
                         mainCorrectiveNetList.append(self.setup_corrective_net(fk_ctrls[0], self.shoulderRefGrp, skin_joints[1], side+self.number_name+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.number_name+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
                         mainCorrectiveNetList.append(self.setup_corrective_net(fk_ctrls[0], self.shoulderRefGrp, skin_joints[1], side+self.number_name+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.number_name+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
-                        mainCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
+                        mainCalibratePresetList, inverts = self.get_calibrate_presets(s, isLeg, False, True, False, False, False)
                         mainJntList = self.ar.utils.articulationJoint(self.shoulderRefGrp, skin_joints[1], 2, [(0, mainJarYValue*self.radius, 0), (0.3*self.radius, 0, 0)])
-                        self.setup_corrective_controllers(mainJntList, s, self.number_name+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(mainJntList, s, self.number_name+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList, inverts)
                         
                         # elbow / knee
-                        cornerCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
+                        cornerCalibratePresetList, inverts = self.get_calibrate_presets(s, isLeg, False, False, True, False, False)
                         cornerCorrectiveNetList = [None, self.cornerCorrectiveNet, self.cornerCorrectiveNet, self.cornerCorrectiveNet]
-                        self.setup_corrective_controllers(self.cornerJntList, s, self.number_name+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(self.cornerJntList, s, self.number_name+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, inverts)
 
                         # quadruped kneeB
                         if quadruped:
-                            cornerBCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
+                            cornerBCalibratePresetList, inverts = self.get_calibrate_presets(s, isLeg, False, False, False, True, False)
                             cornerBCorrectiveNetList = [None, self.cornerBCorrectiveNet, self.cornerBCorrectiveNet, self.cornerBCorrectiveNet]
-                            self.setup_corrective_controllers(self.cornerBJntList, s, self.number_name+"_"+cornerBNumber+"_"+cornerBName, cornerBCorrectiveNetList, cornerBCalibratePresetList, invertList)
+                            self.setup_corrective_controllers(self.cornerBJntList, s, self.number_name+"_"+cornerBNumber+"_"+cornerBName, cornerBCorrectiveNetList, cornerBCalibratePresetList, inverts)
                         
                         # wrist / ankle
                         extremCorrectiveNetList = [None]
@@ -1868,12 +1868,12 @@ class Limb(standard.BaseStandard):
                             extremCorrectiveNetList.append(self.setup_corrective_net(to_parent_extrem_ctrl, skin_joints[-3], skin_joints[-2], side+self.number_name+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.number_name+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
                             extremCorrectiveNetList.append(self.setup_corrective_net(to_parent_extrem_ctrl, skin_joints[-3], skin_joints[-2], side+self.number_name+"_"+self.jNameList[-1]+"_YawRight", 0, 2, -80, isLeg, [side+self.number_name+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
                             extremCorrectiveNetList.append(self.setup_corrective_net(to_parent_extrem_ctrl, skin_joints[-3], skin_joints[-2], side+self.number_name+"_"+self.jNameList[-1]+"_YawLeft", 0, 2, 80, isLeg, [side+self.number_name+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
-                        extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
+                        extremCalibratePresetList, inverts = self.get_calibrate_presets(s, isLeg, False, False, False, False, True)
                         if self.limbTypeName == self.armName:
                             extremJntList = self.ar.utils.articulationJoint(skin_joints[-3], skin_joints[-2], 4, [(0.2*self.radius, 0, 0), (-0.2*self.radius, 0, 0), (0, 0.2*self.radius, 0), (0, -0.2*self.radius, 0)], orientCtrl=self.extremOrientCtrl)
                         else:
                             extremJntList = self.ar.utils.articulationJoint(skin_joints[-3], skin_joints[-2], 4, [(0.2*self.radius, 0, 0), (-0.2*self.radius, 0, 0), (0, 0.2*self.radius, 0), (0, -0.2*self.radius, 0)])
-                        self.setup_corrective_controllers(extremJntList, s, self.number_name+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
+                        self.setup_corrective_controllers(extremJntList, s, self.number_name+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, inverts)
                         # fix rotate with 100% of value for the wrist axis - Thanks Andre Ruegger for the help!
                         extremJax = cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0]
                         orientConnection = cmds.listConnections(extremJax+".rotateZ", destination=False, source=True, plugs=True)[0]
@@ -2046,7 +2046,7 @@ class Limb(standard.BaseStandard):
                             "masterCtrlRefList": self.masterCtrlRefList,
                             "rootCtrlRefList": self.rootCtrlRefList,
                             "softIkCalibrateList": self.softIkCalibrateList,
-                            "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
+                            "correctiveCtrlGrpList": self.corrective_ctrl_grps,
                             "addArticJoint": self.articulation,
                             "addCorrective": self.corrective, 
                             "ankleArticList": self.ankleArticList,

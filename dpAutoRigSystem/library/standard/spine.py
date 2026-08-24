@@ -152,7 +152,7 @@ class Spine(standard.BaseStandard):
             # naming main controls:
             hipsName  = self.ar.data.lang['c100_bottom']
             chestName = self.ar.data.lang['c099_top']
-            baseName = self.ar.data.lang['c106_base']
+            base_name = self.ar.data.lang['c106_base']
             endName = self.ar.data.lang['c120_tip']
             if style == 1: #biped
                 hipsName  = self.ar.data.lang['c027_hips']
@@ -195,7 +195,7 @@ class Spine(standard.BaseStandard):
                 self.aIkFkBlendAttrList.append(attr_name_lower+'Fk_ikFkBlend')
                 
                 # base and end controls:
-                self.baseCtrl = self.ar.ctrls.cvControl("id_089_SpineBase", side+self.number_name+"_"+baseName+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc1")
+                self.baseCtrl = self.ar.ctrls.cvControl("id_089_SpineBase", side+self.number_name+"_"+base_name+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc1")
                 self.tipCtrl = self.ar.ctrls.cvControl("id_090_SpineTip", side+self.number_name+"_"+endName+"_Ctrl", r=0.75*self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
                 self.tipList.append(self.tipCtrl)
                 # optimize control CV shapes:
@@ -210,11 +210,11 @@ class Spine(standard.BaseStandard):
                 cmds.delete([self.baseCtrl, self.tipCtrl], constructionHistory=True)
                 # shape visibility
                 cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+endName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+baseName+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attr_name_lower+base_name+self.ar.data.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.connectAttr(self.hipsACtrl+"."+attr_name_lower+endName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+"."+attr_name_lower+baseName+self.ar.data.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attr_name_lower+base_name+self.ar.data.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
                 self.shapeVisAttrList.append(attr_name_lower+endName+self.ar.data.lang['c126_display'])
-                self.shapeVisAttrList.append(attr_name_lower+baseName+self.ar.data.lang['c126_display'])
+                self.shapeVisAttrList.append(attr_name_lower+base_name+self.ar.data.lang['c126_display'])
 
                 # Setup axis order
                 if style == 2: #quadruped

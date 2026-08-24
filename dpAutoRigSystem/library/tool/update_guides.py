@@ -268,8 +268,7 @@ class UpdateGuides(base.BaseLibrary):
                 self.setPupilGuideAttribute(guide, value)
             elif attr == 'aimDirection':
                 currentInstance = self.getNewGuideInstance(guide)
-                aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
-                currentInstance.changeAimDirection(aimMenuItemList[value])
+                currentInstance.change_aim_direction(self.ar.data.direcions[value])
             # self.noseName ATTRIBUTES
             elif attr == 'nostril':
                 self.setNostrilGuideAttribute(guide, value)

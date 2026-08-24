@@ -217,10 +217,10 @@ class GuideUI(object):
         if 'aimDirection' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_eye_aim_direction_rl', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
             cmds.text('edit_guide_eye_aim_direction_txt', label=self.ar.data.lang['i082_aimDirection'], parent='edit_guide_eye_aim_direction_rl')
-            cmds.optionMenu('edit_guide_eye_aim_direction_om', label='', changeCommand=standard.changeAimDirection, parent='edit_guide_eye_aim_direction_rl')
-            for item in standard.aimMenuItemList:
+            cmds.optionMenu('edit_guide_eye_aim_direction_om', label='', changeCommand=standard.change_aim_direction, parent='edit_guide_eye_aim_direction_rl')
+            for item in self.ar.data.directions:
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_eye_aim_direction_om')
-            cmds.optionMenu('edit_guide_eye_aim_direction_om', edit=True, value=standard.aimMenuItemList[cmds.getAttr(standard.guide_base+".aimDirection")])
+            cmds.optionMenu('edit_guide_eye_aim_direction_om', edit=True, value=self.ar.data.directions[cmds.getAttr(standard.guide_base+".aimDirection")])
 
 
     def indirectskin_layout(self, standard):
@@ -242,11 +242,11 @@ class GuideUI(object):
         if 'eyelid' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_eyelid_rl', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="rig_selected_module_cl")
             cmds.text(" ", parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_cb', label=self.ar.data.lang['i079_eyelid'], value=cmds.getAttr(standard.guide_base+".eyelid"), changeCommand=standard.changeEyelid, parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_pivot_cb', label=self.ar.data.lang['i283_pivot'], value=cmds.getAttr(standard.guide_base+".lidPivot"), changeCommand=standard.changeLidPivot, parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_specular_cb', label=self.ar.data.lang['i184_specular'], value=cmds.getAttr(standard.guide_base+".specular"), changeCommand=standard.changeSpecular, parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_iris_cb', label=self.ar.data.lang['i080_iris'], value=cmds.getAttr(standard.guide_base+".iris"), changeCommand=standard.changeIris, parent='edit_guide_eyelid_rl')
-            cmds.checkBox('edit_guide_eyelid_pupil_cb', label=self.ar.data.lang['i081_pupil'], value=cmds.getAttr(standard.guide_base+".pupil"), changeCommand=standard.changePupil, parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_cb', label=self.ar.data.lang['i079_eyelid'], value=cmds.getAttr(standard.guide_base+".eyelid"), changeCommand=standard.change_eyelid, parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_pivot_cb', label=self.ar.data.lang['i283_pivot'], value=cmds.getAttr(standard.guide_base+".lidPivot"), changeCommand=standard.change_lid_pivot, parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_specular_cb', label=self.ar.data.lang['i184_specular'], value=cmds.getAttr(standard.guide_base+".specular"), changeCommand=partial(standard.change_eye_guide_attr, 'specular'), parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_iris_cb', label=self.ar.data.lang['i080_iris'], value=cmds.getAttr(standard.guide_base+".iris"), changeCommand=partial(standard.change_eye_guide_attr, 'iris'), parent='edit_guide_eyelid_rl')
+            cmds.checkBox('edit_guide_eyelid_pupil_cb', label=self.ar.data.lang['i081_pupil'], value=cmds.getAttr(standard.guide_base+".pupil"), changeCommand=partial(standard.change_eye_guide_attr, 'pupil'), parent='edit_guide_eyelid_rl')
 
 
     def geometry_layout(self, standard):

@@ -135,6 +135,7 @@ class Data:
     facial_grimace_targets: list = field(default_factory=lambda: ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"])
     facial_face_targets: list = field(default_factory=lambda: ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"])
     mirror_menus: list = field(default_factory=lambda: ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ'])
+    directions: list = field(default_factory=lambda: ['+X', '-X', '+Y', '-Y', '+Z', '-Z'])
     facial_connect_types: list = field(default_factory=lambda: ['bsType', 'jointsType'])
     
     to_ids: list = field(default_factory=list)

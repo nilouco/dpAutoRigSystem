@@ -254,7 +254,7 @@ class Utils(object):
 
 
     def getSuffixNumberList(self, name, *args):
-        """ Returns a list of [index, baseName, suffixTrailingNumber]
+        """ Returns a list of [index, base_name, suffixTrailingNumber]
         """
         idx = name.rfind(next(filter(lambda x: not x.isdigit(), name[::-1])))
         if idx:
@@ -292,7 +292,7 @@ class Utils(object):
     def zeroOut(self, transforms=[], offset=False, notTransformIO=True):
         """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
             If don't have a transforms given, try to get the current selection.
-            If want to create with offset, it'll be an offset group between zeroGrp and transform.
+            If want to create with offset, it'll be an offset group between zero_grp and transform.
             Return a list of names of the zeroOut groups.
         """
         zeroList = []
@@ -312,24 +312,24 @@ class Utils(object):
                             suffix = "_Grp"
                             if not cmds.objExists(transformName+suffix):
                                 needAddNumber = False
-                zeroGrp = cmds.duplicate(transform, name=transformName+suffix)[0]
-                self.removeUserDefinedAttr(zeroGrp)
-                allChildrenList = cmds.listRelatives(zeroGrp, allDescendents=True, children=True, fullPath=True)
+                zero_grp = cmds.duplicate(transform, name=transformName+suffix)[0]
+                self.removeUserDefinedAttr(zero_grp)
+                allChildrenList = cmds.listRelatives(zero_grp, allDescendents=True, children=True, fullPath=True)
                 if allChildrenList:
                     cmds.delete(allChildrenList)
                 if offset:
-                    offsetGrp = cmds.duplicate(zeroGrp, name=transform+'_Offset_Grp')[0]
+                    offsetGrp = cmds.duplicate(zero_grp, name=transform+'_Offset_Grp')[0]
                     self.ar.custom_attr.addAttr(0, [offsetGrp]) #dpID
                     cmds.parent(transform, offsetGrp, absolute=True)
-                    cmds.parent(offsetGrp, zeroGrp, absolute=True)
+                    cmds.parent(offsetGrp, zero_grp, absolute=True)
                 else:
-                    cmds.parent(transform, zeroGrp, absolute=True)
+                    cmds.parent(transform, zero_grp, absolute=True)
                 if notTransformIO:
-                    self.addCustomAttr([zeroGrp], self.ignoreTransformIOAttr)
+                    self.addCustomAttr([zero_grp], self.ignoreTransformIOAttr)
                     if offset:
                         self.addCustomAttr([offsetGrp], self.ignoreTransformIOAttr)
-                self.ar.custom_attr.addAttr(0, [zeroGrp]) #dpID
-                zeroList.append(zeroGrp)
+                self.ar.custom_attr.addAttr(0, [zero_grp]) #dpID
+                zeroList.append(zero_grp)
         return zeroList
 
 
@@ -710,14 +710,14 @@ class Utils(object):
         endSuffixList = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp", "_Crv"]
         for endSuffix in endSuffixList:
             if nodeName.endswith(endSuffix):
-                baseName = nodeName[:nodeName.rfind(endSuffix)]
-                return baseName
+                base_name = nodeName[:nodeName.rfind(endSuffix)]
+                return base_name
             if nodeName.endswith(endSuffix.lower()):
-                baseName = nodeName[:nodeName.rfind(endSuffix.lower())]
-                return baseName
+                base_name = nodeName[:nodeName.rfind(endSuffix.lower())]
+                return base_name
             if nodeName.endswith(endSuffix.upper()):
-                baseName = nodeName[:nodeName.rfind(endSuffix.upper())]
-                return baseName
+                base_name = nodeName[:nodeName.rfind(endSuffix.upper())]
+                return base_name
         return nodeName
 
 
@@ -961,20 +961,20 @@ class Utils(object):
 
     def resolveName(self, name, suffix, *args):
         """ Resolve repeated name adding number in the middle of the string.
-            Returns the resolved baseName and name (including the suffix).
+            Returns the resolved base_name and name (including the suffix).
         """
         name = name[0].upper()+name[1:].replace(" ", "_")
-        baseName = name
+        base_name = name
         name = name+"_00_"+suffix
         if cmds.objExists(name):
             i = 1
             while cmds.objExists(name):
-                name = baseName+"_"+str(i).zfill(2)+"_"+suffix
+                name = base_name+"_"+str(i).zfill(2)+"_"+suffix
                 i = i+1
-            baseName = baseName+"_"+str(i-1).zfill(2)
+            base_name = base_name+"_"+str(i-1).zfill(2)
         else:
-            baseName = baseName+"_00"
-        return baseName, name
+            base_name = base_name+"_00"
+        return base_name, name
 
 
     def magnitude(self, v, *args):

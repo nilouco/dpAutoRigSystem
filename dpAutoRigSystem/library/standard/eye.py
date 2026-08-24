@@ -19,15 +19,14 @@ PIVOT = "lidPivot"
 class Eye(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.cValue = 70
-        self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
+        self.corrective_value = 70
     
     
     def create_guide(self):
         self.create_guide_base()
         self.create_guide_custom_attr()
         self.create_guide_elements()
-        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc, self.cvLidPivotLoc, self.cvUpperEyelidLoc, self.cvLowerEyelidLoc, self.cvIrisLoc, self.cvPupilLoc, self.cvSpecularLoc], 
+        self.add_node_to_guide_net([self.guide_loc, self.guide_end_loc, self.guide_lid_pivot_loc, self.guide_upper_eyelid_loc, self.guide_lower_eyelid_loc, self.guide_iris_loc, self.guide_pupil_loc, self.guide_specular_loc], 
                                     ["JointLoc1", "JointEnd", "_LidPivotLoc", "_UpperEyelidLoc", "_LowerEyelidLoc", "_IrisLoc", "_PupilLoc", "_SpecularLoc"])
 
     
@@ -55,337 +54,307 @@ class Eye(standard.BaseStandard):
         # locators
         self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
         self.guide_end_loc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_JointEnd", r=0.5, d=1, rot=(-90, 0, -90))
-        self.cvLidPivotLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LidPivotLoc", r=0.5, d=1, guide=True)
-        self.cvUpperEyelidLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_UpperEyelidLoc", r=0.2, d=1, guide=True)
-        self.cvLowerEyelidLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LowerEyelidLoc", r=0.2, d=1, guide=True)
-        self.cvIrisLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_IrisLoc", r=0.15, d=1, guide=True)
-        self.cvPupilLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_PupilLoc", r=0.12, d=1, guide=True)
-        self.cvSpecularLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_SpecularLoc", r=0.12, d=1, guide=True)
-        self.cvUpLocGuide = cmds.spaceLocator(name=self.guide_end_loc+"_UpLoc")[0]
+        self.guide_lid_pivot_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LidPivotLoc", r=0.5, d=1, guide=True)
+        self.guide_upper_eyelid_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_UpperEyelidLoc", r=0.2, d=1, guide=True)
+        self.guide_lower_eyelid_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LowerEyelidLoc", r=0.2, d=1, guide=True)
+        self.guide_iris_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_IrisLoc", r=0.15, d=1, guide=True)
+        self.guide_pupil_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_PupilLoc", r=0.12, d=1, guide=True)
+        self.guide_specular_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_SpecularLoc", r=0.12, d=1, guide=True)
+        self.guide_up_loc = cmds.spaceLocator(name=self.guide_end_loc+"_UpLoc")[0]
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
-        self.jEyelid = cmds.joint(name=self.name_guide+"_JEyelid", radius=0.001)
+        self.line_eyelid = cmds.joint(name=self.name_guide+"_JEyelid", radius=0.001)
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
-        self.jUpperEyelid = cmds.joint(name=self.name_guide+"_JUpperEyelid", radius=0.001)
-        self.jLowerEyelid = cmds.joint(name=self.name_guide+"_JLowerEyelid", radius=0.001)
+        self.line_upper_eyelid = cmds.joint(name=self.name_guide+"_JUpperEyelid", radius=0.001)
+        self.line_lower_eyelid = cmds.joint(name=self.name_guide+"_JLowerEyelid", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.line, self.line_end, self.jUpperEyelid, self.jLowerEyelid])
+        self.ar.utils.set_template([self.line, self.line_end, self.line_upper_eyelid, self.line_lower_eyelid])
         cmds.setAttr(self.guide_end_loc+".tz", 13)
-        cmds.setAttr(self.cvUpLocGuide+".ty", 13)
-        cmds.setAttr(self.cvUpperEyelidLoc+".ty", 0.5)
-        cmds.setAttr(self.cvUpperEyelidLoc+".tz", 0.5)
-        cmds.setAttr(self.cvLowerEyelidLoc+".ty", -0.5)
-        cmds.setAttr(self.cvLowerEyelidLoc+".tz", 0.5)
-        cmds.setAttr(self.cvIrisLoc+".tz", 0.4)
-        cmds.setAttr(self.cvPupilLoc+".tz", 0.3)
-        cmds.setAttr(self.cvSpecularLoc+".tz", 1)
-        cmds.setAttr(self.cvUpLocGuide+".visibility", 0)
-        cmds.setAttr(self.cvSpecularLoc+".visibility", 0)
-        cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", 0)
+        cmds.setAttr(self.guide_up_loc+".ty", 13)
+        cmds.setAttr(self.guide_upper_eyelid_loc+".ty", 0.5)
+        cmds.setAttr(self.guide_upper_eyelid_loc+".tz", 0.5)
+        cmds.setAttr(self.guide_lower_eyelid_loc+".ty", -0.5)
+        cmds.setAttr(self.guide_lower_eyelid_loc+".tz", 0.5)
+        cmds.setAttr(self.guide_iris_loc+".tz", 0.4)
+        cmds.setAttr(self.guide_pupil_loc+".tz", 0.3)
+        cmds.setAttr(self.guide_specular_loc+".tz", 1)
+        cmds.setAttr(self.guide_up_loc+".visibility", 0)
+        cmds.setAttr(self.guide_specular_loc+".visibility", 0)
+        cmds.setAttr(self.guide_lid_pivot_loc+"0Shape.visibility", 0)
         # parenting
-        self.cvEndJointZero = cmds.group(self.guide_end_loc, self.cvUpLocGuide, name=self.guide_end_loc+"_Grp")
-        self.cvEndBackRotGrp = cmds.group(self.cvEndJointZero, name=self.cvEndJointZero+"_Back_Grp")
+        self.guide_end_loc_zero = cmds.group(self.guide_end_loc, self.guide_up_loc, name=self.guide_end_loc+"_Grp")
+        self.guide_end_back_rot_zero = cmds.group(self.guide_end_loc_zero, name=self.guide_end_loc_zero+"_Back_Grp")
         cmds.parent(self.line, self.guide_base, relative=True)
-        cmds.parent(self.guide_loc, self.cvEndBackRotGrp, self.guide_base)
-        cmds.parent(self.cvLidPivotLoc, self.cvIrisLoc, self.cvPupilLoc, self.guide_loc)
-        cmds.parent(self.cvUpperEyelidLoc, self.cvLowerEyelidLoc, self.cvLidPivotLoc)
-        cmds.parent(self.cvSpecularLoc, self.guide_loc)
-        cmds.parent(self.jUpperEyelid, self.jLowerEyelid, self.jEyelid)
+        cmds.parent(self.guide_loc, self.guide_end_back_rot_zero, self.guide_base)
+        cmds.parent(self.guide_lid_pivot_loc, self.guide_iris_loc, self.guide_pupil_loc, self.guide_loc)
+        cmds.parent(self.guide_upper_eyelid_loc, self.guide_lower_eyelid_loc, self.guide_lid_pivot_loc)
+        cmds.parent(self.guide_specular_loc, self.guide_loc)
+        cmds.parent(self.line_upper_eyelid, self.line_lower_eyelid, self.line_eyelid)
         cmds.parent(self.line_end, self.line)
         cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
-        cmds.parentConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=False, name=self.jUpperEyelid+"_PaC")
-        cmds.parentConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=False, name=self.jLowerEyelid+"_PaC")
+        cmds.parentConstraint(self.guide_upper_eyelid_loc, self.line_upper_eyelid, maintainOffset=False, name=self.line_upper_eyelid+"_PaC")
+        cmds.parentConstraint(self.guide_lower_eyelid_loc, self.line_lower_eyelid, maintainOffset=False, name=self.line_lower_eyelid+"_PaC")
         cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
-        cmds.parentConstraint(self.cvLidPivotLoc, self.jEyelid, maintainOffset=False, name=self.jEyelid+"_PaC")
+        cmds.parentConstraint(self.guide_lid_pivot_loc, self.line_eyelid, maintainOffset=False, name=self.line_eyelid+"_PaC")
         # edit
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
-        cmds.orientConstraint(self.ar.data.temp_grp, self.cvEndBackRotGrp, maintainOffset=False, name=self.cvEndBackRotGrp+"_OrC")
+        cmds.orientConstraint(self.ar.data.temp_grp, self.guide_end_back_rot_zero, maintainOffset=False, name=self.guide_end_back_rot_zero+"_OrC")
         self.ar.ctrls.colorShape([self.guide_end_loc], "blue")
         self.ar.ctrls.shapeSizeSetup(self.guide_end_loc)
         self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        self.ar.ctrls.setLockHide([self.cvUpperEyelidLoc, self.cvLowerEyelidLoc], ['tx', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.setLockHide([self.guide_upper_eyelid_loc, self.guide_lower_eyelid_loc], ['tx', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
-        
-    
-    def changeEyelid(self, *args):
+    def change_eyelid(self, value, *args):
         """ Set the attribute value for eyelid.
         """
-        # re-declaring variables:
-        self.cvUpperEyelidLoc = self.name_guide+"_UpperEyelidLoc"
-        self.cvLowerEyelidLoc = self.name_guide+"_LowerEyelidLoc"
-        self.jEyelid = self.name_guide+"_JEyelid"
-        self.jUpperEyelid = self.name_guide+"_JUpperEyelid"
-        self.jLowerEyelid = self.name_guide+"_JLowerEyelid"
-        # getting value:
-        currentEyelidValue = cmds.checkBox('edit_guide_eyelid_cb', query=True, value=True)
-        # setting values:
-        cmds.setAttr(self.guide_base+".eyelid", currentEyelidValue)
-        cmds.setAttr(self.cvUpperEyelidLoc+".visibility", currentEyelidValue)
-        cmds.setAttr(self.cvLowerEyelidLoc+".visibility", currentEyelidValue)
-        cmds.setAttr(self.jEyelid+".visibility", currentEyelidValue)
-        cmds.setAttr(self.jUpperEyelid+".visibility", currentEyelidValue)
-        cmds.setAttr(self.jLowerEyelid+".visibility", currentEyelidValue)
-        cmds.checkBox('edit_guide_eyelid_pivot_cb', edit=True, value=currentEyelidValue)
-        self.changeLidPivot()
+        cmds.setAttr(self.guide_base+".eyelid", value)
+        cmds.setAttr(self.name_guide+"_UpperEyelidLoc.visibility", value)
+        cmds.setAttr(self.name_guide+"_LowerEyelidLoc.visibility", value)
+        cmds.setAttr(self.name_guide+"_JEyelid.visibility", value)
+        cmds.setAttr(self.name_guide+"_JUpperEyelid.visibility", value)
+        cmds.setAttr(self.name_guide+"_JLowerEyelid.visibility", value)
+        self.change_lid_pivot(value)
         
         
-    def changeSpecular(self, *args):
+    def change_eye_guide_attr(self, attr, value, *args):
         """ Set the attribute value for specular.
         """
-        self.cvSpecularLoc = self.name_guide+"_SpecularLoc"
-        cmds.setAttr(self.guide_base+".specular", cmds.checkBox('edit_guide_eyelid_specular_cb', query=True, value=True))
-        cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox('edit_guide_eyelid_specular_cb', query=True, value=False))
+        cmds.setAttr(f"{self.guide_base}.{attr}", value)
+        cmds.setAttr(f"{self.name_guide}_{attr.capitalize()}Loc.visibility", value)
 
 
-    def changeLidPivot(self, *args):
+    def change_lid_pivot(self, value, *args):
         """ Set the attribute value for eyelid center pivot.
         """
-        self.cvLidPivotLoc = self.name_guide+"_LidPivotLoc"
-        cmds.setAttr(self.guide_base+".lidPivot", cmds.checkBox('edit_guide_eyelid_pivot_cb', query=True, value=True))
-        cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", cmds.checkBox('edit_guide_eyelid_pivot_cb', query=True, value=False))
-
-
-    def changeIris(self, *args):
-        """ Set the attribute value for iris.
-        """
-        self.cvIrisLoc = self.name_guide+"_IrisLoc"
-        cmds.setAttr(self.guide_base+".iris", cmds.checkBox('edit_guide_eyelid_iris_cb', query=True, value=True))
-        cmds.setAttr(self.cvIrisLoc+".visibility", cmds.checkBox('edit_guide_eyelid_iris_cb', query=True, value=True))
-        
+        cmds.setAttr(self.guide_base+".lidPivot", value)
+        cmds.setAttr(self.name_guide+"_LidPivotLoc0Shape.visibility", value)
     
-    def changePupil(self, *args):
-        """ Set the attribute value for pupil.
-        """
-        self.cvPupilLoc = self.name_guide+"_PupilLoc"
-        cmds.setAttr(self.guide_base+".pupil", cmds.checkBox('edit_guide_eyelid_pupil_cb', query=True, value=True))
-        cmds.setAttr(self.cvPupilLoc+".visibility", cmds.checkBox('edit_guide_eyelid_pupil_cb', query=True, value=True))
-        
     
-    def changeAimDirection(self, item, *args):
+    def change_aim_direction(self, value, *args):
         """ Set the good direction for Eye look at Aim setup.
         """
         if self.check_guide_integrity():
             # re-declaring variables:
             self.line_end = self.name_guide+"_JGuideEnd"
-            self.cvEndJointZero = self.name_guide+"_JointEnd_Grp"
+            self.guide_end_loc_zero = self.name_guide+"_JointEnd_Grp"
             # setting attributes:
-            cmds.setAttr(self.guide_base+".aimDirection", self.aimMenuItemList.index(item))
-            cmds.setAttr(self.guide_base+".aimDirectionName", item[1], type='string')
+            cmds.setAttr(self.guide_base+".aimDirection", self.ar.data.directions.index(value))
+            cmds.setAttr(self.guide_base+".aimDirectionName", value[1], type='string')
             cmds.setAttr(self.guide_base+".aimDirectionPositive", 0)
-            if item[0] == "+":
+            if value[0] == "+":
                 cmds.setAttr(self.guide_base+".aimDirectionPositive", 1)
             # changing module aim guides:
-            cmds.setAttr(self.cvEndJointZero+".rotateX", 0)
-            cmds.setAttr(self.cvEndJointZero+".rotateY", 0)
-            if item[1] == "X":
-                if item[0] == "+":
-                    cmds.setAttr(self.cvEndJointZero+".rotateY", 90)
+            cmds.setAttr(self.guide_end_loc_zero+".rotateX", 0)
+            cmds.setAttr(self.guide_end_loc_zero+".rotateY", 0)
+            if value[1] == "X":
+                if value[0] == "+":
+                    cmds.setAttr(self.guide_end_loc_zero+".rotateY", 90)
                 else:
-                    cmds.setAttr(self.cvEndJointZero+".rotateY", -90)
-            if item[1] == "Y":
-                if item[0] == "+":
-                    cmds.setAttr(self.cvEndJointZero+".rotateX", -90)
+                    cmds.setAttr(self.guide_end_loc_zero+".rotateY", -90)
+            if value[1] == "Y":
+                if value[0] == "+":
+                    cmds.setAttr(self.guide_end_loc_zero+".rotateX", -90)
                 else:
-                    cmds.setAttr(self.cvEndJointZero+".rotateX", 90)
-            if item[1] == "Z":
-                if item[0] == "-":
-                    cmds.setAttr(self.cvEndJointZero+".rotateY", 180)
+                    cmds.setAttr(self.guide_end_loc_zero+".rotateX", 90)
+            if value[1] == "Z":
+                if value[0] == "-":
+                    cmds.setAttr(self.guide_end_loc_zero+".rotateY", 180)
     
     
-    def createEyelidJoints(self, side, lid, middle, cvEyelidLoc, jointLabelNumber, *args):
+    def create_eyelids_joints(self, side, lid, middle, guide_eyelid_loc, joint_label_number):
         ''' Create the eyelid joints to be used in the needed setup.
             Returns EyelidBaseJxt and EyelidJnt created for rotate and skinning.
         '''
         # declating a concatenated name used for base to compose:
-        baseName = side+self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle
+        base_name = side+self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle
         # creating joints:
-        eyelidBaseZeroJxt = cmds.joint(name=baseName+"_Base_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
-        eyelidBaseJxt = cmds.joint(name=baseName+"_Base_Jxt", rotationOrder="yzx", scaleCompensate=False)
-        eyelidZeroJxt = cmds.joint(name=baseName+"_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
-        eyelidJnt = cmds.joint(name=baseName+"_Jnt", rotationOrder="yzx", scaleCompensate=False)
-        cmds.addAttr(eyelidJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        self.ar.utils.setJointLabel(eyelidJnt, jointLabelNumber, 18, self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle)
-        cmds.select(eyelidZeroJxt)
-        eyelidSupportJxt = cmds.joint(name=baseName+"_Jxt", rotationOrder="yzx", scaleCompensate=False)
-        cmds.setAttr(eyelidSupportJxt+".translateX", self.radius*0.1)
+        eyelid_base_zero_jxt = cmds.joint(name=base_name+"_Base_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
+        eyelid_base_jxt = cmds.joint(name=base_name+"_Base_Jxt", rotationOrder="yzx", scaleCompensate=False)
+        eyelid_zero_jxt = cmds.joint(name=base_name+"_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
+        eyelid_jnt = cmds.joint(name=base_name+"_Jnt", rotationOrder="yzx", scaleCompensate=False)
+        cmds.addAttr(eyelid_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+        self.ar.utils.setJointLabel(eyelid_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle)
+        cmds.select(eyelid_zero_jxt)
+        eyelid_support_jxt = cmds.joint(name=base_name+"_Jxt", rotationOrder="yzx", scaleCompensate=False)
+        cmds.setAttr(eyelid_support_jxt+".translateX", self.radius*0.1)
         # positioning and orienting correctely eyelid joints:
-        cmds.delete(cmds.aimConstraint(cvEyelidLoc, eyelidBaseZeroJxt, aimVector=(0,0,1), worldUpType="objectrotation", worldUpObject=self.eyelidJxt))
-        cmds.matchTransform(eyelidZeroJxt, cvEyelidLoc, position=True, rotation=True)
-        cmds.setAttr(eyelidZeroJxt+".rotateX", 0)
-        cmds.setAttr(eyelidZeroJxt+".rotateY", 0)
-        cmds.setAttr(eyelidZeroJxt+".rotateZ", 0)
-        cmds.select(self.eyelidJxt)
-        return eyelidBaseJxt, eyelidJnt
+        cmds.delete(cmds.aimConstraint(guide_eyelid_loc, eyelid_base_zero_jxt, aimVector=(0,0,1), worldUpType="objectrotation", worldUpObject=self.eyelid_jxt))
+        cmds.matchTransform(eyelid_zero_jxt, guide_eyelid_loc, position=True, rotation=True)
+        cmds.setAttr(eyelid_zero_jxt+".rotateX", 0)
+        cmds.setAttr(eyelid_zero_jxt+".rotateY", 0)
+        cmds.setAttr(eyelid_zero_jxt+".rotateZ", 0)
+        cmds.select(self.eyelid_jxt)
+        return eyelid_base_jxt, eyelid_jnt
 
 
-    def createEyelidSetup(self, side, lid, eyelidJnt, eyelidBaseJxt, eyelidMiddleBaseJxt, eyelidMiddleJnt, preset, rotCtrl, cvEyelidLoc, *args):
+    def create_eyelid_setup(self, side, lid, eyelid_jnt, eyelid_base_jxt, eyelid_middle_base_jxt, eyelid_middle_jnt, preset, rot_ctrl, guide_eyelid_loc):
         ''' Work with the joints created in order to develop a solid and stable eyelid setup for blink and facial eye expressions using direct skinning process in the final render mesh.
             Returns the main controller and its zeroOut group.
         '''
         # declating a concatenated name used for base to compose:
-        baseName = side+self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']
+        base_name = side+self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']
         # creating eyelid control:
-        eyelidCtrl = self.ar.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.radius*0.4, d=self.curve_degree, rot=rotCtrl, headDef=self.head_def_value, guideSource=self.name_guide+"__"+cvEyelidLoc.replace("_Guide", ":Guide"), parentTag=self.fkEyeSubCtrl)
-        self.ar.utils.originedFrom(objName=eyelidCtrl, attrString=cvEyelidLoc)
-        eyelidCtrlZero = self.ar.utils.zeroOut([eyelidCtrl])[0]
-        self.ar.ctrls.setLockHide([eyelidCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
-        cmds.parent(eyelidCtrlZero, self.baseEyeCtrl)
+        eyelid_ctrl = self.ar.ctrls.cvControl("id_008_Eyelid", base_name+"_Ctrl", self.radius*0.4, d=self.curve_degree, rot=rot_ctrl, headDef=self.head_def_value, guideSource=self.name_guide+"__"+guide_eyelid_loc.replace("_Guide", ":Guide"), parentTag=self.fk_eye_sub_ctrl)
+        self.ar.utils.originedFrom(objName=eyelid_ctrl, attrString=guide_eyelid_loc)
+        eyelid_ctrl_zero = self.ar.utils.zeroOut([eyelid_ctrl])[0]
+        self.ar.ctrls.setLockHide([eyelid_ctrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+        cmds.parent(eyelid_ctrl_zero, self.base_eye_ctrl)
         # positioning correctely eyelid control:
-        cmds.matchTransform(eyelidCtrlZero, self.eyelidJxt, position=True, rotation=True)
-        cmds.delete(cmds.pointConstraint(eyelidJnt, eyelidCtrlZero, mo=False))
-        cmds.xform(eyelidCtrlZero, translation=(0, 0, self.radius), relative=True)
+        cmds.matchTransform(eyelid_ctrl_zero, self.eyelid_jxt, position=True, rotation=True)
+        cmds.delete(cmds.pointConstraint(eyelid_jnt, eyelid_ctrl_zero, mo=False))
+        cmds.xform(eyelid_ctrl_zero, translation=(0, 0, self.radius), relative=True)
         # adding useful control attributes to calibrate eyelid setup:
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c049_intensity']+"X", attributeType="float", minValue=0, defaultValue=1)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c049_intensity']+"Y", attributeType="float", minValue=0, defaultValue=1)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c032_follow'], attributeType="float", minValue=0, defaultValue=0.6, maxValue=1)
-        cmds.setAttr(eyelidCtrl+"."+self.ar.data.lang['c049_intensity']+"X", keyable=False, channelBox=True)
-        cmds.setAttr(eyelidCtrl+"."+self.ar.data.lang['c049_intensity']+"Y", keyable=False, channelBox=True)
-        cmds.setAttr(eyelidCtrl+"."+self.ar.data.lang['c032_follow'], channelBox=True)
-        cmds.setAttr(eyelidCtrl+"."+self.ar.data.lang['c032_follow'], keyable=True)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c053_invert']+"X", attributeType="bool", defaultValue=0)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c053_invert']+"Y", attributeType="bool", defaultValue=0)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], attributeType="bool", defaultValue=0)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c051_preset']+"X", attributeType="float", defaultValue=preset, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c051_preset']+"Y", attributeType="float", defaultValue=preset, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], attributeType="float", minValue=0, defaultValue=0.5, maxValue=1, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c052_fix']+"ScaleX", attributeType="float", defaultValue=0.01, minValue=0, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c052_fix']+"TranslateZ", attributeType="float", defaultValue=0.15, minValue=0, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c052_fix']+self.ar.data.lang['c029_middle']+"TranslateZ", attributeType="float", defaultValue=0.3, minValue=0, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.ar.data.lang['c107_reduce']+self.ar.data.lang['c029_middle']+"Open", attributeType="float", defaultValue=0.2, minValue=0, maxValue=1, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c049_intensity']+"X", attributeType="float", minValue=0, defaultValue=1)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c049_intensity']+"Y", attributeType="float", minValue=0, defaultValue=1)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c032_follow'], attributeType="float", minValue=0, defaultValue=0.6, maxValue=1)
+        cmds.setAttr(eyelid_ctrl+"."+self.ar.data.lang['c049_intensity']+"X", keyable=False, channelBox=True)
+        cmds.setAttr(eyelid_ctrl+"."+self.ar.data.lang['c049_intensity']+"Y", keyable=False, channelBox=True)
+        cmds.setAttr(eyelid_ctrl+"."+self.ar.data.lang['c032_follow'], channelBox=True)
+        cmds.setAttr(eyelid_ctrl+"."+self.ar.data.lang['c032_follow'], keyable=True)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c053_invert']+"X", attributeType="bool", defaultValue=0)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c053_invert']+"Y", attributeType="bool", defaultValue=0)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], attributeType="bool", defaultValue=0)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c051_preset']+"X", attributeType="float", defaultValue=preset, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c051_preset']+"Y", attributeType="float", defaultValue=preset, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], attributeType="float", minValue=0, defaultValue=0.5, maxValue=1, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c052_fix']+"ScaleX", attributeType="float", defaultValue=0.01, minValue=0, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c052_fix']+"TranslateZ", attributeType="float", defaultValue=0.15, minValue=0, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c052_fix']+self.ar.data.lang['c029_middle']+"TranslateZ", attributeType="float", defaultValue=0.3, minValue=0, keyable=False)
+        cmds.addAttr(eyelid_ctrl, longName=self.ar.data.lang['c107_reduce']+self.ar.data.lang['c029_middle']+"Open", attributeType="float", defaultValue=0.2, minValue=0, maxValue=1, keyable=False)
         # creating utility nodes to eyelid setup:
-        eyelidIntensityMD = cmds.createNode('multiplyDivide', name=baseName+"_Intensity_MD")
-        eyelidInvertMD = cmds.createNode('multiplyDivide', name=baseName+"_Invert_MD")
-        eyelidInvertXCnd = cmds.createNode('condition', name=baseName+"_InvertX_Cnd")
-        eyelidInvertYCnd = cmds.createNode('condition', name=baseName+"_InvertY_Cnd")
-        eyelidInvertYMiddleCnd = cmds.createNode('condition', name=baseName+"_InvertY_Middle_Cnd")
-        eyelidInvertFixMiddleCnd = cmds.createNode('condition', name=baseName+"_InvertFix_Middle_Cnd")
-        eyelidPresetMD = cmds.createNode('multiplyDivide', name=baseName+"_Preset_MD")
-        eyelidMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Middle_MD")
-        eyelidMiddleCnd = cmds.createNode('condition', name=baseName+"_Middle_Cnd")
-        eyelidFixMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_MD")
-        eyelidFixPMA = cmds.createNode('plusMinusAverage', name=baseName+"_Fix_PMA")
-        eyelidFixModulusXCnd = cmds.createNode('condition', name=baseName+"_Fix_ModulusX_Cnd")
-        eyelidFixModulusYMiddleCnd = cmds.createNode('condition', name=baseName+"_Fix_ModulusYMiddle_Cnd")
-        eyelidFixModulusYCnd = cmds.createNode('condition', name=baseName+"_Fix_ModulusY_Cnd")
-        eyelidFixNegativeMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Negative_MD")
-        eyelidReduceOpenMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Reduce_MiddleOpen_MD")
-        eyelidInvertOpenMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Invert_MiddleOpen_MD")
-        eyelidFixInvertOpenMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Invert_MiddleOpen_MD")
-        eyelidFixMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Middle_MD")
-        eyelidFixMiddleTZMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_MiddleTZ_MD")
-        eyelidFixMiddleScaleClp = cmds.createNode('clamp', name=baseName+"_Fix_Middle_Clp")
-        eyelidFollowRev = cmds.createNode('reverse', name=baseName+"_Follow_Rev")
-        self.to_ids.extend([eyelidIntensityMD, eyelidInvertMD, eyelidInvertXCnd, eyelidInvertYCnd, eyelidInvertYMiddleCnd, eyelidInvertFixMiddleCnd, eyelidPresetMD, eyelidMiddleMD, eyelidMiddleCnd, eyelidFixMD,
-                              eyelidFixPMA, eyelidFixModulusXCnd, eyelidFixModulusYMiddleCnd, eyelidFixModulusYCnd, eyelidFixNegativeMD, eyelidReduceOpenMiddleMD, eyelidInvertOpenMiddleMD, eyelidFixInvertOpenMiddleMD,
-                              eyelidFixMiddleMD, eyelidFixMiddleTZMD, eyelidFixMiddleScaleClp, eyelidFollowRev])
+        eyelid_intensity_md = cmds.createNode('multiplyDivide', name=base_name+"_Intensity_MD")
+        eyelid_invert_md = cmds.createNode('multiplyDivide', name=base_name+"_Invert_MD")
+        eyelid_invert_x_cnd = cmds.createNode('condition', name=base_name+"_InvertX_Cnd")
+        eyelid_invert_y_cnd = cmds.createNode('condition', name=base_name+"_InvertY_Cnd")
+        eyelid_invert_middle_cnd = cmds.createNode('condition', name=base_name+"_InvertY_Middle_Cnd")
+        eyelid_invert_fix_middle_cnd = cmds.createNode('condition', name=base_name+"_InvertFix_Middle_Cnd")
+        eyelid_preset_md = cmds.createNode('multiplyDivide', name=base_name+"_Preset_MD")
+        eyelid_middle_md = cmds.createNode('multiplyDivide', name=base_name+"_Middle_MD")
+        eyelid_middle_cnd = cmds.createNode('condition', name=base_name+"_Middle_Cnd")
+        eyelid_fix_md = cmds.createNode('multiplyDivide', name=base_name+"_Fix_MD")
+        eyelid_fix_pma = cmds.createNode('plusMinusAverage', name=base_name+"_Fix_PMA")
+        eyelid_fix_modulus_x_cnd = cmds.createNode('condition', name=base_name+"_Fix_ModulusX_Cnd")
+        eyelid_fix_modulus_y_middle_cnd = cmds.createNode('condition', name=base_name+"_Fix_ModulusYMiddle_Cnd")
+        eyelid_fix_modulus_y_cnd = cmds.createNode('condition', name=base_name+"_Fix_ModulusY_Cnd")
+        eyelid_fix_negative_md = cmds.createNode('multiplyDivide', name=base_name+"_Fix_Negative_MD")
+        eyelid_reduce_open_middle_md = cmds.createNode('multiplyDivide', name=base_name+"_Reduce_MiddleOpen_MD")
+        eyelid_invert_open_middle_md = cmds.createNode('multiplyDivide', name=base_name+"_Invert_MiddleOpen_MD")
+        eyelid_fix_invert_open_middle_md = cmds.createNode('multiplyDivide', name=base_name+"_Fix_Invert_MiddleOpen_MD")
+        eyelid_fix_middle_md = cmds.createNode('multiplyDivide', name=base_name+"_Fix_Middle_MD")
+        eyelid_fix_middle_tz_md = cmds.createNode('multiplyDivide', name=base_name+"_Fix_MiddleTZ_MD")
+        eyelid_fix_middle_scale_clp = cmds.createNode('clamp', name=base_name+"_Fix_Middle_Clp")
+        eyelid_follow_rev = cmds.createNode('reverse', name=base_name+"_Follow_Rev")
+        self.to_ids.extend([eyelid_intensity_md, eyelid_invert_md, eyelid_invert_x_cnd, eyelid_invert_y_cnd, eyelid_invert_middle_cnd, eyelid_invert_fix_middle_cnd, eyelid_preset_md, eyelid_middle_md, eyelid_middle_cnd, eyelid_fix_md,
+                              eyelid_fix_pma, eyelid_fix_modulus_x_cnd, eyelid_fix_modulus_y_middle_cnd, eyelid_fix_modulus_y_cnd, eyelid_fix_negative_md, eyelid_reduce_open_middle_md, eyelid_invert_open_middle_md, eyelid_fix_invert_open_middle_md,
+                              eyelid_fix_middle_md, eyelid_fix_middle_tz_md, eyelid_fix_middle_scale_clp, eyelid_follow_rev])
         # seting up the node attributes:
-        cmds.setAttr(eyelidInvertXCnd+".colorIfTrueR", 1)
-        cmds.setAttr(eyelidInvertXCnd+".colorIfFalseR", -1)
-        cmds.setAttr(eyelidInvertYCnd+".colorIfTrueR", 1)
-        cmds.setAttr(eyelidInvertYCnd+".colorIfFalseR", -1)
-        cmds.setAttr(eyelidInvertYMiddleCnd+".colorIfTrueR", 4)
-        cmds.setAttr(eyelidInvertYMiddleCnd+".colorIfFalseR", 2)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".secondTerm", 1)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".colorIfTrueR", 5)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".colorIfFalseR", 3)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".colorIfTrueG", -1)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".colorIfFalseG", 1)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".colorIfTrueB", 1)
-        cmds.setAttr(eyelidInvertFixMiddleCnd+".colorIfFalseB", -1)
-        cmds.setAttr(eyelidFixNegativeMD+".input2X", -1)
-        cmds.setAttr(eyelidFixModulusXCnd+".operation", 3)
-        cmds.setAttr(eyelidFixPMA+".input3D[0].input3Dx", 1)
-        cmds.setAttr(eyelidFixNegativeMD+".input2Y", -1)
-        cmds.setAttr(eyelidFixModulusYCnd+".operation", 3)
-        cmds.setAttr(eyelidFixMiddleScaleClp+".minR", 1)
-        cmds.setAttr(eyelidFixMiddleScaleClp+".maxR", 1000)
-        cmds.setAttr(eyelidMiddleCnd+".colorIfFalseR", 1)
+        cmds.setAttr(eyelid_invert_x_cnd+".colorIfTrueR", 1)
+        cmds.setAttr(eyelid_invert_x_cnd+".colorIfFalseR", -1)
+        cmds.setAttr(eyelid_invert_y_cnd+".colorIfTrueR", 1)
+        cmds.setAttr(eyelid_invert_y_cnd+".colorIfFalseR", -1)
+        cmds.setAttr(eyelid_invert_middle_cnd+".colorIfTrueR", 4)
+        cmds.setAttr(eyelid_invert_middle_cnd+".colorIfFalseR", 2)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".secondTerm", 1)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".colorIfTrueR", 5)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".colorIfFalseR", 3)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".colorIfTrueG", -1)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".colorIfFalseG", 1)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".colorIfTrueB", 1)
+        cmds.setAttr(eyelid_invert_fix_middle_cnd+".colorIfFalseB", -1)
+        cmds.setAttr(eyelid_fix_negative_md+".input2X", -1)
+        cmds.setAttr(eyelid_fix_modulus_x_cnd+".operation", 3)
+        cmds.setAttr(eyelid_fix_pma+".input3D[0].input3Dx", 1)
+        cmds.setAttr(eyelid_fix_negative_md+".input2Y", -1)
+        cmds.setAttr(eyelid_fix_modulus_y_cnd+".operation", 3)
+        cmds.setAttr(eyelid_fix_middle_scale_clp+".minR", 1)
+        cmds.setAttr(eyelid_fix_middle_scale_clp+".maxR", 1000)
+        cmds.setAttr(eyelid_middle_cnd+".colorIfFalseR", 1)
         # connecting eyelid control to nodes and joints:
-        cmds.connectAttr(eyelidCtrl+".translateX", eyelidInvertMD+".input1X", force=True)
-        cmds.connectAttr(eyelidCtrl+".translateY", eyelidInvertMD+".input1Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+".translateX", eyelid_invert_md+".input1X", force=True)
+        cmds.connectAttr(eyelid_ctrl+".translateY", eyelid_invert_md+".input1Y", force=True)
         # working with invert nodes in order to be able to adjust the control by User after the setup done:
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c053_invert']+"X", eyelidInvertXCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", eyelidInvertYCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", eyelidInvertYMiddleCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], eyelidInvertFixMiddleCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidInvertXCnd+".outColorR", eyelidInvertMD+".input2X", force=True)
-        cmds.connectAttr(eyelidInvertYCnd+".outColorR", eyelidInvertMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidInvertMD+".outputX", eyelidIntensityMD+".input1X", force=True)
-        cmds.connectAttr(eyelidInvertMD+".outputY", eyelidIntensityMD+".input1Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"X", eyelid_invert_x_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"Y", eyelid_invert_y_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"Y", eyelid_invert_middle_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], eyelid_invert_fix_middle_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_invert_x_cnd+".outColorR", eyelid_invert_md+".input2X", force=True)
+        cmds.connectAttr(eyelid_invert_y_cnd+".outColorR", eyelid_invert_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_invert_md+".outputX", eyelid_intensity_md+".input1X", force=True)
+        cmds.connectAttr(eyelid_invert_md+".outputY", eyelid_intensity_md+".input1Y", force=True)
         # working with intensity attributes in order to chose the control force by User:
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c049_intensity']+"X", eyelidIntensityMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c049_intensity']+"Y", eyelidIntensityMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidIntensityMD+".outputX", eyelidPresetMD+".input1X", force=True)
-        cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidPresetMD+".input1Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c049_intensity']+"X", eyelid_intensity_md+".input2X", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c049_intensity']+"Y", eyelid_intensity_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_intensity_md+".outputX", eyelid_preset_md+".input1X", force=True)
+        cmds.connectAttr(eyelid_intensity_md+".outputY", eyelid_preset_md+".input1Y", force=True)
         # working with the predefined values in order to help the Rigger calibrate the control intensity preset:
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c051_preset']+"X", eyelidPresetMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c051_preset']+"Y", eyelidPresetMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidPresetMD+".outputX", eyelidBaseJxt+".rotateZ", force=True)
-        cmds.connectAttr(eyelidPresetMD+".outputY", eyelidBaseJxt+".rotateX", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c051_preset']+"X", eyelid_preset_md+".input2X", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c051_preset']+"Y", eyelid_preset_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_preset_md+".outputX", eyelid_base_jxt+".rotateZ", force=True)
+        cmds.connectAttr(eyelid_preset_md+".outputY", eyelid_base_jxt+".rotateX", force=True)
         # setup the middle extra joint to be skinned as a helper to deform correctly the mesh following the main eyelid joint:
-        cmds.connectAttr(eyelidPresetMD+".outputX", eyelidMiddleMD+".input1X", force=True)
-        cmds.connectAttr(eyelidPresetMD+".outputY", eyelidMiddleMD+".input1Y", force=True)
+        cmds.connectAttr(eyelid_preset_md+".outputX", eyelid_middle_md+".input1X", force=True)
+        cmds.connectAttr(eyelid_preset_md+".outputY", eyelid_middle_md+".input1Y", force=True)
         # using the proximity attribute to let User chose the good deformation on the skinning:
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelidMiddleMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelidMiddleCnd+".colorIfTrueR", force=True)
-        cmds.connectAttr(eyelidBaseJxt+".rotateX", eyelidMiddleCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidMiddleCnd+".outColorR", eyelidMiddleMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidInvertYMiddleCnd+".outColorR", eyelidMiddleCnd+".operation", force=True)
-        cmds.connectAttr(eyelidMiddleMD+".outputX", eyelidMiddleBaseJxt+".rotateZ", force=True)
-        cmds.connectAttr(eyelidMiddleMD+".outputY", eyelidMiddleBaseJxt+".rotateX", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelid_middle_md+".input2X", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelid_middle_cnd+".colorIfTrueR", force=True)
+        cmds.connectAttr(eyelid_base_jxt+".rotateX", eyelid_middle_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_middle_cnd+".outColorR", eyelid_middle_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_invert_middle_cnd+".outColorR", eyelid_middle_cnd+".operation", force=True)
+        cmds.connectAttr(eyelid_middle_md+".outputX", eyelid_middle_base_jxt+".rotateZ", force=True)
+        cmds.connectAttr(eyelid_middle_md+".outputY", eyelid_middle_base_jxt+".rotateX", force=True)
         if "lower" in lid:
-            cmds.setAttr(eyelidInvertYMiddleCnd+".secondTerm", 1)
+            cmds.setAttr(eyelid_invert_middle_cnd+".secondTerm", 1)
         # try to fix the maintain volume by mimic the SetDrivenKey and SculptDeform technique using nodes to scale and translate the skinned joints:
-        cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidFixMD+".input1X", force=True)
-        cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidFixMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidFixMiddleTZMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c052_fix']+"ScaleX", eyelidFixMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c052_fix']+"TranslateZ", eyelidFixMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c052_fix']+self.ar.data.lang['c029_middle']+"TranslateZ", eyelidFixMiddleTZMD+".input2Y", force=True)
+        cmds.connectAttr(eyelid_intensity_md+".outputY", eyelid_fix_md+".input1X", force=True)
+        cmds.connectAttr(eyelid_intensity_md+".outputY", eyelid_fix_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_intensity_md+".outputY", eyelid_fix_middle_tz_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c052_fix']+"ScaleX", eyelid_fix_md+".input2X", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c052_fix']+"TranslateZ", eyelid_fix_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c052_fix']+self.ar.data.lang['c029_middle']+"TranslateZ", eyelid_fix_middle_tz_md+".input2Y", force=True)
         # modulus of fix values in order to avoid opositive values when the control pass to another direction from start position:
-        cmds.connectAttr(eyelidFixMD+".outputX", eyelidFixModulusXCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidFixMD+".outputX", eyelidFixModulusXCnd+".colorIfTrueR", force=True)
-        cmds.connectAttr(eyelidFixMD+".outputX", eyelidFixNegativeMD+".input1X", force=True)
-        cmds.connectAttr(eyelidFixNegativeMD+".outputX", eyelidFixModulusXCnd+".colorIfFalseR", force=True)
-        cmds.connectAttr(eyelidFixModulusXCnd+".outColorR", eyelidFixPMA+".input3D[1].input3Dx", force=True)
-        cmds.connectAttr(eyelidFixMD+".outputY", eyelidFixModulusYCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidFixMD+".outputY", eyelidFixModulusYCnd+".colorIfTrueR", force=True)
-        cmds.connectAttr(eyelidFixMD+".outputY", eyelidFixNegativeMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidFixNegativeMD+".outputY", eyelidFixModulusYCnd+".colorIfFalseR", force=True)
-        cmds.connectAttr(eyelidFixPMA+".output3Dx", eyelidJnt+".scaleX", force=True)
-        cmds.connectAttr(eyelidFixModulusYCnd+".outColorR", eyelidJnt+".translateZ", force=True)
+        cmds.connectAttr(eyelid_fix_md+".outputX", eyelid_fix_modulus_x_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_fix_md+".outputX", eyelid_fix_modulus_x_cnd+".colorIfTrueR", force=True)
+        cmds.connectAttr(eyelid_fix_md+".outputX", eyelid_fix_negative_md+".input1X", force=True)
+        cmds.connectAttr(eyelid_fix_negative_md+".outputX", eyelid_fix_modulus_x_cnd+".colorIfFalseR", force=True)
+        cmds.connectAttr(eyelid_fix_modulus_x_cnd+".outColorR", eyelid_fix_pma+".input3D[1].input3Dx", force=True)
+        cmds.connectAttr(eyelid_fix_md+".outputY", eyelid_fix_modulus_y_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_fix_md+".outputY", eyelid_fix_modulus_y_cnd+".colorIfTrueR", force=True)
+        cmds.connectAttr(eyelid_fix_md+".outputY", eyelid_fix_negative_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_fix_negative_md+".outputY", eyelid_fix_modulus_y_cnd+".colorIfFalseR", force=True)
+        cmds.connectAttr(eyelid_fix_pma+".output3Dx", eyelid_jnt+".scaleX", force=True)
+        cmds.connectAttr(eyelid_fix_modulus_y_cnd+".outColorR", eyelid_jnt+".translateZ", force=True)
         # fixing middle joint proximity:
-        cmds.connectAttr(eyelidFixMiddleTZMD+".outputY", eyelidReduceOpenMiddleMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c107_reduce']+self.ar.data.lang['c029_middle']+"Open", eyelidReduceOpenMiddleMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidReduceOpenMiddleMD+".outputY", eyelidInvertOpenMiddleMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidFixMiddleTZMD+".outputY", eyelidFixModulusYMiddleCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidFixMiddleTZMD+".outputY", eyelidFixInvertOpenMiddleMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidFixInvertOpenMiddleMD+".outputY", eyelidFixModulusYMiddleCnd+".colorIfTrueR", force=True)
-        cmds.connectAttr(eyelidInvertOpenMiddleMD+".outputY", eyelidFixModulusYMiddleCnd+".colorIfFalseR", force=True)
-        cmds.connectAttr(eyelidFixModulusYMiddleCnd+".outColorR", eyelidFixMiddleMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelidFixMiddleMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelidFixMiddleMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidFixMiddleMD+".outputX", eyelidFixMiddleScaleClp+".inputR", force=True)
-        cmds.connectAttr(eyelidFixMiddleScaleClp+".outputR", eyelidMiddleJnt+".scaleX", force=True)
-        cmds.connectAttr(eyelidFixMiddleMD+".outputY", eyelidMiddleJnt+".translateZ", force=True)
-        cmds.connectAttr(eyelidInvertFixMiddleCnd+".outColorR", eyelidFixModulusYMiddleCnd+".operation", force=True)
-        cmds.connectAttr(eyelidInvertFixMiddleCnd+".outColorG", eyelidFixInvertOpenMiddleMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidInvertFixMiddleCnd+".outColorB", eyelidInvertOpenMiddleMD+".input2Y", force=True)
+        cmds.connectAttr(eyelid_fix_middle_tz_md+".outputY", eyelid_reduce_open_middle_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c107_reduce']+self.ar.data.lang['c029_middle']+"Open", eyelid_reduce_open_middle_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_reduce_open_middle_md+".outputY", eyelid_invert_open_middle_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_fix_middle_tz_md+".outputY", eyelid_fix_modulus_y_middle_cnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelid_fix_middle_tz_md+".outputY", eyelid_fix_invert_open_middle_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_fix_invert_open_middle_md+".outputY", eyelid_fix_modulus_y_middle_cnd+".colorIfTrueR", force=True)
+        cmds.connectAttr(eyelid_invert_open_middle_md+".outputY", eyelid_fix_modulus_y_middle_cnd+".colorIfFalseR", force=True)
+        cmds.connectAttr(eyelid_fix_modulus_y_middle_cnd+".outColorR", eyelid_fix_middle_md+".input1Y", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelid_fix_middle_md+".input2X", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c050_proximity']+self.ar.data.lang['c029_middle'], eyelid_fix_middle_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_fix_middle_md+".outputX", eyelid_fix_middle_scale_clp+".inputR", force=True)
+        cmds.connectAttr(eyelid_fix_middle_scale_clp+".outputR", eyelid_middle_jnt+".scaleX", force=True)
+        cmds.connectAttr(eyelid_fix_middle_md+".outputY", eyelid_middle_jnt+".translateZ", force=True)
+        cmds.connectAttr(eyelid_invert_fix_middle_cnd+".outColorR", eyelid_fix_modulus_y_middle_cnd+".operation", force=True)
+        cmds.connectAttr(eyelid_invert_fix_middle_cnd+".outColorG", eyelid_fix_invert_open_middle_md+".input2Y", force=True)
+        cmds.connectAttr(eyelid_invert_fix_middle_cnd+".outColorB", eyelid_invert_open_middle_md+".input2Y", force=True)
         # follow setup:
-        eyelidBaseZeroJxt = cmds.listRelatives(eyelidBaseJxt, parent=True)[0]
-        eyelidMiddleBaseZeroJxt = cmds.listRelatives(eyelidMiddleBaseJxt, parent=True)[0]
-        followPC = cmds.parentConstraint(self.jxt, self.eyeScaleJnt, eyelidBaseZeroJxt, skipTranslate=["x", "y", "z"], skipRotate=["y", "z"], maintainOffset=1, name=baseName+"_Follow_PaC")[0]
-        cmds.setAttr(followPC+".interpType", 2)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c032_follow'], followPC+"."+self.jxt+"W0", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.ar.data.lang['c032_follow'], eyelidFollowRev+".inputX", force=True)
-        cmds.connectAttr(eyelidFollowRev+".outputX", followPC+"."+self.eyeScaleJnt+"W1", force=True)
-        cmds.connectAttr(eyelidBaseZeroJxt+".rotateX", eyelidMiddleBaseZeroJxt+".rotateX", force=True)
+        eyelid_base_zero_jxt = cmds.listRelatives(eyelid_base_jxt, parent=True)[0]
+        eyelid_middle_base_zero_jxt = cmds.listRelatives(eyelid_middle_base_jxt, parent=True)[0]
+        follow_pac = cmds.parentConstraint(self.jxt, self.eye_scale_jnt, eyelid_base_zero_jxt, skipTranslate=["x", "y", "z"], skipRotate=["y", "z"], maintainOffset=1, name=base_name+"_Follow_PaC")[0]
+        cmds.setAttr(follow_pac+".interpType", 2)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c032_follow'], follow_pac+"."+self.jxt+"W0", force=True)
+        cmds.connectAttr(eyelid_ctrl+"."+self.ar.data.lang['c032_follow'], eyelid_follow_rev+".inputX", force=True)
+        cmds.connectAttr(eyelid_follow_rev+".outputX", follow_pac+"."+self.eye_scale_jnt+"W1", force=True)
+        cmds.connectAttr(eyelid_base_zero_jxt+".rotateX", eyelid_middle_base_zero_jxt+".rotateX", force=True)
         # corrective network
         if self.corrective:
-            self.setup_corrective_net(eyelidCtrl, eyelidBaseJxt, cmds.listRelatives(eyelidBaseJxt, parent=True)[0], baseName, 0, 0, -self.cValue)
+            self.setup_corrective_net(eyelid_ctrl, eyelid_base_jxt, cmds.listRelatives(eyelid_base_jxt, parent=True)[0], base_name, 0, 0, -self.corrective_value)
         # calibration attribute:
-        eyelidCalibrationList = [
+        eyelid_calibrations = [
             self.ar.data.lang['c049_intensity']+"X",
             self.ar.data.lang['c049_intensity']+"Y",
             self.ar.data.lang['c032_follow'],
@@ -400,63 +369,63 @@ class Eye(standard.BaseStandard):
             self.ar.data.lang['c052_fix']+self.ar.data.lang['c029_middle']+"TranslateZ",
             self.ar.data.lang['c107_reduce']+self.ar.data.lang['c029_middle']+"Open"
         ]
-        eyelidNotMirrorList = [self.ar.data.lang['c053_invert']+"X",
+        eyelid_not_mirrors = [self.ar.data.lang['c053_invert']+"X",
                                self.ar.data.lang['c053_invert']+"Y",
                                self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle']]
-        self.ar.ctrls.setStringAttrFromList(eyelidCtrl, eyelidCalibrationList)
-        self.ar.ctrls.setStringAttrFromList(eyelidCtrl, eyelidNotMirrorList, "notMirrorList") #useful to export calibrationIO and not mirror them
-        return eyelidCtrl, eyelidCtrlZero
+        self.ar.ctrls.setStringAttrFromList(eyelid_ctrl, eyelid_calibrations)
+        self.ar.ctrls.setStringAttrFromList(eyelid_ctrl, eyelid_not_mirrors, "notMirrorList") #useful to export calibrationIO and not mirror them
+        return eyelid_ctrl, eyelid_ctrl_zero
         
         
-    def createIrisPupilSetup(self, s, side, type, codeName, jointLabelNumber, *args):
+    def create_iris_pupil_setup(self, s, side, type, code_name, joint_label_number):
         ''' Predefined function to add Iris or Pupil setup.
-            Returns control.
+            Returns controller.
         '''
         # declare cv guides:
-        cvLoc = side+self.number_name+"_Guide_"+type.capitalize()+"Loc"
+        guide_loc = side+self.number_name+"_Guide_"+type.capitalize()+"Loc"
         # creating joint:
-        mainJnt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang[codeName]+"_1_Jnt", scaleCompensate=False)
-        cmds.addAttr(mainJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        self.ar.utils.setJointLabel(mainJnt, jointLabelNumber, 18, self.number_name+"_"+self.ar.data.lang[codeName]+"_1")
+        main_jnt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang[code_name]+"_1_Jnt", scaleCompensate=False)
+        cmds.addAttr(main_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+        self.ar.utils.setJointLabel(main_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[code_name]+"_1")
         # joint position:
-        cmds.matchTransform(mainJnt, cvLoc, position=True, rotation=True)
-        end_joint = self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang[codeName], mainJnt, tz=self.radius)
+        cmds.matchTransform(main_jnt, guide_loc, position=True, rotation=True)
+        end_joint = self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang[code_name], main_jnt, tz=self.radius)
         # creating control:
         if type == IRIS:
-            ctrlId = "id_012_EyeIris"
+            ctrl_id = "id_012_EyeIris"
             radius = 0.4*self.radius
         else:
-            ctrlId = "id_013_EyePupil"
+            ctrl_id = "id_013_EyePupil"
             radius = 0.2*self.radius
-        ctrl = self.ar.ctrls.cvControl(ctrlId, side+self.number_name+"_"+self.ar.data.lang[codeName]+"_1_Ctrl", r=radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"__"+cvLoc.replace("_Guide", ":Guide"), parentTag=self.fkEyeSubCtrl)
-        self.ar.utils.originedFrom(objName=ctrl, attrString=cvLoc)
+        ctrl = self.ar.ctrls.cvControl(ctrl_id, side+self.number_name+"_"+self.ar.data.lang[code_name]+"_1_Ctrl", r=radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"__"+guide_loc.replace("_Guide", ":Guide"), parentTag=self.fk_eye_sub_ctrl)
+        self.ar.utils.originedFrom(objName=ctrl, attrString=guide_loc)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
-        ctrlZero = self.ar.utils.zeroOut([ctrl], offset=True)
-        cmds.setAttr(cmds.listRelatives(ctrlZero, children=True, type="transform")[0]+".dpNotTransformIO", 0)
-        cmds.matchTransform(ctrlZero[0], cvLoc, position=True, rotation=True)
-        cmds.parent(ctrlZero[0], self.baseEyeCtrl)
+        ctrl_zero = self.ar.utils.zeroOut([ctrl], offset=True)
+        cmds.setAttr(cmds.listRelatives(ctrl_zero, children=True, type="transform")[0]+".dpNotTransformIO", 0)
+        cmds.matchTransform(ctrl_zero[0], guide_loc, position=True, rotation=True)
+        cmds.parent(ctrl_zero[0], self.base_eye_ctrl)
         # fixing flip mirror:
         if s == 1:
             if cmds.getAttr(self.guide_base+".flip") == 1:
                 if not "X" == cmds.getAttr(self.guide_base+".aimDirectionName"):
-                    cmds.setAttr(ctrlZero[0]+".scaleX", -1)
+                    cmds.setAttr(ctrl_zero[0]+".scaleX", -1)
                 else:
-                    cmds.setAttr(ctrlZero[0]+".scaleX", 1)
+                    cmds.setAttr(ctrl_zero[0]+".scaleX", 1)
                 if not "Y" == cmds.getAttr(self.guide_base+".aimDirectionName"):
-                    cmds.setAttr(ctrlZero[0]+".scaleY", -1)
+                    cmds.setAttr(ctrl_zero[0]+".scaleY", -1)
                 else:
-                    cmds.setAttr(ctrlZero[0]+".scaleY", 1)
+                    cmds.setAttr(ctrl_zero[0]+".scaleY", 1)
                 if not "Z" == cmds.getAttr(self.guide_base+".aimDirectionName"):
-                    cmds.setAttr(ctrlZero[0]+".scaleZ", -1)
+                    cmds.setAttr(ctrl_zero[0]+".scaleZ", -1)
                 else:
-                    cmds.setAttr(ctrlZero[0]+".scaleZ", 1)
+                    cmds.setAttr(ctrl_zero[0]+".scaleZ", 1)
             cmds.setAttr(end_joint+".translateZ", -self.radius)
-        cmds.parentConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_PaC")
-        cmds.scaleConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ScC")
-        cmds.parent(mainJnt, self.jnt)
-        cmds.parentConstraint(ctrl, mainJnt, maintainOffset=False, name=mainJnt+"_PaC")
-        cmds.scaleConstraint(ctrl, mainJnt, maintainOffset=True, name=mainJnt+"_ScC")
+        cmds.parentConstraint(self.fk_eye_sub_ctrl, ctrl_zero[0], maintainOffset=True, name=ctrl_zero[0]+"_PaC")
+        cmds.scaleConstraint(self.fk_eye_sub_ctrl, ctrl_zero[0], maintainOffset=True, name=ctrl_zero[0]+"_ScC")
+        cmds.parent(main_jnt, self.jnt)
+        cmds.parentConstraint(ctrl, main_jnt, maintainOffset=False, name=main_jnt+"_PaC")
+        cmds.scaleConstraint(ctrl, main_jnt, maintainOffset=True, name=main_jnt+"_ScC")
         return ctrl
     
     
@@ -465,246 +434,244 @@ class Eye(standard.BaseStandard):
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             # create lists to export:
-            self.eyeScaleGrpList, self.irisCtrlList, self.pupilCtrlList = [], [], []
-            self.hasIris = False
-            self.hasPupil = False
+            self.eye_scale_grps, self.iris_ctrls, self.pupil_ctrls = [], [], []
+            self.has_iris = False
+            self.has_pupil = False
             # create the main control:
-            self.eyeCtrl = self.ar.ctrls.cvControl("id_010_EyeLookAtMain", self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=(2.25*self.radius), d=self.curve_degree, guideSource=self.name_guide+"_JointEnd")
-            cmds.addAttr(self.eyeCtrl, longName=self.ar.data.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
-            cmds.matchTransform(self.eyeCtrl, self.sides[0]+self.number_name+"_Guide_JointEnd", position=True, rotation=True)
+            self.eye_ctrl = self.ar.ctrls.cvControl("id_010_EyeLookAtMain", self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=(2.25*self.radius), d=self.curve_degree, guideSource=self.name_guide+"_JointEnd")
+            cmds.addAttr(self.eye_ctrl, longName=self.ar.data.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
+            cmds.matchTransform(self.eye_ctrl, self.sides[0]+self.number_name+"_Guide_JointEnd", position=True, rotation=True)
             if self.mirror_axis != 'off':
-                cmds.setAttr(self.eyeCtrl+".translate"+self.mirror_axis, 0)
-            self.eyeGrp = cmds.group(self.eyeCtrl, name=self.number_name+"_"+self.ar.data.lang['c058_main']+"_Grp")
-            self.ar.utils.zeroOut([self.eyeCtrl])
-            self.upLocGrp = cmds.group(name=self.number_name+"_UpLoc_Grp", empty=True)
-            self.to_ids.append(self.upLocGrp)
+                cmds.setAttr(self.eye_ctrl+".translate"+self.mirror_axis, 0)
+            self.eye_grp = cmds.group(self.eye_ctrl, name=self.number_name+"_"+self.ar.data.lang['c058_main']+"_Grp")
+            self.ar.utils.zeroOut([self.eye_ctrl])
+            self.up_loc_grp = cmds.group(name=self.number_name+"_UpLoc_Grp", empty=True)
+            self.to_ids.append(self.up_loc_grp)
             # run for all sides:
             for s, side in enumerate(self.sides):
                 cmds.select(clear=True)
                 self.base = side+self.number_name+'_Guide_Base'
                 # declare guide:
                 self.guide = side+self.number_name+"_Guide_JointLoc1"
-                self.cvEndJointZero = side+self.number_name+"_Guide_JointEnd_Grp"
+                self.guide_end_loc_zero = side+self.number_name+"_Guide_JointEnd_Grp"
                 self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
-                self.cvSpecularLoc = side+self.number_name+"_Guide_SpecularLoc"
+                self.guide_specular_loc = side+self.number_name+"_Guide_SpecularLoc"
                 self.head_def_value = cmds.getAttr(self.base+".deformedBy")
                 # create a joint:
                 self.jxt = cmds.joint(name=side+self.number_name+"_1_Jxt", scaleCompensate=False)
-                self.subJnt = cmds.joint(name=side+self.number_name+"_1_Sub_Jxt", scaleCompensate=False)
+                sub_jnt = cmds.joint(name=side+self.number_name+"_1_Sub_Jxt", scaleCompensate=False)
                 self.jnt = cmds.joint(name=side+self.number_name+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 if s == 1:
-                    lEyeFkCtrlData = self.ar.utils.getTransformData(self.fkEyeCtrl)
-                self.baseEyeCtrl = self.ar.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1")
-                self.fkEyeCtrl = self.ar.ctrls.cvControl("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=self.baseEyeCtrl)
-                self.fkEyeSubCtrl = self.ar.ctrls.cvControl("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=self.fkEyeCtrl)
-                self.ar.utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
-                self.ar.utils.originedFrom(objName=self.baseEyeCtrl, attrString=self.base+";"+self.guide)
-                cmds.parent(self.fkEyeSubCtrl, self.fkEyeCtrl)
+                    left_eye_fk_ctrl_data = self.ar.utils.getTransformData(fk_eye_ctrl)
+                self.base_eye_ctrl = self.ar.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1")
+                fk_eye_ctrl = self.ar.ctrls.cvControl("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=self.base_eye_ctrl)
+                self.fk_eye_sub_ctrl = self.ar.ctrls.cvControl("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=fk_eye_ctrl)
+                self.ar.utils.originedFrom(objName=fk_eye_ctrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
+                self.ar.utils.originedFrom(objName=self.base_eye_ctrl, attrString=self.base+";"+self.guide)
+                cmds.parent(self.fk_eye_sub_ctrl, fk_eye_ctrl)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.pointConstraint(self.guide, self.jxt, maintainOffset=False))
-                cmds.delete(cmds.orientConstraint(self.cvEndJointZero, self.jxt, maintainOffset=False))
-                cmds.delete(cmds.pointConstraint(self.guide, self.fkEyeCtrl, maintainOffset=False))
-                cmds.delete(cmds.orientConstraint(self.cvEndJointZero, self.fkEyeCtrl, maintainOffset=False))
-                cmds.matchTransform(self.baseEyeCtrl, self.guide, position=True, rotation=True)
+                cmds.delete(cmds.orientConstraint(self.guide_end_loc_zero, self.jxt, maintainOffset=False))
+                cmds.delete(cmds.pointConstraint(self.guide, fk_eye_ctrl, maintainOffset=False))
+                cmds.delete(cmds.orientConstraint(self.guide_end_loc_zero, fk_eye_ctrl, maintainOffset=False))
+                cmds.matchTransform(self.base_eye_ctrl, self.guide, position=True, rotation=True)
                 # zeroOut controls:
-                eyeZeroList = self.ar.utils.zeroOut([self.baseEyeCtrl])
-                eyeZeroList.append(self.ar.utils.zeroOut([self.fkEyeCtrl], offset=True))
-                eyeZeroOffsetGrp = cmds.listRelatives(eyeZeroList[1], children=True)[0]
+                eye_zeros = self.ar.utils.zeroOut([self.base_eye_ctrl])
+                eye_zeros.append(self.ar.utils.zeroOut([fk_eye_ctrl], offset=True))
+                eye_zero_offset_grp = cmds.listRelatives(eye_zeros[1], children=True)[0]
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(eyeZeroList[0]+".scaleX", -1)
-                        cmds.setAttr(eyeZeroList[0]+".scaleY", -1)
-                        cmds.setAttr(eyeZeroList[0]+".scaleZ", -1)                        
-                cmds.parent(eyeZeroList[1], self.baseEyeCtrl)
+                        cmds.setAttr(eye_zeros[0]+".scaleX", -1)
+                        cmds.setAttr(eye_zeros[0]+".scaleY", -1)
+                        cmds.setAttr(eye_zeros[0]+".scaleZ", -1)                        
+                cmds.parent(eye_zeros[1], self.base_eye_ctrl)
                 # calibrate offset rotate:
-                for offsetAxis in ['X', 'Y', 'Z']:
-                    cmds.addAttr(self.fkEyeCtrl, longName="calibrateR"+offsetAxis, attributeType='float', defaultValue=0, keyable=False)
-                    cmds.connectAttr(self.fkEyeCtrl+".calibrateR"+offsetAxis, eyeZeroOffsetGrp+".rotate"+offsetAxis, force=True)
-                fkCtrlCalibrationList = ["calibrateRX", "calibrateRY", "calibrateRZ"]
-                self.ar.ctrls.setStringAttrFromList(self.fkEyeCtrl, fkCtrlCalibrationList)
+                for offset_axis in self.ar.data.axes:
+                    cmds.addAttr(fk_eye_ctrl, longName="calibrateR"+offset_axis, attributeType='float', defaultValue=0, keyable=False)
+                    cmds.connectAttr(fk_eye_ctrl+".calibrateR"+offset_axis, eye_zero_offset_grp+".rotate"+offset_axis, force=True)
+                self.ar.ctrls.setStringAttrFromList(fk_eye_ctrl, ["calibrateRX", "calibrateRY", "calibrateRZ"]) #fkCtrlCalibrationList
                 # hide visibility attribute:
-                cmds.setAttr(self.fkEyeCtrl+'.visibility', keyable=False)
-                self.ar.ctrls.setLockHide([self.fkEyeCtrl], ['tx', 'ty', 'tz'])
+                cmds.setAttr(fk_eye_ctrl+'.visibility', keyable=False)
+                self.ar.ctrls.setLockHide([fk_eye_ctrl], ['tx', 'ty', 'tz'])
                 # create end joint:
                 cmds.select(self.jnt)
                 self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
                 self.create_end_joint(side+self.number_name)
                 # create parent and scale constraint from ctrl to jxt:
-                cmds.parentConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=False, name=self.jxt+"_PaC")
-                cmds.scaleConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=True, name=self.jxt+"_ScC")
+                cmds.parentConstraint(fk_eye_ctrl, self.jxt, maintainOffset=False, name=self.jxt+"_PaC")
+                cmds.scaleConstraint(fk_eye_ctrl, self.jxt, maintainOffset=True, name=self.jxt+"_ScC")
                 # constraint from sub control to sub joint:
-                cmds.parentConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=False, name=self.subJnt+"_PaC")
-                cmds.scaleConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=True, name=self.subJnt+"_ScC")
+                cmds.parentConstraint(self.fk_eye_sub_ctrl, sub_jnt, maintainOffset=False, name=sub_jnt+"_PaC")
+                cmds.scaleConstraint(self.fk_eye_sub_ctrl, sub_jnt, maintainOffset=True, name=sub_jnt+"_ScC")
                 
                 # lookAt control:
-                self.lookAtCtrl = self.ar.ctrls.cvControl("id_011_EyeLookAt", side+self.number_name+"_LookAt_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.eyeCtrl)
-                cmds.matchTransform(self.lookAtCtrl, self.guide_end_loc, position=True, rotation=True)
-                lookAtCtrlZeroGrp = self.ar.utils.zeroOut([self.lookAtCtrl])
-                cmds.parent(lookAtCtrlZeroGrp, self.eyeCtrl, relative=False)
-                cmds.addAttr(self.lookAtCtrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                self.ar.utils.originedFrom(objName=self.lookAtCtrl, attrString=side+self.number_name+"_Guide_JointEnd")
+                look_at_ctrl = self.ar.ctrls.cvControl("id_011_EyeLookAt", side+self.number_name+"_LookAt_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.eye_ctrl)
+                cmds.matchTransform(look_at_ctrl, self.guide_end_loc, position=True, rotation=True)
+                cmds.parent(self.ar.utils.zeroOut([look_at_ctrl]), self.eye_ctrl, relative=False) #lookAtCtrlZeroGrp
+                cmds.addAttr(look_at_ctrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                self.ar.utils.originedFrom(objName=look_at_ctrl, attrString=side+self.number_name+"_Guide_JointEnd")
                 
                 # up locator:
-                self.cvUpLocGuide = side+self.number_name+"_Guide_JointEnd_UpLoc"
-                self.lUpGrpLoc = cmds.group(name=side+self.number_name+"_Up_Loc_Grp", empty=True)
-                cmds.delete(cmds.pointConstraint(self.jnt, self.lUpGrpLoc, maintainOffset=False))
-                cmds.delete(cmds.orientConstraint(self.cvEndJointZero, self.lUpGrpLoc, maintainOffset=False))
-                self.lUpLoc = cmds.spaceLocator(name=side+self.number_name+"_Up_Loc")[0]
-                cmds.matchTransform(self.lUpLoc, self.cvUpLocGuide, position=True, rotation=True)
-                cmds.parent(self.lUpLoc, self.lUpGrpLoc, relative=False)
-                cmds.parent(self.lUpGrpLoc, self.upLocGrp, relative=False)
+                self.guide_up_loc = side+self.number_name+"_Guide_JointEnd_UpLoc"
+                left_up_grp_loc = cmds.group(name=side+self.number_name+"_Up_Loc_Grp", empty=True)
+                cmds.delete(cmds.pointConstraint(self.jnt, left_up_grp_loc, maintainOffset=False))
+                cmds.delete(cmds.orientConstraint(self.guide_end_loc_zero, left_up_grp_loc, maintainOffset=False))
+                left_up_loc = cmds.spaceLocator(name=side+self.number_name+"_Up_Loc")[0]
+                cmds.matchTransform(left_up_loc, self.guide_up_loc, position=True, rotation=True)
+                cmds.parent(left_up_loc, left_up_grp_loc, relative=False)
+                cmds.parent(left_up_grp_loc, self.up_loc_grp, relative=False)
                 
                 # look at aim constraint:
-                aimConst = cmds.aimConstraint(self.lookAtCtrl, eyeZeroList[1], worldUpType="object", worldUpObject=self.upLocGrp+"|"+self.lUpGrpLoc+"|"+self.lUpLoc, maintainOffset=True, name=self.fkEyeCtrl+"_Zero_0_Grp"+"_AiC")[0]
-                cmds.connectAttr(self.lookAtCtrl+"."+self.ar.data.lang['c118_active'], aimConst+"."+self.lookAtCtrl+"W0", force=True)
+                aic = cmds.aimConstraint(look_at_ctrl, eye_zeros[1], worldUpType="object", worldUpObject=self.up_loc_grp+"|"+left_up_grp_loc+"|"+left_up_loc, maintainOffset=True, name=fk_eye_ctrl+"_Zero_0_Grp"+"_AiC")[0]
+                cmds.connectAttr(look_at_ctrl+"."+self.ar.data.lang['c118_active'], aic+"."+look_at_ctrl+"W0", force=True)
                 # eye aim rotation
-                cmds.addAttr(self.fkEyeCtrl, longName="aimRotation", attributeType="float", keyable=True)
-                cmds.connectAttr(self.fkEyeCtrl+".aimRotation", self.jnt+".rotateZ", force=True)
-                cmds.pointConstraint(self.baseEyeCtrl, self.lUpGrpLoc, maintainOffset=True, name=self.lUpGrpLoc+"_PoC")
+                cmds.addAttr(fk_eye_ctrl, longName="aimRotation", attributeType="float", keyable=True)
+                cmds.connectAttr(fk_eye_ctrl+".aimRotation", self.jnt+".rotateZ", force=True)
+                cmds.pointConstraint(self.base_eye_ctrl, left_up_grp_loc, maintainOffset=True, name=left_up_grp_loc+"_PoC")
                 
                 # create eyeScale setup:
                 cmds.select(clear=True)
-                self.eyeScaleJnt = cmds.joint(name=side+self.number_name+"Scale_1_Jnt", scaleCompensate=False)
-                cmds.addAttr(self.eyeScaleJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(self.eyeScaleJnt, s+self.joint_label_add, 18, self.number_name+"Scale_1")
+                self.eye_scale_jnt = cmds.joint(name=side+self.number_name+"Scale_1_Jnt", scaleCompensate=False)
+                cmds.addAttr(self.eye_scale_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                self.ar.utils.setJointLabel(self.eye_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Scale_1")
                 # jointScale position:
-                cmds.matchTransform(self.eyeScaleJnt, self.guide, position=True, rotation=True)
+                cmds.matchTransform(self.eye_scale_jnt, self.guide, position=True, rotation=True)
                 # create endScale joint:
-                end_scale_joint = self.create_end_joint(side+self.number_name+'Scale', self.eyeScaleJnt, tz=self.radius)
+                end_scale_joint = self.create_end_joint(side+self.number_name+'Scale', self.eye_scale_jnt, tz=self.radius)
                 if s == 1:
                     cmds.setAttr(end_scale_joint+".translateZ", -self.radius)
                 # create constraints to eyeScale:
-                cmds.pointConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_PoC")
-                cmds.orientConstraint(self.baseEyeCtrl, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_OrC")
-                cmds.scaleConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=True, name=self.eyeScaleJnt+"_ScC")
-                self.eyeScaleGrp = cmds.group(self.eyeScaleJnt, name=self.eyeScaleJnt+"_Grp")
-                self.eyeScaleGrpList.append(self.eyeScaleGrp)
+                cmds.pointConstraint(self.jnt, self.eye_scale_jnt, maintainOffset=False, name=self.eye_scale_jnt+"_PoC")
+                cmds.orientConstraint(self.base_eye_ctrl, self.eye_scale_jnt, maintainOffset=False, name=self.eye_scale_jnt+"_OrC")
+                cmds.scaleConstraint(self.jnt, self.eye_scale_jnt, maintainOffset=True, name=self.eye_scale_jnt+"_ScC")
+                self.eye_scale_grp = cmds.group(self.eye_scale_jnt, name=self.eye_scale_jnt+"_Grp")
+                self.eye_scale_grps.append(self.eye_scale_grp)
                 
                 # create specular setup:
                 if self.get_guide_attr(SPEC):
                     cmds.select(clear=True)
-                    self.cvSpecularLoc = side+self.number_name+"_Guide_SpecularLoc"
+                    self.guide_specular_loc = side+self.number_name+"_Guide_SpecularLoc"
                     # specular joint:
-                    self.eyeSpecJnt = cmds.joint(name=side+self.number_name+"Specular_1_Jnt", scaleCompensate=False)
-                    cmds.addAttr(self.eyeSpecJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.setJointLabel(self.eyeSpecJnt, s+self.joint_label_add, 18, self.number_name+"Specular_1")
+                    eye_spec_jnt = cmds.joint(name=side+self.number_name+"Specular_1_Jnt", scaleCompensate=False)
+                    cmds.addAttr(eye_spec_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                    self.ar.utils.setJointLabel(eye_spec_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_1")
                     # specular joint scale:
-                    self.eyeSpecScaleJnt = cmds.joint(name=side+self.number_name+"Specular_2_Jnt", scaleCompensate=False)
-                    cmds.addAttr(self.eyeSpecScaleJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.setJointLabel(self.eyeSpecScaleJnt, s+self.joint_label_add, 18, self.number_name+"Specular_2")
-                    cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", self.radius)
-                    self.create_end_joint(side+self.number_name+'Specular', self.eyeSpecScaleJnt, tz=0.2*self.radius)
-                    cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)
+                    eye_spec_scale_jnt = cmds.joint(name=side+self.number_name+"Specular_2_Jnt", scaleCompensate=False)
+                    cmds.addAttr(eye_spec_scale_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                    self.ar.utils.setJointLabel(eye_spec_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_2")
+                    cmds.setAttr(eye_spec_scale_jnt+".translateZ", self.radius)
+                    self.create_end_joint(side+self.number_name+'Specular', eye_spec_scale_jnt, tz=0.2*self.radius)
+                    cmds.parent(eye_spec_jnt, self.eye_scale_jnt)
                     # specular control:
-                    self.eyeSpecCtrl = self.ar.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.fkEyeSubCtrl)
-                    cmds.matchTransform(self.eyeSpecCtrl, self.guide, position=True, rotation=True)
-                    eyeSpecZeroGrp = self.ar.utils.zeroOut([self.eyeSpecCtrl])[0]
-                    cmds.parent(eyeSpecZeroGrp, self.baseEyeCtrl)
-                    cmds.parentConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=False, name=self.eyeSpecJnt+"_PaC")
-                    cmds.scaleConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=True, name=self.eyeSpecJnt+"_ScC")
+                    eye_spec_ctrl = self.ar.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.fk_eye_sub_ctrl)
+                    cmds.matchTransform(eye_spec_ctrl, self.guide, position=True, rotation=True)
+                    eye_spec_zero_grp = self.ar.utils.zeroOut([eye_spec_ctrl])[0]
+                    cmds.parent(eye_spec_zero_grp, self.base_eye_ctrl)
+                    cmds.parentConstraint(eye_spec_ctrl, eye_spec_jnt, maintainOffset=False, name=eye_spec_jnt+"_PaC")
+                    cmds.scaleConstraint(eye_spec_ctrl, eye_spec_jnt, maintainOffset=True, name=eye_spec_jnt+"_ScC")
                     # specular follow subcontrol
-                    cmds.addAttr(self.eyeSpecCtrl, longName=self.ar.data.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
-                    followSPC = cmds.parentConstraint(self.fkEyeSubCtrl, self.baseEyeCtrl, eyeSpecZeroGrp, maintainOffset=True, name=eyeSpecZeroGrp+"_PaC")[0]
-                    eyeSpecFollowRev = cmds.createNode('reverse', name=side+self.number_name+"_Spec_Follow_Rev")
-                    self.to_ids.append(eyeSpecFollowRev)
-                    cmds.connectAttr(self.eyeSpecCtrl+"."+self.ar.data.lang['c032_follow'], followSPC+"."+self.fkEyeSubCtrl+"W0", force=True)
-                    cmds.connectAttr(self.eyeSpecCtrl+"."+self.ar.data.lang['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
-                    cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
+                    cmds.addAttr(eye_spec_ctrl, longName=self.ar.data.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
+                    follow_spec_pac = cmds.parentConstraint(self.fk_eye_sub_ctrl, self.base_eye_ctrl, eye_spec_zero_grp, maintainOffset=True, name=eye_spec_zero_grp+"_PaC")[0]
+                    eye_spec_follow_rev = cmds.createNode('reverse', name=side+self.number_name+"_Spec_Follow_Rev")
+                    self.to_ids.append(eye_spec_follow_rev)
+                    cmds.connectAttr(eye_spec_ctrl+"."+self.ar.data.lang['c032_follow'], follow_spec_pac+"."+self.fk_eye_sub_ctrl+"W0", force=True)
+                    cmds.connectAttr(eye_spec_ctrl+"."+self.ar.data.lang['c032_follow'], eye_spec_follow_rev+".inputX", force=True)
+                    cmds.connectAttr(eye_spec_follow_rev+".outputX", follow_spec_pac+"."+self.base_eye_ctrl+"W1", force=True)
                     # specular scale control:
-                    self.eyeSpecScaleCtrl = self.ar.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.eyeSpecCtrl)
-                    cmds.matchTransform(self.eyeSpecScaleCtrl, self.cvSpecularLoc, position=True, rotation=True)
+                    eye_spec_scale_ctrl = self.ar.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=eye_spec_ctrl)
+                    cmds.matchTransform(eye_spec_scale_ctrl, self.guide_specular_loc, position=True, rotation=True)
                     if s == 1:
-                        noWSLEyeSpecScaleZeroGrpData = self.ar.utils.getTransformData(self.eyeSpecScaleZeroGrp, useWorldSpace=False)
-                        lEyeSpecScaleZeroGrpData = self.ar.utils.getTransformData(self.eyeSpecScaleZeroGrp)
-                        rEyeFkCtrlData = self.ar.utils.getTransformData(self.fkEyeCtrl)
-                    self.eyeSpecScaleZeroGrp = self.ar.utils.zeroOut([self.eyeSpecScaleCtrl])[0]
-                    cmds.parent(self.eyeSpecScaleZeroGrp, self.eyeSpecCtrl)
-                    cmds.parentConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=False, name=self.eyeSpecScaleJnt+"_PaC")
-                    cmds.scaleConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=True, name=self.eyeSpecScaleJnt+"_ScC")
+                        no_wsl_eye_spec_scale_zero_grp_data = self.ar.utils.getTransformData(eye_spec_scale_zero_grp, useWorldSpace=False)
+                        left_eye_spec_scale_zero_grp_data = self.ar.utils.getTransformData(eye_spec_scale_zero_grp)
+                        rigth_eye_fk_ctrl_data = self.ar.utils.getTransformData(fk_eye_ctrl)
+                    eye_spec_scale_zero_grp = self.ar.utils.zeroOut([eye_spec_scale_ctrl])[0]
+                    cmds.parent(eye_spec_scale_zero_grp, eye_spec_ctrl)
+                    cmds.parentConstraint(eye_spec_scale_ctrl, eye_spec_scale_jnt, maintainOffset=False, name=eye_spec_scale_jnt+"_PaC")
+                    cmds.scaleConstraint(eye_spec_scale_ctrl, eye_spec_scale_jnt, maintainOffset=True, name=eye_spec_scale_jnt+"_ScC")
                     # fixing flip mirror:
                     if s == 1:
                         if cmds.getAttr(self.guide_base+".flip") == 0:
-                            cmds.xform(self.eyeSpecScaleZeroGrp, translation=noWSLEyeSpecScaleZeroGrpData["translation"], worldSpace=False)
+                            cmds.xform(eye_spec_scale_zero_grp, translation=no_wsl_eye_spec_scale_zero_grp_data["translation"], worldSpace=False)
                         else:
-                            translationList, tempList = [], []
-                            for i, j in zip(lEyeSpecScaleZeroGrpData["translation"], lEyeFkCtrlData["translation"]):
-                                tempList.append(i-j)
-                            for k, w in zip(tempList, rEyeFkCtrlData["translation"]):
-                                translationList.append(k+w)
-                            cmds.xform(self.eyeSpecScaleZeroGrp, translation=translationList, worldSpace=True)
-                            cmds.xform(self.eyeSpecScaleZeroGrp, rotation=lEyeSpecScaleZeroGrpData["rotation"], worldSpace=True)
+                            translations, temps = [], []
+                            for i, j in zip(left_eye_spec_scale_zero_grp_data["translation"], left_eye_fk_ctrl_data["translation"]):
+                                temps.append(i-j)
+                            for k, w in zip(temps, rigth_eye_fk_ctrl_data["translation"]):
+                                translations.append(k+w)
+                            cmds.xform(eye_spec_scale_zero_grp, translation=translations, worldSpace=True)
+                            cmds.xform(eye_spec_scale_zero_grp, rotation=left_eye_spec_scale_zero_grp_data["rotation"], worldSpace=True)
 
                 # create eyelid setup:
                 if self.get_guide_attr(EYELID):
                     # declare eyelid guides:
-                    self.cvUpperEyelidLoc = side+self.number_name+"_Guide_UpperEyelidLoc"
-                    self.cvLowerEyelidLoc = side+self.number_name+"_Guide_LowerEyelidLoc"
-                    self.cvLidPivotLoc = side+self.number_name+"_Guide_LidPivotLoc"
+                    self.guide_upper_eyelid_loc = side+self.number_name+"_Guide_UpperEyelidLoc"
+                    self.guide_lower_eyelid_loc = side+self.number_name+"_Guide_LowerEyelidLoc"
+                    self.guide_lid_pivot_loc = side+self.number_name+"_Guide_LidPivotLoc"
                     
                     # creating eyelids joints:
                     cmds.select(clear=True)
-                    self.eyelidJxt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['c042_eyelid']+"_Jxt", scaleCompensate=False)
-                    cmds.matchTransform(self.eyelidJxt, self.cvLidPivotLoc, position=True, rotation=True)
-                    cmds.parent(self.eyelidJxt, self.eyeScaleJnt)
-                    self.upperEyelidBaseJxt, self.upperEyelidJnt = self.createEyelidJoints(side, 'c044_upper', "", self.cvUpperEyelidLoc, s+self.joint_label_add)
-                    self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt = self.createEyelidJoints(side, 'c044_upper', self.ar.data.lang['c029_middle'], self.cvUpperEyelidLoc, s+self.joint_label_add)
-                    self.lowerEyelidBaseJxt, self.lowerEyelidJnt = self.createEyelidJoints(side, 'c045_lower', "", self.cvLowerEyelidLoc, s+self.joint_label_add)
-                    self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt = self.createEyelidJoints(side, 'c045_lower', self.ar.data.lang['c029_middle'], self.cvLowerEyelidLoc, s+self.joint_label_add)
+                    self.eyelid_jxt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['c042_eyelid']+"_Jxt", scaleCompensate=False)
+                    cmds.matchTransform(self.eyelid_jxt, self.guide_lid_pivot_loc, position=True, rotation=True)
+                    cmds.parent(self.eyelid_jxt, self.eye_scale_jnt)
+                    upper_eyelid_base_jxt, upper_eyelid_jnt = self.create_eyelids_joints(side, 'c044_upper', "", self.guide_upper_eyelid_loc, s+self.joint_label_add)
+                    upper_eyelid_middle_base_jxt, upper_eyelid_middle_jnt = self.create_eyelids_joints(side, 'c044_upper', self.ar.data.lang['c029_middle'], self.guide_upper_eyelid_loc, s+self.joint_label_add)
+                    lower_eyelid_base_jxt, lower_eyelid_jnt = self.create_eyelids_joints(side, 'c045_lower', "", self.guide_lower_eyelid_loc, s+self.joint_label_add)
+                    lowerEyelidMiddleBaseJxt, lower_eyelid_middle_jnt = self.create_eyelids_joints(side, 'c045_lower', self.ar.data.lang['c029_middle'], self.guide_lower_eyelid_loc, s+self.joint_label_add)
                     
                     # creating eyelids controls and setup:
-                    self.upperEyelidCtrl, self.upperEyelidCtrlZero = self.createEyelidSetup(side, 'c044_upper', self.upperEyelidJnt, self.upperEyelidBaseJxt, self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt, 30, (0, 0, 0), self.cvUpperEyelidLoc)
-                    self.lowerEyelidCtrl, self.lowerEyelidCtrlZero = self.createEyelidSetup(side, 'c045_lower', self.lowerEyelidJnt, self.lowerEyelidBaseJxt, self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt, 30, (0, 0, 180), self.cvLowerEyelidLoc)
+                    upper_eyelid_ctrl, upper_eyelid_ctrl_zero = self.create_eyelid_setup(side, 'c044_upper', upper_eyelid_jnt, upper_eyelid_base_jxt, upper_eyelid_middle_base_jxt, upper_eyelid_middle_jnt, 30, (0, 0, 0), self.guide_upper_eyelid_loc)
+                    lower_eyelid_ctrl, lower_eyelid_ctrl_zero = self.create_eyelid_setup(side, 'c045_lower', lower_eyelid_jnt, lower_eyelid_base_jxt, lowerEyelidMiddleBaseJxt, lower_eyelid_middle_jnt, 30, (0, 0, 180), self.guide_lower_eyelid_loc)
                     # fixing mirror behavior for side controls:
                     if s == 0: #left
-                        cmds.setAttr(self.upperEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
-                        cmds.setAttr(self.upperEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
-                        cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
-                        cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], 1)
+                        cmds.setAttr(upper_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
+                        cmds.setAttr(upper_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
+                        cmds.setAttr(lower_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
+                        cmds.setAttr(lower_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], 1)
                         if self.corrective:
-                            cmds.setAttr(self.lowerEyelidCtrl.replace("_Ctrl", "_00_Net")+".inputEnd", self.cValue)
+                            cmds.setAttr(lower_eyelid_ctrl[0].upper()+lower_eyelid_ctrl[1:].replace("Ctrl", "00_Net")+".inputEnd", self.corrective_value)
                     else: #right
                         if cmds.getAttr(self.guide_base+".flip") == 0:
-                            cmds.setAttr(self.upperEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], 1)
-                            cmds.setAttr(self.upperEyelidCtrlZero+".rotateY", 180)
-                            cmds.setAttr(self.lowerEyelidCtrlZero+".rotateY", 180)
+                            cmds.setAttr(upper_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
+                            cmds.setAttr(lower_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
+                            cmds.setAttr(lower_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"Y", 1)
+                            cmds.setAttr(lower_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], 1)
+                            cmds.setAttr(upper_eyelid_ctrl_zero+".rotateY", 180)
+                            cmds.setAttr(lower_eyelid_ctrl_zero+".rotateY", 180)
                             if self.corrective:
-                                cmds.setAttr(self.lowerEyelidCtrl.replace("_Ctrl", "_00_Net")+".inputEnd", self.cValue)
+                                cmds.setAttr(lower_eyelid_ctrl[0].upper()+lower_eyelid_ctrl[1:].replace("Ctrl", "00_Net")+".inputEnd", self.corrective_value)
                         else:
-                            cmds.setAttr(self.upperEyelidCtrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], 1)
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
+                            cmds.setAttr(upper_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+self.ar.data.lang['c029_middle'], 1)
+                            cmds.setAttr(lower_eyelid_ctrl+"."+self.ar.data.lang['c053_invert']+"X", 1)
                             if self.corrective:
-                                cmds.setAttr(self.upperEyelidCtrl.replace("_Ctrl", "_00_Net")+".inputEnd", self.cValue)
+                                cmds.setAttr(upper_eyelid_ctrl[0].upper()+upper_eyelid_ctrl[1:].replace("Ctrl", "00_Net")+".inputEnd", self.corrective_value)
                     # set eyelid scale by Base control attribute:
-                    cmds.addAttr(self.baseEyeCtrl, longName=self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
-                    cmds.connectAttr(self.baseEyeCtrl+"."+self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], self.eyelidJxt+".scaleX", force=True)
-                    cmds.connectAttr(self.baseEyeCtrl+"."+self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], self.eyelidJxt+".scaleY", force=True)
-                    cmds.connectAttr(self.baseEyeCtrl+"."+self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], self.eyelidJxt+".scaleZ", force=True)
+                    cmds.addAttr(self.base_eye_ctrl, longName=self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
+                    cmds.connectAttr(self.base_eye_ctrl+"."+self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], self.eyelid_jxt+".scaleX", force=True)
+                    cmds.connectAttr(self.base_eye_ctrl+"."+self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], self.eyelid_jxt+".scaleY", force=True)
+                    cmds.connectAttr(self.base_eye_ctrl+"."+self.ar.data.lang['c042_eyelid'].lower()+self.ar.data.lang['i115_size'], self.eyelid_jxt+".scaleZ", force=True)
                     
                 # create iris setup:
                 if self.get_guide_attr(IRIS):
-                    self.irisCtrl = self.createIrisPupilSetup(s, side, IRIS, 'i080_iris', s+self.joint_label_add)
-                    self.irisCtrlList.append(self.irisCtrl)
-                    self.hasIris = True
+                    self.iris_ctrl = self.create_iris_pupil_setup(s, side, IRIS, 'i080_iris', s+self.joint_label_add)
+                    self.iris_ctrls.append(self.iris_ctrl)
+                    self.has_iris = True
                     
                 # create pupil setup:
                 if self.get_guide_attr(PUPIL):
-                    self.pupilCtrl = self.createIrisPupilSetup(s, side, PUPIL, 'i081_pupil', s+self.joint_label_add)
-                    self.pupilCtrlList.append(self.pupilCtrl)
-                    self.hasPupil = True
+                    self.pupil_ctrl = self.create_iris_pupil_setup(s, side, PUPIL, 'i081_pupil', s+self.joint_label_add)
+                    self.pupil_ctrls.append(self.pupil_ctrl)
+                    self.has_pupil = True
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.create_hook_setup(side, [eyeZeroList[0]], [self.jxt, self.eyeScaleGrp])
+                self.create_hook_setup(side, [eye_zeros[0]], [self.jxt, self.eye_scale_grp])
                 if s == 0:
-                    cmds.parent(self.eyeGrp, self.ctrl_hook_grp)
-                    cmds.parent(self.upLocGrp, self.scalable_hook_grp)
+                    cmds.parent(self.eye_grp, self.ctrl_hook_grp)
+                    cmds.parent(self.up_loc_grp, self.scalable_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
-                self.ar.utils.addCustomAttr([self.eyeGrp, self.upLocGrp, self.lUpGrpLoc, self.eyeScaleGrp], self.ar.utils.ignoreTransformIOAttr)
+                self.ar.utils.addCustomAttr([self.eye_grp, self.up_loc_grp, left_up_grp_loc, self.eye_scale_grp], self.ar.utils.ignoreTransformIOAttr)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
@@ -720,12 +687,12 @@ class Eye(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "eyeCtrl"     : self.eyeCtrl,
-                            "eyeGrp"      : self.eyeGrp,
-                            "upLocGrp"    : self.upLocGrp,
-                            "eyeScaleGrp" : self.eyeScaleGrpList,
-                            "irisCtrl"    : self.irisCtrlList,
-                            "pupilCtrl"   : self.pupilCtrlList,
-                            "hasIris"     : self.hasIris,
-                            "hasPupil"    : self.hasPupil,
+                            "eyeCtrl"     : self.eye_ctrl,
+                            "eyeGrp"      : self.eye_grp,
+                            "upLocGrp"    : self.up_loc_grp,
+                            "eyeScaleGrp" : self.eye_scale_grps,
+                            "irisCtrl"    : self.iris_ctrls,
+                            "pupilCtrl"   : self.pupil_ctrls,
+                            "hasIris"     : self.has_iris,
+                            "hasPupil"    : self.has_pupil,
                         }

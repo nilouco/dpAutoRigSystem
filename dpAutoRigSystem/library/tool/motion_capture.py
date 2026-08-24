@@ -576,9 +576,9 @@ class MotionCapture(base.BaseLibrary):
         if controllers:
             for ctrl in controllers:
                 self.lockAutoRotateAttr(ctrl, True)
-                zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                zero_grp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.ar.data.axes:
-                    cmds.mute(zeroGrp+".rotate"+axis, force=True)
+                    cmds.mute(zero_grp+".rotate"+axis, force=True)
         print(self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
 
 
@@ -657,10 +657,10 @@ class MotionCapture(base.BaseLibrary):
         fingerCtrlList.extend(self.ar.ctrls.getControlNodeById("id_016_FingerFk"))
         if fingerCtrlList:
             fingerCtrlList = [f for f in fingerCtrlList if not "_00_" in f and not self.ar.data.lang['m036_thumb'] in f]
-            for fingerCtrl in fingerCtrlList:
-                zeroGrp = fingerCtrl.replace("_Ctrl", "_SDK_Zero_0_Grp")
-                if cmds.objExists(zeroGrp):
-                    cmds.setAttr(fingerCtrl+".rotateY", (-1)*cmds.getAttr(zeroGrp+".rotateY"))
+            for finger_ctrl in fingerCtrlList:
+                zero_grp = finger_ctrl.replace("_Ctrl", "_SDK_Zero_0_Grp")
+                if cmds.objExists(zero_grp):
+                    cmds.setAttr(finger_ctrl+".rotateY", (-1)*cmds.getAttr(zero_grp+".rotateY"))
         # ik
         optCtrl = self.ar.utils.getNodeByMessage("optionCtrl")
         if optCtrl:
@@ -795,9 +795,9 @@ class MotionCapture(base.BaseLibrary):
         if controllers:
             for ctrl in controllers:
                 self.lockAutoRotateAttr(ctrl, False)
-                zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                zero_grp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.ar.data.axes:
-                    cmds.mute(zeroGrp+".rotate"+axis, disable=True)
+                    cmds.mute(zero_grp+".rotate"+axis, disable=True)
             print(self.ar.data.lang['i046_remove']+" "+self.ar.data.lang['m249_muteAutoRotate']+" "+", ".join(controllers))
 
 
@@ -906,9 +906,9 @@ class HumanIKCleaner(object):
         if self.controllers:
             for ctrl in self.controllers:
                 self.lockAutoRotateAttr(ctrl, False)
-                zeroGrp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                zero_grp = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
                 for axis in self.ar.data.axes:
-                    cmds.mute(zeroGrp+".rotate"+axis, disable=True)
+                    cmds.mute(zero_grp+".rotate"+axis, disable=True)
             print("'''+self.ar.data.lang['i046_remove']+''' '''+self.ar.data.lang['m249_muteAutoRotate']+''' "+", ".join(self.controllers))
 
     def lockAutoRotateAttr(self, ctrl, value, *args):

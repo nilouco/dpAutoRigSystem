@@ -103,8 +103,8 @@ class Skinning(weights.Weights):
                             except:
                                 notSkinnedList.append(joint)
                     else: # None = create a new skinCluster node
-                        baseName = self.ar.utils.extractSuffix(geomSkin)
-                        skinClusterName = baseName+"_SC"
+                        base_name = self.ar.utils.extractSuffix(geomSkin)
+                        skinClusterName = base_name+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         newSkinClusterNode = cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)[0]

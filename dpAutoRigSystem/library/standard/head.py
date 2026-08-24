@@ -26,7 +26,7 @@ class Head(standard.BaseStandard):
         """ Just load class variables here.
         """
         self.declare_guide_elements(self.name_guide)
-        self.correctiveCtrlGrpList = []
+        self.corrective_ctrl_grps = []
         self.aInnerCtrls = []
         self.facialFactor = 0.15
     
@@ -470,15 +470,15 @@ class Head(standard.BaseStandard):
             cmds.setAttr(self.jawCtrl+"."+outputAttrName, lock=True)
 
     
-    def getCalibratePresetList(self, s, *args):
+    def get_calibrate_presets(self, s):
         """ Returns the calibration preset and invert lists for neck and head joints.
         """
-        invertList = [[], [], ["invertTX", "invertRY", "invertRZ"], [], []]
-        presetList = [{}, {"calibrateTX":1}, {"calibrateTX":1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
+        inverts = [[], [], ["invertTX", "invertRY", "invertRZ"], [], []]
+        presets = [{}, {"calibrateTX":1}, {"calibrateTX":1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
         if s == 1:
             if self.flip:
-                invertList = [[], ["invertTX"], ["invertTX"], ["invertTZ"], ["invertTZ"]]
-        return presetList, invertList
+                inverts = [[], ["invertTX"], ["invertTX"], ["invertTZ"], ["invertTZ"]]
+        return presets, inverts
 
 
     def autoRotateCalc(self, n, *args):
@@ -1023,8 +1023,8 @@ class Head(standard.BaseStandard):
                     if self.corrective:
                         # corrective controls group
                         self.corrective_ctrls_grp = cmds.group(name=side+self.number_name+"_Corrective_Grp", empty=True)
-                        self.correctiveCtrlGrpList.append(self.corrective_ctrls_grp)
-                        neckHeadCalibratePresetList, invertList = self.getCalibratePresetList(s)
+                        self.corrective_ctrl_grps.append(self.corrective_ctrls_grp)
+                        neckHeadCalibratePresetList, inverts = self.get_calibrate_presets(s)
                         
                         # neck corrective
                         for n in range(0, self.n_joints):
@@ -1032,20 +1032,20 @@ class Head(standard.BaseStandard):
                                 fatherJoint = neckBaseJzt
                             else:
                                 fatherJoint = self.neckJointList[n-1]
-                            correctiveNetList = [None]
-                            correctiveNetList.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_YawRight", 2, 2, -80))
-                            correctiveNetList.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_YawLeft", 2, 2, 80))
-                            correctiveNetList.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchUp", 0, 0, 80))
-                            correctiveNetList.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchDown", 0, 0, -80))
+                            corrective_nets = [None]
+                            corrective_nets.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_YawRight", 2, 2, -80))
+                            corrective_nets.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_YawLeft", 2, 2, 80))
+                            corrective_nets.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchUp", 0, 0, 80))
+                            corrective_nets.append(self.setup_corrective_net(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchDown", 0, 0, -80))
                             
-                            articJntList = self.ar.utils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
-                            self.setup_corrective_controllers(articJntList, s, neckCtrlBaseName+"_"+str(n), correctiveNetList, neckHeadCalibratePresetList, invertList, [False, True, True, False, False])
+                            articulation_joints = self.ar.utils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
+                            self.setup_corrective_controllers(articulation_joints, s, neckCtrlBaseName+"_"+str(n), corrective_nets, neckHeadCalibratePresetList, inverts, [False, True, True, False, False])
                             if s == 1:
                                 if self.flip:
-                                    cmds.setAttr(articJntList[0]+".scaleX", -1)
-                                    cmds.setAttr(articJntList[0]+".scaleY", -1)
-                                    cmds.setAttr(articJntList[0]+".scaleZ", -1)
-                            self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
+                                    cmds.setAttr(articulation_joints[0]+".scaleX", -1)
+                                    cmds.setAttr(articulation_joints[0]+".scaleY", -1)
+                                    cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
+                            self.ar.utils.setJointLabel(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
 
                         # head corrective
                         headCorrectiveNetList = [None]
@@ -1053,25 +1053,25 @@ class Head(standard.BaseStandard):
                         headCorrectiveNetList.append(self.setup_corrective_net(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.number_name+"_"+self.ar.data.lang['c024_head']+"_YawLeft", 2, 2, 80))
                         headCorrectiveNetList.append(self.setup_corrective_net(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.number_name+"_"+self.ar.data.lang['c024_head']+"_PitchUp", 0, 0, 80))
                         headCorrectiveNetList.append(self.setup_corrective_net(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.number_name+"_"+self.ar.data.lang['c024_head']+"_PitchDown", 0, 0, -80))
-                        headCalibratePresetList, invertList = self.getCalibratePresetList(s)
-                        articJntList = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
-                        self.setup_corrective_controllers(articJntList, s, side+self.number_name+"_"+self.ar.data.lang['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList, [False, True, True, False, False])
+                        headCalibratePresetList, inverts = self.get_calibrate_presets(s)
+                        articulation_joints = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
+                        self.setup_corrective_controllers(articulation_joints, s, side+self.number_name+"_"+self.ar.data.lang['c024_head'], headCorrectiveNetList, headCalibratePresetList, inverts, [False, True, True, False, False])
                         if s == 1:
                             if self.flip:
-                                cmds.setAttr(articJntList[0]+".scaleX", -1)
-                                cmds.setAttr(articJntList[0]+".scaleY", -1)
-                                cmds.setAttr(articJntList[0]+".scaleZ", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleX", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleY", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
                     else:
-                        articJntList = self.ar.utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
-                        self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
-                        cmds.rename(articJntList[0], side+self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
-                        articJntList = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt)
+                        articulation_joints = self.ar.utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
+                        self.ar.utils.setJointLabel(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
+                        cmds.rename(articulation_joints[0], side+self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
+                        articulation_joints = self.ar.utils.articulationJoint(self.neckJointList[-1], self.headJnt)
                     
                     self.neckJointList.insert(0, neckBaseJzt)
                     cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
                     cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
-                    self.ar.utils.setJointLabel(articJntList[0], s+self.joint_label_add, 18, self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
-                    cmds.rename(articJntList[0], side+self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
+                    self.ar.utils.setJointLabel(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
+                    cmds.rename(articulation_joints[0], side+self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
                 
                 # facial controls hierarchy
                 if cmds.getAttr(self.guide_base+".facial"):
@@ -1163,8 +1163,8 @@ class Head(standard.BaseStandard):
                 self.ar.utils.addCustomAttr([self.headOrientGrp, world_ref], self.ar.utils.ignoreTransformIOAttr)
                 if hasLips:
                     self.ar.utils.addCustomAttr([self.lLipGrp, self.rLipGrp], self.ar.utils.ignoreTransformIOAttr)
-                if self.correctiveCtrlGrpList:
-                    self.ar.utils.addCustomAttr(self.correctiveCtrlGrpList, self.ar.utils.ignoreTransformIOAttr)
+                if self.corrective_ctrl_grps:
+                    self.ar.utils.addCustomAttr(self.corrective_ctrl_grps, self.ar.utils.ignoreTransformIOAttr)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
                 
             # connect to facial controllers to blendShapes or facial joints
@@ -1447,7 +1447,7 @@ for net in cmds.ls(type="network"):
                             "InnerCtrls"           : self.aInnerCtrls,
                             "lCtrls"               : self.aLCtrls,
                             "rCtrls"               : self.aRCtrls,
-                            "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
+                            "correctiveCtrlGrpList": self.corrective_ctrl_grps,
                             "upperJawCtrlList"     : self.upperJawCtrlList,
                             "facialCtrlGrpList"    : self.facialCtrlGrpList
                         }

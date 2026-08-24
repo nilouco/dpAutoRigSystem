@@ -75,9 +75,9 @@ class Isolate(base.BaseLibrary):
         """ Function to run isolate setup.
         """
         # get father zero out transform node
-        zeroGrp = cmds.listRelatives(nodes[2], allParents=True, type="transform")[0]
+        zero_grp = cmds.listRelatives(nodes[2], allParents=True, type="transform")[0]
         # create parent constraint
-        pConst = cmds.parentConstraint(nodes[0], nodes[1], zeroGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zeroGrp+"_PaC")[0]
+        pConst = cmds.parentConstraint(nodes[0], nodes[1], zero_grp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zero_grp+"_PaC")[0]
         cmds.setAttr(pConst+".interpType", 0) #noFlip
         # add isolate attribute to selected control
         cmds.addAttr(nodes[2], longName=attr_name, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 

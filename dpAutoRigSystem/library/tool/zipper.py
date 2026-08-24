@@ -319,7 +319,7 @@ class Zipper(base.BaseLibrary):
         # calculate distance position based 1.0 from our control attribute:
         distPos = 1.0 / self.curveLength
         for c, curve in enumerate([self.firstCurve, self.secondCurve]):
-            baseName = self.ar.utils.extractSuffix(curve)
+            base_name = self.ar.utils.extractSuffix(curve)
             for i in range(0, self.curveLength+1):
                 lPosA = (i * distPos)
                 lPosB = (lPosA + distPos)
@@ -333,8 +333,8 @@ class Zipper(base.BaseLibrary):
                 if rPosA < 0:
                     rPosA = 0
                 # create setRange nodes:
-                crescentSR = cmds.createNode("setRange", name=baseName+"_"+crescentAttr+"_"+str(i)+"_SR")
-                decrescentSR = cmds.createNode("setRange", name=baseName+"_"+decrescentAttr+"_"+str(i)+"_SR")
+                crescentSR = cmds.createNode("setRange", name=base_name+"_"+crescentAttr+"_"+str(i)+"_SR")
+                decrescentSR = cmds.createNode("setRange", name=base_name+"_"+decrescentAttr+"_"+str(i)+"_SR")
                 # set values for serRange nodes:
                 cmds.setAttr(crescentSR+".oldMinX", lPosA)
                 cmds.setAttr(crescentSR+".oldMaxX", lPosB)
@@ -346,7 +346,7 @@ class Zipper(base.BaseLibrary):
                 cmds.connectAttr(self.zipperCtrl+"."+crescentAttr, crescentSR+".valueX", force=True)
                 cmds.connectAttr(self.zipperCtrl+"."+decrescentAttr, decrescentSR+".valueX", force=True)
                 # add values for two sides and auto too:
-                zipperPMA = cmds.createNode("plusMinusAverage", name=baseName+"_"+str(i)+"_PMA")
+                zipperPMA = cmds.createNode("plusMinusAverage", name=base_name+"_"+str(i)+"_PMA")
                 cmds.connectAttr(crescentSR+".outValueX", zipperPMA+".input1D[0]", force=True)
                 cmds.connectAttr(decrescentSR+".outValueX", zipperPMA+".input1D[1]", force=True)
                 # add auto setRange value:
@@ -355,7 +355,7 @@ class Zipper(base.BaseLibrary):
                 if i > halfCurveLength:
                     autoPosA = rPosA
                     autoPosB = rPosB
-                autoSR = cmds.createNode("setRange", name=baseName+"_"+autoAttr.capitalize()+"_"+str(i)+"_SR")
+                autoSR = cmds.createNode("setRange", name=base_name+"_"+autoAttr.capitalize()+"_"+str(i)+"_SR")
                 cmds.setAttr(autoSR+".oldMinX", autoPosA)
                 cmds.setAttr(autoSR+".oldMaxX", autoPosB)
                 cmds.setAttr(autoSR+".maxX", 1)
@@ -363,7 +363,7 @@ class Zipper(base.BaseLibrary):
                 cmds.connectAttr(autoOnOffMD+".outputX", autoSR+".valueX", force=True)
                 cmds.connectAttr(autoSR+".outValueX", zipperPMA+".input1D[2]", force=True)
                 # clamp max value to 1 in order to connect it to the blend setup
-                zipperClp = cmds.createNode("clamp", name=baseName+"_"+str(i)+"_Clp")
+                zipperClp = cmds.createNode("clamp", name=base_name+"_"+str(i)+"_Clp")
                 cmds.setAttr(zipperClp+".maxR", 1)
                 cmds.connectAttr(zipperPMA+".output1D", zipperClp+".inputR", force=True)
                 # output clamp value to blendShape node target weights:
