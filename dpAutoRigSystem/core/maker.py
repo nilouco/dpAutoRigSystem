@@ -159,7 +159,7 @@ class Maker(object):
         # TODO: change to unify style and type attributes        
         if "type" in current_attrs:
             typeValue = cmds.getAttr(selected_item+'.type')
-            new_guide_instance.changeType(typeValue)
+            new_guide_instance.change_type(typeValue)
         if "style" in current_attrs:
             styleValue = cmds.getAttr(selected_item+'.style')
             new_guide_instance.changeStyle(styleValue)
@@ -830,7 +830,6 @@ class Composer(object):
         elif item.name == self.ar.data.limb_name:
             self.limb_options(item)
             self.limb_spine(item, father)
-            self.limb_spring_solver(item)
         elif item.name == self.ar.data.spine_name:
             self.spine_options(item)
         elif item.name == self.ar.data.head_name:
@@ -1038,7 +1037,7 @@ class Composer(object):
                     limb_type_name = limb.composed['limbTypeName']
                     ik_ctrl_zero = limb.composed['ikCtrlZeroList'][s]
                     ik_polevector_ctrl_zero = limb.composed['ikPoleVectorZeroList'][s]
-                    limbStyle = limb.composed['limbStyle']
+                    limb_style = limb.composed['limbStyle']
                     ik_handle_grp = limb.composed['ikHandleGrpList'][s]
                     root_ctrl_refs = limb.composed['rootCtrlRefList']
                     # getting spine data:
@@ -1057,14 +1056,6 @@ class Composer(object):
                         self.to_ids.extend(cmds.parentConstraint(tip_ctrl, root_ctrl_refs[s], maintainOffset=True, name=root_ctrl_refs[s]+"_PaC"))
 
 
-    def limb_spring_solver(self, limb):
-        # fixing ikSpringSolver parenting for quadrupeds:
-        # getting limb data:
-        fix_ik_spring_solver_grp = limb.composed['fixIkSpringSolverGrpList']
-        if fix_ik_spring_solver_grp:
-            cmds.parent(fix_ik_spring_solver_grp, self.ar.maker.scalable_grp, absolute=True)
-            for node_to_fix in fix_ik_spring_solver_grp:
-                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, node_to_fix, name=node_to_fix+"_ScC"))
 
 
     def spine_options(self, spine):

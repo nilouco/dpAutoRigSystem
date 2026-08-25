@@ -186,7 +186,7 @@ class GuideUI(object):
         if 'type' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_type_rl', numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="rig_selected_module_cl")
             cmds.text('edit_guide_type_txt', label=self.ar.data.lang['m021_type'], parent='edit_guide_type_rl')
-            cmds.optionMenu('edit_guide_type_om', label='', changeCommand=standard.changeType, parent='edit_guide_type_rl')
+            cmds.optionMenu('edit_guide_type_om', label='', changeCommand=standard.change_type, parent='edit_guide_type_rl')
             for item in [self.ar.data.lang['m028_arm'], self.ar.data.lang['m030_leg']]: #typeMenuItemList
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_type_om')
             # read from guide attribute the current value to type:
@@ -385,8 +385,8 @@ class GuideUI(object):
             cmds.rowColumnLayout('edit_guide_bend_rcl', numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="rig_selected_module_cl")
             cmds.rowLayout('edit_guide_bend_rl', numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent='edit_guide_bend_rcl')
             cmds.text('edit_guide_bend_txt', label=self.ar.data.lang['m044_addBend'], visible=True, parent='edit_guide_bend_rl')
-            cmds.checkBox('edit_guide_bend_cb', value=standard.getHasBend(), label=' ', changeCommand=standard.changeBend, parent='edit_guide_bend_rl')
-            cmds.optionMenu('edit_guide_bend_num_om', label='Ribbon Joints', changeCommand=standard.changeNumBend, enable=standard.getHasBend(), parent='edit_guide_bend_rl')
+            cmds.checkBox('edit_guide_bend_cb', value=cmds.getAttr(standard.guide_base+'.hasBend'), label=' ', changeCommand=standard.change_bend, parent='edit_guide_bend_rl')
+            cmds.optionMenu('edit_guide_bend_num_om', label='Ribbon Joints', changeCommand=standard.change_bend_number, enable=cmds.getAttr(standard.guide_base+'.hasBend'), parent='edit_guide_bend_rl')
             bend_num_menus = [3, 5, 7]
             for item in bend_num_menus:
                 cmds.menuItem(f"{item}_mi", label=item, parent='edit_guide_bend_num_om')

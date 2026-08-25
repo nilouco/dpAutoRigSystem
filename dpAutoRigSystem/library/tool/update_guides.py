@@ -243,7 +243,7 @@ class UpdateGuides(base.BaseLibrary):
             elif attr == 'type':
                 currentInstance = self.getNewGuideInstance(guide)
                 expectedValue = self.translateLimbTypeValue(value)
-                currentInstance.changeType(expectedValue)
+                currentInstance.change_type(expectedValue)
             elif attr == 'mirrorAxis':
                 currentInstance = self.getNewGuideInstance(guide)
                 currentInstance.change_mirror(value)

@@ -195,9 +195,9 @@ class GuideIO(action.BaseAction):
                         elif base_attr == "nJoints":
                             self.instance.change_joint_number(self.net_data["GuideData"][item]["nJoints"])
                         elif base_attr == "type": #limb
-                            self.instance.changeType(self.net_data["GuideData"][item]["type"])
+                            self.instance.change_type(self.net_data["GuideData"][item]["type"])
                         elif base_attr == "hasBend": #limb
-                            self.instance.changeBend(self.net_data["GuideData"][item]["hasBend"])
+                            self.instance.change_bend(self.net_data["GuideData"][item]["hasBend"])
                         elif base_attr == "aimDirection": #eye
                             self.instance.change_aim_direction(self.ar.data.directions[(int(self.net_data["GuideData"][item]["aimDirection"]))])
                         elif base_attr == "fatherB": #suspention
