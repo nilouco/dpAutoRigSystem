@@ -14,21 +14,9 @@ class Single(standard.BaseStandard):
     def __init__(self, ar):
         standard.BaseStandard.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         # returned data from the dictionary
-        self.mainJisList = []
-        self.aStaticGrpList = []
-        self.aCtrlGrpList = []
-    
-    
-    def getHasIndirectSkin(self):
-        return cmds.getAttr(self.guide_base + ".indirectSkin")
-    
-    
-    def getHasHolder(self):
-        return cmds.getAttr(self.guide_base + ".holder")
-        
-    
-    def getHasSDKLocator(self):
-        return cmds.getAttr(self.guide_base + ".sdkLocator")
+        self.main_jis_items = []
+        self.static_grps = []
+        self.ctrl_grps = []
     
     
     def create_guide(self):
@@ -70,10 +58,9 @@ class Single(standard.BaseStandard):
         cmds.scaleConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_ScC")
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-        
 
     
-    def changeIndirectSkin(self, value, *args):
+    def change_indirectskin(self, value, *args):
         """ Set the attribute value for indirectSkin.
         """
         cmds.setAttr(self.guide_base+".indirectSkin", value)
@@ -82,8 +69,6 @@ class Single(standard.BaseStandard):
             cmds.setAttr(self.guide_base+".sdkLocator", 0)
         if self.ar.data.ui_state:
             self.ar.guide_ui.change_indirectskin_ui(value)
-            
-            
 
     
     def rig_me(self, *args):
@@ -99,130 +84,128 @@ class Single(standard.BaseStandard):
                 self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
                 self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # create a joint:
-                self.jnt = cmds.joint(name=side+self.number_name+"_Jnt", scaleCompensate=False)
-                cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name)
+                jnt = cmds.joint(name=side+self.number_name+"_Jnt", scaleCompensate=False)
+                cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name)
                 # create a control:
-                if not self.getHasIndirectSkin():
+                if not self.get_guide_attr('indirectSkin'):
                     if self.curve_degree == 0:
                         self.curve_degree = 1
                 # work with curve shape and rotation cases:
-                indirectSkinRot = (0, 0, 0)
+                indirectskin_rot = (0, 0, 0)
                 if self.ar.data.lang['c058_main'] in self.number_name:
-                    ctrlTypeID = "id_054_SingleMain"
+                    ctrl_type_id = "id_054_SingleMain"
                     if len(self.sides) > 1:
                         if self.ar.data.lang['c041_eyebrow'] in self.number_name:
-                            indirectSkinRot = (0, 0, -90)
+                            indirectskin_rot = (0, 0, -90)
                         else:
-                            indirectSkinRot = (0, 0, 90)
+                            indirectskin_rot = (0, 0, 90)
                 else:
-                    ctrlTypeID = "id_029_SingleIndSkin"
+                    ctrl_type_id = "id_029_SingleIndSkin"
                     if self.ar.data.lang['c045_lower'] in self.number_name:
-                        indirectSkinRot=(0, 0, 180)
+                        indirectskin_rot=(0, 0, 180)
                     elif self.ar.data.lang['c043_corner'] in self.number_name:
                         if "00" in self.number_name:
-                            indirectSkinRot=(0, 0, 90)
+                            indirectskin_rot=(0, 0, 90)
                         else:
-                            indirectSkinRot=(0, 0, -90)
-                self.singleCtrl = self.ar.ctrls.cvControl(ctrlTypeID, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
-                self.ar.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
+                            indirectskin_rot=(0, 0, -90)
+                single_ctrl = self.ar.ctrls.cvControl(ctrl_type_id, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectskin_rot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
+                self.ar.utils.originedFrom(objName=single_ctrl, attrString=self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
                 # position and orientation of joint and control:
-                cmds.matchTransform(self.jnt, self.guide, position=True, rotation=True)
-                cmds.matchTransform(self.singleCtrl, self.guide, position=True, rotation=True)
+                cmds.matchTransform(jnt, self.guide, position=True, rotation=True)
+                cmds.matchTransform(single_ctrl, self.guide, position=True, rotation=True)
                 # zeroOut controls:
-                zeroOutCtrlGrp = self.ar.utils.zeroOut([self.singleCtrl], offset=True)[0]
+                single_ctrl_zero = self.ar.utils.zeroOut([single_ctrl], offset=True)[0]
                 # hide visibility attribute:
-                cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
+                cmds.setAttr(single_ctrl+'.visibility', keyable=False)
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
-                        cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
-                        cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
-                if not self.getHasIndirectSkin():
-                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
-                    cmds.setAttr(self.singleCtrl+".scaleCompensate", channelBox=True)
-                    cmds.connectAttr(self.singleCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
-                if self.getHasIndirectSkin():
+                        cmds.setAttr(single_ctrl_zero+".scaleX", -1)
+                        cmds.setAttr(single_ctrl_zero+".scaleY", -1)
+                        cmds.setAttr(single_ctrl_zero+".scaleZ", -1)
+                if not self.get_guide_attr('indirectSkin'):
+                    cmds.addAttr(single_ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                    cmds.setAttr(single_ctrl+".scaleCompensate", channelBox=True)
+                    cmds.connectAttr(single_ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
+                if self.get_guide_attr('indirectSkin'):
                     # create fatherJoints in order to zeroOut the skinning joint:
                     cmds.select(clear=True)
-                    jxtName = self.jnt.replace("_Jnt", "_Jxt")
-                    jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
+                    jxt_name = jnt.replace("_Jnt", "_Jxt")
+                    jxt = cmds.duplicate(jnt, name=jxt_name)[0]
                     self.ar.utils.clearDpArAttr([jxt])
-                    cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
-                    cmds.parent(self.jnt, jxt)
+                    cmds.makeIdentity(jnt, apply=True, jointOrient=False)
+                    cmds.parent(jnt, jxt)
                     for attr in self.ar.data.transform_attrs[:-1]:
-                        cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr, force=True)
+                        cmds.connectAttr(single_ctrl+'.'+attr, jnt+'.'+attr, force=True)
                     # fix mirror issue: Maya 2026 release bug
                     if s == 1:
                         if cmds.getAttr(self.guide_base+".flip") == 1:
-                            invMD = cmds.createNode("multiplyDivide", name=jxtName.replace("_Jxt", "_Inv_MD"))
-                            for sAxis in self.ar.data.axes:
-                                cmds.setAttr(invMD+".input2"+sAxis, -1)
-                                cmds.connectAttr(self.singleCtrl+'.translate'+sAxis, invMD+'.input1'+sAxis, force=True)
-                                cmds.connectAttr(invMD+'.output'+sAxis, self.jnt+'.translate'+sAxis, force=True)
-                    if self.getHasHolder():
-                        cmds.delete(self.singleCtrl+"0Shape", shape=True)
-                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
-                        self.ar.utils.removeUserDefinedAttr(self.singleCtrl, True)
-                        #cmds.addAttr(self.singleCtrl, longName="dpHolder", attributeType="bool", defaultValue=1)
-                        #self.ar.custom_attr.addAttr("custom", [self.singleCtrl], "dpHolder")
-                        self.ar.utils.addCustomAttr([self.singleCtrl], "dpHolder")
-                        self.ar.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
-                        self.ar.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
+                            inv_md = cmds.createNode("multiplyDivide", name=jxt_name.replace("_Jxt", "_Inv_MD"))
+                            for axis in self.ar.data.axes:
+                                cmds.setAttr(inv_md+".input2"+axis, -1)
+                                cmds.connectAttr(single_ctrl+'.translate'+axis, inv_md+'.input1'+axis, force=True)
+                                cmds.connectAttr(inv_md+'.output'+axis, jnt+'.translate'+axis, force=True)
+                    if self.get_guide_attr('holder'):
+                        cmds.delete(single_ctrl+"0Shape", shape=True)
+                        single_ctrl = cmds.rename(single_ctrl, single_ctrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
+                        self.ar.utils.removeUserDefinedAttr(single_ctrl, True)
+                        self.ar.utils.addCustomAttr([single_ctrl], "dpHolder")
+                        self.ar.ctrls.setLockHide([single_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+                        jnt = cmds.rename(jnt, jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
+                        self.ar.ctrls.setLockHide([jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
-                        if self.getHasSDKLocator():
+                        if self.get_guide_attr('sdkLocator'):
                             if not self.ar.data.lang['c058_main'] in self.number_name:
                                 # this one will be used to receive inputs from sdk locator:
-                                sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
-                                sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
+                                sdk_jis_name = jnt.replace("_Jnt", "_SDK_Jis")
+                                sdk_jis = cmds.duplicate(jnt, name=sdk_jis_name)[0]
                                 # sdk locator:
-                                sdkLoc = cmds.spaceLocator(name=sdkJis.replace("_Jis", "_Loc"))[0]
-                                sdkLocGrp = cmds.group(sdkLoc, name=sdkLoc+"_Grp")
-                                cmds.matchTransform(sdkLocGrp, self.singleCtrl, position=True, rotation=True)
-                                cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
-                                sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
-                                self.to_ids.append(sdkLocMD)
-                                cmds.addAttr(sdkLoc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
-                                cmds.addAttr(sdkLoc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
-                                cmds.addAttr(sdkLoc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
-                                cmds.connectAttr(sdkLoc+".translateX", sdkLocMD+".input1X", force=True)
-                                cmds.connectAttr(sdkLoc+".translateY", sdkLocMD+".input1Y", force=True)
-                                cmds.connectAttr(sdkLoc+".translateZ", sdkLocMD+".input1Z", force=True)
-                                cmds.connectAttr(sdkLoc+".intensityX", sdkLocMD+".input2X", force=True)
-                                cmds.connectAttr(sdkLoc+".intensityY", sdkLocMD+".input2Y", force=True)
-                                cmds.connectAttr(sdkLoc+".intensityZ", sdkLocMD+".input2Z", force=True)
-                                cmds.connectAttr(sdkLocMD+".outputX", sdkLocGrp+".translateX", force=True)
-                                cmds.connectAttr(sdkLocMD+".outputY", sdkLocGrp+".translateY", force=True)
-                                cmds.connectAttr(sdkLocMD+".outputZ", sdkLocGrp+".translateZ", force=True)
-                                cmds.addAttr(self.singleCtrl, longName="displayLocator", attributeType="bool", keyable=False)
-                                cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
-                                cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
-                                cmds.setAttr(sdkLoc+".visibility", lock=True)
+                                sdk_loc = cmds.spaceLocator(name=sdk_jis.replace("_Jis", "_Loc"))[0]
+                                sdk_loc_grp = cmds.group(sdk_loc, name=sdk_loc+"_Grp")
+                                cmds.matchTransform(sdk_loc_grp, single_ctrl, position=True, rotation=True)
+                                cmds.parent(sdk_loc_grp, single_ctrl, relative=True)
+                                sdk_loc_md = cmds.createNode("multiplyDivide", name=sdk_loc+"_MD")
+                                self.to_ids.append(sdk_loc_md)
+                                cmds.addAttr(sdk_loc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
+                                cmds.addAttr(sdk_loc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
+                                cmds.addAttr(sdk_loc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
+                                cmds.connectAttr(sdk_loc+".translateX", sdk_loc_md+".input1X", force=True)
+                                cmds.connectAttr(sdk_loc+".translateY", sdk_loc_md+".input1Y", force=True)
+                                cmds.connectAttr(sdk_loc+".translateZ", sdk_loc_md+".input1Z", force=True)
+                                cmds.connectAttr(sdk_loc+".intensityX", sdk_loc_md+".input2X", force=True)
+                                cmds.connectAttr(sdk_loc+".intensityY", sdk_loc_md+".input2Y", force=True)
+                                cmds.connectAttr(sdk_loc+".intensityZ", sdk_loc_md+".input2Z", force=True)
+                                cmds.connectAttr(sdk_loc_md+".outputX", sdk_loc_grp+".translateX", force=True)
+                                cmds.connectAttr(sdk_loc_md+".outputY", sdk_loc_grp+".translateY", force=True)
+                                cmds.connectAttr(sdk_loc_md+".outputZ", sdk_loc_grp+".translateZ", force=True)
+                                cmds.addAttr(single_ctrl, longName="displayLocator", attributeType="bool", keyable=False)
+                                cmds.setAttr(single_ctrl+".displayLocator", 0, channelBox=True)
+                                cmds.connectAttr(single_ctrl+".displayLocator", sdk_loc+".visibility", force=True)
+                                cmds.setAttr(sdk_loc+".visibility", lock=True)
                                 for attr in self.ar.data.transform_attrs[:-1]:
-                                    cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
-                                cmds.setAttr(sdkLocGrp+".rotateX", 0)
-                                cmds.setAttr(sdkLocGrp+".rotateY", 0)
-                                cmds.setAttr(sdkLocGrp+".rotateZ", 0)
+                                    cmds.connectAttr(sdk_loc+'.'+attr, sdk_jis+'.'+attr)
+                                cmds.setAttr(sdk_loc_grp+".rotateX", 0)
+                                cmds.setAttr(sdk_loc_grp+".rotateY", 0)
+                                cmds.setAttr(sdk_loc_grp+".rotateZ", 0)
                         # rename indirectSkinning joint from Jnt to Jis:
-                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
+                        jnt = cmds.rename(jnt, jnt.replace("_Jnt", "_Jis"))
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
-                    cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
+                    cmds.parentConstraint(single_ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
                     # create scaleConstraint from ctrl to jnt:
-                    cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
+                    cmds.scaleConstraint(single_ctrl, jnt, maintainOffset=True, name=jnt+"_ScC")
                 # create end joint:
-                cmds.select(self.jnt)
+                cmds.select(jnt)
                 self.create_end_joint(side+self.number_name)
-                self.mainJisList.append(self.jnt)
+                self.main_jis_items.append(jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
-                if self.getHasIndirectSkin():
+                if self.get_guide_attr('indirectSkin'):
                     self.create_hook_setup(side, [side+self.number_name+"_Ctrl_Zero_0_Grp"], staticList=[side+self.number_name+"_Jxt"])
                 else:
                     self.create_hook_setup(side, [side+self.number_name+"_Ctrl_Zero_0_Grp"], [side+self.number_name+"_Jnt"])
-                self.aStaticGrpList.append(self.static_hook_grp)
-                self.aCtrlGrpList.append(self.ctrl_hook_grp)
+                self.static_grps.append(self.static_hook_grp)
+                self.ctrl_grps.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
@@ -240,7 +223,7 @@ class Single(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "mainJisList"   : self.mainJisList,
-                            "staticGrpList" : self.aStaticGrpList,
-                            "ctrlGrpList"   : self.aCtrlGrpList,
+                            "mainJisList"   : self.main_jis_items,
+                            "staticGrpList" : self.static_grps,
+                            "ctrlGrpList"   : self.ctrl_grps,
                         }

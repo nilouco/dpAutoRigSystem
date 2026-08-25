@@ -227,7 +227,7 @@ class GuideUI(object):
         if 'indirectSkin' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_indirectskin_rl', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
             cmds.text(" ", parent='edit_guide_indirectskin_rl')
-            cmds.checkBox('edit_guide_indirectskin_cb', label="Indirect Skinning", value=cmds.getAttr(standard.guide_base+".indirectSkin"), changeCommand=standard.changeIndirectSkin, parent='edit_guide_indirectskin_rl')
+            cmds.checkBox('edit_guide_indirectskin_cb', label="Indirect Skinning", value=cmds.getAttr(standard.guide_base+".indirectSkin"), changeCommand=standard.change_indirectskin, parent='edit_guide_indirectskin_rl')
             cmds.text(" ", parent='edit_guide_indirectskin_rl')
             cmds.checkBox('edit_guide_indirectskin_holder_cb', label=self.ar.data.lang['c046_holder'], value=cmds.getAttr(standard.guide_base+".holder"), enable=False, changeCommand=partial(standard.set_guide_attr, 'holder'), parent='edit_guide_indirectskin_rl')
             cmds.rowLayout('edit_guide_indirectskin_sdk_locator_rl', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
@@ -235,7 +235,7 @@ class GuideUI(object):
             cmds.text(" ", parent='edit_guide_indirectskin_sdk_locator_rl')
             cmds.text(" ", parent='edit_guide_indirectskin_sdk_locator_rl')
             cmds.checkBox('edit_guide_indirectskin_sdk_locator_cb', label="SDK Locator", value=cmds.getAttr(standard.guide_base+".sdkLocator"), enable=False, changeCommand=partial(standard.set_guide_attr, 'sdkLocator'), parent='edit_guide_indirectskin_sdk_locator_rl')
-            standard.changeIndirectSkin(cmds.getAttr(standard.guide_base+".indirectSkin"))
+            standard.change_indirectskin(cmds.getAttr(standard.guide_base+".indirectSkin"))
 
 
     def eyelid_layout(self, standard):
