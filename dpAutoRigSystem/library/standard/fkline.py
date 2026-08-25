@@ -40,8 +40,8 @@ class FkLine(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
@@ -77,7 +77,7 @@ class FkLine(standard.BaseStandard):
             if joint_number > self.current_joint_number:
                 for n in range(self.current_joint_number+1, joint_number+1):
                     # create another N cvJointLoc:
-                    self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                    self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
                     self.increment_joint_number(n)
                     self.add_node_to_guide_net([self.guide_loc], ["JointLoc"+str(n)])
             elif joint_number < self.current_joint_number:

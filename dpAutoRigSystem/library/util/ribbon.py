@@ -711,7 +711,7 @@ class Ribbon(object):
             
             # create extra control
             extraName = jnt[:-4] #removed _Jnt suffix
-            extraCtrl = self.ar.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.limbInstance.guide_base, parentTag=self.limbInstance.get_parent_to_tag(extraCtrlList))
+            extraCtrl = self.ar.ctrls.cvControl("id_040_RibbonExtra", ctrl_name=extraName+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.limbInstance.guide_base, parentTag=self.limbInstance.get_parent_to_tag(extraCtrlList))
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
@@ -767,7 +767,7 @@ class Ribbon(object):
                         self.ar.utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
-                        addCtrl = self.ar.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guideSource=self.limbInstance.guide_base)
+                        addCtrl = self.ar.ctrls.cvControl("id_088_LimbAdditional", ctrl_name=extraName+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guideSource=self.limbInstance.guide_base)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = self.ar.utils.zeroOut([addCtrl])[0]
                         cmds.matchTransform(addCtrlGrp, jad, position=True, rotation=True)

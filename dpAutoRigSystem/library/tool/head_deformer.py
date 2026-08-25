@@ -66,7 +66,7 @@ class HeadDeformer(base.BaseLibrary):
     def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, guideNet=None, ui=True, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
-        self.headCtrl = None
+        head_ctrl = None
         self.wellDone = True
         if ui:
             dialogName = self.dpHeadDeformerPromptDialog()
@@ -75,7 +75,7 @@ class HeadDeformer(base.BaseLibrary):
         # defining variables
         self.to_ids = []
         self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
-        self.headCtrl = ctrl
+        head_ctrl = ctrl
         deformerName = self.addDeformerInName(dialogName, True)
         clusterName = self.addDeformerInName(dialogName, False)
         mainCtrlName = deformerName+"_"+self.ar.data.lang["c058_main"]
@@ -351,19 +351,19 @@ class HeadDeformer(base.BaseLibrary):
                                     cmds.deformer(deformerName+"_FFD", edit=True, geometry=shape)
                                 
             # try to integrate to Head_Head_Sub_Ctrl
-            if not self.headCtrl:
+            if not head_ctrl:
                 if headSubCtrl:
                     if len(headSubCtrl) > 1:
                         mel.eval("warning" + "\"" + self.ar.data.lang["i075_moreOne"] + " Head control.\"" + ";")
                     else:
-                        self.headCtrl = headSubCtrl[0]
-            if self.headCtrl:
+                        head_ctrl = headSubCtrl[0]
+            if head_ctrl:
                 # correcting topSymetry pivot to match headCtrl pivot
-                cmds.matchTransform(topSymmetryCtrl, topClusterList[1], self.headCtrl, pivots=True)
+                cmds.matchTransform(topSymmetryCtrl, topClusterList[1], head_ctrl, pivots=True)
                 # setup hierarchy
-                headCtrlPosList = cmds.xform(self.headCtrl, query=True, rotatePivot=True, worldSpace=True)
+                headCtrlPosList = cmds.xform(head_ctrl, query=True, rotatePivot=True, worldSpace=True)
                 cmds.xform(dataGrp, translation=(headCtrlPosList[0], headCtrlPosList[1], headCtrlPosList[2]), worldSpace=True)
-                cmds.parent(mainCtrlGrp, self.headCtrl)
+                cmds.parent(mainCtrlGrp, head_ctrl)
             else:
                 mel.eval("warning" + "\"" + self.ar.data.lang["e020_notFoundHeadCtrl"] + "\"" + ";")
                 self.wellDone = False

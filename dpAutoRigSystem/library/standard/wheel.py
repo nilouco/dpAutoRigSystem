@@ -42,10 +42,10 @@ class Wheel(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
-        self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
-        self.cvInsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_InsideLoc", r=0.2, d=1, guide=True)
-        self.cvOutsideLoc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_OutsideLoc", r=0.2, d=1, guide=True)
+        self.cvCenterLoc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
+        self.cvFrontLoc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrl_name=self.name_guide+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
+        self.cvInsideLoc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_InsideLoc", r=0.2, d=1, guide=True)
+        self.cvOutsideLoc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_OutsideLoc", r=0.2, d=1, guide=True)
         # joints
         self.jGuideCenter = cmds.joint(name=self.name_guide+"_JGuideCenter", radius=0.001)
         self.jGuideFront = cmds.joint(name=self.name_guide+"_JGuideFront", radius=0.001)

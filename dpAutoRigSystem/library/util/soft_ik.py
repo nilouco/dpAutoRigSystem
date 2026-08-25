@@ -36,7 +36,7 @@ class SoftIk(object):
         self.ar = ar
 
 
-    def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skin_joints, distBetween, world_ref, stretch=True, axis="Z", *args):
+    def createSoftIk(self, userName, ctrl_name, ikhName, ikJointList, skin_joints, distBetween, world_ref, stretch=True, axis="Z", *args):
         """ Create the softIk setup for given parameters.
             Just a general function edited from Nick Miller code.
             Returns the softIk calibrate multiplyDivide node to receive the Option_Ctrl.rigScale output.
@@ -44,9 +44,9 @@ class SoftIk(object):
         self.to_ids = []
         softIkCalibValue = 0.02*cmds.getAttr(distBetween+".distance")
         # add the dSoft and softIk attributes on the controller:
-        cmds.addAttr(ctrlName, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
-        cmds.addAttr(ctrlName, longName="softIk_"+self.ar.data.lang['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
-        cmds.addAttr(ctrlName, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
+        cmds.addAttr(ctrl_name, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
+        cmds.addAttr(ctrl_name, longName="softIk_"+self.ar.data.lang['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
+        cmds.addAttr(ctrl_name, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
         
         # set up node network for softIk:
         self.calibrateMD = cmds.createNode("multiplyDivide", name=userName+"_SoftCalibrate_MD")
@@ -85,23 +85,23 @@ class SoftIk(object):
         cmds.setAttr(softIkRigScaleClp+".maxR", 1000000)
 
         # make connections:
-        cmds.connectAttr(ctrlName+".softIk_"+self.ar.data.lang['c111_calibrate'], self.calibrateMD+".input1X", force=True)
+        cmds.connectAttr(ctrl_name+".softIk_"+self.ar.data.lang['c111_calibrate'], self.calibrateMD+".input1X", force=True)
         cmds.connectAttr(self.calibrateMD+".outputX", softRmV+".outputMax", force=True)
-        cmds.connectAttr(ctrlName+".softIk", softRmV+".inputValue", force=True)
-        cmds.connectAttr(softRmV+".outValue", ctrlName+".softDistance", force=True)
-        cmds.connectAttr(ctrlName+".startChainLength", lengthStartMD+".input1X", force=True)
+        cmds.connectAttr(ctrl_name+".softIk", softRmV+".inputValue", force=True)
+        cmds.connectAttr(softRmV+".outValue", ctrl_name+".softDistance", force=True)
+        cmds.connectAttr(ctrl_name+".startChainLength", lengthStartMD+".input1X", force=True)
         cmds.connectAttr(lengthStartMD+".outputX", daMD+".input1D[0]", force=True)
-        cmds.connectAttr(ctrlName+"."+self.ar.data.lang["c113_length"], lengthStartMD+".input2X", force=True)
-        cmds.connectAttr(ctrlName+".softDistance", daMD+".input1D[1]", force=True)
+        cmds.connectAttr(ctrl_name+"."+self.ar.data.lang["c113_length"], lengthStartMD+".input2X", force=True)
+        cmds.connectAttr(ctrl_name+".softDistance", daMD+".input1D[1]", force=True)
         cmds.connectAttr(distBetween+".distance", xMinusDaPMA+".input1D[0]", force=True)
         cmds.connectAttr(daMD+".output1D", xMinusDaPMA+".input1D[1]", force=True)
         cmds.connectAttr(xMinusDaPMA+".output1D", negateXMinusMD+".input1X", force=True)
         cmds.connectAttr(negateXMinusMD+".outputX", divByDSoftMD+".input1X", force=True)
-        cmds.connectAttr(ctrlName+".softDistance", divByDSoftMD+".input2X", force=True)
+        cmds.connectAttr(ctrl_name+".softDistance", divByDSoftMD+".input2X", force=True)
         cmds.connectAttr(divByDSoftMD+".outputX", powEMD+".input2X", force=True)
         cmds.connectAttr(powEMD+".outputX", oneMinusPowEPMD+".input1D[1]", force=True)
         cmds.connectAttr(oneMinusPowEPMD+".output1D", timesDSoftMD+".input1X", force=True)
-        cmds.connectAttr(ctrlName+".softDistance", timesDSoftMD+".input2X", force=True)
+        cmds.connectAttr(ctrl_name+".softDistance", timesDSoftMD+".input2X", force=True)
         cmds.connectAttr(timesDSoftMD+".outputX", plusDAPMA+".input1D[0]", force=True)
         cmds.connectAttr(daMD+".output1D", plusDAPMA+".input1D[1]", force=True)
         cmds.connectAttr(daMD+".output1D", daCnd+".firstTerm", force=True)
@@ -115,7 +115,7 @@ class SoftIk(object):
         cmds.connectAttr(world_ref+".scaleX", softIkRigScaleMD+".input2X", force=True)
         cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
 
-        self.ar.ctrls.setLockHide([ctrlName], ["softDistance"])
+        self.ar.ctrls.setLockHide([ctrl_name], ["softDistance"])
 
         # if stretch exists, we need to do this...
         if stretch:
@@ -125,15 +125,15 @@ class SoftIk(object):
             self.to_ids.extend([softRatioMD, disableFkStretchMD, stretch_bc])
             cmds.setAttr(softRatioMD+".operation", 2) #divide
             cmds.setAttr(stretch_bc+".color2R", 1)
-            cmds.connectAttr(ctrlName+".stretchable", disableFkStretchMD+".input1X", force=True)
-            cmds.connectAttr(ctrlName+".disableIkFkRevOutputX", disableFkStretchMD+".input2X", force=True)
+            cmds.connectAttr(ctrl_name+".stretchable", disableFkStretchMD+".input1X", force=True)
+            cmds.connectAttr(ctrl_name+".disableIkFkRevOutputX", disableFkStretchMD+".input2X", force=True)
             cmds.connectAttr(disableFkStretchMD+".outputX", stretch_bc+".blender", force=True)
             cmds.connectAttr(distBetween+".distance", softRatioMD+".input1X", force=True)
             cmds.connectAttr(daCnd+".outColorR", softRatioMD+".input2X", force=True)
             cmds.connectAttr(distDiffPMA+".output1D", stretch_bc+".color2G", force=True)
             cmds.connectAttr(softRatioMD+".outputX", stretch_bc+".color1R", force=True)
             cmds.connectAttr(stretch_bc+".outputR", lenghtOutputMD+".input1X", force=True)
-            cmds.connectAttr(ctrlName+"."+self.ar.data.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
+            cmds.connectAttr(ctrl_name+"."+self.ar.data.lang["c113_length"], lenghtOutputMD+".input2X", force=True)
             cmds.connectAttr(stretch_bc+".outputG", softIkRigScaleClp+".inputR", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):

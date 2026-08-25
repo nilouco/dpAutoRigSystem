@@ -497,7 +497,7 @@ class Controllers(object):
         return ctrlModule
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, parentTag=None, *args):
+    def cvControl(self, ctrlType, ctrl_name, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, parentTag=None, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -516,7 +516,7 @@ class Controllers(object):
         controlInstance = self.ar.config.get_instance(ctrlModule, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
         if controlInstance:
             # create curve
-            curve = controlInstance.cv_main(False, ctrlType, ctrlName, r, d, dir, rot, 1)
+            curve = controlInstance.cv_main(False, ctrlType, ctrl_name, r, d, dir, rot, 1)
             if corrective:
                 self.addCorrectiveAttrs(curve)
                 self.ar.job.start_corrective_edit_mode([curve])
@@ -543,36 +543,36 @@ class Controllers(object):
                 cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
 
 
-    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", pin=True, *args):
+    def cvLocator(self, ctrl_name, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", pin=True, *args):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.ar.config.get_instance(cvType, [self.ar.data.curve_simple_folder, self.ar.data.curve_combined_folder])
-        curve = curveInstance.cv_main(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
+        curve = curveInstance.cv_main(False, cvType, ctrl_name, r, d, '+Y', rot, 1, guide)
         if guide:
             self.addGuideAttrs(curve, color, pin)
         return curve
 
 
     #@utils.profiler
-    def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, pin=True, *args):
+    def cvJointLoc(self, ctrl_name, r=0.3, d=1, rot=(0, 0, 0), guide=True, pin=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
         # create locator curve:
-        cvLoc = self.cvLocator(ctrlName+"_CvLoc", r, d)
+        cvLoc = self.cvLocator(ctrl_name+"_CvLoc", r, d)
         # create arrow curves:
-        cvArrow1 = cmds.curve(n=ctrlName+"_CvArrow1", d=3, p=[(-0.1*r, 0.9*r, 0.2*r), (-0.1*r, 0.9*r, 0.23*r), (-0.1*r, 0.9*r, 0.27*r), (-0.1*r, 0.9*r, 0.29*r), (-0.1*r, 0.9*r, 0.3*r), (-0.372*r, 0.9*r, 0.24*r), (-0.45*r, 0.9*r, -0.13*r), (-0.18*r, 0.9*r, -0.345*r), (-0.17*r, 0.9*r, -0.31*r), (-0.26*r, 0.9*r, -0.41*r), (-0.21*r, 0.9*r, -0.41*r), (-0.05*r, 0.9*r, -0.4*r), (0, 0.9*r, -0.4*r), (-0.029*r, 0.9*r, -0.33*r), (-0.048*r, 0.9*r, -0.22*r), (-0.055*r, 0.9*r, -0.16*r), (-0.15*r, 0.9*r, -0.272*r), (-0.12*r, 0.9*r, -0.27*r), (-0.35*r, 0.9*r, -0.1*r), (-0.29*r, 0.9*r, 0.15*r), (-0.16*r, 0.9*r, 0.21*r), (-0.1*r, 0.9*r, 0.2*r)] )
-        cvArrow2 = cmds.curve(n=ctrlName+"_CvArrow2", d=3, p=[(0.1*r, 0.9*r, -0.2*r), (0.1*r, 0.9*r, -0.23*r), (0.1*r, 0.9*r, -0.27*r), (0.1*r, 0.9*r, -0.29*r), (0.1*r, 0.9*r, -0.3*r), (0.372*r, 0.9*r, -0.24*r), (0.45*r, 0.9*r, 0.13*r), (0.18*r, 0.9*r, 0.345*r), (0.17*r, 0.9*r, 0.31*r), (0.26*r, 0.9*r, 0.41*r), (0.21*r, 0.9*r, 0.41*r), (0.05*r, 0.9*r, 0.4*r), (0, 0.9*r, 0.4*r), (0.029*r, 0.9*r, 0.33*r), (0.048*r, 0.9*r, 0.22*r), (0.055*r, 0.9*r, 0.16*r), (0.15*r, 0.9*r, 0.272*r), (0.12*r, 0.9*r, 0.27*r), (0.35*r, 0.9*r, 0.1*r), (0.29*r, 0.9*r, -0.15*r), (0.16*r, 0.9*r, -0.21*r), (0.1*r, 0.9*r, -0.2*r)] )
-        cvArrow3 = cmds.curve(n=ctrlName+"_CvArrow3", d=3, p=[(-0.1*r, -0.9*r, 0.2*r), (-0.1*r, -0.9*r, 0.23*r), (-0.1*r, -0.9*r, 0.27*r), (-0.1*r, -0.9*r, 0.29*r), (-0.1*r, -0.9*r, 0.3*r), (-0.372*r, -0.9*r, 0.24*r), (-0.45*r, -0.9*r, -0.13*r), (-0.18*r, -0.9*r, -0.345*r), (-0.17*r, -0.9*r, -0.31*r), (-0.26*r, -0.9*r, -0.41*r), (-0.21*r, -0.9*r, -0.41*r), (-0.05*r, -0.9*r, -0.4*r), (0, -0.9*r, -0.4*r), (-0.029*r, -0.9*r, -0.33*r), (-0.048*r, -0.9*r, -0.22*r), (-0.055*r, -0.9*r, -0.16*r), (-0.15*r, -0.9*r, -0.272*r), (-0.12*r, -0.9*r, -0.27*r), (-0.35*r, -0.9*r, -0.1*r), (-0.29*r, -0.9*r, 0.15*r), (-0.16*r, -0.9*r, 0.21*r), (-0.1*r, -0.9*r, 0.2*r)] )
-        cvArrow4 = cmds.curve(n=ctrlName+"_CvArrow4", d=3, p=[(0.1*r, -0.9*r, -0.2*r), (0.1*r, -0.9*r, -0.23*r), (0.1*r, -0.9*r, -0.27*r), (0.1*r, -0.9*r, -0.29*r), (0.1*r, -0.9*r, -0.3*r), (0.372*r, -0.9*r, -0.24*r), (0.45*r, -0.9*r, 0.13*r), (0.18*r, -0.9*r, 0.345*r), (0.17*r, -0.9*r, 0.31*r), (0.26*r, -0.9*r, 0.41*r), (0.21*r, -0.9*r, 0.41*r), (0.05*r, -0.9*r, 0.4*r), (0, -0.9*r, 0.4*r), (0.029*r, -0.9*r, 0.33*r), (0.048*r, -0.9*r, 0.22*r), (0.055*r, -0.9*r, 0.16*r), (0.15*r, -0.9*r, 0.272*r), (0.12*r, -0.9*r, 0.27*r), (0.35*r, -0.9*r, 0.1*r), (0.29*r, -0.9*r, -0.15*r), (0.16*r, -0.9*r, -0.21*r), (0.1*r, -0.9*r, -0.2*r)] )
-        cvArrow5 = cmds.curve(n=ctrlName+"_CvArrow5", d=1, p=[(0, 0, 1.2*r), (0.09*r, 0, 1*r), (-0.09*r, 0, 1*r), (0, 0, 1.2*r)] )
-        cvArrow6 = cmds.curve(n=ctrlName+"_CvArrow6", d=1, p=[(0, 0, 1.2*r), (0, 0.09*r, 1*r), (0, -0.09*r, 1*r), (0, 0, 1.2*r)] )
+        cvArrow1 = cmds.curve(n=ctrl_name+"_CvArrow1", d=3, p=[(-0.1*r, 0.9*r, 0.2*r), (-0.1*r, 0.9*r, 0.23*r), (-0.1*r, 0.9*r, 0.27*r), (-0.1*r, 0.9*r, 0.29*r), (-0.1*r, 0.9*r, 0.3*r), (-0.372*r, 0.9*r, 0.24*r), (-0.45*r, 0.9*r, -0.13*r), (-0.18*r, 0.9*r, -0.345*r), (-0.17*r, 0.9*r, -0.31*r), (-0.26*r, 0.9*r, -0.41*r), (-0.21*r, 0.9*r, -0.41*r), (-0.05*r, 0.9*r, -0.4*r), (0, 0.9*r, -0.4*r), (-0.029*r, 0.9*r, -0.33*r), (-0.048*r, 0.9*r, -0.22*r), (-0.055*r, 0.9*r, -0.16*r), (-0.15*r, 0.9*r, -0.272*r), (-0.12*r, 0.9*r, -0.27*r), (-0.35*r, 0.9*r, -0.1*r), (-0.29*r, 0.9*r, 0.15*r), (-0.16*r, 0.9*r, 0.21*r), (-0.1*r, 0.9*r, 0.2*r)] )
+        cvArrow2 = cmds.curve(n=ctrl_name+"_CvArrow2", d=3, p=[(0.1*r, 0.9*r, -0.2*r), (0.1*r, 0.9*r, -0.23*r), (0.1*r, 0.9*r, -0.27*r), (0.1*r, 0.9*r, -0.29*r), (0.1*r, 0.9*r, -0.3*r), (0.372*r, 0.9*r, -0.24*r), (0.45*r, 0.9*r, 0.13*r), (0.18*r, 0.9*r, 0.345*r), (0.17*r, 0.9*r, 0.31*r), (0.26*r, 0.9*r, 0.41*r), (0.21*r, 0.9*r, 0.41*r), (0.05*r, 0.9*r, 0.4*r), (0, 0.9*r, 0.4*r), (0.029*r, 0.9*r, 0.33*r), (0.048*r, 0.9*r, 0.22*r), (0.055*r, 0.9*r, 0.16*r), (0.15*r, 0.9*r, 0.272*r), (0.12*r, 0.9*r, 0.27*r), (0.35*r, 0.9*r, 0.1*r), (0.29*r, 0.9*r, -0.15*r), (0.16*r, 0.9*r, -0.21*r), (0.1*r, 0.9*r, -0.2*r)] )
+        cvArrow3 = cmds.curve(n=ctrl_name+"_CvArrow3", d=3, p=[(-0.1*r, -0.9*r, 0.2*r), (-0.1*r, -0.9*r, 0.23*r), (-0.1*r, -0.9*r, 0.27*r), (-0.1*r, -0.9*r, 0.29*r), (-0.1*r, -0.9*r, 0.3*r), (-0.372*r, -0.9*r, 0.24*r), (-0.45*r, -0.9*r, -0.13*r), (-0.18*r, -0.9*r, -0.345*r), (-0.17*r, -0.9*r, -0.31*r), (-0.26*r, -0.9*r, -0.41*r), (-0.21*r, -0.9*r, -0.41*r), (-0.05*r, -0.9*r, -0.4*r), (0, -0.9*r, -0.4*r), (-0.029*r, -0.9*r, -0.33*r), (-0.048*r, -0.9*r, -0.22*r), (-0.055*r, -0.9*r, -0.16*r), (-0.15*r, -0.9*r, -0.272*r), (-0.12*r, -0.9*r, -0.27*r), (-0.35*r, -0.9*r, -0.1*r), (-0.29*r, -0.9*r, 0.15*r), (-0.16*r, -0.9*r, 0.21*r), (-0.1*r, -0.9*r, 0.2*r)] )
+        cvArrow4 = cmds.curve(n=ctrl_name+"_CvArrow4", d=3, p=[(0.1*r, -0.9*r, -0.2*r), (0.1*r, -0.9*r, -0.23*r), (0.1*r, -0.9*r, -0.27*r), (0.1*r, -0.9*r, -0.29*r), (0.1*r, -0.9*r, -0.3*r), (0.372*r, -0.9*r, -0.24*r), (0.45*r, -0.9*r, 0.13*r), (0.18*r, -0.9*r, 0.345*r), (0.17*r, -0.9*r, 0.31*r), (0.26*r, -0.9*r, 0.41*r), (0.21*r, -0.9*r, 0.41*r), (0.05*r, -0.9*r, 0.4*r), (0, -0.9*r, 0.4*r), (0.029*r, -0.9*r, 0.33*r), (0.048*r, -0.9*r, 0.22*r), (0.055*r, -0.9*r, 0.16*r), (0.15*r, -0.9*r, 0.272*r), (0.12*r, -0.9*r, 0.27*r), (0.35*r, -0.9*r, 0.1*r), (0.29*r, -0.9*r, -0.15*r), (0.16*r, -0.9*r, -0.21*r), (0.1*r, -0.9*r, -0.2*r)] )
+        cvArrow5 = cmds.curve(n=ctrl_name+"_CvArrow5", d=1, p=[(0, 0, 1.2*r), (0.09*r, 0, 1*r), (-0.09*r, 0, 1*r), (0, 0, 1.2*r)] )
+        cvArrow6 = cmds.curve(n=ctrl_name+"_CvArrow6", d=1, p=[(0, 0, 1.2*r), (0, 0.09*r, 1*r), (0, -0.09*r, 1*r), (0, 0, 1.2*r)] )
         # rename curveShape:
         locArrowList = [cvLoc, cvArrow1, cvArrow2, cvArrow3, cvArrow4, cvArrow5, cvArrow6]
         self.renameShape(locArrowList)
         # create ball curve:
-        cvTemplateBall = self.cvControl("Ball", ctrlName+"_CvBall", r=0.7*r, d=3)
+        cvTemplateBall = self.cvControl("Ball", ctrl_name+"_CvBall", r=0.7*r, d=3)
         # parent shapes to transform:
-        locCtrl = cmds.group(name=ctrlName, empty=True)
+        locCtrl = cmds.group(name=ctrl_name, empty=True)
         ballChildrenList = cmds.listRelatives(cvTemplateBall, shapes=True, children=True)
         for ballChildren in ballChildrenList:
             cmds.setAttr(ballChildren+".template", 1)
@@ -590,12 +590,12 @@ class Controllers(object):
         return locCtrl
 
 
-    def cvCharacter(self, ctrlType, ctrlName, r=1, d=1, dir="+Y", rot=(0, 0, 0), *args):
+    def cvCharacter(self, ctrlType, ctrl_name, r=1, d=1, dir="+Y", rot=(0, 0, 0), *args):
         """ Create and return a curve to be used as a control.
         """
         # get radius by checking linear unit
         #r = self.dpCheckLinearUnit(r)
-        curve = self.cvControl(ctrlType, ctrlName, r, d, dir, rot)
+        curve = self.cvControl(ctrlType, ctrl_name, r, d, dir, rot)
         # edit a minime curve:
         cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True, minValue=0.001)
         cmds.addAttr(curve, longName="rigScaleMultiplier", attributeType='float', defaultValue=1, keyable=False)
@@ -646,15 +646,15 @@ class Controllers(object):
             return found_histories
 
 
-    def cvBaseGuide(self, ctrlName, r=1, *args):
+    def cvBaseGuide(self, ctrl_name, r=1, *args):
         """Create a control to be used as a Base Guide control.
             Returns the main control (circle) and the radius control in a list.
         """
         # get radius by checking linear unit
         #r = self.dpCheckLinearUnit(r)
         # create a simple circle curve:
-        circle = cmds.circle(n=ctrlName, ch=True, o=True, nr=(0, 0, 1), d=3, s=8, radius=r)[0]
-        radius_ctrl = cmds.circle(n=ctrlName+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
+        circle = cmds.circle(n=ctrl_name, ch=True, o=True, nr=(0, 0, 1), d=3, s=8, radius=r)[0]
+        radius_ctrl = cmds.circle(n=ctrl_name+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
         # rename curveShape:
         self.renameShape([circle, radius_ctrl])
         # configure system of limits and radius:
@@ -1097,19 +1097,19 @@ class Controllers(object):
         cmds.parent(clusterHandle, self.ar.data.temp_grp)
 
 
-    def addGuideAttrs(self, ctrlName, color="blue", pin=True, *args):
+    def addGuideAttrs(self, ctrl_name, color="blue", pin=True, *args):
         """ Add and set attributes to this control curve be used as a guide.
         """
         # create an attribute to be used as guide by module:
-        cmds.addAttr(ctrlName, longName="nJoint", attributeType='long')
-        cmds.setAttr(ctrlName+".nJoint", 1)
+        cmds.addAttr(ctrl_name, longName="nJoint", attributeType='long')
+        cmds.setAttr(ctrl_name+".nJoint", 1)
         # colorize curveShapes:
-        self.colorShape([ctrlName], color)
+        self.colorShape([ctrl_name], color)
         # shapeSize setup:
-        self.shapeSizeSetup(ctrlName)
+        self.shapeSizeSetup(ctrl_name)
         # pinGuide:
         if pin:
-            self.ar.job.create_pin_guide(ctrlName)
+            self.ar.job.create_pin_guide(ctrl_name)
 
 
     def importCalibration(self, *args):
@@ -1439,13 +1439,13 @@ class Controllers(object):
         return jcrCtrl, jcrGrp1
 
 
-    def addCorrectiveAttrs(self, ctrlName, *args):
+    def addCorrectiveAttrs(self, ctrl_name, *args):
         """ Add and set attributes to this control curve be used as a corrective controller.
         """
-        cmds.addAttr(ctrlName, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        cmds.addAttr(ctrl_name, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # create an attribute to be used as editMode by module:
-        cmds.addAttr(ctrlName, longName="editMode", attributeType="bool", keyable=False)
-        cmds.setAttr(ctrlName+".editMode", channelBox=True)
+        cmds.addAttr(ctrl_name, longName="editMode", attributeType="bool", keyable=False)
+        cmds.setAttr(ctrl_name+".editMode", channelBox=True)
 
 
     def displayRotateOrderAttr(self, controllers, *args):

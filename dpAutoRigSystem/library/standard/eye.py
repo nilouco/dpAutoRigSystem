@@ -52,14 +52,14 @@ class Eye(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrlName=self.name_guide+"_JointEnd", r=0.5, d=1, rot=(-90, 0, -90))
-        self.guide_lid_pivot_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LidPivotLoc", r=0.5, d=1, guide=True)
-        self.guide_upper_eyelid_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_UpperEyelidLoc", r=0.2, d=1, guide=True)
-        self.guide_lower_eyelid_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_LowerEyelidLoc", r=0.2, d=1, guide=True)
-        self.guide_iris_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_IrisLoc", r=0.15, d=1, guide=True)
-        self.guide_pupil_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_PupilLoc", r=0.12, d=1, guide=True)
-        self.guide_specular_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_SpecularLoc", r=0.12, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvControl("id_059_AimLoc", ctrl_name=self.name_guide+"_JointEnd", r=0.5, d=1, rot=(-90, 0, -90))
+        self.guide_lid_pivot_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_LidPivotLoc", r=0.5, d=1, guide=True)
+        self.guide_upper_eyelid_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_UpperEyelidLoc", r=0.2, d=1, guide=True)
+        self.guide_lower_eyelid_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_LowerEyelidLoc", r=0.2, d=1, guide=True)
+        self.guide_iris_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_IrisLoc", r=0.15, d=1, guide=True)
+        self.guide_pupil_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_PupilLoc", r=0.12, d=1, guide=True)
+        self.guide_specular_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_SpecularLoc", r=0.12, d=1, guide=True)
         self.guide_up_loc = cmds.spaceLocator(name=self.guide_end_loc+"_UpLoc")[0]
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
@@ -465,7 +465,7 @@ class Eye(standard.BaseStandard):
                 self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 if s == 1:
                     left_eye_fk_ctrl_data = self.ar.utils.getTransformData(fk_eye_ctrl)
-                self.base_eye_ctrl = self.ar.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1")
+                self.base_eye_ctrl = self.ar.ctrls.cvControl("id_009_EyeBase", ctrl_name=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1")
                 fk_eye_ctrl = self.ar.ctrls.cvControl("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=self.base_eye_ctrl)
                 self.fk_eye_sub_ctrl = self.ar.ctrls.cvControl("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_JointLoc1", parentTag=fk_eye_ctrl)
                 self.ar.utils.originedFrom(objName=fk_eye_ctrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
@@ -566,7 +566,7 @@ class Eye(standard.BaseStandard):
                     self.create_end_joint(side+self.number_name+'Specular', eye_spec_scale_jnt, tz=0.2*self.radius)
                     cmds.parent(eye_spec_jnt, self.eye_scale_jnt)
                     # specular control:
-                    eye_spec_ctrl = self.ar.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.fk_eye_sub_ctrl)
+                    eye_spec_ctrl = self.ar.ctrls.cvControl("id_071_EyeSpec", ctrl_name=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=self.fk_eye_sub_ctrl)
                     cmds.matchTransform(eye_spec_ctrl, self.guide, position=True, rotation=True)
                     eye_spec_zero_grp = self.ar.utils.zeroOut([eye_spec_ctrl])[0]
                     cmds.parent(eye_spec_zero_grp, self.base_eye_ctrl)
@@ -581,7 +581,7 @@ class Eye(standard.BaseStandard):
                     cmds.connectAttr(eye_spec_ctrl+"."+self.ar.data.lang['c032_follow'], eye_spec_follow_rev+".inputX", force=True)
                     cmds.connectAttr(eye_spec_follow_rev+".outputX", follow_spec_pac+"."+self.base_eye_ctrl+"W1", force=True)
                     # specular scale control:
-                    eye_spec_scale_ctrl = self.ar.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=eye_spec_ctrl)
+                    eye_spec_scale_ctrl = self.ar.ctrls.cvControl("id_091_EyeSpecScale", ctrl_name=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, headDef=self.head_def_value, guideSource=self.name_guide+"_SpecularLoc", parentTag=eye_spec_ctrl)
                     cmds.matchTransform(eye_spec_scale_ctrl, self.guide_specular_loc, position=True, rotation=True)
                     if s == 1:
                         no_wsl_eye_spec_scale_zero_grp_data = self.ar.utils.getTransformData(eye_spec_scale_zero_grp, useWorldSpace=False)

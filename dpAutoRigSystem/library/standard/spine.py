@@ -25,7 +25,7 @@ class Spine(standard.BaseStandard):
         self.aActVolVariationAttrList = []
         self.aMScaleVolVariationAttrList = []
         self.aIkFkBlendAttrList = []
-        self.aInnerCtrls = []
+        self.inner_ctrls = []
         self.aOuterCtrls = []
         self.aRbnJointList = []
         self.aClusterGrp = []
@@ -53,8 +53,8 @@ class Spine(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLoc1", r=0.5, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.5, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         # setup
@@ -94,7 +94,7 @@ class Spine(standard.BaseStandard):
                     # add the new cvLocators:
                     for n in range(self.current_joint_number+1, joint_number+1):
                         # create another N cvLocator:
-                        self.cvLocator = self.ar.ctrls.cvLocator(ctrlName=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                        self.cvLocator = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
                         self.line = cmds.joint(name=self.name_guide+"_JGuide"+str(n), radius=0.001)
                         # set its nJoint value as n:
                         cmds.setAttr(self.line+".template", 1)
@@ -165,11 +165,11 @@ class Spine(standard.BaseStandard):
                 # get the number of joints to be created:
                 self.n_joints = cmds.getAttr(self.base+".nJoints")
                 # create controls:
-                self.hipsACtrl = self.ar.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.number_name+"_"+hipsName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
-                self.chestACtrl = self.ar.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.number_name+"_"+chestName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
+                self.hipsACtrl = self.ar.ctrls.cvControl("id_041_SpineHipsA", ctrl_name=side+self.number_name+"_"+hipsName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
+                self.chestACtrl = self.ar.ctrls.cvControl("id_044_SpineChestA", ctrl_name=side+self.number_name+"_"+chestName+"A_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
                 # create start and end Fk controls:
-                self.hipsFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.number_name+"_"+hipsName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc1")
-                self.chestFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.number_name+"_"+chestName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
+                self.hipsFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrl_name=side+self.number_name+"_"+hipsName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc1")
+                self.chestFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", ctrl_name=side+self.number_name+"_"+chestName+"A_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_JointLoc"+str(self.n_joints))
                 # optimize controls CV shapes:
                 tempHipsACluster = cmds.cluster(self.hipsACtrl)[1]
                 cmds.setAttr(tempHipsACluster+".scaleY", 0.25)
@@ -239,7 +239,7 @@ class Spine(standard.BaseStandard):
                     cmds.setAttr(self.tipCtrl + ".rotateOrder", 3)
                 
                 # Keep a list of ctrls we want to colorize a certain way
-                self.aInnerCtrls.append([self.hipsBCtrl, self.chestBCtrl])
+                self.inner_ctrls.append([self.hipsBCtrl, self.chestBCtrl])
                 self.aOuterCtrls.append([self.hipsACtrl, self.chestACtrl, self.hipsFkCtrl, self.chestFkCtrl])
                 
                 # organize hierarchy:
@@ -404,7 +404,7 @@ class Spine(standard.BaseStandard):
                         self.middleFkCtrl = self.ar.ctrls.cvControl("id_067_SpineFk", side+self.number_name+"_"+self.ar.data.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, dir="+X", guideSource=self.name_guide+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 3)
                         cmds.setAttr(self.middleFkCtrl+".rotateOrder", 3)
-                    self.aInnerCtrls[s].append(self.middleCtrl)
+                    self.inner_ctrls[s].append(self.middleCtrl)
                     self.aOuterCtrls[s].append(self.middleFkCtrl)
                     self.ar.ctrls.setLockHide([self.middleCtrl, self.middleFkCtrl], ['sx', 'sy', 'sz'])
                     cmds.setAttr(self.middleCtrl+'.visibility', keyable=False)
@@ -521,16 +521,16 @@ class Spine(standard.BaseStandard):
     def addParentTagInfo(self, *args):
         """ Set the parentTag connections for existing controllers.
         """
-        for i in range(2, len(self.aInnerCtrls[0])-1):
-            cmds.connectAttr(self.aInnerCtrls[0][i+1]+".message", self.aInnerCtrls[0][i]+".parentTag", force=True) #middles
+        for i in range(2, len(self.inner_ctrls[0])-1):
+            cmds.connectAttr(self.inner_ctrls[0][i+1]+".message", self.inner_ctrls[0][i]+".parentTag", force=True) #middles
         for j in range(4, len(self.aOuterCtrls[0])-1):
             cmds.connectAttr(self.aOuterCtrls[0][j+1]+".message", self.aOuterCtrls[0][j]+".parentTag", force=True) #fks
-        cmds.connectAttr(self.aInnerCtrls[0][2]+".message", self.hipsBCtrl+".parentTag", force=True)
+        cmds.connectAttr(self.inner_ctrls[0][2]+".message", self.hipsBCtrl+".parentTag", force=True)
         cmds.connectAttr(self.hipsBCtrl+".message", self.hipsACtrl+".parentTag", force=True)
         cmds.connectAttr(self.hipsBCtrl+".message", self.baseCtrl+".parentTag", force=True)
         cmds.connectAttr(self.aOuterCtrls[0][4]+".message", self.hipsFkCtrl+".parentTag", force=True)
         cmds.connectAttr(self.chestFkCtrl+".message", self.aOuterCtrls[0][-1]+".parentTag", force=True)
-        cmds.connectAttr(self.chestBCtrl+".message", self.aInnerCtrls[0][-1]+".parentTag", force=True)
+        cmds.connectAttr(self.chestBCtrl+".message", self.inner_ctrls[0][-1]+".parentTag", force=True)
         cmds.connectAttr(self.tipCtrl+".message", self.chestFkCtrl+".parentTag", force=True)
         cmds.connectAttr(self.chestBCtrl+".message", self.tipCtrl+".parentTag", force=True)
         cmds.connectAttr(self.chestACtrl+".message", self.chestBCtrl+".parentTag", force=True)
@@ -555,7 +555,7 @@ class Spine(standard.BaseStandard):
                             "ActiveVolumeVariationAttrList": self.aActVolVariationAttrList,
                             "MasterScaleVolumeVariationAttrList": self.aMScaleVolVariationAttrList,
                             "IkFkBlendAttrList": self.aIkFkBlendAttrList,
-                            "InnerCtrls": self.aInnerCtrls,
+                            "InnerCtrls": self.inner_ctrls,
                             "OuterCtrls": self.aOuterCtrls,
                             "jointList": self.aRbnJointList,
                             "scalableGrp": self.aClusterGrp,

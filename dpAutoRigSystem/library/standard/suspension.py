@@ -35,8 +35,8 @@ class Suspension(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.cvALoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
-        self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrlName=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
+        self.cvALoc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
+        self.cvBLoc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
         # joints
         self.jAGuide = cmds.joint(name=self.name_guide+"_jAGuide", radius=0.001)
         self.jBGuide = cmds.joint(name=self.name_guide+"_jBGuide", radius=0.001)

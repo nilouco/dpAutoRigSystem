@@ -282,10 +282,10 @@ class GuideUI(object):
         if 'jaw' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_head_items_rl', numberOfColumns=5, columnWidth5=(30, 75, 75, 75, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent="rig_selected_module_cl")
             cmds.text(" ", parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_jaw_cb', label=self.ar.data.lang['c025_jaw'], value=cmds.getAttr(standard.guide_base+".jaw"), changeCommand=standard.changeJaw, parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_chin_cb', label=self.ar.data.lang['c026_chin'], value=cmds.getAttr(standard.guide_base+".chin"), changeCommand=standard.changeChin, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_lips_cb', label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(standard.guide_base+".lips"), changeCommand=standard.changeLips, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
-            cmds.checkBox('edit_guide_head_upperhead_cb', label=self.ar.data.lang['c044_upper']+" "+self.ar.data.lang['c024_head'], value=cmds.getAttr(standard.guide_base+".upperHead"), changeCommand=standard.changeUpperHead, parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_jaw_cb', label=self.ar.data.lang['c025_jaw'], value=cmds.getAttr(standard.guide_base+".jaw"), changeCommand=standard.change_jaw, parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_chin_cb', label=self.ar.data.lang['c026_chin'], value=cmds.getAttr(standard.guide_base+".chin"), changeCommand=standard.change_chin, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_lips_cb', label=self.ar.data.lang['c062_lips'], value=cmds.getAttr(standard.guide_base+".lips"), changeCommand=standard.change_lips, enable=cmds.checkBox('edit_guide_head_jaw_cb', query=True, value=True), parent='edit_guide_head_items_rl')
+            cmds.checkBox('edit_guide_head_upperhead_cb', label=self.ar.data.lang['c044_upper']+" "+self.ar.data.lang['c024_head'], value=cmds.getAttr(standard.guide_base+".upperHead"), changeCommand=standard.change_upper_head, parent='edit_guide_head_items_rl')
 
 
     def articulation_layout(self, standard):      
@@ -336,7 +336,7 @@ class GuideUI(object):
         if 'deformer' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_deformer_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
             cmds.text('edit_guide_deformer_txt', label=self.ar.data.lang['c097_deformer'].capitalize(), enable=cmds.getAttr(standard.guide_base+".upperHead"), parent='edit_guide_deformer_rl')
-            cmds.checkBox('edit_guide_deformer_cb', label="", value=cmds.getAttr(standard.guide_base+".deformer"), changeCommand=standard.changeDeformer, enable=cmds.getAttr(standard.guide_base+".upperHead"), parent='edit_guide_deformer_rl')
+            cmds.checkBox('edit_guide_deformer_cb', label="", value=cmds.getAttr(standard.guide_base+".deformer"), changeCommand=standard.change_deformer, enable=cmds.getAttr(standard.guide_base+".upperHead"), parent='edit_guide_deformer_rl')
 
 
     def facial_layout(self, standard):
@@ -347,7 +347,7 @@ class GuideUI(object):
             cmds.rowLayout('edit_guide_facial_rl', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="rig_selected_module_cl" )
             cmds.text('edit_guide_facial_txt', label=self.ar.data.lang['c059_facial'].capitalize(), enable=facial_enable_value, parent='edit_guide_facial_rl')
             facial_value = cmds.getAttr(standard.guide_base+".facial")
-            cmds.checkBox('edit_guide_facial_cb', label="", value=facial_value, changeCommand=standard.changeFacial, enable=facial_enable_value, parent='edit_guide_facial_rl') #facial
+            cmds.checkBox('edit_guide_facial_cb', label="", value=facial_value, changeCommand=standard.change_facial, enable=facial_enable_value, parent='edit_guide_facial_rl') #facial
             collapsed = False
             if not facial_value:
                 collapsed = True
@@ -355,19 +355,19 @@ class GuideUI(object):
             cmds.frameLayout("edit_guide_facial_fl", label=self.ar.data.lang['m139_facialCtrlsAttr'], collapsable=True, collapse=collapsed, enable=facial_value, parent="rig_selected_module_cl")
             cmds.rowColumnLayout('edit_guide_facial_rcl', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='edit_guide_facial_fl')
             # facial element checkboxes
-            cmds.checkBox('edit_guide_facial_brow_cb', label=self.ar.data.lang["c060_brow"], value=cmds.getAttr(standard.guide_base+".facialBrow"), changeCommand=partial(standard.changeFacialElement, "facialBrow"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_brow_cb', label=self.ar.data.lang["c060_brow"], value=cmds.getAttr(standard.guide_base+".facialBrow"), changeCommand=partial(standard.change_facial_element, "facialBrow"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_brow_txt', label=', '.join(self.ar.data.facial_brow_targets), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_eyelid_cb', label=self.ar.data.lang["c042_eyelid"], value=cmds.getAttr(standard.guide_base+".facialEyelid"), changeCommand=partial(standard.changeFacialElement, "facialEyelid"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_eyelid_cb', label=self.ar.data.lang["c042_eyelid"], value=cmds.getAttr(standard.guide_base+".facialEyelid"), changeCommand=partial(standard.change_facial_element, "facialEyelid"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_eyelid_txt', label=', '.join(self.ar.data.facial_eyelid_targets[2:]), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_mouth_cb', label=self.ar.data.lang["c061_mouth"], value=cmds.getAttr(standard.guide_base+".facialMouth"), changeCommand=partial(standard.changeFacialElement, "facialMouth"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_mouth_cb', label=self.ar.data.lang["c061_mouth"], value=cmds.getAttr(standard.guide_base+".facialMouth"), changeCommand=partial(standard.change_facial_element, "facialMouth"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_mouth_txt', label=', '.join(self.ar.data.facial_mouth_targets), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_lips_cb', label=self.ar.data.lang["c062_lips"], value=cmds.getAttr(standard.guide_base+".facialLips"), changeCommand=partial(standard.changeFacialElement, "facialLips"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_lips_cb', label=self.ar.data.lang["c062_lips"], value=cmds.getAttr(standard.guide_base+".facialLips"), changeCommand=partial(standard.change_facial_element, "facialLips"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_lips_txt', label=', '.join(self.ar.data.facial_lips_targets), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_sneer_cb', label=self.ar.data.lang["c063_sneer"], value=cmds.getAttr(standard.guide_base+".facialSneer"), changeCommand=partial(standard.changeFacialElement, "facialSneer"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_sneer_cb', label=self.ar.data.lang["c063_sneer"], value=cmds.getAttr(standard.guide_base+".facialSneer"), changeCommand=partial(standard.change_facial_element, "facialSneer"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_sneer_txt', label=', '.join([item for item in self.ar.data.facial_sneer_targets if item is not None]), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_grimace_cb', label=self.ar.data.lang["c064_grimace"], value=cmds.getAttr(standard.guide_base+".facialGrimace"), changeCommand=partial(standard.changeFacialElement, "facialGrimace"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_grimace_cb', label=self.ar.data.lang["c064_grimace"], value=cmds.getAttr(standard.guide_base+".facialGrimace"), changeCommand=partial(standard.change_facial_element, "facialGrimace"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_grimace_txt', label=', '.join([item for item in self.ar.data.facial_grimace_targets if item is not None]), parent='edit_guide_facial_rcl')
-            cmds.checkBox('edit_guide_facial_face_cb', label=self.ar.data.lang["c065_face"], value=cmds.getAttr(standard.guide_base+".facialFace"), changeCommand=partial(standard.changeFacialElement, "facialFace"), parent='edit_guide_facial_rcl')
+            cmds.checkBox('edit_guide_facial_face_cb', label=self.ar.data.lang["c065_face"], value=cmds.getAttr(standard.guide_base+".facialFace"), changeCommand=partial(standard.change_facial_element, "facialFace"), parent='edit_guide_facial_rcl')
             cmds.text('edit_guide_facial_face_txt', label=', '.join(self.ar.data.facial_face_targets), parent='edit_guide_facial_rcl')
             cmds.separator(style='none', height=5, parent='edit_guide_facial_rcl')
             cmds.columnLayout('edit_guide_facial_type_cl', parent="edit_guide_facial_fl")
@@ -541,3 +541,22 @@ class GuideUI(object):
                 selection.remove(standard.guide_base)
         cmds.select(selection)
         cmds.button(f"{standard.number_name}_select_bt", edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
+
+
+    def set_head_facial_ui(self, value):
+        cmds.checkBox('edit_guide_facial_cb', edit=True, enable=value)
+        cmds.text('edit_guide_facial_txt', edit=True, enable=value)
+        if not value:
+            cmds.checkBox('edit_guide_facial_cb', edit=True, value=False)
+
+
+    def set_head_jaw_ui(self, value):
+        cmds.checkBox('edit_guide_head_lips_cb', edit=True, value=value, enable=value)
+        cmds.checkBox('edit_guide_head_chin_cb', edit=True, value=value, enable=value)
+
+
+    def set_head_upper_head_ui(self, value):
+        cmds.checkBox('edit_guide_deformer_cb', edit=True, enable=value)
+        cmds.text('edit_guide_deformer_txt', edit=True, enable=value)
+        if not value:
+            cmds.checkBox('edit_guide_deformer_cb', edit=True, value=False)
