@@ -298,7 +298,7 @@ class GuideUI(object):
     def nostril_layout(self, standard):
         if 'nostril' in cmds.listAttr(standard.guide_base):
             cmds.text(" ", parent='edit_guide_articulation_rl')
-            self.nostrilCB = cmds.checkBox(label=self.ar.data.lang['m079_nostril'], value=cmds.getAttr(standard.guide_base+".nostril"), changeCommand=standard.changeNostril, parent='edit_guide_articulation_rl')
+            cmds.checkBox('edit_guide_nostril_cb', label=self.ar.data.lang['m079_nostril'], value=cmds.getAttr(standard.guide_base+".nostril"), changeCommand=standard.change_nostril, parent='edit_guide_articulation_rl')
 
 
     def corrective_layout(self, standard):
