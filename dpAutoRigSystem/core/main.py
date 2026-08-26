@@ -48,6 +48,18 @@ from ..ui import pipeline_ui
 from ..ui import publish_ui
 from ..ui import guide_ui
 from ..ui import copy_paste_attr_ui
+from ..ui import correction_manager_ui
+from ..ui import custom_attr_ui
+from ..ui import facial_connection_ui
+from ..ui import joint_display_ui
+from ..ui import motion_capture_ui
+from ..ui import one_skeleton_ui
+from ..ui import renamer_ui
+from ..ui import reorder_attr_ui
+from ..ui import rivet_ui
+from ..ui import target_mirror_ui
+from ..ui import update_guides_ui
+from ..ui import zipper_ui
 from .. import version
 
 
@@ -105,6 +117,18 @@ class Start(object):
             reload(publish_ui)
             reload(guide_ui)
             reload(copy_paste_attr_ui)
+            reload(correction_manager_ui)
+            reload(custom_attr_ui)
+            reload(facial_connection_ui)
+            reload(joint_display_ui)
+            reload(motion_capture_ui)
+            reload(one_skeleton_ui)
+            reload(renamer_ui)
+            reload(reorder_attr_ui)
+            reload(rivet_ui)
+            reload(target_mirror_ui)
+            reload(update_guides_ui)
+            reload(zipper_ui)
             print("Reloaded imported modules")
 
 
@@ -150,6 +174,18 @@ class Start(object):
         self.publish_ui = publish_ui.PublishUI(self)
         self.guide_ui = guide_ui.GuideUI(self)
         self.copy_paste_attr_ui = copy_paste_attr_ui.CopyPasteAttrUI(self)
+        self.correction_manager_ui = correction_manager_ui.CorrectionManagerUI(self)
+        self.custom_attr_ui = custom_attr_ui.CustomAttrUI(self)
+        self.facial_connection_ui = facial_connection_ui.FacialConnectionUI(self)
+        self.joint_display_ui = joint_display_ui.JointDisplayUI(self)
+        self.motion_capture_ui = motion_capture_ui.MotionCaptureUI(self)
+        self.one_skeleton_ui = one_skeleton_ui.OneSkeletonUI(self)
+        self.renamer_ui = renamer_ui.RenamerUI(self)
+        self.reorder_attr_ui = reorder_attr_ui.ReorderAttrUI(self)
+        self.rivet_ui = rivet_ui.RivetUI(self)
+        self.target_mirror_ui = target_mirror_ui.TargetMirrorUI(self)
+        self.update_guides_ui = update_guides_ui.UpdateGuidesUI(self)
+        self.zipper_ui = zipper_ui.ZipperUI(self)
 
 
     def ui(self):

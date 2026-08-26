@@ -1620,24 +1620,24 @@ class Controllers(object):
                     cmds.separator(style='in', height=10, parent=self.dvSelectedLayout)
 
 
-    def selectControl(self, ctrl, refreshUI=False, *args):
+    def selectControl(self, ctrl, refresh_ui=False, *args):
         """ Select the given controller.
             Populate the defaultValueEditor if True.
         """
         if cmds.objExists(ctrl):
             cmds.select(ctrl)
-        if refreshUI:
+        if refresh_ui:
             self.populateSelectedControls()
 
 
-    def selectAllControls(self, refreshUI=False, *args):
+    def selectAllControls(self, refresh_ui=False, *args):
         """ Select all dpAR controllers in the scene.
             Populate the defaultValueEditor if True.
         """
         controllers = self.getControlList()
         if controllers:
             cmds.select(controllers)
-        if refreshUI:
+        if refresh_ui:
             self.populateSelectedControls()
 
 
