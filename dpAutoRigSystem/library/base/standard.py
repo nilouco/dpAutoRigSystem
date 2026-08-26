@@ -1017,8 +1017,3 @@ class BaseStandard(base.BaseLibrary):
             cmds.setAttr(f"{self.guide_base}.{attr}", value, type='string')
         else:
             cmds.setAttr(f"{self.guide_base}.{attr}", value)
-
-
-    def set_articulation(self, value):
-        self.articulation = value
-        cmds.setAttr(self.guide_base+".articulation", value)

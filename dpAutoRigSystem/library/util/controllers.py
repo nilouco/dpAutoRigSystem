@@ -35,6 +35,16 @@ class Controllers(object):
         self.shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
         self.doingName = self.ar.data.lang['m094_doing']
+        self.long_attr_data = {'tx': 'translateX',
+                                'ty': 'translateY',
+                                'tz': 'translateZ',
+                                'rx': 'rotateX',
+                                'ry': 'rotateY',
+                                'rz': 'rotateZ',
+                                'sx': 'scaleZ',
+                                'sy': 'scaleY',
+                                'sz': 'scaleZ',
+                                'v': 'visibility'}
         self.declareColors()
 
 
@@ -738,6 +748,8 @@ class Controllers(object):
                 # store attribute values in a data:
                 self.attrValueDic = {}
                 for attr in attributes:
+                    if attr in self.long_attr_data.keys():
+                        attr = self.long_attr_data[attr]
                     if attr in cmds.listAttr(sourceItem):
                         value = cmds.getAttr(sourceItem+'.'+attr)
                         self.attrValueDic[attr] = value

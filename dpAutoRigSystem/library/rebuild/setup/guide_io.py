@@ -132,47 +132,48 @@ class GuideIO(action.BaseAction):
     def setup_instance_changes(self, rebuilding=True):
         """ Run instance code to Guide_Base node configuration or just set the simple attributes.
         """
-        custom_attributes = ["flip",
-                          "mainControls",
-                          "nMain",
-                          "dynamic",
-                          "corrective",
-                          "alignWorld",
-                          "additional",
-                          "softIk",
-                          "nostril",
-                          "indirectSkin",
-                          "holder",
-                          "sdkLocator",
-                          "startFrame",
-                          "showControls",
-                          "steering",
-                          "degree",
-                          "eyelid",
-                          "iris",
-                          "pupil",
-                          "specular",
-                          "lidPivot",
-                          "style",
-                          "rigType",
-                          "numBendJoints",
-                          "facial",
-                          "facialBrow",
-                          "facialEyelid",
-                          "facialMouth",
-                          "facialLips",
-                          "facialSneer",
-                          "facialGrimace",
-                          "facialFace",
-                          "deformer",
-                          "deformedBy",
-                          "worldSize",
-                          "shapeSize",
-                          "jaw",
-                          "chin",
-                          "lips",
-                          "upperHead"
-                          ]
+        custom_attributes = ["articulation",
+                            "flip",
+                            "mainControls",
+                            "nMain",
+                            "dynamic",
+                            "corrective",
+                            "alignWorld",
+                            "additional",
+                            "softIk",
+                            "nostril",
+                            "indirectSkin",
+                            "holder",
+                            "sdkLocator",
+                            "startFrame",
+                            "showControls",
+                            "steering",
+                            "degree",
+                            "eyelid",
+                            "iris",
+                            "pupil",
+                            "specular",
+                            "lidPivot",
+                            "style",
+                            "rigType",
+                            "numBendJoints",
+                            "facial",
+                            "facialBrow",
+                            "facialEyelid",
+                            "facialMouth",
+                            "facialLips",
+                            "facialSneer",
+                            "facialGrimace",
+                            "facialFace",
+                            "deformer",
+                            "deformedBy",
+                            "worldSize",
+                            "shapeSize",
+                            "jaw",
+                            "chin",
+                            "lips",
+                            "upperHead"
+                            ]
         for item in list(self.net_data["GuideData"]):
             new_item = self.get_new_name(item)
             if cmds.objExists(new_item):
@@ -190,8 +191,6 @@ class GuideIO(action.BaseAction):
                             end = self.ar.utils.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][-1])
                             cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
                             self.instance.create_mirror_preview()
-                        elif base_attr == "articulation":
-                            self.instance.set_articulation(self.net_data["GuideData"][item]["articulation"])
                         elif base_attr == "nJoints":
                             self.instance.change_joint_number(self.net_data["GuideData"][item]["nJoints"])
                         elif base_attr == "type": #limb

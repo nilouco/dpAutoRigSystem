@@ -41,12 +41,13 @@ from . import filler
 from . import updater
 from . import maker
 from . import job
-from ..ui import auto_rig
-from ..ui import update
-from ..ui import donate
-from ..ui import pipeline
-from ..ui import publish
-from ..ui import guide
+from ..ui import auto_rig_ui
+from ..ui import update_ui
+from ..ui import donate_ui
+from ..ui import pipeline_ui
+from ..ui import publish_ui
+from ..ui import guide_ui
+from ..ui import copy_paste_attr_ui
 from .. import version
 
 
@@ -97,13 +98,13 @@ class Start(object):
             reload(maker)
             reload(job)
             reload(version)
-            # ui
-            reload(auto_rig)
-            reload(update)
-            reload(donate)
-            reload(pipeline)
-            reload(publish)
-            reload(guide)
+            reload(auto_rig_ui)
+            reload(update_ui)
+            reload(donate_ui)
+            reload(pipeline_ui)
+            reload(publish_ui)
+            reload(guide_ui)
+            reload(copy_paste_attr_ui)
             print("Reloaded imported modules")
 
 
@@ -142,12 +143,13 @@ class Start(object):
 
     def load_ui(self):
         self.ui_manager = manager.UIManager(self)
-        self.auto_rig_ui = auto_rig.MainUI(self)
-        self.update_ui = update.UpdateUI(self)
-        self.donate_ui = donate.DonateUI(self)
-        self.pipeline_ui = pipeline.PipelineUI(self)
-        self.publish_ui = publish.PublishUI(self)
-        self.guide_ui = guide.GuideUI(self)
+        self.auto_rig_ui = auto_rig_ui.MainUI(self)
+        self.update_ui = update_ui.UpdateUI(self)
+        self.donate_ui = donate_ui.DonateUI(self)
+        self.pipeline_ui = pipeline_ui.PipelineUI(self)
+        self.publish_ui = publish_ui.PublishUI(self)
+        self.guide_ui = guide_ui.GuideUI(self)
+        self.copy_paste_attr_ui = copy_paste_attr_ui.CopyPasteAttrUI(self)
 
 
     def ui(self):
