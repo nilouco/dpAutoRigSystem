@@ -44,7 +44,7 @@ class Spine(standard.BaseStandard):
         """ Add guide_base attributes and set them.
         """
         cmds.addAttr(self.guide_base, longName="nJoints", attributeType='long', defaultValue=1)
-        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped']+":"+self.ar.data.lang['m037_quadruped'])
+        cmds.addAttr(self.guide_base, longName="style", attributeType='enum', enumName=self.ar.data.lang['m042_default']+':'+self.ar.data.lang['m026_biped'])
 
 
     def create_guide_elements(self):
@@ -215,7 +215,7 @@ class Spine(standard.BaseStandard):
                 self.shape_vis_attributes.append(attr_name_lower+base_name+self.ar.data.lang['c126_display'])
 
                 # Setup axis order
-                if style == 2: #quadruped
+                if self.rigType == "quadruped" or style == 2: #quadruped
                     cmds.setAttr(self.hips_a_ctrl + ".rotateOrder", 1)
                     cmds.setAttr(self.hips_b_ctrl + ".rotateOrder", 1)
                     cmds.setAttr(self.chest_a_ctrl + ".rotateOrder", 1)
@@ -411,7 +411,7 @@ class Spine(standard.BaseStandard):
                     cmds.matchTransform(middle_fk_ctrl, guide_middle_loc, position=True, rotation=True)
                     if style == 1: #biped
                         cmds.rotate(0, 0, 0, middle_ctrl, middle_fk_ctrl)
-                    elif style == 2: #quadruped
+                    if self.rigType == "quadruped": #quadruped
                         cmds.rotate(90, 0, 0, middle_ctrl, middle_fk_ctrl)
                         cmds.makeIdentity(middle_ctrl, middle_fk_ctrl, apply=True, rotate=True)
                     middle_ctrl_grp = self.ar.utils.zeroOut([middle_ctrl])[0]

@@ -4075,7 +4075,7 @@
             "FkLine__dpAR_036:Guide_Base": {
                 "FatherNode": "FkLine__dpAR_000:Guide_Base",
                 "articulation": false,
-                "customName": "insideMirror",
+                "customName": "InsideMirror",
                 "deformedBy": 0,
                 "degree": 0,
                 "displayAnnotation": true,

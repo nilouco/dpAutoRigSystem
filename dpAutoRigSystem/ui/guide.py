@@ -104,7 +104,7 @@ class GuideUI(object):
             cmds.checkBox('edit_guide_flip', label="Flip", value=cmds.getAttr(standard.guide_base+".flip"), changeCommand=partial(standard.set_guide_attr, 'flip'), parent='edit_guide_mirror_rl')
             if standard.check_father_mirror():
                 if standard.father_flip_exists:
-                    cmds.checkBox(self.flipCB, edit=True, enable=False)
+                    cmds.checkBox('edit_guide_flip', edit=True, enable=False)
         else:
             cmds.text("", parent='edit_guide_mirror_rl')
 
@@ -253,7 +253,7 @@ class GuideUI(object):
         if 'geo' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_geo_rl', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="rig_selected_module_cl" )
             cmds.button('edit_guide_geo_bt', label=self.ar.data.lang["m146_geo"]+" >", command=partial(self.load_geo, standard), parent='edit_guide_geo_rl')
-            cmds.textField('edit_guide_geo_tf', text=cmds.getAttr(standard.guide_base+".geo"), enable=True, changeCommand=standard.changeGeo, parent='edit_guide_geo_rl')
+            cmds.textField('edit_guide_geo_tf', text=cmds.getAttr(standard.guide_base+".geo"), enable=True, changeCommand=partial(standard.set_guide_attr, 'geo', is_string=True), parent='edit_guide_geo_rl')
 
 
     def start_frame_layout(self, standard):
@@ -274,8 +274,8 @@ class GuideUI(object):
     def fatherb_layout(self, standard):
         if 'fatherB' in cmds.listAttr(standard.guide_base):
             cmds.rowLayout('edit_guide_fatherb_rl', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="rig_selected_module_cl" )
-            cmds.button('edit_guide_fatherb_bt', label=self.ar.data.lang["m160_fatherB"]+" >", command=standard.loadFatherB, parent='edit_guide_fatherb_rl')
-            cmds.textField('edit_guide_fatherb_tf', text=cmds.getAttr(standard.guide_base+".fatherB"), enable=True, changeCommand=standard.changeFatherB, parent='edit_guide_fatherb_rl')
+            cmds.button('edit_guide_fatherb_bt', label=self.ar.data.lang["m160_fatherB"]+" >", command=standard.load_father_b, parent='edit_guide_fatherb_rl')
+            cmds.textField('edit_guide_fatherb_tf', text=cmds.getAttr(standard.guide_base+".fatherB"), enable=True, changeCommand=partial(standard.set_guide_attr, 'fatherB', is_string=True), parent='edit_guide_fatherb_rl')
 
 
     def head_items_layout(self, standard):

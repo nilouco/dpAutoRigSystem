@@ -52,7 +52,7 @@ class BaseStandard(base.BaseLibrary):
             self.number_name = number_name
         if self.ar.data.ui_state:
             self.create_module_layout()
-        self.update_module_instance_info()
+        self.set_guide_attr('moduleInstanceInfo', self, True)
         self.guide_net = self.ar.utils.getNodeByMessage("net", self.guide_base)
         if self.guide_net:
             self.raw = cmds.getAttr(self.guide_net+".rawGuide")
@@ -131,12 +131,6 @@ class BaseStandard(base.BaseLibrary):
         cmds.setAttr(self.annotation+'.text', self.guide_base[self.guide_base.find("__")+2:self.guide_base.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
         cmds.connectAttr(self.radius_ctrl+".translateX", self.annotation+".translateY", force=True)
-
-    
-    def update_module_instance_info(self):
-        """ Just update modeuleInstanceInfo attribute in the guideNode transform.
-        """
-        cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
     
     
     def check_guide_integrity(self):
@@ -494,6 +488,7 @@ class BaseStandard(base.BaseLibrary):
             self.articulation = self.get_guide_attr('articulation')
             self.corrective = self.get_guide_attr('corrective')
             self.flip = self.get_guide_attr('flip')
+            self.rigType = self.get_guide_attr('rigType')
     
 
     def create_hook_setup(self, side, controllers, scalableList=None, staticList=None, *args):
@@ -1015,10 +1010,13 @@ class BaseStandard(base.BaseLibrary):
     
     # Setters:
     #
-    def set_guide_attr(self, attr, value, *args):
-        """ Set guide_base simple attribute value.
+    def set_guide_attr(self, attr, value, is_string=False, *args):
+        """ Set guide_base attribute value.
         """
-        cmds.setAttr(f"{self.guide_base}.{attr}", value)
+        if is_string:
+            cmds.setAttr(f"{self.guide_base}.{attr}", value, type='string')
+        else:
+            cmds.setAttr(f"{self.guide_base}.{attr}", value)
 
 
     def set_articulation(self, value):

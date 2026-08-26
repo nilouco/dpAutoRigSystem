@@ -50,20 +50,19 @@ class Steering(standard.BaseStandard):
         self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
         cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
-        
+
 
     def set_guide_base_initial_position(self):
         cmds.setAttr(self.guide_base+".translateY", 3)
         cmds.setAttr(self.guide_base+".rotateX", 45)
 
 
-        
     def rig_me(self, *args):
         standard.BaseStandard.rig_me(self)
         # verify if the guide exists:
         if cmds.objExists(self.guide_base):
             # declare lists to store names and attributes:
-            self.steeringCtrlList = []
+            self.steering_ctrls = []
             # run for all sides
             for s, side in enumerate(self.sides):
                 self.base = side+self.number_name+'_Guide_Base'
@@ -80,65 +79,65 @@ class Steering(standard.BaseStandard):
                 # joint labelling:
                 self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
-                self.steeringCtrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
-                self.mainCtrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.steeringCtrl)
-                self.ar.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
-                self.ar.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide_end_loc+";"+self.guide_radius)
-                self.steeringCtrlList.append(self.steeringCtrl)
+                steering_ctrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
+                main_ctrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=steering_ctrl)
+                self.ar.utils.originedFrom(objName=steering_ctrl, attrString=self.guide)
+                self.ar.utils.originedFrom(objName=main_ctrl, attrString=self.base+";"+self.guide_end_loc+";"+self.guide_radius)
+                self.steering_ctrls.append(steering_ctrl)
                 # position and orientation of joint and control:
                 cmds.matchTransform(self.jnt, self.guide, position=True, rotation=True)
-                cmds.matchTransform(self.steeringCtrl, self.guide, position=True, rotation=True)
-                cmds.matchTransform(self.mainCtrl, self.guide_end_loc, position=True, rotation=True)
+                cmds.matchTransform(steering_ctrl, self.guide, position=True, rotation=True)
+                cmds.matchTransform(main_ctrl, self.guide_end_loc, position=True, rotation=True)
                 # zeroOut controls:
-                zeroOutCtrlGrpList = self.ar.utils.zeroOut([self.steeringCtrl, self.mainCtrl])
+                zeros = self.ar.utils.zeroOut([steering_ctrl, main_ctrl])
                 # hide visibility attribute:
-                self.ar.ctrls.setLockHide([self.steeringCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
+                self.ar.ctrls.setLockHide([steering_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleX", -1)
-                        cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleY", -1)
-                        cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleZ", -1)
-                cmds.addAttr(self.steeringCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
-                cmds.setAttr(self.steeringCtrl+".scaleCompensate", channelBox=True)
-                cmds.connectAttr(self.steeringCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                        cmds.setAttr(zeros[0]+".scaleX", -1)
+                        cmds.setAttr(zeros[0]+".scaleY", -1)
+                        cmds.setAttr(zeros[0]+".scaleZ", -1)
+                cmds.addAttr(steering_ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                cmds.setAttr(steering_ctrl+".scaleCompensate", channelBox=True)
+                cmds.connectAttr(steering_ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 # integrating setup:
-                cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c071_limit'], defaultValue=500, attributeType="float", keyable=False)
-                cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c049_intensity'], min=0, defaultValue=0.8, attributeType="float", keyable=False)
-                cmds.addAttr(self.steeringCtrl, longName=self.ar.data.lang['c070_steering'], attributeType="float", keyable=False)
-                cmds.setAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], 500, channelBox=True)
-                cmds.setAttr(self.steeringCtrl+"."+self.ar.data.lang['c049_intensity'], 0.8, channelBox=True)
-                self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Unit_MD")
-                self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Rotate_MD")
-                self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.number_name+"_MD")
-                self.to_ids.extend([self.steeringUnitMD, self.steeringInvertMD, self.steeringMD])
-                cmds.setAttr(self.steeringInvertMD+".input2X", 0.1)
-                cmds.setAttr(self.steeringUnitMD+".input2X", -1)
-                cmds.transformLimits(self.steeringCtrl, enableRotationZ=(1, 1))
-                cmds.connectAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], self.steeringUnitMD+".input1X", force=True)
-                cmds.connectAttr(self.steeringUnitMD+".outputX", self.steeringCtrl+".minRotLimit.minRotZLimit", force=True)
-                cmds.connectAttr(self.steeringCtrl+"."+self.ar.data.lang['c071_limit'], self.steeringCtrl+".maxRotLimit.maxRotZLimit", force=True)
-                cmds.connectAttr(self.steeringCtrl+".rotateZ", self.steeringInvertMD+".input1X", force=True)
-                cmds.connectAttr(self.steeringInvertMD+".outputX", self.steeringMD+".input1X", force=True)
-                cmds.connectAttr(self.steeringCtrl+"."+self.ar.data.lang['c049_intensity'], self.steeringMD+".input2X", force=True)
-                cmds.connectAttr(self.steeringMD+".outputX", self.steeringCtrl+"."+self.ar.data.lang['c070_steering'], force=True)
+                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c071_limit'], defaultValue=500, attributeType="float", keyable=False)
+                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c049_intensity'], min=0, defaultValue=0.8, attributeType="float", keyable=False)
+                cmds.addAttr(steering_ctrl, longName=self.ar.data.lang['c070_steering'], attributeType="float", keyable=False)
+                cmds.setAttr(steering_ctrl+"."+self.ar.data.lang['c071_limit'], 500, channelBox=True)
+                cmds.setAttr(steering_ctrl+"."+self.ar.data.lang['c049_intensity'], 0.8, channelBox=True)
+                unit_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Unit_MD")
+                invert_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_Rotate_MD")
+                steering_md = cmds.createNode('multiplyDivide', name=side+self.number_name+"_MD")
+                self.to_ids.extend([unit_md, invert_md, steering_md])
+                cmds.setAttr(invert_md+".input2X", 0.1)
+                cmds.setAttr(unit_md+".input2X", -1)
+                cmds.transformLimits(steering_ctrl, enableRotationZ=(1, 1))
+                cmds.connectAttr(steering_ctrl+"."+self.ar.data.lang['c071_limit'], unit_md+".input1X", force=True)
+                cmds.connectAttr(unit_md+".outputX", steering_ctrl+".minRotLimit.minRotZLimit", force=True)
+                cmds.connectAttr(steering_ctrl+"."+self.ar.data.lang['c071_limit'], steering_ctrl+".maxRotLimit.maxRotZLimit", force=True)
+                cmds.connectAttr(steering_ctrl+".rotateZ", invert_md+".input1X", force=True)
+                cmds.connectAttr(invert_md+".outputX", steering_md+".input1X", force=True)
+                cmds.connectAttr(steering_ctrl+"."+self.ar.data.lang['c049_intensity'], steering_md+".input2X", force=True)
+                cmds.connectAttr(steering_md+".outputX", steering_ctrl+"."+self.ar.data.lang['c070_steering'], force=True)
                 
                 # calibration attributes:
-                steeringCalibrationList = [
+                steering_calibrates = [
                                             self.ar.data.lang['c071_limit'],
                                             self.ar.data.lang['c049_intensity']
                                             ]
-                self.ar.ctrls.setStringAttrFromList(self.steeringCtrl, steeringCalibrationList)
+                self.ar.ctrls.setStringAttrFromList(steering_ctrl, steering_calibrates)
 
                 # grouping:
-                cmds.parent(zeroOutCtrlGrpList[0], self.mainCtrl)
+                cmds.parent(zeros[0], main_ctrl)
                 # create parentConstraint from steeringCtrl to jnt:
-                cmds.parentConstraint(self.steeringCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
+                cmds.parentConstraint(steering_ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
                 # create scaleConstraint from steeringCtrl to jnt:
-                cmds.scaleConstraint(self.steeringCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
+                cmds.scaleConstraint(steering_ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.create_hook_setup(side, [zeroOutCtrlGrpList[1]], [side+self.number_name+"_1_Jnt"])
+                self.create_hook_setup(side, [zeros[1]], [side+self.number_name+"_1_Jnt"])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
@@ -156,5 +155,5 @@ class Steering(standard.BaseStandard):
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.composed = {
-                            "steeringCtrlList"   : self.steeringCtrlList,
+                            "steeringCtrlList"   : self.steering_ctrls,
                         }
