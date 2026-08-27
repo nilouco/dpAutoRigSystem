@@ -217,7 +217,7 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.addAttr(self.cm_data_grp, longName="dpCorrectionManagerDataGrp", attributeType="bool")
                         cmds.setAttr(self.cm_data_grp+".dpCorrectionManagerDataGrp", 1)
                         self.ar.ctrls.setLockHide([self.cm_data_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                        scalable_grp = self.ar.utils.getNodeByMessage("scalable_grp")
+                        scalable_grp = self.ar.utils.getNodeByMessage("scalableGrp")
                         if scalable_grp:
                             cmds.parent(self.cm_data_grp, scalable_grp)
                         cmds.setAttr(self.cm_data_grp+".visibility", 0)

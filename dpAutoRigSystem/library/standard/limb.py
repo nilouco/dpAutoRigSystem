@@ -4,7 +4,6 @@ from ..base import standard
 from ...library.util import soft_ik
 from ...library.util import ik_fk_snap
 from ...library.util import ribbon
-from functools import partial
 from importlib import reload
 from maya.api import OpenMaya
 import math
