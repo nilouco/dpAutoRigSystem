@@ -795,10 +795,10 @@
     "m260_combinationTargets"    : "Ajouter des cibles combinées",
     "m261_combinationTargetsDesc": "Il cree et relie des cibles combinées pour la bouche et les sourcils.",
     "m262_tweakTargetOnly"       : "Cible tweak uniquement",
-    "m263_tweakTargetOnlyDesc"   : "Il cree la cible de tweak sans aucune cible faciale.",
+    "m263_tweakTargetOnlyDesc"   : "Il cree la target de tweak sans aucune target faciale.",
     "m264_rebuildTargetsText"    : "Sélectionner l'ancien mesh et le nouveau mesh pour:",
-    "m265_rebuildTargets"        : "Reconstruire les Cibles",
-    "m266_rebuildTargetsDesc"    : "D'abord sélectionnez l'ancien mesh avec le node blendShape et ensuite le nouveau.",
+    "m265_recreateTargets"        : "Recréer les Targets",
+    "m266_recreateTargetsDesc"    : "D'abord sélectionnez l'ancien mesh avec le node blendShape et ensuite le nouveau.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

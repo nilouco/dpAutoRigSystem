@@ -1165,9 +1165,9 @@ class Head(standard.BaseStandard):
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.guide_base+".facial"):
                 if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
-                    self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).dpConnectToBlendShape()
+                    self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).connect_to_blendshape()
                 else:
-                    self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).dpConnectToJoints()
+                    self.ar.config.get_instance("FacialConnection", [self.ar.data.tools_folder]).connect_to_joints()
 
             # finalize this rig:
             self.serialize_guide()

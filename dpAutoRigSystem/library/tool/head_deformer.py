@@ -32,16 +32,16 @@ class HeadDeformer(base.BaseLibrary):
     def dpHeadDeformerPromptDialog(self, *args):
         """ dpDeformer prompt dialog to get the name of the deformer
         """
-        btContinue = self.ar.data.lang['i174_continue']
-        btCancel = self.ar.data.lang['i132_cancel']
+        bt_continue = self.ar.data.lang['i174_continue']
+        bt_cancel = self.ar.data.lang['i132_cancel']
         result = cmds.promptDialog(title="dpHeadDeformer", 
                                    message=self.ar.data.lang["m006_name"], 
                                    text=self.ar.data.lang["c024_head"], 
-                                   button=[btContinue, btCancel], 
-                                   defaultButton=btContinue, 
-                                   cancelButton=btCancel, 
-                                   dismissString=btCancel)
-        if result == btContinue:
+                                   button=[bt_continue, bt_cancel], 
+                                   defaultButton=bt_continue, 
+                                   cancelButton=bt_cancel, 
+                                   dismissString=bt_cancel)
+        if result == bt_continue:
             dialogName = cmds.promptDialog(query=True, text=True)
             dialogName = dialogName[0].upper() + dialogName[1:]
             return dialogName

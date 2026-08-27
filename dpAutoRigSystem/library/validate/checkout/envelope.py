@@ -16,14 +16,8 @@ class Envelope(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
 
 
-    def nodeHasEnvelope(self, node):
+    def node_has_envelope(self, node):
         return cmds.attributeQuery('envelope', node=node, exists=True)
-    
-    def envelopeIsValid(self, node):
-        notConnected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
-        nodeStateNormal = cmds.getAttr(node+".nodeState") == 0
-        notUserDefined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
-        return notConnected and nodeStateNormal and notUserDefined
 
 
     def verifyEnvelope(self, node):
@@ -52,8 +46,8 @@ class Envelope(action.BaseAction):
                 allNodesList = inputs
             else:
                 allNodesList = cmds.ls()
-            allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
-            allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
+            allEnvelopedNodes = list(filter(self.node_has_envelope, allNodesList))
+            allValidEnvelopeNodes = list(filter(self.ar.utils.envelope_is_valid, allEnvelopedNodes))
             self.checked_items.extend(allValidEnvelopeNodes)
             if self.checked_items:
                 self.ar.utils.setProgress(max=len(self.checked_items), add_one=False, add_number=False)

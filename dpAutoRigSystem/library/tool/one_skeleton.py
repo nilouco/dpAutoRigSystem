@@ -88,16 +88,16 @@ class OneSkeleton(base.BaseLibrary):
     def oneSkeletonPromptDialog(self, *args):
         """ Prompt dialog to get the name of the root joint to receive all the web joints as children.
         """
-        btContinue = self.ar.data.lang['i174_continue']
-        btCancel = self.ar.data.lang['i132_cancel']
+        bt_continue = self.ar.data.lang['i174_continue']
+        bt_cancel = self.ar.data.lang['i132_cancel']
         result = cmds.promptDialog(title=CLASS_NAME, 
                                    message=self.ar.data.lang["m006_name"], 
                                    text=self.prefix+self.rootName+self.suffix,
-                                   button=[btContinue, btCancel], 
-                                   defaultButton=btContinue, 
-                                   cancelButton=btCancel, 
-                                   dismissString=btCancel)
-        if result == btContinue:
+                                   button=[bt_continue, bt_cancel], 
+                                   defaultButton=bt_continue, 
+                                   cancelButton=bt_cancel, 
+                                   dismissString=bt_cancel)
+        if result == bt_continue:
             dialogName = cmds.promptDialog(query=True, text=True)
             return dialogName
         elif result is None:

@@ -1603,3 +1603,12 @@ class Utils(object):
     def set_template(self, items, value=1):
         for item in items:
             cmds.setAttr(f"{item}.template", value)
+
+
+    def envelope_is_valid(self, node):
+        """ Check if the given node envelope attribute is not connected, nodeState is normal and not user defined.
+        """
+        not_connected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
+        node_state_normal = cmds.getAttr(node+".nodeState") == 0
+        not_user_defined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
+        return not_connected and node_state_normal and not_user_defined

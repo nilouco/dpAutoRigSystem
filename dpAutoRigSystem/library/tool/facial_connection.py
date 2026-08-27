@@ -1,5 +1,4 @@
 # importing libraries:
-import os
 from maya import cmds
 from maya import mel
 from ..base import base
@@ -22,219 +21,178 @@ class FacialConnection(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.headFacialCtrlsGrp = self.ar.data.lang["c024_head"]+"_"+self.ar.data.lang["c059_facial"]+"_Ctrls_Grp"
-        self.jntTargetList = []
-        self.RmVNumber = 0
-        self.bsReceptSuffix = "Recept_BS"
-        self.bsSuffix = "BS"
-        self.defaultTargetList = ["Base", "Recept", "Tweaks",]
-        self.facialTargetList = ["L_BrowUp", "L_BrowDown", "L_BrowSad", "L_BrowFrown", "L_EyelidsClose",  "L_EyelidsOpen",
-                                 "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
-                                 "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
-        self.combinationTargetList = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
+        self.joint_targets = []
+        self.rmv_number = 0
+        self.recept_bs_suffix = "Recept_BS"
+        self.bs_suffix = "BS"
+        self.default_targets = ["Base", "Recept", "Tweaks",]
+        self.facial_targets = ["L_BrowUp", "L_BrowDown", "L_BrowSad", "L_BrowFrown", "L_EyelidsClose",  "L_EyelidsOpen",
+                                "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
+                                "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
+        self.combination_targets = ["L_MouthComb_SmileWide", "L_MouthComb_SmileNarrow", "L_MouthComb_SadWide", "L_MouthComb_SadNarrow", "L_BrowComb_UpSad", "L_BrowComb_UpFrown", "L_BrowComb_DownSad", "L_BrowComb_DownFrown"]
         
 
     def build_tool(self, *args):
         # call main function:
         if self.ar.data.ui_state:
-            self.dpFacialConnectionUI(self)
+            self.ar.facial_connection_ui.create_ui(self)
     
 
-    def dpInitTweaksVariables(self, *args):
+    def load_tweaks_variables(self):
         # part names:
-        mainName = self.ar.data.lang['c058_main']
-        tweaksName = self.ar.data.lang['m081_tweaks']
-        middleName = self.ar.data.lang['c029_middle']
-        eyebrowName = self.ar.data.lang['c041_eyebrow']
-        cornerName = self.ar.data.lang['c043_corner']
-        upperName = self.ar.data.lang['c044_upper']
-        lowerName = self.ar.data.lang['c045_lower']
-        lipName = self.ar.data.lang['c039_lip']
-        squintName = self.ar.data.lang['c054_squint']
-        cheekName = self.ar.data.lang['c055_cheek']
-        self.calibrateName = self.ar.data.lang["c111_calibrate"].lower()
+        tweaks_name = self.ar.data.lang['m081_tweaks']
+        middle_name = self.ar.data.lang['c029_middle']
+        elbow_name = self.ar.data.lang['c041_eyebrow']
+        corner_name = self.ar.data.lang['c043_corner']
+        upper_name = self.ar.data.lang['c044_upper']
+        lower_name = self.ar.data.lang['c045_lower']
+        lip_name = self.ar.data.lang['c039_lip']
+        squint_name = self.ar.data.lang['c054_squint']
+        cheek_name = self.ar.data.lang['c055_cheek']
         # eyebrows names:
-        self.eyebrowMiddleName = tweaksName+"_"+middleName+"_"+eyebrowName
-        self.eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
-        self.eyebrowName2 = tweaksName+"_"+eyebrowName+"_02"
-        self.eyebrowName3 = tweaksName+"_"+eyebrowName+"_03"
-        self.eyebrowName4 = tweaksName+"_"+eyebrowName+"_04"
+        eyebrow_middle_name = tweaks_name+"_"+middle_name+"_"+elbow_name
+        eyebrow_name_1 = tweaks_name+"_"+elbow_name+"_01"
+        eyebrow_name_2 = tweaks_name+"_"+elbow_name+"_02"
+        eyebrow_name_3 = tweaks_name+"_"+elbow_name+"_03"
+        eyebrow_name_4 = tweaks_name+"_"+elbow_name+"_04"
         # squints names:
-        self.squintName1 = tweaksName+"_"+squintName+"_01"
-        self.squintName2 = tweaksName+"_"+squintName+"_02"
-        self.squintName3 = tweaksName+"_"+squintName+"_03"
-        self.squintName4 = tweaksName+"_"+squintName+"_04"
+        squint_name_1 = tweaks_name+"_"+squint_name+"_01"
+        squint_name_2 = tweaks_name+"_"+squint_name+"_02"
+        squint_name_3 = tweaks_name+"_"+squint_name+"_03"
         # cheeks names:
-        self.cheekName1 = tweaksName+"_"+cheekName+"_01"
-        self.cheekName2 = tweaksName+"_"+cheekName+"_02"
+        cheek_name_1 = tweaks_name+"_"+cheek_name+"_01"
+        cheek_name_2 = tweaks_name+"_"+cheek_name+"_02"
         # lip names:
-        self.upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
-        self.upperLipName1 = tweaksName+"_"+upperName+"_"+lipName+"_01"
-        self.upperLipName2 = tweaksName+"_"+upperName+"_"+lipName+"_02"
-        self.lowerLipMiddleName = tweaksName+"_"+lowerName+"_"+lipName+"_00"
-        self.lowerLipName1 = tweaksName+"_"+lowerName+"_"+lipName+"_01"
-        self.lowerLipName2 = tweaksName+"_"+lowerName+"_"+lipName+"_02"
-        self.lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
+        upper_lip_middle_name = tweaks_name+"_"+upper_name+"_"+lip_name+"_00"
+        upper_lip_name_1 = tweaks_name+"_"+upper_name+"_"+lip_name+"_01"
+        upper_lip_name_2 = tweaks_name+"_"+upper_name+"_"+lip_name+"_02"
+        lower_lip_middle_name = tweaks_name+"_"+lower_name+"_"+lip_name+"_00"
+        lower_lip_name_1 = tweaks_name+"_"+lower_name+"_"+lip_name+"_01"
+        lower_lip_name_2 = tweaks_name+"_"+lower_name+"_"+lip_name+"_02"
+        lip_corner_name = tweaks_name+"_"+corner_name+"_"+lip_name
         # list:
-        self.tweaksNameList = [self.eyebrowMiddleName, self.eyebrowName1, self.eyebrowName2, self.eyebrowName3, self.eyebrowName4, \
-                                self.squintName1, self.squintName2, self.squintName3,\
-                                self.cheekName1, self.cheekName2, \
-                                self.upperLipMiddleName, self.upperLipName1, self.upperLipName2, self.lowerLipMiddleName, self.lowerLipName1, self.lowerLipName2, self.lipCornerName]
-        self.tweaksNameStrList = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", "eyebrowName4", \
+        self.tweaks_names = [eyebrow_middle_name, eyebrow_name_1, eyebrow_name_2, eyebrow_name_3, eyebrow_name_4, \
+                                squint_name_1, squint_name_2, squint_name_3,\
+                                cheek_name_1, cheek_name_2, \
+                                upper_lip_middle_name, upper_lip_name_1, upper_lip_name_2, lower_lip_middle_name, lower_lip_name_1, lower_lip_name_2, lip_corner_name]
+        self.tweaks_string_names = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", "eyebrowName4", \
                                 "squintName1", "squintName2", "squintName3", \
                                 "cheekName1", "cheekName2", \
                                 "upperLipMiddleName", "upperLipName1", "upperLipName2", "lowerLipMiddleName", "lowerLipName1", "lowerLipName2", "lipCornerName"]
     
     
-    def dpInitTweaksDic(self, *args):
+    def get_tweaks_data(self):
         """ Load FacialJoints json file.
             Read its content.
-            Rebuild a dictionary changing string variables to current mounted language names.
-            Return the presetContent
+            Rebuild a dictionary value string variables to current mounted language names.
+            Return the preset_content
         """
         # load json file:
         founds, datas = self.ar.config.get_json_file_content(self.ar.data.facial_preset_folder)
         if founds and datas:
             for found in founds:
                 if found == FACIALPRESET:
-                    presetContent = datas[found]
+                    preset_content = datas[found]
                     break
-        if presetContent:
+        if preset_content:
             # rebuild dictionary using object variables:
-            for storedAttr in list(presetContent):
-                for sideName in list(presetContent[storedAttr]):
-                    for toNodeName in list(presetContent[storedAttr][sideName]):
-                        for i, item in enumerate(self.tweaksNameStrList):
-                            if toNodeName == item:
-                                presetContent[storedAttr][sideName][self.tweaksNameList[i]] = presetContent[storedAttr][sideName].pop(toNodeName)
-                    if sideName == "MIDDLE":
-                        presetContent[storedAttr][MIDDLE] = presetContent[storedAttr].pop(sideName)
-                    elif sideName == "SIDED":
-                        presetContent[storedAttr][SIDED] = presetContent[storedAttr].pop(sideName)
-        return presetContent
-    
-    
-    def dpFacialConnectionUI(self, *args):
-        """ Create a window in order to load the original model and targets to be mirrored.
-        """
-        # creating targetMirrorUI Window:
-        self.ar.utils.close_ui('dpFacialConnectionWindow')
-        facialCtrl_winWidth  = 230
-        facialCtrl_winHeight = 330
-        dpFacialControlWin = cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(self.ar.data.version), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
-        # creating layout:
-        facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("both", 10), rowSpacing=10)
-        cmds.separator(height=5, style="in", horizontal=True, parent=facialCtrlLayout)
-        cmds.button(label=self.ar.data.lang['m140_createTargets'], annotation=self.ar.data.lang["m141_createTargetsDesc"], width=220, command=self.dpCreateTargetsFromUI, align="center", parent=facialCtrlLayout)
-        self.createBsNodeCB = cmds.checkBox(label=self.ar.data.lang['m258_createBSNode'], annotation=self.ar.data.lang["m259_createBSNodeDesc"], value=1, parent=facialCtrlLayout)
-        self.combinationTgtCB = cmds.checkBox(label=self.ar.data.lang['m260_combinationTargets'], annotation=self.ar.data.lang["m261_combinationTargetsDesc"], value=1, parent=facialCtrlLayout)
-        self.tweakTgtOnlyCB = cmds.checkBox(label=self.ar.data.lang['m262_tweakTargetOnly'], annotation=self.ar.data.lang["m263_tweakTargetOnlyDesc"], value=0, changeCommand=self.dpDisableCombination, parent=facialCtrlLayout)
-        cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
-        cmds.text(label=self.ar.data.lang['m264_rebuildTargetsText'], parent=facialCtrlLayout)
-        cmds.button(label=self.ar.data.lang['m265_rebuildTargets'], annotation=self.ar.data.lang["m266_rebuildTargetsDesc"], width=220, command=self.dpRebuildTargets, parent=facialCtrlLayout)
-        cmds.separator(height=5, style="single", horizontal=True, parent=facialCtrlLayout)
-        cmds.text(label=self.ar.data.lang['m142_connectFacialAttr'], parent=facialCtrlLayout)
-        cmds.button(label=self.ar.data.lang['m170_blendShapes']+" - "+self.ar.data.lang['i185_animation'], annotation="Create selected facial controls.", width=220, command=self.dpConnectToBlendShape, parent=facialCtrlLayout)
-        cmds.button(label=self.ar.data.lang['i181_facialJoint']+" - "+self.ar.data.lang['i186_gaming'], annotation="Create default facial controls package.", width=220, command=self.dpConnectToJoints, parent=facialCtrlLayout)
-        # call facialControlUI Window:
-        cmds.showWindow(dpFacialControlWin)
-    
+            for stored_attr in list(preset_content):
+                for side_name in list(preset_content[stored_attr]):
+                    for to_node_name in list(preset_content[stored_attr][side_name]):
+                        for i, item in enumerate(self.tweaks_string_names):
+                            if to_node_name == item:
+                                preset_content[stored_attr][side_name][self.tweaks_names[i]] = preset_content[stored_attr][side_name].pop(to_node_name)
+                    if side_name == "MIDDLE":
+                        preset_content[stored_attr][MIDDLE] = preset_content[stored_attr].pop(side_name)
+                    elif side_name == "SIDED":
+                        preset_content[stored_attr][SIDED] = preset_content[stored_attr].pop(side_name)
+        return preset_content
 
-    def dpCreateTargetsFromUI(self, *args):
-        """ Get UI values and call the dpCreateTargets function.
+
+    def create_targets_from_ui(self, *args):
+        """ Get UI values and call the create_targets function.
         """
-        createBsNode = cmds.checkBox(self.createBsNodeCB, query=True, value=True)
-        combinationTgt = cmds.checkBox(self.combinationTgtCB, query=True, value=True)
-        tweakTgtOnly = cmds.checkBox(self.tweakTgtOnlyCB, query=True, value=True)
-        # call run function
-        self.dpCreateTargets(fromMesh=None, base_name="Head", createBsNode=createBsNode, combinationTargets=combinationTgt,  tweakTgtOnly=tweakTgtOnly)
- 
-   
-    def dpDisableCombination(self, value, *args):
-        """ If the tweakTgtOnlyCB is checked, turn off and disable the combinationTgtCB.
-        """
-        value = cmds.checkBox(self.tweakTgtOnlyCB, query=True, value=True)
-        if value:
-            cmds.checkBox(self.combinationTgtCB, edit=True, enable=False)
-            cmds.checkBox(self.combinationTgtCB, edit=True, value=False)
-        else:
-            cmds.checkBox(self.combinationTgtCB, edit=True, enable=True)
+        if self.ar.data.ui_state:
+            bs = cmds.checkBox('facial_connect_bs_cb', query=True, value=True)
+            comb = cmds.checkBox('facial_connect_comb_cb', query=True, value=True)
+            tweak = cmds.checkBox('facial_connect_tweak_only_cb', query=True, value=True)
+            # call run function
+            self.create_targets(from_mesh=None, base_name="Head", create_bs_node=bs, combination_targets=comb,  tweak_tgt_only=tweak)
         
 
-    def dpCreateTargets(self, fromMesh=None, base_name="Head", createBsNode=None, combinationTargets=None, tweakTgtOnly=None, *args):
+    def create_targets(self, from_mesh=None, base_name="Head", create_bs_node=None, combination_targets=None, tweak_tgt_only=None):
         """ Creates the default blendShape targets used in the system by default.
         """
-        if not fromMesh:
-            fromMeshList = cmds.ls(selection=True, type="transform")
-            if fromMeshList:
-                for n, node in enumerate(fromMeshList):
-                    fromMeshChildrenList = cmds.listRelatives(fromMeshList[n], children=True, type="mesh")
-                    if fromMeshChildrenList:
-                        fromMesh = fromMeshList[n]
+        if not from_mesh:
+            from_mesh_items = cmds.ls(selection=True, type="transform")
+            if from_mesh_items:
+                for n, node in enumerate(from_mesh_items):
+                    if cmds.listRelatives(from_mesh_items[n], children=True, type="mesh"): #fromMeshChildrenList
+                        from_mesh = from_mesh_items[n]
                         break
-        if fromMesh:
+        if from_mesh:
             geos, results = [], []
-            for geoBase in fromMeshList:
+            for geo_base in from_mesh_items:
                 prefix = base_name
                 if self.ar.data.ui_state:
-                    btContinue = self.ar.data.lang['i174_continue']
-                    btCancel = self.ar.data.lang['i132_cancel']
+                    bt_continue = self.ar.data.lang['i174_continue']
+                    bt_cancel = self.ar.data.lang['i132_cancel']
                     result = cmds.promptDialog(
                                                 title=self.ar.data.lang['m006_name'],
                                                 message=self.ar.data.lang['i144_prefix']+":",
-                                                button=[btContinue, btCancel],
-                                                defaultButton=btContinue,
-                                                cancelButton=btCancel,
-                                                dismissString=btCancel)
-                    if result == btContinue:
+                                                button=[bt_continue, bt_cancel],
+                                                defaultButton=bt_continue,
+                                                cancelButton=bt_cancel,
+                                                dismissString=bt_cancel)
+                    if result == bt_continue:
                         prefix = cmds.promptDialog(query=True, text=True)
-                if prefix == "": # if no name provided in the promptDialog, use the geoBase name
-                    prefix = geoBase
-                    if "|" in geoBase:
-                        prefix = geoBase[geoBase.rfind("|")+1:]
+                if prefix == "": # if no name provided in the promptDialog, use the geo_base name
+                    prefix = geo_base
+                    if "|" in geo_base:
+                        prefix = geo_base[geo_base.rfind("|")+1:]
                 if not prefix.endswith("_"):
                     prefix = prefix+"_"
                 prefix = prefix.capitalize()
                 suffix = "_Tgt"
                 # get default list of targets to be created:
-                tgtList = list(self.defaultTargetList)
-                # if the tweakTgtOnly is not checked, add facial targets to the list
-                if not tweakTgtOnly:
-                    tgtList.extend(self.facialTargetList)
-                    # if the combinationTargets is checked, add combination targets to the list
-                    if combinationTargets:
-                        tgtList.extend(self.combinationTargetList)
-                if len(tgtList) > 3:
+                targets = list(self.default_targets)
+                # if the tweak_tgt_only is not checked, add facial targets to the list
+                if not tweak_tgt_only:
+                    targets.extend(self.facial_targets)
+                    # if the combination_targets is checked, add combination targets to the list
+                    if combination_targets:
+                        targets.extend(self.combination_targets)
+                if len(targets) > 3:
                     # create facial target group if there's more than 3 targets to be created (Base, Recept, Tweaks)
-                    facialTgtGrp = cmds.group(empty=True, name=prefix+"Facial_Tgt_Grp")
-                tgtGrp = cmds.group(empty=True, name=prefix+"Tgt_Grp")
+                    facial_target_grp = cmds.group(empty=True, name=prefix+"Facial_Tgt_Grp")
+                target_grps = cmds.group(empty=True, name=prefix+"Tgt_Grp")
                 # turn off deformers envelope to avoid incorrect base mesh duplication
-                self.turnDeformersEnvelope(turnOn=False)
-                facialTgtList = []
-                createdTgts = []
-                for t, tgt in enumerate(tgtList):
+                self.change_all_envelope(False)
+                facial_targets = []
+                created_targets = []
+                for t, tgt in enumerate(targets):
                     # duplicate, rename and assign initial shader to target
-                    newGeo = self.dpDuplicateRenameAndInitShaderTgt(geoBase, prefix, tgt, suffix)
-                    createdTgts.append(newGeo)
+                    new_geo = self.prepare_new_target(geo_base, prefix, tgt, suffix)
+                    created_targets.append(new_geo)
                     if t == 0: # base target
-                        cmds.setAttr(newGeo+".visibility", 0)
-                        geos.append(newGeo)
-                        cmds.parent(newGeo, tgtGrp)
+                        cmds.setAttr(new_geo+".visibility", 0)
+                        geos.append(new_geo)
+                        cmds.parent(new_geo, target_grps)
                     elif t == 1: # recept target
-                        geos.append(newGeo)
-                        cmds.parent(newGeo, tgtGrp)
+                        geos.append(new_geo)
+                        cmds.parent(new_geo, target_grps)
                     elif t == 2: # tweak target
-                        geos.append(newGeo)
-                        cmds.parent(newGeo, tgtGrp)
+                        geos.append(new_geo)
+                        cmds.parent(new_geo, target_grps)
                     else: # facial targets
-                        cmds.parent(newGeo, facialTgtGrp)
-                        facialTgtList.append(newGeo)
-                if facialTgtList:
-                    cmds.parent(facialTgtGrp, tgtGrp)
-                self.turnDeformersEnvelope(turnOn=True)
-                # if createBsNode is checked, it will create the blendShape node connecting combination if needed
-                if createBsNode:
-                    self.createBlendShapeNode(geoBase, prefix, createdTgts, combTgt=combinationTargets)
+                        cmds.parent(new_geo, facial_target_grp)
+                        facial_targets.append(new_geo)
+                if facial_targets:
+                    cmds.parent(facial_target_grp, target_grps)
+                self.change_all_envelope(True)
+                # if create_bs_node is checked, it will create the blendShape node connecting combination if needed
+                if create_bs_node:
+                    self.create_blendshape_node(geo_base, prefix, created_targets, comb_tgt=combination_targets)
             if self.ar.data.ui_state and results:
                 self.ar.logger.infoWin('m085_facialConnection', 'm048_createdTgt', '\n'.join(results), 'center', 200, 350)
         else:
@@ -242,34 +200,34 @@ class FacialConnection(base.BaseLibrary):
         self.ar.utils.close_ui('dpFacialConnectionWindow')
     
 
-    def dpDuplicateRenameAndInitShaderTgt(self, fromMesh, prefix, tgt, suffix, *args):
+    def prepare_new_target(self, from_mesh, prefix, tgt, suffix):
         """ Duplicate the given mesh, rename and assign initial shading to the target.
         """
-        dup = cmds.duplicate(fromMesh)[0]
-        newTgt = cmds.rename(dup, prefix+tgt+suffix)
-        self.ar.custom_attr.add_attr(0, [newTgt], descendents=True) #dpID
-        cmds.select(newTgt)
-        cmds.hyperShade(newTgt, assign="initialShadingGroup")
-        connectedPlug = cmds.listConnections(newTgt+".drawOverride", destination=False, source=True, plugs=True)
-        if connectedPlug:
-            cmds.disconnectAttr(connectedPlug[0], newTgt+".drawOverride")
-        return newTgt
+        dup = cmds.duplicate(from_mesh)[0]
+        new_tgt = cmds.rename(dup, prefix+tgt+suffix)
+        self.ar.custom_attr.add_attr(0, [new_tgt], descendents=True) #dpID
+        cmds.select(new_tgt)
+        cmds.hyperShade(new_tgt, assign="initialShadingGroup")
+        connection = cmds.listConnections(new_tgt+".drawOverride", destination=False, source=True, plugs=True)
+        if connection:
+            cmds.disconnectAttr(connection[0], new_tgt+".drawOverride")
+        return new_tgt
 
 
-    def dpGetFacialCtrlDic(self, controllers, *args):
+    def get_facial_ctrl_data(self, controllers):
         """ Return the facial control data with facialList attributes.
         """
-        resultDic = {}
+        result_data = {}
         if not controllers:
             controllers = self.ar.ctrls.getControlList()
         if controllers:
             for ctrl in controllers:
                 if cmds.objExists(ctrl+".facialList"):
-                    resultDic[ctrl] = self.ar.ctrls.getListFromStringAttr(ctrl, "facialList")
-        return resultDic
+                    result_data[ctrl] = self.ar.ctrls.getListFromStringAttr(ctrl, "facialList")
+        return result_data
     
 
-    def dpGetBsNodeDic(self, bs_items):
+    def get_bs_node_data(self, bs_items):
         """ Return the blendShape nodes data with their target.
         """        
         bs_data = {}
@@ -281,41 +239,41 @@ class FacialConnection(base.BaseLibrary):
         return bs_data
 
 
-    def dpConnectToBlendShape(self, controllers=None, bs_items=None, *args):
+    def connect_to_blendshape(self, controllers=None, bs_items=None, *args):
         """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
         """
         results = []
         # get facialList attr from found dpAR controls
-        facialCtrlDic = self.dpGetFacialCtrlDic(controllers)
+        facial_ctrl_data = self.get_facial_ctrl_data(controllers)
         # get target list from existing blendShape nodes
         if not bs_items:
             bs_items = cmds.ls(selection=False, type="blendShape")
-        bs_data = self.dpGetBsNodeDic(bs_items)
+        bs_data = self.get_bs_node_data(bs_items)
         # connect them
         if bs_data:
-            if facialCtrlDic and bs_data:
-                for facialCtrl in list(facialCtrlDic.keys()):
+            if facial_ctrl_data and bs_data:
+                for facial_ctrl in list(facial_ctrl_data.keys()):
                     for bs_node in list(bs_data.keys()):
-                        for facialAttr in facialCtrlDic[facialCtrl]:
-                            for targetAttr in bs_data[bs_node]:
-                                connectIt = False
-                                if targetAttr.endswith(facialAttr+"_Tgt"):
-                                    connectIt = True
-                                elif targetAttr.endswith(facialAttr):
-                                    connectIt = True
-                                elif facialAttr == targetAttr:
-                                    connectIt = True
-                                # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
-                                if connectIt:
-                                    cmds.connectAttr(facialCtrl+"."+facialAttr, bs_node+"."+targetAttr, force=True)
-                                    print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bs_node+"."+targetAttr)
-                                    results.append(facialCtrl+"."+facialAttr+" -> "+bs_node+"."+targetAttr)
+                        for facial_attr in facial_ctrl_data[facial_ctrl]:
+                            for target_attr in bs_data[bs_node]:
+                                connect_it = False
+                                if target_attr.endswith(facial_attr+"_Tgt"):
+                                    connect_it = True
+                                elif target_attr.endswith(facial_attr):
+                                    connect_it = True
+                                elif facial_attr == target_attr:
+                                    connect_it = True
+                                # not including here the (facial_attr in target_attr) statement to try avoid connect into combination alias
+                                if connect_it:
+                                    cmds.connectAttr(facial_ctrl+"."+facial_attr, bs_node+"."+target_attr, force=True)
+                                    print(self.ar.data.lang['m143_connected'], facial_ctrl+"."+facial_attr, "->", bs_node+"."+target_attr)
+                                    results.append(facial_ctrl+"."+facial_attr+" -> "+bs_node+"."+target_attr)
             for bs_node in list(bs_data.keys()):
                 # check and connect combination targets if any
-                combinationsDic = self.dpFindCombinationTgtRelationship(bs_node)
-                combResultList = self.connectCombinationTargets(bs_node, combinationsDic)
-                if combResultList:
-                    for result in combResultList:
+                combinations_data = self.find_comb_tgt_relatonship(bs_node)
+                comb_results = self.connect_comb_targets(bs_node, combinations_data)
+                if comb_results:
+                    for result in comb_results:
                         results.append(result)
         if not self.ar.data.rebuilding:
             if self.ar.data.ui_state and results:
@@ -323,244 +281,233 @@ class FacialConnection(base.BaseLibrary):
         self.ar.utils.close_ui('dpFacialConnectionWindow')
     
 
-    def dpConnectToJoints(self, controllers=None, *args):
+    def connect_to_joints(self, controllers=None, *args):
         """ Connect the facial controllers attributes to the stored facial tweakers data.
         """
         self.to_ids, results = [], []
         # redefining Tweaks variables to get the tweaks name list
-        self.dpInitTweaksVariables()
+        self.load_tweaks_variables()
         # get joint target list
-        self.jntTargetList = self.dpGetJointNodeList(self.tweaksNameList)
-        if self.jntTargetList:
-            facialCtrlDic = self.dpGetFacialCtrlDic(controllers)
-            if facialCtrlDic:
+        self.joint_targets = self.get_joint_nodes(self.tweaks_names)
+        if self.joint_targets:
+            facial_ctrl_data = self.get_facial_ctrl_data(controllers)
+            if facial_ctrl_data:
                 # declaring gaming dictionary:
-                self.tweaksDic = self.dpInitTweaksDic()
-                if self.tweaksDic:
-                    for facialCtrl in list(facialCtrlDic.keys()):
-                        for facialAttr in facialCtrlDic[facialCtrl]:
+                tweaks_data = self.get_tweaks_data()
+                if tweaks_data:
+                    for facial_ctrl in list(facial_ctrl_data.keys()):
+                        for facial_attr in facial_ctrl_data[facial_ctrl]:
                             # check attribute prefix like "L_" or "R_"
-                            sidePrefix = None
-                            sidedAttr = facialAttr
-                            if facialAttr[1] == "_":
-                                sidePrefix = facialAttr[0]
-                                sidedAttr = facialAttr[2:]
+                            side_prefix = None
+                            side_attr = facial_attr
+                            if facial_attr[1] == "_":
+                                side_prefix = facial_attr[0]
+                                side_attr = facial_attr[2:]
                             # work with Middle, L_Middle, R_Middle or Sided data
-                            for middleOrSided in list(self.tweaksDic[sidedAttr].keys()):
-                                nodeDataList = []
-                                if middleOrSided == MIDDLE:
-                                    nodeDataList.append(self.tweaksDic[sidedAttr][middleOrSided])
-                                elif middleOrSided == SIDED:
+                            for middle_or_sided in list(tweaks_data[side_attr].keys()):
+                                node_datas = []
+                                if middle_or_sided == MIDDLE:
+                                    node_datas.append(tweaks_data[side_attr][middle_or_sided])
+                                elif middle_or_sided == SIDED:
                                     data = {}
                                     for s in ["L", "R"]:
-                                        if sidePrefix == None or sidePrefix == s:
-                                            for n in list(self.tweaksDic[sidedAttr][middleOrSided].keys()):
+                                        if side_prefix == None or side_prefix == s:
+                                            for n in list(tweaks_data[side_attr][middle_or_sided].keys()):
                                                 # add prefix to the destination joint target node
-                                                data[s+"_"+n] = self.tweaksDic[sidedAttr][middleOrSided][n]
-                                    nodeDataList.append(data)
+                                                data[s+"_"+n] = tweaks_data[side_attr][middle_or_sided][n]
+                                    node_datas.append(data)
                                 else:
                                     for s in ["L", "R"]:
-                                        if middleOrSided == s+"_"+MIDDLE:
-                                            if sidePrefix == "L":
+                                        if middle_or_sided == s+"_"+MIDDLE:
+                                            if side_prefix == "L":
                                                 # simple connection
-                                                nodeDataList.append(self.tweaksDic[sidedAttr][middleOrSided])
-                                if nodeDataList:
-                                    for nodeDic in nodeDataList:
-                                        for toNode in list(nodeDic.keys()):
-                                            for jntTarget in self.jntTargetList:
-                                                if cmds.objExists(jntTarget):
-                                                    if jntTarget.startswith(toNode):
+                                                node_datas.append(tweaks_data[side_attr][middle_or_sided])
+                                if node_datas:
+                                    for node_data in node_datas:
+                                        for to_node in list(node_data.keys()):
+                                            for joint_target in self.joint_targets:
+                                                if cmds.objExists(joint_target):
+                                                    if joint_target.startswith(to_node):
                                                         # caculate factor for scaled item:
-                                                        sizeFactor = self.dpGetSizeFactor(jntTarget)
-                                                        if not sizeFactor:
-                                                            sizeFactor = 1
-                                                        for toAttr in list(nodeDic[toNode].keys()):
+                                                        size_factor = self.get_size_factor(joint_target)
+                                                        if not size_factor:
+                                                            size_factor = 1
+                                                        for to_attr in list(node_data[to_node].keys()):
                                                             # read stored values in order to call function to make the setup
-                                                            oMin = nodeDic[toNode][toAttr][0]
-                                                            oMax = nodeDic[toNode][toAttr][1]
-                                                            self.dpCreateRemapNode(facialCtrl, facialAttr, jntTarget, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
-                                                            self.RmVNumber = self.RmVNumber+1
-                                                        print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
-                                                        results.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
+                                                            output_min = node_data[to_node][to_attr][0]
+                                                            output_max = node_data[to_node][to_attr][1]
+                                                            self.create_remap_node(facial_ctrl, facial_attr, joint_target, to_attr, self.rmv_number, size_factor, output_min, output_max)
+                                                            self.rmv_number = self.rmv_number+1
+                                                        print(self.ar.data.lang['m143_connected'], facial_ctrl+"."+facial_attr, "->", joint_target)
+                                                        results.append(facial_ctrl+"."+facial_attr+" -> "+joint_target)
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and results:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
         self.ar.utils.close_ui('dpFacialConnectionWindow')
 
     
-    def dpGetJointNodeList(self, items, *args):
+    def get_joint_nodes(self, items):
         """ Load the respective items to build the joint target list (offset group node) and returns it.
         """
-        self.offsetSuffix = "_Ctrl_Offset_Grp"
-        leftPrefix = self.ar.data.lang["p002_left"]+"_"
-        rightPrefix = self.ar.data.lang["p003_right"]+"_"
+        self.offset_suffix = "_Ctrl_Offset_Grp"
+        left_prefix = self.ar.data.lang["p002_left"]+"_"
+        right_prefix = self.ar.data.lang["p003_right"]+"_"
         for item in items:
-            centerName = item+self.offsetSuffix
-            leftName   = leftPrefix+item+self.offsetSuffix
-            rightName  = rightPrefix+item+self.offsetSuffix
-            if cmds.objExists(centerName):
-                self.jntTargetList.append(centerName)
-            if cmds.objExists(leftName):
-                self.jntTargetList.append(leftName)
-            if cmds.objExists(rightName):
-                self.jntTargetList.append(rightName)
-        return self.jntTargetList
+            center_name = item+self.offset_suffix
+            left_name   = left_prefix+item+self.offset_suffix
+            right_name  = right_prefix+item+self.offset_suffix
+            if cmds.objExists(center_name):
+                self.joint_targets.append(center_name)
+            if cmds.objExists(left_name):
+                self.joint_targets.append(left_name)
+            if cmds.objExists(right_name):
+                self.joint_targets.append(right_name)
+        return self.joint_targets
     
     
-    def dpGetSizeFactor(self, toNode, *args):
+    def get_size_factor(self, to_node):
         """ Get the child control size value and return it.
         """
-        children = cmds.listRelatives(toNode, children=True, type="transform")
+        children = cmds.listRelatives(to_node, children=True, type="transform")
         if children:
             for child in children:
                 if cmds.objExists(child+".dpControl"):
                     if cmds.getAttr(child+".dpControl") == 1:
                         if cmds.objExists(child+".size"):
-                            sizeValue = cmds.getAttr(child+".size")
-                            return sizeValue
-                        
+                            return cmds.getAttr(child+".size") #sizeValue
 
-    def dpCreateRemapNode(self, fromNode, fromAttr, jntTarget, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
-        """ Creates the nodes to remap values and connect it to final output (jntTarget) item.
+
+    def create_remap_node(self, from_node, from_attr, joint_target, to_attr, number, size_factor, output_min=0, output_max=1, input_min=0, input_max=1):
+        """ Creates the nodes to remap values and connect it to final output (joint_target) item.
         """
-        fromNodeName = self.ar.utils.extractSuffix(fromNode)
-        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
+        from_node_name = self.ar.utils.extractSuffix(from_node)
+        remap = cmds.createNode("remapValue", name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_RmV")
         self.to_ids.append(remap)
-        outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
-        if not cmds.objExists(fromNode+"."+outMaxAttr):
-            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
-        if "t" in toAttr:
-            if not cmds.objExists(fromNode+".sizeFactor"):
-                cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
-            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
+        out_max_attr = joint_target.split(self.offset_suffix)[0]+"_"+str(number).zfill(2)+"_"+to_attr.upper()
+        if not cmds.objExists(from_node+"."+out_max_attr):
+            cmds.addAttr(from_node, longName=out_max_attr, attributeType="float", defaultValue=output_max, keyable=False)
+        if "t" in to_attr:
+            if not cmds.objExists(from_node+".size_factor"):
+                cmds.addAttr(from_node, longName="size_factor", attributeType="float", defaultValue=size_factor, keyable=False)
+            md = cmds.createNode("multiplyDivide", name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_SizeFactor_MD")
             self.to_ids.append(md)
-            cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
-            cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
+            cmds.connectAttr(from_node+"."+out_max_attr, md+".input1X", force=True)
+            cmds.connectAttr(from_node+".size_factor", md+".input2X", force=True)
             cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
         else:
-            cmds.connectAttr(fromNode+"."+outMaxAttr, remap+".outputMax", force=True)
-        cmds.setAttr(remap+".inputMin", iMin)
-        cmds.setAttr(remap+".inputMax", iMax)
-        cmds.setAttr(remap+".outputMin", oMin)
-        cmds.connectAttr(fromNode+"."+fromAttr, remap+".inputValue", force=True)
+            cmds.connectAttr(from_node+"."+out_max_attr, remap+".outputMax", force=True)
+        cmds.setAttr(remap+".inputMin", input_min)
+        cmds.setAttr(remap+".inputMax", input_max)
+        cmds.setAttr(remap+".outputMin", output_min)
+        cmds.connectAttr(from_node+"."+from_attr, remap+".inputValue", force=True)
         # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
-        connectedList = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=False)
-        if connectedList:
-            if cmds.objectType(connectedList[0]) == "plusMinusAverage":
-                inputList = cmds.listConnections(connectedList[0]+".input1D", destination=False, source=True, plugs=False)
-                cmds.connectAttr(remap+".outValue", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
+        connections = cmds.listConnections(joint_target+"."+to_attr, destination=False, source=True, plugs=False)
+        if connections:
+            if cmds.objectType(connections[0]) == "plusMinusAverage":
+                inputs = cmds.listConnections(connections[0]+".input1D", destination=False, source=True, plugs=False)
+                cmds.connectAttr(remap+".outValue", connections[0]+".input1D["+str(len(inputs))+"]", force=True)
             else:
-                if cmds.objectType(connectedList[0]) == "unitConversion":
-                    connectedAttr = cmds.listConnections(connectedList[0]+".input", destination=False, source=True, plugs=True)[0]
+                if cmds.objectType(connections[0]) == "unitConversion":
+                    connected_attr = cmds.listConnections(connections[0]+".input", destination=False, source=True, plugs=True)[0]
                 else:
-                    connectedAttr = cmds.listConnections(jntTarget+"."+toAttr, destination=False, source=True, plugs=True)[0]
-                pma = cmds.createNode("plusMinusAverage", name=jntTarget+"_"+toAttr.upper()+"_PMA")
+                    connected_attr = cmds.listConnections(joint_target+"."+to_attr, destination=False, source=True, plugs=True)[0]
+                pma = cmds.createNode("plusMinusAverage", name=joint_target+"_"+to_attr.upper()+"_PMA")
                 self.to_ids.append(pma)
-                cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
+                cmds.connectAttr(connected_attr, pma+".input1D[0]", force=True)
                 cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
-                cmds.connectAttr(pma+".output1D", jntTarget+"."+toAttr, force=True)
-                if cmds.objectType(connectedList[0]) == "unitConversion":
-                    cmds.delete(connectedList[0])
+                cmds.connectAttr(pma+".output1D", joint_target+"."+to_attr, force=True)
+                if cmds.objectType(connections[0]) == "unitConversion":
+                    cmds.delete(connections[0])
         else:
-            cmds.connectAttr(remap+".outValue", jntTarget+"."+toAttr, force=True)
+            cmds.connectAttr(remap+".outValue", joint_target+"."+to_attr, force=True)
 
 
-    def nodeHasEnvelope(self, node,*args):
+    def node_has_envelope(self, node):
         """ Check if the given node has an envelope attribute. Avoid tweak nodes.
         """
         if cmds.nodeType(node) != "tweak":
             return cmds.attributeQuery('envelope', node=node, exists=True)
 
 
-    def envelopeIsValid(self, node, *args):
-        """ Check if the given node envelope attribute is not connected, nodeState is normal and not user defined.
-        """
-        notConnected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
-        nodeStateNormal = cmds.getAttr(node+".nodeState") == 0
-        notUserDefined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
-        return notConnected and nodeStateNormal and notUserDefined
-
-
-    def turnDeformersEnvelope(self, turnOn=False, *args):
+    def change_all_envelope(self, value=False):
         """ Turn on/off envelope attribute in the scene, to avoind miss deformation in base mesh duplication.
         """
         checked_items = []
-        allNodesList = cmds.ls()
-        allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
-        allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
-        checked_items.extend(allValidEnvelopeNodes)
+        all_enveloped_nodes = list(filter(self.node_has_envelope, cmds.ls())) #all
+        all_valid_envelope_nodes = list(filter(self.ar.utils.envelope_is_valid, all_enveloped_nodes))
+        checked_items.extend(all_valid_envelope_nodes)
         if checked_items:
-            if turnOn == True:
+            if value == True:
                 for node in checked_items:
                     cmds.setAttr(f"{node}.envelope", 1)
-            if turnOn == False:
+            if value == False:
                 for node in checked_items:
                     cmds.setAttr(f"{node}.envelope", 0)
             
 
-    def createBlendShapeNode(self, fromMesh, prefix, tgtList, combTgt=False, *args):
+    def create_blendshape_node(self, from_mesh, prefix, targets, comb_tgt=False):
         """ Create a blendShape node connecting all created target meshes.
         """
-        receptTgt = tgtList[1]
-        tweakTarget = tgtList[2]
-        tgtsForRecept = tgtList[2:]
+        recept_target = targets[1]
+        tweak_target = targets[2]
+        targets_for_recept = targets[2:]
         # create Recept blendshape node with facial targets
-        bsRecept = cmds.blendShape(tgtsForRecept, receptTgt, frontOfChain=True, name=prefix+self.bsReceptSuffix)[0]
+        bs_recept = cmds.blendShape(targets_for_recept, recept_target, frontOfChain=True, name=prefix+self.recept_bs_suffix)[0]
         # create blendShape node from recept to main mesh
-        bsMain = cmds.blendShape(receptTgt, fromMesh, frontOfChain=True, name=prefix+self.bsSuffix)[0]
+        bs_main = cmds.blendShape(recept_target, from_mesh, frontOfChain=True, name=prefix+self.bs_suffix)[0]
         # store prefix to define names further
-        cmds.addAttr(bsRecept, longName="dpPrefix", dataType="string")
-        cmds.addAttr(bsMain, longName="dpPrefix", dataType="string")
-        cmds.setAttr(bsRecept+".dpPrefix", prefix, type="string")
-        cmds.setAttr(bsMain+".dpPrefix", prefix, type="string")
+        cmds.addAttr(bs_recept, longName="dpPrefix", dataType="string")
+        cmds.addAttr(bs_main, longName="dpPrefix", dataType="string")
+        cmds.setAttr(bs_recept+".dpPrefix", prefix, type="string")
+        cmds.setAttr(bs_main+".dpPrefix", prefix, type="string")
         # turning on the targets to make it easier to work
-        cmds.setAttr(f"{bsMain}.{receptTgt}", 1)
-        cmds.setAttr(f"{bsRecept}.{tweakTarget}", 1)
-        if combTgt:
+        cmds.setAttr(f"{bs_main}.{recept_target}", 1)
+        cmds.setAttr(f"{bs_recept}.{tweak_target}", 1)
+        if comb_tgt:
             # check and connect combination targets if any
-            combinationsDic = self.dpFindCombinationTgtRelationship(bsRecept)
-            self.connectCombinationTargets(bsRecept, combinationsDic)
+            combinations_data = self.find_comb_tgt_relatonship(bs_recept)
+            self.connect_comb_targets(bs_recept, combinations_data)
 
 
-    def dpFindCombinationTgtRelationship(self, bs_node, *args):
+    def find_comb_tgt_relatonship(self, bs_node):
         """ Find combination targets in the given blendShape node and their respective driver targets.
         """
         prefix = None
-        combinationTargetRelationship = {}
+        comb_target_relationship_data = {}
         if bs_node:
             targets = cmds.listAttr(bs_node+".w", multi=True) or []
             if "dpPrefix" in cmds.listAttr(bs_node):
                 prefix = cmds.getAttr(bs_node+".dpPrefix")
         if prefix: #only pass if the blendShape node was created by this current tool version
-            baseTargets = []
-            comboTargets = []
+            base_targets = []
+            combo_targets = []
             # separate in lists between base or combination target to further classification
             for target in targets:
-                targetCheck = self.decomposeTgtName(target, prefix)
-                if targetCheck[0] == True:
-                    comboTargets.append(target)
+                target_check = self.decompose_tgt_name(target, prefix)
+                if target_check[0] == True:
+                    combo_targets.append(target)
                 else:
-                    baseTargets.append(target)
-            for combName in comboTargets:
-                combTgtRaw = self.decomposeTgtName(combName, prefix)[-1]
-                combLower = combTgtRaw.lower()
-                # splitting using "comb_" to get beforeComb name e.g: l_mouth and combination part e.g. smilewide
-                beforeComb, combPart = combLower.split("comb_")
+                    base_targets.append(target)
+            for comb_name in combo_targets:
+                comb_tgt_raw = self.decompose_tgt_name(comb_name, prefix)[-1]
+                comb_lower = comb_tgt_raw.lower()
+                # splitting using "comb_" to get before_comb name e.g: l_mouth and combination part e.g. smilewide
+                before_comb, comb_part = comb_lower.split("comb_")
                 drivers = []
-                for base_name in baseTargets:
-                    baseNameAttr = self.decomposeTgtName(base_name, prefix)[-1]
-                    baseLower = baseNameAttr.lower()
+                for base_name in base_targets:
+                    base_name_attr = self.decompose_tgt_name(base_name, prefix)[-1]
+                    base_lower = base_name_attr.lower()
                     # when the base target match the combination part prefix, it will replace same prefix for blank
                     # it will be remained only the suffix to compare e.g smile
-                    baseSuffix = baseLower.replace(beforeComb, "")
-                    if baseSuffix and baseSuffix in combPart: # if it finds the suffix in the combination part, it's a driver
+                    base_suffix = base_lower.replace(before_comb, "")
+                    if base_suffix and base_suffix in comb_part: # if it finds the suffix in the combination part, it's a driver
                         drivers.append(base_name)
                     if len(drivers) >= 2: # its necessary more than two drivers per combination target
-                        combinationTargetRelationship[combName] = drivers
-            return combinationTargetRelationship
+                        comb_target_relationship_data[comb_name] = drivers
+            return comb_target_relationship_data
     
 
-    def getBlendShapeTargetIndex(self, bs_node, target_name, *args):
+    def get_blendshape_tgt_index(self, bs_node, target_name, *args):
         """ Get the blendShape target index from its name.
         """         
         alias = cmds.aliasAttr(bs_node, q=True) or []
@@ -570,115 +517,105 @@ class FacialConnection(base.BaseLibrary):
         return None
     
 
-    def connectCombinationTargets(self, bs_node, combinationsDic, *args):
-        """ Connect combination targets in the given blendShape node using the combinationsDic information.
+    def connect_comb_targets(self, bs_node, combinations_data, *args):
+        """ Connect combination targets in the given blendShape node using the combinations_data information.
         """
         results = []
-        if combinationsDic:
-            for combTgt, drivers in combinationsDic.items():
-                combIndex = self.getBlendShapeTargetIndex(bs_node, combTgt)
-                driverIdxList = []
-                for driverTgt in drivers:
-                    driverIndex = self.getBlendShapeTargetIndex(bs_node, driverTgt)
-                    driverIdxList.append(driverIndex) 
-                inputWeights = cmds.combinationShape(query=True, blendShape=bs_node, combinationTargetIndex=combIndex, exist=True)    
+        if combinations_data:
+            for comb_tgt, drivers in combinations_data.items():
+                comb_index = self.get_blendshape_tgt_index(bs_node, comb_tgt)
+                driver_indexes = []
+                for driver_tgt in drivers:
+                    driver_index = self.get_blendshape_tgt_index(bs_node, driver_tgt)
+                    driver_indexes.append(driver_index) 
+                input_weights = cmds.combinationShape(query=True, blendShape=bs_node, combinationTargetIndex=comb_index, exist=True)    
                 # check if combination target is already connected
-                if not inputWeights:
+                if not input_weights:
                     # add combination only if the target is not locked
-                    if not cmds.getAttr(bs_node+"."+combTgt, lock=True):
-                        cmds.combinationShape(blendShape=bs_node, combineMethod=0, combinationTargetIndex=combIndex, driverTargetIndex=driverIdxList)
-                        print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", combTgt)
-                        results.append(str(drivers[0]+" + "+drivers[1]+" -> "+combTgt))
+                    if not cmds.getAttr(bs_node+"."+comb_tgt, lock=True):
+                        cmds.combinationShape(blendShape=bs_node, combineMethod=0, combinationTargetIndex=comb_index, driverTargetIndex=driver_indexes)
+                        print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", comb_tgt)
+                        results.append(str(drivers[0]+" + "+drivers[1]+" -> "+comb_tgt))
         return results
 
 
-    def decomposeTgtName(self, tgtName, prefix, *args):
+    def decompose_tgt_name(self, tgt_name, prefix, *args):
         """ Decomposes a target name into its side and if it is a combination target, also [-1] will return the raw tgt name.
             e.g. Head_L_MouthSmile -> False, L, L_MouthSmile
         """
         comb = None
         side = None
-        if tgtName:
+        if tgt_name:
             if prefix:
-                tgtName = tgtName.replace(prefix, "")
-            nameSplitted = tgtName.split("_")[:-1]
-            if len(nameSplitted) > 2: # combination target
-                side = nameSplitted[0]    
-                combRegion = nameSplitted[1]
-                tgtRaw = nameSplitted[2]
-                tgt = f"{side}_{combRegion}_{tgtRaw}"
+                tgt_name = tgt_name.replace(prefix, "")
+            splitted_name = tgt_name.split("_")[:-1]
+            if len(splitted_name) > 2: # combination target
+                side = splitted_name[0]    
+                comb_region = splitted_name[1]
+                raw_tgt = splitted_name[2]
+                tgt = f"{side}_{comb_region}_{raw_tgt}"
                 comb = True   
-            elif len(nameSplitted) == 1: # symetrical target
+            elif len(splitted_name) == 1: # symetrical target
                 comb = False
                 side = False
-                tgt = nameSplitted[0]
-            elif len(nameSplitted) == 2: # sided target
+                tgt = splitted_name[0]
+            elif len(splitted_name) == 2: # sided target
                 comb = False
-                side = nameSplitted[0]    
-                tgtRaw = nameSplitted[1]
-                tgt = f"{side}_{tgtRaw}"
+                side = splitted_name[0]    
+                raw_tgt = splitted_name[1]
+                tgt = f"{side}_{raw_tgt}"
         return comb, side, tgt
     
 
-    def dpRebuildTargets(self, *args):
+    def recreate_targets(self, *args):
         """ Rebuild the blendShape targets from an old mesh to a new one.
         """
-        selectionList = cmds.ls(selection=True, type="transform")
-        if selectionList and len(selectionList) == 2:
-            if self.ar.utils.dpCheckGeometry(selectionList[0]) and self.ar.utils.dpCheckGeometry(selectionList[1]):
-                oldMesh = selectionList[0]
-                newMesh = selectionList[1]
-                bs_node = cmds.ls(cmds.listHistory(oldMesh), type="blendShape")
+        selections = cmds.ls(selection=True, type="transform")
+        if selections and len(selections) == 2:
+            if self.ar.utils.dpCheckGeometry(selections[0]) and self.ar.utils.dpCheckGeometry(selections[1]):
+                old_mesh = selections[0]
+                new_mesh = selections[1]
+                bs_node = cmds.ls(cmds.listHistory(old_mesh), type="blendShape")
                 if bs_node:
                     targets = cmds.listAttr(bs_node[0]+".w", multi=True)
                     if targets:
-                        # progress window
-                        progressAmount = 0
-                        self.ar.utils.setProgress('Rebuilding Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m265_rebuildTargets"], len(targets), add_one=False, add_number=False)
-                        cancelled = False
-                        nbTarget = len(targets)
-                        reconnectList = []
-                        cmds.select([newMesh, oldMesh])
+                        self.ar.utils.setProgress(self.ar.data.lang['c110_start'], self.ar.data.lang["m265_recreateTargets"], max=len(targets), add_one=False, add_number=False)
+                        reconnect_items = []
+                        cmds.select([new_mesh, old_mesh])
                         mel.eval("CreateWrap;")
-                        tgtGrp = cmds.group(name="New_Tgt_Grp", empty=True)
+                        target_grps = cmds.group(name="New_Tgt_Grp", empty=True)
                         # clear selection
                         cmds.select(clear=True)
-                        newTgtList = []
+                        new_targets = []
                         for item in targets:
-                            # update progress window
-                            progressAmount += 1
-                            # check if the dialog has been cancelled
-                            if cmds.progressWindow(query=True, isCancelled=True):
-                                cancelled = True
-                                break
-                            cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
-                            if not item == oldMesh:
-                                hasConnection = cmds.listConnections(bs_node[0]+"."+item, source=True, destination=False, plugs=True)
-                                if hasConnection:
-                                    cmds.disconnectAttr(hasConnection[0], bs_node[0]+"."+item)
-                                    reconnectList.append(hasConnection[0])
+                            self.ar.utils.setProgress('Target: '+item)
+                            if not item == old_mesh:
+                                has_connection = cmds.listConnections(bs_node[0]+"."+item, source=True, destination=False, plugs=True)
+                                if has_connection:
+                                    cmds.disconnectAttr(has_connection[0], bs_node[0]+"."+item)
+                                    reconnect_items.append(has_connection[0])
                                 else:
-                                    reconnectList.append(None)
+                                    reconnect_items.append(None)
                                 # set blendShape slider as 1
                                 cmds.setAttr(bs_node[0]+"."+item, 1)
                                 # renaming old target
                                 cmds.rename(item, item+"_Old")
-                                tgt = cmds.duplicate(newMesh, name=item)[0]
-                                cmds.parent(tgt, tgtGrp)
-                                newTgtList.append(tgt)
+                                tgt = cmds.duplicate(new_mesh, name=item)[0]
+                                cmds.parent(tgt, target_grps)
+                                new_targets.append(tgt)
                                 # back to zero
                                 cmds.setAttr(bs_node[0]+"."+item, 0)
-                                if hasConnection:
-                                    cmds.connectAttr(hasConnection[0], bs_node[0]+"."+item)
+                                if has_connection:
+                                    cmds.connectAttr(has_connection[0], bs_node[0]+"."+item)
                                 # clear undo
                                 mel.eval("flushUndo;")
-                        cmds.delete(newMesh, constructionHistory=True)
+                        cmds.delete(new_mesh, constructionHistory=True)
                         cmds.rename(bs_node[0], bs_node[0]+"_Old")
-                        cmds.blendShape(newTgtList, newMesh, topologyCheck=False, name=bs_node[0])
-                        for p, plug in enumerate(reconnectList):
+                        cmds.blendShape(new_targets, new_mesh, topologyCheck=False, name=bs_node[0])
+                        for p, plug in enumerate(reconnect_items):
                             if plug:
-                                cmds.connectAttr(plug, bs_node[0]+"."+newTgtList[p], force=True)
-                        if cmds.objExists(oldMesh+"Base"):
-                            cmds.delete(oldMesh+"Base")
-                        cmds.progressWindow(endPogress=True)
+                                cmds.connectAttr(plug, bs_node[0]+"."+new_targets[p], force=True)
+                        if cmds.objExists(old_mesh+"Base"):
+                            cmds.delete(old_mesh+"Base")
+                        self.ar.utils.setProgress(endIt=True)
                         cmds.select(clear=True)
