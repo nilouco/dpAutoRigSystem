@@ -428,7 +428,7 @@ class Foot(standard.BaseStandard):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.utils.addCustomAttr([rfa_grp, rfb_grp, rfc_grp, rfd_grp, rfe_grp], self.ar.utils.ignoreTransformIOAttr)
                 self.to_ids.extend([side_clp, side_md, foot_heel_clp, foot_pma, foot_sr, foot_plant_clp, foot_plant_cnd, angle_plant_pma, angle_plant_md, angle_plant_rmv, angle_plant_cnd, foot_ball_rev, vis_md])
-                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
+                self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composing_info()
@@ -436,7 +436,7 @@ class Foot(standard.BaseStandard):
         # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
-        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
 
 
     def composing_info(self):

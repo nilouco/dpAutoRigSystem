@@ -48,12 +48,12 @@ class CorrectionManager(base.BaseLibrary):
                 if connections:
                     children = cmds.listRelatives(connections[0], children=True, allDescendents=True)
                     cmds.rename(connections[0], connections[0].replace(old_name, name))
-                    self.ar.custom_attr.updateID([connections[0].replace(old_name, name)])
+                    self.ar.custom_attr.update_id([connections[0].replace(old_name, name)])
                     if children:
                         for child in children:
                             try:
                                 cmds.rename(child, child.replace(old_name, name))
-                                self.ar.custom_attr.updateID([child.replace(old_name, name)])
+                                self.ar.custom_attr.update_id([child.replace(old_name, name)])
                             except:
                                 pass
 
@@ -431,8 +431,8 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.connectAttr(distance_axis_x_cnd+".message", self.net+".distanceAxisXCnd", force=True)
                         cmds.connectAttr(distance_axis_yz_cnd+".message", self.net+".distanceAxisYZCnd", force=True)
                     
-                    self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
-                    self.ar.custom_attr.addAttr(0, [self.cm_data_grp], descendents=True) #dpID
+                    self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
+                    self.ar.custom_attr.add_attr(0, [self.cm_data_grp], descendents=True) #dpID
                     # update UI                    
                     if self.ar.data.ui_state:
                         self.ar.correction_manager_ui.populate_net_ui()

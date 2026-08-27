@@ -195,7 +195,7 @@ class OneSkeleton(base.BaseLibrary):
                 pass
             cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
             # dpIDs
-            self.ar.custom_attr.addAttr(0, [new_joint, pac]) #dpID
+            self.ar.custom_attr.add_attr(0, [new_joint, pac]) #dpID
         if not scale:
             cmds.delete(scale_constraints)
         return newJointList

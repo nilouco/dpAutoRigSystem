@@ -445,7 +445,7 @@ class Controllers(object):
         for j in range(totalJoints+1):
             # create pointOnSurfaceInfo:
             infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+str(j+1)+"_POSI")
-            self.ar.custom_attr.addAttr(0, [infoNode]) #dpID
+            self.ar.custom_attr.add_attr(0, [infoNode]) #dpID
             # setting parameters worldSpace, U and V:
             cmds.connectAttr(ribbonNurbsPlaneShape+".worldSpace[0]", infoNode+".inputSurface")
             cmds.setAttr(infoNode+".parameterV", ((1/float(totalJoints))*j) )
@@ -636,7 +636,7 @@ class Controllers(object):
             cmds.setAttr(optCtrlTxt+".template", 1)
             cmds.setAttr(optCtrlTxt+".tx", -0.61*r)
             cmds.setAttr(optCtrlTxt+".ty", 1.1*r)
-            self.ar.custom_attr.addAttr(0, [optCtrlTxt]) #dpID
+            self.ar.custom_attr.add_attr(0, [optCtrlTxt]) #dpID
         except:
             # it will pass if we don't able to find the font to create the text
             pass
@@ -887,7 +887,7 @@ class Controllers(object):
                         # update cvControls attributes:
                         self.transferAttr(sourceItem, destinations, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
-                    self.ar.custom_attr.addAttr(0, destinations, shapes=True) #dpID
+                    self.ar.custom_attr.add_attr(0, destinations, shapes=True) #dpID
 
 
     def transferPlug(self, fromPlug, toPlug, value=True, connections=True, *args):
@@ -1446,7 +1446,7 @@ class Controllers(object):
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
-        self.ar.custom_attr.addAttr(0, to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, to_ids) #dpID
         self.setStringAttrFromList(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
 

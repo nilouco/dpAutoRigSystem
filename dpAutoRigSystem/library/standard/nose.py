@@ -390,7 +390,7 @@ class Nose(standard.BaseStandard):
                 self.ctrl_hook_grps.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
-                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
+                self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composing_info()

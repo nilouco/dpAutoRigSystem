@@ -503,7 +503,7 @@ class BaseStandard(base.BaseLibrary):
             cmds.parent(staticList, self.static_hook_grp)
         if scalableList:
             cmds.parent(scalableList, self.scalable_hook_grp)
-        self.ar.custom_attr.addAttr(0, [self.ctrl_hook_grp, self.scalable_hook_grp, self.static_hook_grp]) #dpID
+        self.ar.custom_attr.add_attr(0, [self.ctrl_hook_grp, self.scalable_hook_grp, self.static_hook_grp]) #dpID
         # add hook attributes to be read when rigging composed modules:
         self.ar.utils.addHook(objName=self.ctrl_hook_grp, hookType='ctrlHook')
         self.ar.utils.addHook(objName=self.scalable_hook_grp, hookType='scalableHook')
@@ -539,7 +539,7 @@ class BaseStandard(base.BaseLibrary):
         else:
             guide_number = self.ar.utils.findLastNumber()
         self.guide_net = cmds.createNode("network", name="dpGuide_"+guide_number+"_Net")
-        self.ar.custom_attr.addAttr(0, [self.guide_net])[0] #dpID
+        self.ar.custom_attr.add_attr(0, [self.guide_net])[0] #dpID
         for base_attr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
             cmds.addAttr(self.guide_net, longName=base_attr, attributeType="bool")
             cmds.setAttr(self.guide_net+"."+base_attr, 1)

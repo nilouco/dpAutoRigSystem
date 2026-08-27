@@ -689,7 +689,7 @@ class MotionCapture(base.BaseLibrary):
         mel.eval("HIKCharacterControlsTool;")
         mel.eval("hikCreateDefinition;")
         self.hikNode = list(set(cmds.ls(type="HIKCharacterNode"))-set(hikOldList))[0]
-        self.id = self.ar.custom_attr.addAttr(0, [self.hikNode])[0] #dpID
+        self.id = self.ar.custom_attr.add_attr(0, [self.hikNode])[0] #dpID
         print(self.ar.data.lang['m251_createdCharDefinition']+" "+self.hikNode)
         return self.hikNode
     
@@ -924,7 +924,7 @@ for hik in cmds.ls(type="HIKCharacterNode"):
         HumanIKCleaner(hik, "'''+self.hikNode+'_Cleaner_SN'+'''", '''+str(self.getAutoRotateCtrlList())+''', '''+str(self.autoRotateAttrList)+''')
 '''
         sn = cmds.scriptNode(name=self.hikNode+'_Cleaner_SN', sourceType='python', scriptType=2, beforeScript=hikCleanerCode)
-        self.ar.custom_attr.addAttr(0, [sn]) #dpID
+        self.ar.custom_attr.add_attr(0, [sn]) #dpID
         cmds.scriptNode(sn, executeBefore=True)
 
 

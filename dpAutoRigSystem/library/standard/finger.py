@@ -446,7 +446,7 @@ class Finger(standard.BaseStandard):
                 self.scalable_grps.append(self.scalable_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
-                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
+                self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composing_info()
@@ -454,7 +454,7 @@ class Finger(standard.BaseStandard):
         # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
-        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
 
 
     def composing_info(self):

@@ -1947,7 +1947,7 @@ class Limb(standard.BaseStandard):
                 self.ar.utils.addCustomAttr([fk_ctrl_zero_grp, master_ctrl_ref, root_ctrl_ref, shoulder_ref_grp, ik_stretch_extreme_loc, ik_extreme_ctrl_grp, ik_extreme_ctrl_orient_grp, to_rf_ik_handle_grp, self.corner_grp, ik_handle_auto_clavicle_grp, clavicle_ctrl_grp, ac_loc_grp], self.ar.utils.ignoreTransformIOAttr)
                 self.ar.utils.addCustomAttr(self.to_rev_foot_ik_handle_grps, self.ar.utils.ignoreTransformIOAttr)
                 self.to_ids.extend([fk_isolate_rev, up_loc_pac, up_loc_orient_rev, ik_scale_md, fk_scale_md, uni_blend, ik_stretchable_md, ik_stretch_ctrl_cnd, ik_stretch_dif_pma, ik_stretch_cnd, ik_stretch_clp])
-                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
+                self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composing_info()
@@ -1955,7 +1955,7 @@ class Limb(standard.BaseStandard):
         # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
-        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
 
 
     def composing_info(self):

@@ -352,7 +352,7 @@ class Wheel(standard.BaseStandard):
                 self.to_ids.extend([recept_steering_md, inverse_steering_md, inverse_steering_cnd, exp_node, geo_holder, skincluster_node, side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_BP"])
                 for ids in [lattice_items, upper_clusters, middle_clusters, lower_clusters]:
                     self.to_ids.extend(ids)
-                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
+                self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composing_info()
@@ -360,7 +360,7 @@ class Wheel(standard.BaseStandard):
         # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
-        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
     
     
     def composing_info(self):

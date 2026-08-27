@@ -319,7 +319,7 @@ class Utils(object):
                     cmds.delete(allChildrenList)
                 if offset:
                     offsetGrp = cmds.duplicate(zero_grp, name=transform+'_Offset_Grp')[0]
-                    self.ar.custom_attr.addAttr(0, [offsetGrp]) #dpID
+                    self.ar.custom_attr.add_attr(0, [offsetGrp]) #dpID
                     cmds.parent(transform, offsetGrp, absolute=True)
                     cmds.parent(offsetGrp, zero_grp, absolute=True)
                 else:
@@ -328,7 +328,7 @@ class Utils(object):
                     self.addCustomAttr([zero_grp], self.ignoreTransformIOAttr)
                     if offset:
                         self.addCustomAttr([offsetGrp], self.ignoreTransformIOAttr)
-                self.ar.custom_attr.addAttr(0, [zero_grp]) #dpID
+                self.ar.custom_attr.add_attr(0, [zero_grp]) #dpID
                 zeroList.append(zero_grp)
         return zeroList
 
@@ -495,7 +495,7 @@ class Utils(object):
             dist = cmds.getAttr(distBet+".distance")
             if keep:
                 self.addCustomAttr([nullA, nullB, nullC], self.ignoreTransformIOAttr)
-                self.ar.custom_attr.addAttr(0, [distBet]) #dpID
+                self.ar.custom_attr.add_attr(0, [distBet]) #dpID
                 return [dist, distBet, nullA, nullB, nullC, pointConst]
             else:
                 cmds.delete(distBet, nullA, nullB, nullC, pointConst)
@@ -652,7 +652,7 @@ class Utils(object):
                     cmds.parent(jnt, dup)
                     if not displayBone:
                         cmds.setAttr(dup+".drawStyle", 2) #none
-                    self.ar.custom_attr.addAttr(0, [dup]) #dpID
+                    self.ar.custom_attr.add_attr(0, [dup]) #dpID
                     results.append(dup)
         return results
 
@@ -788,7 +788,7 @@ class Utils(object):
         else:
             twistBoneMD = cmds.createNode("multiplyDivide", name=twistBoneName+"_MD")
             cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotate"+axis, twistBoneMD+".input2"+axis, force=True)
-        self.ar.custom_attr.addAttr(0, [twistBoneMM, twistBoneDM, twistBoneQtE, twistBoneMD]) #dpID
+        self.ar.custom_attr.add_attr(0, [twistBoneMM, twistBoneDM, twistBoneQtE, twistBoneMD]) #dpID
         return twistBoneMD
         
 
@@ -1184,7 +1184,7 @@ class Utils(object):
             cmds.setAttr(parentConst+".interpType", 2) #shortest
             if n == 0:
                 revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attr_name+"_Rev")
-                self.ar.custom_attr.addAttr(0, [revNode]) #dpID
+                self.ar.custom_attr.add_attr(0, [revNode]) #dpID
                 cmds.addAttr(world_ref, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(world_ref, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
                 if storeName:
@@ -1347,7 +1347,7 @@ class Utils(object):
         if not items:
             items = cmds.ls(selection=False, type=node_type)
         if items:
-            self.ar.custom_attr.addAttr(0, items) #dpID
+            self.ar.custom_attr.add_attr(0, items) #dpID
             for item in items:
                 if not item.endswith(suffix):
                     if cmds.attributeQuery("input", node=item, exists=True):

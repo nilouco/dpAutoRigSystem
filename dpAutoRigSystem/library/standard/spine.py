@@ -501,7 +501,7 @@ class Spine(standard.BaseStandard):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
                 self.ar.utils.addCustomAttr([middle_orig_grp], self.ar.utils.ignoreTransformIOAttr)
                 self.to_ids.extend([middle_scale_y_md, arcLen, ribbon_md, ribbon_bc, ribbon_cnd, ribbon_vv_md])
-                self.ar.custom_attr.addAttr(0, [self.static_hook_grp], descendents=True) #dpID
+                self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()
             self.composing_info()
@@ -509,7 +509,7 @@ class Spine(standard.BaseStandard):
         # delete UI (moduleLayout), GUIDE and module_instance namespace:
         self.delete_guide()
         self.rename_unit_conversion()
-        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
 
 
     def add_parent_tag_info(self):

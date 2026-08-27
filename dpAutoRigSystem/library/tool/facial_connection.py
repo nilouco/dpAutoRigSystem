@@ -247,7 +247,7 @@ class FacialConnection(base.BaseLibrary):
         """
         dup = cmds.duplicate(fromMesh)[0]
         newTgt = cmds.rename(dup, prefix+tgt+suffix)
-        self.ar.custom_attr.addAttr(0, [newTgt], descendents=True) #dpID
+        self.ar.custom_attr.add_attr(0, [newTgt], descendents=True) #dpID
         cmds.select(newTgt)
         cmds.hyperShade(newTgt, assign="initialShadingGroup")
         connectedPlug = cmds.listConnections(newTgt+".drawOverride", destination=False, source=True, plugs=True)
@@ -382,7 +382,7 @@ class FacialConnection(base.BaseLibrary):
                                                             self.RmVNumber = self.RmVNumber+1
                                                         print(self.ar.data.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", jntTarget)
                                                         results.append(facialCtrl+"."+facialAttr+" -> "+jntTarget)
-                    self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+                    self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and results:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
         self.ar.utils.close_ui('dpFacialConnectionWindow')

@@ -121,7 +121,7 @@ class Zipper(base.BaseLibrary):
             self.dpDeleteOldCurve(zipperId)
             # create curve:
             baseCurveList = cmds.polyToCurve(name=curveName, form=2, degree=3, conformToSmoothMeshPreview=0)
-            self.ar.custom_attr.addAttr(0, baseCurveList, descendents=True) #dpID
+            self.ar.custom_attr.add_attr(0, baseCurveList, descendents=True) #dpID
             baseCurve = baseCurveList[0]
             # rename polyEdgeToCurve node:
             cmds.rename(cmds.listConnections(baseCurve+".create")[0], pecName)
@@ -488,7 +488,7 @@ class Zipper(base.BaseLibrary):
 
 
                     self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="addDoubleLinear"))-set(self.oldAddDoubleLinearList)), "addDoubleLinear", "_ADL")
-                    self.ar.custom_attr.addAttr(0, self.to_ids, descendents=True) #dpID
+                    self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID
                     cmds.select(self.zipperCtrl)
                     print(self.ar.data.lang['m174_createdZipper'])
                 else:

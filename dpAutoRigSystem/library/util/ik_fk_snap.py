@@ -40,7 +40,7 @@ class IkFkSnap(object):
             # store data
             self.ikFkState = round(cmds.getAttr(self.world_ref+"."+self.ikFkBlendAttr), 0)
             self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
-            self.ar.custom_attr.addAttr(0, [self.ikFkSnapNet]) #dpID
+            self.ar.custom_attr.add_attr(0, [self.ikFkSnapNet]) #dpID
             self.id = cmds.getAttr(self.ikFkSnapNet+"."+self.ar.data.dp_id)
             self.storeIkFkSnapData()
             if dpDev:
@@ -521,7 +521,7 @@ for net in cmds.ls(type="network"):
                 IkFkSnap(net)
 '''
         sn = cmds.scriptNode(name=self.netName+'_IkFkSnap_SN', sourceType='python', scriptType=2, beforeScript=ikFkSnapCode)
-        self.ar.custom_attr.addAttr(0, [sn]) #dpID
+        self.ar.custom_attr.add_attr(0, [sn]) #dpID
         cmds.addAttr(self.ikFkSnapNet, longName="ikFkSnapScriptNode", attributeType="message")
         cmds.addAttr(sn, longName="ikFkSnapNet", attributeType="message")
         cmds.connectAttr(sn+".message", self.ikFkSnapNet+".ikFkSnapScriptNode", force=True)

@@ -154,4 +154,4 @@ class LimbSpaceSwitch(base.BaseLibrary):
         if oldDrivenKeyList:
             newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
         self.to_ids.extend(newDrivenKeyList)
-        self.ar.custom_attr.addAttr(0, self.to_ids) #dpID
+        self.ar.custom_attr.add_attr(0, self.to_ids) #dpID

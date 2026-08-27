@@ -216,7 +216,7 @@ class Maker(object):
             cmds.addAttr(self.all_grp, longName=attr, attributeType="message")
         if not cmds.listConnections(self.all_grp+"."+attr, destination=False, source=True):
             cmds.connectAttr(item+".message", self.all_grp+"."+attr, force=True)
-        self.ar.custom_attr.addAttr(0, [item]) #dpID
+        self.ar.custom_attr.add_attr(0, [item]) #dpID
         return item
     
 
@@ -241,7 +241,7 @@ class Maker(object):
             cmds.rename(self.ar.data.master_name, self.ar.data.master_name+"_Old")
         #Create Master Grp
         self.all_grp = cmds.createNode("transform", name=self.ar.data.prefix+self.ar.data.master_name)
-        self.ar.custom_attr.addAttr(0, [self.all_grp]) #dpID
+        self.ar.custom_attr.add_attr(0, [self.all_grp]) #dpID
         # adding All_Grp attributes
         cmds.addAttr(self.all_grp, longName=self.ar.data.master_attr, attributeType="bool")
         cmds.addAttr(self.all_grp, longName="dpAutoRigSystem", dataType="string")
@@ -342,7 +342,7 @@ class Maker(object):
         cmds.setAttr(self.option_ctrl_grp+".translateX", self.ar.ctrls.dpCheckLinearUnit(10))
         # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
         self.rig_scale_md = cmds.createNode("multiplyDivide", name=self.ar.data.prefix+'RigScale_MD')
-        self.ar.custom_attr.addAttr(0, [self.rig_scale_md]) #dpID
+        self.ar.custom_attr.add_attr(0, [self.rig_scale_md]) #dpID
         cmds.addAttr(self.rig_scale_md, longName="dpRigScale", attributeType="bool", defaultValue=True)
         cmds.addAttr(self.option_ctrl, longName="dpRigScaleNode", attributeType="message")
         cmds.addAttr(self.option_ctrl, longName="rigScaleOutput", attributeType="float", defaultValue=1)
@@ -399,7 +399,7 @@ class Maker(object):
             cmds.parent(self.base_root_jnt_grp, self.scalable_grp)
             cmds.parentConstraint(self.root_ctrl, self.base_root_jnt_grp, maintainOffset=True, name=self.base_root_jnt_grp+"_PaC")
             cmds.scaleConstraint(self.root_ctrl, self.base_root_jnt_grp, maintainOffset=True, name=self.base_root_jnt_grp+"_ScC")
-            self.ar.custom_attr.addAttr(0, [self.base_root_jnt_grp], descendents=True) #dpID
+            self.ar.custom_attr.add_attr(0, [self.base_root_jnt_grp], descendents=True) #dpID
             cmds.setAttr(self.base_root_jnt_grp+".visibility", 0)
             self.ar.ctrls.setLockHide([self.base_root_jnt, self.base_root_jnt_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
 
@@ -853,7 +853,7 @@ class Composer(object):
         elif item.name == self.ar.data.chain_name:
             self.chain_options(item)
         if self.to_ids:
-            self.ar.custom_attr.addAttr(0, list(set(self.to_ids)), descendents=True)
+            self.ar.custom_attr.add_attr(0, list(set(self.to_ids)), descendents=True)
 
 
     def foot_limb(self, foot, limb):
@@ -974,8 +974,8 @@ class Composer(object):
                                         if "Fk_ikFkBlendRevOutputX" in world_ref_attr:
                                             cmds.connectAttr(world_ref+"."+world_ref_attr, ik_ctrl+'.'+attr, force=True)
                     rev_foot_ctrl_old = cmds.rename(reverse_foot_ctrl, reverse_foot_ctrl+"_Old")
-                    self.ar.custom_attr.removeAttr("dpControl", [rev_foot_ctrl_old])
-                    self.ar.custom_attr.updateID([rev_foot_ctrl_old])
+                    self.ar.custom_attr.remove_attr("dpControl", [rev_foot_ctrl_old])
+                    self.ar.custom_attr.update_id([rev_foot_ctrl_old])
 
 
     def limb_options(self, limb):
@@ -1017,7 +1017,7 @@ class Composer(object):
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=world_ref+"_PaC"))
 
             # remove dpControl attribute
-            self.ar.custom_attr.removeAttr("dpControl", [world_ref])
+            self.ar.custom_attr.remove_attr("dpControl", [world_ref])
             self.to_ids.append(world_ref)
 
             # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
@@ -1326,4 +1326,4 @@ class Composer(object):
             world_ref = cmds.rename(world_ref, world_ref.replace("_Ctrl", "_Grp"))
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=world_ref+"_PaC"))
             # remove dpControl attribute
-            self.ar.custom_attr.removeAttr("dpControl", [world_ref])
+            self.ar.custom_attr.remove_attr("dpControl", [world_ref])
