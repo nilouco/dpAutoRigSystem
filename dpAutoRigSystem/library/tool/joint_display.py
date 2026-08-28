@@ -36,7 +36,7 @@ class JointDisplay(base.BaseLibrary):
         """ Get all joints in the scene and update the joints variable.
         """
         self.joints = cmds.ls(selection=False, type='joint')
-        if self.ar.data.up_state:
+        if self.ar.data.ui_state:
             written_value = cmds.textFieldGrp('joint_display_filter_tfg', query=True, text=True)
             if not written_value == "" and not written_value == " ":
                 self.joints = self.ar.utils.filterName(written_value, cmds.ls(selection=False, type='joint'), " ")
