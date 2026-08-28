@@ -136,8 +136,8 @@ class CustomAttr(base.BaseLibrary):
                     cmds.setAttr(item+"."+attr, edit=True, lock=False)
                     cmds.deleteAttr(item+"."+attr)
                     if self.ar.data.ui_state:
-                        if cmds.button("custom_attr_remove_"+attr+"_btn", query=True, exists=True):
-                            cmds.deleteUI("custom_attr_remove_"+attr+"_btn")
+                        if cmds.button("custom_attr_remove_"+attr+"_bt", query=True, exists=True):
+                            cmds.deleteUI("custom_attr_remove_"+attr+"_bt")
 
 
     def get_custom_attrs(self, items=None, *args):

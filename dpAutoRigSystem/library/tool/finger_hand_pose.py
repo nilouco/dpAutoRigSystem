@@ -16,96 +16,99 @@ class FingerHandPose(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.oldDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
+        self.old_drivenkeys = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
         self.sides = ["", self.ar.data.lang['p002_left']+"_", self.ar.data.lang['p003_right']+"_"]
-        self.armName = self.ar.data.lang['c037_arm']
-        self.wristName = self.ar.data.lang['c004_arm_extrem']
-        self.fingerIndexName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m032_index']
-        self.fingerMiddleName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m033_middle']
-        self.fingerRingName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m034_ring']
-        self.fingerPinkyName = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m035_pinky']
-        self.fingerList = [self.fingerIndexName, self.fingerMiddleName, self.fingerRingName, self.fingerPinkyName]
-        self.curlName = self.ar.data.lang['c128_curl']
-        self.sideName = self.ar.data.lang['c121_side'].lower()
-        self.scratchName = self.ar.data.lang['c129_scratch']
-        self.spreadName = self.ar.data.lang['c130_spread']
-        self.relaxName = self.ar.data.lang['c131_relax']
-        self.handAttrList = [self.curlName, self.sideName, self.scratchName, self.spreadName, self.relaxName]
+        self.arm_name = self.ar.data.lang['c037_arm']
+        self.wrist_name = self.ar.data.lang['c004_arm_extrem']
+        self.finger_index_name = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m032_index']
+        self.finger_middle_name = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m033_middle']
+        self.finger_ring_name = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m034_ring']
+        self.finger_pinky_name = self.ar.data.lang['m007_finger']+"_"+self.ar.data.lang['m035_pinky']
+        self.fingers = [self.finger_index_name, self.finger_middle_name, self.finger_ring_name, self.finger_pinky_name]
+        self.curl_name = self.ar.data.lang['c128_curl']
+        self.side_name = self.ar.data.lang['c121_side'].lower()
+        self.scratch_name = self.ar.data.lang['c129_scratch']
+        self.spread_name = self.ar.data.lang['c130_spread']
+        self.relax_name = self.ar.data.lang['c131_relax']
+        self.hand_attributes = [self.curl_name, self.side_name, self.scratch_name, self.spread_name, self.relax_name]
         
         
     def build_tool(self, *args):
+        self.run_finger_hand_pose()
+
+
+    def run_finger_hand_pose(self):
         self.to_ids = []
-        handCtrlList = []
-        
+        hand_ctrls = []
         # find nodes
-        allGrp = self.ar.utils.getAllGrp()
-        if allGrp:
-            if cmds.getAttr(allGrp+".dpFingerCount"): #it has fingers
+        all_grp = self.ar.utils.getAllGrp()
+        if all_grp:
+            if cmds.getAttr(all_grp+".dpFingerCount"): #it has fingers
                 for side in self.sides:
-                    handCtrl = side+self.armName+"_"+self.wristName+"_ToParent_Ctrl"
-                    if cmds.objExists(handCtrl): #there's an arm
-                        handCtrlList.append(handCtrl)
-                        for attr in self.handAttrList:
-                            if not attr in cmds.listAttr(handCtrl):
-                                cmds.addAttr(handCtrl, longName=attr, attributeType="double", minValue=-1, maxValue=1, defaultValue=0, keyable=True)
-                        for f, finger in enumerate(self.fingerList):
+                    hand_ctrl = side+self.arm_name+"_"+self.wrist_name+"_ToParent_Ctrl"
+                    if cmds.objExists(hand_ctrl): #there's an arm
+                        hand_ctrls.append(hand_ctrl)
+                        for attr in self.hand_attributes:
+                            if not attr in cmds.listAttr(hand_ctrl):
+                                cmds.addAttr(hand_ctrl, longName=attr, attributeType="double", minValue=-1, maxValue=1, defaultValue=0, keyable=True)
+                        for f, finger in enumerate(self.fingers):
                             for n in range(1, 4):
                                 if cmds.objExists(side+finger+"_"+str(n).zfill(2)+"_Ctrl"):
-                                    fingerGrp = side+finger+"_%02d_Pose_Grp"%(n)
-                                    if not cmds.objExists(fingerGrp):
-                                        fingerGrp = cmds.group(side+finger+"_"+str(n).zfill(2)+"_Ctrl", name=side+finger+"_%02d_Pose_Grp"%(n))
-                                        cmds.xform(fingerGrp, rotatePivot=cmds.xform(side+finger+"_"+str(n).zfill(2)+"_Ctrl", query=True, rotatePivot=True, worldSpace=True), worldSpace=True)
-                                        self.to_ids.append(fingerGrp)
+                                    finger_grp = side+finger+"_%02d_Pose_Grp"%(n)
+                                    if not cmds.objExists(finger_grp):
+                                        finger_grp = cmds.group(side+finger+"_"+str(n).zfill(2)+"_Ctrl", name=side+finger+"_%02d_Pose_Grp"%(n))
+                                        cmds.xform(finger_grp, rotatePivot=cmds.xform(side+finger+"_"+str(n).zfill(2)+"_Ctrl", query=True, rotatePivot=True, worldSpace=True), worldSpace=True)
+                                        self.to_ids.append(finger_grp)
                                     # Curl
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.curlName, driverValue=-1, value=-90)
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.curlName, driverValue=0, value=0)
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.curlName, driverValue=1, value=90)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateY", currentDriver=hand_ctrl+"."+self.curl_name, driverValue=-1, value=-90)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateY", currentDriver=hand_ctrl+"."+self.curl_name, driverValue=0, value=0)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateY", currentDriver=hand_ctrl+"."+self.curl_name, driverValue=1, value=90)
                                     # Side
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateX", currentDriver=handCtrl+"."+self.sideName, driverValue=-1, value=-45)
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateX", currentDriver=handCtrl+"."+self.sideName, driverValue=0, value=0)
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateX", currentDriver=handCtrl+"."+self.sideName, driverValue=1, value=45)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateX", currentDriver=hand_ctrl+"."+self.side_name, driverValue=-1, value=-45)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateX", currentDriver=hand_ctrl+"."+self.side_name, driverValue=0, value=0)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateX", currentDriver=hand_ctrl+"."+self.side_name, driverValue=1, value=45)
                                     # Relax
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.relaxName, driverValue=-1, value=(-1*n-f)*(f+1)-10)
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.relaxName, driverValue=0, value=0)
-                                    cmds.setDrivenKeyframe(fingerGrp+".rotateY", currentDriver=handCtrl+"."+self.relaxName, driverValue=1, value=40*(1/(n*(f+1))))
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateY", currentDriver=hand_ctrl+"."+self.relax_name, driverValue=-1, value=(-1*n-f)*(f+1)-10)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateY", currentDriver=hand_ctrl+"."+self.relax_name, driverValue=0, value=0)
+                                    cmds.setDrivenKeyframe(finger_grp+".rotateY", currentDriver=hand_ctrl+"."+self.relax_name, driverValue=1, value=40*(1/(n*(f+1))))
                             # Scratch
                             if cmds.objExists(side+finger+"_01_Pose_Grp"):
-                                cmds.setDrivenKeyframe(side+finger+"_01_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=-1, value=60)
-                                cmds.setDrivenKeyframe(side+finger+"_01_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=0, value=0)
-                                cmds.setDrivenKeyframe(side+finger+"_01_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=1, value=-60)
+                                cmds.setDrivenKeyframe(side+finger+"_01_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=-1, value=60)
+                                cmds.setDrivenKeyframe(side+finger+"_01_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=0, value=0)
+                                cmds.setDrivenKeyframe(side+finger+"_01_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=1, value=-60)
                             if cmds.objExists(side+finger+"_02_Pose_Grp"):
-                                cmds.setDrivenKeyframe(side+finger+"_02_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=-1, value=-60)
-                                cmds.setDrivenKeyframe(side+finger+"_02_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=0, value=0)
-                                cmds.setDrivenKeyframe(side+finger+"_02_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=1, value=60)
+                                cmds.setDrivenKeyframe(side+finger+"_02_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=-1, value=-60)
+                                cmds.setDrivenKeyframe(side+finger+"_02_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=0, value=0)
+                                cmds.setDrivenKeyframe(side+finger+"_02_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=1, value=60)
                             if cmds.objExists(side+finger+"_03_Pose_Grp"):
-                                cmds.setDrivenKeyframe(side+finger+"_03_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=-1, value=-60)
-                                cmds.setDrivenKeyframe(side+finger+"_03_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=0, value=0)
-                                cmds.setDrivenKeyframe(side+finger+"_03_Pose_Grp.rotateY", currentDriver=handCtrl+"."+self.scratchName, driverValue=1, value=60)
+                                cmds.setDrivenKeyframe(side+finger+"_03_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=-1, value=-60)
+                                cmds.setDrivenKeyframe(side+finger+"_03_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=0, value=0)
+                                cmds.setDrivenKeyframe(side+finger+"_03_Pose_Grp.rotateY", currentDriver=hand_ctrl+"."+self.scratch_name, driverValue=1, value=60)
                         # Spread
-                        if cmds.objExists(side+self.fingerIndexName+"_01_Pose_Grp"):
-                            cmds.setDrivenKeyframe(side+self.fingerIndexName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=-1, value=-45)
-                            cmds.setDrivenKeyframe(side+self.fingerIndexName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=0, value=0)
-                            cmds.setDrivenKeyframe(side+self.fingerIndexName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=1, value=10)
-                        if cmds.objExists(side+self.fingerMiddleName+"_01_Pose_Grp"):
-                            cmds.setDrivenKeyframe(side+self.fingerMiddleName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=-1, value=-20)
-                            cmds.setDrivenKeyframe(side+self.fingerMiddleName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=0, value=0)
-                            cmds.setDrivenKeyframe(side+self.fingerMiddleName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=1, value=5)
-                        if cmds.objExists(side+self.fingerRingName+"_01_Pose_Grp"):
-                            cmds.setDrivenKeyframe(side+self.fingerRingName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=-1, value=5)
-                            cmds.setDrivenKeyframe(side+self.fingerRingName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=0, value=0)
-                            cmds.setDrivenKeyframe(side+self.fingerRingName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=1, value=-5)
-                        if cmds.objExists(side+self.fingerPinkyName+"_01_Pose_Grp"):
-                            cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=-1, value=45)
-                            cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=0, value=0)
-                            cmds.setDrivenKeyframe(side+self.fingerPinkyName+"_01_Pose_Grp.rotateX", currentDriver=handCtrl+"."+self.spreadName, driverValue=1, value=-10)
-                if handCtrlList:
-                    currentDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
-                    newDrivenKeyList = currentDrivenKeyList
-                    if self.oldDrivenKeyList:
-                        newDrivenKeyList = list(set(currentDrivenKeyList) - set(self.oldDrivenKeyList))
-                    self.to_ids.extend(newDrivenKeyList)
+                        if cmds.objExists(side+self.finger_index_name+"_01_Pose_Grp"):
+                            cmds.setDrivenKeyframe(side+self.finger_index_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=-1, value=-45)
+                            cmds.setDrivenKeyframe(side+self.finger_index_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=0, value=0)
+                            cmds.setDrivenKeyframe(side+self.finger_index_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=1, value=10)
+                        if cmds.objExists(side+self.finger_middle_name+"_01_Pose_Grp"):
+                            cmds.setDrivenKeyframe(side+self.finger_middle_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=-1, value=-20)
+                            cmds.setDrivenKeyframe(side+self.finger_middle_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=0, value=0)
+                            cmds.setDrivenKeyframe(side+self.finger_middle_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=1, value=5)
+                        if cmds.objExists(side+self.finger_ring_name+"_01_Pose_Grp"):
+                            cmds.setDrivenKeyframe(side+self.finger_ring_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=-1, value=5)
+                            cmds.setDrivenKeyframe(side+self.finger_ring_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=0, value=0)
+                            cmds.setDrivenKeyframe(side+self.finger_ring_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=1, value=-5)
+                        if cmds.objExists(side+self.finger_pinky_name+"_01_Pose_Grp"):
+                            cmds.setDrivenKeyframe(side+self.finger_pinky_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=-1, value=45)
+                            cmds.setDrivenKeyframe(side+self.finger_pinky_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=0, value=0)
+                            cmds.setDrivenKeyframe(side+self.finger_pinky_name+"_01_Pose_Grp.rotateX", currentDriver=hand_ctrl+"."+self.spread_name, driverValue=1, value=-10)
+                if hand_ctrls:
+                    current_drivenkeys = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
+                    new_drivenkeys = current_drivenkeys
+                    if self.old_drivenkeys:
+                        new_drivenkeys = list(set(current_drivenkeys) - set(self.old_drivenkeys))
+                    self.to_ids.extend(new_drivenkeys)
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state: #verbose
-                        cmds.select(handCtrlList)
+                        cmds.select(hand_ctrls)
                         if not self.ar.data.rebuilding:
                             self.ar.logger.infoWin(TITLE, 'i363_addedFingerHandPose', None, 'center', 200, 120)

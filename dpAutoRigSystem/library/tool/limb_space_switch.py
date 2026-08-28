@@ -20,138 +20,138 @@ class LimbSpaceSwitch(base.BaseLibrary):
         
     def build_tool(self, *args):
         # find nodes
-        allGrp = self.ar.utils.getAllGrp()
-        if allGrp:
-            self.rootCtrl = self.ar.utils.getNodeByMessage("ctrlsVisibilityGrp", allGrp)
-            self.globalCtrl = self.ar.utils.getNodeByMessage("globalCtrl", allGrp)
+        all_grp = self.ar.utils.getAllGrp()
+        if all_grp:
+            self.root_ctrl = self.ar.utils.getNodeByMessage("ctrlsVisibilityGrp", all_grp)
+            self.global_ctrl = self.ar.utils.getNodeByMessage("globalCtrl", all_grp)
             self.to_ids = []
 
-            self.globalName = "Global"
-            self.rootName = "Root"
+            self.global_name = "Global"
+            self.root_name = "Root"
 
-            self.spineName = self.ar.data.lang['m011_spine']
-            self.hipsName = self.ar.data.lang['c027_hips']
-            self.headName = self.ar.data.lang['c024_head']
-            self.chestName = self.ar.data.lang['c028_chest']
+            self.spine_name = self.ar.data.lang['m011_spine']
+            self.hips_name = self.ar.data.lang['c027_hips']
+            self.head_name = self.ar.data.lang['c024_head']
+            self.chest_name = self.ar.data.lang['c028_chest']
             
-            self.spineHipsACtrl = self.spineName+"_"+self.hipsName+"A_Ctrl"
-            self.spineHipsBCtrl = self.spineName+"_"+self.hipsName+"B_Ctrl"
-            self.spineChestACtrl = self.spineName+"_"+self.chestName+"A_Ctrl"
-            self.spineChestBCtrl = self.spineName+"_"+self.chestName+"B_Ctrl"
-            self.headSubCtrl = self.headName+"_"+self.headName+"_Sub_Ctrl"
-            self.followAttr = self.ar.data.lang['c032_follow']
+            self.spine_hips_a_ctrl = self.spine_name+"_"+self.hips_name+"A_Ctrl"
+            self.spine_hips_b_ctrl = self.spine_name+"_"+self.hips_name+"B_Ctrl"
+            self.spine_chest_a_ctrl = self.spine_name+"_"+self.chest_name+"A_Ctrl"
+            self.spine_chest_b_ctrl = self.spine_name+"_"+self.chest_name+"B_Ctrl"
+            self.head_sub_ctrl = self.head_name+"_"+self.head_name+"_Sub_Ctrl"
+            self.follow_attr = self.ar.data.lang['c032_follow']
 
             # call main function
-            self.dpMain(self)
+            self.run_limb_space_switch(self)
     
     
-    def dpMain(self, *args):
+    def run_limb_space_switch(self, *args):
         """ Main function.
             Check existen nodes and call the scripted function.
         """
-        callAction = True
-        if not cmds.objExists(self.spineChestACtrl):
-            callAction = False
-        if not cmds.objExists(self.globalCtrl):
-            callAction = False
-        if not cmds.objExists(self.rootCtrl):
-            callAction = False
-        if not cmds.objExists(self.spineHipsBCtrl):
-            callAction = False
-        if not cmds.objExists(self.headSubCtrl):
-            callAction = False
-        if callAction:
-            self.dpDoAddHandFollow()
+        call_action = True
+        if not cmds.objExists(self.spine_chest_a_ctrl):
+            call_action = False
+        if not cmds.objExists(self.global_ctrl):
+            call_action = False
+        if not cmds.objExists(self.root_ctrl):
+            call_action = False
+        if not cmds.objExists(self.spine_hips_b_ctrl):
+            call_action = False
+        if not cmds.objExists(self.head_sub_ctrl):
+            call_action = False
+        if call_action:
+            self.do_add_hand_follow()
     
     
-    def dpSetHandFollowSDK(self, *args):
+    def set_hand_follow_sdk(self, *args):
         """ Create the setDrivenKey.
         """
-        ikCtrl = args[0]
-        cmds.setDrivenKeyframe(self.pac+"."+self.globalCtrl+"W0", currentDriver=ikCtrl+"."+self.followAttr)
-        cmds.setDrivenKeyframe(self.pac+"."+self.rootCtrl+"W1", currentDriver=ikCtrl+"."+self.followAttr)
-        cmds.setDrivenKeyframe(self.pac+"."+self.spineHipsACtrl+"W2", currentDriver=ikCtrl+"."+self.followAttr)
-        cmds.setDrivenKeyframe(self.pac+"."+self.spineHipsBCtrl+"W3", currentDriver=ikCtrl+"."+self.followAttr)
-        cmds.setDrivenKeyframe(self.pac+"."+self.spineChestACtrl+"W4", currentDriver=ikCtrl+"."+self.followAttr)
-        cmds.setDrivenKeyframe(self.pac+"."+self.spineChestBCtrl+"W5", currentDriver=ikCtrl+"."+self.followAttr)
-        cmds.setDrivenKeyframe(self.pac+"."+self.headSubCtrl+"W6", currentDriver=ikCtrl+"."+self.followAttr)
+        ik_ctrl = args[0]
+        cmds.setDrivenKeyframe(self.pac+"."+self.global_ctrl+"W0", currentDriver=ik_ctrl+"."+self.follow_attr)
+        cmds.setDrivenKeyframe(self.pac+"."+self.root_ctrl+"W1", currentDriver=ik_ctrl+"."+self.follow_attr)
+        cmds.setDrivenKeyframe(self.pac+"."+self.spine_hips_a_ctrl+"W2", currentDriver=ik_ctrl+"."+self.follow_attr)
+        cmds.setDrivenKeyframe(self.pac+"."+self.spine_hips_b_ctrl+"W3", currentDriver=ik_ctrl+"."+self.follow_attr)
+        cmds.setDrivenKeyframe(self.pac+"."+self.spine_chest_a_ctrl+"W4", currentDriver=ik_ctrl+"."+self.follow_attr)
+        cmds.setDrivenKeyframe(self.pac+"."+self.spine_chest_b_ctrl+"W5", currentDriver=ik_ctrl+"."+self.follow_attr)
+        cmds.setDrivenKeyframe(self.pac+"."+self.head_sub_ctrl+"W6", currentDriver=ik_ctrl+"."+self.follow_attr)
     
     
-    def dpDoAddHandFollow(self, *args):
+    def do_add_hand_follow(self, *args):
         """ Set attributes and call setDrivenKey method.
         """
-        oldDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
-        sideList = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
-        limbList = [
+        old_drivenkeys = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
+        side_items = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
+        limb_items = [
                     self.ar.data.lang['c037_arm']+"_"+self.ar.data.lang['c004_arm_extrem'],
                     self.ar.data.lang['c006_leg_main']+"_"+self.ar.data.lang['c009_leg_extrem'],
                     self.ar.data.lang['c006_leg_main']+self.ar.data.lang['c056_front']+"_"+self.ar.data.lang['c009_leg_extrem'],
                     self.ar.data.lang['c006_leg_main']+self.ar.data.lang['c057_back']+"_"+self.ar.data.lang['c009_leg_extrem']
                     ]
-        for side in sideList:
-            for x, limbNode in enumerate(limbList):
-                ikCtrl = side+"_"+limbNode+"_Ik_Ctrl"
+        for side in side_items:
+            for x, limb_node in enumerate(limb_items):
+                ik_ctrl = side+"_"+limb_node+"_Ik_Ctrl"
                 
-                if cmds.objExists(ikCtrl):
-                    if cmds.objExists(ikCtrl+"."+self.followAttr):
+                if cmds.objExists(ik_ctrl):
+                    if self.follow_attr in cmds.listAttr(ik_ctrl):
                         pass
                     else:
                         if x == 0: #arm
-                            followValue = 4 #chestB
+                            follow_value = 4 #chestB
                         else: #leg
-                            followValue = 1 #root
+                            follow_value = 1 #root
 
-                        cmds.addAttr(ikCtrl, ln=self.followAttr, at="enum", en=self.globalName+":"+self.rootName+":"+self.hipsName+"A:"+self.hipsName+"B:"+self.chestName+"A:"+self.chestName+"B:"+self.headName+":", defaultValue=followValue)
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, edit=True, keyable=True)
+                        cmds.addAttr(ik_ctrl, ln=self.follow_attr, at="enum", en=self.global_name+":"+self.root_name+":"+self.hips_name+"A:"+self.hips_name+"B:"+self.chest_name+"A:"+self.chest_name+"B:"+self.head_name+":", defaultValue=follow_value)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, edit=True, keyable=True)
                         
-                        self.pac = cmds.parentConstraint(self.globalCtrl, self.rootCtrl, self.spineHipsACtrl, self.spineHipsBCtrl, self.spineChestACtrl, self.spineChestBCtrl, self.headSubCtrl, ikCtrl+"_Orient_Grp", maintainOffset=True, name=ikCtrl+"_Orient_Grp_PaC")[0]
+                        self.pac = cmds.parentConstraint(self.global_ctrl, self.root_ctrl, self.spine_hips_a_ctrl, self.spine_hips_b_ctrl, self.spine_chest_a_ctrl, self.spine_chest_b_ctrl, self.head_sub_ctrl, ik_ctrl+"_Orient_Grp", maintainOffset=True, name=ik_ctrl+"_Orient_Grp_PaC")[0]
                         self.to_ids.append(self.pac)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 0)
-                        cmds.setAttr(self.pac+"."+self.globalCtrl+"W0", 1)
-                        cmds.setAttr(self.pac+"."+self.rootCtrl+"W1", 0)
-                        cmds.setAttr(self.pac+"."+self.spineHipsACtrl+"W2", 0)
-                        cmds.setAttr(self.pac+"."+self.spineHipsBCtrl+"W3", 0)
-                        cmds.setAttr(self.pac+"."+self.spineChestACtrl+"W4", 0)
-                        cmds.setAttr(self.pac+"."+self.spineChestBCtrl+"W5", 0)
-                        cmds.setAttr(self.pac+"."+self.headSubCtrl+"W6", 0)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 0)
+                        cmds.setAttr(self.pac+"."+self.global_ctrl+"W0", 1)
+                        cmds.setAttr(self.pac+"."+self.root_ctrl+"W1", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_hips_a_ctrl+"W2", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_hips_b_ctrl+"W3", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_chest_a_ctrl+"W4", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_chest_b_ctrl+"W5", 0)
+                        cmds.setAttr(self.pac+"."+self.head_sub_ctrl+"W6", 0)
+                        self.set_hand_follow_sdk(ik_ctrl)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 1)
-                        cmds.setAttr(self.pac+"."+self.globalCtrl+"W0", 0)
-                        cmds.setAttr(self.pac+"."+self.rootCtrl+"W1", 1)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 1)
+                        cmds.setAttr(self.pac+"."+self.global_ctrl+"W0", 0)
+                        cmds.setAttr(self.pac+"."+self.root_ctrl+"W1", 1)
+                        self.set_hand_follow_sdk(ik_ctrl)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 2)
-                        cmds.setAttr(self.pac+"."+self.rootCtrl+"W1", 0)
-                        cmds.setAttr(self.pac+"."+self.spineHipsACtrl+"W2", 1)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 2)
+                        cmds.setAttr(self.pac+"."+self.root_ctrl+"W1", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_hips_a_ctrl+"W2", 1)
+                        self.set_hand_follow_sdk(ik_ctrl)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 3)
-                        cmds.setAttr(self.pac+"."+self.spineHipsACtrl+"W2", 0)
-                        cmds.setAttr(self.pac+"."+self.spineHipsBCtrl+"W3", 1)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 3)
+                        cmds.setAttr(self.pac+"."+self.spine_hips_a_ctrl+"W2", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_hips_b_ctrl+"W3", 1)
+                        self.set_hand_follow_sdk(ik_ctrl)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 4)
-                        cmds.setAttr(self.pac+"."+self.spineHipsBCtrl+"W3", 0)
-                        cmds.setAttr(self.pac+"."+self.spineChestACtrl+"W4", 1)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 4)
+                        cmds.setAttr(self.pac+"."+self.spine_hips_b_ctrl+"W3", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_chest_a_ctrl+"W4", 1)
+                        self.set_hand_follow_sdk(ik_ctrl)
                         
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 5)
-                        cmds.setAttr(self.pac+"."+self.spineChestACtrl+"W4", 0)
-                        cmds.setAttr(self.pac+"."+self.spineChestBCtrl+"W5", 1)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 5)
+                        cmds.setAttr(self.pac+"."+self.spine_chest_a_ctrl+"W4", 0)
+                        cmds.setAttr(self.pac+"."+self.spine_chest_b_ctrl+"W5", 1)
+                        self.set_hand_follow_sdk(ik_ctrl)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, 6)
-                        cmds.setAttr(self.pac+"."+self.spineChestBCtrl+"W5", 0)
-                        cmds.setAttr(self.pac+"."+self.headSubCtrl+"W6", 1)
-                        self.dpSetHandFollowSDK(ikCtrl)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, 6)
+                        cmds.setAttr(self.pac+"."+self.spine_chest_b_ctrl+"W5", 0)
+                        cmds.setAttr(self.pac+"."+self.head_sub_ctrl+"W6", 1)
+                        self.set_hand_follow_sdk(ik_ctrl)
 
-                        cmds.setAttr(ikCtrl+"."+self.followAttr, followValue)
+                        cmds.setAttr(ik_ctrl+"."+self.follow_attr, follow_value)
 
-        currentDrivenKeyList = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
-        newDrivenKeyList = currentDrivenKeyList
-        if oldDrivenKeyList:
-            newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
-        self.to_ids.extend(newDrivenKeyList)
+        current_drivenkeys = cmds.ls(selection=False, type=self.ar.data.drivenkey_types)
+        new_drivenkeys = current_drivenkeys
+        if old_drivenkeys:
+            new_drivenkeys = list(set(current_drivenkeys) - set(old_drivenkeys))
+        self.to_ids.extend(new_drivenkeys)
         self.ar.custom_attr.add_attr(0, self.to_ids) #dpID

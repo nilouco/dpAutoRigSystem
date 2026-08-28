@@ -485,12 +485,12 @@ class Maker(object):
                         current_attrs = cmds.listAttr(obj, userDefined=True)
                         if attr in current_attrs:
                             for n in range(1, current_attrs.index(attr)+1-i+delta):
-                                reorder_attr.dpMoveAttr(1, [obj], [attr])
+                                reorder_attr.move_attr(1, [obj], [attr])
                         else:
                             delta += 1
                     if verbose and not self.ar.data.rebuilding:
                         self.ar.utils.setProgress(endIt=True)
-                    self.ar.utils.close_ui(reorder_attr.winName)
+                    self.ar.utils.close_ui('dpReorderAttrWindow')
     
 
     def before_start_rig_all(self):

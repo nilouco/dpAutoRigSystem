@@ -18,8 +18,7 @@ class ReorderAttr(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.winName = "dpReorderAttrWindow"
-        self.nextAttrTypeList = ["message", "typed"]
+        self.next_attr_types = ["message", "typed"]
         
 
     def build_tool(self, *args):
@@ -32,23 +31,21 @@ class ReorderAttr(base.BaseLibrary):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpReorderAttrUI Window:
-        self.ar.utils.close_ui(self.winName)
-        reorderAttr_winWidth  = 175
-        reorderAttr_winHeight = 75
-        dpReorderAttrWin = cmds.window(self.winName, title=self.ar.data.lang["m087_reorderAttr"]+" "+str(self.ar.data.version), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
-
+        self.ar.utils.close_ui('dpReorderAttrWindow')
+        width  = 175
+        height = 75
+        cmds.window('dpReorderAttrWindow', title=self.ar.data.lang["m087_reorderAttr"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        reorderAttrLayout = cmds.columnLayout('reorderAttrLayout', columnOffset=("left", 30))
-        cmds.separator(style='none', height=7, parent=reorderAttrLayout)
-        cmds.button(label=self.ar.data.lang["i154_up"], annotation=self.ar.data.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True, True), parent=reorderAttrLayout)
-        cmds.separator(style='in', height=10, width=110, parent=reorderAttrLayout)
-        cmds.button(label=self.ar.data.lang["i156_down"], annotation=self.ar.data.lang["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True, True), parent=reorderAttrLayout)
-        
+        cmds.columnLayout('reorder_attr_cl', columnOffset=("left", 30))
+        cmds.separator(style='none', height=7, parent='reorder_attr_cl')
+        cmds.button('reorder_attr_up_bt', label=self.ar.data.lang["i154_up"], annotation=self.ar.data.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.move_attr, 1, None, None, True, True), parent='reorder_attr_cl')
+        cmds.separator(style='in', height=10, width=110, parent='reorder_attr_cl')
+        cmds.button('reorder_attr_down_bt', label=self.ar.data.lang["i156_down"], annotation=self.ar.data.lang["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.move_attr, 0, None, None, True, True), parent='reorder_attr_cl')
         # call dpReorderAttrUI Window:
-        cmds.showWindow(dpReorderAttrWin)
+        cmds.showWindow('dpReorderAttrWindow')
     
     
-    def dpMoveAttr(self, mode, items=None, attributes=None, verbose=False, jumpHidden=False, *args):
+    def move_attr(self, mode, items=None, attributes=None, verbose=False, skip_hidden=False, *args):
         """ Change order of attributes in order to move it to up or down in the list position.
         """
         # do ScriptEditor do not print Undo messages:
@@ -62,62 +59,62 @@ class ReorderAttr(base.BaseLibrary):
                 attributes = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
             if attributes:
                 for obj in items:
-                    userDefAttrList = cmds.listAttr(obj, userDefined=True)
-                    if userDefAttrList:
-                        if not attributes[0] in userDefAttrList:
+                    user_def_attrs = cmds.listAttr(obj, userDefined=True)
+                    if user_def_attrs:
+                        if not attributes[0] in user_def_attrs:
                             if verbose:
                                 mel.eval("warning \""+self.ar.data.lang["m235_selectedStaticAttr"]+"\";")
                         else:
                             cmds.scriptEditorInfo(suppressInfo=True)
                             # unlock all user defined attibutes before start the changing position:
-                            lockAttrList = cmds.listAttr(obj, userDefined=True, locked=True)
-                            if lockAttrList:
-                                for lockAttr in lockAttrList:
-                                    cmds.setAttr(obj+"."+lockAttr, lock=False)
+                            lock_attrs = cmds.listAttr(obj, userDefined=True, locked=True)
+                            if lock_attrs:
+                                for lock_attr in lock_attrs:
+                                    cmds.setAttr(obj+"."+lock_attr, lock=False)
 
                             # start moving attributes
                             if mode == 0: #down
                                 if len(attributes) > 1:
                                     attributes.reverse()
-                                    sortedList = attributes.copy()
+                                    sorted_items = attributes.copy()
                                 if len(attributes) == 1:
-                                    sortedList = attributes.copy()
-                                for i in sortedList:
-                                    attrLs = cmds.listAttr(obj, userDefined=True)
-                                    attrSize = len(attrLs)
-                                    attrPos = attrLs.index(i)
-                                    cmds.deleteAttr(obj,at=attrLs[attrPos])
+                                    sorted_items = attributes.copy()
+                                for i in sorted_items:
+                                    user_defs = cmds.listAttr(obj, userDefined=True)
+                                    attr_size = len(user_defs)
+                                    attr_pos = user_defs.index(i)
+                                    cmds.deleteAttr(obj, attribute=user_defs[attr_pos])
                                     cmds.undo()
-                                    for x in range(attrPos+2,attrSize,1):
-                                        cmds.deleteAttr(obj,at=attrLs[x])
+                                    for x in range(attr_pos+2,attr_size,1):
+                                        cmds.deleteAttr(obj, attribute=user_defs[x])
                                         cmds.undo()
-                                if jumpHidden:
-                                    if attrPos < attrSize-1:
-                                        nextAttrType = cmds.attributeQuery(attrLs[attrPos+1], node=obj, attributeType=True)
-                                        if nextAttrType in self.nextAttrTypeList or (not cmds.getAttr(obj+"."+attrLs[attrPos+1], channelBox=True) and not cmds.getAttr(obj+"."+attrLs[attrPos+1], keyable=True)):
-                                            self.dpMoveAttr(mode, items, attributes, False, True)
+                                if skip_hidden:
+                                    if attr_pos < attr_size-1:
+                                        next_attr_type = cmds.attributeQuery(user_defs[attr_pos+1], node=obj, attributeType=True)
+                                        if next_attr_type in self.next_attr_types or (not cmds.getAttr(obj+"."+user_defs[attr_pos+1], channelBox=True) and not cmds.getAttr(obj+"."+user_defs[attr_pos+1], keyable=True)):
+                                            self.move_attr(mode, items, attributes, False, True)
                                         
                             elif mode == 1: #up
                                 for i in attributes:
-                                    attrLs = cmds.listAttr(obj, userDefined=True)
-                                    attrSize = len(attrLs)
-                                    attrPos = attrLs.index(i)
-                                    if attrLs[attrPos-1]:
-                                        cmds.deleteAttr(obj, at=attrLs[attrPos-1])
+                                    user_defs = cmds.listAttr(obj, userDefined=True)
+                                    attr_size = len(user_defs)
+                                    attr_pos = user_defs.index(i)
+                                    if user_defs[attr_pos-1]:
+                                        cmds.deleteAttr(obj, at=user_defs[attr_pos-1])
                                         cmds.undo()
-                                    for x in range(attrPos+1,attrSize,1):
-                                        cmds.deleteAttr(obj, at=attrLs[x])
+                                    for x in range(attr_pos+1,attr_size,1):
+                                        cmds.deleteAttr(obj, at=user_defs[x])
                                         cmds.undo()
-                                if jumpHidden:
-                                    if attrPos > 1:
-                                        nextAttrType = cmds.attributeQuery(attrLs[attrPos-1], node=obj, attributeType=True)
-                                        if nextAttrType in self.nextAttrTypeList or (not cmds.getAttr(obj+"."+attrLs[attrPos-1], channelBox=True) and not cmds.getAttr(obj+"."+attrLs[attrPos-1], keyable=True)):
-                                            self.dpMoveAttr(mode, items, attributes, False, True)
+                                if skip_hidden:
+                                    if attr_pos > 1:
+                                        next_attr_type = cmds.attributeQuery(user_defs[attr_pos-1], node=obj, attributeType=True)
+                                        if next_attr_type in self.next_attr_types or (not cmds.getAttr(obj+"."+user_defs[attr_pos-1], channelBox=True) and not cmds.getAttr(obj+"."+user_defs[attr_pos-1], keyable=True)):
+                                            self.move_attr(mode, items, attributes, False, True)
                             
                             # lock all user defined attibutes after the changing position:
-                            if lockAttrList:
-                                for lockAttr in lockAttrList:
-                                    cmds.setAttr(obj+"."+lockAttr, lock=True)
+                            if lock_attrs:
+                                for lock_attr in lock_attrs:
+                                    cmds.setAttr(obj+"."+lock_attr, lock=True)
                     else:
                         if verbose:
                             mel.eval("warning \""+self.ar.data.lang["m236_canReorderUserDefAttr"]+"\";")

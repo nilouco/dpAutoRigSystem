@@ -22,7 +22,7 @@ class CorrectionManagerUI(object):
         cmds.columnLayout('correction_cl', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text('correction_header_txt', label=self.ar.data.lang['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent='correction_cl')
         cmds.rowColumnLayout('correction_rcl', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent='correction_cl')
-        cmds.button('correction_create_btn', label=self.ar.data.lang['i158_create'], command=partial(self.app.create_correction_manager_setup, from_ui=True), backgroundColor=(0.7, 1.0, 0.7), parent='correction_rcl')
+        cmds.button('correction_create_bt', label=self.ar.data.lang['i158_create'], command=partial(self.app.create_correction_manager_setup, from_ui=True), backgroundColor=(0.7, 1.0, 0.7), parent='correction_rcl')
         cmds.textField('correction_create_tf', editable=True, parent='correction_rcl')
         cmds.separator(style='none', height=10, width=100, parent='correction_cl')
         cmds.rowColumnLayout('correction_refresh_rcl', numberOfColumns=4, columnWidth=[(1, 50), (2, 150), (2, 100), (3, 80)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'both', 10), (2, 'left', 0), (3, 'left', 10), (4, 'left', 90)], parent='correction_cl')
@@ -33,7 +33,7 @@ class CorrectionManagerUI(object):
         cmds.radioButton('correction_type_distance_rb', label=self.ar.data.lang['m182_distance'], annotation=self.app.distance_name, collection='correction_type_rc')
         cmds.radioCollection('correction_type_rc', edit=True, select='correction_type_angle_rb')
         cmds.checkBox('correction_rivet_cb', label="Rivet", parent='correction_refresh_rcl')
-        cmds.button('correction_refresh_btn', label=self.ar.data.lang['m181_refresh'], command=self.refresh_ui, parent='correction_refresh_rcl')
+        cmds.button('correction_refresh_bt', label=self.ar.data.lang['m181_refresh'], command=self.refresh_ui, parent='correction_refresh_rcl')
         cmds.separator(style='in', height=15, width=100, parent='correction_cl')
         # existing:
         cmds.text('correction_existing_txt', label=self.ar.data.lang['m071_existing'], align="left", height=25, font='boldLabelFont', parent='correction_cl')
@@ -62,7 +62,7 @@ class CorrectionManagerUI(object):
                 cmds.columnLayout('correction_selected_cl', adjustableColumn=True, parent='correction_edit_selected_net_fl')
                 cmds.rowLayout('correction_name_rl', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent='correction_selected_cl')
                 cmds.textFieldGrp('correction_name_tfg', label=self.ar.data.lang['m006_name'], text=cmds.getAttr(self.app.net+".name"), editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.app.change_name, parent='correction_name_rl')
-                cmds.button('correction_delete_btn', label=self.ar.data.lang['m005_delete'], command=self.app.delete_setup, backgroundColor=(1.0, 0.7, 0.7), parent='correction_name_rl')
+                cmds.button('correction_delete_bt', label=self.ar.data.lang['m005_delete'], command=self.app.delete_setup, backgroundColor=(1.0, 0.7, 0.7), parent='correction_name_rl')
                 # type:
                 cmds.rowLayout('correction_type_rl', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent='correction_selected_cl')
                 cmds.textFieldGrp("correction_type_tfg", label=self.ar.data.lang['i138_type'], text=cmds.getAttr(self.app.net+".type"), editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.app.change_name, parent='correction_type_rl')

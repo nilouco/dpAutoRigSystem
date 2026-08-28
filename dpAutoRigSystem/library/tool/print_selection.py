@@ -21,49 +21,48 @@ class PrintSelection(base.BaseLibrary):
 
     def build_tool(self, *args):
         # call main function
-        self.dpMain(self)
+        self.get_selection_and_run()
     
     
-    def dpMain(self, *args):
-        """ Main function.
-            Get selection and call the print function.
+    def get_selection_and_run(self):
+        """ Get selection and call the print function.
         """
         # get selection list
-        self.selList = cmds.ls(selection=True)
-        if self.selList:
-            self.resultDic = self.dpDefineDic(self.selList)
-            if self.resultDic:
-                self.dpPrintResults(self.resultDic)
+        selection = cmds.ls(selection=True)
+        if selection:
+            data = self.get_data(selection)
+            if data:
+                self.run_printing(data)
         else:
             mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")
     
     
-    def dpDefineDic(self, selList, *args):
+    def get_data(self, selection):
         """ Recept the selection list and mount the result dictionary in order to print it.
         """
-        toPrintDic = {}
-        if selList:
-            printString = ""
-            for i, item in enumerate(selList):
-                printString = printString + str(item)
-                if i < len(selList):
-                    printString = printString + ";"
-            toPrintDic['string'] = printString
-            toPrintDic['list'] = selList
-        return toPrintDic
+        data = {}
+        if selection:
+            text = ""
+            for i, item in enumerate(selection):
+                text = text + str(item)
+                if i < len(selection):
+                    text = text + ";"
+            data['string'] = text
+            data['list'] = selection
+        return data
     
     
-    def dpPrintResults(self, resultDic, *args):
+    def run_printing(self, data):
         """ Recept the resultDictionary and print it.
         """
-        if resultDic:
+        if data:
             # log
             print("\n-------")
             print("Print Selection Result:")
             print("List:")
-            print(resultDic['list'])
+            print(data['list'])
             print("String:")
-            print(resultDic['string'])
+            print(data['string'])
             print("-------")
         else:
             mel.eval("warning \""+self.ar.data.lang['i042_notSelection']+"\";")

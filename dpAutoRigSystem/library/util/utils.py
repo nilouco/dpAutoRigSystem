@@ -205,14 +205,14 @@ class Utils(object):
                 return str(max(numbers)+1).zfill(pad)
 
 
-    def findModuleLastNumber(self, className, typeName, guideNet=False):
+    def findModuleLastNumber(self, className, typeName, guide_net=False):
         """ Find the last used number of this type of module or guideNet.
             Return its highest number.
         """
         # work with rigged modules in the scene:
         nodes, numbers = [], []
         guideTypeCount = 0
-        if guideNet:
+        if guide_net:
             nodes = self.getNetworkNodeByAttr("dpGuideNet")
         else:
             nodes = cmds.ls(selection=False, transforms=True)

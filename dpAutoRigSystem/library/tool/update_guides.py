@@ -20,108 +20,108 @@ class UpdateGuides(base.BaseLibrary):
 
     def build_tool(self, *args):
         # Dictionary that will hold data for update, whatever don't need update will not be saved
-        self.updateData = {}
+        self.update_data = {}
         # Receive the guides list from hook function
-        self.guidesDictionary = self.ar.utils.get_hook()
+        self.guides_directory = self.ar.utils.get_hook()
         # List that will hold all new guides instances
-        self.newGuidesInstanceList = []
+        self.new_guides_instances = []
         # Dictionary where the keys are the guides that will be used and don't need update
         # and values are its current parent, this is used to search for possible new parent
-        self.guidesToReParentDict = {}
+        self.guides_to_reparent_data = {}
 
         # If there are guides on the dictionary go on.
-        if len(self.guidesDictionary) > 0:
-            # Get all info nedeed and store in updateData dictionary
-            self.getGuidesToUpdateData()
+        if len(self.guides_directory) > 0:
+            # Get all info nedeed and store in update_data dictionary
+            self.get_guides_to_update_data()
             if self.ar.data.ui_state:
                 # Open the UI
                 self.updateGuidesUI()
             else:
                 # Update existing outdated guides.
-                self.doUpdate()
+                self.do_update()
         else:
             mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
 
 
-    def summaryUI(self):
+    def summary_ui(self):
         """ Update Guides Summary UI for log info.
         """
-        self.ar.utils.close_ui('updateSummary')
-        newData = self.listNewAttr()
-        cmds.window('updateSummary', title="Update Summary")
-        updateSummaryCL = cmds.columnLayout('updateSummaryCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
-        cmds.text(label=str(len(self.updateData))+' '+self.ar.data.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
-        if newData:
-            cmds.text(label=self.ar.data.lang['m190_newAttrFound'], align='center', parent=updateSummaryCL)
-            updateSummarySL = cmds.scrollLayout('updateSummarySL', width=330, height=400, parent=updateSummaryCL)
-            updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummarySL)
-            cmds.text(label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
-            cmds.text(label=self.ar.data.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
-            for guide in newData:
-                for newAttr in newData[guide]:
-                    cmds.text(label=guide, align='left', parent=updateSummaryRC)
-                    cmds.text(label=newAttr, align='center', parent=updateSummaryRC)
-        cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.text(label=self.ar.data.lang['m192_askOldGuides'], align='center', parent=updateSummaryCL)
-        cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.button(label=self.ar.data.lang['m193_deleteOldGuides'], command=self.doDelete, backgroundColor=(1.0, 0.6, 0.4), parent=updateSummaryCL)
-        cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.showWindow('updateSummary')
+        self.ar.utils.close_ui('update_summary_win')
+        new_data = self.get_new_attr()
+        cmds.window('update_summary_win', title="Update Summary")
+        cmds.columnLayout('summary_cl', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='update_summary_win')
+        cmds.text('summary_header_txt', label=str(len(self.update_data))+' '+self.ar.data.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent='summary_cl')
+        if new_data:
+            cmds.text('summary_new_attr_found_txt', label=self.ar.data.lang['m190_newAttrFound'], align='center', parent='summary_cl')
+            cmds.scrollLayout('summary_sl', width=330, height=400, parent='summary_cl')
+            cmds.rowColumnLayout('summary_update_rcl', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent='summary_sl')
+            cmds.text('summary_new_guide_title_txt', label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent='summary_update_rcl')
+            cmds.text('summary_new_attr_title_txt', label=self.ar.data.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent='summary_update_rcl')
+            for guide in new_data:
+                for new_attr in new_data[guide]:
+                    cmds.text('summary_new_guide_txt', label=guide, align='left', parent='summary_update_rcl')
+                    cmds.text('summary_new_attr_txt', label=new_attr, align='center', parent='summary_update_rcl')
+        cmds.separator(style='none', height=10, parent='summary_cl')
+        cmds.text('summary_ask_old_txt', label=self.ar.data.lang['m192_askOldGuides'], align='center', parent='summary_cl')
+        cmds.separator(style='none', height=10, parent='summary_cl')
+        cmds.button('summary_delete_old_bt', label=self.ar.data.lang['m193_deleteOldGuides'], command=self.do_delete, backgroundColor=(1.0, 0.6, 0.4), parent='summary_cl')
+        cmds.separator(style='none', height=10, parent='summary_cl')
+        cmds.showWindow('update_summary_win')
 
 
     def updateGuidesUI(self):
         """ Main Update Guides UI.
         """
         self.ar.utils.close_ui('updateGuidesWindow')
-        self.ar.utils.close_ui('updateSummary')
+        self.ar.utils.close_ui('update_summary_win')
         if self.ar.data.ui_state:
             cmds.window('updateGuidesWindow', title="Guides Info")
-            updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
-            cmds.text(label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.ar.data.version), height=30, align="center", parent=updateGuidesCL)
-            if len(self.updateData) > 0:
-                updateGuidesSL = cmds.scrollLayout('updateGuidesSL', width=330, height=400, parent=updateGuidesCL)
-                updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesSL)
-                cmds.text(label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
-                cmds.text(label=self.ar.data.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-                cmds.text(label=self.ar.data.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-                for guide in self.updateData:
-                    cmds.text(label=guide, align='left', parent=updateGuidesBaseRCL)
-                    cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent=updateGuidesBaseRCL)
-                    cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent=updateGuidesBaseRCL)
-                cmds.separator(style='none', height=10, parent=updateGuidesBaseRCL)
-                cmds.button(label=self.ar.data.lang['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
+            cmds.columnLayout('update_guide_main_cl', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
+            cmds.text('update_guide_header_txt', label='DPAR '+self.ar.data.lang['m194_currentVersion']+' '+str(self.ar.data.version), height=30, align="center", parent='update_guide_main_cl')
+            if len(self.update_data) > 0:
+                cmds.scrollLayout('update_guide_sl', width=330, height=400, parent='update_guide_main_cl')
+                cmds.rowColumnLayout('update_guide_base_rcl', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent='update_guide_sl')
+                cmds.text('update_guide_guide_txt', label=self.ar.data.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent='update_guide_base_rcl')
+                cmds.text('update_guide_name_txt', label=self.ar.data.lang['m006_name'], align='center', font='boldLabelFont', parent='update_guide_base_rcl')
+                cmds.text('update_guide_version_title_txt', label=self.ar.data.lang['m205_version'], align='center', font='boldLabelFont', parent='update_guide_base_rcl')
+                for guide in self.update_data:
+                    cmds.text('update_guide_node_txt', label=guide, align='left', parent='update_guide_base_rcl')
+                    cmds.text('update_guide_attr_txt', label=str(self.update_data[guide]['attributes']['customName']), align='center', parent='update_guide_base_rcl')
+                    cmds.text('update_guide_version_txt', label=self.update_data[guide]['attributes']['dpARVersion'], align='left', parent='update_guide_base_rcl')
+                cmds.separator(style='none', height=10, parent='update_guide_base_rcl')
+                cmds.button('update_guide_run_bt', label=self.ar.data.lang['m186_updateGuides'], command=self.do_update, backgroundColor=(0.6, 1.0, 0.7), parent='update_guide_main_cl')
             else:
-                cmds.text(label=self.ar.data.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
-            cmds.separator(style='none', height=10, parent=updateGuidesCL)
+                cmds.text('update_guide_nothing_txt', label=self.ar.data.lang['m188_noGuidesToUpdate'], align='left', parent='update_guide_main_cl')
+            cmds.separator(style='none', height=10, parent='update_guide_main_cl')
             cmds.window('updateGuidesWindow', edit=True, height=1)
             cmds.select(clear=True)
             cmds.showWindow('updateGuidesWindow')
     
 
-    def filterNotNurbsCurveAndTransform(self, mayaObjList):
+    def filter_not_nurbs_curve_and_transform(self, items):
         """ Remove objects different from transform and nurbsCurve from list.
             Returns cleaned list.
         """
         results = []
-        for obj in mayaObjList:
-            objType = cmds.objectType(obj)
-            if objType == 'nurbsCurve' or objType == 'transform':
-                results.append(obj)
+        for item in items:
+            item_type = cmds.objectType(item)
+            if item_type == 'nurbsCurve' or item_type == 'transform':
+                results.append(item)
         return results
     
 
-    def filterAnotation(self, dpArTransformsList):
+    def filter_annotation(self, items):
         """ Remove _Ant(Anotations) items from list of transforms.
             Return cleaned list.
         """
         results = []
-        for obj in dpArTransformsList:
-            if not '_Ant' in obj:
-                results.append(obj)
+        for item in items:
+            if not '_Ant' in item:
+                results.append(item)
         return results
 
 
-    def getAttrValue(self, guide, attr, locked=False):
+    def get_attr_value(self, guide, attr, locked=False):
         if locked:
             try:
                 return cmds.getAttr(guide+'.'+attr, lock=True)
@@ -134,432 +134,418 @@ class UpdateGuides(base.BaseLibrary):
                 return ''
     
 
-    def getNewGuideInstance(self, newGuideName):
-        newGuidesNamesList = list(map(lambda module_instance : module_instance.guide_base, self.newGuidesInstanceList))
-        currentGuideInstanceIdx = newGuidesNamesList.index(newGuideName)
-        return self.newGuidesInstanceList[currentGuideInstanceIdx]
+    def get_new_guide_instance(self, new_name):
+        new_guide_names = list(map(lambda module_instance : module_instance.guide_base, self.new_guides_instances))
+        current_guide_instance_index = new_guide_names.index(new_name)
+        return self.new_guides_instances[current_guide_instance_index]
     
 
-    def translateLimbStyleValue(self, enumValue):
-        if enumValue == 1:
+    def translate_limb_style_value(self, enum_value):
+        if enum_value == 1:
             return self.ar.data.lang['m026_biped']
-        elif enumValue == 2:
+        elif enum_value == 2:
             return self.ar.data.lang['m037_quadruped']
-        elif enumValue == 3:
+        elif enum_value == 3:
             return self.ar.data.lang['m043_quadSpring']
-        elif enumValue == 4:
+        elif enum_value == 4:
             return self.ar.data.lang['m155_quadrupedExtra']
         else:
             return self.ar.data.lang['m042_default']
 
 
-    def translateSpineStyleValue(self, enumValue):
-        if enumValue == 1:
+    def translate_spine_style_value(self, enum_value):
+        if enum_value == 1:
             return self.ar.data.lang['m026_biped']
         else:
             return self.ar.data.lang['m042_default']
     
 
-    def translateLimbTypeValue(self, enumValue):
-        if enumValue == 1:
+    def translate_limb_type_value(self, enum_value):
+        if enum_value == 1:
             return self.ar.data.lang['m030_leg']
         else:
             return self.ar.data.lang['m028_arm']
 
 
-    def setAttrValue(self, guide, attr, value):
+    def set_attr_value(self, guide, attr, value):
         try:
             cmds.setAttr(guide+'.'+attr, value)
         except:
             mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+guide+'.'+attr+'\\n\";')
 
 
-    def setAttrStrValue(self, guide, attr, value):
+    def set_attr_string_value(self, guide, attr, value):
         try:
             cmds.setAttr(guide+'.'+attr, value, type='string')
         except:
             mel.eval('print \"dpAR: '+self.ar.data.lang['m195_couldNotBeSet']+' '+guide+'.'+attr+'\\n\";')
     
 
-    def setEyelidGuideAttribute(self, guide, value):
-        currentInstance = self.getNewGuideInstance(guide)
-        cvUpperEyelidLoc = currentInstance.name_guide+"_UpperEyelidLoc"
-        cvLowerEyelidLoc = currentInstance.name_guide+"_LowerEyelidLoc"
-        jEyelid = currentInstance.name_guide+"_JEyelid"
-        jUpperEyelid = currentInstance.name_guide+"_JUpperEyelid"
-        jLowerEyelid = currentInstance.name_guide+"_JLowerEyelid"
+    def set_eyelid_guide_attr(self, guide, value):
+        current_instance = self.get_new_guide_instance(guide)
         cmds.setAttr(guide+".eyelid", value)
-        cmds.setAttr(cvUpperEyelidLoc+".visibility", value)
-        cmds.setAttr(cvLowerEyelidLoc+".visibility", value)
-        cmds.setAttr(jEyelid+".visibility", value)
-        cmds.setAttr(jUpperEyelid+".visibility", value)
-        cmds.setAttr(jLowerEyelid+".visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_UpperEyelidLoc.visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_LowerEyelidLoc.visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_JEyelid.visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_JUpperEyelid.visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_JLowerEyelid.visibility", value)
 
 
-    def setIrisGuideAttribute(self, guide, value):
-        currentInstance = self.getNewGuideInstance(guide)
-        cvIrisLoc = currentInstance.name_guide+"_IrisLoc"
+    def set_iris_guide_attr(self, guide, value):
+        current_instance = self.get_new_guide_instance(guide)
         cmds.setAttr(guide+".iris", value)
-        cmds.setAttr(cvIrisLoc+".visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_IrisLoc.visibility", value)
 
 
-    def setPupilGuideAttribute(self, guide, value):
-        currentInstance = self.getNewGuideInstance(guide)
-        cvPupilLoc = currentInstance.name_guide+"_PupilLoc"
+    def set_pupil_guide_attr(self, guide, value):
+        current_instance = self.get_new_guide_instance(guide)
         cmds.setAttr(guide+".pupil", value)
-        cmds.setAttr(cvPupilLoc+".visibility", value)
+        cmds.setAttr(current_instance.name_guide+"_PupilLoc.visibility", value)
 
 
-    def setNostrilGuideAttribute(self, guide, value):
-        currentInstance = self.getNewGuideInstance(guide)
+    def set_nostril_guide_attr(self, guide, value):
+        current_instance = self.get_new_guide_instance(guide)
         cmds.setAttr(guide+".nostril", value)
-        cmds.setAttr(currentInstance.cvLNostrilLoc+".visibility", value)
-        cmds.setAttr(currentInstance.cvRNostrilLoc+".visibility", value)
+        cmds.setAttr(current_instance.cvLNostrilLoc+".visibility", value)
+        cmds.setAttr(current_instance.cvRNostrilLoc+".visibility", value)
     
 
-    def checkSetNewGuideToAttr(self, guide, attr, value):
-        if value in self.updateData:
-            self.setAttrStrValue(guide, attr, self.updateData[value]['newGuide'])
+    def check_set_new_guide_to_attr(self, guide, attr, value):
+        if value in self.update_data:
+            self.set_attr_string_value(guide, attr, self.update_data[value]['new_guide'])
         else:
-            self.setAttrStrValue(guide, attr, value)
+            self.set_attr_string_value(guide, attr, value)
             
 
-    def setGuideAttributes(self, guide, attr, value, lock=False):
+    def set_guide_attributes(self, guide, attr, value, lock=False):
         """ Verify if we have specific attribute cases to work with each kind of module guides.
             Ignore known attributes.
         """
         ignores = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
         if attr not in ignores:
             if attr == 'nJoints':
-                currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.change_joint_number(value)
+                current_instance = self.get_new_guide_instance(guide)
+                current_instance.change_joint_number(value)
             elif attr == 'style':
-                currentInstance = self.getNewGuideInstance(guide)
-                if currentInstance.name == 'Limb':
-                    expectedValue = self.translateLimbStyleValue(value)
+                current_instance = self.get_new_guide_instance(guide)
+                if current_instance.name == 'Limb':
+                    expected_value = self.translate_limb_style_value(value)
                 else:
-                    expectedValue = self.translateSpineStyleValue(value)
-                currentInstance.changeStyle(expectedValue)
+                    expected_value = self.translate_spine_style_value(value)
+                current_instance.changeStyle(expected_value)
             elif attr == 'type':
-                currentInstance = self.getNewGuideInstance(guide)
-                expectedValue = self.translateLimbTypeValue(value)
-                currentInstance.change_type(expectedValue)
+                current_instance = self.get_new_guide_instance(guide)
+                expected_value = self.translate_limb_type_value(value)
+                current_instance.change_type(expected_value)
             elif attr == 'mirrorAxis':
-                currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.change_mirror(value)
+                current_instance = self.get_new_guide_instance(guide)
+                current_instance.change_mirror(value)
             elif attr == 'mirrorName':
-                currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.change_mirror_name(value)
+                current_instance = self.get_new_guide_instance(guide)
+                current_instance.change_mirror_name(value)
             elif attr == 'displayAnnotation':
-                currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.display_annotation(value)
+                current_instance = self.get_new_guide_instance(guide)
+                current_instance.display_annotation(value)
             elif attr == 'rigType':
-                currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.rigType = value
-                self.setAttrStrValue(guide, attr, value)
+                current_instance = self.get_new_guide_instance(guide)
+                current_instance.rigType = value
+                self.set_attr_string_value(guide, attr, value)
             elif attr == 'lockedList' and value != '':
-                self.setAttrStrValue(guide, attr, value)
+                self.set_attr_string_value(guide, attr, value)
             # EYE ATTRIBUTES
             elif attr == 'eyelid':
-                self.setEyelidGuideAttribute(guide, value)
+                self.set_eyelid_guide_attr(guide, value)
             elif attr == 'iris':
-                self.setIrisGuideAttribute(guide, value)
+                self.set_iris_guide_attr(guide, value)
             elif attr == 'pupil':
-                self.setPupilGuideAttribute(guide, value)
+                self.set_pupil_guide_attr(guide, value)
             elif attr == 'aimDirection':
-                currentInstance = self.getNewGuideInstance(guide)
-                currentInstance.change_aim_direction(self.ar.data.direcions[value])
+                current_instance = self.get_new_guide_instance(guide)
+                current_instance.change_aim_direction(self.ar.data.direcions[value])
             # self.noseName ATTRIBUTES
             elif attr == 'nostril':
-                self.setNostrilGuideAttribute(guide, value)
+                self.set_nostril_guide_attr(guide, value)
             # self.suspensionName ATTRIBUTES AND self.wheelName ATTRIBUTES
             elif attr == 'fatherB' or attr == 'geo':
-                self.checkSetNewGuideToAttr(guide, attr, value)
+                self.check_set_new_guide_to_attr(guide, attr, value)
             else:
-                self.setAttrValue(guide, attr, value)
+                self.set_attr_value(guide, attr, value)
             if lock:
                 cmds.setAttr(f'{guide}.{attr}', lock=True)
             if self.ar.data.ui_state:
                 cmds.refresh()
     
 
-    def listKeyUserAttr(self, objWithAttr):
+    def get_key_user_attr(self, items):
         """ Return a list of attributes, keyable and userDefined
         """
-        returnList = []
-        keyable = cmds.listAttr(objWithAttr, keyable=True)
+        results = []
+        keyable = cmds.listAttr(items, keyable=True)
         if keyable:
-            returnList.extend(keyable)
-        userAttr = cmds.listAttr(objWithAttr, userDefined=True)
-        if userAttr:
-            returnList.extend(userAttr)
+            results.extend(keyable)
+        user_attr = cmds.listAttr(items, userDefined=True)
+        if user_attr:
+            results.extend(user_attr)
         # Guaranty no duplicated attr
-        returnList = list(set(returnList))
-        return returnList
+        results = list(set(results))
+        return results
     
 
-    def getGuideParent(self, baseGuide):
+    def get_guide_parent(self, base_guide):
         try:
-            return cmds.listRelatives(baseGuide, parent=True)[0]
+            return cmds.listRelatives(base_guide, parent=True)[0]
         except:
             return None
 
 
-    def listChildren(self, baseGuide):
-        children = cmds.listRelatives(baseGuide, allDescendents=True, children=True, type='transform')
-        children = self.filterNotNurbsCurveAndTransform(children)
-        children = self.filterAnotation(children)
+    def get_children(self, base_guide):
+        children = cmds.listRelatives(base_guide, allDescendents=True, children=True, type='transform')
+        children = self.filter_not_nurbs_curve_and_transform(children)
+        children = self.filter_annotation(children)
         return children
     
 
-    def splitTransformAttrValues(self, guide, attributes):
-        nonTransformDic = {}
-        transformDic = {}
+    def split_tranform_attr_values(self, guide, attributes):
+        non_transform_data = {}
+        transform_data = {}
         for attribute in attributes:
-            attributeValue = self.getAttrValue(guide, attribute)
+            attr_value = self.get_attr_value(guide, attribute)
             if attribute in self.ar.data.transform_attrs[:-1]: #without visibility
-                attributeValueLocked = self.getAttrValue(guide, attribute, True)
-                transformDic[attribute] = (attributeValue, attributeValueLocked)
+                attr_value_locked = self.get_attr_value(guide, attribute, True)
+                transform_data[attribute] = (attr_value, attr_value_locked)
             else:
-                nonTransformDic[attribute] = attributeValue
-        return nonTransformDic, transformDic
+                non_transform_data[attribute] = attr_value
+        return non_transform_data, transform_data
 
 
-    def getGuidesToUpdateData(self):
+    def get_guides_to_update_data(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
         """
         guides_to_rig = self.ar.utils.get_guides_to_rig()
-        instancedModulesStrList = list(map(str, guides_to_rig))
-        for baseGuide in self.guidesDictionary:
-            guideVersion = cmds.getAttr(baseGuide+'.dpARVersion', silent=True)
-            if guideVersion != self.ar.data.version:
-                # Create the database holder where the key is the baseGuide
-                self.updateData[baseGuide] = {}
-                self.updateData[baseGuide]["name"] = self.guidesDictionary[baseGuide]["name"]
-                guideAttrList = self.listKeyUserAttr(baseGuide)
-                # Create de attributes dictionary for each baseGuide
-                self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
-                self.updateData[baseGuide]['instance'] = guides_to_rig[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
-                self.updateData[baseGuide]['children'] = {}
-                self.updateData[baseGuide]['parent'] = self.getGuideParent(baseGuide)
-                children = self.listChildren(baseGuide)
+        instance_modules_strings = list(map(str, guides_to_rig))
+        for base_guide in self.guides_directory:
+            guide_version = cmds.getAttr(base_guide+'.dpARVersion', silent=True)
+            if guide_version != self.ar.data.version:
+                # Create the database holder where the key is the base_guide
+                self.update_data[base_guide] = {}
+                self.update_data[base_guide]["name"] = self.guides_directory[base_guide]["name"]
+                guide_attrs = self.get_key_user_attr(base_guide)
+                # Create de attributes dictionary for each base_guide
+                self.update_data[base_guide]['attributes'], self.update_data[base_guide]['transformAttributes'] = self.split_tranform_attr_values(base_guide, guide_attrs)
+                self.update_data[base_guide]['instance'] = guides_to_rig[instance_modules_strings.index(self.update_data[base_guide]['attributes']['moduleInstanceInfo'])]
+                self.update_data[base_guide]['children'] = {}
+                self.update_data[base_guide]['parent'] = self.get_guide_parent(base_guide)
+                children = self.get_children(base_guide)
                 for child in children:
-                    self.updateData[baseGuide]['children'][child] = {'attributes': {}}
-                    self.updateData[baseGuide]['children'][child] = {'transformAttributes': {}}
-                    guideAttrList = self.listKeyUserAttr(child)
-                    self.updateData[baseGuide]['children'][child]['attributes'], self.updateData[baseGuide]['children'][child]['transformAttributes'] = self.splitTransformAttrValues(child, guideAttrList)
+                    self.update_data[base_guide]['children'][child] = {'attributes': {}}
+                    self.update_data[base_guide]['children'][child] = {'transformAttributes': {}}
+                    guide_attrs = self.get_key_user_attr(child)
+                    self.update_data[base_guide]['children'][child]['attributes'], self.update_data[base_guide]['children'][child]['transformAttributes'] = self.split_tranform_attr_values(child, guide_attrs)
             else:
-                self.guidesToReParentDict[baseGuide] = self.getGuideParent(baseGuide)
+                self.guides_to_reparent_data[base_guide] = self.get_guide_parent(base_guide)
 
 
-    def createNewGuides(self):
-        for guide in self.updateData:
-            currentNewGuide = self.ar.config.get_instance(self.updateData[guide]['name'], [self.ar.data.standard_folder])
-            currentNewGuide.build_raw_guide()
+    def create_new_guides(self):
+        for guide in self.update_data:
+            current_new_guide = self.ar.config.get_instance(self.update_data[guide]['name'], [self.ar.data.standard_folder])
+            current_new_guide.build_raw_guide()
             # rename as it's predecessor
-            name_guide = self.updateData[guide]['attributes']['customName']
-            currentNewGuide.set_guide_custom_name(name_guide)
-            self.updateData[guide]['newGuide'] = currentNewGuide.guide_base
-            self.newGuidesInstanceList.append(currentNewGuide)
+            name_guide = self.update_data[guide]['attributes']['customName']
+            current_new_guide.set_guide_custom_name(name_guide)
+            self.update_data[guide]['new_guide'] = current_new_guide.guide_base
+            self.new_guides_instances.append(current_new_guide)
             if self.ar.data.ui_state:
                 cmds.refresh()
 
 
-    def renameOldGuides(self):
-        for guide in self.updateData:
-            currentCustomName = self.updateData[guide]['attributes']['customName']
-            if currentCustomName == '' or currentCustomName == None:
-                self.updateData[guide]['instance'].set_guide_custom_name(self.updateData[guide]['instance'].guide_base.split(':')[0]+'_OLD')
+    def rename_old_guides(self):
+        for guide in self.update_data:
+            current_custom_name = self.update_data[guide]['attributes']['customName']
+            if current_custom_name == '' or current_custom_name == None:
+                self.update_data[guide]['instance'].set_guide_custom_name(self.update_data[guide]['instance'].guide_base.split(':')[0]+'_OLD')
             else:
-                self.updateData[guide]['instance'].set_guide_custom_name(currentCustomName+'_OLD')
+                self.update_data[guide]['instance'].set_guide_custom_name(current_custom_name+'_OLD')
 
 
-    def retrieveNewParent(self, currentParent):
-        currentParentBase = currentParent.split(':')[0]+":Guide_Base"
-        if currentParentBase in self.updateData.keys():
-            newParentBase = self.updateData[currentParentBase]['newGuide']
-            newParentFinal = newParentBase.split(':')[0]+':'+currentParent.split(':')[1]
-            return newParentFinal
+    def retrieve_new_parent(self, current_parent):
+        current_parent_base = current_parent.split(':')[0]+":Guide_Base"
+        if current_parent_base in self.update_data.keys():
+            new_parent_base = self.update_data[current_parent_base]['new_guide']
+            new_parent_final = new_parent_base.split(':')[0]+':'+current_parent.split(':')[1]
+            return new_parent_final
         else:
-            return currentParent
+            return current_parent
 
 
-    def parentNewGuides(self):
-        for guide in self.updateData:
-            hasParent = self.updateData[guide]['parent']
-            if hasParent != None:
-                newParentFinal = self.retrieveNewParent(hasParent)
+    def parent_new_guides(self):
+        for guide in self.update_data:
+            has_parent = self.update_data[guide]['parent']
+            if has_parent != None:
+                new_parent_final = self.retrieve_new_parent(has_parent)
                 try:
-                    cmds.parent(self.updateData[guide]['newGuide'], newParentFinal)
+                    cmds.parent(self.update_data[guide]['new_guide'], new_parent_final)
                 except:
-                    mel.eval('print \"dpAR: '+self.ar.data.lang['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
+                    mel.eval('print \"dpAR: '+self.ar.data.lang['m196_parentNotFound']+' '+self.update_data[guide]['new_guide']+'\\n\";')
             if self.ar.data.ui_state:
                 cmds.refresh()
 
 
-    def parentRetainGuides(self):
-        if len(self.guidesToReParentDict) > 0:
-            for retainGuide in self.guidesToReParentDict:
-                hasParent = self.guidesToReParentDict[retainGuide]
-                if hasParent != None:
-                    newParentFinal = self.retrieveNewParent(hasParent)
+    def parent_retain_guides(self):
+        if len(self.guides_to_reparent_data) > 0:
+            for retain_guide in self.guides_to_reparent_data:
+                has_parent = self.guides_to_reparent_data[retain_guide]
+                if has_parent != None:
+                    new_parent_final = self.retrieve_new_parent(has_parent)
                     try:
-                        cmds.parent(retainGuide, newParentFinal)
+                        cmds.parent(retain_guide, new_parent_final)
                     except:
-                        mel.eval('print \"dpAR: '+self.ar.data.lang['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
+                        mel.eval('print \"dpAR: '+self.ar.data.lang['m197_notPossibleParent']+' '+retain_guide+'\\n\";')
     
 
-    def sendTransformsToListEnd(self, elementList):
-        toMoveList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
-        for element in toMoveList:
-            elementList.append(elementList.pop(elementList.index(element)))
-
-
-    def copyAttrFromGuides(self, newGuide, oldGuideAttrDic):
-        newGuideAttrList = self.listKeyUserAttr(newGuide)
+    def copy_attr_from_guides(self, new_guide, old_guide_attr_data):
+        new_guide_attrs = self.get_key_user_attr(new_guide)
         # For each attribute in the new guide check if exists equivalent in the old one, and check if the value is different, in that case
         # set the new guide attr value to the old one.
-        for attr in newGuideAttrList:
-            if attr in oldGuideAttrDic:
-                currentValue = self.getAttrValue(newGuide, attr)
-                if isinstance(oldGuideAttrDic[attr], tuple):
-                    if currentValue != oldGuideAttrDic[attr][0] or oldGuideAttrDic[attr][1]:
-                        self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr][0], oldGuideAttrDic[attr][1])
+        for attr in new_guide_attrs:
+            if attr in old_guide_attr_data:
+                current_value = self.get_attr_value(new_guide, attr)
+                if isinstance(old_guide_attr_data[attr], tuple):
+                    if current_value != old_guide_attr_data[attr][0] or old_guide_attr_data[attr][1]:
+                        self.set_guide_attributes(new_guide, attr, old_guide_attr_data[attr][0], old_guide_attr_data[attr][1])
                 else:
-                    if currentValue != oldGuideAttrDic[attr]:
-                        self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr])
+                    if current_value != old_guide_attr_data[attr]:
+                        self.set_guide_attributes(new_guide, attr, old_guide_attr_data[attr])
 
 
-    def setNewGuideAttr(self, attributesSet):
-        for guide in self.updateData:
-            self.copyAttrFromGuides(self.updateData[guide]['newGuide'], self.updateData[guide][attributesSet])
+    def set_new_guide_attr(self, attributesSet):
+        for guide in self.update_data:
+            self.copy_attr_from_guides(self.update_data[guide]['new_guide'], self.update_data[guide][attributesSet])
     
 
-    def filterChildrenFromAnotherBase(self, children, baseGuide):
+    def filter_children_from_another_base(self, children, base_guide):
         filtered_items = []
-        filterStr = baseGuide.split(':')[0]
+        filter_string = base_guide.split(':')[0]
         for children in children:
-            if filterStr in children:
+            if filter_string in children:
                 filtered_items.append(children)
         return filtered_items
     
 
-    def setChildrenGuides(self):
+    def set_children_guides(self):
         """ Set all attributes from children with same BaseGuide to avoid double set.
         """
-        for guide in self.updateData:
-            newGuideChildrenList = self.listChildren(self.updateData[guide]['newGuide'])
-            newGuideChildrenList = self.filterChildrenFromAnotherBase(newGuideChildrenList, self.updateData[guide]['newGuide'])
-            oldGuideChildrenList = self.updateData[guide]['children'].keys()
-            oldGuideChildrenList = self.filterChildrenFromAnotherBase(oldGuideChildrenList, guide)
-            newGuideChildrenOnlyList = list(map(lambda name : name.split(':')[1], newGuideChildrenList))
-            oldGuideChildrenOnlyList = list(map(lambda name : name.split(':')[1], oldGuideChildrenList))
-            for i, newChild in enumerate(newGuideChildrenList):
-                if newGuideChildrenOnlyList[i] in oldGuideChildrenOnlyList:
-                    name_guide = self.updateData[guide]['children'][guide.split(':')[0]+':'+newGuideChildrenOnlyList[i]]
-                    self.copyAttrFromGuides(newChild, name_guide['attributes'])
-                    self.copyAttrFromGuides(newChild, name_guide['transformAttributes'])
+        for guide in self.update_data:
+            new_guide_children = self.get_children(self.update_data[guide]['new_guide'])
+            new_guide_children = self.filter_children_from_another_base(new_guide_children, self.update_data[guide]['new_guide'])
+            old_guide_children = self.update_data[guide]['children'].keys()
+            old_guide_children = self.filter_children_from_another_base(old_guide_children, guide)
+            new_guide_children_only = list(map(lambda name : name.split(':')[1], new_guide_children))
+            old_guide_children_only = list(map(lambda name : name.split(':')[1], old_guide_children))
+            for i, new_child in enumerate(new_guide_children):
+                if new_guide_children_only[i] in old_guide_children_only:
+                    name_guide = self.update_data[guide]['children'][guide.split(':')[0]+':'+new_guide_children_only[i]]
+                    self.copy_attr_from_guides(new_child, name_guide['attributes'])
+                    self.copy_attr_from_guides(new_child, name_guide['transformAttributes'])
     
 
-    def listNewAttr(self):
+    def get_new_attr(self):
         """ List new attributes from created guides for possible input.
             Returns new data dictionary if it exists.
         """
-        newDataDic = {}
-        for guide in self.updateData:
-            oldGuideSet = set(self.updateData[guide]['attributes']) | set(self.updateData[guide]['transformAttributes'])
-            newGuideSet = set(self.listKeyUserAttr(self.updateData[guide]['newGuide']))
-            newAttributesSet = newGuideSet - oldGuideSet
-            if len(newAttributesSet) > 0:
-                for attr in newAttributesSet:
-                    if guide in newDataDic:
-                        newDataDic[guide].append(attr)
+        new_data = {}
+        for guide in self.update_data:
+            old_guide_set = set(self.update_data[guide]['attributes']) | set(self.update_data[guide]['transformAttributes'])
+            new_guide_set = set(self.get_key_user_attr(self.update_data[guide]['new_guide']))
+            new_attributes_set = new_guide_set - old_guide_set
+            if len(new_attributes_set) > 0:
+                for attr in new_attributes_set:
+                    if guide in new_data:
+                        new_data[guide].append(attr)
                     else:
-                        newDataDic[guide] = [attr]
-        if len(newDataDic.keys()) == 0:
+                        new_data[guide] = [attr]
+        if len(new_data.keys()) == 0:
             return False
         else:
-            return newDataDic
+            return new_data
     
 
-    def doDelete(self, *args):
-        self.ar.utils.close_ui('updateSummary')
-        for guide in self.updateData:
+    def do_delete(self, *args):
+        self.ar.utils.close_ui('update_summary_win')
+        for guide in self.update_data:
             if cmds.listRelatives(guide, parent=True):
                 cmds.parent(guide, world=True)
         try:
-            cmds.delete(*self.updateData.keys())
+            cmds.delete(*self.update_data.keys())
         except:
             mel.eval('print \"dpAR: '+self.ar.data.lang['e000_guideNotFound']+'\\n\";')
-        for guide in self.updateData:
-             if self.updateData[guide]['instance'].guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
-                cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guide_namespace, ':'), force=True)
-                cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guide_namespace, force=True)
+        for guide in self.update_data:
+             if self.update_data[guide]['instance'].guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
+                cmds.namespace(moveNamespace=(self.update_data[guide]['instance'].guide_namespace, ':'), force=True)
+                cmds.namespace(removeNamespace=self.update_data[guide]['instance'].guide_namespace, force=True)
         self.ar.ui_manager.refresh_ui()
 
 
-    def patchFootRfF(self, *args):
+    def patch_foot_rff(self):
         """ Patching RfF new Foot pivot.
         """
-        reverseFootE = "Guide_RfE"
-        reverseFootF = "Guide_RfF"
-        reverseFootEList = cmds.ls("*:"+reverseFootE)
-        reverseFootFList = cmds.ls("*:"+reverseFootF)
-        if reverseFootFList:
-            needPatch = False
-            if reverseFootEList:
-                for rfE in reverseFootEList:
-                    guideVersion = cmds.getAttr(rfE+".version")
-                    if int(guideVersion.split(".")[0]) == 4:
-                        if float(guideVersion.split(".")[1]+"."+guideVersion.split(".")[2]) < 4.25:
-                            needPatch = True
+        reverse_foot_e = "Guide_RfE"
+        reverse_foot_f = "Guide_RfF"
+        reverse_foot_e_items = cmds.ls("*:"+reverse_foot_e)
+        reverse_foot_f_items = cmds.ls("*:"+reverse_foot_f)
+        if reverse_foot_f_items:
+            need_patch = False
+            if reverse_foot_e_items:
+                for rf_e in reverse_foot_e_items:
+                    guide_version = cmds.getAttr(rf_e+".version")
+                    if int(guide_version.split(".")[0]) == 4:
+                        if float(guide_version.split(".")[1]+"."+guide_version.split(".")[2]) < 4.25:
+                            need_patch = True
                             break
-            if needPatch:
-                for f in reverseFootFList:
-                    e = f.replace(reverseFootF, reverseFootE)
+            if need_patch:
+                for f in reverse_foot_f_items:
+                    e = f.replace(reverse_foot_f, reverse_foot_e)
                     for attr in ["tx", "ty", "tz"]:
                         cmds.setAttr(f+"."+attr, cmds.getAttr(e+"."+attr))
-                    toeList = cmds.listRelatives(e, children=True, type="transform")
-                    if toeList:
+                    toes = cmds.listRelatives(e, children=True, type="transform")
+                    if toes:
                         cmds.matchTransform(e, f, position=True, rotation=True)
-                        cmds.parent(toeList, f)
+                        cmds.parent(toes, f)
                     for attr in ["tx", "ty", "tz"]:
                         cmds.setAttr(e+"."+attr, 0)
 
 
-    def doUpdate(self, *args):
+    def do_update(self, *args):
         """ Main method to update the guides in the scene.
         """
         self.ar.utils.close_ui('updateGuidesWindow')
         # Starts progress bar feedback
         self.ar.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
         # Rename guides to discard as *_OLD
-        self.renameOldGuides()
+        self.rename_old_guides()
         self.ar.utils.setProgress(self.ar.data.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
-        self.createNewGuides()
+        self.create_new_guides()
         self.ar.utils.setProgress(self.ar.data.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
-        self.setNewGuideAttr('attributes')
+        self.set_new_guide_attr('attributes')
         self.ar.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
         # Parent all new guides;
-        self.parentNewGuides()
+        self.parent_new_guides()
         self.ar.utils.setProgress(self.ar.data.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
-        self.setNewGuideAttr('transformAttributes')
+        self.set_new_guide_attr('transformAttributes')
         self.ar.utils.setProgress(self.ar.data.lang['m203_setChildGuides'])
         # Set all children attributes
-        self.setChildrenGuides()
+        self.set_children_guides()
         self.ar.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
-        self.parentRetainGuides()
-        self.patchFootRfF()
+        self.parent_retain_guides()
+        self.patch_foot_rff()
         cmds.select(clear=True)
         # Ends progress bar feedback
         self.ar.utils.setProgress(endIt=True)
         if self.ar.data.ui_state:
             # Calls for summary window
-            self.summaryUI()
+            self.summary_ui()
         else:
-            self.doDelete()
-
+            self.do_delete()

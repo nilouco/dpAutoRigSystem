@@ -117,7 +117,7 @@ class RivetIO(action.BaseAction):
                 self.ar.data.ui_state = False
                 # recreate rivet:
                 self.rivet.deformerToUse = net_data['deformerToUse']
-                rivets = self.rivet.dpCreateRivet(net_data['geoToAttach'], net_data['uvSetName'], net_data['itemList'], net_data['attachTranslate'], net_data['attachRotate'], net_data['addFatherGrp'], net_data['addInvert'], net_data['invT'], net_data['invR'], net_data['faceToRivet'], net_data['rivetGrpName'], net_data['askComponent'], net_data['useOffset'], net_data['reuseFaceToRivet'])
+                rivets = self.rivet.create_rivet(net_data['geoToAttach'], net_data['uvSetName'], net_data['itemList'], net_data['attachTranslate'], net_data['attachRotate'], net_data['addFatherGrp'], net_data['addInvert'], net_data['invT'], net_data['invR'], net_data['faceToRivet'], net_data['rivetGrpName'], net_data['askComponent'], net_data['useOffset'], net_data['reuseFaceToRivet'])
                 self.ar.data.ui_state = old_ui_state
                 if not rivets:
                     well_imported = False

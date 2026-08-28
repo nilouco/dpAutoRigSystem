@@ -42,15 +42,15 @@ class Rivet(base.BaseLibrary):
         base.BaseLibrary.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(base)
-        self.geoToAttach = None
-        self.itemType = None
-        self.meshNode = None
-        self.selectedUVSet = None
-        self.deformerToUse = MORPH
-        self.morphDeformer = MORPH
-        self.wrapDeformer = WRAP
-        self.mayaMinimalVersion = 2022.3
-        self.mayaVersionRequired = self.checkMayaVersion()
+        self.geo_to_attach = None
+        self.item_type = None
+        self.mesh_node = None
+        self.selected_uv_set = None
+        self.deformer_to_use = MORPH
+        self.morph_deformer = MORPH
+        self.wrap_deformer = WRAP
+        self.maya_minimal_version = 2022.3
+        self.maya_required_version = self.check_maya_version()
         self.nets = []
         
 
@@ -59,7 +59,7 @@ class Rivet(base.BaseLibrary):
         if self.ar.data.ui_state:
             self.dpRivetUI()
             # try to fill UI items from selection
-            self.dpFillUI()
+            self.fill_ui()
 
 
     def dpRivetUI(self, *args):
@@ -67,117 +67,117 @@ class Rivet(base.BaseLibrary):
         """
         # creating dpRivetUI Window:
         self.ar.utils.close_ui('dpRivetWindow')
-        rivet_winWidth  = 305
-        rivet_winHeight = 470
-        dpRivetWin = cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(self.ar.data.version), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        width  = 305
+        height = 470
+        cmds.window('dpRivetWindow', title=self.ar.data.lang["m083_rivet"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         # creating layout:
-        rivetTabsLayout = cmds.tabLayout('rivetTabsLayout', innerMarginWidth=5, innerMarginHeight=5, parent="dpRivetWindow")
-        rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10), parent=rivetTabsLayout)
-        cmds.text(label=self.ar.data.lang["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
-        doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=rivetLayout)
-        cmds.button(label=self.ar.data.lang["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
-        self.geoToAttachTF = cmds.textField('geoToAttachTF', width=180, text="", changeCommand=partial(self.dpLoadGeoToAttach, None, True), parent=doubleLayout)
-        uvSetLayout = cmds.rowColumnLayout('uvSetLayout', numberOfColumns=2, columnWidth=[(1, 110), (2, 210)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 1), (2, 'left', 10)], parent=rivetLayout)
-        cmds.text(label="UV Set:", font='obliqueLabelFont', parent=uvSetLayout)
-        self.uvSetTF = cmds.textField('uvSetTF', width=180, text="", editable=False, parent=uvSetLayout)
-        cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.ar.data.lang["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
-        itemsLayout = cmds.columnLayout('itemsLayout', columnOffset=('left', 10), width=310, parent=rivetLayout)
-        self.itemScrollList = cmds.textScrollList('itemScrollList', width=290, height=100, allowMultiSelection=True, parent=itemsLayout)
-        cmds.separator(style='none', height=5, parent=itemsLayout)
-        middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=itemsLayout)
-        cmds.button(label=self.ar.data.lang["i045_add"], annotation=self.ar.data.lang["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
-        cmds.button(label=self.ar.data.lang["i046_remove"], annotation=self.ar.data.lang["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
-        cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.ar.data.lang["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
-        fatherLayout = cmds.columnLayout('fatherLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.attachTCB = cmds.checkBox('attachTCB', label=self.ar.data.lang["m148_attach"]+" Translate", value=True, parent=fatherLayout)
-        self.attachRCB = cmds.checkBox('attachRCB', label=self.ar.data.lang["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
-        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.ar.data.lang["m149_createGroupConst"], value=True, parent=fatherLayout)
-        invertLayout = cmds.columnLayout('invertLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.ar.data.lang["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
-        translateLayout = cmds.rowColumnLayout('translateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
-        cmds.separator(style='none', parent=translateLayout)
-        self.invertTCB = cmds.checkBox('invertTCB', label=self.ar.data.lang["m151_invert"]+" Translate", value=True, parent=translateLayout)
-        rotateLayout = cmds.rowColumnLayout('rotateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
-        cmds.separator(style='none', parent=rotateLayout)
-        self.invertRCB = cmds.checkBox('invertRCB', label=self.ar.data.lang["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
-        faceToRivetLayout = cmds.columnLayout('faceToRivetLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.ar.data.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.dpChangeDeformer, parent=faceToRivetLayout)
-        deformerLayout = cmds.columnLayout('deformerLayout', columnOffset=("left", 20), parent=faceToRivetLayout)
-        self.deformerCollection = cmds.radioCollection('deformerCollection', parent=deformerLayout)
-        self.morphDeformerRB = cmds.radioButton(label=self.ar.data.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
-        self.wrapDeformerRB = cmds.radioButton(label=self.ar.data.lang["m172_wrapDeformer"], annotation=self.wrapDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
-        cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
-        if not self.mayaVersionRequired:
-            cmds.radioCollection(self.deformerCollection, edit=True, select=self.wrapDeformerRB)
-        cmds.separator(style='none', height=15, parent=rivetLayout)
-        createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
-        cmds.button(label=self.ar.data.lang["i158_create"]+" "+self.ar.data.lang["m083_rivet"], annotation=self.ar.data.lang["i158_create"]+" "+self.ar.data.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
+        cmds.tabLayout('rivet_main_tl', innerMarginWidth=5, innerMarginHeight=5, parent="dpRivetWindow")
+        cmds.columnLayout('rivet_add_cl', columnOffset=("left", 10), parent='rivet_main_tl')
+        cmds.text('rivet_load_geo_txt', label=self.ar.data.lang["m145_loadGeo"], height=30, font='boldLabelFont', parent='rivet_add_cl')
+        cmds.rowColumnLayout('rivet_geo_rcl', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent='rivet_add_cl')
+        cmds.button('rivet_geo_bt', label=self.ar.data.lang["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.load_geo_to_attach, parent='rivet_geo_rcl')
+        cmds.textField('rivet_geo_to_attach_tf', width=180, text="", changeCommand=partial(self.load_geo_to_attach, None, True), parent='rivet_geo_rcl')
+        cmds.rowColumnLayout('rivet_use_set_rcl', numberOfColumns=2, columnWidth=[(1, 110), (2, 210)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 1), (2, 'left', 10)], parent='rivet_add_cl')
+        cmds.text('rivet_uv_set_txt', label="UV Set:", font='obliqueLabelFont', parent='rivet_use_set_rcl')
+        cmds.textField('rivet_uv_set_tf', width=180, text="", editable=False, parent='rivet_use_set_rcl')
+        cmds.separator(style='in', height=15, width=300, parent='rivet_add_cl')
+        cmds.text('rivet_follow_geo_txt', label=self.ar.data.lang["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent='rivet_add_cl')
+        cmds.columnLayout('rivet_items_cl', columnOffset=('left', 10), width=310, parent='rivet_add_cl')
+        cmds.textScrollList('rivet_items_tsl', width=290, height=100, allowMultiSelection=True, parent='rivet_items_cl')
+        cmds.separator(style='none', height=5, parent='rivet_items_cl')
+        cmds.rowColumnLayout('rivet_middle_rcl', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent='rivet_items_cl')
+        cmds.button('rivet_add_bt', label=self.ar.data.lang["i045_add"], annotation=self.ar.data.lang["i045_add"], width=140, command=self.add_selected_item, parent='rivet_middle_rcl')
+        cmds.button('rivet_remove_bt', label=self.ar.data.lang["i046_remove"], annotation=self.ar.data.lang["i046_remove"], width=140, command=self.remove_selected_item, parent='rivet_middle_rcl')
+        cmds.separator(style='in', height=15, width=300, parent='rivet_add_cl')
+        cmds.text('rivet_options_txt', label=self.ar.data.lang["i002_options"]+":", height=30, font='boldLabelFont', parent='rivet_add_cl')
+        cmds.columnLayout('rivet_father_cl', columnOffset=("left", 10), parent='rivet_add_cl')
+        cmds.checkBox('rivet_attach_t_cb', label=self.ar.data.lang["m148_attach"]+" Translate", value=True, parent='rivet_father_cl')
+        cmds.checkBox('rivet_attach_r_cb', label=self.ar.data.lang["m148_attach"]+" Rotate", value=False, parent='rivet_father_cl')
+        cmds.checkBox('rivet_father_grp_cb', label=self.ar.data.lang["m149_createGroupConst"], value=True, parent='rivet_father_cl')
+        cmds.columnLayout('rivet_invert_cl', columnOffset=("left", 10), parent='rivet_add_cl')
+        cmds.checkBox('rivet_add_invert_cb', label=self.ar.data.lang["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.change_invert, parent='rivet_invert_cl')
+        cmds.rowColumnLayout('rivet_translate_rcl', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent='rivet_add_cl')
+        cmds.separator(style='none', parent='rivet_translate_rcl')
+        cmds.checkBox('rivet_invert_t_cb', label=self.ar.data.lang["m151_invert"]+" Translate", value=True, parent='rivet_translate_rcl')
+        cmds.rowColumnLayout('rivet_rotate_rcl', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent='rivet_add_cl')
+        cmds.separator(style='none', parent='rivet_rotate_rcl')
+        cmds.checkBox('rivet_invert_r_cb', label=self.ar.data.lang["m151_invert"]+" Rotate", value=False, parent='rivet_rotate_rcl')
+        cmds.columnLayout('rivet_face_to_rivet_cl', columnOffset=("left", 10), parent='rivet_add_cl')
+        cmds.checkBox('rivet_face_to_rivet_cb', label=self.ar.data.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.change_deformer, parent='rivet_face_to_rivet_cl')
+        cmds.columnLayout('rivet_deformer_cl', columnOffset=("left", 20), parent='rivet_face_to_rivet_cl')
+        cmds.radioCollection('rivet_deformer_rc', parent='rivet_deformer_cl')
+        cmds.radioButton('rivet_morph_def_rb', label=self.ar.data.lang["m232_morphDeformer"], annotation=self.morph_deformer, enable=self.maya_required_version, collection='rivet_deformer_rc')
+        cmds.radioButton('rivet_wrap_def_rb', label=self.ar.data.lang["m172_wrapDeformer"], annotation=self.wrap_deformer, enable=self.maya_required_version, collection='rivet_deformer_rc')
+        cmds.radioCollection('rivet_deformer_rc', edit=True, select='rivet_morph_def_rb')
+        if not self.maya_required_version:
+            cmds.radioCollection('rivet_deformer_rc', edit=True, select='rivet_wrap_def_rb')
+        cmds.separator(style='none', height=15, parent='rivet_add_cl')
+        cmds.columnLayout('rivet_create_cl', columnOffset=("left", 10), parent='rivet_add_cl')
+        cmds.button('rivet_create_bt', label=self.ar.data.lang["i158_create"]+" "+self.ar.data.lang["m083_rivet"], annotation=self.ar.data.lang["i158_create"]+" "+self.ar.data.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.create_rivet_from_ui, parent='rivet_create_cl')
         # tab layout - remove tab
-        removeLayout = cmds.columnLayout("removeLayout", columnOffset=("left", 10), parent=rivetTabsLayout)
-        cmds.separator(style='none', height=10, parent=removeLayout)
-        removeButtonsRL = cmds.rowLayout(numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent=removeLayout)
-        cmds.button(label=self.ar.data.lang["i314_selectAll"], width=153, command=self.selectAll, parent=removeButtonsRL)
-        cmds.button(label=self.ar.data.lang["m181_refresh"], width=153, command=self.refreshRivetList, parent=removeButtonsRL)
-        cmds.separator(style='none', height=5, parent=removeLayout)
-        self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
-        cmds.separator(style='none', height=5, parent=removeLayout)
-        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=410, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
-        cmds.separator(style='none', height=5, parent=removeLayout)
-        cmds.button(label=f"{self.ar.data.lang['i046_remove']} {self.ar.data.lang['m083_rivet']}", width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
-        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.ar.data.lang["i158_create"]), (removeLayout, self.ar.data.lang["i046_remove"])))
+        cmds.columnLayout('rivet_remove_cl', columnOffset=("left", 10), parent='rivet_main_tl')
+        cmds.separator(style='none', height=10, parent='rivet_remove_cl')
+        cmds.rowLayout('rivet_remove_rl', numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent='rivet_remove_cl')
+        cmds.button('rivet_select_all_bt', label=self.ar.data.lang["i314_selectAll"], width=153, command=self.select_ctrl_items, parent='rivet_remove_rl')
+        cmds.button('rivet_refresh_bt', label=self.ar.data.lang["m181_refresh"], width=153, command=self.refresh_rivets, parent='rivet_remove_rl')
+        cmds.separator(style='none', height=5, parent='rivet_remove_cl')
+        cmds.textField("rivet_filter_tf", width=310, changeCommand=self.refresh_rivets, parent='rivet_remove_cl')
+        cmds.separator(style='none', height=5, parent='rivet_remove_cl')
+        cmds.textScrollList('rivet_filter_controller_tsl', width=310, height=410, allowMultiSelection=True, selectCommand=self.rivet_item_select, parent='rivet_remove_cl')
+        cmds.separator(style='none', height=5, parent='rivet_remove_cl')
+        cmds.button('rivet_remove_it_bt', label=f"{self.ar.data.lang['i046_remove']} {self.ar.data.lang['m083_rivet']}", width=310, command=self.remove_rivet_from_ui, backgroundColor=(1, .56, 0.48), parent='rivet_remove_cl')
+        cmds.tabLayout('rivet_main_tl', edit=True, changeCommand=self.change_tab, tabLabel=(('rivet_add_cl', self.ar.data.lang["i158_create"]), ('rivet_remove_cl', self.ar.data.lang["i046_remove"])))
         # call dpRivetUI Window:
-        cmds.showWindow(dpRivetWin)
+        cmds.showWindow('dpRivetWindow')
 
 
-    def disablePac(self, rivetIndexList, *args):
+    def disable_pac(self, rivet_indexes, *args):
         """ Receive a index list to disable parent constraint before remove rivet.
         """
-        for index in rivetIndexList:
-            netNode = self.rivetNetNodeList[index]
+        for index in rivet_indexes:
+            net = self.rivet_nets[index]
             try:
-                parentConstraint = cmds.listConnections(f"{netNode}.pacNode", destination=False)[0]
-                rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
-                pacAttrList = cmds.listAttr(parentConstraint, settable=True, visible=True, string=f"{rivetFollicle}*")
-                if pacAttrList:
-                    pacAttr = pacAttrList[0]
-                    cmds.setAttr(f"{parentConstraint}.{pacAttr}", 0)
+                pac = cmds.listConnections(f"{net}.pacNode", destination=False)[0]
+                follicle = cmds.listConnections(f"{net}.follicle", destination=False)[0]
+                pac_attrs = cmds.listAttr(pac, settable=True, visible=True, string=f"{follicle}*")
+                if pac_attrs:
+                    pac_attr = pac_attrs[0]
+                    cmds.setAttr(f"{pac}.{pac_attr}", 0)
             except:
                 pass
 
 
-    def selectAll(self, *args):
+    def select_ctrl_items(self, *args):
         """ Select all items from rivet controllers list.
         """
-        itemsList = cmds.textScrollList(self.rivetControllersList, query=True, allItems=True)
-        if itemsList:
-            cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=itemsList)
+        items = cmds.textScrollList('rivet_filter_controller_tsl', query=True, allItems=True)
+        if items:
+            cmds.textScrollList('rivet_filter_controller_tsl', edit=True, selectItem=items)
 
 
-    def rivetItemSelect(self, *args):
+    def rivet_item_select(self, *args):
         """ Select items on viewport that has been selected on controllers list.
         """
-        selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
-        cmds.select(selectionList)
+        selection = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectItem=True)
+        cmds.select(selection)
 
 
-    def removeRivetFromList(self, indexes, items):
+    def remove_rivet_from_list(self, indexes, items):
         """ Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
         """
-        self.disablePac(indexes)
+        self.disable_pac(indexes)
         for i, index in enumerate(indexes):
             self.ar.utils.setProgress(self.ar.data.lang['i315_removing'])
-            netNode = self.rivetNetNodeList[index]
-            if netNode:
-                self.removeRivetFromNetNode(netNode)
+            net = self.rivet_nets[index]
+            if net:
+                self.remove_rivet_from_net(net)
             else:
                 mel.eval('print \"dpAR: '+self.ar.data.lang['m204_unableRemRivet']+items[i]+'\\n\";')
-        self.refreshRivetList()
+        self.refresh_rivets()
         cmds.select(clear=True)
     
 
-    def checkRivetGrp(self, *args):
+    def check_rivet_grp(self, *args):
         """ Verify if rivet group is empty to remove it.
         """
         if cmds.objExists(RIVET_GRP):
@@ -185,446 +185,446 @@ class Rivet(base.BaseLibrary):
                 cmds.delete(RIVET_GRP)
     
 
-    def removeRivetFromUI(self, *args):
+    def remove_rivet_from_ui(self, *args):
         """ Remove selected rivets on the controllers list in the ui.
         """
-        selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
-        selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
-        if selectionList and selectionIndexList:
-            trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(trueIndexList), add_one=False, add_number=False)
-            self.removeRivetFromList(trueIndexList, selectionList)
-            self.checkRivetGrp()
+        selection = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectItem=True)
+        selection_indexes = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectIndexedItem=True)
+        if selection and selection_indexes:
+            true_indexes = list(map(lambda n : n-1, selection_indexes))
+            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(true_indexes), add_one=False, add_number=False)
+            self.remove_rivet_from_list(true_indexes, selection)
+            self.check_rivet_grp()
             self.ar.utils.setProgress(endIt=True)
         else:
             mel.eval('print \"dpAR: '+self.ar.data.lang['m169_noItemSelect']+'\\n\";')
-        cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
+        cmds.textScrollList('rivet_filter_controller_tsl', edit=True, deselectAll=True)
 
     
-    def removeRivetFromNetNode(self, rivetNetNode):
+    def remove_rivet_from_net(self, rivetNetNode):
         """ Remove the rivet from its network node.
         """
-        rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
-        if rivetTransform:
-            rivetTransform = rivetTransform[0]
-        rivetControl = cmds.listConnections(f"{rivetNetNode}.itemNode", destination=False)[0]
-        rivetFollicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
-        attachedGeometry = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
+        rivet_transform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
+        if rivet_transform:
+            rivet_transform = rivet_transform[0]
+        rivet_ctrl = cmds.listConnections(f"{rivetNetNode}.item_node", destination=False)[0]
+        follicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
+        attached_geo = cmds.listConnections(f"{rivetNetNode}.geo_to_attach", destination=False)[0]
         try:
-            originalParent = cmds.listRelatives(rivetTransform, parent=True)
-            currentParent = cmds.listRelatives(rivetControl, parent=True)
-            if originalParent == None:
-                if currentParent != originalParent:
-                    cmds.parent(rivetControl, world=True)
+            original_parent = cmds.listRelatives(rivet_transform, parent=True)
+            current_parent = cmds.listRelatives(rivet_ctrl, parent=True)
+            if original_parent == None:
+                if current_parent != original_parent:
+                    cmds.parent(rivet_ctrl, world=True)
             else:
-                originalParent = originalParent[0]
-                if not originalParent in currentParent:
-                    cmds.parent(rivetControl, originalParent)
-            if rivetControl != rivetTransform:
-                cmds.delete([rivetTransform, rivetFollicle])
+                original_parent = original_parent[0]
+                if not original_parent in current_parent:
+                    cmds.parent(rivet_ctrl, original_parent)
+            if rivet_ctrl != rivet_transform:
+                cmds.delete([rivet_transform, follicle])
             else:
-                cmds.delete(rivetFollicle)
+                cmds.delete(follicle)
         except:
-            cmds.delete(rivetFollicle)
+            cmds.delete(follicle)
 
-        connectionList = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
-        if len(connectionList) > 1:
-            for connection in connectionList:
+        connection = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
+        if len(connection) > 1:
+            for connection in connection:
                 if "rivetNet" in connection:
                     cmds.deleteAttr(connection)
                     break
         else:
-            cmds.deleteAttr(connectionList[0])
+            cmds.deleteAttr(connection[0])
 
         # check if attached geometry should be discarded
-        networkList = cmds.listConnections(attachedGeometry, type="network")
-        networkList = list(set(networkList))
-        networkList.remove(rivetNetNode)
-        if len(networkList) == 0:
-            skinClusterList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='skinCluster')
-            blendShapeList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='blendShape')
-            if len(skinClusterList) == 0 and len(blendShapeList) == 0:
-                removeAttachedGeo = cmds.confirmDialog(title=self.ar.data.lang['i319_removeGeometry'], icon="question", message=f"{self.ar.data.lang['i320_rivetHeldGeo']} {attachedGeometry} {self.ar.data.lang['i321_noConnectionGeo']}", button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+        networks = cmds.listConnections(attached_geo, type="network")
+        networks = list(set(networks))
+        networks.remove(rivetNetNode)
+        if len(networks) == 0:
+            skinclusters = cmds.ls(cmds.listHistory(attached_geo, pruneDagObjects=True), type='skinCluster')
+            blendshapes = cmds.ls(cmds.listHistory(attached_geo, pruneDagObjects=True), type='blendShape')
+            if len(skinclusters) == 0 and len(blendshapes) == 0:
+                remove_attached_geo = cmds.confirmDialog(title=self.ar.data.lang['i319_removeGeometry'], icon="question", message=f"{self.ar.data.lang['i320_rivetHeldGeo']} {attached_geo} {self.ar.data.lang['i321_noConnectionGeo']}", button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
 
-                if removeAttachedGeo == self.ar.data.lang['i071_yes']:
-                    currentParent = cmds.listRelatives(attachedGeometry, parent=True)
-                    if currentParent:
-                        cmds.lockNode(currentParent[0])
-                        cmds.delete(attachedGeometry)
-                        cmds.lockNode(currentParent[0], lock=False)
+                if remove_attached_geo == self.ar.data.lang['i071_yes']:
+                    current_parent = cmds.listRelatives(attached_geo, parent=True)
+                    if current_parent:
+                        cmds.lockNode(current_parent[0])
+                        cmds.delete(attached_geo)
+                        cmds.lockNode(current_parent[0], lock=False)
                     else:
-                        cmds.delete(attachedGeometry)
+                        cmds.delete(attached_geo)
         cmds.delete(rivetNetNode)
-        mel.eval('print \"dpAR: '+self.ar.data.lang['m144_removedRivet']+" "+rivetControl+'\\n\";')
+        mel.eval('print \"dpAR: '+self.ar.data.lang['m144_removedRivet']+" "+rivet_ctrl+'\\n\";')
     
 
-    def itemsWithRivetList(self):
+    def get_ctrl_items(self):
         """ From all rivet network nodes, rise a controllers list to fill ui.
         """
-        rivetNetList = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
-        if rivetNetList:
-            controllerList = []
-            self.rivetNetNodeList = []
-            for rivetNode in rivetNetList:
-                rivetControlList = cmds.listConnections(f"{rivetNode}.itemNode", destination=False)
-                if rivetControlList:
-                    controllerList.append(rivetControlList[0])
-                    self.rivetNetNodeList.append(rivetNode)
-            return controllerList
+        rivet_networks = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
+        if rivet_networks:
+            ctrls = []
+            self.rivet_nets = []
+            for rivet_node in rivet_networks:
+                rivet_controllers = cmds.listConnections(f"{rivet_node}.item_node", destination=False)
+                if rivet_controllers:
+                    ctrls.append(rivet_controllers[0])
+                    self.rivet_nets.append(rivet_node)
+            return ctrls
         else:
             return None
 
 
-    def filterRivetName(self, name, items, separator):
+    def filter_name(self, name, items, separator):
         """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
             Returns the filtered list.
             Update the index list to match the returned list.
         """
         filtered_items = []
-        multiFilterList = [name]
-        newIndexList = []
+        multi_filters = [name]
+        new_indexes = []
         if separator in name:
-            multiFilterList = list(name.split(separator))
-        for filterName in multiFilterList:
-            if filterName:
+            multi_filters = list(name.split(separator))
+        for filter_name in multi_filters:
+            if filter_name:
                 for i, item in enumerate(items):
-                    if str(filterName) in item:
+                    if str(filter_name) in item:
                         filtered_items.append(item)
-                        newIndexList.append(i)
-        if len(newIndexList) > 0:
-            newNodesList = []
-            for index in newIndexList:
-                newNodesList.append(self.rivetNetNodeList[index])
-            self.rivetNetNodeList = newNodesList
+                        new_indexes.append(i)
+        if len(new_indexes) > 0:
+            new_nodes = []
+            for index in new_indexes:
+                new_nodes.append(self.rivet_nets[index])
+            self.rivet_nets = new_nodes
         return filtered_items
 
 
-    def refreshRivetList(self, *args):
+    def refresh_rivets(self, *args):
         """ Refresh the rivets list in the ui.
         """
-        cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
-        rivetItemsList = self.itemsWithRivetList()
-        filter = cmds.textField(self.filterRivetList, query=True, text=True)
-        if rivetItemsList:
+        cmds.textScrollList('rivet_filter_controller_tsl', edit=True, removeAll=True)
+        rivet_ctrl_items = self.get_ctrl_items()
+        filter = cmds.textField('rivet_filter_tf', query=True, text=True)
+        if rivet_ctrl_items:
             if filter:
-                sortedRivetList = self.filterRivetName(filter, rivetItemsList, " ")
-                cmds.textScrollList(self.rivetControllersList, edit=True, append=sortedRivetList)
+                sorted_rivets = self.filter_name(filter, rivet_ctrl_items, " ")
+                cmds.textScrollList('rivet_filter_controller_tsl', edit=True, append=sorted_rivets)
             else:
-                cmds.textScrollList(self.rivetControllersList, edit=True, append=rivetItemsList)
+                cmds.textScrollList('rivet_filter_controller_tsl', edit=True, append=rivet_ctrl_items)
     
 
-    def rivetTabChange(self, rivetTabsLayout):
+    def change_tab(self):
         """ Intermediate method to control rivet ui tab change.
         """
-        if cmds.tabLayout(rivetTabsLayout, query=True, selectTabIndex=True) == 2:
-            self.refreshRivetList()
+        if cmds.tabLayout('rivet_main_tl', query=True, selectTabIndex=True) == 2:
+            self.refresh_rivets()
         else:
-            self.dpFillUI()
+            self.fill_ui()
     
 
-    def dpFillUI(self, *args):
+    def fill_ui(self, *args):
         """ Try to auto fill UI elements from selection.
         """
-        selList = cmds.ls(selection=True)
-        if selList:
-            if len(selList) > 1:
-                items = selList[:-1]
+        selection = cmds.ls(selection=True)
+        if selection:
+            if len(selection) > 1:
+                items = selection[:-1]
                 items.sort()
-                geo = selList[-1]
-                self.dpLoadGeoToAttach(geo)
-                self.dpAddSelect(items)
+                geo = selection[-1]
+                self.load_geo_to_attach(geo)
+                self.add_selected_item(items)
 
 
-    def riseRemoveAndIndexList(self, needToRemoveSet, hasRivetList):
+    def get_to_remove_indexes(self, needToRemoveSet, has_rivets_items):
         """ From a set of items to be removed rise all rivets and matching indexes needed to removal.
         """
-        needToRemoveList = []
-        trueIndexList = []
+        need_to_remove_items = []
+        true_indexes = []
         for item in needToRemoveSet:
-            index = [i for i, x in enumerate(hasRivetList) if x == item]
+            index = [i for i, x in enumerate(has_rivets_items) if x == item]
             for j in index:
-                needToRemoveList.append(item)
-                trueIndexList.append(j)
-        return needToRemoveList, trueIndexList
+                need_to_remove_items.append(item)
+                true_indexes.append(j)
+        return need_to_remove_items, true_indexes
 
 
-    def dpCreateRivetFromUI(self, *args):
+    def create_rivet_from_ui(self, *args):
         """ Just collect all information from UI and call the main function to create Rivet setup.
         """
         # getting UI values
-        geoToAttach = cmds.textField(self.geoToAttachTF, query=True, text=True)
-        uvSet = cmds.textField(self.uvSetTF, query=True, text=True)
-        items = cmds.textScrollList(self.itemScrollList, query=True, allItems=True)
-        attachTranslate = cmds.checkBox(self.attachTCB, query=True, value=True)
-        attachRotate = cmds.checkBox(self.attachRCB, query=True, value=True)
-        addFatherGrp = cmds.checkBox(self.fatherGrpCB, query=True, value=True)
-        addInvert = cmds.checkBox(self.addInvertCB, query=True, value=True)
-        invT = cmds.checkBox(self.invertTCB, query=True, value=True)
-        invR = cmds.checkBox(self.invertRCB, query=True, value=True)
-        faceToRivet = cmds.checkBox(self.faceToRivetCB, query=True, value=True)
+        geo_to_attach = cmds.textField('rivet_geo_to_attach_tf', query=True, text=True)
+        uv_set = cmds.textField('rivet_uv_set_tf', query=True, text=True)
+        items = cmds.textScrollList('rivet_items_tsl', query=True, allItems=True)
+        attatch_translate = cmds.checkBox('rivet_attach_t_cb', query=True, value=True)
+        attach_rotate = cmds.checkBox('rivet_attach_r_cb', query=True, value=True)
+        add_father_grp = cmds.checkBox('rivet_father_grp_cb', query=True, value=True)
+        add_invert = cmds.checkBox('rivet_add_invert_cb', query=True, value=True)
+        inv_t = cmds.checkBox('rivet_invert_t_cb', query=True, value=True)
+        inv_r = cmds.checkBox('rivet_invert_r_cb', query=True, value=True)
+        face_to_rivet = cmds.checkBox('rivet_face_to_rivet_cb', query=True, value=True)
 
-        needToRemove = None
-        hasRivetList = self.itemsWithRivetList()
-        if hasRivetList:
-            hasRivetSet = set(hasRivetList)
-            toCreateSet = set(items)
-            needToRemove = toCreateSet & hasRivetSet
-        if needToRemove:
-            if len(needToRemove) > 0:
-                removeExistingRivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
-                if removeExistingRivet == self.ar.data.lang['i071_yes']:
-                    needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(needToRemoveList), add_one=False, add_number=False)
-                    self.removeRivetFromList(trueIndexList, needToRemoveList)
+        need_to_remove = None
+        has_rivets_items = self.get_ctrl_items()
+        if has_rivets_items:
+            has_rivet_set = set(has_rivets_items)
+            to_create_set = set(items)
+            need_to_remove = to_create_set & has_rivet_set
+        if need_to_remove:
+            if len(need_to_remove) > 0:
+                remove_existing_rivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
+                if remove_existing_rivet == self.ar.data.lang['i071_yes']:
+                    need_to_remove_items, true_indexes = self.get_to_remove_indexes(need_to_remove, has_rivets_items)
+                    self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(need_to_remove_items), add_one=False, add_number=False)
+                    self.remove_rivet_from_list(true_indexes, need_to_remove_items)
                     self.ar.utils.setProgress(endIt=True)
-                elif removeExistingRivet == self.ar.data.lang['i072_no']:
+                elif remove_existing_rivet == self.ar.data.lang['i072_no']:
                     pass
                 else:
                     return
 
         # call run function to create Rivet setup using UI values
         self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), add_one=False, add_number=False)
-        self.dpCreateRivet(geoToAttach, uvSet, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
+        self.create_rivet(geo_to_attach, uv_set, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, RIVET_GRP, True)
         self.ar.utils.setProgress(endIt=True)
         self.ar.utils.close_ui('dpRivetWindow')
     
     
-    def dpSelectUVSetWin(self, uvSetList, *args):
+    def select_ui_set_ui(self, uv_sets, *args):
         """ Ask user the UV Set to use.
         """
-        self.selectedUVSet = cmds.confirmDialog(title="Multiple UV Sets", message="Which UV Set do you want to use?", button=uvSetList)
+        self.selected_uv_set = cmds.confirmDialog(title="Multiple UV Sets", message="Which UV Set do you want to use?", button=uv_sets)
     
     
-    def dpLoadUVSet(self, item, *args):
+    def load_uv_set(self, item, *args):
         """ Verify the UV sets for polygon mesh and show a dialog box in order to choose if there are more than one UVSet map.
         """
-        if self.itemType == "mesh":
-            uvSetList = cmds.polyUVSet(self.geoToAttach, query=True, allUVSets=True)
-            self.selectedUVSet = uvSetList[0]
-            if len(uvSetList) > 1:
-                self.dpSelectUVSetWin(uvSetList)
-            cmds.textField(self.uvSetTF, edit=True, text=self.selectedUVSet)
-        elif self.itemType == "nurbsSurface":
-            cmds.textField(self.uvSetTF, edit=True, text="nurbsSurface")
+        if self.item_type == "mesh":
+            uv_sets = cmds.polyUVSet(self.geo_to_attach, query=True, allUVSets=True)
+            self.selected_uv_set = uv_sets[0]
+            if len(uv_sets) > 1:
+                self.select_ui_set_ui(uv_sets)
+            cmds.textField('rivet_uv_set_tf', edit=True, text=self.selected_uv_set)
+        elif self.item_type == "nurbsSurface":
+            cmds.textField('rivet_uv_set_tf', edit=True, text="nurbsSurface")
     
     
-    def dpLoadGeoToAttach(self, geoName=None, geoFromUI=None, *args):
+    def load_geo_to_attach(self, geo_name=None, geo_from_ui=None, *args):
         """ Load selected object a geometry to attach rivet.
         """
-        if geoName:
-            selected_nodes = [geoName]
-        elif geoFromUI:
-            selected_nodes = [cmds.textField(self.geoToAttachTF, query=True, text=True)]
+        if geo_name:
+            selected_nodes = [geo_name]
+        elif geo_from_ui:
+            selected_nodes = [cmds.textField('rivet_geo_to_attach_tf', query=True, text=True)]
         else:
             selected_nodes = cmds.ls(selection=True)
         if selected_nodes:
             if self.ar.utils.dpCheckGeometry(selected_nodes[0]):
-                self.geoToAttach = selected_nodes[0]
-                cmds.textField(self.geoToAttachTF, edit=True, text=self.geoToAttach)
-                self.dpLoadUVSet(self.geoToAttach)
+                self.geo_to_attach = selected_nodes[0]
+                cmds.textField('rivet_geo_to_attach_tf', edit=True, text=self.geo_to_attach)
+                self.load_uv_set(self.geo_to_attach)
         else:
             mel.eval("warning \"Select a geometry in order use it to attach rivets, please.\";")
     
     
-    def dpAddSelect(self, sList=None, *args):
+    def add_selected_item(self, items=None, *args):
         """ Add selected items to target textscroll list
         """
         # declare variables
-        selItemList = []
+        selected_items = []
         # get selection
-        if sList:
-            selList=sList
+        if items:
+            selection=items
         else:
-            selList = cmds.ls(selection=True)
+            selection = cmds.ls(selection=True)
         # check if there is any selected object in order to continue
-        if selList:
+        if selection:
             # find transforms
-            for item in selList:
-                if not item in selItemList:
+            for item in selection:
+                if not item in selected_items:
                     if cmds.objectType(item) == "transform":
-                        if not item == self.geoToAttach:
-                            selItemList.append(item)
+                        if not item == self.geo_to_attach:
+                            selected_items.append(item)
                     elif ".vtx" in item or ".cv" in item or ".pt" in item:
-                        selItemList.append(item)
-            if selItemList:
+                        selected_items.append(item)
+            if selected_items:
                 # get current list
-                currentList = cmds.textScrollList(self.itemScrollList, query=True, allItems=True)
-                if currentList:
+                current_items = cmds.textScrollList('rivet_items_tsl', query=True, allItems=True)
+                if current_items:
                     # clear current list
-                    cmds.textScrollList(self.itemScrollList, edit=True, removeAll=True)
+                    cmds.textScrollList('rivet_items_tsl', edit=True, removeAll=True)
                     # avoid repeated items
-                    for item in selItemList:
-                        if not item in currentList:
-                            currentList.append(item)
+                    for item in selected_items:
+                        if not item in current_items:
+                            current_items.append(item)
                     # refresh textScrollList
-                    cmds.textScrollList(self.itemScrollList, edit=True, append=currentList)
+                    cmds.textScrollList('rivet_items_tsl', edit=True, append=current_items)
                 else:
                     # add selected items in the empyt target scroll list
-                    cmds.textScrollList(self.itemScrollList, edit=True, append=selItemList)
+                    cmds.textScrollList('rivet_items_tsl', edit=True, append=selected_items)
             else:
                 mel.eval("warning \"Please, select a tranform node, vertices or lattice points in order to add it in the item list.\";")
         else:
             mel.eval("warning \"Please, select a tranform node, vertices or lattice points in order to add it in the item list.\";")
     
     
-    def dpRemoveSelect(self, *args):
+    def remove_selected_item(self, *args):
         """ Remove selected items from target scroll list.
         """
-        selItemList = cmds.textScrollList(self.itemScrollList, query=True, selectItem=True)
-        if selItemList:
-            for item in selItemList:
-                cmds.textScrollList(self.itemScrollList, edit=True, removeItem=item)
+        selected_items = cmds.textScrollList('rivet_items_tsl', query=True, selectItem=True)
+        if selected_items:
+            for item in selected_items:
+                cmds.textScrollList('rivet_items_tsl', edit=True, removeItem=item)
       
     
-    def dpChangeInvert(self, value, *args):
-        cmds.checkBox(self.invertTCB, edit=True, enable=value)
-        cmds.checkBox(self.invertRCB, edit=True, enable=value)
+    def change_invert(self, value, *args):
+        cmds.checkBox('rivet_invert_t_cb', edit=True, enable=value)
+        cmds.checkBox('rivet_invert_r_cb', edit=True, enable=value)
 
 
-    def dpChangeDeformer(self, value, *args):
-        if not self.mayaVersionRequired:
+    def change_deformer(self, value, *args):
+        if not self.maya_required_version:
             value = False
-        cmds.radioButton(self.morphDeformerRB, edit=True, enable=value)
-        cmds.radioButton(self.wrapDeformerRB, edit=True, enable=value)
+        cmds.radioButton('rivet_morph_def_rb', edit=True, enable=value)
+        cmds.radioButton('rivet_wrap_def_rb', edit=True, enable=value)
 
 
-    def dpInvertAttrTranformation(self, nodeName, invT=True, invR=False, *args):
+    def invert_attr_transformation(self, node_name, inv_t=True, inv_r=False, *args):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
             Return inverted groups.
         """
-        invTGrp = None
-        invRGrp = None
-        if cmds.objExists(nodeName):
-            nodePivot = cmds.xform(nodeName, query=True, worldSpace=True, rotatePivot=True)
-            if invT:
-                invTGrp = cmds.group(nodeName, name=nodeName+"_InvT_Grp")
-                cmds.xform(invTGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]))
-                tMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvT_MD", skipSelect=True)
-                self.to_ids.append(tMD)
-                cmds.setAttr(tMD+'.input2X', -1)
-                cmds.setAttr(tMD+'.input2Y', -1)
-                cmds.setAttr(tMD+'.input2Z', -1)
+        inv_t_grp = None
+        inv_r_grp = None
+        if cmds.objExists(node_name):
+            node_pivot = cmds.xform(node_name, query=True, worldSpace=True, rotatePivot=True)
+            if inv_t:
+                inv_t_grp = cmds.group(node_name, name=node_name+"_InvT_Grp")
+                cmds.xform(inv_t_grp, worldSpace=True, rotatePivot=(node_pivot[0], node_pivot[1], node_pivot[2]))
+                t_md = cmds.createNode('multiplyDivide', name=node_name+"_InvT_MD", skipSelect=True)
+                self.to_ids.append(t_md)
+                cmds.setAttr(t_md+'.input2X', -1)
+                cmds.setAttr(t_md+'.input2Y', -1)
+                cmds.setAttr(t_md+'.input2Z', -1)
                 for axis in self.ar.data.axes:
-                    cmds.connectAttr(nodeName+'.translate'+axis, tMD+'.input1'+axis, force=True)
-                    cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
-            if invR:
-                invRGrp = cmds.group(nodeName, name=nodeName+"_InvR_Grp")
-                cmds.xform(invRGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]), rotateOrder="zyx")
-                rMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvR_MD", skipSelect=True)
-                self.to_ids.append(rMD)
-                cmds.setAttr(rMD+'.input2X', -1)
-                cmds.setAttr(rMD+'.input2Y', -1)
-                cmds.setAttr(rMD+'.input2Z', -1)
+                    cmds.connectAttr(node_name+'.translate'+axis, t_md+'.input1'+axis, force=True)
+                    cmds.connectAttr(t_md+'.output'+axis, inv_t_grp+'.translate'+axis, force=True)
+            if inv_r:
+                inv_r_grp = cmds.group(node_name, name=node_name+"_InvR_Grp")
+                cmds.xform(inv_r_grp, worldSpace=True, rotatePivot=(node_pivot[0], node_pivot[1], node_pivot[2]), rotateOrder="zyx")
+                r_md = cmds.createNode('multiplyDivide', name=node_name+"_InvR_MD", skipSelect=True)
+                self.to_ids.append(r_md)
+                cmds.setAttr(r_md+'.input2X', -1)
+                cmds.setAttr(r_md+'.input2Y', -1)
+                cmds.setAttr(r_md+'.input2Z', -1)
                 for axis in self.ar.data.axes:
-                    cmds.connectAttr(nodeName+'.rotate'+axis, rMD+'.input1'+axis, force=True)
-                    cmds.connectAttr(rMD+'.output'+axis, invRGrp+'.rotate'+axis, force=True)
-        return invTGrp, invRGrp
+                    cmds.connectAttr(node_name+'.rotate'+axis, r_md+'.input1'+axis, force=True)
+                    cmds.connectAttr(r_md+'.output'+axis, inv_r_grp+'.rotate'+axis, force=True)
+        return inv_t_grp, inv_r_grp
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, reuseFaceToRivet=False, *args):
+    def create_rivet(self, geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name=RIVET_GRP, ask_component=False, use_offset=True, reuse_face_to_rivet=False, *args):
         """ Create the Rivet setup.
             Returns the created network node list. 
         """
         # declaring variables
         self.to_ids = []
-        self.originedGeo = geoToAttach
-        self.shapeToAttachList = None
-        self.shapeToAttach = None
-        self.cpNode = None
-        rivets, togetherList = [], []
-        isComponent = None
-        self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
+        self.origined_geo = geo_to_attach
+        self.shapes_to_attach = None
+        self.shape_to_attach = None
+        self.cp_node = None
+        rivets, togethers = [], []
+        is_component = None
+        self.old_unit_conversions = cmds.ls(selection=False, type="unitConversion")
 
         # integrate to dpAutoRigSystem:
-        self.masterCtrl = self.ar.utils.getNodeByMessage("masterCtrl")
-        self.scalableGrp = self.ar.utils.getNodeByMessage("scalableGrp")
+        master_ctrl = self.ar.utils.getNodeByMessage("masterCtrl")
+        scalable_grp = self.ar.utils.getNodeByMessage("scalableGrp")
         
         # create Rivet_Grp in order to organize hierarchy:
-        createdRivetGrp = False
-        self.rivetGrp = rivetGrpName
-        if not cmds.objExists(rivetGrpName):
-            createdRivetGrp = True
-            self.rivetGrp = cmds.group(name=rivetGrpName, empty=True)
-            self.to_ids.append(self.rivetGrp)
+        created_rivet_grp = False
+        self.rivet_grp = rivet_grp_name
+        if not cmds.objExists(rivet_grp_name):
+            created_rivet_grp = True
+            self.rivet_grp = cmds.group(name=rivet_grp_name, empty=True)
+            self.to_ids.append(self.rivet_grp)
             for attr in self.ar.data.transform_attrs[:-1]:
-                cmds.setAttr(self.rivetGrp+"."+attr, lock=True, keyable=False, channelBox=False)
-            cmds.addAttr(self.rivetGrp, longName="dpRivetGrp", attributeType='bool')
-            cmds.setAttr(self.rivetGrp+".dpRivetGrp", 1)
-            if self.scalableGrp:
-                cmds.parent(self.rivetGrp, self.scalableGrp)
+                cmds.setAttr(self.rivet_grp+"."+attr, lock=True, keyable=False, channelBox=False)
+            cmds.addAttr(self.rivet_grp, longName="dpRivetGrp", attributeType='bool')
+            cmds.setAttr(self.rivet_grp+".dpRivetGrp", 1)
+            if scalable_grp:
+                cmds.parent(self.rivet_grp, scalable_grp)
             
         # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Support_Grp
-        if faceToRivet:
-            if reuseFaceToRivet and cmds.objExists(reuseFaceToRivet):
-                geoToAttach = reuseFaceToRivet
+        if face_to_rivet:
+            if reuse_face_to_rivet and cmds.objExists(reuse_face_to_rivet):
+                geo_to_attach = reuse_face_to_rivet
             else:
-                geoToAttach = self.createFaceToRivet(items, self.extractGeoToRivet(geoToAttach), 4)
-            self.deformFaceToRivet(geoToAttach, self.originedGeo)
-            supportGrp = self.ar.utils.getNodeByMessage("supportGrp")
-            if supportGrp:
-                self.ar.ctrls.colorShape([supportGrp], [0.51, 1, 0.667], outliner=True) #green
+                geo_to_attach = self.create_face_to_rivet(items, self.extract_geo_to_rivet(geo_to_attach), 4)
+            self.deform_face_to_rivet(geo_to_attach, self.origined_geo)
+            support_grp = self.ar.utils.getNodeByMessage("supportGrp")
+            if support_grp:
+                self.ar.ctrls.colorShape([support_grp], [0.51, 1, 0.667], outliner=True) #green
 
         # get shape to attach:
-        if cmds.objExists(geoToAttach):
-            self.shapeToAttachList = cmds.ls(geoToAttach, dag=True, shapes=True)
-        if self.shapeToAttachList:
-            self.shapeToAttach = self.shapeToAttachList[0]
+        if cmds.objExists(geo_to_attach):
+            self.shapes_to_attach = cmds.ls(geo_to_attach, dag=True, shapes=True)
+        if self.shapes_to_attach:
+            self.shape_to_attach = self.shapes_to_attach[0]
             # get shape type:
-            self.shapeType = cmds.objectType(self.shapeToAttach)
+            self.shape_type = cmds.objectType(self.shape_to_attach)
             # verify if there are vertices, cv's or lattice points in our items:
             if items:
                 asked = False
                 for i, item in enumerate(items):
                     if ".vtx" in item or ".cv" in item or ".pt" in item:
-                        if askComponent:
+                        if ask_component:
                             if not asked:
-                                isComponent = cmds.confirmDialog(title="dpRivet on Components", message="How do you want attach vertices, cv's or lattice points?", button=("Individually", "Together", "Ignore"), defaultButton="Individually", dismissString="Ignore", cancelButton="Ignore")
+                                is_component = cmds.confirmDialog(title="dpRivet on Components", message="How do you want attach vertices, cv's or lattice points?", button=("Individually", "Together", "Ignore"), defaultButton="Individually", dismissString="Ignore", cancelButton="Ignore")
                                 asked = True
-                                if isComponent == "Individually":
+                                if is_component == "Individually":
                                     cls = cmds.cluster(item, name=item[:item.rfind(".")]+"_"+str(i)+"_Cls")[0]+"Handle"
-                                    clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                                    rivets.append(clsToRivet)
-                                elif isComponent == "Together":
-                                    togetherList.append(item)
-                                elif isComponent == "Ignore":
+                                    cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
+                                    rivets.append(cls_to_rivet)
+                                elif is_component == "Together":
+                                    togethers.append(item)
+                                elif is_component == "Ignore":
                                     items.remove(item)
-                            elif isComponent == "Ignore":
+                            elif is_component == "Ignore":
                                 items.remove(item)
-                            elif isComponent == "Together":
-                                togetherList.append(item)
+                            elif is_component == "Together":
+                                togethers.append(item)
                             else: #Individually
                                 cls = cmds.cluster(item, name=item[:item.rfind(".")]+"_"+str(i)+"_Cls")[0]+"Handle"
-                                clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                                rivets.append(clsToRivet)
+                                cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
+                                rivets.append(cls_to_rivet)
                         else: #Individually
                             cls = cmds.cluster(item, name=item[:item.rfind(".")]+"_"+str(i)+"_Cls")[0]+"Handle"
-                            clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                            rivets.append(clsToRivet)
+                            cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
+                            rivets.append(cls_to_rivet)
                     elif cmds.objExists(item):
                         rivets.append(item)
             else:
                 mel.eval("error \"Select and add at least one item to be attached as a Rivet, please.\";")
-            if isComponent == "Together":
-                cls = cmds.cluster(togetherList, name="dpRivet_Cls")[0]+"Handle"
-                clsToRivet = cmds.parent(cls, self.rivetGrp)[0]
-                rivets.append(clsToRivet)
+            if is_component == "Together":
+                cls = cmds.cluster(togethers, name="dpRivet_Cls")[0]+"Handle"
+                cls_to_rivet = cmds.parent(cls, self.rivet_grp)[0]
+                rivets.append(cls_to_rivet)
             
             # check about locked or animated attributes on items:
-            if not addFatherGrp:
-                cancelProcess = False
+            if not add_father_grp:
+                cancel_process = False
                 for rivet in rivets:
                     # locked:
                     if cmds.listAttr(rivet, locked=True):
-                        cancelProcess = True
+                        cancel_process = True
                         break
                     # animated:
                     for attr in self.ar.data.transform_attrs[:-1]:
                         if cmds.listConnections(rivet+"."+attr, source=True, destination=False):
-                            cancelProcess = True
+                            cancel_process = True
                             break
-                if cancelProcess:
-                    if createdRivetGrp:
-                        cmds.delete(self.rivetGrp)
+                if cancel_process:
+                    if created_rivet_grp:
+                        cmds.delete(self.rivet_grp)
                     else:
                         for rivet in rivets:
                             if not rivet in items:
@@ -635,92 +635,92 @@ class Rivet(base.BaseLibrary):
             
             # workaround to avoid closestPoint node ignores transformations.
             # then we need to duplicate, unlock attributes and freezeTransformation:
-            dupGeo = cmds.duplicate(geoToAttach, name=geoToAttach+"_dpRivet_TEMP_Geo")[0]
+            dup_geo = cmds.duplicate(geo_to_attach, name=geo_to_attach+"_dpRivet_TEMP_Geo")[0]
             # unlock attr:
-            self.ar.utils.unlockAttr([dupGeo])
+            self.ar.utils.unlockAttr([dup_geo])
             # parent to world:
-            if cmds.listRelatives(dupGeo, allParents=True):
-                cmds.parent(dupGeo, world=True)
+            if cmds.listRelatives(dup_geo, allParents=True):
+                cmds.parent(dup_geo, world=True)
             # freezeTransformation:
-            cmds.makeIdentity(dupGeo, apply=True)
-            dupShape = cmds.ls(dupGeo, dag=True, shapes=True)[0]
+            cmds.makeIdentity(dup_geo, apply=True)
+            dup_shape = cmds.ls(dup_geo, dag=True, shapes=True)[0]
             
             # temporary transform node to store object's location:
-            self.tempNode = cmds.createNode("transform", name=geoToAttach+"_dpRivet_TEMP_Transf", skipSelect=True)
+            self.temp_node = cmds.createNode("transform", name=geo_to_attach+"_dpRivet_TEMP_Transf", skipSelect=True)
                 
             # working with mesh:
-            if self.shapeType == "mesh":
+            if self.shape_type == "mesh":
                 # working with uvSet:
-                uvSetList = cmds.polyUVSet(dupShape, query=True, allUVSets=True)
-                if len(uvSetList) > 1:
-                    if not uvSetList[0] == uvSetName:
+                uv_sets = cmds.polyUVSet(dup_shape, query=True, allUVSets=True)
+                if len(uv_sets) > 1:
+                    if not uv_sets[0] == uv_set_name:
                         try:
                             # change uvSet order because closestPointOnMesh uses the default uv set
-                            cmds.polyUVSet(dupShape, copy=True, uvSet=uvSetName, newUVSet=uvSetList[0])
+                            cmds.polyUVSet(dup_shape, copy=True, uvSet=uv_set_name, newUVSet=uv_sets[0])
                         except:
-                            uvSetName = uvSetList[0]
+                            uv_set_name = uv_sets[0]
                 # closest point on mesh node:
-                self.cpNode = cmds.createNode("closestPointOnMesh", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
-                cmds.connectAttr(dupShape+".outMesh", self.cpNode+".inMesh", force=True)
-                # move tempNode to cpNode position:
-                cmds.connectAttr(self.tempNode+".translate", self.cpNode+".inPosition", force=True)
+                self.cp_node = cmds.createNode("closestPointOnMesh", name=geo_to_attach+"_dpRivet_TEMP_CP", skipSelect=True)
+                cmds.connectAttr(dup_shape+".outMesh", self.cp_node+".inMesh", force=True)
+                # move temp_node to cp_node position:
+                cmds.connectAttr(self.temp_node+".translate", self.cp_node+".inPosition", force=True)
             else: #nurbsSurface
-                uRange = cmds.getAttr(dupShape+".minMaxRangeU")[0]
-                vRange = cmds.getAttr(dupShape+".minMaxRangeV")[0]
+                u_range = cmds.getAttr(dup_shape+".minMaxRangeU")[0]
+                v_range = cmds.getAttr(dup_shape+".minMaxRangeV")[0]
                 # closest point on mesh node:
-                self.cpNode = cmds.createNode("closestPointOnSurface", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
-                cmds.connectAttr(dupShape+".local", self.cpNode+".inputSurface", force=True)
-            self.to_ids.append(self.cpNode)
+                self.cp_node = cmds.createNode("closestPointOnSurface", name=geo_to_attach+"_dpRivet_TEMP_CP", skipSelect=True)
+                cmds.connectAttr(dup_shape+".local", self.cp_node+".inputSurface", force=True)
+            self.to_ids.append(self.cp_node)
                 
             # working with follicles and attaches
             for r, rivet in enumerate(rivets):
                 self.ar.utils.setProgress(self.ar.data.lang['i317_creatingRivet'])
-                rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
-                if addFatherGrp:
+                rivet_pos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
+                if add_father_grp:
                     rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)
                     self.to_ids.append(rivet)
-                    cmds.xform(rivet, worldSpace=True, rotatePivot=(rivetPos[0], rivetPos[1], rivetPos[2]))
+                    cmds.xform(rivet, worldSpace=True, rotatePivot=(rivet_pos[0], rivet_pos[1], rivet_pos[2]))
                 
                 # move temp tranform to rivet location:
-                cmds.xform(self.tempNode, worldSpace=True, translation=(rivetPos[0], rivetPos[1], rivetPos[2]))
+                cmds.xform(self.temp_node, worldSpace=True, translation=(rivet_pos[0], rivet_pos[1], rivet_pos[2]))
                 
                 # get uv coords from closestPoint node
-                fu = cmds.getAttr(self.cpNode+".u")
-                fv = cmds.getAttr(self.cpNode+".v")
+                fu = cmds.getAttr(self.cp_node+".u")
+                fv = cmds.getAttr(self.cp_node+".v")
                 
-                if self.shapeType == "nurbsSurface":
+                if self.shape_type == "nurbsSurface":
                     # normalize UVs:
-                    fu = abs((fu - uRange[0])/(uRange[1] - uRange[0]))
-                    fv = abs((fv - vRange[0])/(vRange[1] - vRange[0]))
+                    fu = abs((fu - u_range[0])/(u_range[1] - u_range[0]))
+                    fv = abs((fv - v_range[0])/(v_range[1] - v_range[0]))
                     
                 # create follicle:
-                folTransf = cmds.createNode("transform", name=rivet+"_Fol", parent=self.rivetGrp, skipSelect=True)
-                folShape = cmds.createNode("follicle", name=rivet+"_FolShape", parent=folTransf, skipSelect=True)
+                fol_transform = cmds.createNode("transform", name=rivet+"_Fol", parent=self.rivet_grp, skipSelect=True)
+                fol_shape = cmds.createNode("follicle", name=rivet+"_FolShape", parent=fol_transform, skipSelect=True)
                 
                 # connect geometry shape and follicle:
-                if self.shapeType == "mesh":
-                    cmds.connectAttr(self.shapeToAttach+".worldMesh[0]", folShape+".inputMesh", force=True)
-                    cmds.setAttr(folShape+".mapSetName", uvSetName, type="string")
+                if self.shape_type == "mesh":
+                    cmds.connectAttr(self.shape_to_attach+".worldMesh[0]", fol_shape+".inputMesh", force=True)
+                    cmds.setAttr(fol_shape+".mapSetName", uv_set_name, type="string")
                 else: #nurbsSurface:
-                    cmds.connectAttr(self.shapeToAttach+".local", folShape+".inputSurface", force=True)
-                cmds.connectAttr(self.shapeToAttach+".worldMatrix[0]", folShape+".inputWorldMatrix", force=True)
-                cmds.connectAttr(folShape+".outRotate", folTransf+".rotate", force=True)
-                cmds.connectAttr(folShape+".outTranslate", folTransf+".translate", force=True)
+                    cmds.connectAttr(self.shape_to_attach+".local", fol_shape+".inputSurface", force=True)
+                cmds.connectAttr(self.shape_to_attach+".worldMatrix[0]", fol_shape+".inputWorldMatrix", force=True)
+                cmds.connectAttr(fol_shape+".outRotate", fol_transform+".rotate", force=True)
+                cmds.connectAttr(fol_shape+".outTranslate", fol_transform+".translate", force=True)
                 # put follicle in the correct place:
-                cmds.setAttr(folShape+".parameterU", fu)
-                cmds.setAttr(folShape+".parameterV", fv)
+                cmds.setAttr(fol_shape+".parameterU", fu)
+                cmds.setAttr(fol_shape+".parameterV", fv)
                 
                 # attach follicle and rivet using constraint:
-                if attachTranslate and attachRotate:
-                    rivetPac = cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC")[0]
-                elif attachTranslate:
-                    rivetPac = cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))[0]
-                elif attachRotate:
-                    rivetPac = cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))[0]
+                if attatch_translate and attach_rotate:
+                    rivetPac = cmds.parentConstraint(fol_transform, rivet, maintainOffset=use_offset, name=rivet+"_PaC")[0]
+                elif attatch_translate:
+                    rivetPac = cmds.parentConstraint(fol_transform, rivet, maintainOffset=use_offset, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))[0]
+                elif attach_rotate:
+                    rivetPac = cmds.parentConstraint(fol_transform, rivet, maintainOffset=use_offset, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))[0]
                 
                 # try to integrate to dpAutoRigSystem in order to keep the Rig as scalable:
-                if self.masterCtrl:
-                    cmds.scaleConstraint(self.masterCtrl, folTransf, maintainOffset=True, name=folTransf+"_ScC")
+                if master_ctrl:
+                    cmds.scaleConstraint(master_ctrl, fol_transform, maintainOffset=True, name=fol_transform+"_ScC")
             
                 # serialize network node
                 self.net = cmds.createNode("network", name=rivet+"_Net")
@@ -729,193 +729,193 @@ class Rivet(base.BaseLibrary):
                 # add
                 cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool", defaultValue=1)
                 cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool", defaultValue=1)
-                cmds.addAttr(self.net, longName="itemNode", attributeType="message")
+                cmds.addAttr(self.net, longName="item_node", attributeType="message")
                 cmds.addAttr(self.net, longName="rivet", attributeType="message")
                 cmds.addAttr(self.net, longName="follicle", attributeType="message")
-                cmds.addAttr(self.net, longName="geoToAttach", attributeType="message")
-                cmds.addAttr(self.net, longName="invTGrp", attributeType="message")
-                cmds.addAttr(self.net, longName="invRGrp", attributeType="message")
+                cmds.addAttr(self.net, longName="geo_to_attach", attributeType="message")
+                cmds.addAttr(self.net, longName="inv_t_grp", attributeType="message")
+                cmds.addAttr(self.net, longName="inv_r_grp", attributeType="message")
                 cmds.addAttr(self.net, longName="deformerGeo", attributeType="message")
                 cmds.addAttr(self.net, longName="deformer_node", attributeType="message")
                 cmds.addAttr(self.net, longName="pacNode", attributeType="message")
                 cmds.addAttr(self.net, longName="rivetData", dataType="string")
                 # set
-                cmds.setAttr(self.net+".rivetData", json.dumps(self.getRivetData(items[r], geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset)), type="string")
+                cmds.setAttr(self.net+".rivetData", json.dumps(self.get_rivet_data(items[r], geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name, ask_component, use_offset)), type="string")
                 # connect
                 cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)
-                cmds.connectAttr(folTransf+".message", self.net+".follicle", force=True)
-                cmds.connectAttr(geoToAttach+".message", self.net+".geoToAttach", force=True)
+                cmds.connectAttr(fol_transform+".message", self.net+".follicle", force=True)
+                cmds.connectAttr(geo_to_attach+".message", self.net+".geo_to_attach", force=True)
                 cmds.connectAttr(f"{rivetPac}.message", f"{self.net}.pacNode", force=True)
                 
-                if faceToRivet:
+                if face_to_rivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
                     cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformer_node", force=True)
                 if len(items) == len(rivets):
                     if cmds.objExists(items[r]):
-                        cmds.connectAttr(items[r]+".message", self.net+".itemNode", force=True)
+                        cmds.connectAttr(items[r]+".message", self.net+".item_node", force=True)
                         if not cmds.objExists(f"{items[r]}.rivetNet"):
                             cmds.addAttr(items[r], longName="rivetNet", attributeType="message")
                             cmds.connectAttr(self.net+".message", items[r]+".rivetNet", force=True)
                         else:
-                            rivetNetList = cmds.listAttr(items[r], string="rivetNet*")
-                            rivetNetList.sort(reverse=True)
-                            lastIndex = rivetNetList[0].removeprefix("rivetNet")
-                            if lastIndex == "":
-                                lastIndex = 0
+                            rivet_networks = cmds.listAttr(items[r], string="rivetNet*")
+                            rivet_networks.sort(reverse=True)
+                            last_index = rivet_networks[0].removeprefix("rivetNet")
+                            if last_index == "":
+                                last_index = 0
                             else:
-                                lastIndex = int(lastIndex)
-                            newIndex = lastIndex + 1
-                            currentLongName = f"rivetNet{newIndex}"
-                            cmds.addAttr(items[r], longName=currentLongName, attributeType="message")
-                            cmds.connectAttr(self.net+".message", f"{items[r]}.{currentLongName}", force=True)
+                                last_index = int(last_index)
+                            new_index = last_index + 1
+                            current_long_name = f"rivetNet{new_index}"
+                            cmds.addAttr(items[r], longName=current_long_name, attributeType="message")
+                            cmds.connectAttr(self.net+".message", f"{items[r]}.{current_long_name}", force=True)
             
             # check invert group (back) in order to avoid double transformations:
-            if addInvert:
-                for rivet, netNode in zip(rivets, self.nets):
-                    invTGrp, invRGrp = self.dpInvertAttrTranformation(rivet, invT, invR)
-                    if invTGrp:
-                        cmds.connectAttr(invTGrp+".message", netNode+".invTGrp", force=True)
-                    if invRGrp:
-                        cmds.connectAttr(invRGrp+".message", netNode+".invRGrp", force=True)
+            if add_invert:
+                for rivet, net in zip(rivets, self.nets):
+                    inv_t_grp, inv_r_grp = self.invert_attr_transformation(rivet, inv_t, inv_r)
+                    if inv_t_grp:
+                        cmds.connectAttr(inv_t_grp+".message", net+".inv_t_grp", force=True)
+                    if inv_r_grp:
+                        cmds.connectAttr(inv_r_grp+".message", net+".inv_r_grp", force=True)
             # clean-up temporary nodes:
-            cmds.delete(dupGeo, self.cpNode, self.tempNode)
+            cmds.delete(dup_geo, self.cp_node, self.temp_node)
         else:
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
-        self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
+        self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
         self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID
         cmds.select(clear=True)
         return self.nets
     
 
-    def getRivetData(self, itemNode, geoToAttach, uvSetName, items, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset, *args):
+    def get_rivet_data(self, item_node, geo_to_attach, uv_set_name, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, rivet_grp_name, ask_component, use_offset, *args):
         """ Collect all rivet data and return it as a dictionary.
         """
-        dataDic = {
-                    "rivetNetName"    : self.net,
-                    "itemNode"        : itemNode,
-                    "geoToAttach"     : self.originedGeo,
-                    "uvSetName"       : uvSetName,
-                    "items"        : items,
-                    "attachTranslate" : attachTranslate,
-                    "attachRotate"    : attachRotate,
-                    "addFatherGrp"    : addFatherGrp,
-                    "addInvert"       : addInvert,
-                    "invT"            : invT,
-                    "invR"            : invR,
-                    "faceToRivet"     : faceToRivet,
-                    "rivetGrpName"    : rivetGrpName,
-                    "askComponent"    : askComponent,
-                    "useOffset"       : useOffset,
-                    "deformerToUse"   : self.deformerToUse,
-                    "reuseFaceToRivet": geoToAttach
+        data = {
+                "rivetNetName" : self.net,
+                "item_node" : item_node,
+                "geo_to_attach" : self.origined_geo,
+                "uv_set_name" : uv_set_name,
+                "items" : items,
+                "attatch_translate" : attatch_translate,
+                "attach_rotate" : attach_rotate,
+                "add_father_grp" : add_father_grp,
+                "add_invert" : add_invert,
+                "inv_t" : inv_t,
+                "inv_r" : inv_r,
+                "face_to_rivet" : face_to_rivet,
+                "rivet_grp_name" : rivet_grp_name,
+                "ask_component" : ask_component,
+                "use_offset" : use_offset,
+                "deformer_to_use" : self.deformer_to_use,
+                "reuse_face_to_rivet": geo_to_attach
         }
-        return dataDic
+        return data
 
 
-    def extractGeoToRivet(self, geo, *args):
+    def extract_geo_to_rivet(self, geo, *args):
         """ Turn off skinCluster and blendShape envelope if exists, duplicate the selected geometry
             apply initial shading and remove it from any display layer,
-            if the faceToRivet geometry doesn't exist yet.
+            if the face_to_rivet geometry doesn't exist yet.
         """ 
-        faceToRivetGeoName = self.getFaceToRivetGeoName(geo)
-        if not cmds.objExists(faceToRivetGeoName):
+        face_to_rivet_geo_name = self.get_face_to_rivet_geo_name(geo)
+        if not cmds.objExists(face_to_rivet_geo_name):
             # Get the history to turn off envelopes if exists
-            histList = cmds.listHistory(geo)
+            hist_items = cmds.listHistory(geo)
             shapes = cmds.listRelatives(geo, shapes=True)
             if shapes:
                 # check if there's a skinCluster node connected to the first selected item
-                checkSkin = self.dpCheckNodeExists(shapes, "skinCluster")
-                checkBS = self.dpCheckNodeExists(shapes, "blendShape")
-                if checkSkin == 1:
-                    skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
-                    cmds.setAttr(skinClusterNode+".envelope", 0)
-                if checkBS == 2:
-                    blendShapeNode = cmds.ls(histList, type="blendShape")[0]
-                    cmds.setAttr(blendShapeNode+".envelope", 0)
+                check_skin = self.check_node_exists(shapes, "skinCluster")
+                check_bs = self.check_node_exists(shapes, "blendShape")
+                if check_skin == 1:
+                    skincluster_node = cmds.ls(hist_items, type="skinCluster")[0]
+                    cmds.setAttr(skincluster_node+".envelope", 0)
+                if check_bs == 2:
+                    bs_node = cmds.ls(hist_items, type="blendShape")[0]
+                    cmds.setAttr(bs_node+".envelope", 0)
                 # Duplicate geometry after turn off skinCluster and blendShape. 
-                toRivetGeo = cmds.duplicate(geo)[0]
-                self.ar.utils.removeUserDefinedAttr(toRivetGeo)
+                to_rivet_geo = cmds.duplicate(geo)[0]
+                self.ar.utils.removeUserDefinedAttr(to_rivet_geo)
                 # Unparenting
-                if cmds.listRelatives(toRivetGeo, allParents=True):
-                    cmds.parent(toRivetGeo, world=True)
+                if cmds.listRelatives(to_rivet_geo, allParents=True):
+                    cmds.parent(to_rivet_geo, world=True)
                 # Unlock attributes and apply initialShading
-                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.data.transform_attrs, False, True, True)
-                cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
-                cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
-                self.ar.ctrls.setLockHide([toRivetGeo], self.ar.data.transform_attrs[:-1], True, False, True)
+                self.ar.ctrls.setLockHide([to_rivet_geo], self.ar.data.transform_attrs, False, True, True)
+                cmds.sets(to_rivet_geo, edit=True, forceElement="initialShadingGroup")
+                cmds.editDisplayLayerMembers("defaultLayer", to_rivet_geo, noRecurse=False)
+                self.ar.ctrls.setLockHide([to_rivet_geo], self.ar.data.transform_attrs[:-1], True, False, True)
                 # Renaming
-                cmds.rename(toRivetGeo, faceToRivetGeoName)
+                cmds.rename(to_rivet_geo, face_to_rivet_geo_name)
                 # Turning on nodes
-                if checkSkin == 1:
-                    cmds.setAttr(skinClusterNode+".envelope", 1)
-                if checkBS == 2:
-                    cmds.setAttr(blendShapeNode+".envelope", 1)
-        return faceToRivetGeoName
+                if check_skin == 1:
+                    cmds.setAttr(skincluster_node+".envelope", 1)
+                if check_bs == 2:
+                    cmds.setAttr(bs_node+".envelope", 1)
+        return face_to_rivet_geo_name
     
 
-    def getFaceToRivetGeoName(self, geo, *args):
+    def get_face_to_rivet_geo_name(self, geo, *args):
         """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
             Returns the suggested name.
         """
-        toRivetName = self.ar.utils.extractSuffix(geo)
-        if "|" in toRivetName:
-            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        to_rivet_name = self.ar.utils.extractSuffix(geo)
+        if "|" in to_rivet_name:
+            to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         i = 0
         done = False
         while done == False:
-            if not cmds.objExists(toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"):
+            if not cmds.objExists(to_rivet_name+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"):
                 done = True
             else:
                 i += 1
-        return toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
+        return to_rivet_name+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
 
     
-    def createFaceToRivet(self, controlList, geometry, growMultiplier, *args):
+    def create_face_to_rivet(self, controllers, geometry, grow_multiplier, *args):
         """ Get the pivot coordinates from each control to get the nearest face from control to the geometry.
             After the initial selection it will grow 4 times by default.
             It uses delta to delete the extra faces, than glue it to the original model with Morph or Wrap deformer.
         """
         # Get the pivot's coordinates from each control.
-        pivotList = {}
-        for control in controlList:
+        pivots_data = {}
+        for control in controllers:
             pivot = cmds.xform(control, query=True, translation=True, worldSpace=True)
-            pivotList[control] = pivot
+            pivots_data[control] = pivot
         # Get the coordinates from geometry faces.
-        faceList = cmds.ls(geometry+".f[:]", flatten=True)
-        faceCoordinateList = []
-        for face in faceList:
-            vertexCoordList = cmds.xform(face, query=True, translation=True, worldSpace=True)
-            avgCoordinates = [
-                sum(vertexCoordList[i::3]) / len(vertexCoordList[i::3])
+        faces = cmds.ls(geometry+".f[:]", flatten=True)
+        face_coordinates = []
+        for face in faces:
+            vertex_coordinates = cmds.xform(face, query=True, translation=True, worldSpace=True)
+            average_coordinates = [
+                sum(vertex_coordinates[i::3]) / len(vertex_coordinates[i::3])
                 for i in range(3)
             ]
-            faceCoordinateList.append(avgCoordinates)
+            face_coordinates.append(average_coordinates)
         # Select the nearest face from each pivot.
-        for control, pivot in pivotList.items():
-            nearestFace = None
-            minimalDistance = None
-            for i, coord in enumerate(faceCoordinateList):
+        for control, pivot in pivots_data.items():
+            nearest_face = None
+            minimal_distance = None
+            for i, coord in enumerate(face_coordinates):
                 distance = sum((coord[j] - pivot[j])**2 for j in range(3)) ** 0.5
-                if minimalDistance is None or distance < minimalDistance:
-                    minimalDistance = distance
-                    nearestFace = faceList[i]
-            if nearestFace:
-                cmds.select(nearestFace, add=True)
+                if minimal_distance is None or distance < minimal_distance:
+                    minimal_distance = distance
+                    nearest_face = faces[i]
+            if nearest_face:
+                cmds.select(nearest_face, add=True)
         # Select the faces and growUp selection.
         cmds.scriptEditorInfo(edit=True, suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
         cmds.selectMode(component=True)
         cmds.selectType(facet=True)
-        growMultiplier = growMultiplier - 1
-        if growMultiplier > 0:
-            for i in range(0, growMultiplier):
+        grow_multiplier = grow_multiplier - 1
+        if grow_multiplier > 0:
+            for i in range(0, grow_multiplier):
                 cmds.GrowPolygonSelectionRegion()
         # Delta to delete unnecessary faces.
-        selectedFaceList = cmds.ls(selection=True, flatten=True)
-        allFaceList = cmds.ls(geometry+".f[*]", flatten=True)
-        nonSelectedFaceList = list(set(allFaceList) - set(selectedFaceList))
-        if nonSelectedFaceList:
-            cmds.delete(nonSelectedFaceList)
+        selected_faces = cmds.ls(selection=True, flatten=True)
+        all_faces = cmds.ls(geometry+".f[*]", flatten=True)
+        non_selected_faces = list(set(all_faces) - set(selected_faces))
+        if non_selected_faces:
+            cmds.delete(non_selected_faces)
         # AutoProjection for new UV and order selection to use rivet.
         cmds.polyAutoProjection(geometry, constructionHistory=False)
         cmds.selectMode(object=True)
@@ -923,21 +923,21 @@ class Rivet(base.BaseLibrary):
         return geometry
     
 
-    def deformFaceToRivet(self, geometry, origGeo, *args):
-        """ Do deformation from original mesh to faceToRivet geo.
+    def deform_face_to_rivet(self, geometry, origGeo, *args):
+        """ Do deformation from original mesh to face_to_rivet geo.
         """
         if self.ar.data.ui_state:
             # Create deformer by user selection
-            deformerSelectedRadioButton = cmds.radioCollection(self.deformerCollection, query=True, select=True)
-            self.deformerToUse = cmds.radioButton(deformerSelectedRadioButton, query=True, annotation=True)
-        if self.deformerToUse:
-            if self.deformerToUse == self.morphDeformer:
-                self.deformerNodeList = self.applyMorphDeformer(geometry, origGeo)
-            elif self.deformerToUse == self.wrapDeformer:
-                self.deformerNodeList = self.applyWrapDeformer(geometry, origGeo)
+            selected_deformer_rb = cmds.radioCollection('rivet_deformer_rc', query=True, select=True)
+            self.deformer_to_use = cmds.radioButton(selected_deformer_rb, query=True, annotation=True)
+        if self.deformer_to_use:
+            if self.deformer_to_use == self.morph_deformer:
+                self.deformerNodeList = self.apply_morph_deformer(geometry, origGeo)
+            elif self.deformer_to_use == self.wrap_deformer:
+                self.deformerNodeList = self.apply_wrap_deformer(geometry, origGeo)
 
 
-    def dpCheckNodeExists(self, shapes, type, *args):
+    def check_node_exists(self, shapes, type, *args):
         """ Verify if there's a skinCluster or blendShape node in the list of history of the shape.
             Return 1 if there's skinCluster.
             Return 2 if there's blendShape node
@@ -946,9 +946,9 @@ class Rivet(base.BaseLibrary):
         for shape in shapes:
             if not shape.endswith("Orig"):
                 try:
-                    histList = cmds.listHistory(shape)
-                    if histList:
-                        for histItem in histList:
+                    hist_items = cmds.listHistory(shape)
+                    if hist_items:
+                        for histItem in hist_items:
                             if type == "skinCluster":
                                 if cmds.objectType(histItem) == "skinCluster":
                                     return 1
@@ -960,82 +960,82 @@ class Rivet(base.BaseLibrary):
         return False
     
                     
-    def applyMorphDeformer(self, morphGeo, targetGeo, *args):
-        """ Apply morphDeform from morphGeo(FaceToRivet) to targetGeo(Source)
+    def apply_morph_deformer(self, morph_geo, target_geo, *args):
+        """ Apply morphDeform from morph_geo(FaceToRivet) to target_geo(Source)
             Rename and Parent to Support_Grp
             Return morph geometry and deformer node
         """
-        targets = cmds.ls(targetGeo, dag=True, shapes=True)
-        targetShape = targets[0]
-        targetOrig = self.findOrig(targets)
-        if not targetOrig:
-            cmds.delete(cmds.cluster(targetGeo, name="ToOrig_ClsTemp"))
-            targets = cmds.ls(targetGeo, dag=True, shapes=True)
-            targetOrig = self.findOrig(targets)
-        morphDeformer = cmds.deformer(morphGeo, type="morph")[0]
-        cmds.setAttr(morphDeformer+".morphMode", 1)
-        cmds.setAttr(morphDeformer+".useComponentLookup", 1)
-        cmds.setAttr(morphDeformer+".morphSpace", 0)
-        cmds.connectAttr(targetShape+".worldMesh[0]", morphDeformer+".morphTarget[0]")
-        componentMatchNode = cmds.createNode("componentMatch")
-        cmds.connectAttr(componentMatchNode+".componentLookup", morphDeformer+".componentLookupList[0].componentLookup")
-        morphOrigOutMesh = cmds.listConnections(morphDeformer+".originalGeometry[0]", source=True, destination=False, plugs=True)[0]
-        cmds.connectAttr(morphOrigOutMesh, componentMatchNode+".inputGeometry")
-        cmds.connectAttr(targetOrig+".outMesh", componentMatchNode+".targetGeometry")
+        targets = cmds.ls(target_geo, dag=True, shapes=True)
+        target_shape = targets[0]
+        target_orig = self.find_orig(targets)
+        if not target_orig:
+            cmds.delete(cmds.cluster(target_geo, name="ToOrig_ClsTemp"))
+            targets = cmds.ls(target_geo, dag=True, shapes=True)
+            target_orig = self.find_orig(targets)
+        morph_deformer = cmds.deformer(morph_geo, type="morph")[0]
+        cmds.setAttr(morph_deformer+".morphMode", 1)
+        cmds.setAttr(morph_deformer+".useComponentLookup", 1)
+        cmds.setAttr(morph_deformer+".morphSpace", 0)
+        cmds.connectAttr(target_shape+".worldMesh[0]", morph_deformer+".morphTarget[0]")
+        component_match_node = cmds.createNode("componentMatch")
+        cmds.connectAttr(component_match_node+".componentLookup", morph_deformer+".componentLookupList[0].componentLookup")
+        morphOrigOutMesh = cmds.listConnections(morph_deformer+".originalGeometry[0]", source=True, destination=False, plugs=True)[0]
+        cmds.connectAttr(morphOrigOutMesh, component_match_node+".inputGeometry")
+        cmds.connectAttr(target_orig+".outMesh", component_match_node+".targetGeometry")
         #Renaming
-        hist = cmds.listHistory(morphGeo)
-        morphList = cmds.ls(hist, type="morph")[0]
-        toRivetName = self.ar.utils.extractSuffix(morphGeo)
-        if "|" in toRivetName:
-            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
-        morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
-        componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
-        componentMatchNode = cmds.rename(componentMatchNode, toRivetName+"_CpM")
-        self.to_ids.extend([morphGeo, morphNode, componentMatchNode])
+        hist = cmds.listHistory(morph_geo)
+        morphs = cmds.ls(hist, type="morph")[0]
+        to_rivet_name = self.ar.utils.extractSuffix(morph_geo)
+        if "|" in to_rivet_name:
+            to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
+        morph_node = cmds.rename(morphs, to_rivet_name+"_Mrp")
+        component_match_node = cmds.listConnections(morph_node+".componentLookupList[0].componentLookup")[0]
+        component_match_node = cmds.rename(component_match_node, to_rivet_name+"_CpM")
+        self.to_ids.extend([morph_geo, morph_node, component_match_node])
         # Parent in supportGrp
-        self.parentToTransform([morphGeo], self.ar.utils.getNodeByMessage("supportGrp"))
-        return morphGeo, morphNode
+        self.parent_to_transform([morph_geo], self.ar.utils.getNodeByMessage("supportGrp"))
+        return morph_geo, morph_node
 
 
-    def applyWrapDeformer(self, wrapGeo, targetGeo, *args):
-        """ Apply wrapDeformer from wrapGeo(FaceToRivet) to targetGeo(Source)
+    def apply_wrap_deformer(self, wrap_geo, target_geo, *args):
+        """ Apply wrap_deformer from wrap_geo(FaceToRivet) to target_geo(Source)
             Rename and Parent to Support_Grp
             Return wrap geometry and wrap deformer
         """
-        cmds.select([wrapGeo, targetGeo])
+        cmds.select([wrap_geo, target_geo])
         mel.eval("CreateWrap;")
-        hist = cmds.listHistory(wrapGeo)
+        hist = cmds.listHistory(wrap_geo)
         wrap_items = cmds.ls(hist, type="wrap")[0]
         # Renaming
-        toRivetName = self.ar.utils.extractSuffix(wrapGeo)
-        if "|" in toRivetName:
-            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
-        wrapNode = cmds.rename(wrap_items, toRivetName+"_Wrp")
-        baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
-        baseShape = cmds.rename(baseShape, toRivetName+"_Base")
-        self.ar.ctrls.setLockHide([baseShape], self.ar.data.transform_attrs[:-1], True, False, True)
+        to_rivet_name = self.ar.utils.extractSuffix(wrap_geo)
+        if "|" in to_rivet_name:
+            to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
+        wrap_node = cmds.rename(wrap_items, to_rivet_name+"_Wrp")
+        base_shape = cmds.listConnections(wrap_node+".basePoints")[0]
+        base_shape = cmds.rename(base_shape, to_rivet_name+"_Base")
+        self.ar.ctrls.setLockHide([base_shape], self.ar.data.transform_attrs[:-1], True, False, True)
         # Remove from displayLayers
-        cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
-        self.to_ids.extend([wrapGeo, wrapNode, baseShape])
+        cmds.editDisplayLayerMembers("defaultLayer", base_shape, noRecurse=False)
+        self.to_ids.extend([wrap_geo, wrap_node, base_shape])
         # Parent in supportGrp
-        self.parentToTransform([wrapGeo, baseShape], self.ar.utils.getNodeByMessage("supportGrp"))
-        return wrapGeo, wrapNode
+        self.parent_to_transform([wrap_geo, base_shape], self.ar.utils.getNodeByMessage("supportGrp"))
+        return wrap_geo, wrap_node
 
 
-    def parentToTransform(self, items, destParent, *args):
+    def parent_to_transform(self, items, dest_parent, *args):
         """ Just check if the item is child of the destination parent node then parent it if needed.
         """
-        if items and destParent:
-            if cmds.objExists(destParent):
+        if items and dest_parent:
+            if cmds.objExists(dest_parent):
                 for item in items:
-                    children = cmds.listRelatives(destParent, allDescendents=True, children=True)
+                    children = cmds.listRelatives(dest_parent, allDescendents=True, children=True)
                     if not children:
-                        cmds.parent(item, destParent)
+                        cmds.parent(item, dest_parent)
                     elif not item in children:
-                        cmds.parent(item, destParent)
+                        cmds.parent(item, dest_parent)
 
 
-    def findOrig(self, geos, *args):
+    def find_orig(self, geos, *args):
         """ Return the orig of the shapes
         """
         #TODO maybe use this command instead?
@@ -1046,7 +1046,7 @@ class Rivet(base.BaseLibrary):
                     return item
                 
 
-    def checkMayaVersion(self, *args):
+    def check_maya_version(self, *args):
         """ Get Maya's version installed to compare with the minimalVersionRequired (2022.3)
             If the installed version is above the minimal it returns True, otherwise False
         """ 
@@ -1054,5 +1054,5 @@ class Rivet(base.BaseLibrary):
         maya_version = maya_version.split(" ")[-1]
         if maya_version.count(".") > 1:
             maya_version = maya_version[:maya_version.rfind(".")]
-        installedVersion = float(maya_version)
-        return installedVersion > self.mayaMinimalVersion
+        current_version = float(maya_version)
+        return current_version > self.maya_minimal_version

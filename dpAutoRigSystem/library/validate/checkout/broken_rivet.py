@@ -313,7 +313,7 @@ class BrokenRivet(action.BaseAction):
     def recreateRivetWithNewPivot(self, rivetControllersList, attachGeoList):
         for idx, controller in enumerate(rivetControllersList):
             uvSet = cmds.polyUVSet(attachGeoList[idx], query=True, allUVSets=True)[0]
-            self.rivet.dpCreateRivet(attachGeoList[idx], uvSet, [controller], *self.rivetOptionsDic[controller])
+            self.rivet.create_rivet(attachGeoList[idx], uvSet, [controller], *self.rivetOptionsDic[controller])
             connectedJointList = cmds.listConnections(controller, source=False, type="joint")
             if connectedJointList:
                 suffix = connectedJointList[0][connectedJointList[0].rfind('_'):]

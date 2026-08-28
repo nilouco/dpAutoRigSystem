@@ -49,17 +49,17 @@ class MotionCaptureUI(object):
         cmds.separator(parent='mocap_cl')
         # processes buttons
         cmds.text('mocap_processes_txt', label=self.ar.data.lang['i292_processes'], parent='mocap_cl')
-        cmds.button('mocap_prepare_tpose_btn', label=self.ar.data.lang['m241_prepareTPose'], annotation="prepare_t_pose", width=240, command=self.app.prepare_t_pose, parent='mocap_cl')
-        cmds.button('mocap_retargeting_btn', label=self.ar.data.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.app.hik_retarget, parent='mocap_cl')
-        cmds.button('mocap_reset_pose_btn', label=self.ar.data.lang['v032_resetPose'], annotation="resetPose", width=240, command=self.app.reset_default_pose, parent='mocap_cl')
+        cmds.button('mocap_prepare_tpose_bt', label=self.ar.data.lang['m241_prepareTPose'], annotation="prepare_t_pose", width=240, command=self.app.prepare_t_pose, parent='mocap_cl')
+        cmds.button('mocap_retargeting_bt', label=self.ar.data.lang['m242_retargeting']+" HumanIk", annotation="retargetHumanIk", width=240, command=self.app.hik_retarget, parent='mocap_cl')
+        cmds.button('mocap_reset_pose_bt', label=self.ar.data.lang['v032_resetPose'], annotation="resetPose", width=240, command=self.app.reset_default_pose, parent='mocap_cl')
         # animation buttons
         cmds.separator(style='in', height=10, width=240, parent='mocap_cl')
         cmds.text('mocap_animation_txt', label=self.ar.data.lang['i185_animation'], parent='mocap_cl')
-        cmds.button('mocap_snap_ik_from_baked_fk_btn', label=self.ar.data.lang['i360_snapIkFromBakedFk'], annotation="Snap Ik timeline", width=240, command=self.app.hik_snap_ik_timeline, parent='mocap_cl')
+        cmds.button('mocap_snap_ik_from_baked_fk_bt', label=self.ar.data.lang['i360_snapIkFromBakedFk'], annotation="Snap Ik timeline", width=240, command=self.app.hik_snap_ik_timeline, parent='mocap_cl')
         # clear buttons
         cmds.separator(style='in', height=10, width=240, parent='mocap_cl')
         cmds.text('mocap_cleanup_txt', label=self.ar.data.lang['v096_cleanup'], parent='mocap_cl')
-        cmds.button('mocap_remove_hik_btn', label=self.ar.data.lang['i046_remove']+" HumanIk", annotation="removeHumanIk", width=240, command=self.app.hik_remove_mocap, parent='mocap_cl')
+        cmds.button('mocap_remove_hik_bt', label=self.ar.data.lang['i046_remove']+" HumanIk", annotation="removeHumanIk", width=240, command=self.app.hik_remove_mocap, parent='mocap_cl')
         cmds.tabLayout('mocap_tl', edit=True, tabLabel=(('mocap_hik_fl', 'HumanIk')))
         # call Window:
         cmds.showWindow('dpMotionCaptureWindow')

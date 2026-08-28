@@ -1145,7 +1145,7 @@ class Head(standard.BaseStandard):
                     # collect nodes to be deformedBy this Head module:
                     deformed_by_items = head_def_ctrls + self.get_deformed_by_items(s) + facial_ctrls
 
-                    hd_net = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).dpHeadDeformer(side+self.number_name+"_"+self.ar.data.lang['c024_head'], [self.deformer_cube], self.head_sub_ctrl, deformed_by_items, self.guide_net, ui=False)
+                    hd_net = self.ar.config.get_instance("HeadDeformer", [self.ar.data.tools_folder]).create_head_def(side+self.number_name+"_"+self.ar.data.lang['c024_head'], [self.deformer_cube], self.head_sub_ctrl, deformed_by_items, self.guide_net, ui=False)
 
                     self.add_node_to_guide_net([hd_net], ["hdNet"])
                     cmds.connectAttr(self.head_sub_ctrl+".message", cmds.listConnections(hd_net+".linkedNode", source=True, destination=False)[0]+".parentTag", force=True)
