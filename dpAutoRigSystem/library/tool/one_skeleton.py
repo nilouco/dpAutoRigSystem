@@ -1,6 +1,8 @@
 # importing libraries:
+import re
 from maya import cmds
 from maya import mel
+from maya.api import OpenMaya
 from itertools import zip_longest
 from ..base import base
 from importlib import reload
@@ -19,7 +21,7 @@ class OneSkeleton(base.BaseLibrary):
         if self.ar.dev:
             reload(base)
         self.prefix = "Engine_"
-        self.rootName = "Root"
+        self.root_name = "Root"
         self.suffix = "_Joint"
         self.sides = [f"{self.ar.data.lang['p002_left']}_", f"{self.ar.data.lang['p003_right']}_", ""]
 
@@ -27,50 +29,16 @@ class OneSkeleton(base.BaseLibrary):
     def build_tool(self, *args):
         # call main UI function
         if self.ar.data.ui_state:
-            self.create_ui()
-            
-
-    def create_ui(self, *args):
-        # creating Window:
-        self.ar.utils.close_ui('one_skeleton_win')
-        win_width  = 230
-        win_height = 230
-        cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(self.ar.data.version), widthHeight=(win_width, win_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
-        # creating layout:
-        cmds.columnLayout('main_layout', columnOffset=("both", 10), rowSpacing=10, adjustableColumn=True, parent='one_skeleton_win')
-        cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')
-        cmds.rowColumnLayout('naming_rcl', numberOfColumns=2, adjustableColumn=2, columnWidth=(80, 100), rowSpacing=(7, 7), parent='main_layout')
-        cmds.text('prefix_txt', label=self.ar.data.lang['i144_prefix'], parent='naming_rcl')
-        cmds.textField('prefix_tf', text=self.prefix, textChangedCommand=self.change_prefix, parent='naming_rcl')
-        cmds.text('root_txt', label="Root", parent='naming_rcl')
-        cmds.textField('root_tf', text=self.rootName, textChangedCommand=self.change_root, parent='naming_rcl')
-        cmds.text('suffix_txt', label=self.ar.data.lang['m217_suffix'], parent='naming_rcl')
-        cmds.textField('suffix_tf', text=self.suffix, textChangedCommand=self.change_suffix, parent='naming_rcl')
-        cmds.text('header_txt', label=self.ar.data.lang['m223_preview'], parent='naming_rcl')
-        cmds.text('preview_txt', label=f"{self.prefix}{self.rootName}{self.suffix}", font="boldLabelFont", parent='naming_rcl')
-        cmds.radioButtonGrp("skeleton_rbg", label=self.ar.data.lang['i138_type'], labelArray2=["Floating Joints", self.ar.data.lang['m216_hierarchy']], vertical=True, numberOfRadioButtons=2, columnAlign2=("left", "left"), columnAttach2=("left", "left"), columnWidth2=(40, 100), parent="main_layout")
-        cmds.radioButtonGrp("skeleton_rbg", edit=True, select=2) #hierarchy = 2
-        cmds.checkBox("use_scale_cb", label="Scale constraint", value=False, parent="main_layout")
-        cmds.button("run_one_skeleton_bt", label=self.ar.data.lang['i158_create'], command=self.create_by_ui, parent="main_layout")
-        cmds.separator(height=5, style="in", horizontal=True, parent='main_layout')
-        # call Window:
-        cmds.showWindow('one_skeleton_win')
-        
-
-    def create_by_ui(self, *args):
-        joint_type = cmds.radioButtonGrp('skeleton_rbg', query=True, select=True)-1
-        use_scale = cmds.checkBox('use_scale_cb', query=True, value=True)
-        self.createOneSkeleton(hierarchy=joint_type, scale=use_scale)
-        self.ar.utils.close_ui('one_skeleton_win')
+            self.ar.one_skeleton_ui.create_ui(self)
 
 
     def change_prefix(self, value, *args):
         self.prefix = value
         self.refresh_preview()
 
-    
+
     def change_root(self, value, *args):
-        self.rootName = value
+        self.root_name = value
         self.refresh_preview()
 
 
@@ -79,75 +47,77 @@ class OneSkeleton(base.BaseLibrary):
         self.refresh_preview()
 
 
-    def refresh_preview(self, *args):
+    def change_parenting(self, *args):
+        if self.ar.data.ui_state:
+            joint_type = cmds.radioButtonGrp('one_skeleton_skeleton_rbg', query=True, select=True)-1
+            cmds.checkBox('one_skeleton_use_scale_cb', edit=True, enable=False, value=False)
+            if not joint_type:
+                cmds.checkBox('one_skeleton_use_scale_cb', edit=True, enable=True)
+            self.refresh_preview()
+
+
+    def refresh_preview(self):
         """ Reload the preview naming list and populate its UI textScrollList.
         """
-        cmds.text('preview_txt', edit=True, label=f"{self.prefix}{self.rootName}{self.suffix}")
+        if self.ar.data.ui_state:
+            if cmds.text('one_skeleton_preview_txt', query=True, exists=True):
+                cmds.text('one_skeleton_preview_txt', edit=True, label=f"{self.prefix}{self.root_name}{self.suffix}")
     
 
-    def oneSkeletonPromptDialog(self, *args):
-        """ Prompt dialog to get the name of the root joint to receive all the web joints as children.
-        """
-        bt_continue = self.ar.data.lang['i174_continue']
-        bt_cancel = self.ar.data.lang['i132_cancel']
-        result = cmds.promptDialog(title=CLASS_NAME, 
-                                   message=self.ar.data.lang["m006_name"], 
-                                   text=self.prefix+self.rootName+self.suffix,
-                                   button=[bt_continue, bt_cancel], 
-                                   defaultButton=bt_continue, 
-                                   cancelButton=bt_cancel, 
-                                   dismissString=bt_cancel)
-        if result == bt_continue:
-            dialogName = cmds.promptDialog(query=True, text=True)
-            return dialogName
-        elif result is None:
-            return None
-
-
-    def createOneSkeleton(self, root=None, hierarchy=True, scale=True, *args):
+    def create_one_skeleton(self, root=None, hierarchy=True, scale=True):
         """ Create one skeleton hierarchy using the given name as a root joint name or use the default root name.
         """
         if not root:
-            root = f"{self.prefix}{self.rootName}{self.suffix}"
-        uniqueInfList = self.getInfList(self.getMeshList())
-        if uniqueInfList:
+            root = f"{self.prefix}{self.root_name}{self.suffix}"
+        unique_inf_items = self.get_inf_items(self.get_meshes())
+        if unique_inf_items:
             if not cmds.objExists(root):
-                self.createRootJoint(root)
-            newJointList = self.transferJoint(uniqueInfList, scale)
-            if newJointList:
-                #newJointList.sort()
+                self.create_root_joint(root)
+            new_joints = self.create_new_joints(unique_inf_items)
+            if new_joints:
                 if hierarchy:
-                    self.mount_hierarchy(newJointList, root)
+                    self.mount_hierarchy(new_joints, root)
                 else:
-                    cmds.parent(newJointList, root)
+                    cmds.parent(new_joints, root)
+                    if scale:
+                        self.scale_connect(unique_inf_items)
                 cmds.select(root)
+            self.re_set_scale(unique_inf_items)
             self.ar.ctrls.setControllerScaleCompensate(False)
             self.ar.utils.setProgress(endIt=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
 
 
-    def grouper(self, iterable, n, fillvalue=None, *args):
+    def grouper(self, iterable, n, fill_value=None, *args):
         """ Collect data into fixed-length chunks or blocks.
             Example:
                 grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
         """
         args = [iter(iterable)] * n
-        return zip_longest(fillvalue=fillvalue, *args)
+        return zip_longest(fillvalue=fill_value, *args)
 
 
-    def transferJoint(self, sourceList, scale=True, *args):
+    def create_new_joints(self, source_items, *args):
         """ Make a duplicated joints and transfer connections and deformation to them.
             Returns the new created joint list.
         """
         scale_constraints = []
-        newJointList = []
-        self.ar.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(sourceList), add_one=False, add_number=False)
-        for sourceNode in sourceList:
+        new_joints = []
+        self.ar.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(source_items), add_one=False, add_number=False)
+        for sourceNode in source_items:
             self.ar.utils.setProgress("Joint")
             cmds.select(clear=True)
             new_joint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
-            newJointList.append(new_joint)
+            new_joints.append(new_joint)
+            # Match joint orient
+            for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
+                value = cmds.getAttr(f"{sourceNode}.{attr}")
+                cmds.setAttr(f"{new_joint}.{attr}", value)
+            # Constraint to the original
+            pac = cmds.parentConstraint([sourceNode, new_joint], maintainOffset=False, name=new_joint+"_PaC")[0]
+            cmds.refresh()
+            self.ar.custom_attr.add_attr(0, [new_joint, pac]) #dpID
             # Transfer skinCluster + bindPose connection from the original
             connectionList = cmds.listConnections(sourceNode, destination=True, source=False, connections=True, plugs=True) or []
             for src, dest in self.grouper(connectionList, 2):
@@ -162,78 +132,75 @@ class OneSkeleton(base.BaseLibrary):
                         # Transfer connection to the new node
                         cmds.disconnectAttr(src, dest)
                         cmds.connectAttr(new_joint+"."+sourceAttr, dest, force=True)
-            # Match joint orient
-            for attr in ["jointOrientX", "jointOrientY", "jointOrientZ"]:
-                value = cmds.getAttr(f"{sourceNode}.{attr}")
-                cmds.setAttr(f"{new_joint}.{attr}", value)
-            # Constraint to the original
-            pac = cmds.parentConstraint([sourceNode, new_joint], maintainOffset=False, name=new_joint+"_PaC")[0]
-            scc = cmds.scaleConstraint([sourceNode, new_joint], name=new_joint+"_ScC", maintainOffset=False)[0]
-            scale_constraints.append(scc)
-            # fixes for negative scale joints
-            parentList = cmds.listRelatives(sourceNode, parent=True)
-            if parentList:
-                if not "_Jar" in parentList[0]:
-                    for axis in self.ar.data.axes:
-                        if cmds.getAttr(parentList[0]+".scale"+axis) < 0: #negative scale OMG
-                            for a in self.ar.data.axes:
-                                if not a == axis:
-                                    cmds.setAttr(scc+".offset"+a, -1)
-            # corrective joints
-            if "_Jcr" in new_joint:
-                for axis in self.ar.data.axes:
-                    if cmds.getAttr(sourceNode+".scale"+axis) < 0 or cmds.getAttr(new_joint+".scale"+axis) < 0:
-                        cmds.setAttr(pac+".target[0].targetOffsetRotate"+axis, 180)
-                    cmds.setAttr(scc+".offset"+axis, 1)
-            # Ensure the new joint doesn't have segmentScaleCompensate enabled
-            # But do allow the scale constraint to compensate
-            cmds.refresh()
-            cmds.setAttr(f"{new_joint}.segmentScaleCompensate", False)
-            try:
-                cmds.setAttr(f"{sourceNode}.segmentScaleCompensate", False)
-            except:
-                pass
-            cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
-            # dpIDs
-            self.ar.custom_attr.add_attr(0, [new_joint, pac]) #dpID
-        if not scale:
-            cmds.delete(scale_constraints)
-        return newJointList
+            self.bind_pre_matrix_node(new_joint)
+        return new_joints
 
 
-    def getMeshList(self, *args):
+    def re_set_scale(self, source_items):
+        for sourceNode in source_items:
+            for axis in self.ar.data.axes:
+                cmds.setAttr(self.prefix+sourceNode+self.suffix+".scale"+axis, cmds.getAttr(sourceNode+".scale"+axis))
+
+    
+    def scale_connect(self, source_items):
+        for sourceNode in source_items:
+            scc = cmds.scaleConstraint(sourceNode, self.prefix+sourceNode+self.suffix, maintainOffset=True, name=self.prefix+sourceNode+self.suffix+"_ScC")[0]
+            #cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
+
+
+    def bind_pre_matrix_node(self, new_joint):
+        destinations = cmds.listConnections(new_joint+".worldMatrix", source=False, destination=True, plugs=True, type="skinCluster") or []
+        for destination in destinations:
+            skin, attr = destination.split(".", 1)
+            match = re.search(r"^matrix\[(\d+)\]$", attr)
+            if not match:
+                continue
+            index = int(match.group(1))
+            # Get the bindPreMatrix for that influence index
+            bind_prematrix_plug = f"{skin}.bindPreMatrix[{index}]"
+            bind_prematrix = cmds.getAttr(bind_prematrix_plug)
+            if bind_prematrix is None:
+                # Can happen if the value is not initialiezd - if so
+                # assume the current joints position
+                bind_prematrix = cmds.xform(new_joint, query=True, worldSpace=True, matrix=True)
+                bind_prematrix = OpenMaya.MMatrix(bind_prematrix).inverse()
+            # set bindPreMatrix
+            cmds.setAttr(bind_prematrix_plug, bind_prematrix, type="matrix")
+
+
+    def get_meshes(self):
         """ Returns the Render_Grp meshes or all meshes in the scene.
         """
         if self.ar.utils.getAllGrp():
-            renderGrp = self.ar.utils.getNodeByMessage("renderGrp")
-            if renderGrp:
-                meshes = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
+            render_grp = self.ar.utils.getNodeByMessage("renderGrp")
+            if render_grp:
+                meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, type="mesh")
                 if meshes:
                     return meshes
         return cmds.ls(type="mesh")
     
     
-    def getInfList(self, meshes, *args):
+    def get_inf_items(self, meshes):
         """ Returns the influenceList of a given meshes.
         """
-        uniqueInfList = []
-        skinClusterList = []
+        unique_inf_items = []
+        skinclusters = []
         if not cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True):
             mel.eval('warning \"'+self.ar.data.lang['i041_meshConnEmpty']+'\";')
             return
-        for transformNode in list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True))):
-            skinClusterList.extend(self.ar.skin.checkExistingDeformerNode(transformNode)[2] or [])
-        if skinClusterList:
-            for skinClusterNode in skinClusterList:
-                infList = cmds.skinCluster(skinClusterNode, query=True, influence=True)
-                if infList:
-                    for item in infList:
-                        if not item in uniqueInfList:
-                            uniqueInfList.append(item)
-        return uniqueInfList
+        for transform_node in list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True))):
+            skinclusters.extend(self.ar.skin.checkExistingDeformerNode(transform_node)[2] or [])
+        if skinclusters:
+            for skincluster_node in skinclusters:
+                infs = cmds.skinCluster(skincluster_node, query=True, influence=True)
+                if infs:
+                    for item in infs:
+                        if not item in unique_inf_items:
+                            unique_inf_items.append(item)
+        return unique_inf_items
 
 
-    def createRootJoint(self, root, *args):
+    def create_root_joint(self, root):
         """ Create a base joint as root.
         """
         cmds.select(clear=True)
@@ -241,30 +208,34 @@ class OneSkeleton(base.BaseLibrary):
         cmds.addAttr(root, longName="dpRootJoint", attributeType="bool", defaultValue=1)
         cmds.setAttr(root+".visibility", 0)
         self.ar.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
+        try:
+            cmds.parent(root, self.ar.utils.getAllGrp())
+        except:
+            pass
 
 
-    def mount_hierarchy(self, joints, root, *args):
+    def mount_hierarchy(self, joints, root):
         hierarchy_data = self.get_hierarchy_data()
         integration_data = self.get_integration_data()
         for side in self.sides:
             for item in hierarchy_data.keys():
                 if cmds.objExists(f"{self.prefix}{side}{item}{self.suffix}"):
                     for p, parent in enumerate(hierarchy_data[item]):
-                        if cmds.objExists(f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}"):
+                        if cmds.objExists(f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}") and not f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}" in cmds.listRelatives(f"{self.prefix}{side}{item}{self.suffix}", children=True):
                             cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}")
                             break
                         elif item in integration_data.keys():
                             if cmds.objExists(f"{self.prefix}{integration_data[item][p]}{self.suffix}"):
                                 cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{integration_data[item][p]}{self.suffix}")
                                 break
-                        else:
-                            cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", root)
                 if f"{self.prefix}{side}{item}{self.suffix}" in joints:
                     joints.remove(f"{self.prefix}{side}{item}{self.suffix}")
+        if joints:
+            joints = self.set_exceptions(joints)
         cmds.parent(joints, root)
 
 
-    def get_hierarchy_data(self, *args):
+    def get_hierarchy_data(self):
         # getting default names
         arm = self.ar.data.lang['c037_arm']
         clavicle = self.ar.data.lang['c000_arm_before']
@@ -311,6 +282,8 @@ class OneSkeleton(base.BaseLibrary):
         lower_teeth = self.ar.data.lang['m076_lowerTeeth']
         tongue = self.ar.data.lang['m077_tongue']
         ear = self.ar.data.lang['m040_ear']
+        upper_tooth = self.ar.data.lang['c044_upper']+self.ar.data.lang['m267_tooth']
+        lower_tooth = self.ar.data.lang['c045_lower']+self.ar.data.lang['m267_tooth']
         
         nose = self.ar.data.lang['m078_nose']
         nostril = self.ar.data.lang['m079_nostril']
@@ -337,183 +310,183 @@ class OneSkeleton(base.BaseLibrary):
         data = {
                 # arm
                 f"{arm}_{clavicle}_Jar" : [f"{arm}_{clavicle}_Jnt"],
-                f"{arm}_{clavicle}_0_Jcr" : [f"{arm}_{clavicle}_Jnt"],
+                f"{arm}_{clavicle}_0_Jcr" : [f"{arm}_{clavicle}_Jar", f"{arm}_{clavicle}_Jnt"],
                 f"{arm}_{shoulder}_Jnt" : [f"{arm}_{clavicle}_Jnt"],
                 f"{arm}_{elbow}_Jar" : [f"{arm}_{elbow}_Jnt", f"{arm}_{shoulder}_Jnt"],
-                f"{arm}_{elbow}_0_Jcr" : [f"{arm}_{elbow}_Jar"],
-                f"{arm}_{elbow}_1_Jcr" : [f"{arm}_{elbow}_Jar"],
-                f"{arm}_{elbow}_2_Jcr" : [f"{arm}_{elbow}_Jar"],
+                f"{arm}_{elbow}_0_Jcr" : [f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt", f"{arm}_{shoulder}_Jnt"],
+                f"{arm}_{elbow}_1_Jcr" : [f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt", f"{arm}_{shoulder}_Jnt"],
+                f"{arm}_{elbow}_2_Jcr" : [f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt", f"{arm}_{shoulder}_Jnt"],
                 f"{arm}_{elbow}_Jnt" : [f"{arm}_{shoulder}_Jnt"],
                 f"{arm}_{forearm}_Jnt" : [f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt"],
                 f"{arm}_{wrist}_Jnt" : [f"{arm}_{forearm}_Jnt", f"{arm}_{elbow}_Jar", f"{arm}_{elbow}_Jnt"],
-                f"{arm}_{wrist}_0_Jcr" : [f"{arm}_13_{wrist}_Jar"],
-                f"{arm}_{wrist}_1_Jcr" : [f"{arm}_13_{wrist}_Jar"],
-                f"{arm}_{wrist}_2_Jcr" : [f"{arm}_13_{wrist}_Jar"],
-                f"{arm}_{wrist}_3_Jcr" : [f"{arm}_13_{wrist}_Jar"],
+                f"{arm}_{wrist}_0_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_{wrist}_1_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_{wrist}_2_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_{wrist}_3_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{elbow}_Jnt"],
                 f"{arm}_00_{clavicle}_Jar" : [f"{arm}_00_{clavicle}_Jnt"],
                 f"{arm}_00_{clavicle}_0_Jcr" : [f"{arm}_00_{clavicle}_Jar", f"{arm}_00_{clavicle}_Jnt"],
                 f"{arm}_01_{shoulder}_Jar" : [f"{arm}_01_{shoulder}_Jnt", f"{arm}_00_{clavicle}_Jnt", f"{arm}_{shoulder}_Jnt"],
-                f"{arm}_{shoulder}_0_Jcr" : [f"{arm}_01_{shoulder}_Jar"],
-                f"{arm}_{shoulder}_1_Jcr" : [f"{arm}_01_{shoulder}_Jar"],
-                f"{arm}_02_Jnt" : [f"{arm}_01_{shoulder}_Jar"],
+                f"{arm}_{shoulder}_0_Jcr" : [f"{arm}_01_{shoulder}_Jar", f"{arm}_01_{shoulder}_Jnt", f"{arm}_00_{clavicle}_Jnt", f"{arm}_{shoulder}_Jnt"],
+                f"{arm}_{shoulder}_1_Jcr" : [f"{arm}_01_{shoulder}_Jar", f"{arm}_01_{shoulder}_Jnt", f"{arm}_00_{clavicle}_Jnt", f"{arm}_{shoulder}_Jnt"],
+                f"{arm}_02_Jnt" : [f"{arm}_01_{shoulder}_Jar", f"{arm}_01_{shoulder}_Jnt", f"{arm}_00_{clavicle}_Jnt", f"{arm}_{shoulder}_Jnt"],
                 f"{arm}_03_Jnt" : [f"{arm}_02_Jnt"],
                 f"{arm}_04_Jnt" : [f"{arm}_03_Jnt"],
                 f"{arm}_05_Jnt" : [f"{arm}_04_Jnt"],
-                f"{arm}_05_{elbow}_Jar" : [f"{arm}_04_Jnt"],
-                f"{arm}_05_{elbow}_0_Jcr" : [f"{arm}_05_{elbow}_Jar"],
-                f"{arm}_05_{elbow}_1_Jcr" : [f"{arm}_05_{elbow}_Jar"],
-                f"{arm}_05_{elbow}_2_Jcr" : [f"{arm}_05_{elbow}_Jar"],
+                f"{arm}_05_{elbow}_Jar" : [f"{arm}_05_Jnt", f"{arm}_04_Jnt"],
+                f"{arm}_05_{elbow}_0_Jcr" : [f"{arm}_05_{elbow}_Jar", f"{arm}_04_Jnt"],
+                f"{arm}_05_{elbow}_1_Jcr" : [f"{arm}_05_{elbow}_Jar", f"{arm}_04_Jnt"],
+                f"{arm}_05_{elbow}_2_Jcr" : [f"{arm}_05_{elbow}_Jar", f"{arm}_04_Jnt"],
                 f"{arm}_06_Jnt" : [f"{arm}_05_{elbow}_Jar", f"{arm}_05_Jnt"],
                 f"{arm}_07_Jnt" : [f"{arm}_06_Jnt"],
-                f"{arm}_07_{elbow}_Jar" : [f"{arm}_06_Jnt"],
-                f"{arm}_07_{elbow}_0_Jcr" : [f"{arm}_07_{elbow}_Jar"],
-                f"{arm}_07_{elbow}_1_Jcr" : [f"{arm}_07_{elbow}_Jar"],
-                f"{arm}_07_{elbow}_2_Jcr" : [f"{arm}_07_{elbow}_Jar"],
+                f"{arm}_07_{elbow}_Jar" : [f"{arm}_07_Jnt", f"{arm}_06_Jnt"],
+                f"{arm}_07_{elbow}_0_Jcr" : [f"{arm}_07_{elbow}_Jar", f"{arm}_06_Jnt"],
+                f"{arm}_07_{elbow}_1_Jcr" : [f"{arm}_07_{elbow}_Jar", f"{arm}_06_Jnt"],
+                f"{arm}_07_{elbow}_2_Jcr" : [f"{arm}_07_{elbow}_Jar", f"{arm}_06_Jnt"],
                 f"{arm}_08_Jnt" : [f"{arm}_07_{elbow}_Jar", f"{arm}_07_Jnt"],
                 f"{arm}_09_Jnt" : [f"{arm}_08_Jnt"],
-                f"{arm}_09_{elbow}_Jar" : [f"{arm}_08_Jnt"],
-                f"{arm}_09_{elbow}_0_Jcr" : [f"{arm}_09_{elbow}_Jar"],
-                f"{arm}_09_{elbow}_1_Jcr" : [f"{arm}_09_{elbow}_Jar"],
-                f"{arm}_09_{elbow}_2_Jcr" : [f"{arm}_09_{elbow}_Jar"],
+                f"{arm}_09_{elbow}_Jar" : [f"{arm}_09_Jnt", f"{arm}_08_Jnt"],
+                f"{arm}_09_{elbow}_0_Jcr" : [f"{arm}_09_{elbow}_Jar", f"{arm}_08_Jnt"],
+                f"{arm}_09_{elbow}_1_Jcr" : [f"{arm}_09_{elbow}_Jar", f"{arm}_08_Jnt"],
+                f"{arm}_09_{elbow}_2_Jcr" : [f"{arm}_09_{elbow}_Jar", f"{arm}_08_Jnt"],
                 f"{arm}_09_{wrist}_Jnt" : [f"{arm}_08_Jnt"],
                 f"{arm}_09_{wrist}_Jar" : [f"{arm}_09_{wrist}_Jnt", f"{arm}_08_Jnt"],
-                f"{arm}_09_{wrist}_0_Jcr" : [f"{arm}_09_{wrist}_Jar"],
-                f"{arm}_09_{wrist}_1_Jcr" : [f"{arm}_09_{wrist}_Jar"],
-                f"{arm}_09_{wrist}_2_Jcr" : [f"{arm}_09_{wrist}_Jar"],
-                f"{arm}_09_{wrist}_3_Jcr" : [f"{arm}_09_{wrist}_Jar"],
+                f"{arm}_09_{wrist}_0_Jcr" : [f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_08_Jnt"],
+                f"{arm}_09_{wrist}_1_Jcr" : [f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_08_Jnt"],
+                f"{arm}_09_{wrist}_2_Jcr" : [f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_08_Jnt"],
+                f"{arm}_09_{wrist}_3_Jcr" : [f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_08_Jnt"],
                 f"{arm}_10_Jnt" : [f"{arm}_09_{elbow}_Jar", f"{arm}_09_Jnt"],
                 f"{arm}_11_Jnt" : [f"{arm}_10_Jnt"],
                 f"{arm}_12_Jnt" : [f"{arm}_11_Jnt"],
                 f"{arm}_13_{wrist}_Jnt" : [f"{arm}_12_Jnt"],
-                f"{arm}_13_{wrist}_Jar" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{elbow}_Jnt"],
-                f"{arm}_13_{wrist}_0_Jcr" : [f"{arm}_13_{wrist}_Jar"],
-                f"{arm}_13_{wrist}_1_Jcr" : [f"{arm}_13_{wrist}_Jar"],
-                f"{arm}_13_{wrist}_2_Jcr" : [f"{arm}_13_{wrist}_Jar"],
-                f"{arm}_13_{wrist}_3_Jcr" : [f"{arm}_13_{wrist}_Jar"],
+                f"{arm}_13_{wrist}_Jar" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{wrist}_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_13_{wrist}_0_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{wrist}_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_13_{wrist}_1_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{wrist}_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_13_{wrist}_2_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{wrist}_Jnt", f"{arm}_{elbow}_Jnt"],
+                f"{arm}_13_{wrist}_3_Jcr" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_12_Jnt", f"{arm}_{wrist}_Jnt", f"{arm}_{elbow}_Jnt"],
                 f"{arm}_13_Jnt" : [f"{arm}_12_Jnt"],
                 f"{arm}_14_Jnt" : [f"{arm}_13_Jnt"],
                 f"{arm}_15_Jnt" : [f"{arm}_14_Jnt"],
                 f"{arm}_16_Jnt" : [f"{arm}_15_Jnt"],
                 f"{arm}_17_{wrist}_Jnt" : [f"{arm}_16_Jnt"],
                 f"{arm}_17_{wrist}_Jar" : [f"{arm}_17_{wrist}_Jnt", f"{arm}_16_Jnt"],
-                f"{arm}_17_{wrist}_0_Jcr" : [f"{arm}_17_{wrist}_Jar"],
-                f"{arm}_17_{wrist}_1_Jcr" : [f"{arm}_17_{wrist}_Jar"],
-                f"{arm}_17_{wrist}_2_Jcr" : [f"{arm}_17_{wrist}_Jar"],
-                f"{arm}_17_{wrist}_3_Jcr" : [f"{arm}_17_{wrist}_Jar"],
+                f"{arm}_17_{wrist}_0_Jcr" : [f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_16_Jnt"],
+                f"{arm}_17_{wrist}_1_Jcr" : [f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_16_Jnt"],
+                f"{arm}_17_{wrist}_2_Jcr" : [f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_16_Jnt"],
+                f"{arm}_17_{wrist}_3_Jcr" : [f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_16_Jnt"],
                 
                 # fingers
-                f"{finger}_{thumb}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
+                f"{finger}_{thumb}_00_Jnt" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{thumb}_01_Jnt" : [f"{finger}_{thumb}_00_Jnt"],
                 f"{finger}_{thumb}_01_Jar" : [f"{finger}_{thumb}_01_Jnt"],
-                f"{finger}_{thumb}_01_0_Jcr" : [f"{finger}_{thumb}_01_Jar"],
-                f"{finger}_{thumb}_02_Jnt" : [f"{finger}_{thumb}_01_Jar", f"{finger}_{thumb}_01_Jnt"],
+                f"{finger}_{thumb}_01_0_Jcr" : [f"{finger}_{thumb}_01_Jar", f"{finger}_{thumb}_01_Jnt"],
+                f"{finger}_{thumb}_02_Jnt" : [f"{finger}_{thumb}_01_Jnt"],
                 f"{finger}_{thumb}_02_Jar" : [f"{finger}_{thumb}_02_Jnt"],
-                f"{finger}_{thumb}_02_0_Jcr" : [f"{finger}_{thumb}_02_Jar"],
-                f"{finger}_{index}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
+                f"{finger}_{thumb}_02_0_Jcr" : [f"{finger}_{thumb}_02_Jar", f"{finger}_{thumb}_02_Jnt"],
+                f"{finger}_{index}_00_Jnt" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{index}_01_Jnt" : [f"{finger}_{index}_00_Jnt"],
                 f"{finger}_{index}_01_Jar" : [f"{finger}_{index}_01_Jnt"],
-                f"{finger}_{index}_01_0_Jcr" : [f"{finger}_{index}_01_Jar"],
-                f"{finger}_{index}_02_Jnt" : [f"{finger}_{index}_01_Jar", f"{finger}_{index}_01_Jnt"],
+                f"{finger}_{index}_01_0_Jcr" : [f"{finger}_{index}_01_Jar", f"{finger}_{index}_01_Jnt"],
+                f"{finger}_{index}_02_Jnt" : [f"{finger}_{index}_01_Jnt"],
                 f"{finger}_{index}_02_Jar" : [f"{finger}_{index}_02_Jnt"],
-                f"{finger}_{index}_02_0_Jcr" : [f"{finger}_{index}_02_Jar"],
-                f"{finger}_{index}_03_Jnt" : [f"{finger}_{index}_02_Jar", f"{finger}_{index}_02_Jnt"],
+                f"{finger}_{index}_02_0_Jcr" : [f"{finger}_{index}_02_Jar", f"{finger}_{index}_02_Jnt"],
+                f"{finger}_{index}_03_Jnt" : [f"{finger}_{index}_02_Jnt"],
                 f"{finger}_{index}_03_Jar" : [f"{finger}_{index}_03_Jnt"],
-                f"{finger}_{index}_03_0_Jcr" : [f"{finger}_{index}_03_Jar"],
-                f"{finger}_{middle}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
+                f"{finger}_{index}_03_0_Jcr" : [f"{finger}_{index}_03_Jnt"],
+                f"{finger}_{middle}_00_Jnt" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{middle}_01_Jnt" : [f"{finger}_{middle}_00_Jnt"],
                 f"{finger}_{middle}_01_Jar" : [f"{finger}_{middle}_01_Jnt"],
-                f"{finger}_{middle}_01_0_Jcr" : [f"{finger}_{middle}_01_Jar"],
-                f"{finger}_{middle}_02_Jnt" : [f"{finger}_{middle}_01_Jar", f"{finger}_{middle}_01_Jnt"],
+                f"{finger}_{middle}_01_0_Jcr" : [f"{finger}_{middle}_01_Jar", f"{finger}_{middle}_01_Jnt"],
+                f"{finger}_{middle}_02_Jnt" : [f"{finger}_{middle}_01_Jnt"],
                 f"{finger}_{middle}_02_Jar" : [f"{finger}_{middle}_02_Jnt"],
-                f"{finger}_{middle}_02_0_Jcr" : [f"{finger}_{middle}_02_Jar"],
-                f"{finger}_{middle}_03_Jnt" : [f"{finger}_{middle}_02_Jar", f"{finger}_{middle}_02_Jnt"],
+                f"{finger}_{middle}_02_0_Jcr" : [f"{finger}_{middle}_02_Jar", f"{finger}_{middle}_02_Jnt"],
+                f"{finger}_{middle}_03_Jnt" : [f"{finger}_{middle}_02_Jnt"],
                 f"{finger}_{middle}_03_Jar" : [f"{finger}_{middle}_03_Jnt"],
-                f"{finger}_{middle}_03_0_Jcr" : [f"{finger}_{middle}_03_Jar"],
-                f"{finger}_{ring}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
+                f"{finger}_{middle}_03_0_Jcr" : [f"{finger}_{middle}_03_Jar", f"{finger}_{middle}_03_Jnt"],
+                f"{finger}_{ring}_00_Jnt" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{ring}_01_Jnt" : [f"{finger}_{ring}_00_Jnt"],
                 f"{finger}_{ring}_01_Jar" : [f"{finger}_{ring}_01_Jnt"],
-                f"{finger}_{ring}_01_0_Jcr" : [f"{finger}_{ring}_01_Jar"],
-                f"{finger}_{ring}_02_Jnt" : [f"{finger}_{ring}_01_Jar", f"{finger}_{ring}_01_Jnt"],
+                f"{finger}_{ring}_01_0_Jcr" : [f"{finger}_{ring}_01_Jar", f"{finger}_{ring}_01_Jnt"],
+                f"{finger}_{ring}_02_Jnt" : [f"{finger}_{ring}_01_Jnt"],
                 f"{finger}_{ring}_02_Jar" : [f"{finger}_{ring}_02_Jnt"],
-                f"{finger}_{ring}_02_0_Jcr" : [f"{finger}_{ring}_02_Jar"],
-                f"{finger}_{ring}_03_Jnt" : [f"{finger}_{ring}_02_Jar", f"{finger}_{ring}_02_Jnt"],
+                f"{finger}_{ring}_02_0_Jcr" : [f"{finger}_{ring}_02_Jar", f"{finger}_{ring}_02_Jnt"],
+                f"{finger}_{ring}_03_Jnt" : [f"{finger}_{ring}_02_Jnt"],
                 f"{finger}_{ring}_03_Jar" : [f"{finger}_{ring}_03_Jnt"],
-                f"{finger}_{ring}_03_0_Jcr" : [f"{finger}_{ring}_03_Jar"],
-                f"{finger}_{pinky}_00_Jnt" : [f"{arm}_13_{wrist}_Jar", f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jar", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jar", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
+                f"{finger}_{ring}_03_0_Jcr" : [f"{finger}_{ring}_03_Jar", f"{finger}_{ring}_03_Jnt"],
+                f"{finger}_{pinky}_00_Jnt" : [f"{arm}_13_{wrist}_Jnt", f"{arm}_17_{wrist}_Jnt", f"{arm}_09_{wrist}_Jnt", f"{arm}_{wrist}_Jnt"],
                 f"{finger}_{pinky}_01_Jnt" : [f"{finger}_{pinky}_00_Jnt"],
                 f"{finger}_{pinky}_01_Jar" : [f"{finger}_{pinky}_01_Jnt"],
-                f"{finger}_{pinky}_01_0_Jcr" : [f"{finger}_{pinky}_01_Jar"],
-                f"{finger}_{pinky}_02_Jnt" : [f"{finger}_{pinky}_01_Jar", f"{finger}_{pinky}_01_Jnt"],
+                f"{finger}_{pinky}_01_0_Jcr" : [f"{finger}_{pinky}_01_Jar", f"{finger}_{pinky}_01_Jnt"],
+                f"{finger}_{pinky}_02_Jnt" : [f"{finger}_{pinky}_01_Jnt"],
                 f"{finger}_{pinky}_02_Jar" : [f"{finger}_{pinky}_02_Jnt"],
-                f"{finger}_{pinky}_02_0_Jcr" : [f"{finger}_{pinky}_02_Jar"],
-                f"{finger}_{pinky}_03_Jnt" : [f"{finger}_{pinky}_02_Jar", f"{finger}_{pinky}_02_Jnt"],
+                f"{finger}_{pinky}_02_0_Jcr" : [f"{finger}_{pinky}_02_Jar", f"{finger}_{pinky}_02_Jnt"],
+                f"{finger}_{pinky}_03_Jnt" : [f"{finger}_{pinky}_02_Jnt"],
                 f"{finger}_{pinky}_03_Jar" : [f"{finger}_{pinky}_03_Jnt"],
-                f"{finger}_{pinky}_03_0_Jcr" : [f"{finger}_{pinky}_03_Jar"],
+                f"{finger}_{pinky}_03_0_Jcr" : [f"{finger}_{pinky}_03_Jar", f"{finger}_{pinky}_03_Jnt"],
 
                 # leg
                 f"{leg}_{hip}_Jar" : [f"{leg}_{hip}_Jnt"],
                 f"{leg}_{hip}_0_Jcr" : [f"{leg}_{hip}_Jnt"],
                 f"{leg}_{leg}_Jnt" : [f"{leg}_{hip}_Jnt"],
                 f"{leg}_{knee}_Jar" : [f"{leg}_{knee}_Jnt", f"{leg}_{leg}_Jnt"],
-                f"{leg}_{knee}_0_Jcr" : [f"{leg}_{knee}_Jar"],
-                f"{leg}_{knee}_1_Jcr" : [f"{leg}_{knee}_Jar"],
-                f"{leg}_{knee}_2_Jcr" : [f"{leg}_{knee}_Jar"],
+                f"{leg}_{knee}_0_Jcr" : [f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt", f"{leg}_{leg}_Jnt"],
+                f"{leg}_{knee}_1_Jcr" : [f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt", f"{leg}_{leg}_Jnt"],
+                f"{leg}_{knee}_2_Jcr" : [f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt", f"{leg}_{leg}_Jnt"],
                 f"{leg}_{knee}_Jnt" : [f"{leg}_{leg}_Jnt"],
                 f"{leg}_{ankle}_Jnt" : [f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt"],
-                f"{leg}_{ankle}_0_Jcr" : [f"{leg}_13_{ankle}_Jar"],
-                f"{leg}_{ankle}_1_Jcr" : [f"{leg}_13_{ankle}_Jar"],
-                f"{leg}_{ankle}_2_Jcr" : [f"{leg}_13_{ankle}_Jar"],
-                f"{leg}_{ankle}_3_Jcr" : [f"{leg}_13_{ankle}_Jar"],
+                f"{leg}_{ankle}_0_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_{ankle}_1_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_{ankle}_2_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_{ankle}_3_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
                 f"{leg}_00_{hip}_Jar" : [f"{leg}_00_{hip}_Jnt"],
                 f"{leg}_00_{hip}_0_Jcr" : [f"{leg}_00_{hip}_Jar", f"{leg}_00_{hip}_Jnt"],
                 f"{leg}_01_{leg}_Jar" : [f"{leg}_00_{leg}_Jnt", f"{leg}_00_{hip}_Jnt", f"{leg}_{leg}_Jnt"],
-                f"{leg}_{leg}_0_Jcr" : [f"{leg}_01_{leg}_Jar"],
-                f"{leg}_{leg}_1_Jcr" : [f"{leg}_01_{leg}_Jar"],
-                f"{leg}_02_Jnt" : [f"{leg}_01_{leg}_Jar"],
+                f"{leg}_{leg}_0_Jcr" : [f"{leg}_01_{leg}_Jar", f"{leg}_00_{leg}_Jnt", f"{leg}_00_{hip}_Jnt", f"{leg}_{leg}_Jnt"],
+                f"{leg}_{leg}_1_Jcr" : [f"{leg}_01_{leg}_Jar", f"{leg}_00_{leg}_Jnt", f"{leg}_00_{hip}_Jnt", f"{leg}_{leg}_Jnt"],
+                f"{leg}_02_Jnt" : [f"{leg}_01_{leg}_Jar", f"{leg}_00_{leg}_Jnt", f"{leg}_00_{hip}_Jnt", f"{leg}_{leg}_Jnt"],
                 f"{leg}_03_Jnt" : [f"{leg}_02_Jnt"],
                 f"{leg}_04_Jnt" : [f"{leg}_03_Jnt"],
                 f"{leg}_05_Jnt" : [f"{leg}_04_Jnt"],
-                f"{leg}_05_{knee}_Jar" : [f"{leg}_04_Jnt"],
-                f"{leg}_05_{knee}_0_Jcr" : [f"{leg}_05_{knee}_Jar"],
-                f"{leg}_05_{knee}_1_Jcr" : [f"{leg}_05_{knee}_Jar"],
-                f"{leg}_05_{knee}_2_Jcr" : [f"{leg}_05_{knee}_Jar"],
+                f"{leg}_05_{knee}_Jar" : [f"{leg}_05_Jnt", f"{leg}_04_Jnt"],
+                f"{leg}_05_{knee}_0_Jcr" : [f"{leg}_05_{knee}_Jar", f"{leg}_05_Jnt", f"{leg}_04_Jnt"],
+                f"{leg}_05_{knee}_1_Jcr" : [f"{leg}_05_{knee}_Jar", f"{leg}_05_Jnt", f"{leg}_04_Jnt"],
+                f"{leg}_05_{knee}_2_Jcr" : [f"{leg}_05_{knee}_Jar", f"{leg}_05_Jnt", f"{leg}_04_Jnt"],
                 f"{leg}_06_Jnt" : [f"{leg}_05_{knee}_Jar", f"{leg}_05_Jnt"],
                 f"{leg}_07_Jnt" : [f"{leg}_06_Jnt"],
-                f"{leg}_07_{knee}_Jar" : [f"{leg}_06_Jnt"],
-                f"{leg}_07_{knee}_0_Jcr" : [f"{leg}_07_{knee}_Jar"],
-                f"{leg}_07_{knee}_1_Jcr" : [f"{leg}_07_{knee}_Jar"],
-                f"{leg}_07_{knee}_2_Jcr" : [f"{leg}_07_{knee}_Jar"],
+                f"{leg}_07_{knee}_Jar" : [f"{leg}_07_Jnt", f"{leg}_06_Jnt"],
+                f"{leg}_07_{knee}_0_Jcr" : [f"{leg}_07_{knee}_Jar", f"{leg}_07_Jnt", f"{leg}_06_Jnt"],
+                f"{leg}_07_{knee}_1_Jcr" : [f"{leg}_07_{knee}_Jar", f"{leg}_07_Jnt", f"{leg}_06_Jnt"],
+                f"{leg}_07_{knee}_2_Jcr" : [f"{leg}_07_{knee}_Jar", f"{leg}_07_Jnt", f"{leg}_06_Jnt"],
                 f"{leg}_08_Jnt" : [f"{leg}_07_{knee}_Jar", f"{leg}_07_Jnt"],
                 f"{leg}_09_Jnt" : [f"{leg}_08_Jnt"],
-                f"{leg}_09_{knee}_Jar" : [f"{leg}_08_Jnt"],
-                f"{leg}_09_{knee}_0_Jcr" : [f"{leg}_09_{knee}_Jar"],
-                f"{leg}_09_{knee}_1_Jcr" : [f"{leg}_09_{knee}_Jar"],
-                f"{leg}_09_{knee}_2_Jcr" : [f"{leg}_09_{knee}_Jar"],
+                f"{leg}_09_{knee}_Jar" : [f"{leg}_09_Jnt", f"{leg}_08_Jnt"],
+                f"{leg}_09_{knee}_0_Jcr" : [f"{leg}_09_{knee}_Jar", f"{leg}_09_Jnt", f"{leg}_08_Jnt"],
+                f"{leg}_09_{knee}_1_Jcr" : [f"{leg}_09_{knee}_Jar", f"{leg}_09_Jnt", f"{leg}_08_Jnt"],
+                f"{leg}_09_{knee}_2_Jcr" : [f"{leg}_09_{knee}_Jar", f"{leg}_09_Jnt", f"{leg}_08_Jnt"],
                 f"{leg}_09_{ankle}_Jnt" : [f"{leg}_08_Jnt"],
                 f"{leg}_09_{ankle}_Jar" : [f"{leg}_09_{ankle}_Jnt", f"{leg}_08_Jnt"],
-                f"{leg}_09_{ankle}_0_Jcr" : [f"{leg}_09_{ankle}_Jar"],
-                f"{leg}_09_{ankle}_1_Jcr" : [f"{leg}_09_{ankle}_Jar"],
-                f"{leg}_09_{ankle}_2_Jcr" : [f"{leg}_09_{ankle}_Jar"],
-                f"{leg}_09_{ankle}_3_Jcr" : [f"{leg}_09_{ankle}_Jar"],
+                f"{leg}_09_{ankle}_0_Jcr" : [f"{leg}_09_{ankle}_Jar", f"{leg}_09_{ankle}_Jnt", f"{leg}_08_Jnt"],
+                f"{leg}_09_{ankle}_1_Jcr" : [f"{leg}_09_{ankle}_Jar", f"{leg}_09_{ankle}_Jnt", f"{leg}_08_Jnt"],
+                f"{leg}_09_{ankle}_2_Jcr" : [f"{leg}_09_{ankle}_Jar", f"{leg}_09_{ankle}_Jnt", f"{leg}_08_Jnt"],
+                f"{leg}_09_{ankle}_3_Jcr" : [f"{leg}_09_{ankle}_Jar", f"{leg}_09_{ankle}_Jnt", f"{leg}_08_Jnt"],
                 f"{leg}_10_Jnt" : [f"{leg}_09_{knee}_Jar", f"{leg}_09_Jnt"],
                 f"{leg}_11_Jnt" : [f"{leg}_10_Jnt"],
                 f"{leg}_12_Jnt" : [f"{leg}_11_Jnt"],
                 f"{leg}_13_{ankle}_Jnt" : [f"{leg}_12_Jnt"],
-                f"{leg}_13_{ankle}_Jar" : [f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{leg}_{knee}_Jnt"],
-                f"{leg}_13_{ankle}_0_Jcr" : [f"{leg}_13_{ankle}_Jar"],
-                f"{leg}_13_{ankle}_1_Jcr" : [f"{leg}_13_{ankle}_Jar"],
-                f"{leg}_13_{ankle}_2_Jcr" : [f"{leg}_13_{ankle}_Jar"],
-                f"{leg}_13_{ankle}_3_Jcr" : [f"{leg}_13_{ankle}_Jar"],
+                f"{leg}_13_{ankle}_Jar" : [f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_13_{ankle}_0_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_13_{ankle}_1_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_13_{ankle}_2_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
+                f"{leg}_13_{ankle}_3_Jcr" : [f"{leg}_13_{ankle}_Jar", f"{leg}_13_{ankle}_Jnt", f"{leg}_12_Jnt", f"{foot}_{ankle}_Jnt", f"{leg}_{ankle}_Jnt", f"{leg}_{knee}_Jnt"],
                 f"{leg}_13_Jnt" : [f"{leg}_12_Jnt"],
                 f"{leg}_14_Jnt" : [f"{leg}_13_Jnt"],
                 f"{leg}_15_Jnt" : [f"{leg}_14_Jnt"],
                 f"{leg}_16_Jnt" : [f"{leg}_15_Jnt"],
                 f"{leg}_17_{ankle}_Jnt" : [f"{leg}_16_Jnt"],
                 f"{leg}_17_{ankle}_Jar" : [f"{leg}_17_{ankle}_Jnt", f"{leg}_16_Jnt"],
-                f"{leg}_17_{ankle}_0_Jcr" : [f"{leg}_17_{ankle}_Jar"],
-                f"{leg}_17_{ankle}_1_Jcr" : [f"{leg}_17_{ankle}_Jar"],
-                f"{leg}_17_{ankle}_2_Jcr" : [f"{leg}_17_{ankle}_Jar"],
-                f"{leg}_17_{ankle}_3_Jcr" : [f"{leg}_17_{ankle}_Jar"],
+                f"{leg}_17_{ankle}_0_Jcr" : [f"{leg}_17_{ankle}_Jar", f"{leg}_17_{ankle}_Jnt", f"{leg}_16_Jnt"],
+                f"{leg}_17_{ankle}_1_Jcr" : [f"{leg}_17_{ankle}_Jar", f"{leg}_17_{ankle}_Jnt", f"{leg}_16_Jnt"],
+                f"{leg}_17_{ankle}_2_Jcr" : [f"{leg}_17_{ankle}_Jar", f"{leg}_17_{ankle}_Jnt", f"{leg}_16_Jnt"],
+                f"{leg}_17_{ankle}_3_Jcr" : [f"{leg}_17_{ankle}_Jar", f"{leg}_17_{ankle}_Jnt", f"{leg}_16_Jnt"],
                 
                 # foot
                 f"{foot}_{ankle}_Jnt" : [f"{leg}_17_{ankle}_Jar", f"{leg}_13_{ankle}_Jar", f"{leg}_09_{ankle}_Jar", f"{leg}_17_{ankle}_Jnt", f"{leg}_13_{ankle}_Jnt", f"{leg}_09_{ankle}_Jnt", f"{leg}_{knee}_Jar", f"{leg}_{knee}_Jnt"],
@@ -543,98 +516,65 @@ class OneSkeleton(base.BaseLibrary):
                 f"{leg}{back}_{hip}_0_Jcr" : [f"{leg}{back}_{hip}_Jnt"],
                 f"{leg}{back}_{leg}_Jnt" : [f"{leg}{back}_{hip}_Jnt"],
                 f"{leg}{back}_{knee}_Jar" : [f"{leg}{back}_{knee}_Jnt", f"{leg}{back}_{leg}_Jnt"],
-                f"{leg}{back}_{knee}_0_Jcr" : [f"{leg}{back}_{knee}_Jar"],
-                f"{leg}{back}_{knee}_1_Jcr" : [f"{leg}{back}_{knee}_Jar"],
-                f"{leg}{back}_{knee}_2_Jcr" : [f"{leg}{back}_{knee}_Jar"],
+                f"{leg}{back}_{knee}_0_Jcr" : [f"{leg}{back}_{knee}_Jar", f"{leg}{back}_{knee}_Jnt", f"{leg}{back}_{leg}_Jnt"],
+                f"{leg}{back}_{knee}_1_Jcr" : [f"{leg}{back}_{knee}_Jar", f"{leg}{back}_{knee}_Jnt", f"{leg}{back}_{leg}_Jnt"],
+                f"{leg}{back}_{knee}_2_Jcr" : [f"{leg}{back}_{knee}_Jar", f"{leg}{back}_{knee}_Jnt", f"{leg}{back}_{leg}_Jnt"],
                 f"{leg}{back}_{knee}_Jnt" : [f"{leg}{back}_{leg}_Jnt"],
-                f"{leg}{back}_{ankle}_Jnt" : [f"{leg}{back}_{knee}_Jar", f"{leg}{back}_{knee}_Jnt", f"{leg}{back}_09_Jnt", f"{leg}{back}_13_Jnt", f"{leg}{back}_19_Jnt"],
-                f"{leg}{back}_{ankle}_0_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
-                f"{leg}{back}_{ankle}_1_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
-                f"{leg}{back}_{ankle}_2_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
-                f"{leg}{back}_{ankle}_3_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
+                f"{leg}{back}_{ankle}_Jnt" : [f"{leg}{back}_{knee}_Jar", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_{ankle}_0_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_{ankle}_1_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_{ankle}_2_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_{ankle}_3_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
                 f"{leg}{back}_00_{hip}_Jar" : [f"{leg}{back}_00_{hip}_Jnt"],
                 f"{leg}{back}_00_{hip}_0_Jcr" : [f"{leg}{back}_00_{hip}_Jar", f"{leg}{back}_00_{hip}_Jnt"],
                 f"{leg}{back}_01_{leg}_Jar" : [f"{leg}{back}_00_{leg}_Jnt", f"{leg}{back}_00_{hip}_Jnt", f"{leg}{back}_{leg}_Jnt"],
-                f"{leg}{back}_{leg}_0_Jcr" : [f"{leg}{back}_01_{leg}_Jar"],
-                f"{leg}{back}_{leg}_1_Jcr" : [f"{leg}{back}_01_{leg}_Jar"],
-                f"{leg}{back}_02_Jnt" : [f"{leg}{back}_01_{leg}_Jar", f"{leg}{back}_01_Jnt"],
+                f"{leg}{back}_{leg}_0_Jcr" : [f"{leg}{back}_01_{leg}_Jar", f"{leg}{back}_00_{leg}_Jnt", f"{leg}{back}_00_{hip}_Jnt", f"{leg}{back}_{leg}_Jnt"],
+                f"{leg}{back}_{leg}_1_Jcr" : [f"{leg}{back}_01_{leg}_Jar", f"{leg}{back}_00_{leg}_Jnt", f"{leg}{back}_00_{hip}_Jnt", f"{leg}{back}_{leg}_Jnt"],
+                f"{leg}{back}_02_Jnt" : [f"{leg}{back}_01_{leg}_Jar", f"{leg}{back}_00_{leg}_Jnt", f"{leg}{back}_00_{hip}_Jnt", f"{leg}{back}_{leg}_Jnt"],
                 f"{leg}{back}_03_Jnt" : [f"{leg}{back}_02_Jnt"],
                 f"{leg}{back}_04_Jnt" : [f"{leg}{back}_03_Jnt"],
                 f"{leg}{back}_05_Jnt" : [f"{leg}{back}_04_Jnt"],
-                f"{leg}{back}_05_{knee}_Jar" : [f"{leg}{back}_04_Jnt"],
-                f"{leg}{back}_05_{knee}_0_Jcr" : [f"{leg}{back}_05_{knee}_Jar"],
-                f"{leg}{back}_05_{knee}_1_Jcr" : [f"{leg}{back}_05_{knee}_Jar"],
-                f"{leg}{back}_05_{knee}_2_Jcr" : [f"{leg}{back}_05_{knee}_Jar"],
-                f"{leg}{back}_06_Jnt" : [f"{leg}{back}_05_{knee}_Jar", f"{leg}{back}_05_Jnt", f"{leg}{back}_05_{knee}B_Jar"],
+                f"{leg}{back}_05_{knee}_Jar" : [f"{leg}{back}_05_Jnt", f"{leg}{back}_04_Jnt"],
+                f"{leg}{back}_05_{knee}_0_Jcr" : [f"{leg}{back}_05_{knee}_Jar", f"{leg}{back}_05_Jnt", f"{leg}{back}_04_Jnt"],
+                f"{leg}{back}_05_{knee}_1_Jcr" : [f"{leg}{back}_05_{knee}_Jar", f"{leg}{back}_05_Jnt", f"{leg}{back}_04_Jnt"],
+                f"{leg}{back}_05_{knee}_2_Jcr" : [f"{leg}{back}_05_{knee}_Jar", f"{leg}{back}_05_Jnt", f"{leg}{back}_04_Jnt"],
+                f"{leg}{back}_06_Jnt" : [f"{leg}{back}_05_{knee}_Jar", f"{leg}{back}_05_Jnt"],
                 f"{leg}{back}_07_Jnt" : [f"{leg}{back}_06_Jnt"],
-                f"{leg}{back}_07_{knee}_Jar" : [f"{leg}{back}_06_Jnt", f"{leg}{back}_{knee}_Jnt"],
-                f"{leg}{back}_07_{knee}_0_Jcr" : [f"{leg}{back}_07_{knee}_Jar"],
-                f"{leg}{back}_07_{knee}_1_Jcr" : [f"{leg}{back}_07_{knee}_Jar"],
-                f"{leg}{back}_07_{knee}_2_Jcr" : [f"{leg}{back}_07_{knee}_Jar"],
-                f"{leg}{back}_08_Jnt" : [f"{leg}{back}_07_{knee}_Jar", f"{leg}{back}_07_Jnt", f"{leg}{back}_07_{knee}B_Jar"],
+                f"{leg}{back}_07_{knee}_Jar" : [f"{leg}{back}_07_Jnt", f"{leg}{back}_06_Jnt"],
+                f"{leg}{back}_07_{knee}_0_Jcr" : [f"{leg}{back}_07_{knee}_Jar", f"{leg}{back}_07_Jnt", f"{leg}{back}_06_Jnt"],
+                f"{leg}{back}_07_{knee}_1_Jcr" : [f"{leg}{back}_07_{knee}_Jar", f"{leg}{back}_07_Jnt", f"{leg}{back}_06_Jnt"],
+                f"{leg}{back}_07_{knee}_2_Jcr" : [f"{leg}{back}_07_{knee}_Jar", f"{leg}{back}_07_Jnt", f"{leg}{back}_06_Jnt"],
+                f"{leg}{back}_08_Jnt" : [f"{leg}{back}_07_{knee}_Jar", f"{leg}{back}_07_Jnt"],
                 f"{leg}{back}_09_Jnt" : [f"{leg}{back}_08_Jnt"],
-                f"{leg}{back}_09_{knee}_Jar" : [f"{leg}{back}_08_Jnt"],
-                f"{leg}{back}_09_{knee}_0_Jcr" : [f"{leg}{back}_09_{knee}_Jar"],
-                f"{leg}{back}_09_{knee}_1_Jcr" : [f"{leg}{back}_09_{knee}_Jar"],
-                f"{leg}{back}_09_{knee}_2_Jcr" : [f"{leg}{back}_09_{knee}_Jar"],
-                f"{leg}{back}_09_{knee}B_Jar" : [f"{leg}{back}_08_Jnt"],
-                f"{leg}{back}_09_{knee}B_0_Jcr" : [f"{leg}{back}_09_{knee}B_Jar"],
-                f"{leg}{back}_09_{knee}B_1_Jcr" : [f"{leg}{back}_09_{knee}B_Jar"],
-                f"{leg}{back}_09_{knee}B_2_Jcr" : [f"{leg}{back}_09_{knee}B_Jar"],
+                f"{leg}{back}_09_{knee}_Jar" : [f"{leg}{back}_09_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_09_{knee}_0_Jcr" : [f"{leg}{back}_09_{knee}_Jar", f"{leg}{back}_09_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_09_{knee}_1_Jcr" : [f"{leg}{back}_09_{knee}_Jar", f"{leg}{back}_09_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_09_{knee}_2_Jcr" : [f"{leg}{back}_09_{knee}_Jar", f"{leg}{back}_09_Jnt", f"{leg}{back}_08_Jnt"],
                 f"{leg}{back}_09_{ankle}_Jnt" : [f"{leg}{back}_08_Jnt"],
                 f"{leg}{back}_09_{ankle}_Jar" : [f"{leg}{back}_09_{ankle}_Jnt", f"{leg}{back}_08_Jnt"],
-                f"{leg}{back}_09_{ankle}_0_Jcr" : [f"{leg}{back}_09_{ankle}_Jar"],
-                f"{leg}{back}_09_{ankle}_1_Jcr" : [f"{leg}{back}_09_{ankle}_Jar"],
-                f"{leg}{back}_09_{ankle}_2_Jcr" : [f"{leg}{back}_09_{ankle}_Jar"],
-                f"{leg}{back}_09_{ankle}_3_Jcr" : [f"{leg}{back}_09_{ankle}_Jar"],
-                f"{leg}{back}_10_Jnt" : [f"{leg}{back}_09_{knee}_Jar", f"{leg}{back}_09_Jnt", f"{leg}{back}_09_{knee}B_Jar"],
+                f"{leg}{back}_09_{ankle}_0_Jcr" : [f"{leg}{back}_09_{ankle}_Jar", f"{leg}{back}_09_{ankle}_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_09_{ankle}_1_Jcr" : [f"{leg}{back}_09_{ankle}_Jar", f"{leg}{back}_09_{ankle}_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_09_{ankle}_2_Jcr" : [f"{leg}{back}_09_{ankle}_Jar", f"{leg}{back}_09_{ankle}_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_09_{ankle}_3_Jcr" : [f"{leg}{back}_09_{ankle}_Jar", f"{leg}{back}_09_{ankle}_Jnt", f"{leg}{back}_08_Jnt"],
+                f"{leg}{back}_10_Jnt" : [f"{leg}{back}_09_{knee}_Jar", f"{leg}{back}_09_Jnt"],
                 f"{leg}{back}_11_Jnt" : [f"{leg}{back}_10_Jnt"],
                 f"{leg}{back}_12_Jnt" : [f"{leg}{back}_11_Jnt"],
-                f"{leg}{back}_{knee}B_Jnt" : [f"{leg}{back}_07_{knee}_Jar", f"{leg}{back}_{knee}_Jnt"],
-                f"{leg}{back}_13_{knee}B_Jar" : [f"{leg}{back}_12_Jnt", f"{leg}{back}_{knee}B_Jnt"],
-                f"{leg}{back}_13_{knee}B_0_Jcr" : [f"{leg}{back}_13_{knee}B_Jar"],
-                f"{leg}{back}_13_{knee}B_1_Jcr" : [f"{leg}{back}_13_{knee}B_Jar"],
-                f"{leg}{back}_13_{knee}B_2_Jcr" : [f"{leg}{back}_13_{knee}B_Jar"],
                 f"{leg}{back}_13_{ankle}_Jnt" : [f"{leg}{back}_12_Jnt"],
-                f"{leg}{back}_13_{ankle}_Jar" : [f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{leg}{back}_{knee}_Jnt"],
-                f"{leg}{back}_13_{ankle}_0_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
-                f"{leg}{back}_13_{ankle}_1_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
-                f"{leg}{back}_13_{ankle}_2_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
-                f"{leg}{back}_13_{ankle}_3_Jcr" : [f"{leg}{back}_13_{ankle}_Jar"],
+                f"{leg}{back}_13_{ankle}_Jar" : [f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_13_{ankle}_0_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_13_{ankle}_1_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_13_{ankle}_2_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
+                f"{leg}{back}_13_{ankle}_3_Jcr" : [f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_12_Jnt", f"{foot}{back}_{ankle}_Jnt", f"{leg}{back}_{ankle}_Jnt", f"{leg}{back}_{knee}_Jnt"],
                 f"{leg}{back}_13_Jnt" : [f"{leg}{back}_12_Jnt"],
-                f"{leg}{back}_14_Jnt" : [f"{leg}{back}_13_Jnt", f"{leg}{back}_13_{knee}B_Jar"],
+                f"{leg}{back}_14_Jnt" : [f"{leg}{back}_13_Jnt"],
                 f"{leg}{back}_15_Jnt" : [f"{leg}{back}_14_Jnt"],
                 f"{leg}{back}_16_Jnt" : [f"{leg}{back}_15_Jnt"],
-                f"{leg}{back}_17_{knee}B_Jar" : [f"{leg}{back}_16_Jnt"],
-                f"{leg}{back}_17_{knee}B_0_Jcr" : [f"{leg}{back}_17_{knee}B_Jar"],
-                f"{leg}{back}_17_{knee}B_1_Jcr" : [f"{leg}{back}_17_{knee}B_Jar"],
-                f"{leg}{back}_17_{knee}B_2_Jcr" : [f"{leg}{back}_17_{knee}B_Jar"],
                 f"{leg}{back}_17_{ankle}_Jnt" : [f"{leg}{back}_16_Jnt"],
                 f"{leg}{back}_17_{ankle}_Jar" : [f"{leg}{back}_17_{ankle}_Jnt", f"{leg}{back}_16_Jnt"],
-                f"{leg}{back}_17_{ankle}_0_Jcr" : [f"{leg}{back}_17_{ankle}_Jar"],
-                f"{leg}{back}_17_{ankle}_1_Jcr" : [f"{leg}{back}_17_{ankle}_Jar"],
-                f"{leg}{back}_17_{ankle}_2_Jcr" : [f"{leg}{back}_17_{ankle}_Jar"],
-                f"{leg}{back}_17_{ankle}_3_Jcr" : [f"{leg}{back}_17_{ankle}_Jar"],
-                f"{leg}{back}_17_Jnt" : [f"{leg}{back}_16_Jnt"],
-                f"{leg}{back}_18_Jnt" : [f"{leg}{back}_17_Jnt", f"{leg}{back}_17_{knee}B_Jar"],
-                f"{leg}{back}_19_Jnt" : [f"{leg}{back}_18_Jnt"],
-                f"{leg}{back}_19_{ankle}_Jnt" : [f"{leg}{back}_18_Jnt"],
-                f"{leg}{back}_19_{ankle}_Jar" : [f"{leg}{back}_19_{ankle}_Jnt", f"{leg}{back}_18_Jnt", f"{leg}{back}_13_{knee}_Jar", f"{leg}{back}_{knee}B_Jnt"],
-                f"{leg}{back}_19_{ankle}_0_Jcr" : [f"{leg}{back}_19_{ankle}_Jar"],
-                f"{leg}{back}_19_{ankle}_1_Jcr" : [f"{leg}{back}_19_{ankle}_Jar"],
-                f"{leg}{back}_19_{ankle}_2_Jcr" : [f"{leg}{back}_19_{ankle}_Jar"],
-                f"{leg}{back}_19_{ankle}_3_Jcr" : [f"{leg}{back}_19_{ankle}_Jar"],
-                f"{leg}{back}_20_Jnt" : [f"{leg}{back}_19_Jnt"],
-                f"{leg}{back}_21_Jnt" : [f"{leg}{back}_20_Jnt"],
-                f"{leg}{back}_22_Jnt" : [f"{leg}{back}_21_Jnt"],
-                f"{leg}{back}_23_Jnt" : [f"{leg}{back}_22_Jnt"],
-                f"{leg}{back}_24_Jnt" : [f"{leg}{back}_23_Jnt"],
-                f"{leg}{back}_25_{ankle}_Jnt" : [f"{leg}{back}_24_Jnt"],
-                f"{leg}{back}_25_{ankle}_Jar" : [f"{leg}{back}_25_{ankle}_Jnt", f"{leg}{back}_24_Jnt"],
-                f"{leg}{back}_25_{ankle}_0_Jcr" : [f"{leg}{back}_25_{ankle}_Jar"],
-                f"{leg}{back}_25_{ankle}_1_Jcr" : [f"{leg}{back}_25_{ankle}_Jar"],
-                f"{leg}{back}_25_{ankle}_2_Jcr" : [f"{leg}{back}_25_{ankle}_Jar"],
-                f"{leg}{back}_25_{ankle}_3_Jcr" : [f"{leg}{back}_25_{ankle}_Jar"],
+                f"{leg}{back}_17_{ankle}_0_Jcr" : [f"{leg}{back}_17_{ankle}_Jar", f"{leg}{back}_17_{ankle}_Jnt", f"{leg}{back}_16_Jnt"],
+                f"{leg}{back}_17_{ankle}_1_Jcr" : [f"{leg}{back}_17_{ankle}_Jar", f"{leg}{back}_17_{ankle}_Jnt", f"{leg}{back}_16_Jnt"],
+                f"{leg}{back}_17_{ankle}_2_Jcr" : [f"{leg}{back}_17_{ankle}_Jar", f"{leg}{back}_17_{ankle}_Jnt", f"{leg}{back}_16_Jnt"],
+                f"{leg}{back}_17_{ankle}_3_Jcr" : [f"{leg}{back}_17_{ankle}_Jar", f"{leg}{back}_17_{ankle}_Jnt", f"{leg}{back}_16_Jnt"],
                 # foot
                 f"{foot}{back}_{ankle}_Jnt" : [f"{leg}{back}_25_{ankle}_Jar", f"{leg}{back}_19_{ankle}_Jar", f"{leg}{back}_17_{ankle}_Jar", f"{leg}{back}_13_{ankle}_Jar", f"{leg}{back}_09_{ankle}_Jar", f"{leg}{back}_25_{ankle}_Jnt", f"{leg}{back}_19_{ankle}_Jnt", f"{leg}{back}_17_{ankle}_Jnt", f"{leg}{back}_13_{ankle}_Jnt", f"{leg}{back}_09_{ankle}_Jnt", f"{leg}{back}_{knee}_Jar", f"{leg}{back}_{knee}_Jnt", f"{leg}{back}_09_Jnt", f"{leg}{back}_13_Jnt", f"{leg}{back}_19_Jnt"],
                 f"{foot}{back}_{middle}_Jnt" : [f"{foot}{back}_{ankle}_Jar", f"{foot}{back}_{ankle}_Jnt"],
@@ -659,98 +599,65 @@ class OneSkeleton(base.BaseLibrary):
                 f"{leg}{front}_{hip}_0_Jcr" : [f"{leg}{front}_{hip}_Jnt"],
                 f"{leg}{front}_{leg}_Jnt" : [f"{leg}{front}_{hip}_Jnt"],
                 f"{leg}{front}_{knee}_Jar" : [f"{leg}{front}_{knee}_Jnt", f"{leg}{front}_{leg}_Jnt"],
-                f"{leg}{front}_{knee}_0_Jcr" : [f"{leg}{front}_{knee}_Jar"],
-                f"{leg}{front}_{knee}_1_Jcr" : [f"{leg}{front}_{knee}_Jar"],
-                f"{leg}{front}_{knee}_2_Jcr" : [f"{leg}{front}_{knee}_Jar"],
+                f"{leg}{front}_{knee}_0_Jcr" : [f"{leg}{front}_{knee}_Jar", f"{leg}{front}_{knee}_Jnt", f"{leg}{front}_{leg}_Jnt"],
+                f"{leg}{front}_{knee}_1_Jcr" : [f"{leg}{front}_{knee}_Jar", f"{leg}{front}_{knee}_Jnt", f"{leg}{front}_{leg}_Jnt"],
+                f"{leg}{front}_{knee}_2_Jcr" : [f"{leg}{front}_{knee}_Jar", f"{leg}{front}_{knee}_Jnt", f"{leg}{front}_{leg}_Jnt"],
                 f"{leg}{front}_{knee}_Jnt" : [f"{leg}{front}_{leg}_Jnt"],
-                f"{leg}{front}_{ankle}_Jnt" : [f"{leg}{front}_{knee}_Jar", f"{leg}{front}_{knee}_Jnt", f"{leg}{front}_09_Jnt", f"{leg}{front}_13_Jnt", f"{leg}{front}_19_Jnt"],
-                f"{leg}{front}_{ankle}_0_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
-                f"{leg}{front}_{ankle}_1_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
-                f"{leg}{front}_{ankle}_2_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
-                f"{leg}{front}_{ankle}_3_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
+                f"{leg}{front}_{ankle}_Jnt" : [f"{leg}{front}_{knee}_Jar", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_{ankle}_0_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_{ankle}_1_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_{ankle}_2_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_{ankle}_3_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
                 f"{leg}{front}_00_{hip}_Jar" : [f"{leg}{front}_00_{hip}_Jnt"],
                 f"{leg}{front}_00_{hip}_0_Jcr" : [f"{leg}{front}_00_{hip}_Jar", f"{leg}{front}_00_{hip}_Jnt"],
                 f"{leg}{front}_01_{leg}_Jar" : [f"{leg}{front}_00_{leg}_Jnt", f"{leg}{front}_00_{hip}_Jnt", f"{leg}{front}_{leg}_Jnt"],
-                f"{leg}{front}_{leg}_0_Jcr" : [f"{leg}{front}_01_{leg}_Jar"],
-                f"{leg}{front}_{leg}_1_Jcr" : [f"{leg}{front}_01_{leg}_Jar"],
-                f"{leg}{front}_02_Jnt" : [f"{leg}{front}_01_{leg}_Jar", f"{leg}{front}_01_Jnt"],
+                f"{leg}{front}_{leg}_0_Jcr" : [f"{leg}{front}_01_{leg}_Jar", f"{leg}{front}_00_{leg}_Jnt", f"{leg}{front}_00_{hip}_Jnt", f"{leg}{front}_{leg}_Jnt"],
+                f"{leg}{front}_{leg}_1_Jcr" : [f"{leg}{front}_01_{leg}_Jar", f"{leg}{front}_00_{leg}_Jnt", f"{leg}{front}_00_{hip}_Jnt", f"{leg}{front}_{leg}_Jnt"],
+                f"{leg}{front}_02_Jnt" : [f"{leg}{front}_01_{leg}_Jar", f"{leg}{front}_00_{leg}_Jnt", f"{leg}{front}_00_{hip}_Jnt", f"{leg}{front}_{leg}_Jnt"],
                 f"{leg}{front}_03_Jnt" : [f"{leg}{front}_02_Jnt"],
                 f"{leg}{front}_04_Jnt" : [f"{leg}{front}_03_Jnt"],
                 f"{leg}{front}_05_Jnt" : [f"{leg}{front}_04_Jnt"],
-                f"{leg}{front}_05_{knee}_Jar" : [f"{leg}{front}_04_Jnt"],
-                f"{leg}{front}_05_{knee}_0_Jcr" : [f"{leg}{front}_05_{knee}_Jar"],
-                f"{leg}{front}_05_{knee}_1_Jcr" : [f"{leg}{front}_05_{knee}_Jar"],
-                f"{leg}{front}_05_{knee}_2_Jcr" : [f"{leg}{front}_05_{knee}_Jar"],
-                f"{leg}{front}_06_Jnt" : [f"{leg}{front}_05_{knee}_Jar", f"{leg}{front}_05_Jnt", f"{leg}{front}_05_{knee}B_Jar"],
+                f"{leg}{front}_05_{knee}_Jar" : [f"{leg}{front}_05_Jnt", f"{leg}{front}_04_Jnt"],
+                f"{leg}{front}_05_{knee}_0_Jcr" : [f"{leg}{front}_05_{knee}_Jar", f"{leg}{front}_05_Jnt", f"{leg}{front}_04_Jnt"],
+                f"{leg}{front}_05_{knee}_1_Jcr" : [f"{leg}{front}_05_{knee}_Jar", f"{leg}{front}_05_Jnt", f"{leg}{front}_04_Jnt"],
+                f"{leg}{front}_05_{knee}_2_Jcr" : [f"{leg}{front}_05_{knee}_Jar", f"{leg}{front}_05_Jnt", f"{leg}{front}_04_Jnt"],
+                f"{leg}{front}_06_Jnt" : [f"{leg}{front}_05_{knee}_Jar", f"{leg}{front}_05_Jnt"],
                 f"{leg}{front}_07_Jnt" : [f"{leg}{front}_06_Jnt"],
-                f"{leg}{front}_07_{knee}_Jar" : [f"{leg}{front}_06_Jnt", f"{leg}{front}_{knee}_Jnt"],
-                f"{leg}{front}_07_{knee}_0_Jcr" : [f"{leg}{front}_07_{knee}_Jar"],
-                f"{leg}{front}_07_{knee}_1_Jcr" : [f"{leg}{front}_07_{knee}_Jar"],
-                f"{leg}{front}_07_{knee}_2_Jcr" : [f"{leg}{front}_07_{knee}_Jar"],
-                f"{leg}{front}_08_Jnt" : [f"{leg}{front}_07_{knee}_Jar", f"{leg}{front}_07_Jnt", f"{leg}{front}_07_{knee}B_Jar"],
+                f"{leg}{front}_07_{knee}_Jar" : [f"{leg}{front}_07_Jnt", f"{leg}{front}_06_Jnt"],
+                f"{leg}{front}_07_{knee}_0_Jcr" : [f"{leg}{front}_07_{knee}_Jar", f"{leg}{front}_07_Jnt", f"{leg}{front}_06_Jnt"],
+                f"{leg}{front}_07_{knee}_1_Jcr" : [f"{leg}{front}_07_{knee}_Jar", f"{leg}{front}_07_Jnt", f"{leg}{front}_06_Jnt"],
+                f"{leg}{front}_07_{knee}_2_Jcr" : [f"{leg}{front}_07_{knee}_Jar", f"{leg}{front}_07_Jnt", f"{leg}{front}_06_Jnt"],
+                f"{leg}{front}_08_Jnt" : [f"{leg}{front}_07_{knee}_Jar", f"{leg}{front}_07_Jnt"],
                 f"{leg}{front}_09_Jnt" : [f"{leg}{front}_08_Jnt"],
-                f"{leg}{front}_09_{knee}_Jar" : [f"{leg}{front}_08_Jnt"],
-                f"{leg}{front}_09_{knee}_0_Jcr" : [f"{leg}{front}_09_{knee}_Jar"],
-                f"{leg}{front}_09_{knee}_1_Jcr" : [f"{leg}{front}_09_{knee}_Jar"],
-                f"{leg}{front}_09_{knee}_2_Jcr" : [f"{leg}{front}_09_{knee}_Jar"],
-                f"{leg}{front}_09_{knee}B_Jar" : [f"{leg}{front}_08_Jnt"],
-                f"{leg}{front}_09_{knee}B_0_Jcr" : [f"{leg}{front}_09_{knee}B_Jar"],
-                f"{leg}{front}_09_{knee}B_1_Jcr" : [f"{leg}{front}_09_{knee}B_Jar"],
-                f"{leg}{front}_09_{knee}B_2_Jcr" : [f"{leg}{front}_09_{knee}B_Jar"],
+                f"{leg}{front}_09_{knee}_Jar" : [f"{leg}{front}_09_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_09_{knee}_0_Jcr" : [f"{leg}{front}_09_{knee}_Jar", f"{leg}{front}_09_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_09_{knee}_1_Jcr" : [f"{leg}{front}_09_{knee}_Jar", f"{leg}{front}_09_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_09_{knee}_2_Jcr" : [f"{leg}{front}_09_{knee}_Jar", f"{leg}{front}_09_Jnt", f"{leg}{front}_08_Jnt"],
                 f"{leg}{front}_09_{ankle}_Jnt" : [f"{leg}{front}_08_Jnt"],
                 f"{leg}{front}_09_{ankle}_Jar" : [f"{leg}{front}_09_{ankle}_Jnt", f"{leg}{front}_08_Jnt"],
-                f"{leg}{front}_09_{ankle}_0_Jcr" : [f"{leg}{front}_09_{ankle}_Jar"],
-                f"{leg}{front}_09_{ankle}_1_Jcr" : [f"{leg}{front}_09_{ankle}_Jar"],
-                f"{leg}{front}_09_{ankle}_2_Jcr" : [f"{leg}{front}_09_{ankle}_Jar"],
-                f"{leg}{front}_09_{ankle}_3_Jcr" : [f"{leg}{front}_09_{ankle}_Jar"],
-                f"{leg}{front}_10_Jnt" : [f"{leg}{front}_09_{knee}_Jar", f"{leg}{front}_09_Jnt", f"{leg}{front}_09_{knee}B_Jar"],
+                f"{leg}{front}_09_{ankle}_0_Jcr" : [f"{leg}{front}_09_{ankle}_Jar", f"{leg}{front}_09_{ankle}_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_09_{ankle}_1_Jcr" : [f"{leg}{front}_09_{ankle}_Jar", f"{leg}{front}_09_{ankle}_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_09_{ankle}_2_Jcr" : [f"{leg}{front}_09_{ankle}_Jar", f"{leg}{front}_09_{ankle}_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_09_{ankle}_3_Jcr" : [f"{leg}{front}_09_{ankle}_Jar", f"{leg}{front}_09_{ankle}_Jnt", f"{leg}{front}_08_Jnt"],
+                f"{leg}{front}_10_Jnt" : [f"{leg}{front}_09_{knee}_Jar", f"{leg}{front}_09_Jnt"],
                 f"{leg}{front}_11_Jnt" : [f"{leg}{front}_10_Jnt"],
                 f"{leg}{front}_12_Jnt" : [f"{leg}{front}_11_Jnt"],
-                f"{leg}{front}_{knee}B_Jnt" : [f"{leg}{front}_07_{knee}_Jar", f"{leg}{front}_{knee}_Jnt"],
-                f"{leg}{front}_13_{knee}B_Jar" : [f"{leg}{front}_12_Jnt", f"{leg}{front}_{knee}B_Jnt"],
-                f"{leg}{front}_13_{knee}B_0_Jcr" : [f"{leg}{front}_13_{knee}B_Jar"],
-                f"{leg}{front}_13_{knee}B_1_Jcr" : [f"{leg}{front}_13_{knee}B_Jar"],
-                f"{leg}{front}_13_{knee}B_2_Jcr" : [f"{leg}{front}_13_{knee}B_Jar"],
                 f"{leg}{front}_13_{ankle}_Jnt" : [f"{leg}{front}_12_Jnt"],
-                f"{leg}{front}_13_{ankle}_Jar" : [f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{leg}{front}_{knee}_Jnt"],
-                f"{leg}{front}_13_{ankle}_0_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
-                f"{leg}{front}_13_{ankle}_1_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
-                f"{leg}{front}_13_{ankle}_2_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
-                f"{leg}{front}_13_{ankle}_3_Jcr" : [f"{leg}{front}_13_{ankle}_Jar"],
+                f"{leg}{front}_13_{ankle}_Jar" : [f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_13_{ankle}_0_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_13_{ankle}_1_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_13_{ankle}_2_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
+                f"{leg}{front}_13_{ankle}_3_Jcr" : [f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_12_Jnt", f"{foot}{front}_{ankle}_Jnt", f"{leg}{front}_{ankle}_Jnt", f"{leg}{front}_{knee}_Jnt"],
                 f"{leg}{front}_13_Jnt" : [f"{leg}{front}_12_Jnt"],
-                f"{leg}{front}_14_Jnt" : [f"{leg}{front}_13_Jnt", f"{leg}{front}_13_{knee}B_Jar"],
+                f"{leg}{front}_14_Jnt" : [f"{leg}{front}_13_Jnt"],
                 f"{leg}{front}_15_Jnt" : [f"{leg}{front}_14_Jnt"],
                 f"{leg}{front}_16_Jnt" : [f"{leg}{front}_15_Jnt"],
-                f"{leg}{front}_17_{knee}B_Jar" : [f"{leg}{front}_16_Jnt"],
-                f"{leg}{front}_17_{knee}B_0_Jcr" : [f"{leg}{front}_17_{knee}B_Jar"],
-                f"{leg}{front}_17_{knee}B_1_Jcr" : [f"{leg}{front}_17_{knee}B_Jar"],
-                f"{leg}{front}_17_{knee}B_2_Jcr" : [f"{leg}{front}_17_{knee}B_Jar"],
                 f"{leg}{front}_17_{ankle}_Jnt" : [f"{leg}{front}_16_Jnt"],
                 f"{leg}{front}_17_{ankle}_Jar" : [f"{leg}{front}_17_{ankle}_Jnt", f"{leg}{front}_16_Jnt"],
-                f"{leg}{front}_17_{ankle}_0_Jcr" : [f"{leg}{front}_17_{ankle}_Jar"],
-                f"{leg}{front}_17_{ankle}_1_Jcr" : [f"{leg}{front}_17_{ankle}_Jar"],
-                f"{leg}{front}_17_{ankle}_2_Jcr" : [f"{leg}{front}_17_{ankle}_Jar"],
-                f"{leg}{front}_17_{ankle}_3_Jcr" : [f"{leg}{front}_17_{ankle}_Jar"],
-                f"{leg}{front}_17_Jnt" : [f"{leg}{front}_16_Jnt"],
-                f"{leg}{front}_18_Jnt" : [f"{leg}{front}_17_Jnt", f"{leg}{front}_17_{knee}B_Jar"],
-                f"{leg}{front}_19_Jnt" : [f"{leg}{front}_18_Jnt"],
-                f"{leg}{front}_19_{ankle}_Jnt" : [f"{leg}{front}_18_Jnt"],
-                f"{leg}{front}_19_{ankle}_Jar" : [f"{leg}{front}_19_{ankle}_Jnt", f"{leg}{front}_18_Jnt", f"{leg}{front}_13_{knee}_Jar", f"{leg}{front}_{knee}B_Jnt"],
-                f"{leg}{front}_19_{ankle}_0_Jcr" : [f"{leg}{front}_19_{ankle}_Jar"],
-                f"{leg}{front}_19_{ankle}_1_Jcr" : [f"{leg}{front}_19_{ankle}_Jar"],
-                f"{leg}{front}_19_{ankle}_2_Jcr" : [f"{leg}{front}_19_{ankle}_Jar"],
-                f"{leg}{front}_19_{ankle}_3_Jcr" : [f"{leg}{front}_19_{ankle}_Jar"],
-                f"{leg}{front}_20_Jnt" : [f"{leg}{front}_19_Jnt"],
-                f"{leg}{front}_21_Jnt" : [f"{leg}{front}_20_Jnt"],
-                f"{leg}{front}_22_Jnt" : [f"{leg}{front}_21_Jnt"],
-                f"{leg}{front}_23_Jnt" : [f"{leg}{front}_22_Jnt"],
-                f"{leg}{front}_24_Jnt" : [f"{leg}{front}_23_Jnt"],
-                f"{leg}{front}_25_{ankle}_Jnt" : [f"{leg}{front}_24_Jnt"],
-                f"{leg}{front}_25_{ankle}_Jar" : [f"{leg}{front}_25_{ankle}_Jnt", f"{leg}{front}_24_Jnt"],
-                f"{leg}{front}_25_{ankle}_0_Jcr" : [f"{leg}{front}_25_{ankle}_Jar"],
-                f"{leg}{front}_25_{ankle}_1_Jcr" : [f"{leg}{front}_25_{ankle}_Jar"],
-                f"{leg}{front}_25_{ankle}_2_Jcr" : [f"{leg}{front}_25_{ankle}_Jar"],
-                f"{leg}{front}_25_{ankle}_3_Jcr" : [f"{leg}{front}_25_{ankle}_Jar"],
+                f"{leg}{front}_17_{ankle}_0_Jcr" : [f"{leg}{front}_17_{ankle}_Jar", f"{leg}{front}_17_{ankle}_Jnt", f"{leg}{front}_16_Jnt"],
+                f"{leg}{front}_17_{ankle}_1_Jcr" : [f"{leg}{front}_17_{ankle}_Jar", f"{leg}{front}_17_{ankle}_Jnt", f"{leg}{front}_16_Jnt"],
+                f"{leg}{front}_17_{ankle}_2_Jcr" : [f"{leg}{front}_17_{ankle}_Jar", f"{leg}{front}_17_{ankle}_Jnt", f"{leg}{front}_16_Jnt"],
+                f"{leg}{front}_17_{ankle}_3_Jcr" : [f"{leg}{front}_17_{ankle}_Jar", f"{leg}{front}_17_{ankle}_Jnt", f"{leg}{front}_16_Jnt"],
                 # foot
                 f"{foot}{front}_{ankle}_Jnt" : [f"{leg}{front}_25_{ankle}_Jar", f"{leg}{front}_19_{ankle}_Jar", f"{leg}{front}_17_{ankle}_Jar", f"{leg}{front}_13_{ankle}_Jar", f"{leg}{front}_09_{ankle}_Jar", f"{leg}{front}_25_{ankle}_Jnt", f"{leg}{front}_19_{ankle}_Jnt", f"{leg}{front}_17_{ankle}_Jnt", f"{leg}{front}_13_{ankle}_Jnt", f"{leg}{front}_09_{ankle}_Jnt", f"{leg}{front}_{knee}_Jar", f"{leg}{front}_{knee}_Jnt", f"{leg}{front}_09_Jnt", f"{leg}{front}_13_Jnt", f"{leg}{front}_19_Jnt"],
                 f"{foot}{front}_{middle}_Jnt" : [f"{foot}{front}_{ankle}_Jar", f"{foot}{front}_{ankle}_Jnt"],
@@ -1164,11 +1071,26 @@ class OneSkeleton(base.BaseLibrary):
                 f"{tweaks}_{lower}_{lip}_00_Jnt" : [""],
                 f"{tweaks}_{lower}_{lip}_01_Jnt" : [""],
                 f"{tweaks}_{lower}_{lip}_02_Jnt" : [""],
+                # tooth
+                f"{upper_tooth}_1_00_Jnt" : [""],
+                f"{upper_tooth}_2_00_Jnt" : [""],
+                f"{upper_tooth}_3_00_Jnt" : [""],
+                f"{upper_tooth}_4_00_Jnt" : [""],
+                f"{upper_tooth}_5_00_Jnt" : [""],
+                f"{upper_tooth}_6_00_Jnt" : [""],
+                f"{upper_tooth}_7_00_Jnt" : [""],
+                f"{lower_tooth}_1_00_Jnt" : [""],
+                f"{lower_tooth}_2_00_Jnt" : [""],
+                f"{lower_tooth}_3_00_Jnt" : [""],
+                f"{lower_tooth}_4_00_Jnt" : [""],
+                f"{lower_tooth}_5_00_Jnt" : [""],
+                f"{lower_tooth}_6_00_Jnt" : [""],
+                f"{lower_tooth}_7_00_Jnt" : [""],
         }
         return data
 
 
-    def get_integration_data(self, *args):
+    def get_integration_data(self):
         # getting default names
         middle = self.ar.data.lang['m033_middle']
 
@@ -1187,11 +1109,14 @@ class OneSkeleton(base.BaseLibrary):
         head = self.ar.data.lang['c024_head']
         upper = self.ar.data.lang['c044_upper']
         jaw = self.ar.data.lang['c025_jaw']
+        chin = self.ar.data.lang['c026_chin']
         
         upper_teeth = self.ar.data.lang['m075_upperTeeth']
         lower_teeth = self.ar.data.lang['m076_lowerTeeth']
         ear = self.ar.data.lang['m040_ear']
         eye = self.ar.data.lang['c036_eye']
+        upper_tooth = self.ar.data.lang['c044_upper']+self.ar.data.lang['m267_tooth']
+        lower_tooth = self.ar.data.lang['c045_lower']+self.ar.data.lang['m267_tooth']
 
         tweaks = self.ar.data.lang['m081_tweaks']
         eyebrow = self.ar.data.lang['c041_eyebrow']
@@ -1234,5 +1159,64 @@ class OneSkeleton(base.BaseLibrary):
                 f"{tweaks}_{lower}_{lip}_00_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
                 f"{tweaks}_{lower}_{lip}_01_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
                 f"{tweaks}_{lower}_{lip}_02_Jnt" : [f"{tweaks}_{lip}_{main}_Jnt"],
+                # tooth
+                f"{upper_tooth}_1_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_2_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_3_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_4_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_5_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_6_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{upper_tooth}_7_00_Jnt" : [f"{head}_{upper}{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_1_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_2_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_3_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_4_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_5_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_6_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
+                f"{lower_tooth}_7_00_Jnt" : [f"{head}_{chin}_Jnt", f"{head}_{jaw}_Jnt", f"{head}_01_{head}_Jnt"],
         }
         return data
+
+
+    def set_exceptions(self, joints):
+        head = self.ar.data.lang['c024_head']
+        upper = self.ar.data.lang['c044_upper']
+        jaw = self.ar.data.lang['c025_jaw']
+        tweaks = self.ar.data.lang['m081_tweaks']
+        hips = self.ar.data.lang['c027_hips']
+        chest = self.ar.data.lang['c028_chest']
+        spine = self.ar.data.lang['m011_spine']
+        base = self.ar.data.lang['c106_base']
+        tip = self.ar.data.lang['c120_tip']
+
+        removed_joints = []
+        for jnt in joints:
+            if f"{hips}" in jnt:
+                if cmds.objExists(f"{self.prefix}{spine}_00_{base}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{spine}_00_{base}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+                elif cmds.objExists(f"{self.prefix}{spine}_00_{hips}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{spine}_00_{hips}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+            elif f"{chest}" in jnt:
+                if cmds.objExists(f"{self.prefix}{spine}_04_{tip}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{spine}_04_{tip}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+                elif cmds.objExists(f"{self.prefix}{spine}_04_{chest}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{spine}_04_{chest}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+            elif f"{upper}{head}" in jnt:
+                if cmds.objExists(f"{self.prefix}{head}_{upper}{head}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{head}_{upper}{head}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+            elif f"{upper}{jaw}" in jnt:
+                if cmds.objExists(f"{self.prefix}{head}_{upper}{jaw}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{head}_{upper}{jaw}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+            elif f"{tweaks}" in jnt:
+                if cmds.objExists(f"{self.prefix}{head}_01_{head}_Jnt{self.suffix}"):
+                    cmds.parent(jnt, f"{self.prefix}{head}_01_{head}_Jnt{self.suffix}")
+                    removed_joints.append(jnt)
+        if removed_joints:
+            joints = list(set(joints)-set(removed_joints))
+        return joints
