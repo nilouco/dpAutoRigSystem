@@ -1906,7 +1906,7 @@ class Limb(standard.BaseStandard):
                     cmds.orientConstraint(soft_ik_orient_loc, ik_stretch_extreme_loc_zero, maintainOffset=False, name=ik_stretch_extreme_loc_zero+"_OrC")
                 
                 # ikFkSnap
-                ik_fk_snap.IkFkSnap(self.ar, side+self.number_name, world_ref, fk_ctrls, [ik_corner_ctrl, ik_extreme_ctrl, ik_extreme_sub_ctrl], ik_joints, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], dpDev=self.ar.dev)
+                ik_fk_snap.IkFkSnap(self.ar, side+self.number_name, world_ref, fk_ctrls, [ik_corner_ctrl, ik_extreme_ctrl, ik_extreme_sub_ctrl], ik_joints, [self.ar.data.lang['c018_revFoot_roll'], self.ar.data.lang['c019_revFoot_spin'], self.ar.data.lang['c020_revFoot_turn']], self.ar.data.lang['c040_uniformScale'], dp_dev=self.ar.dev)
                 
                 # calibration attribute:
                 if self.limb_types == self.arm_name:
