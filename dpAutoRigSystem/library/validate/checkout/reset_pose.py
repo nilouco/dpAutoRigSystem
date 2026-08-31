@@ -53,7 +53,7 @@ class ResetPose(action.BaseAction):
             if inputs:
                 check_items = inputs
             else:
-                check_items = self.ar.ctrls.getControlList()
+                check_items = self.ar.ctrls.get_controllers()
             if check_items:
                 self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:

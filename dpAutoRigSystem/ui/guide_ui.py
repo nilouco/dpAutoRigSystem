@@ -466,13 +466,13 @@ class GuideUI(object):
             cmds.text(f"{standard.number_name}_plus_header_guide_txt", label=guide_name, align='left', parent=f"{standard.number_name}_plus_header_rcl")
             cmds.text(f"{standard.number_name}_plus_header_custom_txt", label=custom_name, align='left', font='boldLabelFont', parent=f"{standard.number_name}_plus_header_rcl")
             cmds.separator(style='none', height=10, parent='plus_sl')
-            cmds.checkBox(f"{standard.number_name}_plus_annotation_cb", label=self.ar.data.lang['m014_annotation'], annotation=self.ar.data.lang['m014_annotation'], value=cmds.getAttr(standard.guide_base+'.displayAnnotation'), onCommand=partial(standard.displayAnnotation, 1), offCommand=partial(standard.displayAnnotation, 0), parent='plus_sl')
+            cmds.checkBox(f"{standard.number_name}_plus_annotation_cb", label=self.ar.data.lang['m014_annotation'], annotation=self.ar.data.lang['m014_annotation'], value=cmds.getAttr(standard.guide_base+'.displayAnnotation'), onCommand=partial(standard.display_annotation, 1), offCommand=partial(standard.display_annotation, 0), parent='plus_sl')
             cmds.separator(style='none', height=5, parent='plus_sl')
             cmds.floatSliderGrp(f"{standard.number_name}_plus_radius_size_fsg", label=self.ar.data.lang['c067_radius'].capitalize(), field=True, width=width_size, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(standard.radius_ctrl+".translateX"), changeCommand=standard.change_radius_size, dragCommand=standard.change_radius_size, columnWidth=[(1, 55), (2, 60), (3, 30)], parent='plus_sl')
             cmds.separator(style='none', height=5, parent='plus_sl')
             cmds.floatSliderGrp(f"{standard.number_name}_plus_shape_size_fsg", label=self.ar.data.lang['m067_shape']+" "+self.ar.data.lang['i115_size'], width=width_size, field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(standard.guide_base+'.shapeSize'), changeCommand=partial(standard.set_guide_attr, 'shapeSize'), dragCommand=partial(standard.set_guide_attr, 'shapeSize'), columnWidth=[(1, 55), (2, 60), (3, 30)], parent='plus_sl')
             cmds.separator(style='none', height=10, parent='plus_sl')
-            cmds.button(f"{standard.number_name}_plus_color_bt", label=self.ar.data.lang['m013_color'], annotation=self.ar.data.lang['m013_color'], width=width_size, align="center", command=partial(self.ar.ctrls.colorizeUI, standard), backgroundColor=self.ar.ctrls.getGuideRGBColorList(standard), parent='plus_sl')
+            cmds.button(f"{standard.number_name}_plus_color_bt", label=self.ar.data.lang['m013_color'], annotation=self.ar.data.lang['m013_color'], width=width_size, align="center", command=partial(self.colorizeUI, standard), backgroundColor=self.ar.ctrls.get_guide_rgb_colors(standard), parent='plus_sl')
             cmds.separator(style='none', height=5, parent='plus_sl')
             cmds.separator(style='in', height=10, width=width_size, parent='plus_sl')
         # call Info Window:
@@ -516,7 +516,7 @@ class GuideUI(object):
             for m, instance in enumerate(self.ar.data.guide_instances):
                 if cmds.objExists(instance.guide_base):
                     if cmds.button(f"{instance.number_name}_select_bt", query=True, exists=True):
-                        current_colors = self.ar.ctrls.getGuideRGBColorList(instance)
+                        current_colors = self.ar.ctrls.get_guide_rgb_colors(instance)
                         if current_colors:
                             cmds.button(f"{instance.number_name}_select_bt", edit=True, label=" ", backgroundColor=current_colors)
                         if selected_guides:
@@ -560,3 +560,35 @@ class GuideUI(object):
         cmds.text('edit_guide_deformer_txt', edit=True, enable=value)
         if not value:
             cmds.checkBox('edit_guide_deformer_cb', edit=True, value=False)
+
+
+    def colorizeUI(self, standard, *args):
+        """ Show a little window to choose the color of the button and the override the guide.
+            From the old dpColorOverride extra tool. Thanks!
+        """
+        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
+        # creating colorOverride Window:
+        width  = 170
+        height = 115
+        cmds.window(self.ar.data.color_override_win_name, title=self.ar.data.lang['m047_colorOver'], iconName='dpColorOverride', widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        # creating layout:
+        cmds.tabLayout('colorize_tl', innerMarginWidth=5, innerMarginHeight=5, parent=self.ar.data.color_override_win_name)
+        # Index layout:
+        cmds.gridLayout('colorize_gl', numberOfColumns=8, cellWidthHeight=(20,20), parent='colorize_tl')
+        # creating buttons
+        for color_index, color_values in enumerate(self.ar.ctrls.colors):
+            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.color_shape, [standard.guide_base], color_index, instance=standard), parent='colorize_gl')
+        # RGB layout:
+        cmds.columnLayout('colorize_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='colorize_tl')
+        cmds.separator(height=10, style='none', parent='colorize_rgb_cl')
+        cmds.colorSliderGrp('colorize_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=self.ar.ctrls.get_current_rgb_color(standard.guide_base), changeCommand=partial(self.ar.ctrls.set_color_rgb_by_ui, [standard.guide_base], 'colorRGBSlider', standard), parent='colorize_rgb_cl')
+        cmds.button('colorize_remove_rgb_btn', label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='colorize_rgb_cl')
+        # Outliner layout:
+        cmds.columnLayout('colorize_outliner_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='colorize_tl')
+        cmds.separator(height=10, style='none', parent='colorize_outliner_cl')
+        cmds.colorSliderGrp('colorize_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=self.ar.ctrls.get_current_rgb_color(standard.guide_base, True), changeCommand=partial(self.ar.ctrls.set_color_outliner_by_ui, [standard.guide_base], 'colorOutlinerSlider'), parent='colorize_outliner_cl')
+        cmds.button('colorize_remove_outliner_btn', label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='colorize_outliner_cl')
+        # renaming tabLayouts:
+        cmds.tabLayout('colorize_tl', edit=True, tabLabel=(('colorize_gl', "Index"), ('colorize_rgb_cl', "RGB"), ('colorize_outliner_cl', "Outliner")))
+        # call colorIndex Window:
+        cmds.showWindow(self.ar.data.color_override_win_name)

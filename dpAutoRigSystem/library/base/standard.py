@@ -80,11 +80,11 @@ class BaseStandard(base.BaseLibrary):
         """
         self.ar.opt.check_use_default_render_layer()
         # create guide base (main guide node):
-        self.guide_base, self.radius_ctrl = self.ar.ctrls.cvBaseGuide(self.guide_base, r=2)
+        self.guide_base, self.radius_ctrl = self.ar.ctrls.create_guide_base_loc(self.guide_base, r=2)
         self.add_guide_base_attr()
         self.create_guide_annotation()
         # setup worldSize
-        self.ar.ctrls.getDPARTempGrp()
+        self.ar.ctrls.get_dpar_temp_grp()
         self.create_world_size()
         # prepare guide to serialization
         self.create_guide_network()
@@ -288,7 +288,7 @@ class BaseStandard(base.BaseLibrary):
                         s = s_default
                     # add joint label, create controller, zeroOut
                     self.ar.utils.setJointLabel(jcr, s+self.joint_label_add, 18, label_name+"_"+str(m))
-                    jcr_ctrl, jcr_grp = self.ar.ctrls.createCorrectiveJointCtrl(corrective_joints[i], corrective_nets[i], radius=self.radius*0.2)
+                    jcr_ctrl, jcr_grp = self.ar.ctrls.create_corrective_joint_ctrl(corrective_joints[i], corrective_nets[i], radius=self.radius*0.2)
                     cmds.parent(jcr_grp, self.corrective_ctrls_grp)
                     # preset calibration
                     for calibrate_attr in calibrate_presets[i].keys():
@@ -367,9 +367,9 @@ class BaseStandard(base.BaseLibrary):
                 current_ctrl_zero = cmds.listRelatives(current_ctrl, parent=True)[0]
                 if n == start:
                     # create a main controller
-                    main_ctrl = self.ar.ctrls.cvControl("id_096_FkLineMain", side+self.number_name+"_%02d_Main_Fk_Ctrl"%(n), r=self.radius*1.2, d=self.curve_degree, guideSource=self.name_guide+"_Base", parentTag=self.get_parent_to_tag(main_ctrls))
+                    main_ctrl = self.ar.ctrls.create_controller("id_096_FkLineMain", side+self.number_name+"_%02d_Main_Fk_Ctrl"%(n), r=self.radius*1.2, d=self.curve_degree, guide_source=self.name_guide+"_Base", parent_tag=self.get_parent_to_tag(main_ctrls))
                     main_ctrls.append(main_ctrl)
-                    self.ar.ctrls.colorShape([main_ctrl], "cyan")
+                    self.ar.ctrls.color_shape([main_ctrl], "cyan")
                     cmds.addAttr(main_ctrl, longName=self.ar.data.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     # position
                     cmds.parent(main_ctrl, current_ctrl_zero)
@@ -390,7 +390,7 @@ class BaseStandard(base.BaseLibrary):
                     for axis in self.ar.data.axes:
                         cmds.connectAttr(r_intensity_md+".output"+axis, offset_grp+".rotate"+axis, force=True)
                 # display sub controllers shapes
-                self.ar.ctrls.setSubControlDisplay(main_ctrl, current_ctrl, 0)
+                self.ar.ctrls.set_sub_ctrl_display(main_ctrl, current_ctrl, 0)
     
 
     def get_mirror_sides(self):
@@ -622,8 +622,8 @@ class BaseStandard(base.BaseLibrary):
                 attr_data["FatherNode"] = fathers[0]
                 if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1:
                     if not "__" in fathers[0]: #not a rawGuide
-                        if "guideSource" in cmds.listAttr(fathers[0]):
-                            attr_data["FatherNode"] = cmds.getAttr(fathers[0]+".guideSource")
+                        if "guide_source" in cmds.listAttr(fathers[0]):
+                            attr_data["FatherNode"] = cmds.getAttr(fathers[0]+".guide_source")
                     cmds.parent(node, world=True) #to export guide base transformation in worldSpace
             else:
                 attr_data["FatherNode"] = None

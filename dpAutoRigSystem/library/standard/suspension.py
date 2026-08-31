@@ -34,8 +34,8 @@ class Suspension(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_a_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
-        self.guide_b_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
+        self.guide_a_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLocA", r=0.3, d=1, guide=True)
+        self.guide_b_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLocB", r=0.3, d=1, guide=True)
         # joints
         self.line_a = cmds.joint(name=self.name_guide+"_line_a", radius=0.001)
         self.line_b = cmds.joint(name=self.name_guide+"_line_b", radius=0.001)
@@ -52,7 +52,7 @@ class Suspension(standard.BaseStandard):
         cmds.scaleConstraint(self.guide_a_loc, self.line_a, maintainOffset=False, name=self.line_a+"_ScC")
         cmds.scaleConstraint(self.guide_b_loc, self.line_b, maintainOffset=False, name=self.line_b+"_ScC")
         cmds.transformLimits(self.guide_b_loc, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.guide_b_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.set_lock_hide([self.guide_b_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
     
     def load_father_b(self, *args):
@@ -94,11 +94,11 @@ class Suspension(standard.BaseStandard):
                     self.joints.append(jnt)
                     
                     # create a control:
-                    main_ctrl = self.ar.ctrls.cvControl("id_055_SuspensionMain", side+self.number_name+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter)
-                    ctrl = self.ar.ctrls.cvControl("id_056_SuspensionAB", side+self.number_name+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=main_ctrl)
-                    upLocCtrl = self.ar.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.number_name+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+letter, parentTag=ctrl)
-                    self.ar.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
-                    self.ar.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+                    main_ctrl = self.ar.ctrls.create_controller("id_055_SuspensionMain", side+self.number_name+"_"+self.ar.data.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter)
+                    ctrl = self.ar.ctrls.create_controller("id_056_SuspensionAB", side+self.number_name+"_"+letter+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter, parent_tag=main_ctrl)
+                    upLocCtrl = self.ar.ctrls.create_controller("id_057_SuspensionUpLoc", side+self.number_name+"_"+letter+"_UpLoc_Ctrl", r=self.radius*0.1, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+letter, parent_tag=ctrl)
+                    self.ar.ctrls.set_lock_hide([ctrl], ['tx', 'ty', 'tz', 'v'])
+                    self.ar.ctrls.set_lock_hide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:
                     cmds.parent(ctrl, upLocCtrl, main_ctrl)
                     cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")

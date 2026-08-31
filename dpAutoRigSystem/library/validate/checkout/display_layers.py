@@ -37,7 +37,7 @@ class DisplayLayers(action.BaseAction):
             else:
                 # List all controls
                 ctrlsGeometryList = None
-                self.allCtrlsList = self.ar.ctrls.getControlList()
+                self.allCtrlsList = self.ar.ctrls.get_controllers()
                 if self.allCtrlsList:
                     allGeoList = self.getGeometryTranform()
                     ctrlsGeometryList = self.allCtrlsList

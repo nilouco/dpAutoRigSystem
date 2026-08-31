@@ -84,7 +84,7 @@ class RemapvalueToSetrange(action.BaseAction):
                                 setRangeNode = cmds.createNode("setRange", name=remapValueNode.replace("_RmV", "_SR"))
                                 # Transfer values or connections
                                 for remapAttr, setRangeAttr in self.mappingDic.items():
-                                    self.ar.ctrls.transferPlug(f"{remapValueNode}.{remapAttr}", f"{setRangeNode}.{setRangeAttr}")
+                                    self.ar.ctrls.transfer_plug(f"{remapValueNode}.{remapAttr}", f"{setRangeNode}.{setRangeAttr}")
                                 #clear Interpolation_PMA node
                                 indexes = cmds.getAttr(f"{remapValueNode}.value", multiIndices=True)
                                 for index in indexes:

@@ -195,7 +195,7 @@ class BrokenRivet(action.BaseAction):
         fn_mesh = OpenMaya.MFnMesh(dag_path)
 
         # Get the two vertex indices that form the edge
-        edge_vertices = fn_mesh.getEdgeVertices(edge_index)
+        edge_vertices = fn_mesh.get_edge_vertices(edge_index)
 
         # Get vertex positions in world space
         pt1 = fn_mesh.getPoint(edge_vertices[0], OpenMaya.MSpace.kWorld)

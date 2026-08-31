@@ -38,10 +38,10 @@ class Finger(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_base_joint_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointLoc0", r=0.2, d=1, guide=True)
-        self.guide_joint_1_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc2", r=0.25, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.2, d=1, guide=True)
+        self.guide_base_joint_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointLoc0", r=0.2, d=1, guide=True)
+        self.guide_joint_1_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc2", r=0.25, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.2, d=1, guide=True)
         # joints
         self.line1 = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.line0 = cmds.joint(name=self.name_guide+"_JGuide0", radius=0.001)
@@ -63,10 +63,10 @@ class Finger(standard.BaseStandard):
         # edit
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         cmds.parentConstraint(self.guide_base_joint_loc, self.line0, maintainOffset=False, name=self.line0+"_PaC")
-        self.ar.ctrls.directConnect(self.guide_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_joint_1_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.setLockHide([self.guide_end_loc], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.direct_connect(self.guide_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_joint_1_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
     def set_guide_base_initial_position(self):
@@ -89,11 +89,11 @@ class Finger(standard.BaseStandard):
                 cmds.parent(self.guide_end_loc, self.line_end, world=True)
                 if joint_number > self.current_joint_number:
                     for n in range(self.current_joint_number+1, joint_number+1):
-                        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.2, d=1, guide=True)
+                        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.2, d=1, guide=True)
                         self.increment_joint_number(n)
                         cmds.setAttr(self.guide_loc+".translateZ", 1)
                         cmds.setAttr(self.guide_loc+".rotateY", -1)
-                        self.ar.ctrls.directConnect(self.guide_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+                        self.ar.ctrls.direct_connect(self.guide_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
                         self.add_node_to_guide_net([self.guide_loc], ["JointLoc"+str(n)])
                 elif joint_number < self.current_joint_number:
                     self.line = self.name_guide+"_JGuide"+str(joint_number)
@@ -150,7 +150,7 @@ class Finger(standard.BaseStandard):
                     self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     # create a control:
                     if n == 1:
-                        finger_ctrl = self.ar.ctrls.cvControl("id_015_FingerMain", ctrl_name=side+self.number_name+"_%02d_Ctrl"%(n), r=(self.radius * 2.0), d=self.curve_degree, rot=(0, 0, -90), guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.controllers[0])
+                        finger_ctrl = self.ar.ctrls.create_controller("id_015_FingerMain", ctrl_name=side+self.number_name+"_%02d_Ctrl"%(n), r=(self.radius * 2.0), d=self.curve_degree, rot=(0, 0, -90), guide_source=self.name_guide+"_JointLoc"+str(n), parent_tag=self.controllers[0])
                         cmds.setAttr(finger_ctrl+".rotateOrder", 1)
                         self.ar.utils.originedFrom(objName=finger_ctrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
@@ -187,7 +187,7 @@ class Finger(standard.BaseStandard):
                             cmds.connectAttr(scale_compensate_cnd+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
                             cmds.connectAttr(scale_compensate_cnd+".outColorR", skin_joints[0]+".segmentScaleCompensate", force=True)
                     else:
-                        finger_ctrl = self.ar.ctrls.cvControl("id_016_FingerFk", ctrl_name=side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc"+str(n), parentTag=self.get_parent_to_tag(self.controllers))
+                        finger_ctrl = self.ar.ctrls.create_controller("id_016_FingerFk", ctrl_name=side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc"+str(n), parent_tag=self.get_parent_to_tag(self.controllers))
                         cmds.setAttr(finger_ctrl+".rotateOrder", 1)
                         if n == self.n_joints:
                             self.ar.utils.originedFrom(objName=finger_ctrl, attrString=self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
@@ -349,7 +349,7 @@ class Finger(standard.BaseStandard):
                     cmds.rename(ik_handles[1], side+self.number_name+"_Eff")
                     end_ik_handles = cmds.ikHandle(startJoint=side+self.number_name+"_%02d_Ik_Jxt"%(self.n_joints), endEffector=side+self.number_name+"_Ik_"+self.ar.data.joint_end_attr, solver="ikSCsolver", name=side+self.number_name+"_EndIkHandle")
                     cmds.rename(end_ik_handles[1], side+self.number_name+"_End_Eff")
-                    ik_ctrl = self.ar.ctrls.cvControl("id_017_FingerIk", ctrl_name=side+self.number_name+"_Ik_Ctrl", r=(self.radius * 0.3), d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=self.controllers[1])
+                    ik_ctrl = self.ar.ctrls.create_controller("id_017_FingerIk", ctrl_name=side+self.number_name+"_Ik_Ctrl", r=(self.radius * 0.3), d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=self.controllers[1])
                     cmds.addAttr(ik_ctrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(ik_ctrl+".twist", ik_handles[0]+".twist", force=True)
                     cmds.setAttr(ik_ctrl+".rotateOrder", 1)
@@ -364,7 +364,7 @@ class Finger(standard.BaseStandard):
                     cmds.parentConstraint(ik_ctrl, end_ik_handles[0], name=side+self.number_name+"_EndIkHandle_PaC", maintainOffset=True)
                     ik_handle_grp = cmds.group(ik_handles[0], end_ik_handles[0], name=side+self.number_name+"_IKH_Grp")
                     cmds.setAttr(ik_handle_grp+".visibility", 0)
-                    self.ar.ctrls.setLockHide([ik_ctrl], ['sx', 'sy', 'sz', 'v'])
+                    self.ar.ctrls.set_lock_hide([ik_ctrl], ['sx', 'sy', 'sz', 'v'])
 
                     if self.n_joints == 2:
                         cmds.parentConstraint(side+self.number_name+"_00_Ctrl", side+self.number_name+"_00_Ik_Jxt", maintainOffset=True, name=side+self.number_name+"_00_Ik_Jxt_PaC")

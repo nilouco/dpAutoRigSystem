@@ -83,7 +83,7 @@ class OneSkeleton(base.BaseLibrary):
                         self.scale_connect(unique_inf_items)
                 cmds.select(root)
             self.re_set_scale(unique_inf_items)
-            self.ar.ctrls.setControllerScaleCompensate(False)
+            self.ar.ctrls.set_controller_scale_compensate(False)
             self.ar.utils.setProgress(endIt=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
@@ -207,7 +207,7 @@ class OneSkeleton(base.BaseLibrary):
         cmds.joint(name=root, scaleCompensate=False)
         cmds.addAttr(root, longName="dpRootJoint", attributeType="bool", defaultValue=1)
         cmds.setAttr(root+".visibility", 0)
-        self.ar.ctrls.setLockHide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
+        self.ar.ctrls.set_lock_hide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
         try:
             cmds.parent(root, self.ar.utils.getAllGrp())
         except:

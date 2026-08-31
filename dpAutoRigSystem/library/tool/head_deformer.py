@@ -170,10 +170,10 @@ class HeadDeformer(base.BaseLibrary):
                     cmds.setAttr(def_handle+".scale"+axis, 1)
             
             # arrow control curve
-            arrow_ctrl = self.ar.ctrls.cvControl("id_053_HeadDeformer", deformer_name+"_Ctrl", 0.25*bbox_size, d=0)
+            arrow_ctrl = self.ar.ctrls.create_controller("id_053_HeadDeformer", deformer_name+"_Ctrl", 0.25*bbox_size, d=0)
 
             # main control curve and shape
-            main_ctrl = self.ar.ctrls.cvControl("id_097_HeadDeformerMain", main_ctrl_name+"_Ctrl", 0.57*bbox_size, d=0, parentTag=arrow_ctrl)
+            main_ctrl = self.ar.ctrls.create_controller("id_097_HeadDeformerMain", main_ctrl_name+"_Ctrl", 0.57*bbox_size, d=0, parent_tag=arrow_ctrl)
             main_ctrl_shape = cmds.listRelatives(main_ctrl, shapes=True)[0]
             
             # add control intensity and calibrate attributes
@@ -235,7 +235,7 @@ class HeadDeformer(base.BaseLibrary):
                     if cmds.objectType(unit_conv_node) == "unitConversion":
                         cmds.setAttr(unit_conv_node+".conversionFactor", 1)
             cmds.connectAttr(arrow_ctrl+"."+self.ar.data.lang["c021_showControls"], main_ctrl_shape+".visibility")
-            self.ar.ctrls.setLockHide([arrow_ctrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+            self.ar.ctrls.set_lock_hide([arrow_ctrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             
             # create symmetry setup
             center_cluster_items = cmds.cluster(lattice_def_items[1]+".pt[0:5][2:3][0:5]", relative=True, name=center_symmetry_name+"_Cls") #[Cluster, Handle]
@@ -246,8 +246,8 @@ class HeadDeformer(base.BaseLibrary):
             # arrange lattice deform points percent
             cmds.percent(top_cluster_items[0], [lattice_def_items[1]+".pt[0:5][2][0]", lattice_def_items[1]+".pt[0:5][2][1]", lattice_def_items[1]+".pt[0:5][2][2]", lattice_def_items[1]+".pt[0:5][2][3]", lattice_def_items[1]+".pt[0:5][2][4]", lattice_def_items[1]+".pt[0:5][2][5]"], value=0.5)
             # symmetry controls
-            center_symmetry_ctrl = self.ar.ctrls.cvControl("id_068_Symmetry", center_symmetry_name+"_Ctrl", bbox_size, d=0, rot=(-90, 0, 90), parentTag=arrow_ctrl)
-            top_symmetry_ctrl = self.ar.ctrls.cvControl("id_068_Symmetry", top_symmetry_name+"_Ctrl", bbox_size, d=0, rot=(0, 90, 0), parentTag=arrow_ctrl)
+            center_symmetry_ctrl = self.ar.ctrls.create_controller("id_068_Symmetry", center_symmetry_name+"_Ctrl", bbox_size, d=0, rot=(-90, 0, 90), parent_tag=arrow_ctrl)
+            top_symmetry_ctrl = self.ar.ctrls.create_controller("id_068_Symmetry", top_symmetry_name+"_Ctrl", bbox_size, d=0, rot=(0, 90, 0), parent_tag=arrow_ctrl)
             symmetry_ctrl_zeros = self.ar.utils.zeroOut([center_symmetry_ctrl, top_symmetry_ctrl])
             for axis in self.ar.data.axes:
                 cmds.connectAttr(center_symmetry_ctrl+".translate"+axis, center_cluster_items[1]+".translate"+axis, force=True)
@@ -267,7 +267,7 @@ class HeadDeformer(base.BaseLibrary):
                 self.to_ids.extend(sub_cluster_items)
                 cmds.parent(self.ar.utils.zeroOut([sub_cluster_items[1]])[0], cluter_grp)
                 # create control and match zeroOutGrp
-                sub_ctrl = self.ar.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bbox_size, d=0, rot=(90, 0, 0), parentTag=arrow_ctrl)
+                sub_ctrl = self.ar.ctrls.create_controller("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bbox_size, d=0, rot=(90, 0, 0), parent_tag=arrow_ctrl)
                 sub_ctrls.append(sub_ctrl)
                 ctrl_sub_zeros = self.ar.utils.zeroOut([sub_ctrl])[0]
                 sub_ctrl_grps.append(ctrl_sub_zeros)
@@ -308,8 +308,8 @@ class HeadDeformer(base.BaseLibrary):
 
             # workaround to add the deformer attribute on the remaining maincontrols from head and jaw control         
             ctrls_children = []
-            head_sub_ctrl = self.ar.ctrls.getControlNodeById("id_093_HeadSub")
-            jaw_ctrl = self.ar.ctrls.getControlNodeById("id_024_HeadJaw")
+            head_sub_ctrl = self.ar.ctrls.get_controller_node_by_id("id_093_HeadSub")
+            jaw_ctrl = self.ar.ctrls.get_controller_node_by_id("id_024_HeadJaw")
             jaw_conditions = [self.ar.data.lang["m075_upperTeeth"], self.ar.data.lang["m076_lowerTeeth"], self.ar.data.lang["m077_tongue"], self.ar.data.lang["c039_lip"]+"_"+self.ar.data.lang["c058_main"]]
             ctrl_id_not_include_items = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if head_sub_ctrl:
@@ -327,11 +327,11 @@ class HeadDeformer(base.BaseLibrary):
                     if cmds.objExists(item+".controlID"):
                         if not cmds.objExists(item+"."+DPHEADDEFINFLUENCE):
                             if cmds.getAttr(item+".controlID") not in ctrl_id_not_include_items:
-                                self.ar.ctrls.addDefInfluenceAttrs(item, defInfluenceType=1)
+                                self.ar.ctrls.add_def_influence_attrs(item, def_influence_type=1)
                                 if not cmds.objExists(item+"."+DPJAWDEFINFLUENCE):
                                     for condition in jaw_conditions:
                                         if condition in item:
-                                            self.ar.ctrls.addDefInfluenceAttrs(item, defInfluenceType=2)
+                                            self.ar.ctrls.add_def_influence_attrs(item, def_influence_type=2)
 
             # apply influence deformer only in child shape controls which have the attribute or given nodes
             if not deformed_by_items:
@@ -380,7 +380,7 @@ class HeadDeformer(base.BaseLibrary):
             cmds.scale(1.25, 1.25, 1.25, offset_grp)
             
             # colorize
-            self.ar.ctrls.colorShape([arrow_ctrl, main_ctrl, center_symmetry_ctrl, top_symmetry_ctrl, sub_ctrls[0], sub_ctrls[1], sub_ctrls[2]], "cyan")
+            self.ar.ctrls.color_shape([arrow_ctrl, main_ctrl, center_symmetry_ctrl, top_symmetry_ctrl, sub_ctrls[0], sub_ctrls[1], sub_ctrls[2]], "cyan")
 
             # if there's Jaw in the deformer_name it will configure rotate and delete symetries and subControls setup
             if self.ar.data.lang["c025_jaw"] in main_ctrl:
@@ -412,7 +412,7 @@ class HeadDeformer(base.BaseLibrary):
                                     calibrate_name+"Z",
                                     calibrate_name+"Reduce"
                                 ]
-            self.ar.ctrls.setStringAttrFromList(arrow_ctrl, hd_calibrations)
+            self.ar.ctrls.set_string_attr_from_items(arrow_ctrl, hd_calibrations)
             
             # rename unitConversion nodes
             self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))

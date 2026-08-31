@@ -40,8 +40,8 @@ class FkLine(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
@@ -56,7 +56,7 @@ class FkLine(standard.BaseStandard):
         cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
         cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
     def change_joint_number(self, inputted, *args):
@@ -76,8 +76,8 @@ class FkLine(standard.BaseStandard):
             # verify if the nJoints is greather or less than the current
             if joint_number > self.current_joint_number:
                 for n in range(self.current_joint_number+1, joint_number+1):
-                    # create another N cvJointLoc:
-                    self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                    # create another N create_joint_locator:
+                    self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
                     self.increment_joint_number(n)
                     self.add_node_to_guide_net([self.guide_loc], ["JointLoc"+str(n)])
             elif joint_number < self.current_joint_number:
@@ -190,7 +190,7 @@ class FkLine(standard.BaseStandard):
                     self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     skin_joints.append(jnt)
                     # create a control:
-                    ctrl = self.ar.ctrls.cvControl("id_007_FkLine", side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc"+str(n+1), parentTag=self.get_parent_to_tag(fk_ctrls))
+                    ctrl = self.ar.ctrls.create_controller("id_007_FkLine", side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, head_def=cmds.getAttr(self.base+".deformedBy"), guide_source=self.name_guide+"_JointLoc"+str(n+1), parent_tag=self.get_parent_to_tag(fk_ctrls))
                     fk_ctrls.append(ctrl)
                     # zeroOut controls:
                     ctrl_zero = self.ar.utils.zeroOut([ctrl])[0]

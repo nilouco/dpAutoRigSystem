@@ -40,14 +40,14 @@ class Foot(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_foot_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_Foot", r=0.3, d=1, guide=True)
-        self.guide_rfa_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RfA", r=0.3, d=1, guide=True)
-        self.guide_rfb_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RfB", r=0.3, d=1, guide=True)
-        self.guide_rfc_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RfC", r=0.3, d=1, guide=True)
-        self.guide_rfd_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RfD", r=0.3, d=1, guide=True)
-        self.guide_rfe_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RfE", r=0.3, d=1, guide=True)
-        self.guide_rff_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RfF", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_foot_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_Foot", r=0.3, d=1, guide=True)
+        self.guide_rfa_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RfA", r=0.3, d=1, guide=True)
+        self.guide_rfb_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RfB", r=0.3, d=1, guide=True)
+        self.guide_rfc_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RfC", r=0.3, d=1, guide=True)
+        self.guide_rfd_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RfD", r=0.3, d=1, guide=True)
+        self.guide_rfe_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RfE", r=0.3, d=1, guide=True)
+        self.guide_rff_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RfF", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line_foot = cmds.joint(name=self.name_guide+"_JGuideFoot", radius=0.001)
         self.line_rff = cmds.joint(name=self.name_guide+"_JGuideRfF", radius=0.001)
@@ -101,9 +101,9 @@ class Foot(standard.BaseStandard):
         cmds.parentConstraint(self.guide_rfe_loc, self.line_rfe, maintainOffset=False, name=self.line_rfe+"_PaC")
         cmds.parentConstraint(self.guide_rff_loc, self.line_rff, maintainOffset=False, name=self.line_rff+"_PaC")
         cmds.parentConstraint(self.guide_rfa_loc, self.line_rfac, maintainOffset=False, name=self.line_rfac+"_PaC")
-        self.ar.ctrls.directConnect(self.guide_foot_loc, self.line_foot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.direct_connect(self.guide_foot_loc, self.line_foot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
 
  
@@ -171,11 +171,11 @@ class Foot(standard.BaseStandard):
                 cmds.setAttr(middle_foot_jnt+".segmentScaleCompensate", 0)
 
                 # creating Fk controls:
-                foot_ctrl = self.ar.ctrls.cvControl("id_020_FootFk", side+self.number_name+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, dir="+Z", guideSource=self.name_guide+"_Foot")
+                foot_ctrl = self.ar.ctrls.create_controller("id_020_FootFk", side+self.number_name+"_"+self.ar.data.lang['c009_leg_extrem']+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, dir="+Z", guide_source=self.name_guide+"_Foot")
                 self.foot_ctrls.append(foot_ctrl)
                 cmds.setAttr(foot_ctrl+".rotateOrder", 1)
                 self.rev_foot_ctrl_shapes.append(cmds.listRelatives(foot_ctrl, children=True, type='nurbsCurve')[0])
-                middle_foot_ctrl = self.ar.ctrls.cvControl("id_021_FootMiddle", side+self.number_name+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, guideSource=self.name_guide+"_RfF")
+                middle_foot_ctrl = self.ar.ctrls.create_controller("id_021_FootMiddle", side+self.number_name+"_"+self.ar.data.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, guide_source=self.name_guide+"_RfF")
                 cmds.setAttr(middle_foot_ctrl+'.overrideEnabled', 1)
                 cmds.setAttr(middle_foot_ctrl+".rotateOrder", 4)
                 cmds.matchTransform(foot_ctrl, self.guide_foot_loc, position=True, rotation=True)
@@ -187,12 +187,12 @@ class Foot(standard.BaseStandard):
                 foot_ctrl_zeros = self.ar.utils.zeroOut([foot_ctrl, middle_foot_ctrl])
 
                 # reverse foot controls:
-                rfa_ctrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+outside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parentTag=middle_foot_ctrl)
-                rfb_ctrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+inside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parentTag=middle_foot_ctrl)
-                rfc_ctrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+heel_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=middle_foot_ctrl)
-                rfd_ctrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+toe_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=middle_foot_ctrl)
-                rfe_ctrl = self.ar.ctrls.cvControl("id_018_FootReverse", side+self.number_name+"_"+bottom_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parentTag=middle_foot_ctrl)
-                rff_ctrl = self.ar.ctrls.cvControl("id_019_FootReverseE", side+self.number_name+"_"+ball_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, rot=(0, 90, 0), parentTag=foot_ctrl)
+                rfa_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+outside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
+                rfb_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+inside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
+                rfc_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+heel_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
+                rfd_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+toe_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
+                rfe_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+bottom_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, dir="+Y", rot=(0, 90, 0), parent_tag=middle_foot_ctrl)
+                rff_ctrl = self.ar.ctrls.create_controller("id_019_FootReverseE", side+self.number_name+"_"+ball_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.5), d=self.curve_degree, rot=(0, 90, 0), parent_tag=foot_ctrl)
                 self.ball_rf_items.append(rff_ctrl)
                 cmds.connectAttr(rff_ctrl+".message", middle_foot_ctrl+".parentTag", force=True)
                 
@@ -400,7 +400,7 @@ class Foot(standard.BaseStandard):
                 cmds.connectAttr(foot_ball_rev+".outputX", foot_ball_pac+"."+rfe_ctrl+"W1")
 
                 # organizing keyable attributes:
-                self.ar.ctrls.setLockHide([middle_foot_ctrl, foot_ctrl], ['v'], l=False)
+                self.ar.ctrls.set_lock_hide([middle_foot_ctrl, foot_ctrl], ['v'], l=False)
                 
                 # show or hide reverseFoot controls:
                 cmds.addAttr(foot_ctrl, longName=show_ctrls_attr, attributeType='short', minValue=0, defaultValue=1, maxValue=1)

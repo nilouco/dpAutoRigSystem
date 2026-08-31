@@ -63,27 +63,27 @@ class Head(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_neck_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
-        self.guide_head_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Head", r=0.4, d=1, guide=True)
-        self.guide_jaw_loc  = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Jaw", r=0.3, d=1, guide=True)
-        self.guide_chin_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Chin", r=0.3, d=1, guide=True)
-        self.guide_chew_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Chew", r=0.3, d=1, guide=True)
-        self.guide_left_corner_lip_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_LCornerLip", r=0.1, d=1, guide=True)
-        self.guide_right_corner_lip_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_RCornerLip", r=0.1, d=1, guide=True)
-        self.guide_upper_jaw_loc  = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_UpperJaw", r=0.2, d=1, rot=(0, 0, 90), guide=True)
-        self.guide_upper_head_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_UpperHead", r=0.2, d=1, rot=(0, 0, 90), guide=True)
-        self.guide_upper_lip_loc  = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_UpperLip", r=0.15, d=1, guide=True)
-        self.guide_lower_lip_loc  = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_LowerLip", r=0.15, d=1, guide=True)
-        self.guide_brow_loc    = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Brow", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_046_FacialBrow"))
-        self.guide_eyelid_loc  = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Eyelid", r=0.2, d=1, guide=True, rot=(0, 0, 90), color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_047_FacialEyelid"))
-        self.guide_mouth_loc   = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Mouth", r=0.2, d=1, guide=True, rot=(0, 0, -90), color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_048_FacialMouth"))
-        self.guide_lips_loc    = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Lips", r=0.1, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_049_FacialLips"))
-        self.guide_sneer_loc   = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Sneer", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_050_FacialSneer"))
-        self.guide_grimace_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Grimace", r=0.2, d=1, guide=True, rot=(0, 0, 180), color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_051_FacialGrimace"))
-        self.guide_face_loc    = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_Face", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_052_FacialFace"))
-        self.guide_deformer_center_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_DeformerCenter", r=0.6, d=1, guide=True, color="cyan")
-        self.guide_deformer_radius_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_DeformerRadius", r=0.3, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.getControlModuleById("id_100_HeadDeformerRadius"))
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_neck_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
+        self.guide_head_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Head", r=0.4, d=1, guide=True)
+        self.guide_jaw_loc  = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Jaw", r=0.3, d=1, guide=True)
+        self.guide_chin_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Chin", r=0.3, d=1, guide=True)
+        self.guide_chew_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Chew", r=0.3, d=1, guide=True)
+        self.guide_left_corner_lip_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_LCornerLip", r=0.1, d=1, guide=True)
+        self.guide_right_corner_lip_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_RCornerLip", r=0.1, d=1, guide=True)
+        self.guide_upper_jaw_loc  = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_UpperJaw", r=0.2, d=1, rot=(0, 0, 90), guide=True)
+        self.guide_upper_head_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_UpperHead", r=0.2, d=1, rot=(0, 0, 90), guide=True)
+        self.guide_upper_lip_loc  = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_UpperLip", r=0.15, d=1, guide=True)
+        self.guide_lower_lip_loc  = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_LowerLip", r=0.15, d=1, guide=True)
+        self.guide_brow_loc    = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Brow", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_046_FacialBrow"))
+        self.guide_eyelid_loc  = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Eyelid", r=0.2, d=1, guide=True, rot=(0, 0, 90), color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_047_FacialEyelid"))
+        self.guide_mouth_loc   = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Mouth", r=0.2, d=1, guide=True, rot=(0, 0, -90), color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_048_FacialMouth"))
+        self.guide_lips_loc    = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Lips", r=0.1, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_049_FacialLips"))
+        self.guide_sneer_loc   = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Sneer", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_050_FacialSneer"))
+        self.guide_grimace_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Grimace", r=0.2, d=1, guide=True, rot=(0, 0, 180), color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_051_FacialGrimace"))
+        self.guide_face_loc    = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_Face", r=0.2, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_052_FacialFace"))
+        self.guide_deformer_center_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_DeformerCenter", r=0.6, d=1, guide=True, color="cyan")
+        self.guide_deformer_radius_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_DeformerRadius", r=0.3, d=1, guide=True, color="cyan", cvType=self.ar.ctrls.get_controller_module_by_id("id_100_HeadDeformerRadius"))
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line_neck_0 = cmds.joint(name=self.name_guide+"_JGuideNeck0", radius=0.001)
         self.line_head = cmds.joint(name=self.name_guide+"_JGuideHead", radius=0.001)
@@ -194,19 +194,19 @@ class Head(standard.BaseStandard):
         cmds.parent(self.guide_deformer_center_loc, self.guide_upper_head_loc)
         cmds.parent(self.guide_deformer_radius_loc, self.guide_deformer_center_loc)
         # edit
-        self.ar.ctrls.directConnect(self.guide_neck_loc, self.line_neck_0, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_head_loc, self.line_head, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_upper_jaw_loc, self.line_upper_jaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_upper_head_loc, self.line_upper_head, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_jaw_loc, self.line_jaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_chin_loc, self.line_chin, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_chew_loc, self.line_chew, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_upper_lip_loc, self.line_upper_lip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_lower_lip_loc, self.line_lower_lip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.directConnect(self.guide_left_corner_lip_loc, self.line_left_lip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_neck_loc, self.line_neck_0, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_head_loc, self.line_head, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_upper_jaw_loc, self.line_upper_jaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_upper_head_loc, self.line_upper_head, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_jaw_loc, self.line_jaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_chin_loc, self.line_chin, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_chew_loc, self.line_chew, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_upper_lip_loc, self.line_upper_lip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_lower_lip_loc, self.line_lower_lip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_left_corner_lip_loc, self.line_left_lip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
 
     def create_guide_deformer_cube(self):
@@ -236,7 +236,7 @@ class Head(standard.BaseStandard):
             self.ar.opt.check_use_default_render_layer()
             if joint_number > self.current_joint_number:
                 for n in range(self.current_joint_number+1, joint_number+1):
-                    self.guide_neck_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_Neck"+str(n-1), r=0.2, d=1, rot=(-90, 90, 0), guide=True)
+                    self.guide_neck_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_Neck"+str(n-1), r=0.2, d=1, rot=(-90, 90, 0), guide=True)
                     cmds.setAttr(self.guide_neck_loc+".nJoint", n)
                     cmds.parent(self.guide_neck_loc, self.name_guide+"_Neck"+str(n-2), relative=True)
                     self.line = cmds.joint(name=self.name_guide+"_JGuideNeck"+str(n-1), radius=0.001)
@@ -249,7 +249,7 @@ class Head(standard.BaseStandard):
                 self.guide_neck_loc = self.reduce_joint_number(joint_number, "Neck", "Neck", 0, 0)
             # get the length of the neck to position segments.
             dist = self.ar.utils.distanceBet(self.name_guide+"_Neck0", self.name_guide+"_Head")[0]
-            # translateY to input on each cvLocator
+            # translateY to input on each create_curve_locator
             dit_bet = dist/joint_number
             for n in range(1, joint_number):
                 # translate the locators to the calculated position:
@@ -585,16 +585,16 @@ class Head(standard.BaseStandard):
 
                 # creating controllers:
                 for n in range(0, self.n_joints):
-                    neck_ctrl = self.ar.ctrls.cvControl("id_022_HeadNeck", ctrl_name=neck_ctrl_base_name+"_"+str(n).zfill(2)+"_Ctrl", r=(self.radius/((n*0.2)+1)), d=self.curve_degree, dir="-Z", guideSource=self.name_guide+"_Neck"+str(n), parentTag=self.get_parent_to_tag(neck_ctrls))
+                    neck_ctrl = self.ar.ctrls.create_controller("id_022_HeadNeck", ctrl_name=neck_ctrl_base_name+"_"+str(n).zfill(2)+"_Ctrl", r=(self.radius/((n*0.2)+1)), d=self.curve_degree, dir="-Z", guide_source=self.name_guide+"_Neck"+str(n), parent_tag=self.get_parent_to_tag(neck_ctrls))
                     if n > 0:
                         cmds.parent(neck_ctrl, neck_ctrls[-1])
                     neck_ctrls.append(neck_ctrl)
-                head_ctrl = self.ar.ctrls.cvControl("id_023_HeadHead", ctrl_name=head_ctrl_name, r=(self.radius * 2.5), d=self.curve_degree, guideSource=self.name_guide+"_Head", parentTag=neck_ctrls[-1])
-                self.head_sub_ctrl = self.ar.ctrls.cvControl("id_093_HeadSub", ctrl_name=head_sub_ctrl_name, r=(self.radius * 2.2), d=self.curve_degree, guideSource=self.name_guide+"_Head", parentTag=head_ctrl)
+                head_ctrl = self.ar.ctrls.create_controller("id_023_HeadHead", ctrl_name=head_ctrl_name, r=(self.radius * 2.5), d=self.curve_degree, guide_source=self.name_guide+"_Head", parent_tag=neck_ctrls[-1])
+                self.head_sub_ctrl = self.ar.ctrls.create_controller("id_093_HeadSub", ctrl_name=head_sub_ctrl_name, r=(self.radius * 2.2), d=self.curve_degree, guide_source=self.name_guide+"_Head", parent_tag=head_ctrl)
                 to_flip_items = [head_ctrl, self.head_sub_ctrl]
                 # hiding visibility attributes:
-                self.ar.ctrls.setLockHide([head_ctrl, self.head_sub_ctrl], ['v'], l=False)
-                self.ar.ctrls.setLockHide(neck_ctrls, ['v'], l=False)
+                self.ar.ctrls.set_lock_hide([head_ctrl, self.head_sub_ctrl], ['v'], l=False)
+                self.ar.ctrls.set_lock_hide(neck_ctrls, ['v'], l=False)
 
                 # creating joints:
                 cmds.select(clear=True)
@@ -612,18 +612,18 @@ class Head(standard.BaseStandard):
                     self.ar.utils.setJointLabel(upper_head_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head'])
                     cmds.setAttr(upper_end_joint+".translateY", 0.3*self.radius)
                     dpar_joints.extend([upper_jaw_joint, upper_head_joint])
-                    upper_jaw_ctrl = self.ar.ctrls.cvControl("id_069_HeadUpperJaw", ctrl_name=upper_jaw_ctrl_name, r=self.radius, d=self.curve_degree, headDef=1, guideSource=self.name_guide+"_UpperJaw", parentTag=self.head_sub_ctrl)
-                    upper_head_ctrl = self.ar.ctrls.cvControl("id_081_HeadUpperHead", ctrl_name=upper_head_ctrl_name, r=self.radius, d=self.curve_degree, headDef=1, guideSource=self.name_guide+"_UpperHead", parentTag=upper_jaw_ctrl)
+                    upper_jaw_ctrl = self.ar.ctrls.create_controller("id_069_HeadUpperJaw", ctrl_name=upper_jaw_ctrl_name, r=self.radius, d=self.curve_degree, head_def=1, guide_source=self.name_guide+"_UpperJaw", parent_tag=self.head_sub_ctrl)
+                    upper_head_ctrl = self.ar.ctrls.create_controller("id_081_HeadUpperHead", ctrl_name=upper_head_ctrl_name, r=self.radius, d=self.curve_degree, head_def=1, guide_source=self.name_guide+"_UpperHead", parent_tag=upper_jaw_ctrl)
                     to_flip_items.extend([upper_jaw_ctrl, upper_head_ctrl])
-                    self.ar.ctrls.setLockHide([upper_jaw_ctrl, upper_head_ctrl], ['v'], l=False)
+                    self.ar.ctrls.set_lock_hide([upper_jaw_ctrl, upper_head_ctrl], ['v'], l=False)
                     cmds.select(head_joint)
                 if has_jaw:
                     jaw_joint = cmds.joint(name=jaw_joint_name, scaleCompensate=False)
                     self.ar.utils.setJointLabel(jaw_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c025_jaw'])
                     dpar_joints.extend([jaw_joint])
-                    self.jaw_ctrl = self.ar.ctrls.cvControl("id_024_HeadJaw", ctrl_name=jaw_ctrl_name, r=(self.radius *0.5), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_Jaw", parentTag=self.head_sub_ctrl)
+                    self.jaw_ctrl = self.ar.ctrls.create_controller("id_024_HeadJaw", ctrl_name=jaw_ctrl_name, r=(self.radius *0.5), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_Jaw", parent_tag=self.head_sub_ctrl)
                     to_flip_items.extend([self.jaw_ctrl])
-                    self.ar.ctrls.setLockHide([self.jaw_ctrl], ['v'], l=False)
+                    self.ar.ctrls.set_lock_hide([self.jaw_ctrl], ['v'], l=False)
                     if has_chin:
                         cmds.select(jaw_joint)
                         chin_joint = cmds.joint(name=chin_joint_name, scaleCompensate=False)
@@ -632,10 +632,10 @@ class Head(standard.BaseStandard):
                         self.ar.utils.setJointLabel(chin_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c026_chin'])
                         self.ar.utils.setJointLabel(chew_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c048_chew'])
                         dpar_joints.extend([chin_joint, chew_joint])
-                        chin_ctrl = self.ar.ctrls.cvControl("id_025_HeadChin", ctrl_name=chin_ctrl_name, r=(self.radius * 0.13), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_Chin", parentTag=self.jaw_ctrl)
-                        chew_ctrl = self.ar.ctrls.cvControl("id_026_HeadChew", ctrl_name=chew_ctrl_name, r=(self.radius * 0.08), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_Chew", parentTag=chin_ctrl)
+                        chin_ctrl = self.ar.ctrls.create_controller("id_025_HeadChin", ctrl_name=chin_ctrl_name, r=(self.radius * 0.13), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_Chin", parent_tag=self.jaw_ctrl)
+                        chew_ctrl = self.ar.ctrls.create_controller("id_026_HeadChew", ctrl_name=chew_ctrl_name, r=(self.radius * 0.08), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_Chew", parent_tag=chin_ctrl)
                         to_flip_items.extend([chin_ctrl, chew_ctrl])
-                        self.ar.ctrls.setLockHide([chin_ctrl, chew_ctrl], ['v'], l=False)
+                        self.ar.ctrls.set_lock_hide([chin_ctrl, chew_ctrl], ['v'], l=False)
                     cmds.select(head_joint)
                 if has_lips:
                     left_corner_lip_joint = cmds.joint(name=left_corner_lip_joint_name, scaleCompensate=False)
@@ -654,12 +654,12 @@ class Head(standard.BaseStandard):
                     self.ar.utils.setJointLabel(upper_lip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c039_lip'])
                     self.ar.utils.setJointLabel(lower_lip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c045_lower']+self.ar.data.lang['c039_lip'])
                     dpar_joints.extend([left_corner_lip_joint, right_corner_lip_joint, upper_lip_joint, lower_lip_joint])
-                    left_corner_lip_ctrl = self.ar.ctrls.cvControl("id_027_HeadLipCorner", ctrl_name=left_corner_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_LCornerLip", parentTag=self.head_sub_ctrl)
-                    right_corner_lip_ctrl = self.ar.ctrls.cvControl("id_027_HeadLipCorner", ctrl_name=right_corner_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_RCornerLip", parentTag=self.head_sub_ctrl)
-                    upper_lip_ctrl = self.ar.ctrls.cvControl("id_072_HeadUpperLip", ctrl_name=upper_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_UpperLip", parentTag=self.head_sub_ctrl)
-                    lower_lip_ctrl = self.ar.ctrls.cvControl("id_073_HeadLowerLip", ctrl_name=lower_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, headDef=3, guideSource=self.name_guide+"_LowerLip", parentTag=self.head_sub_ctrl)
+                    left_corner_lip_ctrl = self.ar.ctrls.create_controller("id_027_HeadLipCorner", ctrl_name=left_corner_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_LCornerLip", parent_tag=self.head_sub_ctrl)
+                    right_corner_lip_ctrl = self.ar.ctrls.create_controller("id_027_HeadLipCorner", ctrl_name=right_corner_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_RCornerLip", parent_tag=self.head_sub_ctrl)
+                    upper_lip_ctrl = self.ar.ctrls.create_controller("id_072_HeadUpperLip", ctrl_name=upper_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_UpperLip", parent_tag=self.head_sub_ctrl)
+                    lower_lip_ctrl = self.ar.ctrls.create_controller("id_073_HeadLowerLip", ctrl_name=lower_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_LowerLip", parent_tag=self.head_sub_ctrl)
                     to_flip_items.extend([left_corner_lip_ctrl, right_corner_lip_ctrl, upper_lip_ctrl, lower_lip_ctrl])
-                    self.ar.ctrls.setLockHide([upper_lip_ctrl, lower_lip_ctrl], ['v'], l=False)
+                    self.ar.ctrls.set_lock_hide([upper_lip_ctrl, lower_lip_ctrl], ['v'], l=False)
                 dpar_joints.extend(neck_joints)
                 for dpar_joint in dpar_joints:
                     cmds.addAttr(dpar_joint, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -709,7 +709,7 @@ class Head(standard.BaseStandard):
                     self.left_ctrls.append([left_corner_lip_ctrl])
                     self.right_ctrls.append([right_corner_lip_ctrl])
                 self.inner_ctrls.append([self.head_sub_ctrl])
-                self.ar.ctrls.setSubControlDisplay(head_ctrl, self.head_sub_ctrl, 1)
+                self.ar.ctrls.set_sub_ctrl_display(head_ctrl, self.head_sub_ctrl, 1)
 
                 # optimize control CV shapes:
                 temp_head_cluster = cmds.cluster(head_ctrl, self.head_sub_ctrl)[1]
@@ -1104,7 +1104,7 @@ class Head(standard.BaseStandard):
                 
                 # calibration attributes:
                 neck_calibrations = [self.ar.data.lang['c047_autoRotate']]
-                self.ar.ctrls.setStringAttrFromList(neck_ctrls[0], neck_calibrations)
+                self.ar.ctrls.set_string_attr_from_items(neck_ctrls[0], neck_calibrations)
                 if has_jaw:
                     jaw_calibrations = [
                                         self.ar.data.lang['c108_open'].lower()+self.ar.data.lang['c111_calibrate']+"Y",
@@ -1114,14 +1114,14 @@ class Head(standard.BaseStandard):
                                         self.ar.data.lang['c108_open'].lower()+self.ar.data.lang['c111_calibrate']+self.ar.data.lang['c112_output'],
                                         self.ar.data.lang['c109_close'].lower()+self.ar.data.lang['c111_calibrate']+self.ar.data.lang['c112_output']
                     ]
-                    self.ar.ctrls.setStringAttrFromList(self.jaw_ctrl, jaw_calibrations)
+                    self.ar.ctrls.set_string_attr_from_items(self.jaw_ctrl, jaw_calibrations)
                 if has_lips:
                     lip_calibrations = [
                                         self.ar.data.lang['c109_close'].lower()+self.ar.data.lang['c111_calibrate']+"Y",
                                         self.ar.data.lang['c109_close'].lower()+self.ar.data.lang['c111_calibrate']+"Z"
                     ]
-                    self.ar.ctrls.setStringAttrFromList(upper_lip_ctrl, lip_calibrations)
-                    self.ar.ctrls.setStringAttrFromList(lower_lip_ctrl, lip_calibrations)
+                    self.ar.ctrls.set_string_attr_from_items(upper_lip_ctrl, lip_calibrations)
+                    self.ar.ctrls.set_string_attr_from_items(lower_lip_ctrl, lip_calibrations)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 to_hook_items = [neck_ctrl_zeros[0]]
@@ -1248,20 +1248,20 @@ for net in cmds.ls(type="network"):
             return None, None
         else:
             # create control calling controllers function:
-            facial_ctrl = self.ar.ctrls.cvControl(cv_ctrl, facial_ctrl_name, r=1, d=0, rot=rot_vector, parentTag=self.head_sub_ctrl)
+            facial_ctrl = self.ar.ctrls.create_controller(cv_ctrl, facial_ctrl_name, r=1, d=0, rot=rot_vector, parent_tag=self.head_sub_ctrl)
             # add head or jaw influence attribute
             if head_def_influence:
-                self.ar.ctrls.addDefInfluenceAttrs(facial_ctrl, 1)                
+                self.ar.ctrls.add_def_influence_attrs(facial_ctrl, 1)                
             if jaw_def_influence:
-                self.ar.ctrls.addDefInfluenceAttrs(facial_ctrl, 2)
+                self.ar.ctrls.add_def_influence_attrs(facial_ctrl, 2)
             # ctrl zeroOut grp and color:
             facial_ctrl_grp = self.ar.utils.zeroOut([facial_ctrl])[0]
             cmds.addAttr(facial_ctrl_grp, longName="facialReceiver", attributeType="bool", defaultValue=1)
             self.facial_ctrl_grps.append(facial_ctrl_grp)
-            self.ar.ctrls.colorShape([facial_ctrl], color)
+            self.ar.ctrls.color_shape([facial_ctrl], color)
             # lock or limit XYZ axis:
             self.lock_attr_limit(facial_ctrl, ctrl_name, [lock_x, lock_y, lock_z], [limit_x, limit_y, limit_z], limit_min_y)
-            self.ar.ctrls.setLockHide([facial_ctrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+            self.ar.ctrls.set_lock_hide([facial_ctrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             cmds.addAttr(facial_ctrl, longName="scaleFactor", attributeType="float", defaultValue=(self.facial_factor*self.radius), minValue=0.001)
             cmds.connectAttr(facial_ctrl+".scaleFactor", facial_ctrl_grp+".scaleX", force=True)
             cmds.connectAttr(facial_ctrl+".scaleFactor", facial_ctrl_grp+".scaleY", force=True)
@@ -1344,9 +1344,9 @@ for net in cmds.ls(type="network"):
                 if direct_connection:
                     self.create_face_min_max_sn(facial_ctrl)
             if facial_ctrl_attributes:
-                self.ar.ctrls.setStringAttrFromList(facial_ctrl, facial_ctrl_attributes, "facialList")
+                self.ar.ctrls.set_string_attr_from_items(facial_ctrl, facial_ctrl_attributes, "facialList")
             if calibration_attrs:
-                self.ar.ctrls.setStringAttrFromList(facial_ctrl, calibration_attrs)
+                self.ar.ctrls.set_string_attr_from_items(facial_ctrl, calibration_attrs)
         return facial_ctrl, facial_ctrl_grp
     
     
@@ -1420,8 +1420,8 @@ for net in cmds.ls(type="network"):
         if guides:
             all_transforms = cmds.ls(selection=False, type="transform")
             for node in all_transforms:
-                if "guideSource" in cmds.listAttr(node):
-                    guide_source = cmds.getAttr(node+".guideSource")
+                if "guide_source" in cmds.listAttr(node):
+                    guide_source = cmds.getAttr(node+".guide_source")
                     if guide_source.split(":")[0] in guides:
                         if not node in results:
                             if self.mirror_axis != 'off':

@@ -58,7 +58,7 @@ class UnlockNormals(action.BaseAction):
                             else: #fix
                                 try:
                                     #cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True) #it doesn't keep the soft and hard edges when importing mesh
-                                    self.softHardEdges.setSoftHard(mesh)
+                                    self.softHardEdges.set_soft_hard(mesh)
                                     self.good_results.append(True)
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+mesh)
                                 except:

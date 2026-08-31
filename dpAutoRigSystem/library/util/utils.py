@@ -279,7 +279,7 @@ class Utils(object):
             for userDefAttr in userDefAttrList:
                 delIt = True
                 if keepOriginedFrom:
-                    if "originedFrom" in userDefAttr or "guideSource" in userDefAttr:
+                    if "originedFrom" in userDefAttr or "guide_source" in userDefAttr:
                         delIt = False
                 if delIt:
                     try:
@@ -546,13 +546,13 @@ class Utils(object):
             cmds.delete(self.ar.data.guide_mirror_grp)
             
 
-    def getGuideChildrenList(self, nodeName):
-        """ This function verify if there are guide children of the passed nodeName.
+    def getGuideChildrenList(self, node_name):
+        """ This function verify if there are guide children of the passed node_name.
             It will return the guideChildrenList if it exists.
         """
         guideChildrenList = []
-        if cmds.objExists(nodeName):
-            children = cmds.listRelatives(nodeName, allDescendents=True, type='transform')
+        if cmds.objExists(node_name):
+            children = cmds.listRelatives(node_name, allDescendents=True, type='transform')
             if children:
                 for child in children:
                     if cmds.objExists(child+".guideBase") and cmds.getAttr(child+".guideBase") == 1:
@@ -560,11 +560,11 @@ class Utils(object):
         return guideChildrenList
 
 
-    def mirroredGuideFather(self, nodeName):
-        """ This function verify if there is a mirrored guide as a father of the passed nodeName.
+    def mirroredGuideFather(self, node_name):
+        """ This function verify if there is a mirrored guide as a father of the passed node_name.
             Returns the mirrored guide father name if true.
         """
-        parentList = cmds.listRelatives(nodeName, parent=True, type='transform')
+        parentList = cmds.listRelatives(node_name, parent=True, type='transform')
         if parentList:
             nextLoop = True
             while nextLoop:
@@ -579,13 +579,13 @@ class Utils(object):
                         nextLoop = False
 
 
-    def getParentsList(self, nodeName):
+    def getParentsList(self, node_name):
         """ Get all parents.
             Return a list with all parents if they exists.
         """
         # get father:
         allParentsList = []
-        parentList = cmds.listRelatives(nodeName, parent=True, type='transform')
+        parentList = cmds.listRelatives(node_name, parent=True, type='transform')
         if parentList:
             nextLoop = True
             while nextLoop:
@@ -620,11 +620,11 @@ class Utils(object):
         return guides_to_rig
 
 
-    def getCtrlRadius(self, nodeName):
+    def getCtrlRadius(self, node_name):
         """ Calculate and return the final radius to be used as a size of controls.
         """
-        radius = float(cmds.getAttr(nodeName+".translateX"))
-        parentList = self.getParentsList(nodeName)
+        radius = float(cmds.getAttr(node_name+".translateX"))
+        parentList = self.getParentsList(node_name)
         if (parentList):
             for parent in parentList:
                 radius *= cmds.getAttr(parent+'.scaleX')
@@ -704,21 +704,21 @@ class Utils(object):
         cmds.setAttr(jointName+".otherType", "", type="string")
 
 
-    def extractSuffix(self, nodeName):
+    def extractSuffix(self, node_name):
         """ Remove suffix from a node name and return the base name.
         """
         endSuffixList = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp", "_Crv"]
         for endSuffix in endSuffixList:
-            if nodeName.endswith(endSuffix):
-                base_name = nodeName[:nodeName.rfind(endSuffix)]
+            if node_name.endswith(endSuffix):
+                base_name = node_name[:node_name.rfind(endSuffix)]
                 return base_name
-            if nodeName.endswith(endSuffix.lower()):
-                base_name = nodeName[:nodeName.rfind(endSuffix.lower())]
+            if node_name.endswith(endSuffix.lower()):
+                base_name = node_name[:node_name.rfind(endSuffix.lower())]
                 return base_name
-            if nodeName.endswith(endSuffix.upper()):
-                base_name = nodeName[:nodeName.rfind(endSuffix.upper())]
+            if node_name.endswith(endSuffix.upper()):
+                base_name = node_name[:node_name.rfind(endSuffix.upper())]
                 return base_name
-        return nodeName
+        return node_name
 
 
     def filterName(self, name, items, separator):
@@ -792,30 +792,30 @@ class Utils(object):
         return twistBoneMD
         
 
-    def validateName(self, nodeName, suffix=None, *args):
+    def validateName(self, node_name, suffix=None, *args):
         """ Check the default name in order to validate it and preserves the suffix naming.
             Returns the correct node name.
         """
-        if cmds.objExists(nodeName):
+        if cmds.objExists(node_name):
             needRestoreSuffix = False
             if suffix:
-                if nodeName.endswith("_"+suffix):
+                if node_name.endswith("_"+suffix):
                     needRestoreSuffix = True
-                    nodeName = nodeName[:nodeName.rfind("_")]
+                    node_name = node_name[:node_name.rfind("_")]
             # find numering:
             i = 1
             if not needRestoreSuffix:
-                while cmds.objExists(nodeName+str(i)):
+                while cmds.objExists(node_name+str(i)):
                     i += 1
             else:
-                while cmds.objExists(nodeName+str(i)+"_"+suffix):
+                while cmds.objExists(node_name+str(i)+"_"+suffix):
                     i += 1
             # add number:
-            nodeName = nodeName+str(i)
+            node_name = node_name+str(i)
             if needRestoreSuffix:
                 # restore suffix
-                nodeName = nodeName+"_"+suffix
-        return nodeName
+                node_name = node_name+"_"+suffix
+        return node_name
 
 
     def articulationJoint(self, fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcrRotList=None, dist=1, jarRadius=1.5, doScale=True, orientCtrl=None, *args):
@@ -909,12 +909,12 @@ class Utils(object):
         return result
 
 
-    def attachToMotionPath(self, nodeName, curveName, mopName, uValue):
+    def attachToMotionPath(self, node_name, curveName, mopName, uValue):
         """ Simple function to attach a node in a motion path curve.
             Sets the u position based to given uValue.
             Returns the created motion path node.
         """
-        moPath = cmds.pathAnimation(nodeName, curve=curveName, fractionMode=True, name=mopName)
+        moPath = cmds.pathAnimation(node_name, curve=curveName, fractionMode=True, name=mopName)
         cmds.delete(cmds.listConnections(moPath+".u", source=True, destination=False)[0])
         cmds.setAttr(moPath+".u", uValue)
         return moPath

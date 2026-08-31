@@ -112,14 +112,14 @@ class Weights(object):
         items.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve") or [])
         if items:
             for item in items:
-                transformNode = item[:item[1:].find("|")+1]
-                if not transformNode in ranList:
-                    ranList.append(transformNode)
-                    transforms = cmds.listRelatives(transformNode, allDescendents=True, children=True, fullPath=True, type="transform")
+                transform_node = item[:item[1:].find("|")+1]
+                if not transform_node in ranList:
+                    ranList.append(transform_node)
+                    transforms = cmds.listRelatives(transform_node, allDescendents=True, children=True, fullPath=True, type="transform")
                     if transforms:
-                        transforms.append(transformNode)
+                        transforms.append(transform_node)
                     else:
-                        transforms = [transformNode]
+                        transforms = [transform_node]
                     for childNode in transforms:
                         if not cmds.objExists(childNode+"."+ignoreAttr):
                             if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:

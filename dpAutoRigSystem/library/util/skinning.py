@@ -128,36 +128,36 @@ class Skinning(weights.Weights):
         """
         ranList = []
         self.ar.utils.setProgress('Skinning: ', self.ar.data.lang['i287_copy']+" Skinning", len(destinations), add_one=False, add_number=False)
-        for sourceItem in sourceList:
+        for source_item in sourceList:
             self.ar.utils.setProgress("Skinning: ")
             if oneSource:
                 for item in destinations:
-                    self.runCopySkin(sourceItem, item, byUVs)
+                    self.runCopySkin(source_item, item, byUVs)
                 self.ar.utils.setProgress(endIt=True)
                 return
             else:
-                if not sourceItem in ranList:
+                if not source_item in ranList:
                     for item in reversed(destinations): #to avoid find the same item in the same given list
-                        if not sourceItem == item:
-                            if sourceItem[sourceItem.rfind("|")+1:] == item[item.rfind("|")+1:]:
-                                if self.checkExistingDeformerNode(sourceItem)[0]:
-                                    self.runCopySkin(sourceItem, item, byUVs)
+                        if not source_item == item:
+                            if source_item[source_item.rfind("|")+1:] == item[item.rfind("|")+1:]:
+                                if self.checkExistingDeformerNode(source_item)[0]:
+                                    self.runCopySkin(source_item, item, byUVs)
                                 elif self.checkExistingDeformerNode(item)[0]:
-                                    self.runCopySkin(item, sourceItem, byUVs)
+                                    self.runCopySkin(item, source_item, byUVs)
                                 # To avoid repeat the same item in the same given list
                                 ranList.append(item)
                                 break
-                    ranList.append(sourceItem)
+                    ranList.append(source_item)
         self.ar.utils.setProgress(endIt=True)
 
 
-    def runCopySkin(self, sourceItem, destinationItem, byUVs=False, *args):
-        """ Copy the skin from sourceItem to destinationItem.
+    def runCopySkin(self, source_item, destinationItem, byUVs=False, *args):
+        """ Copy the skin from source_item to destinationItem.
             It will get skinInfList and skinMethod by source.
         """
         i = 0
         defOrderIdx = None
-        sourceDefList = self.checkExistingDeformerNode(sourceItem)[2]
+        sourceDefList = self.checkExistingDeformerNode(source_item)[2]
         if sourceDefList:
             # get correct naming
             skinClusterName = self.ar.utils.extractSuffix(destinationItem)
@@ -187,7 +187,7 @@ class Skinning(weights.Weights):
                             cmds.connectAttr(plug[0], newSkinClusterNode+".dqsScaleZ", force=True)
                 # copy skin weights from source to destination
                 if byUVs:
-                    sourceUVMap = cmds.polyUVSet(sourceItem, query=True, allUVSets=True)[0]
+                    sourceUVMap = cmds.polyUVSet(source_item, query=True, allUVSets=True)[0]
                     destinationUVMap = cmds.polyUVSet(destinationItem, query=True, allUVSets=True)[0]
                     cmds.copySkinWeights(sourceSkin=sourceDef, destinationSkin=newSkinClusterNode, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"], uvSpace=[sourceUVMap, destinationUVMap])
                 else:
@@ -197,7 +197,7 @@ class Skinning(weights.Weights):
                     cmds.reorderDeformers(destDefList[1][defOrderIdx-1], newSkinClusterNode, destinationItem)
                 i += 1
         # log result
-        mel.eval("print \""+self.ar.data.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
+        mel.eval("print \""+self.ar.data.lang['i083_copiedSkin']+" "+source_item+" "+destinationItem+"\"; ")
 
 
     def copySkinFromOneSource(self, items=None, ui=False, byUVs=False, *args):
@@ -207,17 +207,17 @@ class Skinning(weights.Weights):
             items = cmds.ls(selection=True, long=True, type="transform")
         if items and len(items) > 1:
             # get first selected item
-            sourceItem = items[0]
+            source_item = items[0]
             # get other selected items
             destinations = items[1:]
-            shapes = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
+            shapes = cmds.listRelatives(source_item, shapes=True, fullPath=True)
             if shapes:
                 # check if there's a skinCluster node connected to the first selected item
                 if self.checkExistingDeformerNode(shapes):
                     if ui:
                         byUVs = self.getByUVsFromUI()
                     # call copySkin function
-                    self.serializeCopySkin([sourceItem], destinations, True, byUVs)
+                    self.serializeCopySkin([source_item], destinations, True, byUVs)
                 else:
                     mel.eval("warning \""+self.ar.data.lang['e007_notSkinFound']+"\";")
             else:

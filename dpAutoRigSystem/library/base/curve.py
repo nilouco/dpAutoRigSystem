@@ -89,8 +89,8 @@ class BaseCurve(base.BaseLibrary):
         """
         cv_curve = cmds.curve(name=cv_name, point=cv_points, degree=cv_degree, knot=cv_knots, periodic=cv_periodic)
         self.add_controller_info(cv_curve, guide=guide)
-        self.ar.ctrls.renameShape([cv_curve])
-        self.ar.ctrls.displayRotateOrderAttr([cv_curve])
+        self.ar.ctrls.rename_shape([cv_curve])
+        self.ar.ctrls.display_rotate_order_attr([cv_curve])
         self.ar.custom_attr.add_attr(0, [cv_curve]) #dpID
         return cv_curve
     
@@ -101,7 +101,7 @@ class BaseCurve(base.BaseLibrary):
         cmds.makeIdentity(curves[0], translate=True, rotate=True, scale=True, apply=True)
         for item in curves[1:]:
             cmds.makeIdentity(item, translate=True, rotate=True, scale=True, apply=True)
-            self.ar.ctrls.transferShape(True, False, item, [curves[0]])
+            self.ar.ctrls.transfer_shape(True, False, item, [curves[0]])
         cmds.setAttr(curves[0]+".className", self.name, type="string")
         return curves[0]
 
@@ -141,9 +141,9 @@ class BaseCurve(base.BaseLibrary):
         else:
             if destinations:
                 if self.cv_action == 2: #add shape
-                    self.ar.ctrls.transferShape(True, False, self.cv_curve, destinations, True)
+                    self.ar.ctrls.transfer_shape(True, False, self.cv_curve, destinations, True)
                 elif self.cv_action == 3: #replace shapes
-                    self.ar.ctrls.transferShape(True, True, self.cv_curve, destinations, True)
+                    self.ar.ctrls.transfer_shape(True, True, self.cv_curve, destinations, True)
             else:
                 cmds.delete(self.cv_curve)
                 mel.eval("warning \""+self.ar.data.lang['e011_notSelShape']+"\";")

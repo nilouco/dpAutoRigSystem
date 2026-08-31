@@ -138,21 +138,21 @@ class Ribbon(object):
                     self.addCorrectiveJoint(jcrNumber, self.cornerBJnt, jcrPosList, jcrRotList)
         
         if arm:
-            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, world_ref=world_ref, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
-            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, iniJxt=iniJxt, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, world_ref=world_ref, jointLabelAdd=jointLabelAdd, joint_label_name='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, iniJxt=iniJxt, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, jointLabelAdd=jointLabelAdd, joint_label_name='Down_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleY", downLimb['extraCtrlGrp']+".scaleY", force=True)
         else:
-            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, world_ref=world_ref, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
-            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, world_ref=world_ref, jointLabelAdd=jointLabelAdd, joint_label_name='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, world_ref=world_ref, jointLabelAdd=jointLabelAdd, joint_label_name='Down_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleY", downLimb['extraCtrlGrp']+".scaleX", force=True)
             if oriBLoc:
-                downBLimb = self.createRibbon(name=prefix+myName+'_DownB', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[2], lista[3]], s=side, world_ref=world_ref, jointLabelAdd=jointLabelAdd, jointLabelName='DownB_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm, oriBLoc=oriBLoc)
+                downBLimb = self.createRibbon(name=prefix+myName+'_DownB', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[2], lista[3]], s=side, world_ref=world_ref, jointLabelAdd=jointLabelAdd, joint_label_name='DownB_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm, oriBLoc=oriBLoc)
                 cmds.connectAttr(downBctrlCtrl+".scaleZ", downBLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(upctrlCtrl+".scaleZ", upLimb['extraCtrlGrp']+".scaleZ", force=True)
         cmds.connectAttr(downctrlCtrl+".scaleZ", downLimb['extraCtrlGrp']+".scaleZ", force=True)
@@ -398,8 +398,8 @@ class Ribbon(object):
             Returns the group zeroOut and the control curve.
         """
         grp = None
-        curve = self.ar.ctrls.cvControl("id_038_RibbonBend", myName, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.limbInstance.guide_base)
-        self.ar.ctrls.setLockHide([curve], ['v'])
+        curve = self.ar.ctrls.create_controller("id_038_RibbonBend", myName, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limbInstance.guide_base)
+        self.ar.ctrls.set_lock_hide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=myName+'_Grp')
             self.ar.utils.addCustomAttr([grp], self.ar.utils.ignoreTransformIOAttr)
@@ -411,9 +411,9 @@ class Ribbon(object):
             Returns the group, the control curve and its zeroOut group.
         """
         if armStyle:
-            curve = self.ar.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.limbInstance.name_guide+"_Corner")
+            curve = self.ar.ctrls.create_controller("id_039_RibbonCorner", myName, r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limbInstance.name_guide+"_Corner")
         else:
-            curve = self.ar.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guideSource=self.limbInstance.name_guide+"_Corner")
+            curve = self.ar.ctrls.create_controller("id_039_RibbonCorner", myName, r=self.radius, d=self.curve_degree, rot=(90, 0, 0), guide_source=self.limbInstance.name_guide+"_Corner")
         grp = None
         if zero:
             zero0 = cmds.group(curve, name=myName+'_Zero_0_Grp')
@@ -430,11 +430,11 @@ class Ribbon(object):
         else:
             cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-        self.ar.ctrls.setLockHide([curve], ['v'])
+        self.ar.ctrls.set_lock_hide([curve], ['v'])
         return [grp, curve, zero0, zero1]
     
     
-    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, world_ref="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, oriBLoc=None, *args):
+    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, world_ref="worldRef", jointLabelAdd=0, joint_label_name="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, oriBLoc=None, *args):
         """ Main method to create the Ribbon system.
             centerUpDown = [0, 1, 2] # center, up, down ribbon part to change proportionList used in volumeVariation.
             Returns results in a dictionary.
@@ -462,7 +462,7 @@ class Ribbon(object):
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
         self.ar.utils.addCustomAttr([ribbon], self.ar.skin.ignoreSkinningAttr)
         #call the function to create follicles and joint in the nurbsPlane
-        results = self.createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
+        results = self.createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, joint_label_name=joint_label_name)
         rb_Jnt = results[0]
         fols = results[1]
         #create locator controls for the middle of the ribbon
@@ -634,7 +634,7 @@ class Ribbon(object):
         
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
-        mid_Ctrl = self.ar.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guideSource=self.limbInstance.name_guide+"_Corner")
+        mid_Ctrl = self.ar.ctrls.create_controller("Circle", name+'_MidCtrl', r=self.radius, d=self.curve_degree, rot=(0, 90, 0), guide_source=self.limbInstance.name_guide+"_Corner")
         self.ar.utils.removeUserDefinedAttr(mid_Ctrl, True)
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
@@ -711,7 +711,7 @@ class Ribbon(object):
             
             # create extra control
             extraName = jnt[:-4] #removed _Jnt suffix
-            extraCtrl = self.ar.ctrls.cvControl("id_040_RibbonExtra", ctrl_name=extraName+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.limbInstance.guide_base, parentTag=self.limbInstance.get_parent_to_tag(extraCtrlList))
+            extraCtrl = self.ar.ctrls.create_controller("id_040_RibbonExtra", ctrl_name=extraName+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.limbInstance.guide_base, parent_tag=self.limbInstance.get_parent_to_tag(extraCtrlList))
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
@@ -764,10 +764,10 @@ class Ribbon(object):
                                 # flip direction to conform with left side
                                 addDir = -1 * addDir
                         cmds.setAttr(jad+".translate"+addAxis, addDir*self.radius*0.5)
-                        self.ar.utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
+                        self.ar.utils.setJointLabel(jad, s+jointLabelAdd, 18, joint_label_name+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
-                        addCtrl = self.ar.ctrls.cvControl("id_088_LimbAdditional", ctrl_name=extraName+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guideSource=self.limbInstance.guide_base)
+                        addCtrl = self.ar.ctrls.create_controller("id_088_LimbAdditional", ctrl_name=extraName+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guide_source=self.limbInstance.guide_base)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = self.ar.utils.zeroOut([addCtrl])[0]
                         cmds.matchTransform(addCtrlGrp, jad, position=True, rotation=True)
@@ -985,7 +985,7 @@ class Ribbon(object):
         return retDict
     
     
-    def createFollicles(self, rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, jointLabelAdd=0, jointLabelName="RibbonName", *args): 
+    def createFollicles(self, rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, jointLabelAdd=0, joint_label_name="RibbonName", *args): 
         """ Create follicles to be used by the Ribbon system.
             Returns a list with joints and follicles created.
         """
@@ -1011,7 +1011,7 @@ class Ribbon(object):
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                self.ar.utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
+                self.ar.utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, joint_label_name+'_%02d'%i)
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the position of the first follicle
@@ -1036,7 +1036,7 @@ class Ribbon(object):
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                self.ar.utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
+                self.ar.utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, joint_label_name+'_%02d'%i)
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the first follicle position

@@ -500,8 +500,8 @@ class MotionCapture(base.BaseLibrary):
     def get_auto_rotate_ctrls(self):
         """ Get and return the clavicle and neck controllers.
         """
-        controllers = self.ar.ctrls.getControlNodeById("id_030_LimbClavicle")
-        controllers.extend(self.ar.ctrls.getControlNodeById("id_022_HeadNeck"))
+        controllers = self.ar.ctrls.get_controller_node_by_id("id_030_LimbClavicle")
+        controllers.extend(self.ar.ctrls.get_controller_node_by_id("id_022_HeadNeck"))
         return controllers
 
 
@@ -542,7 +542,7 @@ class MotionCapture(base.BaseLibrary):
         """ Set the biped arms as TPose and align leg and feet as vertical to front direction.
         """
         # clavicle/hips
-        before_ctrls = self.ar.ctrls.getControlNodeById("id_030_LimbClavicle")
+        before_ctrls = self.ar.ctrls.get_controller_node_by_id("id_030_LimbClavicle")
         if before_ctrls:
             clav_items, hip_items = [], []
             for before_ctrl in before_ctrls:
@@ -558,7 +558,7 @@ class MotionCapture(base.BaseLibrary):
                 cmds.setAttr(clav_items[1]+".rotate"+axis, cmds.getAttr(clav_items[0]+".rotate"+axis)) #right clavicle
                 cmds.setAttr(hip_items[1]+".rotate"+axis, cmds.getAttr(hip_items[0]+".rotate"+axis)) #right hips
         # arm/leg
-        fk_ctrls = self.ar.ctrls.getControlNodeById("id_031_LimbFk")
+        fk_ctrls = self.ar.ctrls.get_controller_node_by_id("id_031_LimbFk")
         if fk_ctrls:
             arms, legs = [], []
             for fkCtrl in fk_ctrls:
@@ -597,8 +597,8 @@ class MotionCapture(base.BaseLibrary):
             cmds.xform(legs[4], rotation=(-90, 0, 90), worldSpace=True) #right knee
             cmds.xform(legs[5], rotation=(0, 90, 90), worldSpace=True) #right ankle
         # fingers
-        finger_ctrls = self.ar.ctrls.getControlNodeById("id_015_FingerMain") or []
-        finger_ctrls.extend(self.ar.ctrls.getControlNodeById("id_016_FingerFk"))
+        finger_ctrls = self.ar.ctrls.get_controller_node_by_id("id_015_FingerMain") or []
+        finger_ctrls.extend(self.ar.ctrls.get_controller_node_by_id("id_016_FingerFk"))
         if finger_ctrls:
             finger_ctrls = [f for f in finger_ctrls if not "_00_" in f and not self.ar.data.lang['m036_thumb'] in f]
             for finger_ctrl in finger_ctrls:

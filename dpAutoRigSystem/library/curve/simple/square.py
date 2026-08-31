@@ -14,7 +14,7 @@ class Square(curve.BaseCurve):
     
     
     def cv_main(self, use_ui, cv_id=None, cv_name=CLASS_NAME+'_Ctrl', cv_size=1.0, cv_degree=1, cv_direction='+Y', cv_rot=(0, 0, 0), cv_action=1, guide=False):
-        """ The principal method to call all other methods in order to build the cvControl curve.
+        """ The principal method to call all other methods in order to build the create_controller curve.
             Return the result: new control curve or the destination list depending of action.
         """
         return self.cv_create(use_ui, cv_id, cv_name, cv_size, cv_degree, cv_direction, cv_rot, cv_action, guide)

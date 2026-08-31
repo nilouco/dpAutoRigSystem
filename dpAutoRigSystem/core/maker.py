@@ -226,9 +226,9 @@ class Maker(object):
             cmds.addAttr(self.all_grp, longName=attr, attributeType="message")
         if not cmds.objExists(item):
             if (item != (self.ar.data.prefix+"Option_Ctrl")):
-                item = self.ar.ctrls.cvControl(ctrl_type, item, r=radius, d=degree, dir="+X")
+                item = self.ar.ctrls.create_controller(ctrl_type, item, r=radius, d=degree, dir="+X")
             else:
-                item = self.ar.ctrls.cvCharacter(ctrl_type, item, r=(radius*0.2))
+                item = self.ar.ctrls.create_character_ctrl(ctrl_type, item, r=(radius*0.2))
             cmds.setAttr(item+".rotateOrder", 3)
             cmds.connectAttr(item+".message", self.all_grp+"."+attr, force=True)
             self.ctrl_was_created = True
@@ -285,7 +285,7 @@ class Maker(object):
         for class_name in self.ar.data.lib[self.ar.data.standard_folder]["names"]:
             cmds.addAttr(self.all_grp, longName="dp"+class_name+"Count", attributeType="long", defaultValue=0)
         # set outliner color
-        self.ar.ctrls.colorShape([self.all_grp], [1, 1, 1], outliner=True) #white
+        self.ar.ctrls.color_shape([self.all_grp], [1, 1, 1], outliner=True) #white
 
 
     def update_all_grp_attrs(self):
@@ -297,9 +297,9 @@ class Maker(object):
 
 
     def set_outliner_color(self):
-        self.ar.ctrls.colorShape([self.ctrls_grp], [0, 0.65, 1], outliner=True) #blue
-        self.ar.ctrls.colorShape([self.data_grp], [1, 1, 0], outliner=True) #yellow
-        self.ar.ctrls.colorShape([self.render_grp], [1, 0.45, 0], outliner=True) #orange
+        self.ar.ctrls.color_shape([self.ctrls_grp], [0, 0.65, 1], outliner=True) #blue
+        self.ar.ctrls.color_shape([self.data_grp], [1, 1, 0], outliner=True) #yellow
+        self.ar.ctrls.color_shape([self.render_grp], [1, 0.45, 0], outliner=True) #orange
 
 
     def set_all_grp_hierarchy(self):
@@ -321,7 +321,7 @@ class Maker(object):
                                 self.fx_grp,
                                 self.static_grp,
                                 self.ctrls_vis_grp]
-        self.ar.ctrls.setLockHide(to_lock_hide_attrs, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ar.ctrls.set_lock_hide(to_lock_hide_attrs, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
 
 
     def set_parent_root_ctrl_pivot(self):
@@ -331,9 +331,9 @@ class Maker(object):
 
 
     def set_ground_shapes(self):
-        self.ar.ctrls.createGroundDirectionShape(self.global_ctrl, 2, 15, 1)
-        self.ar.ctrls.createGroundDirectionShape(self.master_ctrl, 1, 11, 0)
-        self.ar.ctrls.createGroundDirectionShape(self.root_ctrl, 1, 8, 0)
+        self.ar.ctrls.create_ground_direction_shape(self.global_ctrl, 2, 15, 1)
+        self.ar.ctrls.create_ground_direction_shape(self.master_ctrl, 1, 11, 0)
+        self.ar.ctrls.create_ground_direction_shape(self.root_ctrl, 1, 8, 0)
 
 
     def set_option_ctrl_rig_scale(self):
@@ -353,10 +353,10 @@ class Maker(object):
         cmds.connectAttr(self.rig_scale_md+".outputX", self.master_ctrl+".scaleX", force=True)
         cmds.connectAttr(self.rig_scale_md+".outputX", self.master_ctrl+".scaleY", force=True)
         cmds.connectAttr(self.rig_scale_md+".outputX", self.master_ctrl+".scaleZ", force=True)
-        self.ar.ctrls.setLockHide([self.master_ctrl], ['sx', 'sy', 'sz'])
-        self.ar.ctrls.setLockHide([self.option_ctrl], ['rigScaleOutput'])
-        self.ar.ctrls.setNonKeyable([self.option_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-        self.ar.ctrls.setStringAttrFromList(self.option_ctrl, ['rigScaleMultiplier'])
+        self.ar.ctrls.set_lock_hide([self.master_ctrl], ['sx', 'sy', 'sz'])
+        self.ar.ctrls.set_lock_hide([self.option_ctrl], ['rigScaleOutput'])
+        self.ar.ctrls.set_non_keyable([self.option_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        self.ar.ctrls.set_string_attr_from_items(self.option_ctrl, ['rigScaleMultiplier'])
 
 
     def mount_ground_ctrls_hierarchy(self):
@@ -376,9 +376,9 @@ class Maker(object):
 
 
     def set_ground_ctrls_lock_hide_attr(self):
-        self.ar.ctrls.setLockHide([self.scalable_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-        self.ar.ctrls.setLockHide([self.root_ctrl, self.global_ctrl], ['sx', 'sy', 'sz', 'v'])
-        self.ar.ctrls.setLockHide([self.root_pivot_ctrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+        self.ar.ctrls.set_lock_hide([self.scalable_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
+        self.ar.ctrls.set_lock_hide([self.root_ctrl, self.global_ctrl], ['sx', 'sy', 'sz', 'v'])
+        self.ar.ctrls.set_lock_hide([self.root_pivot_ctrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
 
 
     def set_root_pivot_attr(self):
@@ -401,7 +401,7 @@ class Maker(object):
             cmds.scaleConstraint(self.root_ctrl, self.base_root_jnt_grp, maintainOffset=True, name=self.base_root_jnt_grp+"_ScC")
             self.ar.custom_attr.add_attr(0, [self.base_root_jnt_grp], descendents=True) #dpID
             cmds.setAttr(self.base_root_jnt_grp+".visibility", 0)
-            self.ar.ctrls.setLockHide([self.base_root_jnt, self.base_root_jnt_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ar.ctrls.set_lock_hide([self.base_root_jnt, self.base_root_jnt_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
 
 
     def create_base_rig_node(self):
@@ -532,18 +532,18 @@ class Maker(object):
             ground_ctrls = [self.global_ctrl, self.root_ctrl, self.option_ctrl]
             left_pattern = re.compile(f"{self.ar.data.lang['p002_left']}_.*._Ctrl")
             right_pattern = re.compile(f"{self.ar.data.lang['p003_right']}_.*._Ctrl")
-            for ctrl in self.ar.ctrls.getControlList():
+            for ctrl in self.ar.ctrls.get_controllers():
                 shapes = cmds.listRelatives(ctrl, children=True, allDescendents=True, fullPath=True, type="shape")
                 if shapes:
                     if not cmds.getAttr(shapes[0]+".overrideEnabled"):
                         if (left_pattern.match(ctrl)):
-                            self.ar.ctrls.colorShape([ctrl], "red")
+                            self.ar.ctrls.color_shape([ctrl], "red")
                         elif (right_pattern.match(ctrl)):
-                            self.ar.ctrls.colorShape([ctrl], "blue")
+                            self.ar.ctrls.color_shape([ctrl], "blue")
                         elif (ctrl in ground_ctrls):
-                            self.ar.ctrls.colorShape([ctrl], "black")
+                            self.ar.ctrls.color_shape([ctrl], "black")
                         else:
-                            self.ar.ctrls.colorShape([ctrl], "yellow")
+                            self.ar.ctrls.color_shape([ctrl], "yellow")
 
 
     def get_mirror_names(self, item):
@@ -622,19 +622,19 @@ class Maker(object):
 
     def set_parent_tag(self):
         guide_source_data = {}
-        holder_ctrls = self.ar.ctrls.getControlList("dpHolder")
-        ctrls = self.ar.ctrls.getControlList()
+        holder_ctrls = self.ar.ctrls.get_controllers("dpHolder")
+        ctrls = self.ar.ctrls.get_controllers()
         ctrls.extend(holder_ctrls)
         for ctrl in ctrls:
-            if "guideSource" in cmds.listAttr(ctrl):
-                guide_source_data[cmds.getAttr(ctrl+".guideSource")] = ctrl
+            if "guide_source" in cmds.listAttr(ctrl):
+                guide_source_data[cmds.getAttr(ctrl+".guide_source")] = ctrl
         # missing parentTag controllers:
-        for p_tag_ctrl in [c for c in self.ar.ctrls.getControlList("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]:
+        for p_tag_ctrl in [c for c in self.ar.ctrls.get_controllers("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]:
             if not p_tag_ctrl == self.global_ctrl:
                 if "controlID" in cmds.listAttr(p_tag_ctrl):
                     if not cmds.getAttr(p_tag_ctrl+".controlID") == "id_092_Correctives":
-                        if "guideSource" in cmds.listAttr(p_tag_ctrl):
-                            guide_source = cmds.getAttr(p_tag_ctrl+".guideSource")
+                        if "guide_source" in cmds.listAttr(p_tag_ctrl):
+                            guide_source = cmds.getAttr(p_tag_ctrl+".guide_source")
                             guide_base = guide_source.split(":")[0]+":Guide_Base"
                             parent_node = self.hook[guide_base]['parentNode']
                             father_guide = self.hook[guide_base]['fatherGuide']
@@ -645,7 +645,7 @@ class Maker(object):
                                     continue
                                 found_ctrl = guide_source_data[parent_node]
                                 if found_ctrl in holder_ctrls: #holder
-                                    guide_source = cmds.getAttr(found_ctrl+".guideSource")
+                                    guide_source = cmds.getAttr(found_ctrl+".guide_source")
                                     guide_base = guide_source.split(":")[0]+":Guide_Base"
                                     parent_node = self.hook[guide_base]['parentNode']
                                     father_guide = self.hook[guide_base]['fatherGuide']
@@ -1089,8 +1089,8 @@ class Composer(object):
                         cmds.connectAttr(self.ar.maker.option_ctrl+'.'+shape_vis_attr, hips_a+'.'+shape_vis_attr)
                         cmds.setAttr(hips_a+'.'+shape_vis_attr, keyable=False)
             if self.ar.data.colorize_curve:
-                self.ar.ctrls.colorShape(spine.composed['InnerCtrls'][s], "cyan")
-                self.ar.ctrls.colorShape(spine.composed['OuterCtrls'][s], "yellow")
+                self.ar.ctrls.color_shape(spine.composed['InnerCtrls'][s], "cyan")
+                self.ar.ctrls.color_shape(spine.composed['OuterCtrls'][s], "yellow")
 
 
     def head_options(self, head):
@@ -1102,13 +1102,13 @@ class Composer(object):
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=world_ref+"_PaC"))
             if self.ar.data.colorize_curve:
                 if head.composed['controllers']:
-                    self.ar.ctrls.colorShape(head.composed['controllers'][s], "yellow")
+                    self.ar.ctrls.color_shape(head.composed['controllers'][s], "yellow")
                 if head.composed['InnerCtrls']:
-                    self.ar.ctrls.colorShape(head.composed['InnerCtrls'][s], "cyan")
+                    self.ar.ctrls.color_shape(head.composed['InnerCtrls'][s], "cyan")
                 if head.composed['lCtrls']:
-                    self.ar.ctrls.colorShape(head.composed['lCtrls'][s], "red")
+                    self.ar.ctrls.color_shape(head.composed['lCtrls'][s], "red")
                 if head.composed['rCtrls']:
-                    self.ar.ctrls.colorShape(head.composed['rCtrls'][s], "blue")
+                    self.ar.ctrls.color_shape(head.composed['rCtrls'][s], "blue")
         if self.facial_ctrl_grps:
             if not cmds.objExists(self.ar.maker.option_ctrl+"."+self.ar.data.lang['c059_facial'].lower()):
                 cmds.addAttr(self.ar.maker.option_ctrl, longName=self.ar.data.lang['c059_facial'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
@@ -1147,10 +1147,10 @@ class Composer(object):
             for s, side in enumerate(self.ar.maker.get_mirror_names(eye)):
                 if eye.composed['hasIris']:
                     iris_ctrl = eye.composed['irisCtrl'][s]
-                    self.ar.ctrls.colorShape([iris_ctrl], "cyan")
+                    self.ar.ctrls.color_shape([iris_ctrl], "cyan")
                 if eye.composed['hasPupil']:
                     pupil_ctrl = eye.composed['pupilCtrl'][s]
-                    self.ar.ctrls.colorShape([pupil_ctrl], "yellow")
+                    self.ar.ctrls.color_shape([pupil_ctrl], "yellow")
 
 
     def finger_scalable(self, finger):
@@ -1284,9 +1284,9 @@ class Composer(object):
         # compose the nose control colors:
         if self.ar.maker.hook[nose.guide_base]['guideMirrorAxis'] == "off":
             if self.ar.data.colorize_curve:
-                self.ar.ctrls.colorShape(nose.composed['controllers'][0], "yellow")
-                self.ar.ctrls.colorShape(nose.composed['lCtrls'][0], "red")
-                self.ar.ctrls.colorShape(nose.composed['rCtrls'][0], "blue")
+                self.ar.ctrls.color_shape(nose.composed['controllers'][0], "yellow")
+                self.ar.ctrls.color_shape(nose.composed['lCtrls'][0], "red")
+                self.ar.ctrls.color_shape(nose.composed['rCtrls'][0], "blue")
         
         
     def nose_head(self, nose, head):

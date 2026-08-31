@@ -42,7 +42,7 @@ class ConnectionIO(action.BaseAction):
                     if inputs:
                         controllers = inputs
                     else:
-                        controllers = self.ar.ctrls.getControlList()
+                        controllers = self.ar.ctrls.get_controllers()
                     if controllers:
                         if self.first_mode: #export
                             to_export_data = self.get_connection_data(controllers)

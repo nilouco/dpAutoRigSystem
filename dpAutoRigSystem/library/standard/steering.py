@@ -34,8 +34,8 @@ class Steering(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
@@ -47,7 +47,7 @@ class Steering(standard.BaseStandard):
         cmds.parent(self.guide_end_loc, self.guide_loc)
         # edit
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         cmds.parentConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_PaC")
         cmds.parentConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_PaC")
 
@@ -79,8 +79,8 @@ class Steering(standard.BaseStandard):
                 # joint labelling:
                 self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
-                steering_ctrl = self.ar.ctrls.cvControl("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointLoc1")
-                main_ctrl = self.ar.ctrls.cvControl("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guideSource=self.name_guide+"_JointEnd", parentTag=steering_ctrl)
+                steering_ctrl = self.ar.ctrls.create_controller("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc1")
+                main_ctrl = self.ar.ctrls.create_controller("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=steering_ctrl)
                 self.ar.utils.originedFrom(objName=steering_ctrl, attrString=self.guide)
                 self.ar.utils.originedFrom(objName=main_ctrl, attrString=self.base+";"+self.guide_end_loc+";"+self.guide_radius)
                 self.steering_ctrls.append(steering_ctrl)
@@ -91,7 +91,7 @@ class Steering(standard.BaseStandard):
                 # zeroOut controls:
                 zeros = self.ar.utils.zeroOut([steering_ctrl, main_ctrl])
                 # hide visibility attribute:
-                self.ar.ctrls.setLockHide([steering_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
+                self.ar.ctrls.set_lock_hide([steering_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.guide_base+".flip") == 1:
@@ -127,7 +127,7 @@ class Steering(standard.BaseStandard):
                                             self.ar.data.lang['c071_limit'],
                                             self.ar.data.lang['c049_intensity']
                                             ]
-                self.ar.ctrls.setStringAttrFromList(steering_ctrl, steering_calibrates)
+                self.ar.ctrls.set_string_attr_from_items(steering_ctrl, steering_calibrates)
 
                 # grouping:
                 cmds.parent(zeros[0], main_ctrl)

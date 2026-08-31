@@ -46,7 +46,7 @@ class AttributeIO(action.BaseAction):
                     if inputs:
                         items = inputs
                     else:
-                        items = self.ar.ctrls.getControlList()
+                        items = self.ar.ctrls.get_controllers()
                         items.extend(self.get_models_to_export())
                     if items:
                         if self.first_mode: #export

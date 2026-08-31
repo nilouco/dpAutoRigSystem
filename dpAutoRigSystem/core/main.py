@@ -60,6 +60,7 @@ from ..ui import rivet_ui
 from ..ui import target_mirror_ui
 from ..ui import update_guides_ui
 from ..ui import zipper_ui
+from ..ui import value_editor_ui
 from .. import version
 
 
@@ -129,6 +130,7 @@ class Start(object):
             reload(target_mirror_ui)
             reload(update_guides_ui)
             reload(zipper_ui)
+            reload(value_editor_ui)
             print("Reloaded imported modules")
 
 
@@ -186,6 +188,7 @@ class Start(object):
         self.target_mirror_ui = target_mirror_ui.TargetMirrorUI(self)
         self.update_guides_ui = update_guides_ui.UpdateGuidesUI(self)
         self.zipper_ui = zipper_ui.ZipperUI(self)
+        self.value_editor_ui = value_editor_ui.ValueEditorUI(self)
 
 
     def ui(self):

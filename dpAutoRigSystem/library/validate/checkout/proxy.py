@@ -160,7 +160,7 @@ class Proxy(action.BaseAction):
                         if nodeFaceList:
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
                             cmds.delete(faceDupList)
-                        self.ar.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
+                        self.ar.ctrls.set_lock_hide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
                         cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
                         cmds.parent(dup, jnt)
                         cmds.scriptEditorInfo(suppressWarnings=True)
@@ -170,7 +170,7 @@ class Proxy(action.BaseAction):
                         cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
                         cmds.parent(dup, grp)
                         self.ar.utils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
-                        self.ar.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                        self.ar.ctrls.set_lock_hide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
                         if drawOverrideList:
                             # remove from display layer
@@ -214,7 +214,7 @@ class Proxy(action.BaseAction):
             self.connectProxyVis(option_ctrl, "Tweaks") #fixed camelCase for earlier rig versions v4.03.32
             self.connectProxyVis(option_ctrl, suffixName="Facial_Ctrls_Grp")
             self.connectProxyVis(option_ctrl, suffixName="Deformer_Ctrl_Grp")
-        self.ar.ctrls.colorShape([grp], [1, 0.5, 0.5], outliner=True) #red
+        self.ar.ctrls.color_shape([grp], [1, 0.5, 0.5], outliner=True) #red
 
 
     def connectProxyVis(self, ctrl, attr=None, suffixName=None, *args):

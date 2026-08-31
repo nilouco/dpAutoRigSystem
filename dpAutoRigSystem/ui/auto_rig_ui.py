@@ -304,26 +304,26 @@ class MainUI(object):
         # color index
         cmds.gridLayout('ctr_color_index_gl', numberOfColumns=16, cellWidthHeight=(20, 20), parent='ctr_color_tab')
         # creating color buttons
-        for color_index, color_values in enumerate(self.ar.ctrls.getColorList()):
-            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.colorShape, color=color_index), parent='ctr_color_index_gl')
+        for color_index, color_values in enumerate(self.ar.ctrls.get_colors()):
+            cmds.button('index_color_'+str(color_index)+'_bt', label=str(color_index), backgroundColor=(color_values[0], color_values[1], color_values[2]), command=partial(self.ar.ctrls.color_shape, color=color_index), parent='ctr_color_index_gl')
         # RGB layout:
         cmds.columnLayout('ctr_color_rgb_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='ctr_color_tab')
         cmds.separator(height=10, style='none', parent='ctr_color_rgb_cl')
-        cmds.colorSliderGrp('ctr_color_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.setColorRGBByUI, slider='colorRGBSlider'), parent='ctr_color_rgb_cl')
-        cmds.button("ctr_remove_override_color_bt", label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.removeColor, parent='ctr_color_rgb_cl')
+        cmds.colorSliderGrp('ctr_color_rgb_csg', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.set_color_rgb_by_ui, slider='colorRGBSlider'), parent='ctr_color_rgb_cl')
+        cmds.button("ctr_remove_override_color_bt", label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='ctr_color_rgb_cl')
         # outliner layout:
         cmds.columnLayout('ctr_color_outliner_cl', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent='ctr_color_tab')
         cmds.separator(height=10, style='none', parent='ctr_color_outliner_cl')
-        cmds.colorSliderGrp('ctr_color_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.setColorOutlinerByUI, slider='colorOutlinerSlider'), parent='ctr_color_outliner_cl')
-        cmds.button("ctr_remove_outliner_color_bt", label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.removeColor, parent='ctr_color_outliner_cl')
+        cmds.colorSliderGrp('ctr_color_outliner_csg', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=partial(self.ar.ctrls.set_color_outliner_by_ui, slider='colorOutlinerSlider'), parent='ctr_color_outliner_cl')
+        cmds.button("ctr_remove_outliner_color_bt", label=self.ar.data.lang['i046_remove'], command=self.ar.ctrls.remove_color, parent='ctr_color_outliner_cl')
         # renaming color tabLayouts:
         cmds.tabLayout('ctr_color_tab', edit=True, tabLabel=(('ctr_color_index_gl', "Index"), ('ctr_color_rgb_cl', "RGB"), ('ctr_color_outliner_cl', "Outliner")))
         # setup controller
         cmds.frameLayout('ctr_default_value_fl', label=self.ar.data.lang['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
         cmds.paneLayout("ctr_default_value_v3_pl", configuration="vertical3", separatorThickness=2.0, parent='ctr_default_value_fl')
-        cmds.button("ctr_reset_to_default_value_bt", label=self.ar.data.lang['i271_reset'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ar.ctrls.setupDefaultValues, True), parent='ctr_default_value_v3_pl')
-        cmds.button("ctr_set_default_value_bt", label=self.ar.data.lang['i272_set'], backgroundColor=(1.0, 0.8, 0.5), height=30, command=partial(self.ar.ctrls.setupDefaultValues, False), parent='ctr_default_value_v3_pl')
-        cmds.button("ctr_setup_default_value_bt", label=self.ar.data.lang['i274_editor'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=self.ar.ctrls.defaultValueEditor, parent='ctr_default_value_v3_pl')
+        cmds.button("ctr_reset_to_default_value_bt", label=self.ar.data.lang['i271_reset'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ar.ctrls.setup_default_values, True), parent='ctr_default_value_v3_pl')
+        cmds.button("ctr_set_default_value_bt", label=self.ar.data.lang['i272_set'], backgroundColor=(1.0, 0.8, 0.5), height=30, command=partial(self.ar.ctrls.setup_default_values, False), parent='ctr_default_value_v3_pl')
+        cmds.button("ctr_setup_default_value_bt", label=self.ar.data.lang['i274_editor'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=self.ar.value_editor_ui.create_ui, parent='ctr_default_value_v3_pl')
         # create dontroller
         cmds.frameLayout('ctr_create_fl', label=self.ar.data.lang['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent='ctr_main_cl')
         cmds.frameLayout('ctr_create_options_fl', label=self.ar.data.lang['i002_options'], collapsable=True, collapse=True, marginWidth=10, parent='ctr_create_fl')
@@ -352,19 +352,19 @@ class MainUI(object):
         # edit seleted controller
         cmds.frameLayout('ctr_edit_selected_fl', label=self.ar.data.lang['i011_editSelected']+" "+self.ar.data.lang['i111_controller'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
         cmds.paneLayout("ctr_edit_selected_v3_pl", configuration="vertical3", separatorThickness=2.0, parent="ctr_edit_selected_fl")
-        cmds.button("ctr_add_shape_bt", label=self.ar.data.lang['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ar.ctrls.transferShape, False, False), parent="ctr_edit_selected_v3_pl")
-        cmds.button("ctr_copy_shape_bt", label=self.ar.data.lang['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ar.ctrls.transferShape, False, True), parent="ctr_edit_selected_v3_pl")
-        cmds.button("ctr_replace_shape_bt", label=self.ar.data.lang['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ar.ctrls.transferShape, True, True), parent="ctr_edit_selected_v3_pl")
+        cmds.button("ctr_add_shape_bt", label=self.ar.data.lang['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ar.ctrls.transfer_shape, False, False), parent="ctr_edit_selected_v3_pl")
+        cmds.button("ctr_copy_shape_bt", label=self.ar.data.lang['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ar.ctrls.transfer_shape, False, True), parent="ctr_edit_selected_v3_pl")
+        cmds.button("ctr_replace_shape_bt", label=self.ar.data.lang['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ar.ctrls.transfer_shape, True, True), parent="ctr_edit_selected_v3_pl")
         cmds.paneLayout("ctr_edit_selected_v2_pl", configuration="vertical2", separatorThickness=2.0, parent="ctr_edit_selected_fl")
-        cmds.button("ctr_reset_curve_bt", label=self.ar.data.lang['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ar.ctrls.resetCurve), parent="ctr_edit_selected_v2_pl")
-        cmds.button("ctr_change_degree_bt", label=self.ar.data.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ar.ctrls.resetCurve, True), parent="ctr_edit_selected_v2_pl")
+        cmds.button("ctr_reset_curve_bt", label=self.ar.data.lang['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ar.ctrls.reset_curve), parent="ctr_edit_selected_v2_pl")
+        cmds.button("ctr_change_degree_bt", label=self.ar.data.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ar.ctrls.reset_curve, True), parent="ctr_edit_selected_v2_pl")
         cmds.button("ctr_zero_out_grp_bt", label=self.ar.data.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=self.ar.utils.zeroOut, parent="ctr_edit_selected_fl")
-        cmds.button("ctr_select_all_bt", label=self.ar.data.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ar.ctrls.selectAllControls), parent="ctr_edit_selected_fl")
+        cmds.button("ctr_select_all_bt", label=self.ar.data.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ar.ctrls.select_all_controllers), parent="ctr_edit_selected_fl")
         # calibration controllers
         cmds.frameLayout('ctr_calibration_fl', label=self.ar.data.lang['i193_calibration'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
         cmds.paneLayout("ctr_calibration_v2_pl", configuration="vertical2", separatorThickness=2.0, parent="ctr_calibration_fl")
-        cmds.button("ctr_transfer_calibration_bt", label=self.ar.data.lang['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ar.ctrls.transferCalibration, parent="ctr_calibration_v2_pl")
-        cmds.button("ctr_import_calibration_bt", label=self.ar.data.lang['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ar.ctrls.importCalibration, parent="ctr_calibration_v2_pl")
+        cmds.button("ctr_transfer_calibration_bt", label=self.ar.data.lang['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ar.ctrls.transfer_calibration, parent="ctr_calibration_v2_pl")
+        cmds.button("ctr_import_calibration_bt", label=self.ar.data.lang['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ar.ctrls.import_calibration, parent="ctr_calibration_v2_pl")
         # mirror calibration
         cmds.frameLayout('ctr_mirror_calibration_fl', label=self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['i193_calibration'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent="ctr_calibration_fl")
         cmds.rowColumnLayout('ctr_mirror_calibration_rcl', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="ctr_calibration_fl")
@@ -373,12 +373,12 @@ class MainUI(object):
         cmds.textField('ctr_mirror_calibration_from_prefix_tf', text=self.ar.data.lang['p002_left']+"_", parent="ctr_mirror_calibration_rcl")
         cmds.text("ctr_mirror_calibration_to_prefix_txt", label=self.ar.data.lang['i037_to'], parent="ctr_mirror_calibration_rcl")
         cmds.textField('ctr_mirror_calibration_to_prefix_tf', text=self.ar.data.lang['p003_right']+"_", parent="ctr_mirror_calibration_rcl")
-        cmds.button("ctr_mirror_calibration_bt", label=self.ar.data.lang['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ar.ctrls.mirrorCalibration, parent="ctr_mirror_calibration_rcl")
+        cmds.button("ctr_mirror_calibration_bt", label=self.ar.data.lang['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ar.ctrls.mirror_calibration, parent="ctr_mirror_calibration_rcl")
         # control shape IO
         cmds.frameLayout('ctr_shape_io_fl', label=self.ar.data.lang['m067_shape']+" "+self.ar.data.lang['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
         cmds.paneLayout("ctr_shape_io_v4_pl", configuration="vertical4", separatorThickness=2.0, parent="ctr_shape_io_fl")
-        cmds.button("ctr_shape_io_export_bt", label=self.ar.data.lang['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ar.ctrls.exportShape, parent="ctr_shape_io_v4_pl")
-        cmds.button("ctr_shape_io_import_bt", label=self.ar.data.lang['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ar.ctrls.importShape, parent="ctr_shape_io_v4_pl")
+        cmds.button("ctr_shape_io_export_bt", label=self.ar.data.lang['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ar.ctrls.export_shape, parent="ctr_shape_io_v4_pl")
+        cmds.button("ctr_shape_io_import_bt", label=self.ar.data.lang['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ar.ctrls.import_shape, parent="ctr_shape_io_v4_pl")
         # mirror control shape
         cmds.frameLayout('ctr_mirror_shape_fl', label=self.ar.data.lang['m010_mirror']+" "+self.ar.data.lang['m067_shape'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent="ctr_shape_io_fl")
         cmds.rowColumnLayout('ctr_mirror_shape_rcl', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="ctr_shape_io_fl")
@@ -389,7 +389,7 @@ class MainUI(object):
         cmds.textField('ctr_mirror_shape_from_prefix_tf', text=self.ar.data.lang['p002_left']+"_", parent="ctr_mirror_shape_rcl")
         cmds.text("ctr_mirror_shape_to_prefix_txt", label=self.ar.data.lang['i037_to'], parent="ctr_mirror_shape_rcl")
         cmds.textField('ctr_mirror_shape_to_prefix_tf', text=self.ar.data.lang['p003_right']+"_", parent="ctr_mirror_shape_rcl")
-        cmds.button("ctr_mirror_shape_bt", label=self.ar.data.lang['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ar.ctrls.resetMirrorShape, parent="ctr_mirror_shape_rcl")
+        cmds.button("ctr_mirror_shape_bt", label=self.ar.data.lang['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ar.ctrls.reset_mirror_shape, parent="ctr_mirror_shape_rcl")
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout('controllers_tab', edit=True,
                         attachForm=[('ctr_main_sl', 'top', 20), ('ctr_main_sl', 'left', 5), ('ctr_main_sl', 'right', 5), ('ctr_main_sl', 'bottom', 5)]

@@ -40,8 +40,8 @@ class Single(standard.BaseStandard):
         """ Creates the controller locators of the standard module guide.
         """
         # locators
-        self.guide_loc = self.ar.ctrls.cvJointLoc(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
-        self.guide_end_loc = self.ar.ctrls.cvLocator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
+        self.guide_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.guide_end_loc = self.ar.ctrls.create_curve_locator(ctrl_name=self.name_guide+"_JointEnd", r=0.1, d=1, guide=True)
         # joints
         self.line = cmds.joint(name=self.name_guide+"_JGuide1", radius=0.001)
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
@@ -57,7 +57,7 @@ class Single(standard.BaseStandard):
         cmds.scaleConstraint(self.guide_loc, self.line, maintainOffset=False, name=self.line+"_ScC")
         cmds.scaleConstraint(self.guide_end_loc, self.line_end, maintainOffset=False, name=self.line_end+"_ScC")
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
-        self.ar.ctrls.setLockHide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
     
     def change_indirectskin(self, value, *args):
@@ -109,7 +109,7 @@ class Single(standard.BaseStandard):
                             indirectskin_rot=(0, 0, 90)
                         else:
                             indirectskin_rot=(0, 0, -90)
-                single_ctrl = self.ar.ctrls.cvControl(ctrl_type_id, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectskin_rot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.name_guide+"_JointLoc1")
+                single_ctrl = self.ar.ctrls.create_controller(ctrl_type_id, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectskin_rot, head_def=cmds.getAttr(self.base+".deformedBy"), guide_source=self.name_guide+"_JointLoc1")
                 self.ar.utils.originedFrom(objName=single_ctrl, attrString=self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
                 # position and orientation of joint and control:
                 cmds.matchTransform(jnt, self.guide, position=True, rotation=True)
@@ -151,9 +151,9 @@ class Single(standard.BaseStandard):
                         single_ctrl = cmds.rename(single_ctrl, single_ctrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
                         self.ar.utils.removeUserDefinedAttr(single_ctrl, True)
                         self.ar.utils.addCustomAttr([single_ctrl], "dpHolder")
-                        self.ar.ctrls.setLockHide([single_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+                        self.ar.ctrls.set_lock_hide([single_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         jnt = cmds.rename(jnt, jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
-                        self.ar.ctrls.setLockHide([jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
+                        self.ar.ctrls.set_lock_hide([jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.get_guide_attr('sdkLocator'):
                             if not self.ar.data.lang['c058_main'] in self.number_name:

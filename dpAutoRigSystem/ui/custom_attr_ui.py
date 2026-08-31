@@ -179,9 +179,9 @@ class CustomAttrUI(object):
                 cmds.rowColumnLayout('custom_attr_id_'+node+'_rl', numberOfColumns=3, adjustableColumn=3, columnWidth=[(1, 200), (2, 80), (3, 500)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10), (3, 'both', 10)], parent='custom_attr_id_sl')
                 # button
                 if node == id_data[node]["name"]:
-                    cmds.button('custom_attr_id_select_'+node+'_bt', label=node, command=partial(self.ar.ctrls.selectControl, node, False), parent='custom_attr_id_'+node+'_rl')
+                    cmds.button('custom_attr_id_select_'+node+'_bt', label=node, command=partial(self.ar.ctrls.select_controller, node, False), parent='custom_attr_id_'+node+'_rl')
                 else: #supposed renamed node
-                    cmds.button('custom_attr_id_select_'+node+'_bt', label=node, command=partial(self.ar.ctrls.selectControl, node, False), backgroundColor=(0.8, 0.5, 0.5), parent='custom_attr_id_'+node+'_rl')
+                    cmds.button('custom_attr_id_select_'+node+'_bt', label=node, command=partial(self.ar.ctrls.select_controller, node, False), backgroundColor=(0.8, 0.5, 0.5), parent='custom_attr_id_'+node+'_rl')
                 # data
                 cmds.text('custom_attr_id_attr_'+node+'_txt', label=self.app.dpid_attr, parent='custom_attr_id_'+node+'_rl')
                 cmds.text('custom_attr_id_id_'+node+'_txt', label=id_data[node][self.app.dpid_attr], parent='custom_attr_id_'+node+'_rl')

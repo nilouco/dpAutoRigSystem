@@ -35,7 +35,7 @@ class SideCalibration(action.BaseAction):
             if inputs:
                 check_items = inputs
             else:
-                check_items = self.ar.ctrls.getControlList()
+                check_items = self.ar.ctrls.get_controllers()
             if check_items:
                 pairDic = {}
                 self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
@@ -51,9 +51,9 @@ class SideCalibration(action.BaseAction):
                                     foundOtherSide = True
                                     break
                             if foundOtherSide:
-                                calibrationList = self.ar.ctrls.getListFromStringAttr(item)
+                                calibrationList = self.ar.ctrls.get_items_from_string_attr(item)
                                 if calibrationList:
-                                    notMirrorAttrList = self.ar.ctrls.getListFromStringAttr(item, "notMirrorList")
+                                    notMirrorAttrList = self.ar.ctrls.get_items_from_string_attr(item, "notMirrorList")
                                     if notMirrorAttrList:
                                         calibrationList = list(set(calibrationList) - set(notMirrorAttrList))
                                     for attr in calibrationList:

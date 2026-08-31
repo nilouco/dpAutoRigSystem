@@ -219,11 +219,11 @@ class FacialConnection(base.BaseLibrary):
         """
         result_data = {}
         if not controllers:
-            controllers = self.ar.ctrls.getControlList()
+            controllers = self.ar.ctrls.get_controllers()
         if controllers:
             for ctrl in controllers:
                 if cmds.objExists(ctrl+".facialList"):
-                    result_data[ctrl] = self.ar.ctrls.getListFromStringAttr(ctrl, "facialList")
+                    result_data[ctrl] = self.ar.ctrls.get_items_from_string_attr(ctrl, "facialList")
         return result_data
     
 

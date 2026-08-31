@@ -271,7 +271,7 @@ class Rivet(base.BaseLibrary):
             self.deform_face_to_rivet(geo_to_attach, self.origined_geo)
             support_grp = self.ar.utils.getNodeByMessage("supportGrp")
             if support_grp:
-                self.ar.ctrls.colorShape([support_grp], [0.51, 1, 0.667], outliner=True) #green
+                self.ar.ctrls.color_shape([support_grp], [0.51, 1, 0.667], outliner=True) #green
 
         # get shape to attach:
         if cmds.objExists(geo_to_attach):
@@ -549,10 +549,10 @@ class Rivet(base.BaseLibrary):
                 if cmds.listRelatives(to_rivet_geo, allParents=True):
                     cmds.parent(to_rivet_geo, world=True)
                 # Unlock attributes and apply initialShading
-                self.ar.ctrls.setLockHide([to_rivet_geo], self.ar.data.transform_attrs, False, True, True)
+                self.ar.ctrls.set_lock_hide([to_rivet_geo], self.ar.data.transform_attrs, False, True, True)
                 cmds.sets(to_rivet_geo, edit=True, forceElement="initialShadingGroup")
                 cmds.editDisplayLayerMembers("defaultLayer", to_rivet_geo, noRecurse=False)
-                self.ar.ctrls.setLockHide([to_rivet_geo], self.ar.data.transform_attrs[:-1], True, False, True)
+                self.ar.ctrls.set_lock_hide([to_rivet_geo], self.ar.data.transform_attrs[:-1], True, False, True)
                 # Renaming
                 cmds.rename(to_rivet_geo, face_to_rivet_geo_name)
                 # Turning on nodes
@@ -724,7 +724,7 @@ class Rivet(base.BaseLibrary):
         wrap_node = cmds.rename(wrap_items, to_rivet_name+"_Wrp")
         base_shape = cmds.listConnections(wrap_node+".basePoints")[0]
         base_shape = cmds.rename(base_shape, to_rivet_name+"_Base")
-        self.ar.ctrls.setLockHide([base_shape], self.ar.data.transform_attrs[:-1], True, False, True)
+        self.ar.ctrls.set_lock_hide([base_shape], self.ar.data.transform_attrs[:-1], True, False, True)
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", base_shape, noRecurse=False)
         self.to_ids.extend([wrap_geo, wrap_node, base_shape])

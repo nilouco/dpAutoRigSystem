@@ -129,8 +129,8 @@ class Zipper(base.BaseLibrary):
         
         # create zipper control and attributes:
         radius = cmds.xform(self.first_curve+".cv["+str(len(cmds.ls(self.first_curve+".cv[*]", flatten=True))-1)+"]", query=True, worldSpace=True, translation=True)[self.curve_axis]*0.3
-        self.zipper_ctrl = self.ar.ctrls.cvControl('id_074_Zipper', self.zipper_name+"_Ctrl", r=radius, d=0)
-        self.ar.ctrls.colorShape([self.zipper_ctrl], "cyan")
+        self.zipper_ctrl = self.ar.ctrls.create_controller('id_074_Zipper', self.zipper_name+"_Ctrl", r=radius, d=0)
+        self.ar.ctrls.color_shape([self.zipper_ctrl], "cyan")
         cmds.addAttr(self.zipper_ctrl, longName=active_attr, attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
         cmds.addAttr(self.zipper_ctrl, longName=crescent_attr, attributeType='float', minValue=0, defaultValue=0, maxValue=1, keyable=True)
         cmds.addAttr(self.zipper_ctrl, longName=decrescent_attr, attributeType='float', minValue=0, defaultValue=0, maxValue=1, keyable=True)
@@ -141,7 +141,7 @@ class Zipper(base.BaseLibrary):
         cmds.addAttr(self.zipper_ctrl, longName=initial_distance_attr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipper_ctrl, longName=distance_attr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipper_ctrl, longName=rig_scale_attr, attributeType='float', defaultValue=1)
-        self.ar.ctrls.setStringAttrFromList(self.zipper_ctrl, [auto_calibrate_min_attr, auto_calibrate_max_attr])
+        self.ar.ctrls.set_string_attr_from_items(self.zipper_ctrl, [auto_calibrate_min_attr, auto_calibrate_max_attr])
         
         self.ctrl_grp = cmds.group(self.zipper_ctrl, name=self.zipper_name+"_Control_Grp")
         self.to_ids.append(self.ctrl_grp)
@@ -274,7 +274,7 @@ class Zipper(base.BaseLibrary):
                 opt_ctrl_rig_scale_node = cmds.listConnections(option_ctrl+"."+rig_scale_attr, source=False, destination=True)[0]
                 cmds.connectAttr(opt_ctrl_rig_scale_node+".outputX", self.zipper_ctrl+"."+rig_scale_attr, force=True)
                 cmds.setAttr(self.zipper_ctrl+"."+rig_scale_attr, lock=True)
-            head_sub_ctrl = self.ar.ctrls.getControlNodeById("id_093_HeadSub")
+            head_sub_ctrl = self.ar.ctrls.get_controller_node_by_id("id_093_HeadSub")
             if head_sub_ctrl:
                 cmds.parent(self.ctrl_grp, head_sub_ctrl)
             else:
@@ -301,7 +301,7 @@ class Zipper(base.BaseLibrary):
         support_grp = self.ar.utils.getNodeByMessage("supportGrp")
         if support_grp:
             cmds.parent(self.orig_model, support_grp)
-            self.ar.ctrls.colorShape([support_grp], [0.51, 1, 0.667], outliner=True) #green
+            self.ar.ctrls.color_shape([support_grp], [0.51, 1, 0.667], outliner=True) #green
         render_grp = self.ar.utils.getNodeByMessage("renderGrp")
         if render_grp:
             # avoid reparent deform_mesh if already inside RenderGrp:

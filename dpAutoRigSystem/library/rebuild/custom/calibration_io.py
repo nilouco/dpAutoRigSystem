@@ -42,7 +42,7 @@ class CalibrationIO(action.BaseAction):
                     if inputs:
                         controllers = inputs
                     else:
-                        controllers = self.ar.ctrls.getControlList()
+                        controllers = self.ar.ctrls.get_controllers()
                     if controllers:
                         if self.first_mode: #export
                             self.export_json_file(self.get_calibration_data(controllers))
@@ -79,7 +79,7 @@ class CalibrationIO(action.BaseAction):
         self.ar.utils.setProgress(max=len(controllers), add_one=False, add_number=False)
         for ctrl in controllers:
             self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            calibrations = self.ar.ctrls.getListFromStringAttr(ctrl)
+            calibrations = self.ar.ctrls.get_items_from_string_attr(ctrl)
             if calibrations:
                 data[ctrl] = {}
                 for attr in calibrations:

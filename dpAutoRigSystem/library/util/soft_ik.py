@@ -115,7 +115,7 @@ class SoftIk(object):
         cmds.connectAttr(world_ref+".scaleX", softIkRigScaleMD+".input2X", force=True)
         cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
 
-        self.ar.ctrls.setLockHide([ctrl_name], ["softDistance"])
+        self.ar.ctrls.set_lock_hide([ctrl_name], ["softDistance"])
 
         # if stretch exists, we need to do this...
         if stretch:

@@ -92,7 +92,7 @@ class Job(object):
         self.delete_old_job(item)
         cmds.scriptJob(attributeChange=[str(item+".editMode"), lambda node=item: self.corrective_edit_mode(node)], killWithScene=False, compressUndo=True)
         if cmds.getAttr(item+".editMode"):
-            self.ar.ctrls.colorShape([item], 'bonina', rgb=True)
+            self.ar.ctrls.color_shape([item], 'bonina', rgb=True)
 
 
     def corrective_edit_mode(self, item):
@@ -100,7 +100,7 @@ class Job(object):
         """
         if "editMode" in cmds.listAttr(item):
             if cmds.getAttr(item+".editMode"):
-                self.ar.ctrls.colorShape([item], 'bonina', rgb=True)
+                self.ar.ctrls.color_shape([item], 'bonina', rgb=True)
             else:
                 shapes = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
                 if shapes:
@@ -159,7 +159,7 @@ class Job(object):
         """ Set the color override for pinned guide shapes.
         """
         cmds.setAttr(item+".overrideEnabled", status)
-        cmds.setAttr(item+".overrideColor", self.ar.ctrls.dic_colors[color])
+        cmds.setAttr(item+".overrideColor", self.ar.ctrls.colors_data[color])
         shapes = cmds.listRelatives(item, children=True, fullPath=False, shapes=True)
         if shapes:
             for shape in shapes:
