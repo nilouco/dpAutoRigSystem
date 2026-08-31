@@ -27,7 +27,7 @@ class Limb(standard.BaseStandard):
             reload(ik_fk_snap)
             reload(ribbon)
         self.soft_ik = soft_ik.SoftIk(self.ar)
-        self.ribbon = ribbon.Ribbon(self.ar, self)
+        self.ribbon = ribbon.Ribbon(self.ar)
 
 
     def load_variables(self):
@@ -1363,15 +1363,15 @@ class Limb(standard.BaseStandard):
                         cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                     if self.limb_types == self.arm_name: #biped arm
-                        bend_grps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, initial_joint, 'x', bend_joints_number, corner_jxt, side=s, arm=True, world_ref=world_ref, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.get_guide_attr('additional'), addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
+                        bend_grps = self.ribbon.add_ribbon_to_limb(self, prefix, name, loc, initial_joint, 'x', bend_joints_number, corner_jxt, side=s, arm=True, world_ref=world_ref, joint_label_add=self.joint_label_add, add_artic=self.articulation, additional=self.get_guide_attr('additional'), add_correct=self.corrective, jcr_number=3, jcr_pos=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
                     elif quadruped:
                         locB = cmds.spaceLocator(n=side+self.number_name+'_auxBOriLoc', p=(0, 0, 0))[0]
                         cmds.matchTransform(locB, corner_b, position=True, rotation=True)
                         cmds.delete(cmds.aimConstraint(cmds.listRelatives(corner_b, children=True)[0], locB, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
-                        bend_grps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, initial_joint, 'x', bend_joints_number, side=s, arm=False, world_ref=world_ref, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.get_guide_attr('additional'), addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)], oriBLoc=locB)
+                        bend_grps = self.ribbon.add_ribbon_to_limb(self, prefix, name, loc, initial_joint, 'x', bend_joints_number, side=s, arm=False, world_ref=world_ref, joint_label_add=self.joint_label_add, add_artic=self.articulation, additional=self.get_guide_attr('additional'), add_correct=self.corrective, jcr_number=3, jcr_pos=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)], ori_b_loc=locB)
                         cmds.delete(locB)
                     else: #biped leg
-                        bend_grps = self.ribbon.addRibbonToLimb(self, prefix, name, loc, initial_joint, 'x', bend_joints_number, side=s, arm=False, world_ref=world_ref, jointLabelAdd=self.joint_label_add, addArtic=self.articulation, additional=self.get_guide_attr('additional'), addCorrect=self.corrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
+                        bend_grps = self.ribbon.add_ribbon_to_limb(self, prefix, name, loc, initial_joint, 'x', bend_joints_number, side=s, arm=False, world_ref=world_ref, joint_label_add=self.joint_label_add, add_artic=self.articulation, additional=self.get_guide_attr('additional'), add_correct=self.corrective, jcr_number=3, jcr_pos=[(0, 0, -0.25*self.radius), (0.2*self.radius, 0, 0.4*self.radius), (-0.2*self.radius, 0, 0.4*self.radius)])
                     cmds.delete(loc)
 
                     if self.limb_types == self.arm_name:

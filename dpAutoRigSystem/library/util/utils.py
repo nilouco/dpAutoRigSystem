@@ -818,7 +818,7 @@ class Utils(object):
         return node_name
 
 
-    def articulationJoint(self, fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcrRotList=None, dist=1, jarRadius=1.5, doScale=True, orientCtrl=None, *args):
+    def articulationJoint(self, fatherNode, brotherNode, jcr_number=0, jcr_pos=None, jcr_rot=None, dist=1, jarRadius=1.5, doScale=True, orientCtrl=None, *args):
         """ Create a simple joint to help skinning with a half rotation value.
             Receives the number of corrective joints to be created. Zero by default.
             Place these corrective joints with the given vector list.
@@ -839,19 +839,19 @@ class Utils(object):
                 cmds.setAttr(jax+".segmentScaleCompensate", 0)
                 cmds.setAttr(jar+".segmentScaleCompensate", 1)
                 jointList.append(jar)
-                for i in range(0, jcrNumber):
+                for i in range(0, jcr_number):
                     cmds.select(jar)
                     jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
                     cmds.setAttr(jcr+".segmentScaleCompensate", 0)
                     cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
-                    if jcrPosList:
-                        cmds.setAttr(jcr+".translateX", jcrPosList[i][0]*dist)
-                        cmds.setAttr(jcr+".translateY", jcrPosList[i][1]*dist)
-                        cmds.setAttr(jcr+".translateZ", jcrPosList[i][2]*dist)
-                    if jcrRotList:
-                        cmds.setAttr(jcr+".rotateX", jcrRotList[i][0])
-                        cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
-                        cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
+                    if jcr_pos:
+                        cmds.setAttr(jcr+".translateX", jcr_pos[i][0]*dist)
+                        cmds.setAttr(jcr+".translateY", jcr_pos[i][1]*dist)
+                        cmds.setAttr(jcr+".translateZ", jcr_pos[i][2]*dist)
+                    if jcr_rot:
+                        cmds.setAttr(jcr+".rotateX", jcr_rot[i][0])
+                        cmds.setAttr(jcr+".rotateY", jcr_rot[i][1])
+                        cmds.setAttr(jcr+".rotateZ", jcr_rot[i][2])
                     jointList.append(jcr)
                 cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
                 if orientCtrl:
