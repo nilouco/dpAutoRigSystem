@@ -33,9 +33,9 @@ class IntermediateObject(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                check_items = cmds.ls(inputs, type="mesh", intermediateObjects=True)
+                check_items = cmds.ls(inputs, type="mesh", shapes=True, intermediateObjects=True)
             else:
-                check_items = cmds.ls(selection=False, type="mesh", intermediateObjects=True) #all intermediateObject meshes in the scene
+                check_items = cmds.ls(selection=False, type="mesh", shapes=True, intermediateObjects=True) #all intermediateObject meshes in the scene
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
@@ -48,6 +48,7 @@ class IntermediateObject(action.BaseAction):
                         try:
                             cmds.lockNode(item, lock=False)
                             cmds.setAttr(item+".intermediateObject", 0)
+                            cmds.delete(item)
                             self.good_results.append(True)
                             self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
                         except:

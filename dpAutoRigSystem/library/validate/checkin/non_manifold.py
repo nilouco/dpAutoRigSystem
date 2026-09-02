@@ -36,12 +36,12 @@ class NonManifold(action.BaseAction):
             if not self.ar.utils.get_network_by_attr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
                     if inputs:
-                        geoToCleanList = inputs
+                        to_clean_geos = inputs
                     else:
-                        geoToCleanList = cmds.ls(list(set(self.checkNonManifold(self.get_mesh_transforms()))), long=False)
-                    if geoToCleanList:
-                        self.ar.utils.set_progress(max=len(geoToCleanList), add_one=False, add_number=False)
-                        for geo in geoToCleanList:
+                        to_clean_geos = cmds.ls(list(set(self.check_non_manifold(self.get_mesh_transforms()))), long=False)
+                    if to_clean_geos:
+                        self.ar.utils.set_progress(max=len(to_clean_geos), add_one=False, add_number=False)
+                        for geo in to_clean_geos:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):
                                 self.checked_items.append(geo)
@@ -78,12 +78,12 @@ class NonManifold(action.BaseAction):
         return self.log_data
 
 
-    def checkNonManifold(self, items, *args):
+    def check_non_manifold(self, items):
         """ Verify if there are non manifold meshes and return them if exists.
         """
-        nonManifoldList = []
+        non_manifolds = []
         if items:
             for item in items:
                 if cmds.polyInfo(item, nonManifoldEdges=True, nonManifoldUVEdges=True, nonManifoldUVs=True, nonManifoldVertices=True):
-                    nonManifoldList.append(item)
-        return nonManifoldList
+                    non_manifolds.append(item)
+        return non_manifolds

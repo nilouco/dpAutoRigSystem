@@ -45,9 +45,9 @@ class Vaccine(action.BaseAction):
                 for item in check_items:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    scriptdata = cmds.scriptNode(item, beforeScript=True, query=True)
-                    #if "fuck_All_U" in scriptdata:
-                    if "_gene" in scriptdata:
+                    script_data = cmds.scriptNode(item, beforeScript=True, query=True)
+                    #if "fuck_All_U" in script_data:
+                    if "_gene" in script_data:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -56,8 +56,8 @@ class Vaccine(action.BaseAction):
                             try:
                                 cmds.delete(item)
                                 path = cmds.internalVar(userAppDir=True)+"/scripts/"
-                                vaccineList = ["vaccine.py", "vaccine.pyc"]
-                                for vaccine in vaccineList:
+                                vaccine_items = ["vaccine.py", "vaccine.pyc"]
+                                for vaccine in vaccine_items:
                                     if os.path.exists(path+vaccine):
                                         os.remove(path+vaccine)
                                 if os.path.exists(path+"userSetup.py"):

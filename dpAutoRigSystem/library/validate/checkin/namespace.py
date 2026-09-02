@@ -33,39 +33,39 @@ class Namespace(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                namespaceToCleanList = inputs
+                to_clean_namespaces = inputs
             else:
-                namespaceWithGuidesMainList = []
-                namespaceWithoutGuidesMainList = []
+                with_guide_main_namespaces = []
+                without_guide_main_namespaces = []
                 cmds.namespace(setNamespace=':')
-                namespaceMainList = cmds.namespaceInfo(listOnlyNamespaces=True)
-                if namespaceMainList:
-                    for namespace in namespaceMainList:
+                main_namespaces = cmds.namespaceInfo(listOnlyNamespaces=True)
+                if main_namespaces:
+                    for namespace in main_namespaces:
                         if namespace != "UI" and namespace != "shared":
                             # check if there's dpGuides in the list members
                             types = cmds.namespaceInfo(namespace, listNamespace=True)
                             for type in types:
                                 # if dpGuides, append to list with Guides, else append to withouGuides
                                 if type.find("_dpAR_") != -1:
-                                    namespaceWithGuidesMainList.append(namespace)
+                                    with_guide_main_namespaces.append(namespace)
                                 else:
-                                    namespaceWithoutGuidesMainList.append(namespace)
-                    namespaceWithoutGuidesList = []
-                    namespaceWithGuidesList = []
+                                    without_guide_main_namespaces.append(namespace)
+                    with_guide_namespaces = []
+                    without_guide_namespaces = []
                     # append to new list in order to remove the namespace guide base
-                    for namespace in namespaceWithGuidesMainList:
+                    for namespace in with_guide_main_namespaces:
                         # it will only add to namespaceWithGuideList if it's not a guide base
                         if "_dpAR_" not in namespace:
-                            namespaceWithGuidesList.append(namespace)
+                            with_guide_namespaces.append(namespace)
                     # append to a new list if not find the item from with guides in without guides
-                    for item in namespaceWithoutGuidesMainList:
-                        if item not in namespaceWithGuidesMainList:
-                            namespaceWithoutGuidesList.append(item)
+                    for item in without_guide_main_namespaces:
+                        if item not in with_guide_main_namespaces:
+                            without_guide_namespaces.append(item)
                     # set both list together, excluding the duplicated names
-                    namespaceToCleanList = list(set(namespaceWithGuidesList)) + list(set(namespaceWithoutGuidesList))
-            if namespaceToCleanList:
-                self.ar.utils.set_progress(max=len(namespaceMainList), add_one=False, add_number=False)
-                for namespace in namespaceToCleanList:
+                    to_clean_namespaces = list(set(with_guide_namespaces)) + list(set(without_guide_namespaces))
+            if to_clean_namespaces:
+                self.ar.utils.set_progress(max=len(main_namespaces), add_one=False, add_number=False)
+                for namespace in to_clean_namespaces:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     self.checked_items.append(namespace)
                     self.found_issues.append(True)
@@ -73,12 +73,12 @@ class Namespace(action.BaseAction):
                     self.good_results.append(False)
                 else: #fix
                     try:
-                        if namespaceWithGuidesList:
+                        if with_guide_namespaces:
                             # call check_imported_guides from dpAutoRig, to remove namespace when it's guide.
                             self.ar.filler.check_imported_guides(False)
-                        elif namespaceWithoutGuidesList:
+                        elif without_guide_namespaces:
                             # call function inside validator to remove namespaces when it's not a guide.
-                            self.removeNamespace()
+                            self.remove_namespace()
                         self.good_results.append(True)
                         self.messages.append(self.ar.data.lang['v004_fixed']+": "+namespace)
                     except:
@@ -98,15 +98,15 @@ class Namespace(action.BaseAction):
         return self.log_data
     
 
-    def removeNamespace(self, *args):
+    def remove_namespace(self, *args):
         """ This function will use recursive method to remove all namespace, 
             when it isn't a guide namespace
         """
         cmds.namespace(setNamespace=':')
-        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
-        for name in namespaceList:
+        namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
+        for name in namespaces:
             if name != "UI" and name != "shared":
                 if name.find("_dpAR_") == -1:
                     cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
-                    self.removeNamespace()
+                    self.remove_namespace()
                     break

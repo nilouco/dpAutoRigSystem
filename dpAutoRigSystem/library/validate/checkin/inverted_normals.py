@@ -33,68 +33,68 @@ class InvertedNormals(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            invertedObjList = []
+            inverted_items = []
             if inputs:
-                objMeshList = inputs
+                meshes = inputs
             else:
-                objMeshList = cmds.ls(selection=False, type='mesh')
-            if objMeshList:
-                self.ar.utils.set_progress(max=len(objMeshList), add_one=False, add_number=False)
-                geomIter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kMesh)
-                while not geomIter.isDone():
-                    nextGeom = False
-                    useThisObj = False
+                meshes = cmds.ls(selection=False, type='mesh')
+            if meshes:
+                self.ar.utils.set_progress(max=len(meshes), add_one=False, add_number=False)
+                iter_geo = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kMesh)
+                while not iter_geo.isDone():
+                    next_geo = False
+                    use_this_item = False
                     # get mesh data
-                    shape = geomIter.thisNode()
-                    fnShapeNode = OpenMaya.MFnDagNode(shape)
-                    shapeName = fnShapeNode.name()
-                    parentNode = fnShapeNode.parent(0)
-                    fnParentNode = OpenMaya.MFnDagNode(parentNode)
-                    objName = fnParentNode.name()
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title]+": "+shapeName)
-                    # verify if objName or shapeName is in objMeshList
-                    for obj in objMeshList:
-                        if objName in obj or shapeName in obj:
-                            useThisObj = True
+                    shape = iter_geo.thisNode()
+                    fn_shape_node = OpenMaya.MFnDagNode(shape)
+                    shape_name = fn_shape_node.name()
+                    parent_node = fn_shape_node.parent(0)
+                    fn_parent_node = OpenMaya.MFnDagNode(parent_node)
+                    item_name = fn_parent_node.name()
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title]+": "+shape_name)
+                    # verify if item_name or shape_name is in meshes
+                    for item in meshes:
+                        if item_name in item or shape_name in item:
+                            use_this_item = True
                             break
-                    if useThisObj:
+                    if use_this_item:
                         # get faces
-                        faceIter   = OpenMaya.MItMeshPolygon(shape)
-                        conFacesIt = OpenMaya.MItMeshPolygon(shape)
+                        iter_face   = OpenMaya.MItMeshPolygon(shape)
+                        con_faces_it = OpenMaya.MItMeshPolygon(shape)
                         # run in faces listing vertices
-                        while not faceIter.isDone() and not nextGeom:
+                        while not iter_face.isDone() and not next_geo:
                             # list vertices from this face
-                            vtxIntArray = OpenMaya.MIntArray()
-                            faceIter.getVertices(vtxIntArray)
-                            vtxIntArray.append(vtxIntArray[0])
+                            vtx_int_array = OpenMaya.MIntArray()
+                            iter_face.getVertices(vtx_int_array)
+                            vtx_int_array.append(vtx_int_array[0])
                             # get connected faces of this face
-                            conFacesIntArray = OpenMaya.MIntArray()
-                            faceIter.getConnectedFaces(conFacesIntArray)
+                            con_faces_int_array = OpenMaya.MIntArray()
+                            iter_face.getConnectedFaces(con_faces_int_array)
                             # run in adjacent faces to list them vertices
-                            for f in conFacesIntArray:
+                            for f in con_faces_int_array:
                                 # say this is the face index to use for next iterations
-                                lastIndexPtr = OpenMaya.MScriptUtil().asIntPtr()
-                                conFacesIt.setIndex(f, lastIndexPtr)
+                                last_index_ptr = OpenMaya.MScriptUtil().asIntPtr()
+                                con_faces_it.setIndex(f, last_index_ptr)
                                 # get vertices from this adjacent face
-                                conVtxIntArray = OpenMaya.MIntArray()
-                                conFacesIt.getVertices(conVtxIntArray)
-                                conVtxIntArray.append(conVtxIntArray[0])
+                                con_vtx_int_array = OpenMaya.MIntArray()
+                                con_faces_it.getVertices(con_vtx_int_array)
+                                con_vtx_int_array.append(con_vtx_int_array[0])
                                 # compare vertex in order to find double consecutive vertices
-                                for i in range(0, len(vtxIntArray)-1):
-                                    iPair = str(vtxIntArray[i])+","+str(vtxIntArray[i+1])
-                                    for c in range(0, len(conVtxIntArray)-1):
-                                        cPair = str(conVtxIntArray[c])+","+str(conVtxIntArray[c+1])
-                                        if iPair == cPair:
+                                for i in range(0, len(vtx_int_array)-1):
+                                    i_pair = str(vtx_int_array[i])+","+str(vtx_int_array[i+1])
+                                    for c in range(0, len(con_vtx_int_array)-1):
+                                        c_pair = str(con_vtx_int_array[c])+","+str(con_vtx_int_array[c+1])
+                                        if i_pair == c_pair:
                                             # found inverted normals
-                                            invertedObjList.append(objName)
-                                            nextGeom = True
-                            faceIter.next()
+                                            inverted_items.append(item_name)
+                                            next_geo = True
+                            iter_face.next()
                     # go to next geometry
-                    geomIter.next()
+                    iter_geo.next()
             # verify if there are inverted normals
-            if invertedObjList:
-                invertedObjList = list(set(invertedObjList))
-                for mesh in invertedObjList:
+            if inverted_items:
+                inverted_items = list(set(inverted_items))
+                for mesh in inverted_items:
                     self.checked_items.append(mesh)
                     self.found_issues.append(True)
                     if self.first_mode:
@@ -103,9 +103,6 @@ class InvertedNormals(action.BaseAction):
                         try:
                             # conform normals to fix
                             cmds.polyNormal(mesh, normalMode=2, userNormalMode=0, constructionHistory=False)
-                            #cmds.setAttr(mesh+".displayNormal", 0)
-                            #cmds.setAttr(mesh+".doubleSided", 0)
-                            #cmds.setAttr(mesh+".opposite", 0)
                             self.good_results.append(True)
                             self.messages.append(self.ar.data.lang['v004_fixed']+": "+mesh)
                         except:

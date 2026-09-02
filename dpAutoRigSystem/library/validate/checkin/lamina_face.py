@@ -41,74 +41,74 @@ class LaminaFace(action.BaseAction):
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
-                laminaObjList, laminaFaceList = [], []
+                lamina_items, lamina_faces = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shape    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
-                        shapeName    = fnShapeNode.name()
-                        parentNode   = fnShapeNode.parent(0)
-                        fnParentNode = OpenMaya.MFnDagNode(parentNode)
-                        objectName   = fnParentNode.name()
-                        # verify if objName or shapeName is in check_items
-                        for obj in check_items:
+                        shape = iter.thisNode()
+                        fn_shape_node = OpenMaya.MFnDagNode(shape)
+                        shape_name = fn_shape_node.name()
+                        parent_node = fn_shape_node.parent(0)
+                        fn_parent_node = OpenMaya.MFnDagNode(parent_node)
+                        item_name = fn_parent_node.name()
+                        # verify if objName or shape_name is in check_items
+                        for item in check_items:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                            if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
                                 # get faces
-                                faceIter   = OpenMaya.MItMeshPolygon(shape)
-                                conFacesIt = OpenMaya.MItMeshPolygon(shape)
+                                iter_face   = OpenMaya.MItMeshPolygon(shape)
+                                con_faces_it = OpenMaya.MItMeshPolygon(shape)
                                 # run in faces listing edges
-                                while not faceIter.isDone():
+                                while not iter_face.isDone():
                                     # list vertices from this face
-                                    edgesIntArray = OpenMaya.MIntArray()
-                                    faceIter.getEdges(edgesIntArray)
+                                    edges_int_array = OpenMaya.MIntArray()
+                                    iter_face.getEdges(edges_int_array)
                                     # get connected faces of this face
-                                    conFacesIntArray = OpenMaya.MIntArray()
-                                    faceIter.getConnectedFaces(conFacesIntArray)
+                                    con_faces_int_array = OpenMaya.MIntArray()
+                                    iter_face.getConnectedFaces(con_faces_int_array)
                                     # run in adjacent faces to list them vertices
-                                    for f in conFacesIntArray:
+                                    for f in con_faces_int_array:
                                         # say this is the face index to use for next iterations
-                                        lastIndexPtr = OpenMaya.MScriptUtil().asIntPtr()
-                                        conFacesIt.setIndex(f, lastIndexPtr)
+                                        last_index_ptr = OpenMaya.MScriptUtil().asIntPtr()
+                                        con_faces_it.setIndex(f, last_index_ptr)
                                         # get edges from this adjacent face
-                                        conEdgesIntArray = OpenMaya.MIntArray()
-                                        conFacesIt.getEdges(conEdgesIntArray)
+                                        con_edges_int_array = OpenMaya.MIntArray()
+                                        con_faces_it.getEdges(con_edges_int_array)
                                         # compare edges to verify if the list are the same
-                                        if sorted(edgesIntArray) == sorted(conEdgesIntArray):
+                                        if sorted(edges_int_array) == sorted(con_edges_int_array):
                                             # found laminaFaces
-                                            if not objectName in laminaObjList:
-                                                laminaObjList.append(objectName)
-                                            laminaFaceList.append(objectName+'.f['+str(faceIter.index())+']')
-                                    faceIter.next()
+                                            if not item_name in lamina_items:
+                                                lamina_items.append(item_name)
+                                            lamina_faces.append(item_name+'.f['+str(iter_face.index())+']')
+                                    iter_face.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if laminaObjList:
-                    laminaObjList.sort()
-                    laminaFaceList.sort()
-                    for item in laminaObjList:
+                if lamina_items:
+                    lamina_items.sort()
+                    lamina_faces.sort()
+                    for item in lamina_items:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)
-                            self.messages.append("Lamina faces: "+str(laminaFaceList))
-                            cmds.select(laminaFaceList)
+                            self.messages.append("Lamina faces: "+str(lamina_faces))
+                            cmds.select(lamina_faces)
                         else: #fix
                             try:
                                 cmds.select(item)
                                 mel.eval('polyCleanupArgList 3 { \"0\",\"1\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"1e-005\",\"0\",\"-1\",\"1\" };')
                                 cmds.select(clear=True)
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" - Faces: "+", ".join(lamina_faces))
                             except:
                                 self.good_results.append(False)
-                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(laminaFaceList))
+                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" - Faces: "+", ".join(lamina_faces))
                     if self.first_mode:
-                        self.messages.append("Lamina faces: "+str(laminaFaceList))
-                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(laminaFaceList)+")\n---")
-                        cmds.select(laminaFaceList)
+                        self.messages.append("Lamina faces: "+str(lamina_faces))
+                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(lamina_faces)+")\n---")
+                        cmds.select(lamina_faces)
             else:
                 self.not_found_node()
         else:

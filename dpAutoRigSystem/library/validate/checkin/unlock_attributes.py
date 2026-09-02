@@ -38,16 +38,16 @@ class UnlockAttributes(action.BaseAction):
                     if inputs:
                         nodes = inputs
                     if nodes:
-                        lockedAttrDic = {}
+                        locked_attr_data = {}
                         self.ar.utils.set_progress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                            lockedAttrList = cmds.listAttr(item, locked=True)
-                            if lockedAttrList:
-                                lockedAttrDic[item] = lockedAttrList
+                            locked_attrs = cmds.listAttr(item, locked=True)
+                            if locked_attrs:
+                                locked_attr_data[item] = locked_attrs
                         # conditional to check here
-                        if lockedAttrDic:
-                            for item in lockedAttrDic.keys():
+                        if locked_attr_data:
+                            for item in locked_attr_data.keys():
                                 self.checked_items.append(item)
                                 self.found_issues.append(True)
                                 if self.first_mode:
@@ -55,10 +55,10 @@ class UnlockAttributes(action.BaseAction):
                                 else: #fix
                                     try:
                                         cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                        for attr in lockedAttrDic[item]:
+                                        for attr in locked_attr_data[item]:
                                             cmds.setAttr(item+"."+attr, lock=False)
                                         self.good_results.append(True)
-                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(lockedAttrDic[item]))
+                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(locked_attr_data[item]))
                                     except:
                                         self.good_results.append(False)
                                         self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" = "+attr)

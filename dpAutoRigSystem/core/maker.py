@@ -472,7 +472,7 @@ class Maker(object):
             Useful for organize the Option_Ctrl attributes, for example.
         """
         if items and attrs:
-            for obj in items:
+            for item in items:
                 reorder_attr = self.ar.config.get_instance("ReorderAttr", [self.ar.data.tools_folder])
                 if reorder_attr:
                     if verbose and not self.ar.data.rebuilding:
@@ -480,12 +480,12 @@ class Maker(object):
                     delta = 0
                     for i, attr in enumerate(attrs):
                         if verbose:
-                            self.ar.utils.set_progress('Reordering Attributes: '+obj)
+                            self.ar.utils.set_progress('Reordering Attributes: '+item)
                         # get current user defined attributes:
-                        current_attrs = cmds.listAttr(obj, userDefined=True)
+                        current_attrs = cmds.listAttr(item, userDefined=True)
                         if attr in current_attrs:
                             for n in range(1, current_attrs.index(attr)+1-i+delta):
-                                reorder_attr.move_attr(1, [obj], [attr])
+                                reorder_attr.move_attr(1, [item], [attr])
                         else:
                             delta += 1
                     if verbose and not self.ar.data.rebuilding:

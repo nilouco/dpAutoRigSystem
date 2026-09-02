@@ -43,39 +43,39 @@ class BorderGap(action.BaseAction):
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
-                gapList, gapObjList = [], []
+                gap_components, gap_items = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shape    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
-                        shapeName    = fnShapeNode.name()
-                        parentNode   = fnShapeNode.parent(0)
-                        fnParentNode = OpenMaya.MFnDagNode(parentNode)
-                        objectName   = fnParentNode.name()
-                        # verify if objName or shapeName is in check_items
-                        for obj in check_items:
+                        shape = iter.thisNode()
+                        fn_shape_node = OpenMaya.MFnDagNode(shape)
+                        shape_name = fn_shape_node.name()
+                        parent_node = fn_shape_node.parent(0)
+                        fn_parent_node = OpenMaya.MFnDagNode(parent_node)
+                        item_name = fn_parent_node.name()
+                        # verify if objName or shape_name is in check_items
+                        for item in check_items:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                            if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                iterPolys = OpenMaya.MItMeshEdge(shape)
+                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                                iter_polys = OpenMaya.MItMeshEdge(shape)
                                 # Iterate through polys on current mesh
-                                while not iterPolys.isDone():
+                                while not iter_polys.isDone():
                                     # Get current polygons connected faces
-                                    indexConFaces = OpenMaya.MIntArray()
-                                    iterPolys.getConnectedFaces(indexConFaces)
-                                    if len(indexConFaces) == 1:
-                                        if not objectName in gapObjList:
-                                            gapObjList.append(objectName)
-                                        gapList.append(objectName+'.e['+str(iterPolys.index())+']')
+                                    index_con_faces = OpenMaya.MIntArray()
+                                    iter_polys.getConnectedFaces(index_con_faces)
+                                    if len(index_con_faces) == 1:
+                                        if not item_name in gap_items:
+                                            gap_items.append(item_name)
+                                        gap_components.append(item_name+'.e['+str(iter_polys.index())+']')
                                     # Move to next polygon in the mesh list
-                                    iterPolys.next()
+                                    iter_polys.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if gapObjList:
-                    gapObjList.sort()
-                    for item in gapObjList:
+                if gap_items:
+                    gap_items.sort()
+                    for item in gap_items:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -83,9 +83,9 @@ class BorderGap(action.BaseAction):
                         else: #fix
                             self.good_results.append(False)
                             self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-                    self.messages.append(self.ar.data.lang['v122_borderGap']+": "+str(gapList))
-                    self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(gapList)+")\n---")
-                    cmds.select(gapList)
+                    self.messages.append(self.ar.data.lang['v122_borderGap']+": "+str(gap_components))
+                    self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(gap_components)+")\n---")
+                    cmds.select(gap_components)
             else:
                 self.not_found_node()
         else:

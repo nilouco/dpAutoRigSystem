@@ -41,9 +41,9 @@ class DuplicatedName(action.BaseAction):
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # Dictionary {shortName: [Full paths]}
                 names = defaultdict(list)
-                for obj in check_items:
-                    short = obj.split("|")[-1]
-                    names[short].append(obj)
+                for item in check_items:
+                    short = item.split("|")[-1]
+                    names[short].append(item)
                 # Filter only duplicates
                 duplicates = {k:v for k,v in names.items() if len(v) > 1}
                 if duplicates:
@@ -62,7 +62,7 @@ class DuplicatedName(action.BaseAction):
                                     if cmds.objExists(path):
                                         for i in range(1, len(paths)+1):
                                             if not cmds.objExists(name+"_"+str(i)):
-                                                self.renameNodeAndChildren(path, i)
+                                                self.rename_node_and_children(path, i)
                                     self.good_results.append(True)
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+name)
                             except:
@@ -82,7 +82,7 @@ class DuplicatedName(action.BaseAction):
         return self.log_data
 
 
-    def renameNodeAndChildren(self, item, i, *args):
+    def rename_node_and_children(self, item, i):
         """ Rename the given item node and it's children with the given number as suffix.
         """
         if cmds.objExists(item):

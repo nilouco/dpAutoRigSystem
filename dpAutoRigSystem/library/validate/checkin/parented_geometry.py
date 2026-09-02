@@ -37,18 +37,18 @@ class ParentedGeometry(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="mesh") #all meshes in the scene
             if check_items:
-                meshParentList = self.get_mesh_transforms(check_items)
-                if meshParentList:
-                    meshParentList = self.reorder_list(meshParentList)
-                    self.ar.utils.set_progress(max=len(meshParentList), add_one=False, add_number=False)
+                mesh_transforms = self.get_mesh_transforms(check_items)
+                if mesh_transforms:
+                    mesh_transforms = self.reorder_list(mesh_transforms)
+                    self.ar.utils.set_progress(max=len(mesh_transforms), add_one=False, add_number=False)
                     # avoid reporting the same item multiple times
-                    for mesh in meshParentList:
+                    for mesh in mesh_transforms:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         # check if exists to avoid missing nodes
                         if cmds.objExists(mesh):
-                            allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
+                            all_children = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
                             # get all descendents and check if it's different than its parent
-                            children = self.ar.utils.filter_transforms([d for d in allDescendents if cmds.objExists(d) and d != mesh])
+                            children = self.ar.utils.filter_transforms([d for d in all_children if cmds.objExists(d) and d != mesh])
                             if children:
                                 for item in children:
                                     if not self.ar.utils.get_short_name(item, False) in self.checked_items:
@@ -58,11 +58,11 @@ class ParentedGeometry(action.BaseAction):
                                         self.good_results.append(False)
                                     else: #fix
                                         try:
-                                            grandParent = cmds.listRelatives(mesh, parent=True, fullPath=True)
-                                            if grandParent and cmds.objExists(grandParent[0]):
+                                            grand_parents = cmds.listRelatives(mesh, parent=True, fullPath=True)
+                                            if grand_parents and cmds.objExists(grand_parents[0]):
                                                 # try to parent the item to the mesh grandparent
                                                 if cmds.objExists(item):
-                                                    cmds.parent(item, grandParent[0])
+                                                    cmds.parent(item, grand_parents[0])
                                             else: 
                                                 # if no parent, just unparent it to world
                                                 cmds.parent(item, world=True)

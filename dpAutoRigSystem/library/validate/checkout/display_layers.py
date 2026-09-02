@@ -169,7 +169,7 @@ class DisplayLayers(action.BaseAction):
     def verifyFixMode(self, items, *args):
         """ This function will check if the item is a list or not.
             If it's a list it will append the items in the data and run the main function once.
-            If it's not a list it will append the obj and run the main function.
+            If it's not a list it will append the item and run the main function.
         """
         if items:
             self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)

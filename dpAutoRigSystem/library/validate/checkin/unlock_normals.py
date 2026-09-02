@@ -19,7 +19,7 @@ class UnlockNormals(action.BaseAction):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
         if self.ar.dev:
             reload(edge_normals)
-        self.softHardEdges = edge_normals.ConvertNormals(self.ar)
+        self.edge_normals = edge_normals.ConvertNormals(self.ar)
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -40,17 +40,17 @@ class UnlockNormals(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                allMeshList = inputs
+                meshes = inputs
             else:
-                allMeshList = cmds.ls(selection=False, type='mesh')
-            if allMeshList:
-                self.ar.utils.set_progress(max=len(allMeshList), add_one=False, add_number=False)
-                for mesh in allMeshList:
+                meshes = cmds.ls(selection=False, type='mesh')
+            if meshes:
+                self.ar.utils.set_progress(max=len(meshes), add_one=False, add_number=False)
+                for mesh in meshes:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
-                        lockedList = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
+                        locked_items = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
                         # check if there's any locked normal
-                        if True in lockedList:
+                        if True in locked_items:
                             self.checked_items.append(mesh)
                             self.found_issues.append(True)
                             if self.first_mode:
@@ -58,7 +58,7 @@ class UnlockNormals(action.BaseAction):
                             else: #fix
                                 try:
                                     #cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True) #it doesn't keep the soft and hard edges when importing mesh
-                                    self.softHardEdges.set_soft_hard(mesh)
+                                    self.edge_normals.set_soft_hard(mesh)
                                     self.good_results.append(True)
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+mesh)
                                 except:

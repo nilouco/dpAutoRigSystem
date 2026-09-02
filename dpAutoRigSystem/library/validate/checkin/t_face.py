@@ -41,39 +41,39 @@ class TFace(action.BaseAction):
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
-                tFaceList = []
+                t_faces = []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shape    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
-                        shapeName    = fnShapeNode.name()
-                        parentNode   = fnShapeNode.parent(0)
-                        fnParentNode = OpenMaya.MFnDagNode(parentNode)
-                        objectName   = fnParentNode.name()
-                        # verify if objName or shapeName is in check_items
-                        for obj in check_items:
+                        shape = iter.thisNode()
+                        fn_shape_node = OpenMaya.MFnDagNode(shape)
+                        shape_name = fn_shape_node.name()
+                        parent_node = fn_shape_node.parent(0)
+                        fn_parent_node = OpenMaya.MFnDagNode(parent_node)
+                        item_name = fn_parent_node.name()
+                        # verify if objName or shape_name is in check_items
+                        for item in check_items:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                            if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
+                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
                                 # get edges
-                                edgeIter = OpenMaya.MItMeshEdge(shape)
+                                iter_edge = OpenMaya.MItMeshEdge(shape)
                                 # run in faces listing faces
-                                while not edgeIter.isDone():
+                                while not iter_edge.isDone():
                                     # list faces from this edge
-                                    faceIntArray = OpenMaya.MIntArray()
-                                    edgeIter.getConnectedFaces(faceIntArray)
+                                    face_int_array = OpenMaya.MIntArray()
+                                    iter_edge.getConnectedFaces(face_int_array)
                                     # verify the lenght of the connectedFaces
-                                    if len(faceIntArray) > 2:
+                                    if len(face_int_array) > 2:
                                         # found tFace
-                                        tFaceList.append(objectName+".e["+str(edgeIter.index())+"]")
-                                    edgeIter.next()
+                                        t_faces.append(item_name+".e["+str(iter_edge.index())+"]")
+                                    iter_edge.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if tFaceList:
-                    tFaceList.sort()
-                    for item in tFaceList:
+                if t_faces:
+                    t_faces.sort()
+                    for item in t_faces:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -90,7 +90,7 @@ class TFace(action.BaseAction):
                                 self.good_results.append(False)
                                 self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     if self.first_mode:
-                        cmds.select(tFaceList)
+                        cmds.select(t_faces)
             else:
                 self.not_found_node()
         else:

@@ -40,52 +40,52 @@ class RemainingVertex(action.BaseAction):
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
-                borderEdgeIdxList, remainingVertexList = [], []
+                border_edge_indexes, remaining_vertices = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
                 if iter != None:
                     while not iter.isDone():
                         # get mesh data
-                        shape    = iter.thisNode()
-                        fnShapeNode  = OpenMaya.MFnDagNode(shape)
-                        shapeName    = fnShapeNode.name()
-                        parentNode   = fnShapeNode.parent(0)
-                        fnParentNode = OpenMaya.MFnDagNode(parentNode)
-                        objectName   = fnParentNode.name()
-                        # verify if objName or shapeName is in check_items
-                        for obj in check_items:
+                        shape = iter.thisNode()
+                        fn_shape_node = OpenMaya.MFnDagNode(shape)
+                        shape_name = fn_shape_node.name()
+                        parent_node = fn_shape_node.parent(0)
+                        fn_parent_node = OpenMaya.MFnDagNode(parent_node)
+                        item_name = fn_parent_node.name()
+                        # verify if objName or shape_name is in check_items
+                        for item in check_items:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                            if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
-                                vertexIter = OpenMaya.MItMeshVertex(shape)
-                                iterEdges  = OpenMaya.MItMeshEdge(shape)
+                            if item == shape_name and not cmds.getAttr(item+".intermediateObject"):
+                                iter_vertex = OpenMaya.MItMeshVertex(shape)
+                                iter_edges  = OpenMaya.MItMeshEdge(shape)
                                 # Iterate through edges on current mesh
-                                while not iterEdges.isDone():
+                                while not iter_edges.isDone():
                                     # Get current polygons connected faces
-                                    indexConFaces = OpenMaya.MIntArray()
-                                    iterEdges.getConnectedFaces(indexConFaces)
-                                    if len(indexConFaces) == 1:
+                                    index_con_faces = OpenMaya.MIntArray()
+                                    iter_edges.getConnectedFaces(index_con_faces)
+                                    if len(index_con_faces) == 1:
                                         # got a border edge
-                                        borderEdgeIdxList.append(iterEdges.index())
+                                        border_edge_indexes.append(iter_edges.index())
                                     # Move to next edge in the mesh list
-                                    iterEdges.next()
+                                    iter_edges.next()
                                 # Iterate through vertices on current mesh
-                                while not vertexIter.isDone():
+                                while not iter_vertex.isDone():
                                     # Get current vertex connected edges
-                                    indexConEdges = OpenMaya.MIntArray()
-                                    vertexIter.getConnectedEdges(indexConEdges)
-                                    if len(indexConEdges) < 3:
-                                        if borderEdgeIdxList:
-                                            if not set(indexConEdges).intersection(borderEdgeIdxList):
-                                                remainingVertexList.append(objectName+'.vtx['+str(vertexIter.index())+']')
+                                    index_con_edges = OpenMaya.MIntArray()
+                                    iter_vertex.getConnectedEdges(index_con_edges)
+                                    if len(index_con_edges) < 3:
+                                        if border_edge_indexes:
+                                            if not set(index_con_edges).intersection(border_edge_indexes):
+                                                remaining_vertices.append(item_name+'.vtx['+str(iter_vertex.index())+']')
                                         else:
-                                            remainingVertexList.append(objectName+'.vtx['+str(vertexIter.index())+']')
+                                            remaining_vertices.append(item_name+'.vtx['+str(iter_vertex.index())+']')
                                     # Move to next vertex in the mesh list
-                                    vertexIter.next()
+                                    iter_vertex.next()
                         # Move to the next selected node in the list
                         iter.next()
                 # conditional to check here
-                if remainingVertexList:
-                    remainingVertexList.reverse()
-                    for item in remainingVertexList:
+                if remaining_vertices:
+                    remaining_vertices.reverse()
+                    for item in remaining_vertices:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -99,9 +99,9 @@ class RemainingVertex(action.BaseAction):
                                 self.good_results.append(False)
                                 self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
                     if self.first_mode:
-                        self.messages.append("Remaining vertex: "+str(remainingVertexList))
-                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(remainingVertexList)+")\n---")
-                        cmds.select(remainingVertexList)
+                        self.messages.append("Remaining vertex: "+str(remaining_vertices))
+                        self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(remaining_vertices)+")\n---")
+                        cmds.select(remaining_vertices)
             else:
                 self.not_found_node()
         else:

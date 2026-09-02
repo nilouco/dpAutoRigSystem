@@ -41,11 +41,11 @@ class OneVertex(action.BaseAction):
                         check_items = cmds.ls(selection=False, type="mesh")
                     if check_items:
                         self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
-                        oneVertexList = self.checkNonManifoldVertex(check_items)
+                        one_vertices = self.check_non_manifold_vertex(check_items)
                         # conditional to check here
-                        if oneVertexList:
-                            oneVertexList.sort()
-                            for item in oneVertexList:
+                        if one_vertices:
+                            one_vertices.sort()
+                            for item in one_vertices:
                                 self.checked_items.append(item)
                                 self.found_issues.append(True)
                                 if self.first_mode:
@@ -53,8 +53,8 @@ class OneVertex(action.BaseAction):
                                 else: #fix
                                     self.good_results.append(False)
                                     self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-                            self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(oneVertexList)+")\n---")
-                            cmds.select(oneVertexList)
+                            self.messages.append("---\n"+self.ar.data.lang['v121_sharePythonSelect']+"\nmaya.cmds.select("+str(one_vertices)+")\n---")
+                            cmds.select(one_vertices)
                     else:
                         self.not_found_node()
                 else:
@@ -73,16 +73,16 @@ class OneVertex(action.BaseAction):
         return self.log_data
 
 
-    def checkNonManifoldVertex(self, items, *args):
+    def check_non_manifold_vertex(self, items):
         """ Return a list of nonManifold vertex if exists.
         """
-        nmVertexList, foundList = [], []
+        nm_vertices, found_items = [], []
         for item in items:
             cmds.select(item)
-            foundList.extend(mel.eval('polyCleanupArgList 4 { "0","2","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };'))
-        if foundList:
-            for sel in foundList:
+            found_items.extend(mel.eval('polyCleanupArgList 4 { "0","2","0","0","0","0","0","0","0","1e-05","0","1e-05","0","1e-05","0","1","0","0" };'))
+        if found_items:
+            for sel in found_items:
                 if ".vtx[" in sel:
-                    nmVertexList.append(sel)
-        cmds.select(nmVertexList)
-        return nmVertexList
+                    nm_vertices.append(sel)
+        cmds.select(nm_vertices)
+        return nm_vertices

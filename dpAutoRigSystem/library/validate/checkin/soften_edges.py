@@ -33,24 +33,24 @@ class SoftenEdges(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                allMeshList = inputs
+                meshes = inputs
             else:
-                allMeshList = cmds.ls(selection=False, type="mesh")
-            if allMeshList:
-                self.ar.utils.set_progress(max=len(allMeshList), add_one=False, add_number=False)
-                for mesh in allMeshList:
+                meshes = cmds.ls(selection=False, type="mesh")
+            if meshes:
+                self.ar.utils.set_progress(max=len(meshes), add_one=False, add_number=False)
+                for mesh in meshes:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
                         cmds.select(mesh)
                         # set selection only non-smoothed edges
                         cmds.polySelectConstraint(type=0x8000, mode=3, smoothness=1)
-                        hardenEdges = cmds.ls(selection=True)
+                        harden_edges = cmds.ls(selection=True)
                         cmds.polySelectConstraint(mode=0)
-                        if hardenEdges:
+                        if harden_edges:
                             # converts the selected edges to faces
-                            toFace = cmds.polyListComponentConversion(hardenEdges, toFace=True, internal=True)
+                            to_face = cmds.polyListComponentConversion(harden_edges, toFace=True, internal=True)
                             # check if there's any non-smoothed edges
-                            if toFace:
+                            if to_face:
                                 self.checked_items.append(mesh)
                                 self.found_issues.append(True)
                                 if self.first_mode:
@@ -64,7 +64,6 @@ class SoftenEdges(action.BaseAction):
                                         self.good_results.append(False)
                                         self.messages.append(self.ar.data.lang['v005_cantFix']+": "+mesh)
                         cmds.select(clear=True)
-        
             else:
                 self.not_found_node()
         else:

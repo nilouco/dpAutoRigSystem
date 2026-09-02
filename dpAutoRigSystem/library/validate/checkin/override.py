@@ -38,16 +38,16 @@ class Override(action.BaseAction):
                     if inputs:
                         nodes = inputs
                     if nodes:
-                        overridedList = []
+                        override_items = []
                         self.ar.utils.set_progress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             if cmds.objExists(item+".overrideEnabled"):
                                 if cmds.getAttr(item+".overrideEnabled") == 1:
-                                    overridedList.append(item)
+                                    override_items.append(item)
                         # conditional to check here
-                        if overridedList:
-                            for item in overridedList:
+                        if override_items:
+                            for item in override_items:
                                 self.checked_items.append(item)
                                 self.found_issues.append(True)
                                 if self.first_mode:

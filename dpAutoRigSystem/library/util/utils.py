@@ -881,8 +881,8 @@ class Utils(object):
     Open Maya Utils Functions
     '''
 
-    def extract_world_scale_from_matrix(self, obj):
-        world_matrix = cmds.getAttr(obj + ".worldMatrix")
+    def extract_world_scale_from_matrix(self, item):
+        world_matrix = cmds.getAttr(item + ".worldMatrix")
         m_mat = OpenMaya.MMatrix()
         OpenMaya.MScriptUtil.createMatrixFromList(world_matrix, m_mat)
         m_transform = OpenMaya.MTransformationMatrix(m_mat)

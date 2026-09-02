@@ -34,51 +34,54 @@ class FreezeTransform(action.BaseAction):
         if not self.ar.utils.get_all_grp():
             if not self.ar.utils.get_network_by_attr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
-                    allObjectList = []
-                    toFixList = []
+                    transforms, to_fix_items = [], []
                     if inputs:
-                        allObjectList = list(filter(lambda obj: cmds.objectType(obj) == 'transform', inputs))
-                    if len(allObjectList) == 0:
-                        allObjectList = cmds.ls(selection=False, type='transform', long=True)
+                        transforms = list(filter(lambda item: cmds.objectType(item) == 'transform', inputs))
+                    if len(transforms) == 0:
+                        transforms = cmds.ls(selection=False, type='transform', long=True)
                     # analisys transformations
-                    if len(allObjectList) > 0:
-                        self.ar.utils.set_progress(max=len(allObjectList), add_one=False, add_number=False)
-                        self.animCurvesList = cmds.ls(type='animCurve')
-                        zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
-                        oneAttrList = ['scaleX', 'scaleY', 'scaleZ']
-                        camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
-                        allValidObjs = list(filter(lambda obj: obj not in camerasList, allObjectList))
-                        for idx, obj in enumerate(allValidObjs):
+                    if len(transforms) > 0:
+                        self.ar.utils.set_progress(max=len(transforms), add_one=False, add_number=False)
+                        self.anim_curves = cmds.ls(type='animCurve')
+                        zero_attrs = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
+                        one_attrs = ['scaleX', 'scaleY', 'scaleZ']
+                        cameras = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
+                        valid_items = list(filter(lambda item: item not in cameras, transforms))
+                        for idx, item in enumerate(valid_items):
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                            if cmds.objExists(obj):
+                            if cmds.objExists(item):
                                 # run for translates and rotates
-                                frozenTR = self.checkFrozenObject(obj, zeroAttrList, 0)
+                                frozen_tr = self.check_frozen_item(item, zero_attrs, 0)
                                 # run for scales
-                                frozenS = self.checkFrozenObject(obj, oneAttrList, 1)
-                                self.checked_items.append(obj)
-                                if frozenTR and frozenS:
+                                frozen_s = self.check_frozen_item(item, one_attrs, 1)
+                                self.checked_items.append(item)
+                                if frozen_tr and frozen_s:
                                     self.found_issues.append(False)
                                     self.good_results.append(True)
                                 else:
                                     self.found_issues.append(True)
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v018_foundTransform']+obj)
-                                    toFixList.append((obj, idx))
-                        if not self.first_mode and len(toFixList) > 0: #one item to fix
-                            for obj in toFixList:
-                                if self.unlockAttributes(obj[0], zeroAttrList) and self.unlockAttributes(obj[0], oneAttrList):
+                                    self.messages.append(self.ar.data.lang['v018_foundTransform']+item)
+                                    to_fix_items.append((item, idx))
+                        if not self.first_mode and len(to_fix_items) > 0: #one item to fix
+                            for item in to_fix_items:
+                                self.locked_attrs = cmds.listAttr(item[0], locked=True)
+                                if self.unlock_attrs(item[0], zero_attrs) and self.unlock_attrs(item[0], one_attrs):
                                     try:
-                                        cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
-                                        if self.checkFrozenObject(obj[0], zeroAttrList, 0) and self.checkFrozenObject(obj[0], oneAttrList, 1):
-                                            self.found_issues[obj[1]] = False
-                                            self.good_results[obj[1]] = True
-                                            self.messages.append(self.ar.data.lang['v019_frozenTransform']+obj[0])
+                                        cmds.makeIdentity(item[0], apply=True, translate=True, rotate=True, scale=True)
+                                        if self.check_frozen_item(item[0], zero_attrs, 0) and self.check_frozen_item(item[0], one_attrs, 1):
+                                            self.found_issues[item[1]] = False
+                                            self.good_results[item[1]] = True
+                                            self.messages.append(self.ar.data.lang['v019_frozenTransform']+item[0])
                                         else:
                                             raise Exception('Freeze Tranform Failed')
                                     except:
-                                        self.messages.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
+                                        self.messages.append(self.ar.data.lang['v017_freezeError'] + item+'.')
                                 else:
-                                    self.messages.append(self.ar.data.lang['v017_freezeError'] + obj+'.')
+                                    self.messages.append(self.ar.data.lang['v017_freezeError'] + item+'.')
+                                if self.locked_attrs:
+                                    for attr in self.locked_attrs:
+                                        cmds.setAttr(item[0]+'.'+attr, lock=True)
                 else:
                     self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
             else:
@@ -95,25 +98,26 @@ class FreezeTransform(action.BaseAction):
         return self.log_data
 
 
-    def checkFrozenObject(self, obj, attributes, compValue, *args):
+    def check_frozen_item(self, item, attributes, comp_value):
         """ Compare values.
             Return True if equal.
         """
+        cmds.lockNode(item, lock=False, lockUnpublished=False)
         for attr in attributes:
-            if cmds.getAttr(obj+'.'+attr) != compValue:
+            if cmds.getAttr(item+'.'+attr) != comp_value:
                 return False
         return True
 
 
-    def unlockAttributes(self, obj, attributes, *args):
+    def unlock_attrs(self, item, attributes):
         """ Just unlock attributes.
         """
         for attr in attributes:
-            if self.animCurvesList:
-                if obj+'_'+attr in self.animCurvesList:
+            if self.anim_curves:
+                if item+'_'+attr in self.anim_curves:
                     return False
                 else:
-                    cmds.setAttr(obj+'.'+attr, lock=False)
+                    cmds.setAttr(item+'.'+attr, lock=False)
             else:
-                cmds.setAttr(obj+'.'+attr, lock=False)
+                cmds.setAttr(item+'.'+attr, lock=False)
         return True

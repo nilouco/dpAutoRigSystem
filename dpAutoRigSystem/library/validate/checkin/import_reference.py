@@ -32,19 +32,19 @@ class ImportReference(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if inputs:
-            referenceList = inputs
+            references = inputs
         else:
-            referenceList = cmds.file(query=True, reference=True)
-        if referenceList:
-            self.ar.utils.set_progress(max=len(referenceList), add_one=False, add_number=False)
-            for reference in referenceList:
+            references = cmds.file(query=True, reference=True)
+        if references:
+            self.ar.utils.set_progress(max=len(references), add_one=False, add_number=False)
+            for reference in references:
                 self.ar.utils.set_progress(self.ar.data.lang[self.title])
                 self.checked_items.append(reference)
                 self.found_issues.append(True)
             if self.first_mode:
                 self.good_results.append(False)
             else: #fix
-                self.importReference()
+                self.import_reference()
         else:
             self.not_found_node()
         # --- validator code --- end
@@ -57,21 +57,21 @@ class ImportReference(action.BaseAction):
         return self.log_data
 
 
-    def importReference(self, *args):
+    def import_reference(self):
         """ This function will import objects from referenced file.
         """
-        refList = cmds.file(query=True, reference=True)
-        if refList:
-            for ref in refList:
-                topRef = cmds.referenceQuery(ref, referenceNode=True, topReference=True)
-                if cmds.objExists(topRef):
+        refs = cmds.file(query=True, reference=True)
+        if refs:
+            for ref in refs:
+                top_ref = cmds.referenceQuery(ref, referenceNode=True, topReference=True)
+                if cmds.objExists(top_ref):
                     # Only import it if it's loaded, otherwise it would throw an error.
                     if cmds.referenceQuery(ref, isLoaded=True):
                         try:
                             cmds.file(ref, importReference=True)
                             self.good_results.append(True)
                             self.messages.append(self.ar.data.lang['v004_fixed']+": "+ref)
-                            self.importReference()
+                            self.import_reference()
                             break
                         except:
                             self.good_results.append(False)

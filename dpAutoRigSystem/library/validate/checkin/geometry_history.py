@@ -34,29 +34,29 @@ class GeometryHistory(action.BaseAction):
         if not self.ar.utils.get_all_grp():
             if not self.ar.utils.get_network_by_attr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
-                    ignoreTypeList = ["tweak", "file", "place2dTexture"]
+                    ignore_types = ["tweak", "file", "place2dTexture"]
                     if inputs:
-                        geoToCleanList = inputs
+                        to_clean_geos = inputs
                     else:
                         geos = []
                         transforms = self.get_mesh_transforms()
                         if transforms:
                             for transform in transforms:
                                 # Filter which geometry has deformer history and groupLevels to pass through sets and shader
-                                historyList = cmds.listHistory(transform, pruneDagObjects=True, groupLevels=True)
-                                if historyList:
-                                    for history in historyList:
+                                histories = cmds.listHistory(transform, pruneDagObjects=True, groupLevels=True)
+                                if histories:
+                                    for history in histories:
                                         # Pass through tweak and initialShading nodes
-                                        if not cmds.nodeType(history) in ignoreTypeList: 
+                                        if not cmds.nodeType(history) in ignore_types: 
                                             if history != "initialShadingGroup":
                                                 geos.append(transform)
                         # Merge duplicated names
-                        geoToCleanFullPathList = list(set(geos))
+                        to_clean_geo_fullpaths = list(set(geos))
                         # Get shortName to better reading in display log
-                        geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
-                    if geoToCleanList:
-                        self.ar.utils.set_progress(max=len(geoToCleanList), add_one=False, add_number=False)
-                        for geo in geoToCleanList:
+                        to_clean_geos = cmds.ls(to_clean_geo_fullpaths, long=False)
+                    if to_clean_geos:
+                        self.ar.utils.set_progress(max=len(to_clean_geos), add_one=False, add_number=False)
+                        for geo in to_clean_geos:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):
                                 self.checked_items.append(geo)
