@@ -250,7 +250,7 @@ class Configuration(object):
             new_preset = self.ar.ctrls.create_curve_preset()
         elif preset_type == "validator":
             preset_option_var = self.ar.data.validator_option_var
-            new_preset = self.ar.utils.dpCreateValidatorPreset()
+            new_preset = self.ar.utils.create_validator_preset()
         if new_preset:
             # create json file:
             result_data = self.save_json_file(new_preset, preset_folder, '_preset')
@@ -287,7 +287,7 @@ class Configuration(object):
         if os.path.exists(self.ar.pipeliner.pipe_data[path]):
             start_path = self.ar.pipeliner.pipe_data[path][:self.ar.pipeliner.pipe_data[path].rfind("/")]
             end_path = self.ar.pipeliner.pipe_data[path][self.ar.pipeliner.pipe_data[path].rfind("/")+1:]
-            return self.ar.utils.findAllModules(start_path, end_path)
+            return self.ar.utils.find_modules_by_folder(start_path, end_path)
                     
 
     def get_validator_instances(self):
@@ -439,7 +439,7 @@ class Option(object):
             if result_dialog == self.ar.data.lang['i131_ok']:
                 prefix = cmds.promptDialog(query=True, text=True)
         if prefix:
-            prefix = self.ar.utils.normalizeText(prefix, prefixMax=10)
+            prefix = self.ar.utils.normalize_text(prefix, prefixMax=10)
             if not prefix:
                 self.ar.data.prefix = ""
                 if self.ar.data.verbose:
@@ -533,7 +533,7 @@ class Agreement(object):
             local_info['dpAR'] = self.ar.data.version
             #print(local_info)
             if local_info:
-                wh = self.ar.utils.mountWH(self.ar.data.discord_url, self.ar.pipeliner.pipe_data['h000_location'])
+                wh = self.ar.utils.mount_wh(self.ar.data.discord_url, self.ar.pipeliner.pipe_data['h000_location'])
                 self.ar.packager.to_discord(wh, str(local_info))
 
 

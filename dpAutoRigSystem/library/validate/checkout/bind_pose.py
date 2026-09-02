@@ -38,10 +38,10 @@ class BindPose(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="dagPose") #bindPose nodes
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # conditional to check here
                 if len(check_items) > 1:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     self.checked_items.append(", ".join(check_items))
                     self.found_issues.append(True)
                     if self.first_mode:
@@ -51,7 +51,7 @@ class BindPose(action.BaseAction):
                             for item in check_items:
                                 cmds.lockNode(item, lock=False)
                                 cmds.delete(item)
-                            joints = self.ar.skin.getSkinnedJointList()
+                            joints = self.ar.skin.get_skinned_joints()
                             if joints:
                                 cmds.dagPose(joints, save=True, bindPose=True, name=self.bindPoseName)
                             self.good_results.append(True)

@@ -105,14 +105,14 @@ class Wheel(standard.BaseStandard):
                 center_joint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(center_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.setJointLabel(center_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['m156_wheel'])
+                self.ar.utils.set_joint_label(center_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['m156_wheel'])
                 self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang['m156_wheel'], self.guide_front_loc)
                 # main joint:
                 cmds.select(clear=True)
                 main_joint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(main_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.setJointLabel(main_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c058_main'])
+                self.ar.utils.set_joint_label(main_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c058_main'])
                 self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang['c058_main'], self.guide_front_loc)
                 
                 # create controls:
@@ -137,9 +137,9 @@ class Wheel(standard.BaseStandard):
                 self.wheel_ctrls.append(wheel_ctrl)
 
                 # origined from attributes:
-                self.ar.utils.originedFrom(objName=main_ctrl, attrString=self.base+";"+self.guide_center_loc+";"+self.guide_front_loc+";"+self.guide_radius)
-                self.ar.utils.originedFrom(objName=inside_ctrl, attrString=self.guide_inside_loc)
-                self.ar.utils.originedFrom(objName=outside_ctrl, attrString=self.guide_outside_loc)
+                self.ar.utils.set_origined_from_attr(main_ctrl, self.base+";"+self.guide_center_loc+";"+self.guide_front_loc+";"+self.guide_radius)
+                self.ar.utils.set_origined_from_attr(inside_ctrl, self.guide_inside_loc)
+                self.ar.utils.set_origined_from_attr(outside_ctrl, self.guide_outside_loc)
                 
                 # prepare group to receive steering wheel connection:
                 to_steering_grp = cmds.group(inside_ctrl, name=side+self.number_name+"_"+self.ar.data.lang['c070_steering'].capitalize()+"_Grp")
@@ -161,9 +161,9 @@ class Wheel(standard.BaseStandard):
                 cmds.matchTransform(to_steering_grp, self.guide_inside_loc, position=True, rotation=True)
                 cmds.matchTransform(outside_ctrl, self.guide_outside_loc, position=True, rotation=True)
                 
-                # zeroOut controls:
-                zeros = self.ar.utils.zeroOut([main_ctrl, wheel_ctrl, to_steering_grp, outside_ctrl])
-                wheel_auto_grp = self.ar.utils.zeroOut([wheel_ctrl])
+                # create_zero_out controls:
+                zeros = self.ar.utils.create_zero_out([main_ctrl, wheel_ctrl, to_steering_grp, outside_ctrl])
+                wheel_auto_grp = self.ar.utils.create_zero_out([wheel_ctrl])
                 wheel_auto_grp = cmds.rename(wheel_auto_grp, side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Auto_Grp")
                 
                 # fixing flip mirror:
@@ -278,7 +278,7 @@ class Wheel(standard.BaseStandard):
                 cmds.rename(bindpose_node, side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_BP")
                 if loaded_geo:
                     if cmds.objExists(loaded_geo):
-                        base_name = self.ar.utils.extractSuffix(loaded_geo)
+                        base_name = self.ar.utils.extract_suffix(loaded_geo)
                         skincluster_name = base_name+"_SC"
                         if "|" in skincluster_name:
                             skincluster_name = skincluster_name[skincluster_name.rfind("|")+1:]
@@ -289,7 +289,7 @@ class Wheel(standard.BaseStandard):
                                 item_type = cmds.objectType(item)
                                 if item_type == "mesh" or item_type == "nurbsSurface":
                                     try:
-                                        skincluster_name = self.ar.utils.extractSuffix(item)+"_SC"
+                                        skincluster_name = self.ar.utils.extract_suffix(item)+"_SC"
                                         cmds.skinCluster(center_joint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)
                                     except:
                                         pass
@@ -301,14 +301,14 @@ class Wheel(standard.BaseStandard):
                 upper_clusters = cmds.cluster(lattice_items[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.number_name+"_"+self.ar.data.lang['c044_upper']+"_Cls") #[deform, handle]
                 middle_clusters = cmds.cluster(lattice_items[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.number_name+"_"+self.ar.data.lang['m033_middle']+"_Cls") #[deform, handle]
                 lower_clusters = cmds.cluster(lattice_items[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.number_name+"_"+self.ar.data.lang['c045_lower']+"_Cls") #[deform, handle]                
-                cluster_grps = self.ar.utils.zeroOut([upper_clusters[1], middle_clusters[1], lower_clusters[1]])
+                cluster_grps = self.ar.utils.create_zero_out([upper_clusters[1], middle_clusters[1], lower_clusters[1]])
                 cluster_grp = cmds.group(cluster_grps, name=side+self.number_name+"_Clusters_Grp")
                 
                 # deform controls:
                 upper_def_ctrl = self.ar.ctrls.create_controller("id_063_WheelDeform", side+self.number_name+"_"+self.ar.data.lang['c044_upper']+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guide_source=self.name_guide+"_CenterLoc", parent_tag=wheel_ctrl)
                 middle_def_ctrl = self.ar.ctrls.create_controller("id_064_WheelMiddle", side+self.number_name+"_"+self.ar.data.lang['m033_middle']+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, guide_source=self.name_guide+"_CenterLoc", parent_tag=wheel_ctrl)
                 lower_def_ctrl = self.ar.ctrls.create_controller("id_063_WheelDeform", side+self.number_name+"_"+self.ar.data.lang['c045_lower']+"_Ctrl", r=self.radius*0.5, d=self.curve_degree, rot=(0, 0, 180), guide_source=self.name_guide+"_CenterLoc", parent_tag=wheel_ctrl)
-                def_ctrl_grps = self.ar.utils.zeroOut([upper_def_ctrl, middle_def_ctrl, lower_def_ctrl])
+                def_ctrl_grps = self.ar.utils.create_zero_out([upper_def_ctrl, middle_def_ctrl, lower_def_ctrl])
                 def_ctrl_grp = cmds.group(def_ctrl_grps, name=side+self.number_name+"_Ctrl_Grp")
                 
                 # positions:
@@ -317,7 +317,7 @@ class Wheel(standard.BaseStandard):
                 cmds.matchTransform(def_ctrl_grps[2], lower_clusters[1], position=True, rotation=True)
                 if s == 1: #fix right side controllers upper/lower flipping - workaround
                     if cmds.getAttr(self.guide_base+".flip") == 1:
-                        self.ar.utils.unlockAttr([self.guide_center_loc])
+                        self.ar.utils.unlock_attr([self.guide_center_loc])
                         cmds.parent(self.guide_center_loc, world=True)
                 cmds.matchTransform(lattice_items[1], self.guide_center_loc, position=True, rotation=True)
                 cmds.matchTransform(lattice_items[2], self.guide_center_loc, position=True, rotation=True)
@@ -347,7 +347,7 @@ class Wheel(standard.BaseStandard):
                 self.ctrl_hook_grps.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
-                self.ar.utils.addCustomAttr([to_steering_grp, cluster_grp, def_ctrl_grp, def_grp, lattice_items[1], lattice_items[2], geo_holder], self.ar.utils.ignoreTransformIOAttr)
+                self.ar.utils.add_attr_to_items([to_steering_grp, cluster_grp, def_ctrl_grp, def_grp, lattice_items[1], lattice_items[2], geo_holder], self.ar.utils.ignore_transform_io_attr)
                 
                 self.to_ids.extend([recept_steering_md, inverse_steering_md, inverse_steering_cnd, exp_node, geo_holder, skincluster_node, side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_BP"])
                 for ids in [lattice_items, upper_clusters, middle_clusters, lower_clusters]:

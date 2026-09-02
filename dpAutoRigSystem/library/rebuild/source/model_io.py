@@ -37,7 +37,7 @@ class ModelIO(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
-                if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
+                if self.ar.utils.check_loaded_plugin("AbcExport") and self.ar.utils.check_loaded_plugin("AbcImport"):
                     self.io_path = self.get_io_path(self.io_folder)
                     if self.io_path:
                         if self.first_mode: #export
@@ -45,9 +45,9 @@ class ModelIO(action.BaseAction):
                             if inputs:
                                 meshes = inputs
                             else:
-                                meshes = self.ar.utils.filterTransformList(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+                                meshes = self.ar.utils.filter_transforms(self.get_models_to_export(), verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
                             if meshes:
-                                self.ar.utils.setProgress(max=len(meshes), add_one=False, add_number=False)
+                                self.ar.utils.set_progress(max=len(meshes), add_one=False, add_number=False)
                                 constraint_data = self.remove_constraints(meshes)
                                 self.export_alembic_file(meshes)
                                 if constraint_data:

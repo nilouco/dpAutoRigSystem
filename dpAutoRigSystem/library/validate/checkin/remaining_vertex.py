@@ -38,7 +38,7 @@ class RemainingVertex(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="mesh")
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # declare resulted lists
                 borderEdgeIdxList, remainingVertexList = [], []
                 iter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kGeometric)
@@ -53,7 +53,7 @@ class RemainingVertex(action.BaseAction):
                         objectName   = fnParentNode.name()
                         # verify if objName or shapeName is in check_items
                         for obj in check_items:
-                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             if obj == shapeName and not cmds.getAttr(obj+".intermediateObject"):
                                 vertexIter = OpenMaya.MItMeshVertex(shape)
                                 iterEdges  = OpenMaya.MItMeshEdge(shape)

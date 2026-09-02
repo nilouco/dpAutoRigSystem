@@ -74,12 +74,12 @@ class TransformationIO(action.BaseAction):
     def get_transform_data(self, items):
         """ Return the transform data info to export.
         """
-        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
         # define dictionary to export
         transform_data = {}
-        items = self.ar.utils.filterTransformList(items, filterLattice=False, filterBaseName=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        items = self.ar.utils.filter_transforms(items, filter_lattice=False, filter_basename=False, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         for item in items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             use_this_transform = True
             if cmds.objExists(item+".dpNotTransformIO"):
                 if cmds.getAttr(item+".dpNotTransformIO") == 1:
@@ -154,11 +154,11 @@ class TransformationIO(action.BaseAction):
     def import_transformation(self, transform_data):
         """ Import transfomation data from given dictionary.
         """
-        self.ar.utils.setProgress(max=len(transform_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(transform_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in transform_data.keys():
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             not_found_nodes = []
             # check transform
             #if not cmds.objExists(item):

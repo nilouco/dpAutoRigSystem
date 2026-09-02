@@ -53,9 +53,9 @@ class ComponentTagIO(action.BaseAction):
                                     break
                             if has_tag:
                                 # Declaring the data dictionary to export it
-                                self.tag_data = { "tagged"     : self.ar.skin.getComponentTagInfo(nodes),
-                                                    "influencer" : self.ar.skin.getComponentTagInfluencer(),
-                                                    "falloff"    : self.ar.skin.getComponentTagFalloff()
+                                self.tag_data = { "tagged"     : self.ar.skin.get_component_tag_info(nodes),
+                                                    "influencer" : self.ar.skin.get_component_tag_influencer(),
+                                                    "falloff"    : self.ar.skin.get_component_tag_falloff()
                                                 }
                                 self.export_json_file(self.tag_data)
                             else:
@@ -92,17 +92,17 @@ class ComponentTagIO(action.BaseAction):
         fail = False
         # import tagged (tag info into the received deformed mesh)
         if tag_data["tagged"]:
-            if not self.ar.skin.importComponentTagInfo(tag_data["tagged"], nodes):
+            if not self.ar.skin.import_component_tag_info(tag_data["tagged"], nodes):
                 self.fail_io(self.latest_data_file+": tagged - "+", ".join(self.ar.skin.notWorkWellInfoList))
                 fail = True
         # import influencers (tag info into the deformer node)
         if tag_data["influencer"]:
-            if not self.ar.skin.importComponentTagInfluencer(tag_data["influencer"]):
+            if not self.ar.skin.import_component_tag_influencer(tag_data["influencer"]):
                 self.fail_io(self.latest_data_file+": influencer - "+", ".join(self.ar.skin.notWorkWellInfoList))
                 fail = True
         # import falloffs
         if tag_data["falloff"]:
-            if not self.ar.skin.importComponentTagFalloff(tag_data["falloff"]):
+            if not self.ar.skin.import_component_tag__falloff(tag_data["falloff"]):
                 self.fail_io(self.latest_data_file+": falloff - "+", ".join(self.ar.skin.notWorkWellInfoList))
                 fail = True
         if not fail:

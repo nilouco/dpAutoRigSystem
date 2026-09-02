@@ -97,7 +97,7 @@ class FkLine(standard.BaseStandard):
         """
         if cmds.objExists(self.guide_base):
             children = cmds.listRelatives(self.guide_base, allDescendents=True, type="transform")
-            up_vector = self.ar.utils.createLocatorInItemPosition(self.guide_radius)  # using locator to avoid cycle error
+            up_vector = self.ar.utils.create_locator_in_item_position(self.guide_radius)  # using locator to avoid cycle error
             locs = []
             for child in children:
                 # Check if the child is a joint locator, with nJoint attribute
@@ -135,7 +135,7 @@ class FkLine(standard.BaseStandard):
                 # If the father is the guideBase, align the jointLoc1 to the guideBase
                 if father == self.guide_base:
                     child = cmds.listRelatives(joint_loc, children=True, type="transform")[0]
-                    temp_pos_loc = self.ar.utils.createLocatorInItemPosition(child)
+                    temp_pos_loc = self.ar.utils.create_locator_in_item_position(child)
                     # Aim guideBase and joint_loc to child
                     self.aim_to_target(self.guide_base, child, up_vector)
                     # Parenting nJoint to world and reset joint_loc position
@@ -187,13 +187,13 @@ class FkLine(standard.BaseStandard):
                     jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
+                    self.ar.utils.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     skin_joints.append(jnt)
                     # create a control:
                     ctrl = self.ar.ctrls.create_controller("id_007_FkLine", side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, head_def=cmds.getAttr(self.base+".deformedBy"), guide_source=self.name_guide+"_JointLoc"+str(n+1), parent_tag=self.get_parent_to_tag(fk_ctrls))
                     fk_ctrls.append(ctrl)
-                    # zeroOut controls:
-                    ctrl_zero = self.ar.utils.zeroOut([ctrl])[0]
+                    # create_zero_out controls:
+                    ctrl_zero = self.ar.utils.create_zero_out([ctrl])[0]
                     # position and orientation of joint and control:
                     cmds.matchTransform(jnt, self.guide, position=True, rotation=True)
                     cmds.matchTransform(ctrl_zero, self.guide, position=True, rotation=True)
@@ -209,12 +209,12 @@ class FkLine(standard.BaseStandard):
                     cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
-                        self.ar.utils.originedFrom(objName=ctrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
+                        self.ar.utils.set_origined_from_attr(ctrl, self.base+";"+self.guide+";"+self.guide_radius)
                         ctrl_zero_grp = ctrl_zero
                     elif n == self.n_joints-1:
-                        self.ar.utils.originedFrom(objName=ctrl, attrString=self.guide+";"+self.guide_end_loc)
+                        self.ar.utils.set_origined_from_attr(ctrl, self.guide+";"+self.guide_end_loc)
                     else:
-                        self.ar.utils.originedFrom(objName=ctrl, attrString=self.guide)
+                        self.ar.utils.set_origined_from_attr(ctrl, self.guide)
                     # grouping:
                     if n > 0:
                         # parent joints as a simple chain (line)
@@ -228,8 +228,8 @@ class FkLine(standard.BaseStandard):
                     # add articulationJoint:
                     if n > 0:
                         if self.articulation:
-                            articulation_joints = self.ar.utils.articulationJoint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.utils.setJointLabel(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                            articulation_joints = self.ar.utils.create_articulation_joint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(jnt)
                     # end chain:
                     if n == self.n_joints-1:

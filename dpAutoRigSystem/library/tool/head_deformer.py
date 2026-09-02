@@ -90,7 +90,7 @@ class HeadDeformer(base.BaseLibrary):
         position = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
-        valid_name = self.ar.utils.validateName(deformer_name+"_FFD", "FFD")
+        valid_name = self.ar.utils.validate_name(deformer_name+"_FFD", "FFD")
         numbering = valid_name.replace(deformer_name, "")[:-4]
         if numbering:
             deformer_name = deformer_name+numbering
@@ -240,7 +240,7 @@ class HeadDeformer(base.BaseLibrary):
             # create symmetry setup
             center_cluster_items = cmds.cluster(lattice_def_items[1]+".pt[0:5][2:3][0:5]", relative=True, name=center_symmetry_name+"_Cls") #[Cluster, Handle]
             top_cluster_items = cmds.cluster(lattice_def_items[1]+".pt[0:5][2:5][0:5]", relative=True, name=top_symmetry_name+"_Cls")
-            cluster_zeros = self.ar.utils.zeroOut([center_cluster_items[1], top_cluster_items[1]])
+            cluster_zeros = self.ar.utils.create_zero_out([center_cluster_items[1], top_cluster_items[1]])
             cmds.matchTransform(cluster_zeros[1], center_cluster_items[1])
             cluter_grp = cmds.group(cluster_zeros, name=deformer_name+"_Cluster_Grp")
             # arrange lattice deform points percent
@@ -248,7 +248,7 @@ class HeadDeformer(base.BaseLibrary):
             # symmetry controls
             center_symmetry_ctrl = self.ar.ctrls.create_controller("id_068_Symmetry", center_symmetry_name+"_Ctrl", bbox_size, d=0, rot=(-90, 0, 90), parent_tag=arrow_ctrl)
             top_symmetry_ctrl = self.ar.ctrls.create_controller("id_068_Symmetry", top_symmetry_name+"_Ctrl", bbox_size, d=0, rot=(0, 90, 0), parent_tag=arrow_ctrl)
-            symmetry_ctrl_zeros = self.ar.utils.zeroOut([center_symmetry_ctrl, top_symmetry_ctrl])
+            symmetry_ctrl_zeros = self.ar.utils.create_zero_out([center_symmetry_ctrl, top_symmetry_ctrl])
             for axis in self.ar.data.axes:
                 cmds.connectAttr(center_symmetry_ctrl+".translate"+axis, center_cluster_items[1]+".translate"+axis, force=True)
                 cmds.connectAttr(center_symmetry_ctrl+".rotate"+axis, center_cluster_items[1]+".rotate"+axis, force=True)
@@ -265,11 +265,11 @@ class HeadDeformer(base.BaseLibrary):
                 namePos = bottom_ctrl_name.replace(self.ar.data.lang["c100_bottom"], pos)
                 sub_cluster_items = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
                 self.to_ids.extend(sub_cluster_items)
-                cmds.parent(self.ar.utils.zeroOut([sub_cluster_items[1]])[0], cluter_grp)
+                cmds.parent(self.ar.utils.create_zero_out([sub_cluster_items[1]])[0], cluter_grp)
                 # create control and match zeroOutGrp
                 sub_ctrl = self.ar.ctrls.create_controller("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bbox_size, d=0, rot=(90, 0, 0), parent_tag=arrow_ctrl)
                 sub_ctrls.append(sub_ctrl)
-                ctrl_sub_zeros = self.ar.utils.zeroOut([sub_ctrl])[0]
+                ctrl_sub_zeros = self.ar.utils.create_zero_out([sub_ctrl])[0]
                 sub_ctrl_grps.append(ctrl_sub_zeros)
                 cmds.matchTransform(ctrl_sub_zeros, sub_cluster_items[1], pos=True)
                 # connect atributes
@@ -281,7 +281,7 @@ class HeadDeformer(base.BaseLibrary):
 
             # create groups
             arrow_ctrl_grp = cmds.group(arrow_ctrl, name=arrow_ctrl+"_Grp")
-            self.ar.utils.zeroOut([arrow_ctrl], False, False)
+            self.ar.utils.create_zero_out([arrow_ctrl], False, False)
             offset_grp = cmds.group(name=deformer_name+"_Offset_Grp", empty=True)
             data_grp = cmds.group(name=deformer_name+"_Data_Grp", empty=True)
             cmds.matchTransform(arrow_ctrl_grp, lattice_def_items[2], position=True, rotation=True)
@@ -372,7 +372,7 @@ class HeadDeformer(base.BaseLibrary):
             cmds.parent(offset_grp, cluter_grp, lattice_grp, data_grp)
             
             # try to integrate to Scalable_Grp
-            scalable_grp = self.ar.utils.getNodeByMessage("scalableGrp")
+            scalable_grp = self.ar.utils.get_node_by_message("scalableGrp")
             if scalable_grp:
                 cmds.parent(data_grp, scalable_grp)
             
@@ -415,9 +415,9 @@ class HeadDeformer(base.BaseLibrary):
             self.ar.ctrls.set_string_attr_from_items(arrow_ctrl, hd_calibrations)
             
             # rename unitConversion nodes
-            self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
+            self.ar.utils.node_renaming_treatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
             # add ignoreTranformIO attribute
-            self.ar.utils.addCustomAttr([lattice_def_items[1], lattice_def_items[2], offset_grp, arrow_ctrl_grp], self.ar.utils.ignoreTransformIOAttr)
+            self.ar.utils.add_attr_to_items([lattice_def_items[1], lattice_def_items[2], offset_grp, arrow_ctrl_grp], self.ar.utils.ignore_transform_io_attr)
             # add dpID attributes
             self.to_ids.extend([main_ctrl_grp, data_grp, calibrate_md, calibrate_reduce_md, intensity_md, twist_md, rmv_node])
             for deformers in [lattice_def_items, twist_def_items, squash_def_items, side_bend_def_items, front_bend_def_items, center_cluster_items, top_cluster_items]:

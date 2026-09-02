@@ -86,7 +86,7 @@ class Single(standard.BaseStandard):
                 # create a joint:
                 jnt = cmds.joint(name=side+self.number_name+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name)
+                self.ar.utils.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name)
                 # create a control:
                 if not self.get_guide_attr('indirectSkin'):
                     if self.curve_degree == 0:
@@ -110,12 +110,12 @@ class Single(standard.BaseStandard):
                         else:
                             indirectskin_rot=(0, 0, -90)
                 single_ctrl = self.ar.ctrls.create_controller(ctrl_type_id, side+self.number_name+"_Ctrl", r=self.radius, d=self.curve_degree, rot=indirectskin_rot, head_def=cmds.getAttr(self.base+".deformedBy"), guide_source=self.name_guide+"_JointLoc1")
-                self.ar.utils.originedFrom(objName=single_ctrl, attrString=self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
+                self.ar.utils.set_origined_from_attr(single_ctrl, self.base+";"+self.guide+";"+self.guide_end_loc+";"+self.guide_radius)
                 # position and orientation of joint and control:
                 cmds.matchTransform(jnt, self.guide, position=True, rotation=True)
                 cmds.matchTransform(single_ctrl, self.guide, position=True, rotation=True)
-                # zeroOut controls:
-                single_ctrl_zero = self.ar.utils.zeroOut([single_ctrl], offset=True)[0]
+                # create_zero_out controls:
+                single_ctrl_zero = self.ar.utils.create_zero_out([single_ctrl], offset=True)[0]
                 # hide visibility attribute:
                 cmds.setAttr(single_ctrl+'.visibility', keyable=False)
                 # fixing flip mirror:
@@ -129,11 +129,11 @@ class Single(standard.BaseStandard):
                     cmds.setAttr(single_ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(single_ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                 if self.get_guide_attr('indirectSkin'):
-                    # create fatherJoints in order to zeroOut the skinning joint:
+                    # create fatherJoints in order to create_zero_out the skinning joint:
                     cmds.select(clear=True)
                     jxt_name = jnt.replace("_Jnt", "_Jxt")
                     jxt = cmds.duplicate(jnt, name=jxt_name)[0]
-                    self.ar.utils.clearDpArAttr([jxt])
+                    self.ar.utils.clear_dpar_attr([jxt])
                     cmds.makeIdentity(jnt, apply=True, jointOrient=False)
                     cmds.parent(jnt, jxt)
                     for attr in self.ar.data.transform_attrs[:-1]:
@@ -149,8 +149,8 @@ class Single(standard.BaseStandard):
                     if self.get_guide_attr('holder'):
                         cmds.delete(single_ctrl+"0Shape", shape=True)
                         single_ctrl = cmds.rename(single_ctrl, single_ctrl+"_"+self.ar.data.lang['c046_holder']+"_Grp")
-                        self.ar.utils.removeUserDefinedAttr(single_ctrl, True)
-                        self.ar.utils.addCustomAttr([single_ctrl], "dpHolder")
+                        self.ar.utils.remove_user_defined_attr(single_ctrl, True)
+                        self.ar.utils.add_attr_to_items([single_ctrl], "dpHolder")
                         self.ar.ctrls.set_lock_hide([single_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         jnt = cmds.rename(jnt, jnt.replace("_Jnt", "_"+self.ar.data.lang['c046_holder']+"_Jis"))
                         self.ar.ctrls.set_lock_hide([jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)

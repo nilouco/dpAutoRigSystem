@@ -84,7 +84,7 @@ class OneSkeleton(base.BaseLibrary):
                 cmds.select(root)
             self.re_set_scale(unique_inf_items)
             self.ar.ctrls.set_controller_scale_compensate(False)
-            self.ar.utils.setProgress(endIt=True)
+            self.ar.utils.set_progress(end_it=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
 
@@ -104,9 +104,9 @@ class OneSkeleton(base.BaseLibrary):
         """
         scale_constraints = []
         new_joints = []
-        self.ar.utils.setProgress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(source_items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(source_items), add_one=False, add_number=False)
         for sourceNode in source_items:
-            self.ar.utils.setProgress("Joint")
+            self.ar.utils.set_progress("Joint")
             cmds.select(clear=True)
             new_joint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             new_joints.append(new_joint)
@@ -171,8 +171,8 @@ class OneSkeleton(base.BaseLibrary):
     def get_meshes(self):
         """ Returns the Render_Grp meshes or all meshes in the scene.
         """
-        if self.ar.utils.getAllGrp():
-            render_grp = self.ar.utils.getNodeByMessage("renderGrp")
+        if self.ar.utils.get_all_grp():
+            render_grp = self.ar.utils.get_node_by_message("renderGrp")
             if render_grp:
                 meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, type="mesh")
                 if meshes:
@@ -189,7 +189,7 @@ class OneSkeleton(base.BaseLibrary):
             mel.eval('warning \"'+self.ar.data.lang['i041_meshConnEmpty']+'\";')
             return
         for transform_node in list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=True))):
-            skinclusters.extend(self.ar.skin.checkExistingDeformerNode(transform_node)[2] or [])
+            skinclusters.extend(self.ar.skin.check_existing_deformer_node(transform_node)[2] or [])
         if skinclusters:
             for skincluster_node in skinclusters:
                 infs = cmds.skinCluster(skincluster_node, query=True, influence=True)
@@ -209,7 +209,7 @@ class OneSkeleton(base.BaseLibrary):
         cmds.setAttr(root+".visibility", 0)
         self.ar.ctrls.set_lock_hide([root], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'dpRootJoint'], cb=True)
         try:
-            cmds.parent(root, self.ar.utils.getAllGrp())
+            cmds.parent(root, self.ar.utils.get_all_grp())
         except:
             pass
 

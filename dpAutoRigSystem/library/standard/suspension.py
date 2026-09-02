@@ -81,7 +81,7 @@ class Suspension(standard.BaseStandard):
                 self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 self.locators_grp = cmds.group(name=side+self.number_name+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
-                self.dist = self.ar.utils.distanceBet(self.guide_a_loc, self.guide_b_loc)[0] * 0.2
+                self.dist = self.ar.utils.create_dist_between(self.guide_a_loc, self.guide_b_loc)[0] * 0.2
                 self.joints, self.main_ctrls, self.zeros, self.controllers, self.aim_locs, self.up_locs = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
@@ -90,7 +90,7 @@ class Suspension(standard.BaseStandard):
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     self.create_end_joint(side+self.number_name+"_"+letter, jnt, tz=self.dist)
                     # joint labelling:
-                    self.ar.utils.setJointLabel(jnt, s+self.joint_label_add, 18, self.number_name+"_"+letter)
+                    self.ar.utils.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name+"_"+letter)
                     self.joints.append(jnt)
                     
                     # create a control:
@@ -104,17 +104,17 @@ class Suspension(standard.BaseStandard):
                     cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
                     cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScC")
                     self.controllers.append(ctrl)
-                    # zeroOut controls:
-                    ctrl_zeros = self.ar.utils.zeroOut([main_ctrl, ctrl, upLocCtrl])
+                    # create_zero_out controls:
+                    ctrl_zeros = self.ar.utils.create_zero_out([main_ctrl, ctrl, upLocCtrl])
                     self.main_ctrls.append(ctrl_zeros[0])
                     self.zeros.append(ctrl_zeros[1])
                     cmds.setAttr(ctrl_zeros[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
-                        self.ar.utils.originedFrom(objName=main_ctrl, attrString=self.base+";"+self.guide_a_loc+";"+self.guide_radius)
+                        self.ar.utils.set_origined_from_attr(main_ctrl, self.base+";"+self.guide_a_loc+";"+self.guide_radius)
                         cmds.matchTransform(ctrl_zeros[0], self.guide_a_loc, position=True, rotation=True)
                     else:
-                        self.ar.utils.originedFrom(objName=main_ctrl, attrString=self.guide_b_loc)
+                        self.ar.utils.set_origined_from_attr(main_ctrl, self.guide_b_loc)
                         cmds.matchTransform(ctrl_zeros[0], self.guide_b_loc, position=True, rotation=True)
                         # integrating data:
                         self.suspension_b_ctrl_grps.append(ctrl_zeros[0])

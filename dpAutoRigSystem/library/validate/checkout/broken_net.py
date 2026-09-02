@@ -37,9 +37,9 @@ class BrokenNet(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type='network')
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"): #correctionManater
                         if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):

@@ -121,7 +121,7 @@ class CorrectionManagerUI(object):
         if cmds.textScrollList('correction_existing_net_tsl', exists=True):
             cmds.textScrollList('correction_existing_net_tsl', edit=True, deselectAll=True)
             cmds.textScrollList('correction_existing_net_tsl', edit=True, removeAll=True)
-            current_nets = self.ar.utils.getNetworkNodeByAttr("dpCorrectionManager")
+            current_nets = self.ar.utils.get_network_by_attr("dpCorrectionManager")
             if current_nets:
                 self.nets = []
                 filter_name = cmds.textField('correction_filter_name_tf', query=True, text=True)

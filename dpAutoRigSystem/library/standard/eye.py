@@ -174,7 +174,7 @@ class Eye(standard.BaseStandard):
         eyelid_zero_jxt = cmds.joint(name=base_name+"_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
         eyelid_jnt = cmds.joint(name=base_name+"_Jnt", rotationOrder="yzx", scaleCompensate=False)
         cmds.addAttr(eyelid_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        self.ar.utils.setJointLabel(eyelid_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle)
+        self.ar.utils.set_joint_label(eyelid_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle)
         cmds.select(eyelid_zero_jxt)
         eyelid_support_jxt = cmds.joint(name=base_name+"_Jxt", rotationOrder="yzx", scaleCompensate=False)
         cmds.setAttr(eyelid_support_jxt+".translateX", self.radius*0.1)
@@ -190,14 +190,14 @@ class Eye(standard.BaseStandard):
 
     def create_eyelid_setup(self, side, lid, eyelid_jnt, eyelid_base_jxt, eyelid_middle_base_jxt, eyelid_middle_jnt, preset, rot_ctrl, guide_eyelid_loc):
         ''' Work with the joints created in order to develop a solid and stable eyelid setup for blink and facial eye expressions using direct skinning process in the final render mesh.
-            Returns the main controller and its zeroOut group.
+            Returns the main controller and its create_zero_out group.
         '''
         # declating a concatenated name used for base to compose:
         base_name = side+self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']
         # creating eyelid control:
         eyelid_ctrl = self.ar.ctrls.create_controller("id_008_Eyelid", base_name+"_Ctrl", self.radius*0.4, d=self.curve_degree, rot=rot_ctrl, head_def=self.head_def_value, guide_source=self.name_guide+"__"+guide_eyelid_loc.replace("_Guide", ":Guide"), parent_tag=self.fk_eye_sub_ctrl)
-        self.ar.utils.originedFrom(objName=eyelid_ctrl, attrString=guide_eyelid_loc)
-        eyelid_ctrl_zero = self.ar.utils.zeroOut([eyelid_ctrl])[0]
+        self.ar.utils.set_origined_from_attr(eyelid_ctrl, guide_eyelid_loc)
+        eyelid_ctrl_zero = self.ar.utils.create_zero_out([eyelid_ctrl])[0]
         self.ar.ctrls.set_lock_hide([eyelid_ctrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
         cmds.parent(eyelid_ctrl_zero, self.base_eye_ctrl)
         # positioning correctely eyelid control:
@@ -386,7 +386,7 @@ class Eye(standard.BaseStandard):
         # creating joint:
         main_jnt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang[code_name]+"_1_Jnt", scaleCompensate=False)
         cmds.addAttr(main_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        self.ar.utils.setJointLabel(main_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[code_name]+"_1")
+        self.ar.utils.set_joint_label(main_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[code_name]+"_1")
         # joint position:
         cmds.matchTransform(main_jnt, guide_loc, position=True, rotation=True)
         end_joint = self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang[code_name], main_jnt, tz=self.radius)
@@ -398,10 +398,10 @@ class Eye(standard.BaseStandard):
             ctrl_id = "id_013_EyePupil"
             radius = 0.2*self.radius
         ctrl = self.ar.ctrls.create_controller(ctrl_id, side+self.number_name+"_"+self.ar.data.lang[code_name]+"_1_Ctrl", r=radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"__"+guide_loc.replace("_Guide", ":Guide"), parent_tag=self.fk_eye_sub_ctrl)
-        self.ar.utils.originedFrom(objName=ctrl, attrString=guide_loc)
+        self.ar.utils.set_origined_from_attr(ctrl, guide_loc)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
-        ctrl_zero = self.ar.utils.zeroOut([ctrl], offset=True)
+        ctrl_zero = self.ar.utils.create_zero_out([ctrl], offset=True)
         cmds.setAttr(cmds.listRelatives(ctrl_zero, children=True, type="transform")[0]+".dpNotTransformIO", 0)
         cmds.matchTransform(ctrl_zero[0], guide_loc, position=True, rotation=True)
         cmds.parent(ctrl_zero[0], self.base_eye_ctrl)
@@ -444,7 +444,7 @@ class Eye(standard.BaseStandard):
             if self.mirror_axis != 'off':
                 cmds.setAttr(self.eye_ctrl+".translate"+self.mirror_axis, 0)
             self.eye_grp = cmds.group(self.eye_ctrl, name=self.number_name+"_"+self.ar.data.lang['c058_main']+"_Grp")
-            self.ar.utils.zeroOut([self.eye_ctrl])
+            self.ar.utils.create_zero_out([self.eye_ctrl])
             self.up_loc_grp = cmds.group(name=self.number_name+"_UpLoc_Grp", empty=True)
             self.to_ids.append(self.up_loc_grp)
             # run for all sides:
@@ -462,14 +462,14 @@ class Eye(standard.BaseStandard):
                 sub_jnt = cmds.joint(name=side+self.number_name+"_1_Sub_Jxt", scaleCompensate=False)
                 self.jnt = cmds.joint(name=side+self.number_name+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
+                self.ar.utils.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 if s == 1:
-                    left_eye_fk_ctrl_data = self.ar.utils.getTransformData(fk_eye_ctrl)
+                    left_eye_fk_ctrl_data = self.ar.utils.get_transform_data(fk_eye_ctrl)
                 self.base_eye_ctrl = self.ar.ctrls.create_controller("id_009_EyeBase", ctrl_name=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1")
                 fk_eye_ctrl = self.ar.ctrls.create_controller("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1", parent_tag=self.base_eye_ctrl)
                 self.fk_eye_sub_ctrl = self.ar.ctrls.create_controller("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1", parent_tag=fk_eye_ctrl)
-                self.ar.utils.originedFrom(objName=fk_eye_ctrl, attrString=self.base+";"+self.guide+";"+self.guide_radius)
-                self.ar.utils.originedFrom(objName=self.base_eye_ctrl, attrString=self.base+";"+self.guide)
+                self.ar.utils.set_origined_from_attr(fk_eye_ctrl, self.base+";"+self.guide+";"+self.guide_radius)
+                self.ar.utils.set_origined_from_attr(self.base_eye_ctrl, self.base+";"+self.guide)
                 cmds.parent(self.fk_eye_sub_ctrl, fk_eye_ctrl)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.pointConstraint(self.guide, self.jxt, maintainOffset=False))
@@ -477,9 +477,9 @@ class Eye(standard.BaseStandard):
                 cmds.delete(cmds.pointConstraint(self.guide, fk_eye_ctrl, maintainOffset=False))
                 cmds.delete(cmds.orientConstraint(self.guide_end_loc_zero, fk_eye_ctrl, maintainOffset=False))
                 cmds.matchTransform(self.base_eye_ctrl, self.guide, position=True, rotation=True)
-                # zeroOut controls:
-                eye_zeros = self.ar.utils.zeroOut([self.base_eye_ctrl])
-                eye_zeros.append(self.ar.utils.zeroOut([fk_eye_ctrl], offset=True))
+                # create_zero_out controls:
+                eye_zeros = self.ar.utils.create_zero_out([self.base_eye_ctrl])
+                eye_zeros.append(self.ar.utils.create_zero_out([fk_eye_ctrl], offset=True))
                 eye_zero_offset_grp = cmds.listRelatives(eye_zeros[1], children=True)[0]
                 # fixing flip mirror:
                 if s == 1:
@@ -510,9 +510,9 @@ class Eye(standard.BaseStandard):
                 # lookAt control:
                 look_at_ctrl = self.ar.ctrls.create_controller("id_011_EyeLookAt", side+self.number_name+"_LookAt_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=self.eye_ctrl)
                 cmds.matchTransform(look_at_ctrl, self.guide_end_loc, position=True, rotation=True)
-                cmds.parent(self.ar.utils.zeroOut([look_at_ctrl]), self.eye_ctrl, relative=False) #lookAtCtrlZeroGrp
+                cmds.parent(self.ar.utils.create_zero_out([look_at_ctrl]), self.eye_ctrl, relative=False) #lookAtCtrlZeroGrp
                 cmds.addAttr(look_at_ctrl, longName=self.ar.data.lang['c118_active'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                self.ar.utils.originedFrom(objName=look_at_ctrl, attrString=side+self.number_name+"_Guide_JointEnd")
+                self.ar.utils.set_origined_from_attr(look_at_ctrl, side+self.number_name+"_Guide_JointEnd")
                 
                 # up locator:
                 self.guide_up_loc = side+self.number_name+"_Guide_JointEnd_UpLoc"
@@ -536,7 +536,7 @@ class Eye(standard.BaseStandard):
                 cmds.select(clear=True)
                 self.eye_scale_jnt = cmds.joint(name=side+self.number_name+"Scale_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.eye_scale_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.setJointLabel(self.eye_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Scale_1")
+                self.ar.utils.set_joint_label(self.eye_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Scale_1")
                 # jointScale position:
                 cmds.matchTransform(self.eye_scale_jnt, self.guide, position=True, rotation=True)
                 # create endScale joint:
@@ -557,18 +557,18 @@ class Eye(standard.BaseStandard):
                     # specular joint:
                     eye_spec_jnt = cmds.joint(name=side+self.number_name+"Specular_1_Jnt", scaleCompensate=False)
                     cmds.addAttr(eye_spec_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.setJointLabel(eye_spec_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_1")
+                    self.ar.utils.set_joint_label(eye_spec_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_1")
                     # specular joint scale:
                     eye_spec_scale_jnt = cmds.joint(name=side+self.number_name+"Specular_2_Jnt", scaleCompensate=False)
                     cmds.addAttr(eye_spec_scale_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.setJointLabel(eye_spec_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_2")
+                    self.ar.utils.set_joint_label(eye_spec_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_2")
                     cmds.setAttr(eye_spec_scale_jnt+".translateZ", self.radius)
                     self.create_end_joint(side+self.number_name+'Specular', eye_spec_scale_jnt, tz=0.2*self.radius)
                     cmds.parent(eye_spec_jnt, self.eye_scale_jnt)
                     # specular control:
                     eye_spec_ctrl = self.ar.ctrls.create_controller("id_071_EyeSpec", ctrl_name=side+self.number_name+"_Spec_Ctrl", r=self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_SpecularLoc", parent_tag=self.fk_eye_sub_ctrl)
                     cmds.matchTransform(eye_spec_ctrl, self.guide, position=True, rotation=True)
-                    eye_spec_zero_grp = self.ar.utils.zeroOut([eye_spec_ctrl])[0]
+                    eye_spec_zero_grp = self.ar.utils.create_zero_out([eye_spec_ctrl])[0]
                     cmds.parent(eye_spec_zero_grp, self.base_eye_ctrl)
                     cmds.parentConstraint(eye_spec_ctrl, eye_spec_jnt, maintainOffset=False, name=eye_spec_jnt+"_PaC")
                     cmds.scaleConstraint(eye_spec_ctrl, eye_spec_jnt, maintainOffset=True, name=eye_spec_jnt+"_ScC")
@@ -584,10 +584,10 @@ class Eye(standard.BaseStandard):
                     eye_spec_scale_ctrl = self.ar.ctrls.create_controller("id_091_EyeSpecScale", ctrl_name=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_SpecularLoc", parent_tag=eye_spec_ctrl)
                     cmds.matchTransform(eye_spec_scale_ctrl, self.guide_specular_loc, position=True, rotation=True)
                     if s == 1:
-                        no_wsl_eye_spec_scale_zero_grp_data = self.ar.utils.getTransformData(eye_spec_scale_zero_grp, useWorldSpace=False)
-                        left_eye_spec_scale_zero_grp_data = self.ar.utils.getTransformData(eye_spec_scale_zero_grp)
-                        rigth_eye_fk_ctrl_data = self.ar.utils.getTransformData(fk_eye_ctrl)
-                    eye_spec_scale_zero_grp = self.ar.utils.zeroOut([eye_spec_scale_ctrl])[0]
+                        no_wsl_eye_spec_scale_zero_grp_data = self.ar.utils.get_transform_data(eye_spec_scale_zero_grp, use_world_space=False)
+                        left_eye_spec_scale_zero_grp_data = self.ar.utils.get_transform_data(eye_spec_scale_zero_grp)
+                        rigth_eye_fk_ctrl_data = self.ar.utils.get_transform_data(fk_eye_ctrl)
+                    eye_spec_scale_zero_grp = self.ar.utils.create_zero_out([eye_spec_scale_ctrl])[0]
                     cmds.parent(eye_spec_scale_zero_grp, eye_spec_ctrl)
                     cmds.parentConstraint(eye_spec_scale_ctrl, eye_spec_scale_jnt, maintainOffset=False, name=eye_spec_scale_jnt+"_PaC")
                     cmds.scaleConstraint(eye_spec_scale_ctrl, eye_spec_scale_jnt, maintainOffset=True, name=eye_spec_scale_jnt+"_ScC")
@@ -671,7 +671,7 @@ class Eye(standard.BaseStandard):
                     cmds.parent(self.up_loc_grp, self.scalable_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
-                self.ar.utils.addCustomAttr([self.eye_grp, self.up_loc_grp, left_up_grp_loc, self.eye_scale_grp], self.ar.utils.ignoreTransformIOAttr)
+                self.ar.utils.add_attr_to_items([self.eye_grp, self.up_loc_grp, left_up_grp_loc, self.eye_scale_grp], self.ar.utils.ignore_transform_io_attr)
                 self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:
             self.serialize_guide()

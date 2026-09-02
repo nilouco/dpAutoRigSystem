@@ -31,17 +31,17 @@ class UnlockAttributes(action.BaseAction):
 
         # ---
         # --- validator code --- beginning
-        if not self.ar.utils.getAllGrp():
-            if not self.ar.utils.getNetworkNodeByAttr("dpGuideNet"):
+        if not self.ar.utils.get_all_grp():
+            if not self.ar.utils.get_network_by_attr("dpGuideNet"):
                 if not cmds.file(query=True, reference=True):
                     nodes = cmds.ls(selection=False)
                     if inputs:
                         nodes = inputs
                     if nodes:
                         lockedAttrDic = {}
-                        self.ar.utils.setProgress(max=len(nodes), add_one=False, add_number=False)
+                        self.ar.utils.set_progress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
-                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             lockedAttrList = cmds.listAttr(item, locked=True)
                             if lockedAttrList:
                                 lockedAttrDic[item] = lockedAttrList

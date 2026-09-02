@@ -43,12 +43,12 @@ class PassthroughAttributes(action.BaseAction):
                 check_items = cmds.ls(selection=False) #all
             if check_items:
                 if self.first_mode:
-                    self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                    self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 else:
-                    self.ar.utils.setProgress(max=len(check_items)*2, add_one=False, add_number=False)
+                    self.ar.utils.set_progress(max=len(check_items)*2, add_one=False, add_number=False)
                 toOptimizeList = []
                 for item in check_items:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # check optimization
                     for plug, connections in self.getConnectionDic(item).items():
                         sources = connections["sourceList"]
@@ -68,7 +68,7 @@ class PassthroughAttributes(action.BaseAction):
                     else: #fix
                         self.checked_items.append(self.ar.data.lang[self.title])
                         for item in check_items:
-                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             try:
                                 optimizedList = []
                                 for i in range(self.iterNumber):

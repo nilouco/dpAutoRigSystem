@@ -64,9 +64,9 @@ class Namespace(action.BaseAction):
                     # set both list together, excluding the duplicated names
                     namespaceToCleanList = list(set(namespaceWithGuidesList)) + list(set(namespaceWithoutGuidesList))
             if namespaceToCleanList:
-                self.ar.utils.setProgress(max=len(namespaceMainList), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(namespaceMainList), add_one=False, add_number=False)
                 for namespace in namespaceToCleanList:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     self.checked_items.append(namespace)
                     self.found_issues.append(True)
                 if self.first_mode:

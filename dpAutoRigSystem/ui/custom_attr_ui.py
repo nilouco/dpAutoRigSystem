@@ -118,7 +118,7 @@ class CustomAttrUI(object):
         if filter_name:
             current_items = cmds.selectionConnection(self.item_sc, query=True, object=True)
             if current_items:
-                filtered_items = self.ar.utils.filterName(filter_name, current_items, " ")
+                filtered_items = self.ar.utils.filter_name(filter_name, current_items, " ")
                 filtered_items = list(set(filtered_items) - set(self.app.ignores))
                 filtered_items.sort()
                 cmds.selectionConnection(self.item_sc, edit=True, clear=True)

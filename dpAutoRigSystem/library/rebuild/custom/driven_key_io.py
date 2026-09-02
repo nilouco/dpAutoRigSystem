@@ -79,10 +79,10 @@ class DrivenKeyIO(action.BaseAction):
         attributes = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
         key_attributes = ["keyBreakdown", "keyTickDrawSpecial"]
         key_time_attributes = ["keyTime", "keyValue"]
-        self.ar.utils.setProgress(max=len(nodes), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(nodes), add_one=False, add_number=False)
         for item in nodes:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
                 # getting attributes if they exists
                 data[item] = { "attributes"     : {},
                             "keys"             : {},
@@ -138,12 +138,12 @@ class DrivenKeyIO(action.BaseAction):
         """ Import set driven key nodes from exported dictionary.
             Create missing set driven key nodes and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(drivenkey_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(drivenkey_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in drivenkey_data.keys():
             existing_nodes = []
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             # create set driven key node if it needs
             if not cmds.objExists(item):
                 node = cmds.createNode(drivenkey_data[item]["type"], name=drivenkey_data[item]["name"])

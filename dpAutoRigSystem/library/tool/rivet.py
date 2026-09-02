@@ -144,7 +144,7 @@ class Rivet(base.BaseLibrary):
     def get_ctrl_items(self):
         """ From all rivet network nodes, rise a controllers list to fill ui.
         """
-        rivet_networks = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
+        rivet_networks = self.ar.utils.get_network_by_attr("dpRivetNet")
         if rivet_networks:
             ctrls = []
             self.rivet_nets = []
@@ -245,8 +245,8 @@ class Rivet(base.BaseLibrary):
         self.old_unit_conversions = cmds.ls(selection=False, type="unitConversion")
 
         # integrate to dpAutoRigSystem:
-        master_ctrl = self.ar.utils.getNodeByMessage("masterCtrl")
-        scalable_grp = self.ar.utils.getNodeByMessage("scalableGrp")
+        master_ctrl = self.ar.utils.get_node_by_message("masterCtrl")
+        scalable_grp = self.ar.utils.get_node_by_message("scalableGrp")
         
         # create Rivet_Grp in order to organize hierarchy:
         created_rivet_grp = False
@@ -269,7 +269,7 @@ class Rivet(base.BaseLibrary):
             else:
                 geo_to_attach = self.create_face_to_rivet(items, self.extract_geo_to_rivet(geo_to_attach), 4)
             self.deform_face_to_rivet(geo_to_attach, self.origined_geo)
-            support_grp = self.ar.utils.getNodeByMessage("supportGrp")
+            support_grp = self.ar.utils.get_node_by_message("supportGrp")
             if support_grp:
                 self.ar.ctrls.color_shape([support_grp], [0.51, 1, 0.667], outliner=True) #green
 
@@ -346,7 +346,7 @@ class Rivet(base.BaseLibrary):
             # then we need to duplicate, unlock attributes and freezeTransformation:
             dup_geo = cmds.duplicate(geo_to_attach, name=geo_to_attach+"_dpRivet_TEMP_Geo")[0]
             # unlock attr:
-            self.ar.utils.unlockAttr([dup_geo])
+            self.ar.utils.unlock_attr([dup_geo])
             # parent to world:
             if cmds.listRelatives(dup_geo, allParents=True):
                 cmds.parent(dup_geo, world=True)
@@ -383,7 +383,7 @@ class Rivet(base.BaseLibrary):
                 
             # working with follicles and attaches
             for r, rivet in enumerate(rivets):
-                self.ar.utils.setProgress(self.ar.data.lang['i317_creatingRivet'])
+                self.ar.utils.set_progress(self.ar.data.lang['i317_creatingRivet'])
                 rivet_pos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if add_father_grp:
                     rivet = cmds.group(rivet, name=rivet+"_"+self.rivet_grp_name)
@@ -491,7 +491,7 @@ class Rivet(base.BaseLibrary):
         else:
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
-        self.ar.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
+        self.ar.utils.node_renaming_treatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
         self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID
         cmds.select(clear=True)
         return self.nets
@@ -544,7 +544,7 @@ class Rivet(base.BaseLibrary):
                     cmds.setAttr(bs_node+".envelope", 0)
                 # Duplicate geometry after turn off skinCluster and blendShape. 
                 to_rivet_geo = cmds.duplicate(geo)[0]
-                self.ar.utils.removeUserDefinedAttr(to_rivet_geo)
+                self.ar.utils.remove_user_defined_attr(to_rivet_geo)
                 # Unparenting
                 if cmds.listRelatives(to_rivet_geo, allParents=True):
                     cmds.parent(to_rivet_geo, world=True)
@@ -567,7 +567,7 @@ class Rivet(base.BaseLibrary):
         """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
             Returns the suggested name.
         """
-        to_rivet_name = self.ar.utils.extractSuffix(geo)
+        to_rivet_name = self.ar.utils.extract_suffix(geo)
         if "|" in to_rivet_name:
             to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         i = 0
@@ -696,7 +696,7 @@ class Rivet(base.BaseLibrary):
         #Renaming
         hist = cmds.listHistory(morph_geo)
         morphs = cmds.ls(hist, type="morph")[0]
-        to_rivet_name = self.ar.utils.extractSuffix(morph_geo)
+        to_rivet_name = self.ar.utils.extract_suffix(morph_geo)
         if "|" in to_rivet_name:
             to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         morph_node = cmds.rename(morphs, to_rivet_name+"_Mrp")
@@ -704,7 +704,7 @@ class Rivet(base.BaseLibrary):
         component_match_node = cmds.rename(component_match_node, to_rivet_name+"_CpM")
         self.to_ids.extend([morph_geo, morph_node, component_match_node])
         # Parent in supportGrp
-        self.parent_to_transform([morph_geo], self.ar.utils.getNodeByMessage("supportGrp"))
+        self.parent_to_transform([morph_geo], self.ar.utils.get_node_by_message("supportGrp"))
         return morph_geo, morph_node
 
 
@@ -718,7 +718,7 @@ class Rivet(base.BaseLibrary):
         hist = cmds.listHistory(wrap_geo)
         wrap_items = cmds.ls(hist, type="wrap")[0]
         # Renaming
-        to_rivet_name = self.ar.utils.extractSuffix(wrap_geo)
+        to_rivet_name = self.ar.utils.extract_suffix(wrap_geo)
         if "|" in to_rivet_name:
             to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         wrap_node = cmds.rename(wrap_items, to_rivet_name+"_Wrp")
@@ -729,7 +729,7 @@ class Rivet(base.BaseLibrary):
         cmds.editDisplayLayerMembers("defaultLayer", base_shape, noRecurse=False)
         self.to_ids.extend([wrap_geo, wrap_node, base_shape])
         # Parent in supportGrp
-        self.parent_to_transform([wrap_geo, base_shape], self.ar.utils.getNodeByMessage("supportGrp"))
+        self.parent_to_transform([wrap_geo, base_shape], self.ar.utils.get_node_by_message("supportGrp"))
         return wrap_geo, wrap_node
 
 

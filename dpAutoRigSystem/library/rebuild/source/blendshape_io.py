@@ -41,7 +41,7 @@ class BlendshapeIO(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
-                if self.ar.utils.checkLoadedPlugin("AbcExport") and self.ar.utils.checkLoadedPlugin("AbcImport"):
+                if self.ar.utils.check_loaded_plugin("AbcExport") and self.ar.utils.check_loaded_plugin("AbcImport"):
                     self.io_path = self.get_io_path(self.io_folder)
                     self.target_path = self.io_path+"/"+self.target_name
                     self.original_path = self.io_path+"/"+self.original_name
@@ -90,9 +90,9 @@ class BlendshapeIO(action.BaseAction):
         """ Return the blendShape data dictionary to export info.
         """
         bs_data = {}
-        self.ar.utils.setProgress(max=len(bs_items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(bs_items), add_one=False, add_number=False)
         for bs_node in bs_items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title]+": "+bs_node)
+            self.ar.utils.set_progress(self.ar.data.lang[self.title]+": "+bs_node)
             bs_data[bs_node] = {}
             bs_data[bs_node]["targets"] = {}
             # get blendShape node info

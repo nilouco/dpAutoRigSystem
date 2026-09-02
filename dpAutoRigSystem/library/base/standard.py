@@ -27,7 +27,7 @@ class BaseStandard(base.BaseLibrary):
     def get_namespace_for_it(self, number_name=None):
         self.number_name = number_name
         if not self.number_name:
-            self.number_name = self.ar.data.base_name+str(self.ar.utils.findLastNumber())
+            self.number_name = self.ar.data.base_name+str(self.ar.utils.find_last_number())
         self.rigType = "biped"
         # defining namespace:
         self.guide_namespace = self.name+"__"+self.number_name
@@ -53,7 +53,7 @@ class BaseStandard(base.BaseLibrary):
         if self.ar.data.ui_state:
             self.create_module_layout()
         self.set_guide_attr('moduleInstanceInfo', self, True)
-        self.guide_net = self.ar.utils.getNodeByMessage("net", self.guide_base)
+        self.guide_net = self.ar.utils.get_node_by_message("net", self.guide_base)
         if self.guide_net:
             self.raw = cmds.getAttr(self.guide_net+".rawGuide")
 
@@ -98,13 +98,12 @@ class BaseStandard(base.BaseLibrary):
         for bool_attr in ['guideBase', 'mirrorEnable', 'displayAnnotation']:
             cmds.addAttr(self.guide_base, longName=bool_attr, attributeType='bool')
             cmds.setAttr(self.guide_base+"."+bool_attr, 1)
-        for str_attr in ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']:
+        for str_attr in ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']:
             cmds.addAttr(self.guide_base, longName=str_attr, dataType='string')
         cmds.setAttr(self.guide_base+".moduleType", self.name, type='string')
         cmds.setAttr(self.guide_base+".moduleNamespace", self.guide_base[:self.guide_base.rfind(":")], type='string')
         cmds.setAttr(self.guide_base+".mirrorAxis", "off", type='string')
         cmds.setAttr(self.guide_base+".mirrorName", self.ar.data.lang['p002_left']+' --> '+self.ar.data.lang['p003_right'], type='string')
-        cmds.setAttr(self.guide_base+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.guide_base+".moduleInstanceInfo", self, type='string')
         cmds.setAttr(self.guide_base+".guideObjectInfo", self.ar.config.get_instance(self.name, [self.ar.data.standard_folder], "imported"), type='string')
         cmds.setAttr(self.guide_base+".rigType", self.rigType, type='string')
@@ -159,7 +158,7 @@ class BaseStandard(base.BaseLibrary):
             if cmds.objExists(item):
                 cmds.delete(item)
         # delete the guide module:
-        self.ar.utils.clearNodeGrp(self.guide_base, 'guideBase', unparent=True)
+        self.ar.utils.clear_node_grp(self.guide_base, 'guideBase', unparent=True)
         # remove the namespaces:
         if self.guide_namespace in cmds.namespaceInfo(listOnlyNamespaces=True):
             cmds.namespace(moveNamespace=(self.guide_namespace, ':'), force=True)
@@ -188,7 +187,7 @@ class BaseStandard(base.BaseLibrary):
                     inputted_text = ""
             inputted_text = inputted_text.replace(" ", "_")
             # call utils to return the normalized text:
-            self.custom_name = self.ar.utils.normalizeText(inputted_text, prefixMax=30)
+            self.custom_name = self.ar.utils.normalize_text(inputted_text, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.custom_name == "":
                 try:
@@ -199,13 +198,13 @@ class BaseStandard(base.BaseLibrary):
                 self.number_name = self.guide_namespace.split("__")[-1]
             else:
                 base_name = self.custom_name
-                suffix_numbers = self.ar.utils.getSuffixNumberList(self.custom_name)
+                suffix_numbers = self.ar.utils.get_suffix_numbers(self.custom_name)
                 if suffix_numbers[1]:
                     base_name = suffix_numbers[1]
                 dpar_names = []
-                nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
+                nets = self.ar.utils.get_network_by_attr("dpGuideNet")
                 for net in nets:
-                    if base_name == self.ar.utils.getSuffixNumberList(cmds.getAttr(net+".guideName"))[1]:
+                    if base_name == self.ar.utils.get_suffix_numbers(cmds.getAttr(net+".guideName"))[1]:
                         dpar_names.append(cmds.getAttr(net+".guideName"))
                 if dpar_names:
                     if self.custom_name in dpar_names:
@@ -286,8 +285,8 @@ class BaseStandard(base.BaseLibrary):
                             s = s_default
                     else:
                         s = s_default
-                    # add joint label, create controller, zeroOut
-                    self.ar.utils.setJointLabel(jcr, s+self.joint_label_add, 18, label_name+"_"+str(m))
+                    # add joint label, create controller, create_zero_out
+                    self.ar.utils.set_joint_label(jcr, s+self.joint_label_add, 18, label_name+"_"+str(m))
                     jcr_ctrl, jcr_grp = self.ar.ctrls.create_corrective_joint_ctrl(corrective_joints[i], corrective_nets[i], radius=self.radius*0.2)
                     cmds.parent(jcr_grp, self.corrective_ctrls_grp)
                     # preset calibration
@@ -438,7 +437,7 @@ class BaseStandard(base.BaseLibrary):
             # joint labelling:
             self.joint_label_add = 0
         # store the number of this guide by module type
-        self.dpar_count = self.ar.utils.findModuleLastNumber(self.name, "moduleType", True)
+        self.dpar_count = self.ar.utils.find_module_last_number(self.name, "moduleType", True)
 
 
     def rig_me(self, *args):
@@ -461,7 +460,7 @@ class BaseStandard(base.BaseLibrary):
             # get the radius value to controls:
             self.radius = 1
             if cmds.objExists(self.radius_ctrl):
-                self.radius = self.ar.utils.getCtrlRadius(self.radius_ctrl)
+                self.radius = self.ar.utils.get_ctrl_radius(self.radius_ctrl)
                 
             # get curve degree:
             self.curve_degree = cmds.getAttr(self.guide_base+".degree")
@@ -505,9 +504,9 @@ class BaseStandard(base.BaseLibrary):
             cmds.parent(scalableList, self.scalable_hook_grp)
         self.ar.custom_attr.add_attr(0, [self.ctrl_hook_grp, self.scalable_hook_grp, self.static_hook_grp]) #dpID
         # add hook attributes to be read when rigging composed modules:
-        self.ar.utils.addHook(objName=self.ctrl_hook_grp, hookType='ctrlHook')
-        self.ar.utils.addHook(objName=self.scalable_hook_grp, hookType='scalableHook')
-        self.ar.utils.addHook(objName=self.static_hook_grp, hookType='staticHook')
+        self.ar.utils.add_hook(self.ctrl_hook_grp, 'ctrlHook')
+        self.ar.utils.add_hook(self.scalable_hook_grp, 'scalableHook')
+        self.ar.utils.add_hook(self.static_hook_grp, 'staticHook')
         cmds.lockNode(self.guide_net, lock=False)
         # add module type counter value
         if not 'dpAR_count' in cmds.listAttr(self.guide_net):
@@ -537,7 +536,7 @@ class BaseStandard(base.BaseLibrary):
         if number:
             guide_number = number
         else:
-            guide_number = self.ar.utils.findLastNumber()
+            guide_number = self.ar.utils.find_last_number()
         self.guide_net = cmds.createNode("network", name="dpGuide_"+guide_number+"_Net")
         self.ar.custom_attr.add_attr(0, [self.guide_net])[0] #dpID
         for base_attr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
@@ -677,7 +676,7 @@ class BaseStandard(base.BaseLibrary):
                     self.serialized = True
         else: #update linked node to avoid cleanup this network if it's broken
             cmds.lockNode(self.guide_net, lock=False)
-            option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+            option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
             if option_ctrl:
                 cmds.connectAttr(option_ctrl+".message", self.guide_net+".linkedNode", force=True)
             else:
@@ -694,7 +693,7 @@ class BaseStandard(base.BaseLibrary):
             if self.oldUnitConversionList:
                 unit_conversions = list(set(unit_conversions)-set(self.oldUnitConversionList))
             if unit_conversions:
-                self.ar.utils.nodeRenamingTreatment(unit_conversions)
+                self.ar.utils.node_renaming_treatment(unit_conversions)
 
 
     def create_world_size(self):
@@ -759,7 +758,7 @@ class BaseStandard(base.BaseLibrary):
         # re-define cvEndJoint:
         joint_loc = self.name_guide+"_"+name+str(joint_number)
         # re-parent the children guides:
-        children = self.ar.utils.getGuideChildrenList(joint_loc)
+        children = self.ar.utils.get_guide_children(joint_loc)
         if children:
             for child in children:
                 cmds.parent(child, joint_loc)
@@ -792,12 +791,12 @@ class BaseStandard(base.BaseLibrary):
         """
         self.father_flip_exists = None
         if self.check_guide_integrity():
-            mirroredGuideFather = self.ar.utils.mirroredGuideFather(self.guide_base)
-            if mirroredGuideFather:
+            get_mirrored_guide_father = self.ar.utils.get_mirrored_guide_father(self.guide_base)
+            if get_mirrored_guide_father:
                 cmds.setAttr(self.guide_base+".mirrorEnable", 0)
                 # get initial values from father guide base:
-                fatherMirror = cmds.getAttr(mirroredGuideFather+".mirrorAxis")
-                fatherMirrorName = cmds.getAttr(mirroredGuideFather+".mirrorName")
+                fatherMirror = cmds.getAttr(get_mirrored_guide_father+".mirrorAxis")
+                fatherMirrorName = cmds.getAttr(get_mirrored_guide_father+".mirrorName")
                 # set values to guide base:
                 cmds.setAttr(self.guide_base+".mirrorAxis", fatherMirror, type='string')
                 cmds.setAttr(self.guide_base+".mirrorName", fatherMirrorName, type='string')
@@ -808,9 +807,9 @@ class BaseStandard(base.BaseLibrary):
                 except:
                     pass
                 # update flip attribute info from fatherGuide:
-                self.father_flip_exists = cmds.objExists(mirroredGuideFather+".flip")
+                self.father_flip_exists = cmds.objExists(get_mirrored_guide_father+".flip")
                 if self.father_flip_exists:
-                    fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
+                    fatherFlip = cmds.getAttr(get_mirrored_guide_father+".flip")
                     if cmds.objExists(self.guide_base+".flip"):
                         cmds.setAttr(self.guide_base+".flip", fatherFlip)
                 self.create_mirror_preview()
@@ -828,7 +827,7 @@ class BaseStandard(base.BaseLibrary):
         if cmds.objExists(preview_mirror_grp):
             cmds.delete(preview_mirror_grp)
         # get children, verifying if there are children guides:
-        guide_children = self.ar.utils.getGuideChildrenList(self.guide_base)
+        guide_children = self.ar.utils.get_guide_children(self.guide_base)
         self.mirror_axis = cmds.getAttr(self.guide_base+".mirrorAxis")
         if self.mirror_axis != 'off':
             if not cmds.objExists(self.ar.data.guide_mirror_grp):
@@ -877,7 +876,7 @@ class BaseStandard(base.BaseLibrary):
                                 # rebuild the shape as a nurbsSphere:
                                 if cmds.objectType(dup_renamed) == 'transform':
                                     # make this previewMirrorGuide as not skinable from dpAR_UI:
-                                    self.ar.utils.addCustomAttr([dup_renamed], self.ar.skin.ignoreSkinningAttr)
+                                    self.ar.utils.add_attr_to_items([dup_renamed], self.ar.skin.ignore_skinning_attr)
                                     children_shapes = cmds.listRelatives(dup_renamed, shapes=True, children=True)
                                     if children_shapes:
                                         cmds.delete(children_shapes)
@@ -900,7 +899,7 @@ class BaseStandard(base.BaseLibrary):
                 preview_mirror_guide = cmds.rename(duplicated, self.guide_base.replace(":", "_")+'_Mirror')
                 cmds.deleteAttr(preview_mirror_guide+".guideBase")
                 cmds.delete(cmds.listRelatives(preview_mirror_guide, shapes=True, type="nurbsCurve"))
-                self.ar.utils.unlockAttr([preview_mirror_guide])
+                self.ar.utils.unlock_attr([preview_mirror_guide])
                 
                 # clean up old module attributes in order to avoid numbering issue:
                 if cmds.objExists(preview_mirror_guide+".customName"):
@@ -954,7 +953,7 @@ class BaseStandard(base.BaseLibrary):
             # check if the father guide is in X=0 in order to permit mirror:
             if not self.check_father_mirror(): #stopMirrorOperation
                 # loading Maya matrix node (for mirror porpuses)
-                loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loaded_matrix_plugin:
                     self.mirror_axis = item
                     cmds.setAttr(self.guide_base+".mirrorAxis", self.mirror_axis, type='string')
@@ -993,7 +992,7 @@ class BaseStandard(base.BaseLibrary):
         if not match_node:
             match_node = self.guide_end_loc
         end_joint = cmds.joint(name=name+"_"+self.ar.data.joint_end_attr, scaleCompensate=False, radius=0.5)
-        self.ar.utils.addJointEndAttr([end_joint])
+        self.ar.utils.add_joint_end_attr([end_joint])
         cmds.matchTransform(end_joint, match_node, position=True, rotation=True)
         for attr, value in zip(['tx', 'ty', 'tz'], [tx, ty, tz]):
             if value:

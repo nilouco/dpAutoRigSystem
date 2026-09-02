@@ -37,14 +37,14 @@ class EmptyTransform(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 emptyTransformList = self.filterEmptyTransformList(check_items)
                 emptyTransformList.extend(self.filterEmptyTransformList(self.getIgnoreConnected(), True))
                 # conditional to check here
                 if emptyTransformList:
                     for item in emptyTransformList:
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
-                        self.checked_items.append(self.ar.utils.getShortName(item, False))
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                        self.checked_items.append(self.ar.utils.get_short_name(item, False))
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)
@@ -78,7 +78,7 @@ class EmptyTransform(action.BaseAction):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
-        filtered_items = self.ar.utils.filterTransformList(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filtered_items = self.ar.utils.filter_transforms(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filtered_items = self.reorder_list(filtered_items)
         emptyTransforms = []
         for transform in filtered_items:
@@ -104,7 +104,7 @@ class EmptyTransform(action.BaseAction):
         ignoredList = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
         nodes = []
         for item in ignoredList:
-            gotNode = self.ar.utils.getNodeByMessage(item)
+            gotNode = self.ar.utils.get_node_by_message(item)
             if gotNode:
                 nodes.append(gotNode)
         return nodes

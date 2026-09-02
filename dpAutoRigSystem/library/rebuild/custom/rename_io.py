@@ -76,9 +76,9 @@ class RenameIO(action.BaseAction):
             Returns the dictionary to export.
         """
         data = {}
-        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 data[item] = cmds.getAttr(item+"."+self.ar.data.dp_id)
         return data
@@ -88,16 +88,16 @@ class RenameIO(action.BaseAction):
         """ Import data from exported dictionary.
             Check if nodes exist in the scene, otherwise try to find in the dpID if it was probably renamed.
         """
-        self.ar.utils.setProgress(max=len(node_id_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(node_id_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         not_found_nodes = []
         maybe_items = []
         for item in node_id_data.keys():
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             # check item
             if not cmds.objExists(item):
-                old_id_data = self.ar.utils.getDecomposedIDList(node_id_data[item])
+                old_id_data = self.ar.utils.get_decomposed_ids(node_id_data[item])
                 if old_id_data:
                     if cmds.objExists(old_id_data[1]):
                         cmds.rename(old_id_data[1], item)

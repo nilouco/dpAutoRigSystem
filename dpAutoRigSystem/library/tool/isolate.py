@@ -57,7 +57,7 @@ class Isolate(base.BaseLibrary):
             # nodes[2] = Selected item (control)
         """
         # declaring nodes to create the isolate setup:
-        nodes = [self.ar.utils.getNodeByMessage("rootCtrl"), self.grandfather, self.selected]
+        nodes = [self.ar.utils.get_node_by_message("rootCtrl"), self.grandfather, self.selected]
         if len(nodes) == 3:
             for node in nodes:
                 if not cmds.objExists(node):

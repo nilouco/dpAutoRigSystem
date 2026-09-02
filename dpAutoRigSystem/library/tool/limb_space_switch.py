@@ -20,10 +20,10 @@ class LimbSpaceSwitch(base.BaseLibrary):
         
     def build_tool(self, *args):
         # find nodes
-        all_grp = self.ar.utils.getAllGrp()
+        all_grp = self.ar.utils.get_all_grp()
         if all_grp:
-            self.root_ctrl = self.ar.utils.getNodeByMessage("ctrlsVisibilityGrp", all_grp)
-            self.global_ctrl = self.ar.utils.getNodeByMessage("globalCtrl", all_grp)
+            self.root_ctrl = self.ar.utils.get_node_by_message("ctrlsVisibilityGrp", all_grp)
+            self.global_ctrl = self.ar.utils.get_node_by_message("globalCtrl", all_grp)
             self.to_ids = []
 
             self.global_name = "Global"

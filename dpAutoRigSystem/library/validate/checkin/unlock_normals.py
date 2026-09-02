@@ -44,9 +44,9 @@ class UnlockNormals(action.BaseAction):
             else:
                 allMeshList = cmds.ls(selection=False, type='mesh')
             if allMeshList:
-                self.ar.utils.setProgress(max=len(allMeshList), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(allMeshList), add_one=False, add_number=False)
                 for mesh in allMeshList:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
                         lockedList = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
                         # check if there's any locked normal

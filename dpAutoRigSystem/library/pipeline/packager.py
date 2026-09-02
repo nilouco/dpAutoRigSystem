@@ -55,7 +55,7 @@ class Packager(object):
         cmds.viewFit(allObjects=True)
         position = cmds.xform(cam, query=True, translation=True, worldSpace=True)
         if not focus_it:
-            focus_it = self.ar.utils.getNodeByMessage("renderGrp")
+            focus_it = self.ar.utils.get_node_by_message("renderGrp")
         if focus_it:
             # frame render group
             cmds.select(focus_it)

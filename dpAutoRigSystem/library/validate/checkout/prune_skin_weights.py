@@ -39,12 +39,12 @@ class PruneSkinWeights(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type='skinCluster')
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for skinClusterNode in check_items:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     meshes = cmds.skinCluster(skinClusterNode, query=True, geometry=True)
                     if meshes:
-                        weightsList = self.ar.skin.getSkinWeights(meshes[0], skinClusterNode)
+                        weightsList = self.ar.skin.get_skin_weights(meshes[0], skinClusterNode)
                         toPruneList = []
                         # check low weights
                         for v, weight_data in enumerate(weightsList):

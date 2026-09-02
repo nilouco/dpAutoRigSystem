@@ -109,11 +109,11 @@ class CustomAttr(base.BaseLibrary):
                         #if not cmds.objExists(item+"."+ATTR_DPID):
                         #if not ATTR_DPID in (cmds.listAttr(item, userDefined=True) or []):
                         if not cmds.attributeQuery(self.dpid_attr, node=item, exists=True):
-                            id = self.ar.utils.generateID(item)
+                            id = self.ar.utils.generate_id(item)
                             cmds.addAttr(item, longName=self.dpid_attr, dataType="string")
                             cmds.setAttr(item+"."+self.dpid_attr, id, type="string", lock=True)
                             ids.append(id)
-                        elif not self.ar.utils.validateID(item):
+                        elif not self.ar.utils.validate_id(item):
                             ids.extend(self.update_id([item]))
                     else:
                         attr = self.attributes[attr_index]
@@ -182,7 +182,7 @@ class CustomAttr(base.BaseLibrary):
             items = [node for node in cmds.ls(selection=True) for suffix in self.do_not_display_suffixes if not node.endswith(suffix) and not node in self.ignores]
         if items:
             for item in items:
-                decomposed_ids = self.ar.utils.decomposeID(item)
+                decomposed_ids = self.ar.utils.decompose_id(item)
                 id_data[item] = {#"node" : item,
                                 self.dpid_attr : cmds.getAttr(item+"."+self.dpid_attr),
                                 "name" : decomposed_ids[1],

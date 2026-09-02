@@ -50,7 +50,7 @@ class DeformationIO(action.BaseAction):
                             # finding deformers
                             has_def = False
                             input_deformers = cmds.listHistory(items, pruneDagObjects=False, interestLevel=True)
-                            for deformer_type in self.ar.skin.typeAttrDic.keys():
+                            for deformer_type in self.ar.skin.def_attr_data.keys():
                                 if cmds.ls(input_deformers, type=deformer_type):
                                     has_def = True
                                     break
@@ -87,20 +87,20 @@ class DeformationIO(action.BaseAction):
     def get_deformer_data(self, input_deformers):
         """ Return the deformer data dictionary to export.
         """
-        self.ar.utils.setProgress(max=len(self.ar.skin.typeAttrDic.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(self.ar.skin.def_attr_data.keys()), add_one=False, add_number=False)
         # Declaring the data dictionary to export it
         deformer_data = {}
         # run for all deformer types to get info
-        for deformer_type in self.ar.skin.typeAttrDic.keys():
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+        for deformer_type in self.ar.skin.def_attr_data.keys():
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             deformers = cmds.ls(selection=False, type=deformer_type)
             if deformers:
                 for deformer_node in deformers:
                     if deformer_node in input_deformers:
                         # get the attributes and values for this deformer node
-                        deformer_data[deformer_node] = self.ar.skin.getDeformerInfo(deformer_node)
+                        deformer_data[deformer_node] = self.ar.skin.get_deformer_info(deformer_node)
                         # Get shape indexes for the deformer so we can query the deformer weights
-                        shapes, indexes, shape_to_index_data = self.ar.skin.getShapeToIndexData(deformer_node)
+                        shapes, indexes, shape_to_index_data = self.ar.skin.get_shape_to_index_data(deformer_node)
                         # update dictionary
                         deformer_data[deformer_node]["shapeList"] = shapes
                         deformer_data[deformer_node]["indexes"] = indexes
@@ -109,14 +109,14 @@ class DeformationIO(action.BaseAction):
                         for shape in shapes:
                             # Get weights
                             index = shape_to_index_data[shape]
-                            weights = self.ar.skin.getDeformerWeights(deformer_node, index)
+                            weights = self.ar.skin.get_deformer_weights(deformer_node, index)
                             if deformer_data[deformer_node]["relatedNode"]: 
                                 if not deformer_type == "ffd":
                                     # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
-                                    weights = self.ar.skin.getDeformerWeights(deformer_data[deformer_node]["relatedNode"], index)
+                                    weights = self.ar.skin.get_deformer_weights(deformer_data[deformer_node]["relatedNode"], index)
                             deformer_data[deformer_node]["weights"][index] = weights
                         # componentTag
-                        deformer_data[deformer_node]["componentTag"] = self.ar.skin.checkUseComponentTag(deformer_node)
+                        deformer_data[deformer_node]["componentTag"] = self.ar.skin.check_use_component_tag(deformer_node)
                         # parenting
                         deformer_data[deformer_node]["father"] = None
                         if deformer_data[deformer_node]["relatedNode"]:
@@ -133,7 +133,7 @@ class DeformationIO(action.BaseAction):
         # verify if the deformer node exists to don't recreate it and import data
         if cmds.objExists(deformer_node):
             new_def_node = deformer_node
-            self.ar.skin.assignDeformer(deformer_node, self.existShapeList)
+            self.ar.skin.assign_deformer(deformer_node, self.existShapeList)
         else:
             # create a new deformer if it doesn't exists
             if deformer_data[deformer_node]["type"] == "cluster":
@@ -145,7 +145,7 @@ class DeformationIO(action.BaseAction):
             elif deformer_data[deformer_node]["type"] == "ffd":
                 lattice_items = cmds.lattice(self.existShapeList, name=deformer_data[deformer_node]["name"], divisions=deformer_data[deformer_node]["divisions"], useComponentTags=deformer_data[deformer_node]["componentTag"]) #[set, ffd, base] 
                 new_def_node = lattice_items[0]
-                self.ar.skin.setLatticePoints(lattice_items[1], deformer_data[deformer_node]["relatedData"]["pointList"])
+                self.ar.skin.set_lattice_points(lattice_items[1], deformer_data[deformer_node]["relatedData"]["pointList"])
                 cmds.rename(lattice_items[1], deformer_data[deformer_node]["relatedNode"])
                 cmds.rename(lattice_items[2], deformer_data[deformer_node]["relatedData"]["baseLatticeMatrix"])
             elif deformer_data[deformer_node]["type"] == "sculpt":
@@ -174,7 +174,7 @@ class DeformationIO(action.BaseAction):
                     if wrap_base_shape:
                         cmds.connectAttr(wrap_base_shape+".worldMesh[0]", new_def_node+".basePoints[0]", force=True)
                         cmds.delete(new_wrap_base_node)
-                    support_grp = self.ar.utils.getNodeByMessage("supportGrp")
+                    support_grp = self.ar.utils.get_node_by_message("supportGrp")
                     if support_grp:
                         parent_nodes = []
                         if wrap_base_shape:
@@ -233,10 +233,10 @@ class DeformationIO(action.BaseAction):
         weights_data = deformer_data[deformer_node]["weights"]
         if weights_data:
             for index in deformer_data[deformer_node]["indexes"]:
-                currentIndex = self.ar.skin.getCurrentDeformedIndex(deformer_node, deformer_data[deformer_node]["shape_to_index_data"], index)
+                currentIndex = self.ar.skin.get_current_deformed_index(deformer_node, deformer_data[deformer_node]["shape_to_index_data"], index)
                 if weights_data[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
-                    self.ar.skin.setDeformerWeights(deformer_data[deformer_node]["name"], weights_data[str(index)], currentIndex)
+                    self.ar.skin.set_deformer_weights(deformer_data[deformer_node]["name"], weights_data[str(index)], currentIndex)
         return well_imported
 
 
@@ -254,9 +254,9 @@ class DeformationIO(action.BaseAction):
                 else:
                     not_found_meshs.append(deformer_node)
         if to_import_items:
-            self.ar.utils.setProgress(max=len(to_import_items), add_one=False, add_number=False)
+            self.ar.utils.set_progress(max=len(to_import_items), add_one=False, add_number=False)
             for deformer_node in to_import_items:
-                self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.set_progress(self.ar.data.lang[self.title])
                 try:
                     well_imported = self.import_deformation(deformer_node, deformer_data, well_imported)
                 except Exception as e:

@@ -395,7 +395,7 @@ class Controllers(object):
         cmds.setAttr(ribbon_nurbs_plane+".visibility", 0)
         self.set_not_renderable([ribbon_nurbs_plane_shape])
         # make this ribbon_nurbs_plane as not skinable from dpAR_UI:
-        self.ar.utils.addCustomAttr([ribbon_nurbs_plane], self.ar.skin.ignoreSkinningAttr)
+        self.ar.utils.add_attr_to_items([ribbon_nurbs_plane], self.ar.skin.ignore_skinning_attr)
         # create groups to be used as a root of the ribbon system:
         ribbon_grp = cmds.group(ribbon_nurbs_plane, n=name+"_Rbn_RibbonJoint_Grp")
         # create joints:
@@ -431,9 +431,9 @@ class Controllers(object):
             # parent this ribbonPos to the ribbon_grp:
             cmds.parent(pos_grp, ribbon_grp, absolute=True)
             # joint labelling:
-            self.ar.utils.setJointLabel(joint, joint_label_number, 18, joint_label_name+"_%02d"%(j+1))
-            self.ar.utils.addCustomAttr([pos_grp, up_grp, aim_grp, joint_grp], self.ar.utils.ignoreTransformIOAttr)
-        self.ar.utils.addCustomAttr([ribbon_grp, ribbon_nurbs_plane], self.ar.utils.ignoreTransformIOAttr)
+            self.ar.utils.set_joint_label(joint, joint_label_number, 18, joint_label_name+"_%02d"%(j+1))
+            self.ar.utils.add_attr_to_items([pos_grp, up_grp, aim_grp, joint_grp], self.ar.utils.ignore_transform_io_attr)
+        self.ar.utils.add_attr_to_items([ribbon_grp, ribbon_nurbs_plane], self.ar.utils.ignore_transform_io_attr)
         return [ribbon_nurbs_plane, ribbon_nurbs_plane_shape, joint_grps, joints]
 
 
@@ -750,7 +750,7 @@ class Controllers(object):
                         source_vis = None
                         defs = False
                         dup_source_item = cmds.duplicate(source_item)[0]
-                        self.ar.utils.deleteOrigShape(dup_source_item)
+                        self.ar.utils.delete_orig_shape(dup_source_item)
                         if keep_color:
                             self.set_source_color_override(dup_source_item, [dest_transform])
                         dest_shapes = cmds.listRelatives(dest_transform, shapes=True, type="nurbsCurve", fullPath=True)
@@ -777,7 +777,7 @@ class Controllers(object):
                             self.destChildrenGrp = cmds.group(dest_children, name="dpTemp_DestChildren_Grp")
                             cmds.parent(self.destChildrenGrp, world=True)
                         if defs:
-                            self.ar.utils.reapplyDeformers(dup_source_item, defs)
+                            self.ar.utils.reapply_deformers(dup_source_item, defs)
                         dup_source_shapes = cmds.listRelatives(dup_source_item, shapes=True, type="nurbsCurve", fullPath=True)
                         for d, dup_source_shape in enumerate(dup_source_shapes):
                             if need_keep_vis:
@@ -803,7 +803,7 @@ class Controllers(object):
                                 cmds.parent(forced_shape, dest_transform, relative=True, shape=True)
                                 cmds.delete(forced_transform)
                                 if defs and history:
-                                    self.ar.utils.reapplyDeformers(dest_transform+"|"+forced_shape, defs)
+                                    self.ar.utils.reapply_deformers(dest_transform+"|"+forced_shape, defs)
                         if cmds.objExists(dup_source_item):
                             cmds.delete(dup_source_item)
                         self.rename_shape([dest_transform])
@@ -996,7 +996,7 @@ class Controllers(object):
                 if tempList:
                     bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
                     bbList[1] *= 0.75 #less importance to height
-                    bbAverage = self.ar.utils.averageValue(bbList)
+                    bbAverage = self.ar.utils.average_value(bbList)
                     resultValue = magicNumber*bbAverage*origRadius
                     if resultValue:
                         return resultValue
@@ -1060,7 +1060,7 @@ class Controllers(object):
         import_calib_path = cmds.fileDialog2(fileMode=1, caption=self.ar.data.lang['i196_import']+" "+self.ar.data.lang['i193_calibration'])
         if not import_calib_path:
             return
-        self.ar.utils.setProgress(self.ar.data.lang['i214_refFile'], import_calib_namespace, add_one=False)
+        self.ar.utils.set_progress(self.ar.data.lang['i214_refFile'], import_calib_namespace, add_one=False)
         import_calib_path = next(iter(import_calib_path), None)
         # create a file reference:
         refFile = cmds.file(import_calib_path, reference=True, namespace=import_calib_namespace)
@@ -1068,8 +1068,8 @@ class Controllers(object):
         ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
         if ref_nodes:
             for item in ref_nodes:
-                self.ar.utils.setProgress(max=len(ref_nodes), add_one=False, add_number=False)
-                self.ar.utils.setProgress(self.ar.data.lang['i215_setAttr'], add_one=True)
+                self.ar.utils.set_progress(max=len(ref_nodes), add_one=False, add_number=False)
+                self.ar.utils.set_progress(self.ar.data.lang['i215_setAttr'], add_one=True)
                 if "calibrationList" in cmds.listAttr(item):
                     source_ref_nodes.append(item)
         if source_ref_nodes:
@@ -1079,7 +1079,7 @@ class Controllers(object):
                     self.transfer_calibration(source_ref_node, [destination_node], verbose=False)
         # remove referenced file:
         cmds.file(import_calib_path, removeReference=True)
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
         print("dpImportCalibrationPath: "+import_calib_path)
 
 
@@ -1208,7 +1208,7 @@ class Controllers(object):
                         path = paths[0] 
             if path:
                 if ui:
-                    self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), add_one=False, add_number=False)
+                    self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), add_one=False, add_number=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1217,7 +1217,7 @@ class Controllers(object):
                     cmds.group(name=snapshot_grp, empty=True)
                 for item in nodes:
                     if ui or verbose:
-                        self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+': Shape')
+                        self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': Shape')
                     snapshot_name = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshot_name):
                         if override_existing:
@@ -1240,7 +1240,7 @@ class Controllers(object):
                     cmds.file(exportSelected=True, type='mayaAscii', prompt=False, force=True)
                     cmds.file(rename=current_path)
                     # DEV helper keep_snapshot
-                    wip_grp = self.ar.utils.getNodeByMessage("wipGrp")
+                    wip_grp = self.ar.utils.get_node_by_message("wipGrp")
                     if not cmds.objExists(wip_grp):
                         keep_snapshot = False
                     if keep_snapshot:
@@ -1260,7 +1260,7 @@ class Controllers(object):
             mel.eval('warning \"'+self.ar.data.lang['i202_noControls']+'\";')
         if ui:
             # Close progress window
-            self.ar.utils.setProgress(endIt=True)
+            self.ar.utils.set_progress(end_it=True)
 
 
     def import_shape(self, nodes=None, path=None, io=False, ui=True, verbose=False, dir="dpControlShape", *args):
@@ -1300,10 +1300,10 @@ class Controllers(object):
                     ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
                     if ref_nodes:
                         if ui:
-                            self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(ref_nodes), add_one=False, add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(ref_nodes), add_one=False, add_number=False)
                         for source_ref_node in ref_nodes:
                             if ui or verbose:
-                                self.ar.utils.setProgress(self.ar.data.lang['m094_doing']+': Shape')
+                                self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': Shape')
                             if cmds.objectType(source_ref_node) == "transform":
                                 destination_node = source_ref_node[source_ref_node.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destination_node):
@@ -1315,7 +1315,7 @@ class Controllers(object):
             print(self.ar.data.lang['i202_noControls'])
         if ui:
             # Close progress window
-            self.ar.utils.setProgress(endIt=True)
+            self.ar.utils.set_progress(end_it=True)
 
 
     def create_corrective_joint_ctrl(self, jcr_name, corrective_net, type='id_092_Correctives', radius=1, degree=3):
@@ -1327,8 +1327,8 @@ class Controllers(object):
         calib_attrs = ["T", "R", "S"]
         to_calibration_items = []
         jcr_ctrl = self.create_controller(type, jcr_name.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
-        jcr_grp_0 = self.ar.utils.zeroOut([jcr_ctrl])[0]
-        jcr_grp_1 = self.ar.utils.zeroOut([jcr_grp_0])[0]
+        jcr_grp_0 = self.ar.utils.create_zero_out([jcr_ctrl])[0]
+        jcr_grp_1 = self.ar.utils.create_zero_out([jcr_grp_0])[0]
         cmds.matchTransform(jcr_grp_1, jcr_name, position=True, rotation=True)
         cmds.parentConstraint(cmds.listRelatives(jcr_name, parent=True)[0], jcr_grp_1, maintainOffset=True, name=jcr_grp_1+"_PaC")
         cmds.parentConstraint(jcr_ctrl, jcr_name, maintainOffset=True, name=jcr_ctrl+"_PaC")
@@ -1429,20 +1429,20 @@ class Controllers(object):
                         all_nodes = cmds.ls(from_prefix+"*", selection=False, type="transform")
                         allControlList = self.get_controllers()
                         if all_nodes and allControlList:
-                            self.ar.utils.setProgress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(all_nodes), add_one=False, add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(all_nodes), add_one=False, add_number=False)
                             for node in all_nodes:
                                 if node in allControlList:
-                                    self.ar.utils.setProgress(self.ar.data.lang['m067_shape']+": "+node)
+                                    self.ar.utils.set_progress(self.ar.data.lang['m067_shape']+": "+node)
                                     self.mirror_shape(node, from_prefix, to_prefix, axis)
                                     cmds.refresh()
-                        self.ar.utils.setProgress(endIt=True)
+                        self.ar.utils.set_progress(end_it=True)
             else:
                 if DPCONTROL in cmds.listAttr(node_name) and cmds.getAttr(node_name+"."+DPCONTROL) == 1:
                     destination_node = to_prefix+node_name[len(from_prefix):]
                     if cmds.objExists(destination_node):
                         # do mirror algorithm
                         dup_source = cmds.duplicate(node_name, name=node_name+"_Duplicated_TEMP")[0]
-                        self.ar.utils.deleteOrigShape(dup_source)
+                        self.ar.utils.delete_orig_shape(dup_source)
                         dup_grp = cmds.group(dup_source, name=dup_source+"_Grp")
                         mirror_shape_grp = cmds.group(empty=True, name=dup_source+"_MirrorShape_Grp")
                         cmds.parent(dup_grp, mirror_shape_grp)
@@ -1471,7 +1471,7 @@ class Controllers(object):
                 self.ar.value_editor_ui.reset_pose.verbose = False
                 self.ar.value_editor_ui.reset_pose.run_action(False, items)
                 self.ar.value_editor_ui.reset_pose.verbose = True
-                self.ar.utils.setProgress(endIt=True)
+                self.ar.utils.set_progress(end_it=True)
             else: #set default values
                 for item in items:
                     attributes = self.ar.value_editor_ui.reset_pose.getSetupAttrList(item, self.ignore_default_value_attrs)

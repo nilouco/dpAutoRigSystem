@@ -380,7 +380,7 @@ class FacialConnection(base.BaseLibrary):
     def create_remap_node(self, from_node, from_attr, joint_target, to_attr, number, size_factor, output_min=0, output_max=1, input_min=0, input_max=1):
         """ Creates the nodes to remap values and connect it to final output (joint_target) item.
         """
-        from_node_name = self.ar.utils.extractSuffix(from_node)
+        from_node_name = self.ar.utils.extract_suffix(from_node)
         remap = cmds.createNode("remapValue", name=from_node_name+"_"+from_attr+"_"+str(number).zfill(2)+"_"+to_attr.upper()+"_RmV")
         self.to_ids.append(remap)
         out_max_attr = joint_target.split(self.offset_suffix)[0]+"_"+str(number).zfill(2)+"_"+to_attr.upper()
@@ -572,14 +572,14 @@ class FacialConnection(base.BaseLibrary):
         """
         selections = cmds.ls(selection=True, type="transform")
         if selections and len(selections) == 2:
-            if self.ar.utils.dpCheckGeometry(selections[0]) and self.ar.utils.dpCheckGeometry(selections[1]):
+            if self.ar.utils.check_geometry(selections[0]) and self.ar.utils.check_geometry(selections[1]):
                 old_mesh = selections[0]
                 new_mesh = selections[1]
                 bs_node = cmds.ls(cmds.listHistory(old_mesh), type="blendShape")
                 if bs_node:
                     targets = cmds.listAttr(bs_node[0]+".w", multi=True)
                     if targets:
-                        self.ar.utils.setProgress(self.ar.data.lang['c110_start'], self.ar.data.lang["m265_recreateTargets"], max=len(targets), add_one=False, add_number=False)
+                        self.ar.utils.set_progress(self.ar.data.lang['c110_start'], self.ar.data.lang["m265_recreateTargets"], max=len(targets), add_one=False, add_number=False)
                         reconnect_items = []
                         cmds.select([new_mesh, old_mesh])
                         mel.eval("CreateWrap;")
@@ -588,7 +588,7 @@ class FacialConnection(base.BaseLibrary):
                         cmds.select(clear=True)
                         new_targets = []
                         for item in targets:
-                            self.ar.utils.setProgress('Target: '+item)
+                            self.ar.utils.set_progress('Target: '+item)
                             if not item == old_mesh:
                                 has_connection = cmds.listConnections(bs_node[0]+"."+item, source=True, destination=False, plugs=True)
                                 if has_connection:
@@ -617,5 +617,5 @@ class FacialConnection(base.BaseLibrary):
                                 cmds.connectAttr(plug, bs_node[0]+"."+new_targets[p], force=True)
                         if cmds.objExists(old_mesh+"Base"):
                             cmds.delete(old_mesh+"Base")
-                        self.ar.utils.setProgress(endIt=True)
+                        self.ar.utils.set_progress(end_it=True)
                         cmds.select(clear=True)

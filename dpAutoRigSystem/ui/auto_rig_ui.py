@@ -121,7 +121,7 @@ class MainUI(object):
         cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
         cmds.menuItem('update_mi', label='Update', command=partial(self.ar.updater.check_for_update, True), parent='help_menu')
-        cmds.menuItem('help_mi', label='Wiki...', command=partial(self.ar.utils.visitWebSite, self.ar.data.wiki_url), parent='help_menu')
+        cmds.menuItem('help_mi', label='Wiki...', command=partial(self.ar.utils.visit_website, self.ar.data.wiki_url), parent='help_menu')
 
 
     def create_dev_menu(self):
@@ -131,7 +131,7 @@ class MainUI(object):
         cmds.menuItem('check_imported_guides_mi', label="Imported guides", command=partial(self.ar.filler.check_imported_guides, True), parent='check_guides_mi')
         cmds.menuItem('check_guide_nets_mi', label="Guide networks", command=self.ar.filler.check_guide_nets, parent='check_guides_mi')
         cmds.menuItem('check_guide_versions_mi', label="Guide versions", command=self.ar.filler.check_guide_versions, parent='check_guides_mi')
-        cmds.menuItem('end_progress_window_mi', label='End progress window', command=partial(self.ar.utils.setProgress, endIt=True), parent='dev_menu')
+        cmds.menuItem('end_progress_window_mi', label='End progress window', command=partial(self.ar.utils.set_progress, end_it=True), parent='dev_menu')
 
 
     def create_radio_menu(self, name, parent_menu, current, data, option_var=None):
@@ -262,10 +262,10 @@ class MainUI(object):
         # footer
         cmds.columnLayout('skin_footer_cl', adjustableColumn=True, parent='skin_create_fl')
         cmds.separator(style='none', height=3, parent='skin_footer_cl')
-        cmds.button("skin_create_bt", label=self.ar.data.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.ar.skin.skinFromUI), parent='skin_footer_cl')
+        cmds.button("skin_create_bt", label=self.ar.data.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skin_from_ui), parent='skin_footer_cl')
         cmds.paneLayout("skin_add_remove_v2_pl", configuration="vertical2", separatorThickness=2.0, parent='skin_footer_cl')
-        cmds.button("skin_add_bt", label=self.ar.data.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.ar.skin.skinFromUI, "Add"), parent='skin_add_remove_v2_pl')
-        cmds.button("skin_remove_bt", label=self.ar.data.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.ar.skin.skinFromUI, "Remove"), parent='skin_add_remove_v2_pl')
+        cmds.button("skin_add_bt", label=self.ar.data.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skin_from_ui, "Add"), parent='skin_add_remove_v2_pl')
+        cmds.button("skin_remove_bt", label=self.ar.data.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skin_from_ui, "Remove"), parent='skin_add_remove_v2_pl')
         cmds.separator(style='none', height=5, parent='skin_footer_cl')
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         cmds.text('skin_footer_txt', align='center', label="0 "+self.ar.data.lang['i025_joints']+" 0 "+self.ar.data.lang['i024_geometries'], parent='skin_footer_cl')
@@ -276,14 +276,14 @@ class MainUI(object):
         cmds.radioButton('skin_closest_point_rb', label="closestPoint", annotation="closestPoint", parent='skin_copy_rl')
         cmds.radioButton('skin_uvspace_rb', label="uvSpace", annotation="uvSpace", parent='skin_copy_rl') #uvSpace
         cmds.paneLayout("skin_copy_v2_pl", configuration="vertical2", separatorThickness=2.0, parent='skin_copy_rl')
-        cmds.button("skin_copy_one_source_bt", label=self.ar.data.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.ar.skin.copySkinFromOneSource, None, True), annotation=self.ar.data.lang['i288_copySkinDesc'], parent='skin_copy_v2_pl')
-        cmds.button("skin_copy_multi_source_bt", label=self.ar.data.lang['i146_same']+" "+self.ar.data.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.ar.skin.copySkinSameName, None, True), annotation=self.ar.data.lang['i289_sameNameSkinDesc'], parent='skin_copy_v2_pl')
+        cmds.button("skin_copy_one_source_bt", label=self.ar.data.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.ar.skin.copy_skin_from_one_source, None, True), annotation=self.ar.data.lang['i288_copySkinDesc'], parent='skin_copy_v2_pl')
+        cmds.button("skin_copy_multi_source_bt", label=self.ar.data.lang['i146_same']+" "+self.ar.data.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.ar.skin.copy_skin_same_name, None, True), annotation=self.ar.data.lang['i289_sameNameSkinDesc'], parent='skin_copy_v2_pl')
         cmds.radioCollection('skin_surface_association_rc', edit=True, select="skin_closest_point_rb")
         # skin weights IO
         cmds.frameLayout('skin_weights_io_fl', label="SkinCluster weights IO", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent='skin_main_cl')
         cmds.paneLayout("skin_weights_io_v2_pl", configuration="vertical2", separatorThickness=2.0, parent='skin_weights_io_fl')
-        cmds.button("skin_weights_export_bt", label=self.ar.data.lang['i164_export'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.ar.skin.ioSkinWeightsByUI, True), annotation=self.ar.data.lang['i266_selected'], parent='skin_weights_io_v2_pl')
-        cmds.button("skin_weights_import_bt", label=self.ar.data.lang['i196_import'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.ar.skin.ioSkinWeightsByUI, False), annotation=self.ar.data.lang['i266_selected'], parent='skin_weights_io_v2_pl')
+        cmds.button("skin_weights_export_bt", label=self.ar.data.lang['i164_export'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.ar.skin.io_skin_weights_by_dialog, True), annotation=self.ar.data.lang['i266_selected'], parent='skin_weights_io_v2_pl')
+        cmds.button("skin_weights_import_bt", label=self.ar.data.lang['i196_import'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.ar.skin.io_skin_weights_by_dialog, False), annotation=self.ar.data.lang['i266_selected'], parent='skin_weights_io_v2_pl')
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout('skinning_tab', edit=True,
                         attachForm=[('skin_main_sl', 'top', 20),
@@ -358,7 +358,7 @@ class MainUI(object):
         cmds.paneLayout("ctr_edit_selected_v2_pl", configuration="vertical2", separatorThickness=2.0, parent="ctr_edit_selected_fl")
         cmds.button("ctr_reset_curve_bt", label=self.ar.data.lang['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ar.ctrls.reset_curve), parent="ctr_edit_selected_v2_pl")
         cmds.button("ctr_change_degree_bt", label=self.ar.data.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ar.ctrls.reset_curve, True), parent="ctr_edit_selected_v2_pl")
-        cmds.button("ctr_zero_out_grp_bt", label=self.ar.data.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=self.ar.utils.zeroOut, parent="ctr_edit_selected_fl")
+        cmds.button("ctr_zero_out_grp_bt", label=self.ar.data.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=self.ar.utils.create_zero_out, parent="ctr_edit_selected_fl")
         cmds.button("ctr_select_all_bt", label=self.ar.data.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ar.ctrls.select_all_controllers), parent="ctr_edit_selected_fl")
         # calibration controllers
         cmds.frameLayout('ctr_calibration_fl', label=self.ar.data.lang['i193_calibration'], collapsable=True, collapse=True, marginHeight=10, marginWidth=10, parent='ctr_main_cl')
@@ -489,3 +489,39 @@ class MainUI(object):
         cmds.button(name+"_veryfy_all_bt", label=self.ar.data.lang['i210_verify'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, True, True), parent=name+"_select_v2_pl")
         cmds.button(name+"_fix_all_bt", label=self.ar.data.lang['c052_fix'].upper(), command=partial(self.ar.ui_manager.run_selected_actions, instances, False, True), parent=name+"_select_v2_pl")
         cmds.separator(height=30, parent=name+"_fl")
+
+
+    def skin_from_ui(self, mode=None, *args):
+        """ Skin the geometries using the given joints, reading from UI the selected items of the textScrollLists or getting all items if nothing is selected.
+        """
+        log_win = cmds.checkBox("skin_log_win_cb", query=True, value=True)
+        # get joints to be skinned:
+        joints_from_ui = cmds.textScrollList("skin_joint_tsl", query=True, selectItem=True)
+        if not joints_from_ui:
+            joints_from_ui = cmds.textScrollList("skin_joint_tsl", query=True, allItems=True)
+        # check if all items in joints exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
+        joints, no_exist_joints = [], []
+        if joints_from_ui:
+            for item in joints_from_ui:
+                if cmds.objExists(item):
+                    joints.append(item)
+                else:
+                    no_exist_joints.append(item)
+        if no_exist_joints:
+            no_exists_joints_message = self.ar.data.lang['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(no_exist_joint) for no_exist_joint in no_exist_joints) +"\n\n"+ self.ar.data.lang['i070_continueSkin']
+            yes_bt = self.ar.data.lang['i071_yes']
+            no_bt = self.ar.data.lang['i072_no']
+            confirm_skinning = cmds.confirmDialog(title='Confirm Skinning', message=no_exists_joints_message, button=[yes_bt,no_bt], defaultButton=yes_bt, cancelButton=no_bt, dismissString=no_bt)
+            if confirm_skinning == no_bt:
+                joints = None
+        # get geometries to be skinned:
+        geos = cmds.textScrollList("skin_geo_tcl", query=True, selectItem=True)
+        if not geos:
+            geos = cmds.textScrollList("skin_geo_tcl", query=True, allItems=True)
+        self.ar.skin.run_skinning(geos, joints, mode, log_win)
+
+
+    def get_by_uvs_from_ui(self):
+        """ Read the radioCollection, verify its annotation and return True if found selected uvSpace.
+        """
+        return cmds.radioButton(cmds.radioCollection("skin_surface_association_rc", query=True, select=True), query=True, annotation=True) == "uvSpace"

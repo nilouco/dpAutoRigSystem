@@ -45,7 +45,7 @@ class ParentingIO(action.BaseAction):
                         else:
                             transforms = cmds.ls(selection=False, long=True, type="transform")
                         if transforms:
-                            self.ar.utils.setProgress(max=len(transforms), add_one=False, add_number=False)
+                            self.ar.utils.set_progress(max=len(transforms), add_one=False, add_number=False)
                             # define data to export
                             parent_data = self.get_parenting_data(transforms)
                             parent_data.update(self.get_broken_id_data())
@@ -86,7 +86,7 @@ class ParentingIO(action.BaseAction):
         """
         if not transforms:
             transforms = cmds.ls(selection=False, long=True, type="transform")
-        filtered_items = self.ar.utils.filterTransformList(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
+        filtered_items = self.ar.utils.filter_transforms(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filtered_items = self.reorder_list(filtered_items)
         return {"Parent" : filtered_items}
 
@@ -106,10 +106,10 @@ class ParentingIO(action.BaseAction):
             Return True if there are broken nodes.
         """
         if "BrokenID" in parent_data.keys():
-            self.ar.utils.setProgress(max=len(parent_data["BrokenID"]), add_one=False, add_number=False)
+            self.ar.utils.set_progress(max=len(parent_data["BrokenID"]), add_one=False, add_number=False)
             for node_type in parent_data["BrokenID"].keys():
                 if node_type == "transform":
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     for item in parent_data["BrokenID"][node_type].keys():
                         if not cmds.objExists(item):
                             if not self.check_its_from_modeling(parent_data, node_type, item):
@@ -125,7 +125,7 @@ class ParentingIO(action.BaseAction):
         """ Import parenting data and put the nodes as the correct hierarchy if needed.
         """
         if not self.get_parenting_data()["Parent"] == parent_data["Parent"]:
-            self.ar.utils.setProgress(max=len(parent_data["Parent"]), add_one=False, add_number=False)
+            self.ar.utils.set_progress(max=len(parent_data["Parent"]), add_one=False, add_number=False)
             # define lists to check result
             well_imported_items = []
             parent_issues = []
@@ -133,7 +133,7 @@ class ParentingIO(action.BaseAction):
             model_changed_items = []
             # check parenting shaders
             for item in parent_data["Parent"]:
-                self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.set_progress(self.ar.data.lang[self.title])
                 if not cmds.objExists(item):
                     parent_issues.append(item)
                     short_item = item[item.rfind("|")+1:]

@@ -78,9 +78,9 @@ class OffsetMatrixIO(action.BaseAction):
             Returns a dictionary to export.
         """
         data = {}
-        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 in_plugs = cmds.listConnections(item+"."+self.offset_matrix_attr, source=True, destination=False, plugs=True)
                 if in_plugs:
@@ -93,12 +93,12 @@ class OffsetMatrixIO(action.BaseAction):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.ar.utils.setProgress(max=len(connection_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(connection_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in connection_data.keys():
             not_found_nodes = []
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 om_attr = item+"."+self.offset_matrix_attr
                 if not cmds.listConnections(om_attr, plugs=True, source=True, destination=False):

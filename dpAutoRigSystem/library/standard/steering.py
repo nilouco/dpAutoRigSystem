@@ -77,19 +77,19 @@ class Steering(standard.BaseStandard):
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.create_end_joint(side+self.number_name, ty=1)
                 # joint labelling:
-                self.ar.utils.setJointLabel(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
+                self.ar.utils.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
                 steering_ctrl = self.ar.ctrls.create_controller("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc1")
                 main_ctrl = self.ar.ctrls.create_controller("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=steering_ctrl)
-                self.ar.utils.originedFrom(objName=steering_ctrl, attrString=self.guide)
-                self.ar.utils.originedFrom(objName=main_ctrl, attrString=self.base+";"+self.guide_end_loc+";"+self.guide_radius)
+                self.ar.utils.set_origined_from_attr(steering_ctrl, self.guide)
+                self.ar.utils.set_origined_from_attr(main_ctrl, self.base+";"+self.guide_end_loc+";"+self.guide_radius)
                 self.steering_ctrls.append(steering_ctrl)
                 # position and orientation of joint and control:
                 cmds.matchTransform(self.jnt, self.guide, position=True, rotation=True)
                 cmds.matchTransform(steering_ctrl, self.guide, position=True, rotation=True)
                 cmds.matchTransform(main_ctrl, self.guide_end_loc, position=True, rotation=True)
-                # zeroOut controls:
-                zeros = self.ar.utils.zeroOut([steering_ctrl, main_ctrl])
+                # create_zero_out controls:
+                zeros = self.ar.utils.create_zero_out([steering_ctrl, main_ctrl])
                 # hide visibility attribute:
                 self.ar.ctrls.set_lock_hide([steering_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:

@@ -45,9 +45,9 @@ class SkinningIO(action.BaseAction):
                         if inputs:
                             items = inputs
                         else:
-                            items = self.ar.skin.getDeformedItemList(deformerTypeList=["skinCluster"], ignoreAttr=self.ar.skin.ignoreSkinningAttr)
+                            items = self.ar.skin.get_deformed_items(deformer_types=["skinCluster"], ignore_attr=self.ar.skin.ignore_skinning_attr)
                         if items:
-                            self.export_json_file(self.ar.skin.getSkinWeightData(items))
+                            self.export_json_file(self.ar.skin.get_skin_weights_data(items))
                         else:
                             self.maybe_done_io("Render_Grp")
                     else: #import
@@ -113,7 +113,7 @@ class SkinningIO(action.BaseAction):
             if cmds.objExists(item):
                 if ref_nodes: #disable at the momment
                     for ref_node_name in ref_nodes:
-                        if ref_node_name[ref_node_name.rfind(":")+1:] == self.ar.skin.getIOFileName(item):
+                        if ref_node_name[ref_node_name.rfind(":")+1:] == self.ar.skin.get_io_filename(item):
                             if cmds.polyCompare(item, ref_node_name, vertices=True) > 0 or cmds.polyCompare(item, ref_node_name, edges=True) > 0: #check if shape changes
                                 changed_shape_meshes.append(item)
                                 well_imported = False
@@ -131,7 +131,7 @@ class SkinningIO(action.BaseAction):
         if to_import_items:
             try:
                 # import skin weights
-                self.ar.skin.importSkinWeightsFromFile(to_import_items, self.io_path, self.latest_data_file, False)
+                self.ar.skin.import_skin_weights_from_file(to_import_items, self.io_path, self.latest_data_file, False)
                 self.well_done_io(self.latest_data_file)
             except Exception as e:
                 self.fail_io(self.latest_data_file+": "+str(e))

@@ -41,7 +41,7 @@ class FingerHandPose(base.BaseLibrary):
         self.to_ids = []
         hand_ctrls = []
         # find nodes
-        all_grp = self.ar.utils.getAllGrp()
+        all_grp = self.ar.utils.get_all_grp()
         if all_grp:
             if cmds.getAttr(all_grp+".dpFingerCount"): #it has fingers
                 for side in self.sides:

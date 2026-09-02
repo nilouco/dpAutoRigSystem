@@ -32,8 +32,8 @@ class Cycle(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            self.ar.utils.setProgress(max=1, add_one=False, add_number=False)
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(max=1, add_one=False, add_number=False)
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             cycles = None
             if inputs:
                 cycles = cmds.cycleCheck(inputs, list=True)

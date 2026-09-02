@@ -77,9 +77,9 @@ class VisibilityIO(action.BaseAction):
             Returns the dictionary to export.
         """
         data = {}
-        self.ar.utils.setProgress(max=len(items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if "visibility" in cmds.listAttr(item):
                     if not cmds.listConnections(item+".visibility", source=True, destination=False):
@@ -90,12 +90,12 @@ class VisibilityIO(action.BaseAction):
     def import_visibility_data(self, vis_data):
         """ Import visibility attribute values from exported dictionary.
         """
-        self.ar.utils.setProgress(max=len(vis_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(vis_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in vis_data.keys():
             not_found_nodes = []
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             # check attribute
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")

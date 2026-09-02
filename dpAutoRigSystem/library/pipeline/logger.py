@@ -43,7 +43,7 @@ class Logger(object):
                     noneText = cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout)
         if wiki:
             cmds.separator(style='none', height=20, parent=infoLayout)
-            cmds.button(label="Wiki", command=partial(self.ar.utils.visitWebSite, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
+            cmds.button(label="Wiki", command=partial(self.ar.utils.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow("dpInfoWindow")
 

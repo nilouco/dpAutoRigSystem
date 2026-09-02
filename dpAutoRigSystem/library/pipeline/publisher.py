@@ -45,7 +45,7 @@ class Publisher(object):
         validation_results = self.run_checked_validators() #verify mode
         if validation_results:
             mel.eval('warning \"'+validation_results+'\";')
-            self.ar.utils.setProgress(endIt=True)
+            self.ar.utils.set_progress(end_it=True)
         else:
             validation_results = self.ar.data.lang['v007_allOk']
         self.ar.logger.infoWin('i019_log', 'i224_diagnose', validation_results, "left", 250, 150)
@@ -68,7 +68,7 @@ class Publisher(object):
         """
         if self.ar.pipeliner.pipe_data['publishPath']:
             # Starting progress window
-            self.ar.utils.setProgress(self.ar.data.lang['i335_starting']+"...", self.ar.data.lang['m046_publisher'], 5, add_one=False, add_number=False)
+            self.ar.utils.set_progress(self.ar.data.lang['i335_starting']+"...", self.ar.data.lang['m046_publisher'], 5, add_one=False, add_number=False)
 
             # check if there'a a file name to publish this scene
             publish_filename = self.ar.pipeliner.get_pipe_filename(self.ar.pipeliner.pipe_data['publishPath'])
@@ -99,13 +99,13 @@ class Publisher(object):
                     self.abort_publishing(validation_results)
                     return False
                 else:
-                    self.ar.utils.setProgress(self.ar.data.lang['i336_storingData']+"...", add_number=False)
+                    self.ar.utils.set_progress(self.ar.data.lang['i336_storingData']+"...", add_number=False)
                     
                     self.ar.pipeliner.pipe_data.update(publish_log)
 
                     # try to store data into All_Grp if it exists
                     self.ar.pipeliner.pipe_data['modelVersion'] = None
-                    all_grp = self.ar.utils.getAllGrp()
+                    all_grp = self.ar.utils.get_all_grp()
                     if all_grp:
                         # published from file
                         if not cmds.objExists(all_grp+".publishedFromFile"):
@@ -135,7 +135,7 @@ class Publisher(object):
                     else:
                         built_version = self.ar.data.version
 
-                    self.ar.utils.setProgress(self.ar.data.lang['i227_getImage']+"...", add_number=False)
+                    self.ar.utils.set_progress(self.ar.data.lang['i227_getImage']+"...", add_number=False)
 
                     # publishing file
                     # create folders to publish file if needed
@@ -153,10 +153,10 @@ class Publisher(object):
                             # rigging preview image
                             if self.ar.pipeliner.pipe_data['b_imager']:
                                 self.ar.pipeliner.pipe_data['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipe_data, built_version, self.ar.pipeliner.get_today())
-                                self.ar.utils.setProgress(endIt=True)
-                                self.ar.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", self.ar.data.lang['m046_publisher'], 8, add_one=False, add_number=False)
+                                self.ar.utils.set_progress(end_it=True)
+                                self.ar.utils.set_progress(self.ar.data.lang['i225_savingFile']+"...", self.ar.data.lang['m046_publisher'], 8, add_one=False, add_number=False)
                     else:
-                        self.ar.utils.setProgress(self.ar.data.lang['i225_savingFile']+"...", add_number=False)
+                        self.ar.utils.set_progress(self.ar.data.lang['i225_savingFile']+"...", add_number=False)
                     
                     # save published file
                     cmds.file(rename=self.ar.pipeliner.pipe_data['publishPath']+"/"+publish_filename)
@@ -166,27 +166,27 @@ class Publisher(object):
                     if self.ar.pipeliner.pipe_data['b_deliver']:
                         if self.ar.pipeliner.pipe_data['toClientPath']:
                             # toClient
-                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Zipping", add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['i226_exportFiles']+"... Zipping", add_number=False)
                             zip_file = self.ar.packager.create_zip_to_client(self.ar.pipeliner.pipe_data['publishPath'], publish_filename, self.ar.pipeliner.pipe_data['toClientPath'], self.ar.pipeliner.get_today())
                             # dropbox
-                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Clouding", add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['i226_exportFiles']+"... Clouding", add_number=False)
                             if zip_file:
                                 if self.ar.pipeliner.pipe_data['dropboxPath']:
                                     self.ar.packager.to_dropbox(zip_file, self.ar.pipeliner.pipe_data['dropboxPath'])
                             # open folder
-                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... Folder openning", add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['i226_exportFiles']+"... Folder openning", add_number=False)
                             self.ar.packager.open_folder(self.ar.pipeliner.pipe_data['toClientPath'])
                         # hist
                         if self.ar.pipeliner.pipe_data['historyPath']:
-                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpHist", add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['i226_exportFiles']+"... dpHist", add_number=False)
                             self.ar.packager.to_history(self.ar.pipeliner.pipe_data['scenePath'], self.ar.pipeliner.pipe_data['shortName'], self.ar.pipeliner.pipe_data['historyPath'])
                         # organize old published files
                         if self.ar.pipeliner.asset_names:
-                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpOld", add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['i226_exportFiles']+"... dpOld", add_number=False)
                             self.ar.packager.to_old(self.ar.pipeliner.pipe_data['publishPath'], publish_filename, self.ar.pipeliner.asset_names, self.ar.pipeliner.pipe_data['publishPath']+"/"+self.ar.pipeliner.pipe_data['s_old'])
                         # discord
                         if self.ar.pipeliner.pipe_data['b_discord']:
-                            self.ar.utils.setProgress(self.ar.data.lang['i226_exportFiles']+"... dpLog", add_number=False)
+                            self.ar.utils.set_progress(self.ar.data.lang['i226_exportFiles']+"... dpLog", add_number=False)
                             message_text = self.ar.pipeliner.pipe_data["sceneName"]+"\n"+self.ar.pipeliner.pipe_data['publishPath']+"/**"+self.ar.pipeliner.pipe_data['publishFileName']+"**\n*"+self.ar.pipeliner.pipe_data["comments"]+"*"
                             result = self.ar.packager.to_discord(self.ar.pipeliner.pipe_data['publishedWebhook'], message_text)
                             if result: #error
@@ -194,7 +194,7 @@ class Publisher(object):
 
                     # publishing callback
                     if self.ar.pipeliner.pipe_data['s_callback']:
-                        self.ar.utils.setProgress("Callback...", add_number=False)
+                        self.ar.utils.set_progress("Callback...", add_number=False)
                         if self.ar.pipeliner.pipe_data['callbackPath'] and self.ar.pipeliner.pipe_data['callbackFile']:
                             callback_result = self.ar.packager.to_callback(self.ar.pipeliner.pipe_data['callbackPath'], self.ar.pipeliner.pipe_data['callbackFile'], self.ar.pipeliner.pipe_data)
                             if callback_result:
@@ -202,7 +202,7 @@ class Publisher(object):
 
                     # publisher log window
                     self.ar.publish_ui.success_published_ui(publish_filename)
-                    self.ar.utils.setProgress(endIt=True)
+                    self.ar.utils.set_progress(end_it=True)
                     self.ar.utils.close_ui('dpPublisherWindow')
                     if from_ui:
                         self.ask_user_choose_file(publish_filename)
@@ -220,7 +220,7 @@ class Publisher(object):
             End progressWindow.
             Warning the raison of the error.
         """
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
         self.ar.utils.close_ui('dpPublisherWindow')
         # reopen current file
         cmds.file(self.ar.pipeliner.pipe_data['sceneName'], open=True, force=True)

@@ -37,9 +37,9 @@ class ExitEditMode(action.BaseAction):
             else:
                 check_items = self.ar.ctrls.get_controllers()
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if "editMode" in cmds.listAttr(item):
                         if cmds.getAttr(item+".editMode") == 1:

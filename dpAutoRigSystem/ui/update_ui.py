@@ -33,8 +33,8 @@ class UpdateUI(object):
                 cmds.text("update_log_txt", label=self.ar.data.lang['i171_updateLog']+":\n", align="center", parent="update_cl")
                 cmds.text("update_remote_log_txt", label=remote_log, align="left", parent="update_cl")
                 cmds.separator(height=30)
-            cmds.button('update_whats_changed_bt', label=self.ar.data.lang['i117_whatsChanged'], align="center", command=partial(self.ar.utils.visitWebSite, self.ar.data.whats_changed_url), parent="update_cl")
-            cmds.button('update_visit_github_bt', label=self.ar.data.lang['i093_gotoWebSite'], align="center", command=partial(self.ar.utils.visitWebSite, self.ar.data.github_url), parent="update_cl")
+            cmds.button('update_whats_changed_bt', label=self.ar.data.lang['i117_whatsChanged'], align="center", command=partial(self.ar.utils.visit_website, self.ar.data.whats_changed_url), parent="update_cl")
+            cmds.button('update_visit_github_bt', label=self.ar.data.lang['i093_gotoWebSite'], align="center", command=partial(self.ar.utils.visit_website, self.ar.data.github_url), parent="update_cl")
             cmds.button('update_download_bt', label=self.ar.data.lang['i094_downloadUpdate'], align="center", command=partial(self.ar.updater.download, self.ar.data.master_url, "zip"), parent="update_cl")
             cmds.button('update_install_bt', label=self.ar.data.lang['i095_installUpdate'], align="center", command=partial(self.ar.updater.install, self.ar.data.master_url, remote_version), parent="update_cl")
         # automatically check for updates:

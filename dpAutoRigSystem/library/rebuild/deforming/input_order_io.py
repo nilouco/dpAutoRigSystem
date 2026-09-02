@@ -43,7 +43,7 @@ class InputOrderIO(action.BaseAction):
                         if inputs:
                             deformed_items = inputs
                         else:
-                            deformed_items = self.ar.skin.getDeformedItemList(deformerTypeList=self.ar.skin.getAllDeformerTypeList(), ignoreAttr=self.ar.skin.ignoreSkinningAttr)
+                            deformed_items = self.ar.skin.get_deformed_items(deformer_types=self.ar.skin.get_all_deformer_types(), ignore_attr=self.ar.skin.ignore_skinning_attr)
                         if deformed_items:
                             self.export_json_file(self.get_order_data(deformed_items))
                         else:
@@ -75,21 +75,21 @@ class InputOrderIO(action.BaseAction):
         """ Return the deformer order data dictionary to export.
         """
         order_data = {}
-        self.ar.utils.setProgress(max=len(deformed_items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(deformed_items), add_one=False, add_number=False)
         for item in deformed_items:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            order_data[item] = self.ar.skin.getOrderList(item)
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            order_data[item] = self.ar.skin.get_order_items(item)
         return order_data
     
 
     def import_input_order(self, order_data):
         """ Import the input order data from given dictionary.
         """
-        self.ar.utils.setProgress(max=len(order_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(order_data.keys()), add_one=False, add_number=False)
         well_imported = True
         to_import_items, not_found_meshs, = [], []
         for item in order_data.keys():
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 to_import_items.append(item)
             else:
@@ -103,7 +103,7 @@ class InputOrderIO(action.BaseAction):
                     deformers = order_data[item]
                     if deformers:
                         if len(deformers) > 1:
-                            self.ar.skin.setOrderList(item, deformers)
+                            self.ar.skin.set_order_items(item, deformers)
                 except Exception as e:
                     well_imported = False
                     print(e)

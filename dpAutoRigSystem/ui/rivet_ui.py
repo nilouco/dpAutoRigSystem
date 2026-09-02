@@ -112,7 +112,7 @@ class RivetUI(object):
         """
         self.app.disable_pac(indexes)
         for i, index in enumerate(indexes):
-            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'])
+            self.ar.utils.set_progress(self.ar.data.lang['i315_removing'])
             net = self.app.rivet_nets[index]
             if net:
                 self.app.remove_rivet_from_net(net)
@@ -129,10 +129,10 @@ class RivetUI(object):
         selection_indexes = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectIndexedItem=True)
         if selection and selection_indexes:
             true_indexes = list(map(lambda n : n-1, selection_indexes))
-            self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(true_indexes), add_one=False, add_number=False)
+            self.ar.utils.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(true_indexes), add_one=False, add_number=False)
             self.remove_rivet_from_list(true_indexes, selection)
             self.app.remove_rivet_grp()
-            self.ar.utils.setProgress(endIt=True)
+            self.ar.utils.set_progress(end_it=True)
         else:
             mel.eval('print \"dpAR: '+self.ar.data.lang['m169_noItemSelect']+'\\n\";')
         cmds.textScrollList('rivet_filter_controller_tsl', edit=True, deselectAll=True)
@@ -187,18 +187,18 @@ class RivetUI(object):
                 remove_existing_rivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
                 if remove_existing_rivet == self.ar.data.lang['i071_yes']:
                     need_to_remove_items, true_indexes = self.get_to_remove_indexes(need_to_remove, has_rivets_items)
-                    self.ar.utils.setProgress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(need_to_remove_items), add_one=False, add_number=False)
+                    self.ar.utils.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(need_to_remove_items), add_one=False, add_number=False)
                     self.remove_rivet_from_list(true_indexes, need_to_remove_items)
-                    self.ar.utils.setProgress(endIt=True)
+                    self.ar.utils.set_progress(end_it=True)
                 elif remove_existing_rivet == self.ar.data.lang['i072_no']:
                     pass
                 else:
                     return
 
         # call run function to create Rivet setup using UI values
-        self.ar.utils.setProgress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), add_one=False, add_number=False)
+        self.ar.utils.set_progress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), add_one=False, add_number=False)
         self.app.create_rivet(geo_to_attach, uv_set, items, attatch_translate, attach_rotate, add_father_grp, add_invert, inv_t, inv_r, face_to_rivet, self.app.rivet_grp_name, True)
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
         self.ar.utils.close_ui('dpRivetWindow')
 
 
@@ -231,7 +231,7 @@ class RivetUI(object):
         else:
             selected_nodes = cmds.ls(selection=True)
         if selected_nodes:
-            if self.ar.utils.dpCheckGeometry(selected_nodes[0]):
+            if self.ar.utils.check_geometry(selected_nodes[0]):
                 self.app.geo_to_attach = selected_nodes[0]
                 cmds.textField('rivet_geo_to_attach_tf', edit=True, text=self.app.geo_to_attach)
                 self.load_uv_set(self.app.geo_to_attach)

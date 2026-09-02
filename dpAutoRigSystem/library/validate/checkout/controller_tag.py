@@ -37,9 +37,9 @@ class ControllerTag(action.BaseAction):
             else:
                 check_items = self.ar.ctrls.get_controllers()
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if not "controlID" in cmds.listAttr(item):
                         continue
                     if not cmds.getAttr(item+".controlID") == "id_092_Correctives":

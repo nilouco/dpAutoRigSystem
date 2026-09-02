@@ -90,7 +90,7 @@ class Foot(standard.BaseStandard):
         cmds.parent(self.guide_end_loc, self.guide_rff_loc, relative=True)
         cmds.parent(self.guide_rff_loc, self.guide_foot_loc, relative=True)
         cmds.parent(self.line_end, self.line_rff)
-        guide_rfe_zero = self.ar.utils.zeroOut([self.guide_rfe_loc], True)
+        guide_rfe_zero = self.ar.utils.create_zero_out([self.guide_rfe_loc], True)
         # edit
         guide_rfe_offset_grp = cmds.listRelatives(guide_rfe_zero, children=True)[0]
         cmds.parentConstraint(self.guide_rff_loc, guide_rfe_offset_grp, maintainOffset=True, skipTranslate="y", name=guide_rfe_offset_grp+"_PaC")
@@ -151,18 +151,18 @@ class Foot(standard.BaseStandard):
                 # creating joints:
                 cmds.select(clear=True)
                 foot_jnt = cmds.joint(name=side+self.number_name+"_"+ankle_rf_attr.capitalize()+"_Jnt")
-                self.ar.utils.setJointLabel(foot_jnt, s+self.joint_label_add, 18, self.number_name+ "_"+ankle_rf_attr.capitalize())
+                self.ar.utils.set_joint_label(foot_jnt, s+self.joint_label_add, 18, self.number_name+ "_"+ankle_rf_attr.capitalize())
                 middle_foot_jxt = cmds.joint(name=side+self.number_name+"_"+middle_rf_attr.capitalize()+"_Jxt")
                 end_jnt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.joint_end_attr, radius=0.5)
                 cmds.select(clear=True)
                 middle_foot_jnt = cmds.joint(name=side+self.number_name+"_"+middle_rf_attr.capitalize()+"_Jnt")
-                self.ar.utils.setJointLabel(middle_foot_jnt, s+self.joint_label_add, 18, self.number_name+"_"+middle_rf_attr.capitalize())
+                self.ar.utils.set_joint_label(middle_foot_jnt, s+self.joint_label_add, 18, self.number_name+"_"+middle_rf_attr.capitalize())
                 end_b_jnt = cmds.joint(name=side+self.number_name+"B_"+self.ar.data.joint_end_attr, radius=0.5)
                 cmds.parent(middle_foot_jnt, middle_foot_jxt)
                 cmds.addAttr(foot_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.addAttr(middle_foot_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(clear=True)
-                self.ar.utils.addJointEndAttr([end_jnt, end_b_jnt])
+                self.ar.utils.add_joint_end_attr([end_jnt, end_b_jnt])
                 
                 #Deactivate the segment scale compensate on the bone to prevent scaling problem
                 #It will prevent a double scale problem that will come from the upper parent in the rig
@@ -184,7 +184,7 @@ class Foot(standard.BaseStandard):
                     cmds.setAttr(middle_foot_ctrl+".scaleX", -1)
                     cmds.setAttr(middle_foot_ctrl+".scaleY", -1)
                     cmds.setAttr(middle_foot_ctrl+".scaleZ", -1)
-                foot_ctrl_zeros = self.ar.utils.zeroOut([foot_ctrl, middle_foot_ctrl])
+                foot_ctrl_zeros = self.ar.utils.create_zero_out([foot_ctrl, middle_foot_ctrl])
 
                 # reverse foot controls:
                 rfa_ctrl = self.ar.ctrls.create_controller("id_018_FootReverse", side+self.number_name+"_"+outside_rf_attr.capitalize()+"_Ctrl", r=(self.radius*0.1), d=self.curve_degree, parent_tag=middle_foot_ctrl)
@@ -236,15 +236,15 @@ class Foot(standard.BaseStandard):
                 cmds.parent(rff_grp, rfe_ctrl)
                 
                 # reverse foot zero out groups:
-                rff_zero = self.ar.utils.zeroOut([rff_grp])[0]
-                rff_zero_extra = self.ar.utils.zeroOut([rff_zero])[0]
-                rff_zero_follow = self.ar.utils.zeroOut([rff_zero])[0]
-                rfe_zero = self.ar.utils.zeroOut([rfe_grp])[0]
-                rfd_zero = self.ar.utils.zeroOut([rfd_grp])[0]
-                rfc_zero = self.ar.utils.zeroOut([rfc_grp])[0]
-                rfb_zero = self.ar.utils.zeroOut([rfb_grp])[0]
-                rfa_zero = self.ar.utils.zeroOut([rfa_grp])[0]
-                rfa_zero_extra = self.ar.utils.zeroOut([rfa_zero])[0]
+                rff_zero = self.ar.utils.create_zero_out([rff_grp])[0]
+                rff_zero_extra = self.ar.utils.create_zero_out([rff_zero])[0]
+                rff_zero_follow = self.ar.utils.create_zero_out([rff_zero])[0]
+                rfe_zero = self.ar.utils.create_zero_out([rfe_grp])[0]
+                rfd_zero = self.ar.utils.create_zero_out([rfd_grp])[0]
+                rfc_zero = self.ar.utils.create_zero_out([rfc_grp])[0]
+                rfb_zero = self.ar.utils.create_zero_out([rfb_grp])[0]
+                rfa_zero = self.ar.utils.create_zero_out([rfa_grp])[0]
+                rfa_zero_extra = self.ar.utils.create_zero_out([rfa_zero])[0]
                 
                 # fixing side rool rotation order:
                 cmds.setAttr(rfb_zero+".rotateOrder", 5)
@@ -293,13 +293,13 @@ class Foot(standard.BaseStandard):
                             cmds.connectAttr(foot_ctrl+"."+rfa_attr+rf_type, rf_grps[j]+".rotateY", force=True)
                 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                self.ar.utils.originedFrom(objName=foot_ctrl, attrString=self.base+";"+self.guide_foot_loc+";"+self.guide_radius)
-                self.ar.utils.originedFrom(objName=rfa_ctrl, attrString=self.guide_rfa_loc)
-                self.ar.utils.originedFrom(objName=rfb_ctrl, attrString=self.guide_rfb_loc)
-                self.ar.utils.originedFrom(objName=rfc_ctrl, attrString=self.guide_rfc_loc)
-                self.ar.utils.originedFrom(objName=rfd_ctrl, attrString=self.guide_rfd_loc)
-                self.ar.utils.originedFrom(objName=rfe_ctrl, attrString=self.guide_rfe_loc)
-                self.ar.utils.originedFrom(objName=middle_foot_ctrl, attrString=self.guide_rff_loc+";"+self.guide_end_loc)
+                self.ar.utils.set_origined_from_attr(foot_ctrl, self.base+";"+self.guide_foot_loc+";"+self.guide_radius)
+                self.ar.utils.set_origined_from_attr(rfa_ctrl, self.guide_rfa_loc)
+                self.ar.utils.set_origined_from_attr(rfb_ctrl, self.guide_rfb_loc)
+                self.ar.utils.set_origined_from_attr(rfc_ctrl, self.guide_rfc_loc)
+                self.ar.utils.set_origined_from_attr(rfd_ctrl, self.guide_rfd_loc)
+                self.ar.utils.set_origined_from_attr(rfe_ctrl, self.guide_rfe_loc)
+                self.ar.utils.set_origined_from_attr(middle_foot_ctrl, self.guide_rff_loc+";"+self.guide_end_loc)
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
                 cmds.addAttr(foot_ctrl, longName=foot_rf_attr+rf_roll, attributeType='float', keyable=True)
@@ -426,7 +426,7 @@ class Foot(standard.BaseStandard):
                 self.rev_foot_ctrl_grp_finals.append(self.ctrl_hook_grp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.number_name+'_'+self.mirror_grp)
-                self.ar.utils.addCustomAttr([rfa_grp, rfb_grp, rfc_grp, rfd_grp, rfe_grp], self.ar.utils.ignoreTransformIOAttr)
+                self.ar.utils.add_attr_to_items([rfa_grp, rfb_grp, rfc_grp, rfd_grp, rfe_grp], self.ar.utils.ignore_transform_io_attr)
                 self.to_ids.extend([side_clp, side_md, foot_heel_clp, foot_pma, foot_sr, foot_plant_clp, foot_plant_cnd, angle_plant_pma, angle_plant_md, angle_plant_rmv, angle_plant_cnd, foot_ball_rev, vis_md])
                 self.ar.custom_attr.add_attr(0, [self.static_hook_grp], descendents=True) #dpID
             # finalize this rig:

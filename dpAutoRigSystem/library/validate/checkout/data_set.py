@@ -35,16 +35,16 @@ class DataSet(action.BaseAction):
             if inputs:
                 dataGrp = inputs[0]
             else:
-                dataGrp = self.ar.utils.getNodeByMessage("dataGrp")
+                dataGrp = self.ar.utils.get_node_by_message("dataGrp")
                 if not dataGrp:
                     if cmds.objExists("Data_Grp"):
                         dataGrp = "Data_Grp"
             if dataGrp:
                 check_items = cmds.listRelatives(dataGrp, children=True, allDescendents=True)
                 if check_items:
-                    self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                    self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                     for item in check_items:
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         plugList = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
                         if plugList:
                             for plug in plugList:

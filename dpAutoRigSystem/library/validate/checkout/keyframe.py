@@ -46,9 +46,9 @@ class Keyframe(action.BaseAction):
                         if connectionList and not connectionList[0] in animatedList:
                             animatedList.append(connectionList[0])
                     if animatedList:
-                        self.ar.utils.setProgress(max=len(animatedList), add_one=False, add_number=False)
+                        self.ar.utils.set_progress(max=len(animatedList), add_one=False, add_number=False)
                         for item in animatedList:
-                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             if item in check_items:
                                 if cmds.objExists(item):
                                     crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend

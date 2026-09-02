@@ -40,19 +40,19 @@ class ParentedGeometry(action.BaseAction):
                 meshParentList = self.get_mesh_transforms(check_items)
                 if meshParentList:
                     meshParentList = self.reorder_list(meshParentList)
-                    self.ar.utils.setProgress(max=len(meshParentList), add_one=False, add_number=False)
+                    self.ar.utils.set_progress(max=len(meshParentList), add_one=False, add_number=False)
                     # avoid reporting the same item multiple times
                     for mesh in meshParentList:
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         # check if exists to avoid missing nodes
                         if cmds.objExists(mesh):
                             allDescendents = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
                             # get all descendents and check if it's different than its parent
-                            children = self.ar.utils.filterTransformList([d for d in allDescendents if cmds.objExists(d) and d != mesh])
+                            children = self.ar.utils.filter_transforms([d for d in allDescendents if cmds.objExists(d) and d != mesh])
                             if children:
                                 for item in children:
-                                    if not self.ar.utils.getShortName(item, False) in self.checked_items:
-                                        self.checked_items.append(self.ar.utils.getShortName(item, False)) # get only the last part of the path
+                                    if not self.ar.utils.get_short_name(item, False) in self.checked_items:
+                                        self.checked_items.append(self.ar.utils.get_short_name(item, False)) # get only the last part of the path
                                         self.found_issues.append(True)
                                     if self.first_mode:
                                         self.good_results.append(False)

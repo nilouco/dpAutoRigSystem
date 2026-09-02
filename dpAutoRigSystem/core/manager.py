@@ -228,7 +228,7 @@ class UIManager(object):
                        = False for fix/import
         """
         if first_mode and action_type == "r000_rebuilder": #splitData
-            if self.ar.utils.getDuplicatedNames():
+            if self.ar.utils.get_duplicated_names():
                 confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
                 if confirm == self.ar.data.lang['i072_no']:
                     return
@@ -242,10 +242,10 @@ class UIManager(object):
             log_text += f"\nExported: {publish_log['exportPath']}"
             log_text += f"\nComments: {publish_log['comments']}\n"
         if action_instances:
-            self.ar.utils.setProgress(self.ar.data.lang[action_type]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[action_type], len(action_instances))
+            self.ar.utils.set_progress(self.ar.data.lang[action_type]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[action_type], len(action_instances))
             for a, action_instance in enumerate(action_instances):
                 if action_instance.active:
-                    self.ar.utils.setProgress(action_instance.name)
+                    self.ar.utils.set_progress(action_instance.name)
                     action_instance.verbose = False
                     action_result_data[action_instance.name] = action_instance.run_action(first_mode)
                     action_instance.verbose = True
@@ -270,7 +270,7 @@ class UIManager(object):
             print("\n-------------\n"+self.ar.data.lang[action_type]+"\n"+log_text)
             if publish_log:
                 action_result_data["Publisher"] = publish_log
-            if not self.ar.utils.exportLogDicToJson(action_result_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
+            if not self.ar.utils.export_log_dic_to_json(action_result_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
         return action_result_data, False, 0

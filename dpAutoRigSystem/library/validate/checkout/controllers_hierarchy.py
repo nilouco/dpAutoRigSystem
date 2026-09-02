@@ -128,7 +128,7 @@ class ControllersHierarchy(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             rootNode = None
             
-            globalCtrl = self.ar.utils.getNodeByMessage("globalCtrl")
+            globalCtrl = self.ar.utils.get_node_by_message("globalCtrl")
             # Verify if another Ctrl was sent via code to check hierarchy from.
             if inputs and cmds.objExists(inputs[0]) and self.checkNurbs(inputs[0]):
                 rootNode = inputs[0]

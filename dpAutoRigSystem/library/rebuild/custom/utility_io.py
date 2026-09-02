@@ -42,7 +42,7 @@ class UtilityIO(action.BaseAction):
                     if inputs:
                         utilities = inputs
                     else:
-                        utilities = cmds.ls(selection=False, type=self.ar.utils.utilityTypeList)
+                        utilities = cmds.ls(selection=False, type=self.ar.utils.utility_types)
                     if self.first_mode: #export
                         if utilities:
                             self.export_json_file(self.get_utility_data(utilities))
@@ -76,29 +76,29 @@ class UtilityIO(action.BaseAction):
             Returns the dictionary to export.
         """
         data = {}
-        self.ar.utils.setProgress(max=len(utilities), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(utilities), add_one=False, add_number=False)
         for item in utilities:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
-            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validateID(item):
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
                 # getting attributes values
                 node_type = cmds.objectType(item)
                 data[item] = {"attributes" : {},
                                 "type"       : node_type,
                                 "name"       : item
                             }
-                for attr in self.ar.utils.typeAttrDic[node_type]:
+                for attr in self.ar.utils.type_attr_data[node_type]:
                     if cmds.attributeQuery(attr, node=item, exists=True):
                         data[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                 # compound attributes
-                if node_type in self.ar.utils.typeMultiAttrDic.keys():
-                    for multi_attr in self.ar.utils.typeMultiAttrDic[node_type].keys():
+                if node_type in self.ar.utils.type_multi_attr_data.keys():
+                    for multi_attr in self.ar.utils.type_multi_attr_data[node_type].keys():
                         indexes = cmds.getAttr(item+"."+multi_attr, multiIndices=True)
                         if indexes:
                             dot = ""
                             attributes = [""]
-                            if self.ar.utils.typeMultiAttrDic[node_type][multi_attr]:
+                            if self.ar.utils.type_multi_attr_data[node_type][multi_attr]:
                                 dot = "."
-                                attributes = self.ar.utils.typeMultiAttrDic[node_type][multi_attr]
+                                attributes = self.ar.utils.type_multi_attr_data[node_type][multi_attr]
                             for i in indexes:
                                 for attr in attributes:
                                     attr_name = multi_attr+"["+str(i)+"]"+dot+attr
@@ -113,12 +113,12 @@ class UtilityIO(action.BaseAction):
         """ Import utility nodes from exported dictionary.
             Create missing utility nodes and set them values if they don't exists.
         """
-        self.ar.utils.setProgress(max=len(utility_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(utility_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in utility_data.keys():
             existing_nodes = []
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             # create utility node if it needs
             if not cmds.objExists(item):
                 cmds.createNode(utility_data[item]["type"], name=utility_data[item]["name"])

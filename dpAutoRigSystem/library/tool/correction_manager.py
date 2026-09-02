@@ -62,7 +62,7 @@ class CorrectionManager(base.BaseLibrary):
         """ Returns the distance value read from the distance between node.
         """
         if cmds.getAttr(self.net+".type") == self.distance_name:
-            dist_bet = cmds.listConnections(self.net+".distanceBet")[0]
+            dist_bet = cmds.listConnections(self.net+".create_dist_between")[0]
             if dist_bet:
                 return cmds.getAttr(dist_bet+".distance")
 
@@ -77,7 +77,7 @@ class CorrectionManager(base.BaseLibrary):
             if self.ar.data.ui_state:
                 name = cmds.textFieldGrp("correction_name_tfg", query=True, text=True)
         if name:
-            name = self.ar.utils.resolveName(name, self.net_suffix)[0]
+            name = self.ar.utils.resolve_name(name, self.net_suffix)[0]
             self.rename_linked_nodes(old_name, name)
             cmds.setAttr(self.net+".name", name, type="string")
             self.net = cmds.rename(self.net, self.net.replace(old_name, name))
@@ -150,14 +150,14 @@ class CorrectionManager(base.BaseLibrary):
             for net_attr in net_attributes:
                 if "Rivet" in net_attr:
                     try:
-                        cmds.delete(self.ar.utils.getNodeByMessage(net_attr, self.net))
+                        cmds.delete(self.ar.utils.get_node_by_message(net_attr, self.net))
                     except:
                         pass
         if cmds.objExists("Rivet_Grp"):
             if not cmds.listRelatives("Rivet_Grp", allDescendents=True, children=True):
                 cmds.delete("Rivet_Grp")
         try:
-            cmds.delete(self.ar.utils.getNodeByMessage("correction_data_grp", self.net))
+            cmds.delete(self.ar.utils.get_node_by_message("correction_data_grp", self.net))
         except:
             pass
         cmds.delete(self.net)
@@ -173,14 +173,14 @@ class CorrectionManager(base.BaseLibrary):
 
 
     def create_corrective_locator(self, name, to_attach, to_rivet=False):
-        """ Creates a space locator, zeroOut it to receive a parentConstraint.
+        """ Creates a space locator, create_zero_out it to receive a parentConstraint.
             Return the locator to use it as a reader node to the system.
         """
         if cmds.objExists(to_attach):
             loc = cmds.spaceLocator(name=name+"_Loc")[0]
             cmds.addAttr(loc, longName="inputNode", attributeType="message")
             cmds.connectAttr(to_attach+".message", loc+".inputNode", force=True)
-            grp = self.ar.utils.zeroOut([loc])[0]
+            grp = self.ar.utils.create_zero_out([loc])[0]
             if to_rivet:
                 rivet_node = self.rivet.create_rivet(to_attach, "AnyUVSet", [grp], True, False, False, False, False, False, False, use_offset=False)[-1]
                 cmds.addAttr(self.net, longName=to_attach+"_Rivet", attributeType="message")
@@ -188,7 +188,7 @@ class CorrectionManager(base.BaseLibrary):
             else:
                 cmds.parentConstraint(to_attach, grp, maintainOffset=False, name=grp+"_PaC")
                 cmds.scaleConstraint(to_attach, grp, maintainOffset=True, name=grp+"_ScC")
-            cmds.parent(grp, self.ar.utils.getNodeByMessage("correctionDataGrp", self.net))
+            cmds.parent(grp, self.ar.utils.get_node_by_message("correctionDataGrp", self.net))
             return loc
         else:
             mel.eval('warning \"'+to_attach+' '+self.ar.data.lang['i061_notExists']+'\";')
@@ -199,8 +199,8 @@ class CorrectionManager(base.BaseLibrary):
             Returns the created network node.
         """
         # loading Maya matrix node
-        loaded_quaternion_plugin = self.ar.utils.checkLoadedPlugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.utils.checkLoadedPlugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.utils.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
             if not nodes:
                 nodes = cmds.ls(selection=True, flatten=True)
@@ -217,7 +217,7 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.addAttr(self.cm_data_grp, longName="dpCorrectionManagerDataGrp", attributeType="bool")
                         cmds.setAttr(self.cm_data_grp+".dpCorrectionManagerDataGrp", 1)
                         self.ar.ctrls.set_lock_hide([self.cm_data_grp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                        scalable_grp = self.ar.utils.getNodeByMessage("scalableGrp")
+                        scalable_grp = self.ar.utils.get_node_by_message("scalableGrp")
                         if scalable_grp:
                             cmds.parent(self.cm_data_grp, scalable_grp)
                         cmds.setAttr(self.cm_data_grp+".visibility", 0)
@@ -227,7 +227,7 @@ class CorrectionManager(base.BaseLibrary):
                         name = cmds.textField('correction_create_tf', query=True, text=True)
                         if not name:
                             name = "Correction"
-                    correction_name, name = self.ar.utils.resolveName(name, self.net_suffix)
+                    correction_name, name = self.ar.utils.resolve_name(name, self.net_suffix)
                     
                     # type
                     if not correct_type:
@@ -261,11 +261,11 @@ class CorrectionManager(base.BaseLibrary):
                     # add serialization attributes
                     message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisChc", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
                     if correct_type == self.distance_name:
-                        message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
+                        message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "create_dist_between", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
                     for message_attr in message_attrs:
                         cmds.addAttr(self.net, longName=message_attr, attributeType="message")
                     cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
-                    option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+                    option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
                     if option_ctrl:
                         cmds.connectAttr(option_ctrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
                     cmds.addAttr(self.net, longName="corrective", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
@@ -424,7 +424,7 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.connectAttr(distance_all_cnd+".outColorR", self.net+".inputValue", force=True)
                         cmds.setAttr(self.net+".inputValue", lock=True)
                         # serialize distance nodes
-                        cmds.connectAttr(dist_bet+".message", self.net+".distanceBet", force=True)
+                        cmds.connectAttr(dist_bet+".message", self.net+".create_dist_between", force=True)
                         cmds.connectAttr(output_rmv+".message", self.net+".outputRmV", force=True)
                         cmds.connectAttr(distance_axis_extract_pma+".message", self.net+".distanceAxisExtractPMA", force=True)
                         cmds.connectAttr(distance_all_cnd+".message", self.net+".distanceAllCnd", force=True)

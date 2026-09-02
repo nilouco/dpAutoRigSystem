@@ -13,7 +13,7 @@ class PublishUI(object):
         """
         self.ar.utils.close_ui('dpSuccessPublishedWindow')
         self.ar.utils.close_ui('dpPublisherWindow')
-        saved_scene = self.ar.utils.checkSavedScene()
+        saved_scene = self.ar.utils.check_saved_scene()
         if not saved_scene:
             saved_scene = self.ar.pipeliner.confirm_save_this_scene(True)
             return
@@ -75,7 +75,7 @@ class PublishUI(object):
         """ If everything works well we can call a success publishing window here.
         """
         self.ar.utils.close_ui('dpSuccessPublishedWindow')
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
         # window
         win_width  = 250
         win_height = 130

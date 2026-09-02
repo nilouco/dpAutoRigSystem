@@ -44,10 +44,10 @@ class UnusedDeformer(action.BaseAction):
                 check_items = deformers.copy()
                 check_items.extend(intermedList.copy())
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 if deformers:
                     for defNode in deformers:
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         hasTags = False
                         indicesList = cmds.getAttr(defNode+".input", multiIndices=True)
                         if indicesList:
@@ -66,7 +66,7 @@ class UnusedDeformer(action.BaseAction):
                                     unusedList.append(defNode)
                 if intermedList:
                     for intermedObj in intermedList:
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         outputList = cmds.listConnections(intermedObj, source=False, destination=True, plugs=True)
                         if not outputList:
                             unusedList.append(intermedObj)

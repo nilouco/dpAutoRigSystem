@@ -38,13 +38,13 @@ class ScalableDeformer(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type=['skinCluster', 'deltaMush'])
             if check_items:
-                option_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+                option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
                 if option_ctrl:
-                    self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                    self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                     rigScaleOutput = [option_ctrl+"."+self.rigScaleOutputAttr]
                     itemAttrToFixList = []
                     for node in check_items:
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         node_type = cmds.objectType(node)
                         # check skinCluster nodes and connections
                         if node_type == "skinCluster":

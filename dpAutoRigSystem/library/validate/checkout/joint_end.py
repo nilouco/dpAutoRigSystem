@@ -37,18 +37,18 @@ class JointEnd(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="joint")
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # list joint ends
                 jEndList = [j for j in check_items if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
                 jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
                 if jEndList:
                     # check connection with skinCluster to avoid delete it and crash the setup
-                    jEndList = list(set(jEndList)-set(self.ar.skin.getSkinnedJointList())) #remove duplicated and skinned joints
+                    jEndList = list(set(jEndList)-set(self.ar.skin.get_skinned_joints())) #remove duplicated and skinned joints
                     jEndList = [j for j in jEndList if not cmds.listRelatives(j, children=True)] #remove if there are children
                     if jEndList:
                         jEndList.sort()
                         for item in jEndList:
-                            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             self.checked_items.append(item)
                             self.found_issues.append(True)
                             if self.first_mode:

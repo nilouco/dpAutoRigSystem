@@ -53,8 +53,8 @@ class GuideIO(action.BaseAction):
                         if inputs:
                             nets = inputs
                         else:
-                            nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
-                            nets.extend(self.ar.utils.getNetworkNodeByAttr("dpHeadDeformerNet") or [])
+                            nets = self.ar.utils.get_network_by_attr("dpGuideNet")
+                            nets.extend(self.ar.utils.get_network_by_attr("dpHeadDeformerNet") or [])
                         if nets:
                             self.ar.job.unpin_guide(force=True)
                             self.export_json_file(self.get_guide_data(nets))
@@ -111,9 +111,9 @@ class GuideIO(action.BaseAction):
         """ Return a dictionary of the guide data to export it.
         """
         to_export_data = {}
-        self.ar.utils.setProgress(max=len(nets), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(nets), add_one=False, add_number=False)
         for net in nets:
-            self.ar.utils.setProgress(self.ar.data.lang[self.title])
+            self.ar.utils.set_progress(self.ar.data.lang[self.title])
             # mount a data with all data 
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
@@ -257,8 +257,8 @@ class GuideIO(action.BaseAction):
 
 
     def parse_repeated_nets(self, guide_data):
-        if len(self.ar.utils.getNetworkNodeByAttr("dpGuideNet")):
-            last_number = int(self.ar.utils.findLastNumber())
+        if len(self.ar.utils.get_network_by_attr("dpGuideNet")):
+            last_number = int(self.ar.utils.find_last_number())
             for n in reversed(range(0, len(guide_data))):
                 old_net_number = str(guide_data[list(guide_data.keys())[n]]['GuideNumber']).zfill(3)
                 new_net_number = str(last_number+n).zfill(3)
@@ -277,7 +277,7 @@ class GuideIO(action.BaseAction):
         to_initialize_guide = True
         ask_again = True
         self.correlations = {}
-        self.ar.utils.setProgress(max=len(guide_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(guide_data.keys()), add_one=False, add_number=False)
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = True
             self.ar.filler.fill_created_guides()
@@ -317,7 +317,7 @@ class GuideIO(action.BaseAction):
                 if to_initialize_guide:
                     try:
                         self.net_data = guide_data[net]
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+guide_data[net]['ModuleType'])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title]+': '+guide_data[net]['ModuleType'])
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library(self.net_data['ModuleType'], self.ar.data.standard_folder)[0]
                         self.correlations[f"{self.net_data['ModuleType']}__dpAR_{self.net_data['GuideNumber']}"] = self.instance.guide_namespace
@@ -350,7 +350,7 @@ class GuideIO(action.BaseAction):
 
     def get_nets_info(self):
         net_data = {}
-        nets = self.ar.utils.getNetworkNodeByAttr("dpGuideNet")
+        nets = self.ar.utils.get_network_by_attr("dpGuideNet")
         if nets:
             module_types = list(set([cmds.getAttr(f"{n}.moduleType") for n in nets]))
             for module_type in module_types:

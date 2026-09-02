@@ -38,7 +38,7 @@ class DuplicatedName(action.BaseAction):
             else:
                 check_items = cmds.ls(dag=True, long=True)
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # Dictionary {shortName: [Full paths]}
                 names = defaultdict(list)
                 for obj in check_items:
@@ -48,7 +48,7 @@ class DuplicatedName(action.BaseAction):
                 duplicates = {k:v for k,v in names.items() if len(v) > 1}
                 if duplicates:
                     for name, paths in duplicates.items():
-                        self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         # found issue here
                         self.checked_items.append(name)
                         self.found_issues.append(True)

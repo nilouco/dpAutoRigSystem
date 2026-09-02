@@ -589,7 +589,7 @@ class Pipeliner(object):
                     else:
                         wh = self.pipe_data['h001_publishing']
                     if wh:
-                        self.pipe_data['publishedWebhook'] = self.ar.utils.mountWH(self.ar.data.discord_url, wh)
+                        self.pipe_data['publishedWebhook'] = self.ar.utils.mount_wh(self.ar.data.discord_url, wh)
             # callback
             if not self.pipe_data['s_callback']:
                 callback = os.path.join(self.pipe_data['path'], self.callback_file)
@@ -837,7 +837,7 @@ class Pipeliner(object):
                     latest_file = self.get_latest_file(asset_folder)
                     # Open maya scene
                     if latest_file:
-                        saved_scene = self.ar.utils.checkSavedScene()
+                        saved_scene = self.ar.utils.check_saved_scene()
                         if not saved_scene:
                             saved_scene = self.confirm_save_this_scene(False)
                         if saved_scene:

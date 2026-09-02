@@ -166,7 +166,7 @@ class UpdateGuides(base.BaseLibrary):
         """ Verify if we have specific attribute cases to work with each kind of module guides.
             Ignore known attributes.
         """
-        ignores = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
+        ignores = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'guideObjectInfo', 'dpARVersion', 'dpID']
         if attr not in ignores:
             if attr == 'nJoints':
                 current_instance = self.get_new_guide_instance(guide)
@@ -464,31 +464,31 @@ class UpdateGuides(base.BaseLibrary):
         """
         self.ar.utils.close_ui('updateGuidesWindow')
         # Starts progress bar feedback
-        self.ar.utils.setProgress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
+        self.ar.utils.set_progress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
         # Rename guides to discard as *_OLD
         self.rename_old_guides()
-        self.ar.utils.setProgress(self.ar.data.lang['m199_creatingNewGuides'])
+        self.ar.utils.set_progress(self.ar.data.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.create_new_guides()
-        self.ar.utils.setProgress(self.ar.data.lang['m200_setAttrs'])
+        self.ar.utils.set_progress(self.ar.data.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
         self.set_new_guide_attr('attributes')
-        self.ar.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
+        self.ar.utils.set_progress(self.ar.data.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parent_new_guides()
-        self.ar.utils.setProgress(self.ar.data.lang['m202_setTranforms'])
+        self.ar.utils.set_progress(self.ar.data.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
         self.set_new_guide_attr('transformAttributes')
-        self.ar.utils.setProgress(self.ar.data.lang['m203_setChildGuides'])
+        self.ar.utils.set_progress(self.ar.data.lang['m203_setChildGuides'])
         # Set all children attributes
         self.set_children_guides()
-        self.ar.utils.setProgress(self.ar.data.lang['m201_parentGuides'])
+        self.ar.utils.set_progress(self.ar.data.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parent_retain_guides()
         self.patch_foot_rff()
         cmds.select(clear=True)
         # Ends progress bar feedback
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
         if self.ar.data.ui_state:
             # Calls for summary window
             self.ar.update_guides_ui.summary_ui()

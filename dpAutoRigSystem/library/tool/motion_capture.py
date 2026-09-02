@@ -420,25 +420,25 @@ class MotionCapture(base.BaseLibrary):
         """
         if self.ar.data.ui_state:
             rib = cmds.checkBox('mocap_map_ribbon_cb', query=True, value=True)
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=8)
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=8)
         self.hik_create_character_definition()
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_assign_joints_to_definition(rib)
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_create_custom_rig_ctrl()
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_map_biped_controllers(rib)
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.set_ikfk_biped_controllers_by_ui()
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_map_custom_elements(rib)
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_map_custom_chest()
-        self.ar.utils.setProgress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_create_job()
         mel.eval('hikCustomRigToolWidget -e -sl -1;') #unselect
         cmds.select(clear=True)
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
 
 
     def hik_remove_mocap(self, *args):
@@ -448,7 +448,7 @@ class MotionCapture(base.BaseLibrary):
         self.unmute_auto_rotate()
         self.reset_default_pose()
         print(self.ar.data.lang['i046_remove']+" HumanIk")
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
 
 
     def set_ikfk(self, opt_ctrl, mode):
@@ -465,7 +465,7 @@ class MotionCapture(base.BaseLibrary):
         """ Execute the ikFkSnap script nodes.
             It's very usefull to transfer baked fk animation to ik controllers.
         """
-        nets = self.ar.utils.getNetworkNodeByAttr("dpIkFkSnapNet")
+        nets = self.ar.utils.get_network_by_attr("dpIkFkSnapNet")
         if nets:
             for net in nets:
                 # declare needed variables:
@@ -488,7 +488,7 @@ class MotionCapture(base.BaseLibrary):
         """ Set dpAR rig to IK or Fk mode.
             Default: mode = 1 = Fk.
         """
-        opt_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+        opt_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
         if opt_ctrl:
             self.set_ikfk(opt_ctrl, mode)
             print(self.ar.data.lang['m248_setIkFkMode']+" "+str(mode))
@@ -606,7 +606,7 @@ class MotionCapture(base.BaseLibrary):
                 if cmds.objExists(zero_grp):
                     cmds.setAttr(finger_ctrl+".rotateY", (-1)*cmds.getAttr(zero_grp+".rotateY"))
         # ik
-        opt_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+        opt_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
         if opt_ctrl:
             if "ikFkSnap" in cmds.listAttr(opt_ctrl):
                 self.run_ikfk_snap(False)
@@ -641,7 +641,7 @@ class MotionCapture(base.BaseLibrary):
         """ Map dpAR biped joints to HumanIk character definition.
         """
         if self.hik_node:
-            if self.ar.utils.getAllGrp():
+            if self.ar.utils.get_all_grp():
                 old_ref_nodes = cmds.listConnections(self.hik_node+".Reference", source=True, destination=False)
                 if not self.hik_data:
                     self.hik_data = self.hik_get_default_map_data()
@@ -679,7 +679,7 @@ class MotionCapture(base.BaseLibrary):
         if self.ar.data.ui_state:
             iks = self.ar.motion_capture_ui.get_ik_modes_from_ui()
         if self.hik_node:
-            if self.ar.utils.getAllGrp():
+            if self.ar.utils.get_all_grp():
                 if not self.hik_data:
                     self.hik_data = self.hik_get_default_map_data()
                 for hik_item in self.hik_data.keys():
@@ -737,7 +737,7 @@ class MotionCapture(base.BaseLibrary):
         reset_pose.verbose = False
         reset_pose.run_action(False) #fix
         reset_pose.end_progress()
-        self.ar.utils.setProgress(endIt=True)
+        self.ar.utils.set_progress(end_it=True)
 
 
     def set_ikfk_biped_controllers_by_ui(self):
@@ -862,7 +862,7 @@ for hik in cmds.ls(type="HIKCharacterNode"):
     def hik_snap_ik_timeline(self, start=None, end=None, *args):
         """ Run to all timeline and snap ik from baked fk.
         """
-        opt_ctrl = self.ar.utils.getNodeByMessage("optionCtrl")
+        opt_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
         if opt_ctrl:
             if "ikFkSnap" in cmds.listAttr(opt_ctrl):
                 start_frame = start
@@ -871,11 +871,11 @@ for hik in cmds.ls(type="HIKCharacterNode"):
                     start_frame = int(cmds.playbackOptions(query=True, minTime=True))
                 if end == None:
                     end_frame = int(cmds.playbackOptions(query=True, maxTime=True))
-                self.ar.utils.setProgress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(end_frame-start_frame))
+                self.ar.utils.set_progress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(end_frame-start_frame))
                 initial_time = cmds.currentTime(query=True)
                 for t in range(start_frame, end_frame+1):
-                    self.ar.utils.setProgress("Timeline")
+                    self.ar.utils.set_progress("Timeline")
                     cmds.currentTime(t)
                     self.run_ikfk_snap()
                 cmds.currentTime(initial_time)
-                self.ar.utils.setProgress(endIt=True)
+                self.ar.utils.set_progress(end_it=True)

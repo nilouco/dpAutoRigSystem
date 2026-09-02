@@ -49,7 +49,7 @@ class RivetIO(action.BaseAction):
                         if inputs:
                             nets = inputs
                         else:
-                            nets = self.ar.utils.getNetworkNodeByAttr("dpRivetNet")
+                            nets = self.ar.utils.get_network_by_attr("dpRivetNet")
                         if nets:
                             self.export_json_file(self.get_rivet_data(nets))
                         else:
@@ -84,11 +84,11 @@ class RivetIO(action.BaseAction):
             Returns the dictionary to export.
         """
         result_data = {}
-        self.ar.utils.setProgress(max=len(nets), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(nets), add_one=False, add_number=False)
         i = 0
         for n, net in enumerate(nets):
             if self.ar.data.verbose:
-                self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.set_progress(self.ar.data.lang[self.title])
             # mount a rivet data dictionary
             if cmds.objExists(net+".rivetData"):
                 data = json.loads(cmds.getAttr(net+".rivetData"))
@@ -108,11 +108,11 @@ class RivetIO(action.BaseAction):
         """ Import rivet data creating new instances with exported attribute values.
         """
         well_imported = True
-        self.ar.utils.setProgress(max=len(rivet_data.keys()), add_one=False, add_number=False)
+        self.ar.utils.set_progress(max=len(rivet_data.keys()), add_one=False, add_number=False)
         for net in rivet_data.keys():
             try:
                 net_data = rivet_data[net]
-                self.ar.utils.setProgress(self.ar.data.lang[self.title]+': '+net_data['geoToAttach'])
+                self.ar.utils.set_progress(self.ar.data.lang[self.title]+': '+net_data['geoToAttach'])
                 old_ui_state = self.ar.data.ui_state
                 self.ar.data.ui_state = False
                 # recreate rivet:

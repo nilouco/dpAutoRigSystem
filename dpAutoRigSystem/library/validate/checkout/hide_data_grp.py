@@ -36,13 +36,13 @@ class HideDataGrp(action.BaseAction):
             if inputs:
                 dataGrp = inputs[0]
             else:
-                dataGrp = self.ar.utils.getNodeByMessage("dataGrp")
+                dataGrp = self.ar.utils.get_node_by_message("dataGrp")
                 if not dataGrp:
                     if cmds.objExists("Data_Grp"):
                         dataGrp = "Data_Grp"
             if dataGrp:
-                self.ar.utils.setProgress(max=1)
-                self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                self.ar.utils.set_progress(max=1)
+                self.ar.utils.set_progress(self.ar.data.lang[self.title])
                 self.checked_items.append(dataGrp)
                 visibilityStatus = cmds.getAttr(dataGrp+".visibility")
                 if visibilityStatus:

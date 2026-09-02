@@ -42,7 +42,7 @@ class BlendshapeTarget(action.BaseAction):
                 if meshes:
                     check_items = list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=False)))
             if check_items:
-                self.ar.utils.setProgress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # get exception list to keep nodes in the scene
                 deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
                 exceptionList = self.keepGrp(["supportGrp", "renderGrp", "proxyGrp"])
@@ -51,7 +51,7 @@ class BlendshapeTarget(action.BaseAction):
                         if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                             if not item in exceptionList:
                                 exceptionList.append(item)
-                        elif self.ar.utils.getSuffixNumberList(item)[1].endswith("Base"):
+                        elif self.ar.utils.get_suffix_numbers(item)[1].endswith("Base"):
                             exceptionList.append(item)
                         else:
                             try:
@@ -73,7 +73,7 @@ class BlendshapeTarget(action.BaseAction):
                                             
                 # run validation tasks
                 for item in check_items:
-                    self.ar.utils.setProgress(self.ar.data.lang[self.title])
+                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         self.checked_items.append(item)
                         if not item in exceptionList:
@@ -116,7 +116,7 @@ class BlendshapeTarget(action.BaseAction):
         results = []
         if grpList:
             for item in grpList:
-                nodeGrp = self.ar.utils.getNodeByMessage(item)
+                nodeGrp = self.ar.utils.get_node_by_message(item)
                 if nodeGrp:
                     nodes = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
                     if nodes:
