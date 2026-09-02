@@ -103,8 +103,8 @@ class DeformationIO(action.BaseAction):
                         shapes, indexes, shape_to_index_data = self.ar.skin.get_shape_to_index_data(deformer_node)
                         # update dictionary
                         deformer_data[deformer_node]["shapeList"] = shapes
-                        deformer_data[deformer_node]["indexes"] = indexes
-                        deformer_data[deformer_node]["shape_to_index_data"] = shape_to_index_data
+                        deformer_data[deformer_node]["indexList"] = indexes
+                        deformer_data[deformer_node]["shapeToIndexDic"] = shape_to_index_data
                         deformer_data[deformer_node]["weights"] = {}
                         for shape in shapes:
                             # Get weights
@@ -232,8 +232,8 @@ class DeformationIO(action.BaseAction):
         # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
         weights_data = deformer_data[deformer_node]["weights"]
         if weights_data:
-            for index in deformer_data[deformer_node]["indexes"]:
-                currentIndex = self.ar.skin.get_current_deformed_index(deformer_node, deformer_data[deformer_node]["shape_to_index_data"], index)
+            for index in deformer_data[deformer_node]["indexList"]:
+                currentIndex = self.ar.skin.get_current_deformed_index(deformer_node, deformer_data[deformer_node]["shapeToIndexDic"], index)
                 if weights_data[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
                     self.ar.skin.set_deformer_weights(deformer_data[deformer_node]["name"], weights_data[str(index)], currentIndex)

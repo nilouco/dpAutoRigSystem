@@ -417,7 +417,7 @@ class Weights(object):
         """
         """
         return {
-                "points" : self.get_lattice_points(connected_node),
+                "pointList" : self.get_lattice_points(connected_node),
                 "baseLatticeMatrix" : cmds.listConnections(deformer_node+".baseLatticeMatrix", destination=False, source=True)[0]
                }
 
