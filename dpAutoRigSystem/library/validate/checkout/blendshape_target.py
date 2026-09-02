@@ -44,15 +44,15 @@ class BlendshapeTarget(action.BaseAction):
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # get exception list to keep nodes in the scene
-                deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
-                exceptionList = self.keepGrp(["supportGrp", "renderGrp", "proxyGrp"])
+                to_keep_deformers = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
+                exceptions = self.get_children_nodes(["supportGrp", "renderGrp", "proxyGrp"])
                 for item in check_items:
                     if cmds.objExists(item):
                         if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
-                            if not item in exceptionList:
-                                exceptionList.append(item)
+                            if not item in exceptions:
+                                exceptions.append(item)
                         elif self.ar.utils.get_suffix_numbers(item)[1].endswith("Base"):
-                            exceptionList.append(item)
+                            exceptions.append(item)
                         else:
                             try:
                                 input_deformers = cmds.findDeformers(item)
@@ -61,33 +61,33 @@ class BlendshapeTarget(action.BaseAction):
                                 input_deformers = False
                             if input_deformers:
                                 for deformer_node in input_deformers:
-                                    if cmds.objectType(deformer_node) in deformersToKeepList:
-                                        if not item in exceptionList:
-                                            exceptionList.append(item)
+                                    if cmds.objectType(deformer_node) in to_keep_deformers:
+                                        if not item in exceptions:
+                                            exceptions.append(item)
                                         if cmds.objectType(deformer_node) == "wrap":
-                                            wrapAttrList = ["basePoints", "driverPoints"]
-                                            for wrapAttr in wrapAttrList:
-                                                wrapConnectedList = cmds.listConnections(deformer_node+"."+wrapAttr, source=True, destination=False)
-                                                if wrapConnectedList:
-                                                    exceptionList.append(wrapConnectedList[0])
+                                            wrap_attrs = ["basePoints", "driverPoints"]
+                                            for wrap_attr in wrap_attrs:
+                                                wrap_connections = cmds.listConnections(deformer_node+"."+wrap_attr, source=True, destination=False)
+                                                if wrap_connections:
+                                                    exceptions.append(wrap_connections[0])
                                             
                 # run validation tasks
                 for item in check_items:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         self.checked_items.append(item)
-                        if not item in exceptionList:
+                        if not item in exceptions:
                             self.found_issues.append(True)
                             if self.first_mode:
                                 self.good_results.append(False)
                             else: #fix        
                                 try:
-                                    fatherItemList = cmds.listRelatives(item, parent=True, type="transform")
+                                    father_items = cmds.listRelatives(item, parent=True, type="transform")
                                     cmds.delete(item)
-                                    if fatherItemList:
-                                        brotherList = cmds.listRelatives(fatherItemList[0], allDescendents=True, children=True)
-                                        if not brotherList:
-                                            cmds.delete(fatherItemList[0])
+                                    if father_items:
+                                        brother_items = cmds.listRelatives(father_items[0], allDescendents=True, children=True)
+                                        if not brother_items:
+                                            cmds.delete(father_items[0])
                                     self.good_results.append(True)
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
                                 except:
@@ -110,15 +110,15 @@ class BlendshapeTarget(action.BaseAction):
         return self.log_data
 
 
-    def keepGrp(self, grpList, *args):
+    def get_children_nodes(self, grps):
         """ Check if there're some nodes in the given group to return them.
         """
         results = []
-        if grpList:
-            for item in grpList:
-                nodeGrp = self.ar.utils.get_node_by_message(item)
-                if nodeGrp:
-                    nodes = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
+        if grps:
+            for item in grps:
+                node_grp = self.ar.utils.get_node_by_message(item)
+                if node_grp:
+                    nodes = cmds.listRelatives(node_grp, allDescendents=True, children=True, type="transform", fullPath=False)
                     if nodes:
                         results.extend(nodes)
         return results

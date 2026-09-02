@@ -13,6 +13,7 @@ WIKI = "07-‐-Validator#-bindpose-cleaner"
 class BindPose(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        self.bind_pose_name = "dpAR_BP"
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -28,7 +29,6 @@ class BindPose(action.BaseAction):
         # starting
         self.first_mode = first_mode
         self.cleanup_to_start()
-        self.bindPoseName = "dpAR_BP"
         
         # ---
         # --- validator code --- beginning
@@ -53,9 +53,9 @@ class BindPose(action.BaseAction):
                                 cmds.delete(item)
                             joints = self.ar.skin.get_skinned_joints()
                             if joints:
-                                cmds.dagPose(joints, save=True, bindPose=True, name=self.bindPoseName)
+                                cmds.dagPose(joints, save=True, bindPose=True, name=self.bind_pose_name)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+self.bindPoseName)
+                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+self.bind_pose_name)
                         except:
                             self.good_results.append(False)
                             self.messages.append(self.ar.data.lang['v005_cantFix']+": "+", ".join(check_items))

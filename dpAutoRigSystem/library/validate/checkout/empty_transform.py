@@ -13,6 +13,7 @@ WIKI = "07-‐-Validator#-empty-transform-cleaner"
 class EmptyTransform(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        self.keep_attr = 'dpKeepIt'
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -38,11 +39,11 @@ class EmptyTransform(action.BaseAction):
                 check_items = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
-                emptyTransformList = self.filterEmptyTransformList(check_items)
-                emptyTransformList.extend(self.filterEmptyTransformList(self.getIgnoreConnected(), True))
+                empty_transforms = self.filter_empty_transforms(check_items)
+                empty_transforms.extend(self.filter_empty_transforms(self.get_ignore_connected(), True))
                 # conditional to check here
-                if emptyTransformList:
-                    for item in emptyTransformList:
+                if empty_transforms:
+                    for item in empty_transforms:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         self.checked_items.append(self.ar.utils.get_short_name(item, False))
                         self.found_issues.append(True)
@@ -50,7 +51,7 @@ class EmptyTransform(action.BaseAction):
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                if "dpKeepIt" in cmds.listAttr(item) and cmds.getAttr(item+".dpKeepIt") == True:
+                                if self.keep_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+self.keep_attr) == True:
                                     pass
                                 else:
                                     cmds.lockNode(item, lock=False)
@@ -74,38 +75,38 @@ class EmptyTransform(action.BaseAction):
         return self.log_data
     
     
-    def filterEmptyTransformList(self, transforms=None, connected=False, *args):
+    def filter_empty_transforms(self, transforms=None, connected=False, *args):
         """ Filter the transform list to remove those without children or connections.
             Returns a list of transforms that are empty.
         """
         filtered_items = self.ar.utils.filter_transforms(transforms, verbose=self.ar.data.verbose, title=self.ar.data.lang[self.title])
         filtered_items = self.reorder_list(filtered_items)
-        emptyTransforms = []
+        empty_transforms = []
         for transform in filtered_items:
             if connected:
-                hasConnection = False
+                has_connection = False
             else:
-                hasConnection = cmds.listConnections(transform)
-                if hasConnection:
-                    nodeGraphList = cmds.listConnections(transform, type="nodeGraphEditorInfo") or []
-                    hasConnection = set(hasConnection)-set(nodeGraphList)
-            if not hasConnection:
+                has_connection = cmds.listConnections(transform)
+                if has_connection:
+                    node_graphs = cmds.listConnections(transform, type="nodeGraphEditorInfo") or []
+                    has_connection = set(has_connection)-set(node_graphs)
+            if not has_connection:
                 children = cmds.listRelatives(transform, children=True, fullPath=True)
                 if not children:
-                    emptyTransforms.append(transform)
-                elif len(list(set(children).intersection(emptyTransforms))) == len(children):
-                    emptyTransforms.append(transform)
-        return emptyTransforms
+                    empty_transforms.append(transform)
+                elif len(list(set(children).intersection(empty_transforms))) == len(children):
+                    empty_transforms.append(transform)
+        return empty_transforms
     
 
-    def getIgnoreConnected(self, *args):
+    def get_ignore_connected(self, *args):
         """ Ignore dpAr default nodes
         """
-        ignoredList = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
+        ignored_items = ["supportGrp", "renderGrp", "proxyGrp", "fxGrp", "blendShapesGrp", "wipGrp"]
         nodes = []
-        for item in ignoredList:
-            gotNode = self.ar.utils.get_node_by_message(item)
-            if gotNode:
-                nodes.append(gotNode)
+        for item in ignored_items:
+            got_node = self.ar.utils.get_node_by_message(item)
+            if got_node:
+                nodes.append(got_node)
         return nodes
     

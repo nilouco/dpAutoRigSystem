@@ -41,18 +41,18 @@ class BrokenNet(action.BaseAction):
                 for item in check_items:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
-                    if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"): #correctionManater
+                    if 'originalLoc' in cmds.listAttr(item) and 'actionLoc' in cmds.listAttr(item): #correctionManater
                         if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
-                            self.cleanUpNetwork(item)
-                    elif cmds.objExists(item+".worldRef"): #ikFkSnap
+                            self.cleanup_network(item)
+                    elif 'worldRef' in cmds.listAttr(item): #ikFkSnap
                         if not cmds.listConnections(item+".worldRef", source=True, destination=False):
-                            self.cleanUpNetwork(item)
-                    elif cmds.objExists(item+".follicle"): #rivet
+                            self.cleanup_network(item)
+                    elif 'follicle' in cmds.listAttr(item): #rivet
                         if not cmds.listConnections(item+".follicle", source=True, destination=False):
-                            self.cleanUpNetwork(item)
-                    elif cmds.objExists(item+".linkedNode"): #guide
+                            self.cleanup_network(item)
+                    elif 'linkedNode' in cmds.listAttr(item): #guide
                         if not cmds.listConnections(item+".linkedNode", source=True, destination=False):
-                            self.cleanUpNetwork(item)
+                            self.cleanup_network(item)
             else:
                 self.not_found_node()
         else:
@@ -67,7 +67,7 @@ class BrokenNet(action.BaseAction):
         return self.log_data
 
 
-    def cleanUpNetwork(self, item, *args):
+    def cleanup_network(self, item):
         self.checked_items.append(item)
         self.found_issues.append(True)
         if self.first_mode:
@@ -82,4 +82,3 @@ class BrokenNet(action.BaseAction):
             except:
                 self.good_results.append(False)
                 self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-

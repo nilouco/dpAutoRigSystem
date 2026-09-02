@@ -33,35 +33,35 @@ class DataSet(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                dataGrp = inputs[0]
+                data_grp = inputs[0]
             else:
-                dataGrp = self.ar.utils.get_node_by_message("dataGrp")
-                if not dataGrp:
+                data_grp = self.ar.utils.get_node_by_message("data_grp")
+                if not data_grp:
                     if cmds.objExists("Data_Grp"):
-                        dataGrp = "Data_Grp"
-            if dataGrp:
-                check_items = cmds.listRelatives(dataGrp, children=True, allDescendents=True)
+                        data_grp = "Data_Grp"
+            if data_grp:
+                check_items = cmds.listRelatives(data_grp, children=True, allDescendents=True)
                 if check_items:
                     self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                     for item in check_items:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                        plugList = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
-                        if plugList:
-                            for plug in plugList:
+                        plugs = cmds.listConnections(item+".instObjGroups[0]", source=False, destination=True, plugs=True)
+                        if plugs:
+                            for plug in plugs:
                                 if cmds.objectType(plug.split(".")[0]) == "objectSet":
-                                    itemDone = False
+                                    item_done = False
                                     if item in self.checked_items:
-                                        itemDone = True
-                                    if not itemDone:
+                                        item_done = True
+                                    if not item_done:
                                         self.checked_items.append(item)
                                         self.found_issues.append(True)
                                     if self.first_mode:
-                                        if not itemDone:
+                                        if not item_done:
                                             self.good_results.append(False)
                                     else: #fix
                                         try:
                                             cmds.disconnectAttr(item+".instObjGroups[0]", plug)
-                                            if not itemDone:
+                                            if not item_done:
                                                 self.good_results.append(True)
                                                 self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
                                         except:

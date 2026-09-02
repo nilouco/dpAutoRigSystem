@@ -13,7 +13,7 @@ WIKI = "07-‐-Validator#-cleanup"
 class Cleanup(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.cleanupAttr = "dpDeleteIt"
+        self.cleanup_attr = "dpDeleteIt"
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -43,8 +43,8 @@ class Cleanup(action.BaseAction):
                     if cmds.objExists(item):
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         # conditional to check here
-                        if self.cleanupAttr in cmds.listAttr(item):
-                            if cmds.getAttr(item+"."+self.cleanupAttr) == 1:
+                        if self.cleanup_attr in cmds.listAttr(item):
+                            if cmds.getAttr(item+"."+self.cleanup_attr) == 1:
                                 self.checked_items.append(item)
                                 self.found_issues.append(True)
                                 if self.first_mode:

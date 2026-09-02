@@ -17,7 +17,7 @@ class ControllersHierarchy(action.BaseAction):
         self.start_name = "dpHierarchy"
 
 
-    def checkNurbs(self, transform):
+    def check_nurbs(self, transform):
         try:
             shapes = cmds.listRelatives(transform, shapes=True)
         except Exception as e:
@@ -33,76 +33,76 @@ class ControllersHierarchy(action.BaseAction):
         return True
     
 
-    def findNurbsParent(self, node):
-        parentList = cmds.listRelatives(node, parent=True)
-        while parentList != None:
-            for parent in parentList:
-                if self.checkNurbs(parent):
+    def find_nurbs_parent(self, node):
+        parents = cmds.listRelatives(node, parent=True)
+        while parents != None:
+            for parent in parents:
+                if self.check_nurbs(parent):
                     return parent
-            parentList = cmds.listRelatives(parentList, parent=True)
+            parents = cmds.listRelatives(parents, parent=True)
         return None
     
 
-    def addToTree(self, node, dictionary):
-        nurbsParent = self.findNurbsParent(node)
-        if nurbsParent != None:
-            if nurbsParent in dictionary:
-                dictionary[nurbsParent].append(node)
+    def add_to_tree(self, node, data):
+        nurbs_parent = self.find_nurbs_parent(node)
+        if nurbs_parent != None:
+            if nurbs_parent in data:
+                data[nurbs_parent].append(node)
             else:
-                dictionary[nurbsParent] = [node]
-        if node not in dictionary:
-            dictionary[node] = []
+                data[nurbs_parent] = [node]
+        if node not in data:
+            data[node] = []
 
 
-    def raiseHierarchy(self, rootNode):
-        hierarchyDic = {}
-        self.addToTree(rootNode, hierarchyDic)
-        transformDescendentsList = cmds.listRelatives(rootNode, allDescendents=True, type="transform")
-        if transformDescendentsList != None:
-            for node in transformDescendentsList:
-                if self.checkNurbs(node):
-                    self.addToTree(node, hierarchyDic)
-        return hierarchyDic
+    def raise_hierarchy(self, root_node):
+        hierarchy_data = {}
+        self.add_to_tree(root_node, hierarchy_data)
+        transform_descendents = cmds.listRelatives(root_node, allDescendents=True, type="transform")
+        if transform_descendents != None:
+            for node in transform_descendents:
+                if self.check_nurbs(node):
+                    self.add_to_tree(node, hierarchy_data)
+        return hierarchy_data
     
 
-    def findDiffInHierarchy(self, diff, newHierarchy):
-        for list in newHierarchy:
-            if diff in newHierarchy[list]:
+    def find_diff_in_hierarchy(self, diff, new_hierarchy):
+        for list in new_hierarchy:
+            if diff in new_hierarchy[list]:
                 return list
         return None
     
 
-    def checkHierarchyChange(self, originalHierarchy, newHierarchy):
-        # This dictionary is in a way wich each key is the changed control and first value is a list in wich index 0 is the original Father and index 1 is the new Father. 
-        hierarchyChangedCtlsSet = {}
-        for key in originalHierarchy:
-            if (key in newHierarchy):
-                if (originalHierarchy[key] != newHierarchy[key]):
-                    diffSet = set(originalHierarchy[key]) ^ set(newHierarchy[key])
-                    for diff in diffSet:
-                        if diff in originalHierarchy[key]:
-                            lastParent = key
+    def check_hierarchy_change(self, original_hierarchy, new_hierarchy):
+        # This data is in a way wich each key is the changed control and first value is a list in wich index 0 is the original Father and index 1 is the new Father. 
+        hierarchy_change_ctrls_set = {}
+        for key in original_hierarchy:
+            if (key in new_hierarchy):
+                if (original_hierarchy[key] != new_hierarchy[key]):
+                    diff_set = set(original_hierarchy[key]) ^ set(new_hierarchy[key])
+                    for diff in diff_set:
+                        if diff in original_hierarchy[key]:
+                            last_parent = key
                         else:
-                            lastParent = self.findDiffInHierarchy(diff, originalHierarchy)
-                        newDad = self.findDiffInHierarchy(diff, newHierarchy)
-                        hierarchyChangedCtlsSet[diff] = [lastParent, newDad]
-        return hierarchyChangedCtlsSet
+                            last_parent = self.find_diff_in_hierarchy(diff, original_hierarchy)
+                        new_dad = self.find_diff_in_hierarchy(diff, new_hierarchy)
+                        hierarchy_change_ctrls_set[diff] = [last_parent, new_dad]
+        return hierarchy_change_ctrls_set
     
 
-    def logInfo(self, informationDictionary):
-        for ctrl in informationDictionary:
-            if informationDictionary[ctrl][0] == None:
-                self.messages.append(f"{ctrl} {self.ar.data.lang['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
-            elif informationDictionary[ctrl][1] == None:
+    def log_info(self, info_data):
+        for ctrl in info_data:
+            if info_data[ctrl][0] == None:
+                self.messages.append(f"{ctrl} {self.ar.data.lang['v065_addedSonOf']} {info_data[ctrl][1]}")
+            elif info_data[ctrl][1] == None:
                 self.messages.append(f"{ctrl} {self.ar.data.lang['v066_wasRemoved']}")
             else:
-                self.messages.append(f"{ctrl} {self.ar.data.lang['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
+                self.messages.append(f"{ctrl} {self.ar.data.lang['v067_changedParent']} {info_data[ctrl][0]}, new parent: {info_data[ctrl][1]}")
 
 
-    def compareHierarchy(self, originalHierarchy, newHierarchy):
-        if originalHierarchy != newHierarchy:
-            infoDic = self.checkHierarchyChange(originalHierarchy, newHierarchy)
-            self.logInfo(infoDic)
+    def compare_hierarchy(self, original_hierarchy, new_hierarchy):
+        if original_hierarchy != new_hierarchy:
+            info_data = self.check_hierarchy_change(original_hierarchy, new_hierarchy)
+            self.log_info(info_data)
             return False
         else:
             self.messages.append(self.ar.data.lang['v068_matchingHierarchies'])
@@ -126,35 +126,32 @@ class ControllersHierarchy(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            rootNode = None
-            
-            globalCtrl = self.ar.utils.get_node_by_message("globalCtrl")
+            root_node = None
+            global_ctrl = self.ar.utils.get_node_by_message("globalCtrl")
             # Verify if another Ctrl was sent via code to check hierarchy from.
-            if inputs and cmds.objExists(inputs[0]) and self.checkNurbs(inputs[0]):
-                rootNode = inputs[0]
-            elif cmds.objExists(globalCtrl) and self.checkNurbs(globalCtrl):
-                rootNode = globalCtrl
+            if inputs and cmds.objExists(inputs[0]) and self.check_nurbs(inputs[0]):
+                root_node = inputs[0]
+            elif cmds.objExists(global_ctrl) and self.check_nurbs(global_ctrl):
+                root_node = global_ctrl
             else:
-                self.checked_items.append(str(rootNode))
+                self.checked_items.append(str(root_node))
                 self.found_issues.append(False)
                 self.good_results.append(True)
                 self.messages.append(self.ar.data.lang['v062_globalMissing'])
-
-            if rootNode:
-                isHierarchySame = True
+            if root_node:
+                is_hierarchy_same = True
                 self.io_path = self.get_io_path(self.io_folder)
                 if self.io_path:
-                    currentFileHierarchyDic = self.raiseHierarchy(rootNode)
-                    lastHierarchyDic = self.import_latest_json_file(self.get_exported_items(get_any=True))
-                    if lastHierarchyDic:
-                        isHierarchySame = self.compareHierarchy(lastHierarchyDic, currentFileHierarchyDic)
-                        self.checked_items.append(str(lastHierarchyDic))
+                    current_file_hierarchy_data = self.raise_hierarchy(root_node)
+                    last_hierarchy_data = self.import_latest_json_file(self.get_exported_items(get_any=True))
+                    if last_hierarchy_data:
+                        is_hierarchy_same = self.compare_hierarchy(last_hierarchy_data, current_file_hierarchy_data)
+                        self.checked_items.append(str(last_hierarchy_data))
                     else:
                         self.checked_items.append("Controls Hierarchy")
                         self.messages.append(self.ar.data.lang['v063_firstHierarchy'])
-
                     if self.first_mode: #verify
-                        if isHierarchySame:
+                        if is_hierarchy_same:
                             self.found_issues.append(False)
                             self.good_results.append(True)
                         else:
@@ -162,8 +159,8 @@ class ControllersHierarchy(action.BaseAction):
                             self.good_results.append(False)
                     else: #fix
                         if cmds.file(query=True, sceneName=True) != "":
-                            if lastHierarchyDic == None or not isHierarchySame:
-                                self.export_json_file(currentFileHierarchyDic)
+                            if last_hierarchy_data == None or not is_hierarchy_same:
+                                self.export_json_file(current_file_hierarchy_data)
                             self.found_issues.append(False)
                             self.good_results.append(True)
                         else:

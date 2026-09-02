@@ -55,7 +55,7 @@ class ControllerTag(action.BaseAction):
                             try:
                                 # tag as controller
                                 cmds.controller(item, isController=True)
-                                result = self.addParentControllerTag(item)
+                                result = self.add_parent_controller_tag(item)
                                 self.good_results.append(True)
                                 if result:
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+result)
@@ -78,11 +78,11 @@ class ControllerTag(action.BaseAction):
         return self.log_data
 
 
-    def addParentControllerTag(self, item, *args):
+    def add_parent_controller_tag(self, item):
         """ Add parent controller tag to the given item.
         """
         if "parentTag" in cmds.listAttr(item):
-            parentCtrlList = cmds.listConnections(item+".parentTag", source=True, destination=False)
-            if parentCtrlList:
-                cmds.controller(item, parentCtrlList[0], parent=True)
-                return ("Tagged parent = "+item+" --> "+parentCtrlList[0])
+            parent_tag_items = cmds.listConnections(item+".parentTag", source=True, destination=False)
+            if parent_tag_items:
+                cmds.controller(item, parent_tag_items[0], parent=True)
+                return ("Tagged parent = "+item+" --> "+parent_tag_items[0])
