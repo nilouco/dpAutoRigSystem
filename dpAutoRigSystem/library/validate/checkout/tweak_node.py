@@ -41,7 +41,7 @@ class TweakNode(action.BaseAction):
                 for item in check_items:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # check for edited control shape
-                    if not self.checkEditedControlPoints(item):
+                    if not self.check_edited_control_points(item):
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -71,15 +71,15 @@ class TweakNode(action.BaseAction):
         return self.log_data
 
 
-    def checkEditedControlPoints(self, item, *args):
+    def check_edited_control_points(self, item):
         """ Check if there are edited control point in the given tweak node and return them.
         """
         if cmds.objExists(item):
-            pList = cmds.getAttr(item+".plist", multiIndices=True)
-            if pList:
-                for idx in pList:
-                    cpList = cmds.getAttr(item+".plist["+str(idx)+"].controlPoints", multiIndices=True)
-                    if cpList:
-                        for cp in cpList:
+            p_items = cmds.getAttr(item+".plist", multiIndices=True)
+            if p_items:
+                for idx in p_items:
+                    cp_items = cmds.getAttr(item+".plist["+str(idx)+"].controlPoints", multiIndices=True)
+                    if cp_items:
+                        for cp in cp_items:
                             if not cmds.getAttr(item+".plist["+str(idx)+"].controlPoints["+str(cp)+"]") == [0.0, 0.0, 0.0]:
                                 return True

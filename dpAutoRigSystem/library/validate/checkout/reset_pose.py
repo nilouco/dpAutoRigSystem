@@ -29,8 +29,8 @@ ATTR_TYPE = {
 class ResetPose(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
-        self.nonDynZeroAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
-        self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
+        self.non_dyn_zero_attrs = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
+        self.non_dyn_one_attrs = ["scaleX", "scaleY", "scaleZ", "visibility"]
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -61,46 +61,45 @@ class ResetPose(action.BaseAction):
                     # conditional to check here
                     if cmds.objExists(item+".dpControl"):
                         self.checked_items.append(item)
-
-                        editedAttrList = []
-                        attrData = self.getAttrDefaultValueData(item)
-                        for attr in list(attrData):
+                        edited_attrs = []
+                        attr_data = self.get_attr_default_value_data(item)
+                        for attr in list(attr_data):
                             # get attribute type to use in the variables comparation
-                            attrType = self.getAttrType(attrData[attr][2])
-                            if attrType == 0: #boolean
-                                if not bool(attrData[attr][0]) == bool(attrData[attr][1]): #defaultValue vs currentValue
-                                    editedAttrList.append(attr)
-                            elif attrType == 1: #integer
-                                if not int(attrData[attr][0]) == int(attrData[attr][1]):
-                                    editedAttrList.append(attr)
-                            elif attrType == 2: #float
-                                if not float(format(attrData[attr][0],".3f")) == float(format(attrData[attr][1],".3f")):
-                                    editedAttrList.append(attr)
+                            attr_type = self.get_attr_type(attr_data[attr][2])
+                            if attr_type == 0: #boolean
+                                if not bool(attr_data[attr][0]) == bool(attr_data[attr][1]): #defaultValue vs current_value
+                                    edited_attrs.append(attr)
+                            elif attr_type == 1: #integer
+                                if not int(attr_data[attr][0]) == int(attr_data[attr][1]):
+                                    edited_attrs.append(attr)
+                            elif attr_type == 2: #float
+                                if not float(format(attr_data[attr][0],".3f")) == float(format(attr_data[attr][1],".3f")):
+                                    edited_attrs.append(attr)
                         
-                        if editedAttrList:
+                        if edited_attrs:
                             self.found_issues.append(True)
-                            for a, attr in enumerate(editedAttrList):
+                            for a, attr in enumerate(edited_attrs):
                                 if a == 0:
-                                    attrString = "."
+                                    attr_string = "."
                                 else:
-                                    attrString += "/"
-                                attrString += attr
-                            self.checked_items[-1] = item+attrString
+                                    attr_string += "/"
+                                attr_string += attr
+                            self.checked_items[-1] = item+attr_string
                         else:
                             self.found_issues.append(False)
                         
                         if self.first_mode:
                             self.good_results.append(False)
                         else: #fix
-                            for attr in editedAttrList:
+                            for attr in edited_attrs:
                                 try:
-                                    attrType = self.getAttrType(attrData[attr][2])
-                                    if attrType == 0: #boolean
-                                        cmds.setAttr(item+"."+attr, bool(attrData[attr][0]))
-                                    elif attrType == 1: #integer
-                                        cmds.setAttr(item+"."+attr, int(attrData[attr][0]))
-                                    elif attrType == 2: #float
-                                        cmds.setAttr(item+"."+attr, float(format(attrData[attr][0],".3f")))
+                                    attr_type = self.get_attr_type(attr_data[attr][2])
+                                    if attr_type == 0: #boolean
+                                        cmds.setAttr(item+"."+attr, bool(attr_data[attr][0]))
+                                    elif attr_type == 1: #integer
+                                        cmds.setAttr(item+"."+attr, int(attr_data[attr][0]))
+                                    elif attr_type == 2: #float
+                                        cmds.setAttr(item+"."+attr, float(format(attr_data[attr][0],".3f")))
                                     self.good_results.append(True)
                                     self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+"."+attr)
                                 except:
@@ -120,56 +119,56 @@ class ResetPose(action.BaseAction):
         return self.log_data
 
 
-    def getSetupAttrList(self, item, ignoreAttrList=TO_IGNORE, *args):
+    def get_setup_attrs(self, item, ignore_attrs=TO_IGNORE):
         """ Returns the desired attribute list to work with set or reset default values.
         """
-        cleanAttrList = []
+        clean_attrs = []
         attributes = cmds.listAttr(item, channelBox=True)
         if not attributes:
             attributes = []
         if attributes:
             for attr_name in attributes:
                 if not cmds.attributeQuery(attr_name, node=item, attributeType=True) == "bool":
-                    cleanAttrList.append(attr_name)
-        allAttrList = cmds.listAttr(item)
-        animAttrList = cmds.listAnimatable(item)
-        if allAttrList and animAttrList:
-            orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in cleanAttrList]
-            cleanAttrList.extend(orderedAttrs)
-        if ignoreAttrList:
-            for ignoreAttr in ignoreAttrList:
-                if ignoreAttr in cleanAttrList:
-                    cleanAttrList.remove(ignoreAttr)
-        return cleanAttrList
+                    clean_attrs.append(attr_name)
+        all_attrs = cmds.listAttr(item)
+        anim_attrs = cmds.listAnimatable(item)
+        if all_attrs and anim_attrs:
+            ordered_attrs = [attr for attr in all_attrs for animAttr in anim_attrs if animAttr.endswith(attr) and not attr in clean_attrs]
+            clean_attrs.extend(ordered_attrs)
+        if ignore_attrs:
+            for ignore_attr in ignore_attrs:
+                if ignore_attr in clean_attrs:
+                    clean_attrs.remove(ignore_attr)
+        return clean_attrs
     
 
-    def getAttrDefaultValueData(self, item, *args):
+    def get_attr_default_value_data(self, item):
         """ Returns a dictionary with a list of default and current values for each attribute of the given node.
             index 0 = default value
             index 1 = current value
             index 2 = attribute type
         """
-        attrData = {}
-        attributes = self.getSetupAttrList(item)
+        attr_data = {}
+        attributes = self.get_setup_attrs(item)
         if attributes:
             for attr in attributes:
-                attrType = cmds.attributeQuery(attr, node=item, attributeType=True)
-                currentValue = cmds.getAttr(item+"."+attr)
-                if attr in self.nonDynZeroAttrList: #translate and rotate
-                    attrData[attr] = [0.0, currentValue, attrType]
-                elif attr in self.nonDynOneAttrList: #scale
-                    attrData[attr] = [1.0, currentValue, attrType]
+                attr_type = cmds.attributeQuery(attr, node=item, attributeType=True)
+                current_value = cmds.getAttr(item+"."+attr)
+                if attr in self.non_dyn_zero_attrs: #translate and rotate
+                    attr_data[attr] = [0.0, current_value, attr_type]
+                elif attr in self.non_dyn_one_attrs: #scale
+                    attr_data[attr] = [1.0, current_value, attr_type]
                 else: #custom and visibility
-                    attrData[attr] = [cmds.addAttr(item+"."+attr, query=True, defaultValue=True), currentValue, attrType]
-        return attrData
+                    attr_data[attr] = [cmds.addAttr(item+"."+attr, query=True, defaultValue=True), current_value, attr_type]
+        return attr_data
 
 
-    def getAttrType(self, inputData, *args):
+    def get_attr_type(self, input_data):
         """ Just return the attribute type number for the given attribute name based in the Maya's attribute types from documentation.
             Return:
                 0 = boolean
                 1 = integer
                 2 = float
         """
-        if inputData:
-            return ATTR_TYPE[inputData]
+        if input_data:
+            return ATTR_TYPE[input_data]

@@ -39,15 +39,15 @@ class JointEnd(action.BaseAction):
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # list joint ends
-                jEndList = [j for j in check_items if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
-                jEndList.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
-                if jEndList:
+                joint_ends = [j for j in check_items if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
+                joint_ends.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
+                if joint_ends:
                     # check connection with skinCluster to avoid delete it and crash the setup
-                    jEndList = list(set(jEndList)-set(self.ar.skin.get_skinned_joints())) #remove duplicated and skinned joints
-                    jEndList = [j for j in jEndList if not cmds.listRelatives(j, children=True)] #remove if there are children
-                    if jEndList:
-                        jEndList.sort()
-                        for item in jEndList:
+                    joint_ends = list(set(joint_ends)-set(self.ar.skin.get_skinned_joints())) #remove duplicated and skinned joints
+                    joint_ends = [j for j in joint_ends if not cmds.listRelatives(j, children=True)] #remove if there are children
+                    if joint_ends:
+                        joint_ends.sort()
+                        for item in joint_ends:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             self.checked_items.append(item)
                             self.found_issues.append(True)

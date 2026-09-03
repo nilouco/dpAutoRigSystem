@@ -13,6 +13,7 @@ WIKI = "07-‐-Validator#-scalable-deformer-checker"
 class ScalableDeformer(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        self.rig_scale_output_attr = "rig_scale_output"
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -28,7 +29,6 @@ class ScalableDeformer(action.BaseAction):
         # starting
         self.first_mode = first_mode
         self.cleanup_to_start()
-        self.rigScaleOutputAttr = "rigScaleOutput"
         
         # ---
         # --- validator code --- beginning
@@ -41,8 +41,8 @@ class ScalableDeformer(action.BaseAction):
                 option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
                 if option_ctrl:
                     self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
-                    rigScaleOutput = [option_ctrl+"."+self.rigScaleOutputAttr]
-                    itemAttrToFixList = []
+                    rig_scale_output = [option_ctrl+"."+self.rig_scale_output_attr]
+                    to_fix_item_attrs = []
                     for node in check_items:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         node_type = cmds.objectType(node)
@@ -50,36 +50,36 @@ class ScalableDeformer(action.BaseAction):
                         if node_type == "skinCluster":
                             if cmds.getAttr(node+".skinningMethod") != 0: # If it's not "Classic Linear"
                                 if cmds.getAttr(node+".dqsSupportNonRigid") == False:
-                                    itemAttrToFixList.append(node+".dqsSupportNonRigid")
-                                for attrDqs in ["dqsScaleX", "dqsScaleY", "dqsScaleZ"]:
-                                    scConnection = cmds.listConnections(node+"."+attrDqs, source=True, destination=True, plugs=True)
-                                    if scConnection != rigScaleOutput:
-                                        itemAttrToFixList.append(node+"."+attrDqs)
+                                    to_fix_item_attrs.append(node+".dqsSupportNonRigid")
+                                for dqs_attr in ["dqsScaleX", "dqsScaleY", "dqsScaleZ"]:
+                                    sc_connections = cmds.listConnections(node+"."+dqs_attr, source=True, destination=True, plugs=True)
+                                    if sc_connections != rig_scale_output:
+                                        to_fix_item_attrs.append(node+"."+dqs_attr)
                         # check deltaMush nodes and connections
                         elif node_type == "deltaMush":
                             for attr in ["scaleX", "scaleY", "scaleZ"]:
-                                dmConnection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
-                                if dmConnection != rigScaleOutput:
-                                    itemAttrToFixList.append(node+"."+attr)
-                    if itemAttrToFixList:
-                        for itemAttr in itemAttrToFixList:
-                            self.checked_items.append(itemAttr)
+                                dm_connection = cmds.listConnections(node+"."+attr, source=True, destination=True, plugs=True)
+                                if dm_connection != rig_scale_output:
+                                    to_fix_item_attrs.append(node+"."+attr)
+                    if to_fix_item_attrs:
+                        for item_attr in to_fix_item_attrs:
+                            self.checked_items.append(item_attr)
                             self.found_issues.append(True)
                             if self.first_mode:
                                 self.good_results.append(False)
                             else: #fix
                                 try:
-                                    if itemAttr.endswith("dqsSupportNonRigid"):
+                                    if item_attr.endswith("dqsSupportNonRigid"):
                                         # check non-rigid support attribute
-                                        cmds.setAttr(itemAttr, True)
+                                        cmds.setAttr(item_attr, True)
                                     else:
-                                        # connect the rigScaleOutput to the deformer scale attributes
-                                        cmds.connectAttr(rigScaleOutput[0], itemAttr, force=True)
+                                        # connect the rig_scale_output to the deformer scale attributes
+                                        cmds.connectAttr(rig_scale_output[0], item_attr, force=True)
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+itemAttr)
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+item_attr)
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+itemAttr)
+                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item_attr)
                                 cmds.select(clear=True)
                 else:
                     self.not_found_node("Option_Ctrl")

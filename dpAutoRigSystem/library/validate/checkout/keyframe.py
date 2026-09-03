@@ -38,37 +38,37 @@ class Keyframe(action.BaseAction):
                 check_items = cmds.ls(selection=False)
             if check_items:
                 # get animation node list
-                animCurveList = cmds.ls(type="animCurve")
-                if animCurveList:
-                    animatedList = []
-                    for animCrv in animCurveList:
-                        connectionList = cmds.ls(cmds.listConnections(animCrv), type=["transform", "blendShape", "nonLinear"])
-                        if connectionList and not connectionList[0] in animatedList:
-                            animatedList.append(connectionList[0])
-                    if animatedList:
-                        self.ar.utils.set_progress(max=len(animatedList), add_one=False, add_number=False)
-                        for item in animatedList:
+                anim_curve_items = cmds.ls(type="animCurve")
+                if anim_curve_items:
+                    animated_items = []
+                    for anim_crv in anim_curve_items:
+                        connections = cmds.ls(cmds.listConnections(anim_crv), type=["transform", "blendShape", "nonLinear"])
+                        if connections and not connections[0] in animated_items:
+                            animated_items.append(connections[0])
+                    if animated_items:
+                        self.ar.utils.set_progress(max=len(animated_items), add_one=False, add_number=False)
+                        for item in animated_items:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             if item in check_items:
                                 if cmds.objExists(item):
-                                    crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
-                                    if crvList:
-                                        foundKey = False
-                                        for crv in crvList:
+                                    connected_anim_curves = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
+                                    if connected_anim_curves:
+                                        found_key = False
+                                        for crv in connected_anim_curves:
                                             # conditional to check here
                                             if len(cmds.listConnections(crv, source=True)) >= 2:
                                                 pass #drivenKey
                                             else: #normal key
-                                                foundKey = True
+                                                found_key = True
                                                 break
-                                        if foundKey:
+                                        if found_key:
                                             self.checked_items.append(item)
                                             self.found_issues.append(True)
                                             if self.first_mode:
                                                 self.good_results.append(False)
                                             else: #fix
                                                 reported = False
-                                                for crv in crvList:
+                                                for crv in connected_anim_curves:
                                                     if len(cmds.listConnections(crv, source=True)) < 2:
                                                         try:
                                                             # delete animation curve (keyframe)

@@ -40,23 +40,23 @@ class UnusedNode(action.BaseAction):
             if check_items:
                 if len(check_items) > 3: #discarding default materials
                     # getting data to analyse
-                    defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1', 'openPBR_shader1']
-                    allMatList = list(set(check_items) - set(defaultMatList))
-                    usedMatList = list(set(self.get_used_materials()) - set(defaultMatList))
+                    default_materials = ['lambert1', 'standardSurface1', 'particleCloud1', 'openPBR_shader1']
+                    all_materials = list(set(check_items) - set(default_materials))
+                    used_materials = list(set(self.get_used_materials()) - set(default_materials))
                     # conditional to check here
-                    if not len(allMatList) == len(usedMatList):
-                        self.ar.utils.set_progress(max=len(allMatList), add_one=False, add_number=False)
+                    if not len(all_materials) == len(used_materials):
+                        self.ar.utils.set_progress(max=len(all_materials), add_one=False, add_number=False)
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                        issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
-                        self.checked_items.append(str(", ".join(issueMatList)))
+                        issue_materials = sorted(list(set(all_materials) - set(used_materials)))
+                        self.checked_items.append(str(", ".join(issue_materials)))
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                fixResult = mel.eval("MLdeleteUnused;")
+                                fix_result = mel.eval("MLdeleteUnused;")
                                 self.good_results.append(True)
-                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(fixResult)+" nodes = "+str(len(issueMatList))+" materials")
+                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(fix_result)+" nodes = "+str(len(issue_materials))+" materials")
                             except:
                                 self.good_results.append(False)
                                 self.messages.append(self.ar.data.lang['v005_cantFix']+": materials")

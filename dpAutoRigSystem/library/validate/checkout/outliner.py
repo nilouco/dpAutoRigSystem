@@ -32,17 +32,12 @@ class Outliner(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            hiddenList = [self.ar.data.temp_grp, self.ar.data.guide_mirror_grp]
-            
-            
-            #TODO = get node by attribute (dpTemp)
-
-
+            hidden_grps = [self.ar.data.temp_grp, self.ar.data.guide_mirror_grp]
             if not inputs:
                 inputs = cmds.ls(selection=False, type="transform")
             if inputs:
-                self.ar.utils.set_progress(max=len(hiddenList), add_one=False, add_number=False)
-                for item in hiddenList:
+                self.ar.utils.set_progress(max=len(hidden_grps), add_one=False, add_number=False)
+                for item in hidden_grps:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     if item in inputs:
                         self.checked_items.append(item)

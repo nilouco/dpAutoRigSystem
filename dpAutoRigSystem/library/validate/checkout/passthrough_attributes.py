@@ -32,7 +32,7 @@ class PassthroughAttributes(action.BaseAction):
         # starting
         self.first_mode = first_mode
         self.cleanup_to_start()
-        self.iterNumber = 5
+        self.iter_number = 5
         
         # ---
         # --- validator code --- beginning
@@ -46,34 +46,34 @@ class PassthroughAttributes(action.BaseAction):
                     self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 else:
                     self.ar.utils.set_progress(max=len(check_items)*2, add_one=False, add_number=False)
-                toOptimizeList = []
+                to_optimize_items = []
                 for item in check_items:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     # check optimization
-                    for plug, connections in self.getConnectionDic(item).items():
-                        sources = connections["sourceList"]
+                    for plug, connections in self.get_connection_data(item).items():
+                        sources = connections["sources"]
                         destinations = connections["destinations"]
                         if not sources or not destinations:
                             continue
                         if len(sources) == 1:
                             source = sources[0]
                             for destination in destinations:
-                                toOptimizeList.append(f"{plug} -- {source} -> {destination}")
+                                to_optimize_items.append(f"{plug} -- {source} -> {destination}")
                 # conditional to check here
-                if toOptimizeList:
+                if to_optimize_items:
                     self.found_issues.append(True)
                     if self.first_mode:
-                        self.checked_items.append("\n".join(toOptimizeList))
+                        self.checked_items.append("\n".join(to_optimize_items))
                         self.good_results.append(False)
                     else: #fix
                         self.checked_items.append(self.ar.data.lang[self.title])
                         for item in check_items:
                             self.ar.utils.set_progress(self.ar.data.lang[self.title])
                             try:
-                                optimizedList = []
-                                for i in range(self.iterNumber):
-                                    for plug, connections in self.getConnectionDic(item).items():
-                                        sources = connections["sourceList"]
+                                optimized_items = []
+                                for i in range(self.iter_number):
+                                    for plug, connections in self.get_connection_data(item).items():
+                                        sources = connections["sources"]
                                         destinations = connections["destinations"]
                                         if not sources or not destinations:
                                             continue
@@ -81,20 +81,20 @@ class PassthroughAttributes(action.BaseAction):
                                             source = sources[0]
                                             for destination in destinations:
                                                 cmds.connectAttr(source, destination, force=True)
-                                                optimizedList.append(f"{plug} -- {source} -> {destination}")
+                                                optimized_items.append(f"{plug} -- {source} -> {destination}")
                                             # If the plug is a user defined attribute then we assume
                                             # it's a plug that is not used for computation at all.
                                             # And thus we can disconnect the input safely
                                             node, attr = plug.split(".", 1)
                                             user_defined = set(cmds.listAttr(node, userDefined=True) or [])
                                             if attr in user_defined:
-                                                self.disconnectInputs(plug)
-                                    if not optimizedList:
+                                                self.disconnect_inputs(plug)
+                                    if not optimized_items:
                                         # Nothing more to optimize
                                         break
-                                if optimizedList:
+                                if optimized_items:
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+f"\n{self.ar.data.lang['v004_fixed']}: ".join(optimizedList))
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+f"\n{self.ar.data.lang['v004_fixed']}: ".join(optimized_items))
                             except:
                                 self.good_results.append(False)
                                 self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
@@ -112,7 +112,7 @@ class PassthroughAttributes(action.BaseAction):
         return self.log_data
 
 
-    def pairwise(self, iterable, *args):
+    def pairwise(self, iterable):
         """ s -> (s0,s1), (s2,s3), (s4, s5), ...
         """
         a = iter(iterable)
@@ -120,7 +120,7 @@ class PassthroughAttributes(action.BaseAction):
     
 
     @contextlib.contextmanager
-    def unlocked(self, plug, *args):
+    def unlocked(self, plug):
         """ Unlock attribute during the context
         """
         locked = cmds.getAttr(plug, lock=True)
@@ -133,46 +133,45 @@ class PassthroughAttributes(action.BaseAction):
                 cmds.setAttr(plug, lock=True)
 
 
-    def disconnectInputs(self, plug, *args):
+    def disconnect_inputs(self, plug):
         """ Disconnect any input sources for the plug, including for locked attributes that can be unlocked
         """
-        sourceList = cmds.listConnections(plug, plugs=True, source=True, destination=True, shapes=True, skipConversionNodes=False) or []
-        if not sourceList:
+        sources = cmds.listConnections(plug, plugs=True, source=True, destination=True, shapes=True, skipConversionNodes=False) or []
+        if not sources:
             return
-        
         with self.unlocked(plug):
-            for dest, source in self.pairwise(sourceList):
+            for dest, source in self.pairwise(sources):
                 if cmds.isConnected(source, dest):
                     cmds.disconnectAttr(source, dest)
     
 
-    def getConnectionDic(self, nodesOrPlugs, skipConversionNodes=True, *args):
+    def get_connection_data(self, nodes_or_plugs, skip_conversion_nodes=True):
         """ Return 'sources' and 'destinations' per plug for input nodes or plugs.
             Arguments:
-                nodesOrPlugs (list or str): List or single string of node or node.attr name.
+                nodes_or_plugs (list or str): List or single string of node or node.attr name.
             Returns:
                 dict: {plug: {"sources": sources, "destinations": destination}}
         """
-        sourceList = cmds.listConnections(nodesOrPlugs, source=True, destination=False, connections=True, plugs=True, shapes=True, skipConversionNodes=skipConversionNodes) or []
-        destinations = cmds.listConnections(nodesOrPlugs, source=False, destination=True, connections=True, plugs=True, shapes=True, skipConversionNodes=skipConversionNodes) or []
-        if not sourceList and not destinations:
+        sources = cmds.listConnections(nodes_or_plugs, source=True, destination=False, connections=True, plugs=True, shapes=True, skipConversionNodes=skip_conversion_nodes) or []
+        destinations = cmds.listConnections(nodes_or_plugs, source=False, destination=True, connections=True, plugs=True, shapes=True, skipConversionNodes=skip_conversion_nodes) or []
+        if not sources and not destinations:
             return {}
         
         plugs = set()
-        sourcesByPlugDic = defaultdict(list)
-        for plug, src in self.pairwise(sourceList):
-            sourcesByPlugDic[plug].append(src)
+        sources_by_plug_data = defaultdict(list)
+        for plug, src in self.pairwise(sources):
+            sources_by_plug_data[plug].append(src)
             plugs.add(plug)
         
-        destinationsByPlugDic = defaultdict(list)
+        destinations_by_plug_data = defaultdict(list)
         for plug, dest in self.pairwise(destinations):
-            destinationsByPlugDic[plug].append(dest)
+            destinations_by_plug_data[plug].append(dest)
             plugs.add(plug)
         
-        resultDic = {}
+        result_data = {}
         for plug in plugs:
-            resultDic[plug] = {
-                "sourceList": sourcesByPlugDic.get(plug, []),
-                "destinations": destinationsByPlugDic.get(plug, [])
+            result_data[plug] = {
+                "sources": sources_by_plug_data.get(plug, []),
+                "destinations": destinations_by_plug_data.get(plug, [])
             }
-        return resultDic
+        return result_data

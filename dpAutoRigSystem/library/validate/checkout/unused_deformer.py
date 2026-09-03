@@ -34,58 +34,58 @@ class UnusedDeformer(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            unusedList = []
+            unused_items = []
             #cmds.findDeformers("*")
             deformers = cmds.ls(type="geometryFilter") #deformers
-            intermedList = cmds.ls(type="controlPoint", intermediateObjects=True)
+            intermediates = cmds.ls(type="controlPoint", intermediateObjects=True)
             if inputs:
                 check_items = inputs
             else:
                 check_items = deformers.copy()
-                check_items.extend(intermedList.copy())
+                check_items.extend(intermediates.copy())
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
                 if deformers:
-                    for defNode in deformers:
+                    for def_node in deformers:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                        hasTags = False
-                        indicesList = cmds.getAttr(defNode+".input", multiIndices=True)
-                        if indicesList:
-                            for i in indicesList:
-                                if not cmds.getAttr(defNode+".input["+str(i)+"].groupId"):
-                                    if cmds.getAttr(defNode+".input["+str(i)+"].componentTagExpression"):
-                                        hasTags = True
+                        has_tags = False
+                        indices = cmds.getAttr(def_node+".input", multiIndices=True)
+                        if indices:
+                            for i in indices:
+                                if not cmds.getAttr(def_node+".input["+str(i)+"].groupId"):
+                                    if cmds.getAttr(def_node+".input["+str(i)+"].componentTagExpression"):
+                                        has_tags = True
                                         break
-                        if not hasTags:
-                            defSetList = cmds.listConnections(defNode+".message", type="objectSet")
-                            if not defSetList:
-                                unusedList.append(defNode)
+                        if not has_tags:
+                            def_sets = cmds.listConnections(def_node+".message", type="objectSet")
+                            if not def_sets:
+                                unused_items.append(def_node)
                             else:
-                                memberList = cmds.sets(defSetList[0], query=True)
-                                if not memberList:
-                                    unusedList.append(defNode)
-                if intermedList:
-                    for intermedObj in intermedList:
+                                members = cmds.sets(def_sets[0], query=True)
+                                if not members:
+                                    unused_items.append(def_node)
+                if intermediates:
+                    for intermediate in intermediates:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                        outputList = cmds.listConnections(intermedObj, source=False, destination=True, plugs=True)
-                        if not outputList:
-                            unusedList.append(intermedObj)
+                        outputs = cmds.listConnections(intermediate, source=False, destination=True, plugs=True)
+                        if not outputs:
+                            unused_items.append(intermediate)
                 # conditional to check here
-                if unusedList:
-                    self.checked_items.append("\n".join(unusedList))
+                if unused_items:
+                    self.checked_items.append("\n".join(unused_items))
                     self.found_issues.append(True)
                     if self.first_mode:
                         self.good_results.append(False)
                     else: #fix
                         try:
                             # delete them
-                            cmds.lockNode(unusedList, lock=False)
-                            cmds.delete(unusedList)
+                            cmds.lockNode(unused_items, lock=False)
+                            cmds.delete(unused_items)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": nodes = "+str(len(unusedList)))
+                            self.messages.append(self.ar.data.lang['v004_fixed']+": nodes = "+str(len(unused_items)))
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": nodes = "+str(len(unusedList)))
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+": nodes = "+str(len(unused_items)))
             else:
                 self.not_found_node()
         else:

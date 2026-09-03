@@ -43,8 +43,8 @@ class HideCorrectives(action.BaseAction):
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
                     item = option_ctrl+".correctiveCtrls"
                     # conditional to check here
-                    checkChannelBox = cmds.getAttr(item, channelBox=True)
-                    if checkChannelBox:
+                    check_channel_box = cmds.getAttr(item, channelBox=True)
+                    if check_channel_box:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:
@@ -67,12 +67,8 @@ class HideCorrectives(action.BaseAction):
         # --- validator code --- end
         # ---
 
-
         # finishing
         self.update_action_buttons()
         self.report_log()
         self.end_progress()
         return self.log_data
-    
-
-    

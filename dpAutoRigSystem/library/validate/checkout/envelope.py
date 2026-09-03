@@ -20,9 +20,9 @@ class Envelope(action.BaseAction):
         return cmds.attributeQuery('envelope', node=node, exists=True)
 
 
-    def verifyEnvelope(self, node):
-        envelopeValue = cmds.getAttr(f"{node}.envelope")
-        return envelopeValue < 1
+    def verify_envelope(self, node):
+        envelope_value = cmds.getAttr(f"{node}.envelope")
+        return envelope_value < 1
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -43,18 +43,16 @@ class Envelope(action.BaseAction):
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
             if inputs:
-                allNodesList = inputs
+                all_nodes = inputs
             else:
-                allNodesList = cmds.ls()
-            allEnvelopedNodes = list(filter(self.node_has_envelope, allNodesList))
-            allValidEnvelopeNodes = list(filter(self.ar.utils.envelope_is_valid, allEnvelopedNodes))
-            self.checked_items.extend(allValidEnvelopeNodes)
+                all_nodes = cmds.ls()
+            all_enveloped_nodes = list(filter(self.node_has_envelope, all_nodes))
+            all_valid_envelope_nodes = list(filter(self.ar.utils.envelope_is_valid, all_enveloped_nodes))
+            self.checked_items.extend(all_valid_envelope_nodes)
             if self.checked_items:
                 self.ar.utils.set_progress(max=len(self.checked_items), add_one=False, add_number=False)
-
                 for node in self.checked_items:
-                    self.found_issues.append(self.verifyEnvelope(node))
-
+                    self.found_issues.append(self.verify_envelope(node))
                 if not self.first_mode:
                     for idx, issue in enumerate(self.checked_items):
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])

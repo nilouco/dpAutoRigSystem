@@ -13,6 +13,14 @@ WIKI = "07-‐-Validator#-remapvalue-to-setrange"
 class RemapvalueToSetrange(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        self.mapping_data = {
+                            "inputMax"   : "oldMaxX",
+                            "inputMin"   : "oldMinX",
+                            "outputMax"  : "maxX",
+                            "outputMin"  : "minX",
+                            "inputValue" : "valueX",
+                            "outValue"   : "outValueX"
+                            }
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -28,14 +36,6 @@ class RemapvalueToSetrange(action.BaseAction):
         # starting
         self.first_mode = first_mode
         self.cleanup_to_start()
-        self.mappingDic = {
-                            "inputMax"   : "oldMaxX",
-                            "inputMin"   : "oldMinX",
-                            "outputMax"  : "maxX",
-                            "outputMin"  : "minX",
-                            "inputValue" : "valueX",
-                            "outValue"   : "outValueX"
-                            }
         
         # ---
         # --- validator code --- beginning
@@ -45,7 +45,7 @@ class RemapvalueToSetrange(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="remapValue")
             if check_items:
-                remapValueToChangeList = []
+                to_change_rmv_items = []
                 for item in check_items:
                     indexes = cmds.getAttr(f"{item}.value", multiIndices=True)
                     # Check if color is used - if so, ignore it, since we only convert value remaps
@@ -53,63 +53,63 @@ class RemapvalueToSetrange(action.BaseAction):
                         continue
                     # Check if the remapValue node does more than just set min/max range (e.g. has
                     # a gradient curve being tweaked - if so, we skip it)
-                    remappedGradient = True
+                    remapped_gradient = True
                     for index in indexes:
-                        valuePosition, valueFloat, valueInterp = cmds.getAttr(f"{item}.value[{index}]")[0]
-                        if valuePosition != valueFloat: #there's curve
+                        value_position, value_float, value_interp = cmds.getAttr(f"{item}.value[{index}]")[0]
+                        if value_position != value_float: #there's curve
                             break
-                        if valueInterp != 1.0: #linear
+                        if value_interp != 1.0: #linear
                             break
                         if cmds.getAttr(item+".inputMin") > cmds.getAttr(item+".inputMax"): #setRange isn't able to work well with it as a remapValue
                             break
                         if cmds.getAttr(item+".outputMin") > cmds.getAttr(item+".outputMax"):
                             break
                     else:
-                        remappedGradient = False
-                    if remappedGradient:
+                        remapped_gradient = False
+                    if remapped_gradient:
                         continue
-                    remapValueToChangeList.append(item)
+                    to_change_rmv_items.append(item)
                 # conditional to check here
-                if remapValueToChangeList:
-                    self.ar.utils.set_progress(max=len(remapValueToChangeList), add_one=False, add_number=False)
-                    wellDone = True
-                    for remapValueNode in remapValueToChangeList:
+                if to_change_rmv_items:
+                    self.ar.utils.set_progress(max=len(to_change_rmv_items), add_one=False, add_number=False)
+                    well_done = True
+                    for rmv_node in to_change_rmv_items:
                         self.ar.utils.set_progress(self.ar.data.lang[self.title])
                         self.found_issues.append(True)
                         if self.first_mode:
-                            self.checked_items.append(remapValueNode)
+                            self.checked_items.append(rmv_node)
                             self.good_results.append(False)
                         else: #fix
                             try:
-                                setRangeNode = cmds.createNode("setRange", name=remapValueNode.replace("_RmV", "_SR"))
+                                sr_node = cmds.createNode("setRange", name=rmv_node.replace("_RmV", "_SR"))
                                 # Transfer values or connections
-                                for remapAttr, setRangeAttr in self.mappingDic.items():
-                                    self.ar.ctrls.transfer_plug(f"{remapValueNode}.{remapAttr}", f"{setRangeNode}.{setRangeAttr}")
+                                for rmv_attr, sr_attr in self.mapping_data.items():
+                                    self.ar.ctrls.transfer_plug(f"{rmv_node}.{rmv_attr}", f"{sr_node}.{sr_attr}")
                                 #clear Interpolation_PMA node
-                                indexes = cmds.getAttr(f"{remapValueNode}.value", multiIndices=True)
+                                indexes = cmds.getAttr(f"{rmv_node}.value", multiIndices=True)
                                 for index in indexes:
-                                    connectedInputList = cmds.listConnections(remapValueNode+".value["+str(index)+"].value_Interp", source=True, destination=False, plugs=False)
-                                    if connectedInputList:
-                                        cmds.delete(connectedInputList[0])
+                                    connected_inputs = cmds.listConnections(rmv_node+".value["+str(index)+"].value_Interp", source=True, destination=False, plugs=False)
+                                    if connected_inputs:
+                                        cmds.delete(connected_inputs[0])
                                 # delete the old remapValue node
-                                cmds.delete(remapValueNode)
-                                self.checked_items.append(remapValueNode+" -> "+setRangeNode)
+                                cmds.delete(rmv_node)
+                                self.checked_items.append(rmv_node+" -> "+sr_node)
                                 self.good_results.append(True)
                             except:
                                 self.good_results.append(False)
-                                wellDone = False
+                                well_done = False
                                 break
                     if self.first_mode:
-                        self.messages.append(self.ar.data.lang['v006_foundIssue']+": "+str(len(remapValueToChangeList))+" remapValue nodes")
+                        self.messages.append(self.ar.data.lang['v006_foundIssue']+": "+str(len(to_change_rmv_items))+" remapValue nodes")
                     else:
-                        if wellDone:
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(len(remapValueToChangeList))+" remapValue nodes")
+                        if well_done:
+                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+str(len(to_change_rmv_items))+" remapValue nodes")
                         else:
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+remapValueNode)
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+rmv_node)
             else:
                 self.not_found_node()
         else:
-            self.notWorkedWellIO(self.ar.data.lang['r072_noReferenceAllowed'])
+            self.fail_io(self.ar.data.lang['r072_noReferenceAllowed'])
         # --- validator code --- end
         # ---
 

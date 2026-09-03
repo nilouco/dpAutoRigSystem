@@ -14,6 +14,7 @@ WIKI = "07-‐-Validator#-prune-skin-weights"
 class PruneSkinWeights(action.BaseAction):
     def __init__(self, ar):
         action.BaseAction.__init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI)
+        self.prune_min_value = 0.0005
     
 
     def run_action(self, first_mode=True, inputs=None, *args):
@@ -29,7 +30,6 @@ class PruneSkinWeights(action.BaseAction):
         # starting
         self.first_mode = first_mode
         self.cleanup_to_start()
-        self.pruneMinValue = 0.0005
         
         # ---
         # --- validator code --- beginning
@@ -40,37 +40,37 @@ class PruneSkinWeights(action.BaseAction):
                 check_items = cmds.ls(selection=False, type='skinCluster')
             if check_items:
                 self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
-                for skinClusterNode in check_items:
+                for skincluster_node in check_items:
                     self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                    meshes = cmds.skinCluster(skinClusterNode, query=True, geometry=True)
+                    meshes = cmds.skinCluster(skincluster_node, query=True, geometry=True)
                     if meshes:
-                        weightsList = self.ar.skin.get_skin_weights(meshes[0], skinClusterNode)
-                        toPruneList = []
+                        weights = self.ar.skin.get_skin_weights(meshes[0], skincluster_node)
+                        to_prune_items = []
                         # check low weights
-                        for v, weight_data in enumerate(weightsList):
+                        for v, weight_data in enumerate(weights):
                             for w in weight_data.keys():
-                                if weight_data[w] < self.pruneMinValue:
-                                    toPruneList.append(v)
+                                if weight_data[w] < self.prune_min_value:
+                                    to_prune_items.append(v)
                                     break
                         # conditional to check here
-                        if toPruneList:
-                            self.checked_items.append(skinClusterNode)
+                        if to_prune_items:
+                            self.checked_items.append(skincluster_node)
                             self.found_issues.append(True)
                             if self.first_mode:
                                 self.good_results.append(False)
                             else: #fix
                                 try:
-                                    #cmds.skinCluster(skinClusterNode, edit=True, prune=True)
-                                    influenceList = cmds.skinCluster(skinClusterNode, query=True, influence=True)
-                                    for jnt in influenceList:
+                                    #cmds.skinCluster(skincluster_node, edit=True, prune=True)
+                                    influences = cmds.skinCluster(skincluster_node, query=True, influence=True)
+                                    for jnt in influences:
                                         cmds.setAttr(jnt+".liw", 0) #unlock
                                     cmds.select(meshes[0])
-                                    mel.eval('doPruneSkinClusterWeightsArgList 2 { "'+str(self.pruneMinValue)+'", "1" };')
+                                    mel.eval('doPruneSkinClusterWeightsArgList 2 { "'+str(self.prune_min_value)+'", "1" };')
                                     self.good_results.append(True)
-                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+skinClusterNode+" = "+str(len(toPruneList))+" vertices")
+                                    self.messages.append(self.ar.data.lang['v004_fixed']+": "+skincluster_node+" = "+str(len(to_prune_items))+" vertices")
                                 except:
                                     self.good_results.append(False)
-                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+skinClusterNode)
+                                    self.messages.append(self.ar.data.lang['v005_cantFix']+": "+skincluster_node)
                                 cmds.select(clear=True)
             else:
                 self.not_found_node()

@@ -32,31 +32,31 @@ class Wip(action.BaseAction):
         # ---
         # --- validator code --- beginning
         if not cmds.file(query=True, reference=True):
-            wipGrp = None
+            wip_grp = None
             if inputs:
-                wipGrp = inputs
+                wip_grp = inputs
             else:
-                wipGrp = self.ar.utils.get_node_by_message("wipGrp")
-                if not wipGrp:
+                wip_grp = self.ar.utils.get_node_by_message("wipGrp")
+                if not wip_grp:
                     if cmds.objExists("WIP_Grp"):
-                        wipGrp = "WIP_Grp"
-            if wipGrp:
-                self.ar.utils.set_progress(max=len(wipGrp), add_one=False, add_number=False)
+                        wip_grp = "WIP_Grp"
+            if wip_grp:
+                self.ar.utils.set_progress(max=len(wip_grp), add_one=False, add_number=False)
                 self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                self.checked_items.append(wipGrp)
-                wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
-                if wipChildrenList:
+                self.checked_items.append(wip_grp)
+                children = cmds.listRelatives(wip_grp, allDescendents=True, children=True, fullPath=True)
+                if children:
                     self.found_issues.append(True)
                     if self.first_mode:
                         self.good_results.append(False)
                     else: #fix    
                         try:
-                            cmds.delete(wipChildrenList)
+                            cmds.delete(children)
                             self.good_results.append(True)
-                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+wipGrp)
+                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+wip_grp)
                         except:
                             self.good_results.append(False)
-                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+wipGrp)
+                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+wip_grp)
                 else:
                     self.found_issues.append(False)
                     self.good_results.append(True)
