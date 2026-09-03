@@ -245,7 +245,7 @@ class Chain(standard.BaseStandard):
         if cmds.objExists(self.guide_base):
             # run for all sides
             for s, side in enumerate(self.sides):
-                attr_name_lower = self.ar.utils.get_attr_name_lower(side, self.number_name)
+                attr_name_lower = self.ar.naming.get_attr_name_lower(side, self.number_name)
                 self.base = side+self.number_name+'_Guide_Base'
                 self.guide_end_loc = side+self.number_name+"_Guide_JointEnd"
                 self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
@@ -279,7 +279,7 @@ class Chain(standard.BaseStandard):
                 for o, skin_joint in enumerate(self.skin_joints):
                     if o < len(self.skin_joints) - 1:
                         cmds.addAttr(skin_joint, longName='dpAR_joint', attributeType='float', keyable=False)
-                        self.ar.utils.set_joint_label(skin_joint, s+self.joint_label_add, 18, self.number_name+"_%02d"%o)
+                        self.ar.naming.set_joint_label(skin_joint, s+self.joint_label_add, 18, self.number_name+"_%02d"%o)
 
                 fk_ctrls, fk_zeros, orig_from_items = [], [], []
                 for n in range(0, self.n_joints):
@@ -415,8 +415,8 @@ class Chain(standard.BaseStandard):
                         self.fix_mirror_flipping(ik_ctrl_main_zero, s, -1)
 
                         # loading Maya matrix node
-                        loaded_quaternion_plugin = self.ar.utils.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-                        loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+                        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                         if loaded_quaternion_plugin and loaded_matrix_plugin:
                             # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
                             ik_main_loc = cmds.spaceLocator(name=side+self.number_name+"_Ik_Main_Loc")[0]
@@ -427,7 +427,7 @@ class Chain(standard.BaseStandard):
                             cmds.delete(cmds.parentConstraint(ik_ctrl_main, ik_main_loc_grp, maintainOffset=False, skipTranslate=("x", "y", "z")))
                             self.ar.ctrls.set_lock_hide([ik_main_loc_grp], ['rx', 'ry', 'rz'], l=True, k=True)
                             cmds.parentConstraint(ik_ctrl_main, ik_main_loc, maintainOffset=False, skipTranslate=("x", "y", "z"), name=ik_main_loc+"_PaC")
-                            main_twist_matrix_md = self.ar.utils.create_twist_bone_matrix(ik_main_loc_grp, ik_main_loc, "ikCtrlMain_TwistMatrix")
+                            main_twist_matrix_md = self.ar.math.create_twist_bone_matrix(ik_main_loc_grp, ik_main_loc, "ikCtrlMain_TwistMatrix")
                             cmds.setAttr(main_twist_matrix_md+".input1Z", 1)
                             if s == 1:
                                 cmds.setAttr(main_twist_matrix_md+".input1Z", -1)

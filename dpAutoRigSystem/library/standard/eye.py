@@ -174,7 +174,7 @@ class Eye(standard.BaseStandard):
         eyelid_zero_jxt = cmds.joint(name=base_name+"_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
         eyelid_jnt = cmds.joint(name=base_name+"_Jnt", rotationOrder="yzx", scaleCompensate=False)
         cmds.addAttr(eyelid_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        self.ar.utils.set_joint_label(eyelid_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle)
+        self.ar.naming.set_joint_label(eyelid_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[lid]+"_"+self.ar.data.lang['c042_eyelid']+middle)
         cmds.select(eyelid_zero_jxt)
         eyelid_support_jxt = cmds.joint(name=base_name+"_Jxt", rotationOrder="yzx", scaleCompensate=False)
         cmds.setAttr(eyelid_support_jxt+".translateX", self.radius*0.1)
@@ -386,7 +386,7 @@ class Eye(standard.BaseStandard):
         # creating joint:
         main_jnt = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang[code_name]+"_1_Jnt", scaleCompensate=False)
         cmds.addAttr(main_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        self.ar.utils.set_joint_label(main_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[code_name]+"_1")
+        self.ar.naming.set_joint_label(main_jnt, joint_label_number, 18, self.number_name+"_"+self.ar.data.lang[code_name]+"_1")
         # joint position:
         cmds.matchTransform(main_jnt, guide_loc, position=True, rotation=True)
         end_joint = self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang[code_name], main_jnt, tz=self.radius)
@@ -462,7 +462,7 @@ class Eye(standard.BaseStandard):
                 sub_jnt = cmds.joint(name=side+self.number_name+"_1_Sub_Jxt", scaleCompensate=False)
                 self.jnt = cmds.joint(name=side+self.number_name+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
+                self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 if s == 1:
                     left_eye_fk_ctrl_data = self.ar.utils.get_transform_data(fk_eye_ctrl)
                 self.base_eye_ctrl = self.ar.ctrls.create_controller("id_009_EyeBase", ctrl_name=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1")
@@ -536,7 +536,7 @@ class Eye(standard.BaseStandard):
                 cmds.select(clear=True)
                 self.eye_scale_jnt = cmds.joint(name=side+self.number_name+"Scale_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.eye_scale_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.set_joint_label(self.eye_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Scale_1")
+                self.ar.naming.set_joint_label(self.eye_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Scale_1")
                 # jointScale position:
                 cmds.matchTransform(self.eye_scale_jnt, self.guide, position=True, rotation=True)
                 # create endScale joint:
@@ -557,11 +557,11 @@ class Eye(standard.BaseStandard):
                     # specular joint:
                     eye_spec_jnt = cmds.joint(name=side+self.number_name+"Specular_1_Jnt", scaleCompensate=False)
                     cmds.addAttr(eye_spec_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.set_joint_label(eye_spec_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_1")
+                    self.ar.naming.set_joint_label(eye_spec_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_1")
                     # specular joint scale:
                     eye_spec_scale_jnt = cmds.joint(name=side+self.number_name+"Specular_2_Jnt", scaleCompensate=False)
                     cmds.addAttr(eye_spec_scale_jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.set_joint_label(eye_spec_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_2")
+                    self.ar.naming.set_joint_label(eye_spec_scale_jnt, s+self.joint_label_add, 18, self.number_name+"Specular_2")
                     cmds.setAttr(eye_spec_scale_jnt+".translateZ", self.radius)
                     self.create_end_joint(side+self.number_name+'Specular', eye_spec_scale_jnt, tz=0.2*self.radius)
                     cmds.parent(eye_spec_jnt, self.eye_scale_jnt)

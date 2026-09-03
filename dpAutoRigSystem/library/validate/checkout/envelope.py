@@ -50,12 +50,12 @@ class Envelope(action.BaseAction):
             all_valid_envelope_nodes = list(filter(self.ar.utils.envelope_is_valid, all_enveloped_nodes))
             self.checked_items.extend(all_valid_envelope_nodes)
             if self.checked_items:
-                self.ar.utils.set_progress(max=len(self.checked_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(self.checked_items), add_one=False, add_number=False)
                 for node in self.checked_items:
                     self.found_issues.append(self.verify_envelope(node))
                 if not self.first_mode:
                     for idx, issue in enumerate(self.checked_items):
-                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         if issue:
                             try:
                                 cmds.setAttr(f"{self.checked_items[idx]}.envelope", 1)

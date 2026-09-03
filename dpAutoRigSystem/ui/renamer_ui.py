@@ -12,7 +12,7 @@ class RenamerUI(object):
         """ This is the main method to load the Renamer UI.
         """
         self.app = app
-        self.ar.utils.close_ui('dpRenamerWin')
+        self.ar.ui_manager.close_ui('dpRenamerWin')
         # UI:
         width = 530
         height = 280

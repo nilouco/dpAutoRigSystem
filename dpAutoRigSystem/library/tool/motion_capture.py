@@ -420,25 +420,25 @@ class MotionCapture(base.BaseLibrary):
         """
         if self.ar.data.ui_state:
             rib = cmds.checkBox('mocap_map_ribbon_cb', query=True, value=True)
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=8)
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=8)
         self.hik_create_character_definition()
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_assign_joints_to_definition(rib)
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_create_custom_rig_ctrl()
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_map_biped_controllers(rib)
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.set_ikfk_biped_controllers_by_ui()
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_map_custom_elements(rib)
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_map_custom_chest()
-        self.ar.utils.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m242_retargeting']+" HumanIk")
         self.hik_create_job()
         mel.eval('hikCustomRigToolWidget -e -sl -1;') #unselect
         cmds.select(clear=True)
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
 
 
     def hik_remove_mocap(self, *args):
@@ -448,7 +448,7 @@ class MotionCapture(base.BaseLibrary):
         self.unmute_auto_rotate()
         self.reset_default_pose()
         print(self.ar.data.lang['i046_remove']+" HumanIk")
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
 
 
     def set_ikfk(self, opt_ctrl, mode):
@@ -737,7 +737,7 @@ class MotionCapture(base.BaseLibrary):
         reset_pose.verbose = False
         reset_pose.run_action(False) #fix
         reset_pose.end_progress()
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
 
 
     def set_ikfk_biped_controllers_by_ui(self):
@@ -871,11 +871,11 @@ for hik in cmds.ls(type="HIKCharacterNode"):
                     start_frame = int(cmds.playbackOptions(query=True, minTime=True))
                 if end == None:
                     end_frame = int(cmds.playbackOptions(query=True, maxTime=True))
-                self.ar.utils.set_progress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(end_frame-start_frame))
+                self.ar.ui_manager.set_progress("HumanIk - Snap ikFk", self.ar.data.lang['m239_motionCapture'], add_one=False, add_number=False, max=(end_frame-start_frame))
                 initial_time = cmds.currentTime(query=True)
                 for t in range(start_frame, end_frame+1):
-                    self.ar.utils.set_progress("Timeline")
+                    self.ar.ui_manager.set_progress("Timeline")
                     cmds.currentTime(t)
                     self.run_ikfk_snap()
                 cmds.currentTime(initial_time)
-                self.ar.utils.set_progress(end_it=True)
+                self.ar.ui_manager.set_progress(end_it=True)

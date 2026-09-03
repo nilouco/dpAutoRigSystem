@@ -36,9 +36,9 @@ class ImportReference(action.BaseAction):
         else:
             references = cmds.file(query=True, reference=True)
         if references:
-            self.ar.utils.set_progress(max=len(references), add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(max=len(references), add_one=False, add_number=False)
             for reference in references:
-                self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                 self.checked_items.append(reference)
                 self.found_issues.append(True)
             if self.first_mode:

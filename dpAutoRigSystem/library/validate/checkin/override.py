@@ -39,9 +39,9 @@ class Override(action.BaseAction):
                         nodes = inputs
                     if nodes:
                         override_items = []
-                        self.ar.utils.set_progress(max=len(nodes), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
-                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             if cmds.objExists(item+".overrideEnabled"):
                                 if cmds.getAttr(item+".overrideEnabled") == 1:
                                     override_items.append(item)

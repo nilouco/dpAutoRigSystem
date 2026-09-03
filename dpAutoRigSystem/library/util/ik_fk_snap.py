@@ -185,7 +185,7 @@ class IkFkSnap(object):
         corner_base_pos_y = corner_pos[1] - pv_base_pos_y
         corner_base_pos_z = corner_pos[2] - pv_base_pos_z
         # magnitude of the vector
-        mag_dir = math.sqrt(corner_base_pos_x**2+corner_base_pos_y**2+corner_base_pos_z**2)
+        mag_dir = self.ar.math.magnitude([corner_base_pos_x, corner_base_pos_y, corner_base_pos_z])
         # normalize the vector
         normal_dir_x = corner_base_pos_x / mag_dir
         normal_dir_y = corner_base_pos_y / mag_dir

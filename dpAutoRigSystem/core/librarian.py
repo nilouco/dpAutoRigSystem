@@ -56,7 +56,7 @@ class Lib(object):
             self.ar.data.loaded_path = True
         
         # find all guide modules:
-        modules = self.ar.utils.find_modules_by_folder(path, folder)
+        modules = self.ar.env.find_modules_by_folder(path, folder)
         if modules:
             for module in modules:
                 lib_instance, imported_module = self.initialize_library(module, folder, path)
@@ -70,7 +70,6 @@ class Lib(object):
                 folder = path
             if not folder in self.ar.data.lib.keys():
                 self.ar.data.lib[folder] = { 
-                                            #"modules" : modules,
                                             "instances" : libs,
                                             "imported" : imported_modules,
                                             "names" : class_names
@@ -116,7 +115,7 @@ class Lib(object):
 
     def import_library(self, module, folder, path=None):
         imported_module = None
-        basePath = self.ar.utils.find_env("PYTHONPATH", "dpAutoRigSystem")
+        basePath = self.ar.env.find_env("PYTHONPATH", "dpAutoRigSystem")
         try:
             if folder:
                 folder = folder.replace("/", ".")

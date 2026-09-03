@@ -40,11 +40,11 @@ class ScalableDeformer(action.BaseAction):
             if check_items:
                 option_ctrl = self.ar.utils.get_node_by_message("optionCtrl")
                 if option_ctrl:
-                    self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                    self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                     rig_scale_output = [option_ctrl+"."+self.rig_scale_output_attr]
                     to_fix_item_attrs = []
                     for node in check_items:
-                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         node_type = cmds.objectType(node)
                         # check skinCluster nodes and connections
                         if node_type == "skinCluster":

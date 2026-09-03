@@ -75,9 +75,9 @@ class InputOrderIO(action.BaseAction):
         """ Return the deformer order data dictionary to export.
         """
         order_data = {}
-        self.ar.utils.set_progress(max=len(deformed_items), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(deformed_items), add_one=False, add_number=False)
         for item in deformed_items:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             order_data[item] = self.ar.skin.get_order_items(item)
         return order_data
     
@@ -85,11 +85,11 @@ class InputOrderIO(action.BaseAction):
     def import_input_order(self, order_data):
         """ Import the input order data from given dictionary.
         """
-        self.ar.utils.set_progress(max=len(order_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(order_data.keys()), add_one=False, add_number=False)
         well_imported = True
         to_import_items, not_found_meshs, = [], []
         for item in order_data.keys():
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 to_import_items.append(item)
             else:

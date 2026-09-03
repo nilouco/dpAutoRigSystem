@@ -111,9 +111,9 @@ class GuideIO(action.BaseAction):
         """ Return a dictionary of the guide data to export it.
         """
         to_export_data = {}
-        self.ar.utils.set_progress(max=len(nets), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(nets), add_one=False, add_number=False)
         for net in nets:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # mount a data with all data 
             if "afterData" in cmds.listAttr(net):
                 if "rawGuide" in cmds.listAttr(net) and cmds.getAttr(net+".rawGuide"):
@@ -183,12 +183,12 @@ class GuideIO(action.BaseAction):
                             custom_name = self.net_data["GuideData"][item]["customName"]
                             if custom_name:
                                 if not rebuilding: #template
-                                    custom_name = self.ar.utils.get_translated_names(custom_name)
+                                    custom_name = self.ar.naming.get_translated_names(custom_name)
                                 self.instance.set_guide_custom_name(custom_name)
                         elif base_attr == "mirrorAxis":
                             cmds.setAttr(new_item+".mirrorAxis", self.net_data["GuideData"][item]["mirrorAxis"], type="string")
-                            start = self.ar.utils.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][0])
-                            end = self.ar.utils.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][-1])
+                            start = self.ar.naming.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][0])
+                            end = self.ar.naming.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][-1])
                             cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
                             self.instance.create_mirror_preview()
                         elif base_attr == "nJoints":
@@ -258,7 +258,7 @@ class GuideIO(action.BaseAction):
 
     def parse_repeated_nets(self, guide_data):
         if len(self.ar.utils.get_network_by_attr("dpGuideNet")):
-            last_number = int(self.ar.utils.find_last_number())
+            last_number = int(self.ar.naming.find_last_number())
             for n in reversed(range(0, len(guide_data))):
                 old_net_number = str(guide_data[list(guide_data.keys())[n]]['GuideNumber']).zfill(3)
                 new_net_number = str(last_number+n).zfill(3)
@@ -277,7 +277,7 @@ class GuideIO(action.BaseAction):
         to_initialize_guide = True
         ask_again = True
         self.correlations = {}
-        self.ar.utils.set_progress(max=len(guide_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(guide_data.keys()), add_one=False, add_number=False)
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = True
             self.ar.filler.fill_created_guides()
@@ -317,7 +317,7 @@ class GuideIO(action.BaseAction):
                 if to_initialize_guide:
                     try:
                         self.net_data = guide_data[net]
-                        self.ar.utils.set_progress(self.ar.data.lang[self.title]+': '+guide_data[net]['ModuleType'])
+                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+': '+guide_data[net]['ModuleType'])
                         # create a module instance:
                         self.instance = self.ar.lib.initialize_library(self.net_data['ModuleType'], self.ar.data.standard_folder)[0]
                         self.correlations[f"{self.net_data['ModuleType']}__dpAR_{self.net_data['GuideNumber']}"] = self.instance.guide_namespace

@@ -440,7 +440,7 @@ class GuideUI(object):
         win_height = 180
         width_size = (0.8*win_width)
         # creating Plus Info Window:
-        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.color_override_win_name)
         if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
             cmds.deleteUI('plus_fl')
         else:
@@ -566,7 +566,7 @@ class GuideUI(object):
         """ Show a little window to choose the color of the button and the override the guide.
             From the old dpColorOverride extra tool. Thanks!
         """
-        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.color_override_win_name)
         # creating colorOverride Window:
         width  = 170
         height = 115

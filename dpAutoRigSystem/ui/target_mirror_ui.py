@@ -13,7 +13,7 @@ class TargetMirrorUI(object):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         self.app = app
-        self.ar.utils.close_ui('dpTargetMirrorWindow')
+        self.ar.ui_manager.close_ui('dpTargetMirrorWindow')
         # creating targetMirrorUI Window:
         width  = 305
         height = 250

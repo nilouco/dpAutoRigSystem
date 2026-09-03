@@ -84,7 +84,7 @@ class OneSkeleton(base.BaseLibrary):
                 cmds.select(root)
             self.re_set_scale(unique_inf_items)
             self.ar.ctrls.set_controller_scale_compensate(False)
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang["v014_notFoundNodes"]+'\";')
 
@@ -104,9 +104,9 @@ class OneSkeleton(base.BaseLibrary):
         """
         scale_constraints = []
         new_joints = []
-        self.ar.utils.set_progress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(source_items), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(source_items), add_one=False, add_number=False)
         for sourceNode in source_items:
-            self.ar.utils.set_progress("Joint")
+            self.ar.ui_manager.set_progress("Joint")
             cmds.select(clear=True)
             new_joint = cmds.joint(name=self.prefix+sourceNode+self.suffix, scaleCompensate=False)
             new_joints.append(new_joint)

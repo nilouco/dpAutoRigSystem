@@ -13,7 +13,7 @@ class ReorderAttrUI(object):
         """
         self.app = app
         # creating dpReorderAttrUI Window:
-        self.ar.utils.close_ui('dpReorderAttrWindow')
+        self.ar.ui_manager.close_ui('dpReorderAttrWindow')
         width  = 175
         height = 75
         cmds.window('dpReorderAttrWindow', title=self.ar.data.lang["m087_reorderAttr"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)

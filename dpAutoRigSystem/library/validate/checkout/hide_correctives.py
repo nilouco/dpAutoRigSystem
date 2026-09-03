@@ -39,8 +39,8 @@ class HideCorrectives(action.BaseAction):
                 else:
                     check_items = cmds.attributeQuery('correctiveCtrls', node=option_ctrl, exists=True)
                 if check_items:
-                    self.ar.utils.set_progress(max=1)
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(max=1)
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     item = option_ctrl+".correctiveCtrls"
                     # conditional to check here
                     check_channel_box = cmds.getAttr(item, channelBox=True)

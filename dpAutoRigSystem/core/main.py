@@ -21,6 +21,8 @@
 # Import libraries
 from importlib import reload
 from ..library.util import utils
+from ..library.util import math
+from ..library.util import naming
 from ..library.util import controllers
 from ..library.util import skinning
 from ..library.base import standard
@@ -90,6 +92,8 @@ class Start(object):
         if self.dev:
             print("Dev mode = True")
             reload(utils)
+            reload(math)
+            reload(naming)
             reload(controllers)
             reload(skinning)
             reload(standard)
@@ -143,6 +147,8 @@ class Start(object):
         self.config = settings.Configuration(self)
         self.opt = settings.Option(self)
         self.agree = settings.Agreement(self)
+        self.env = settings.Environment(self)
+        self.web = settings.Web(self)
         self.updater = updater.Updater(self)
         self.job = job.Job(self)
 
@@ -151,6 +157,8 @@ class Start(object):
         self.maker = maker.Maker(self)
         self.composer = maker.Composer(self)
         self.utils = utils.Utils(self)
+        self.naming = naming.Naming(self)
+        self.math = math.Math(self)
         self.pipeliner = pipeliner.Pipeliner(self)
         self.packager = packager.Packager(self)
         self.ctrls = controllers.Controllers(self)

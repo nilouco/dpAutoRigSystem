@@ -90,7 +90,7 @@ class HeadDeformer(base.BaseLibrary):
         position = [self.ar.data.lang["c100_bottom"], self.ar.data.lang["m033_middle"], self.ar.data.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
-        valid_name = self.ar.utils.validate_name(deformer_name+"_FFD", "FFD")
+        valid_name = self.ar.naming.validate_name(deformer_name+"_FFD", "FFD")
         numbering = valid_name.replace(deformer_name, "")[:-4]
         if numbering:
             deformer_name = deformer_name+numbering
@@ -415,7 +415,7 @@ class HeadDeformer(base.BaseLibrary):
             self.ar.ctrls.set_string_attr_from_items(arrow_ctrl, hd_calibrations)
             
             # rename unitConversion nodes
-            self.ar.utils.node_renaming_treatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
+            self.ar.naming.node_renaming_treatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
             # add ignoreTranformIO attribute
             self.ar.utils.add_attr_to_items([lattice_def_items[1], lattice_def_items[2], offset_grp, arrow_ctrl_grp], self.ar.utils.ignore_transform_io_attr)
             # add dpID attributes

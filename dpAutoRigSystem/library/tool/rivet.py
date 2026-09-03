@@ -383,7 +383,7 @@ class Rivet(base.BaseLibrary):
                 
             # working with follicles and attaches
             for r, rivet in enumerate(rivets):
-                self.ar.utils.set_progress(self.ar.data.lang['i317_creatingRivet'])
+                self.ar.ui_manager.set_progress(self.ar.data.lang['i317_creatingRivet'])
                 rivet_pos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if add_father_grp:
                     rivet = cmds.group(rivet, name=rivet+"_"+self.rivet_grp_name)
@@ -491,7 +491,7 @@ class Rivet(base.BaseLibrary):
         else:
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
-        self.ar.utils.node_renaming_treatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
+        self.ar.naming.node_renaming_treatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.old_unit_conversions)))
         self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID
         cmds.select(clear=True)
         return self.nets
@@ -567,7 +567,7 @@ class Rivet(base.BaseLibrary):
         """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
             Returns the suggested name.
         """
-        to_rivet_name = self.ar.utils.extract_suffix(geo)
+        to_rivet_name = self.ar.naming.extract_suffix(geo)
         if "|" in to_rivet_name:
             to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         i = 0
@@ -696,7 +696,7 @@ class Rivet(base.BaseLibrary):
         #Renaming
         hist = cmds.listHistory(morph_geo)
         morphs = cmds.ls(hist, type="morph")[0]
-        to_rivet_name = self.ar.utils.extract_suffix(morph_geo)
+        to_rivet_name = self.ar.naming.extract_suffix(morph_geo)
         if "|" in to_rivet_name:
             to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         morph_node = cmds.rename(morphs, to_rivet_name+"_Mrp")
@@ -718,7 +718,7 @@ class Rivet(base.BaseLibrary):
         hist = cmds.listHistory(wrap_geo)
         wrap_items = cmds.ls(hist, type="wrap")[0]
         # Renaming
-        to_rivet_name = self.ar.utils.extract_suffix(wrap_geo)
+        to_rivet_name = self.ar.naming.extract_suffix(wrap_geo)
         if "|" in to_rivet_name:
             to_rivet_name = to_rivet_name[to_rivet_name.rfind("|")+1:]
         wrap_node = cmds.rename(wrap_items, to_rivet_name+"_Wrp")

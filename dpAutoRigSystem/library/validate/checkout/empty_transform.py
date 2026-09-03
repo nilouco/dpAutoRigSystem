@@ -38,14 +38,14 @@ class EmptyTransform(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, long=True, type="transform") #list all transforms in the scene
             if check_items:
-                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 empty_transforms = self.filter_empty_transforms(check_items)
                 empty_transforms.extend(self.filter_empty_transforms(self.get_ignore_connected(), True))
                 # conditional to check here
                 if empty_transforms:
                     for item in empty_transforms:
-                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
-                        self.checked_items.append(self.ar.utils.get_short_name(item, False))
+                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
+                        self.checked_items.append(self.ar.naming.get_short_name(item, False))
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.good_results.append(False)

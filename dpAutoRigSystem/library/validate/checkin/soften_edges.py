@@ -37,9 +37,9 @@ class SoftenEdges(action.BaseAction):
             else:
                 meshes = cmds.ls(selection=False, type="mesh")
             if meshes:
-                self.ar.utils.set_progress(max=len(meshes), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(meshes), add_one=False, add_number=False)
                 for mesh in meshes:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(mesh):
                         cmds.select(mesh)
                         # set selection only non-smoothed edges

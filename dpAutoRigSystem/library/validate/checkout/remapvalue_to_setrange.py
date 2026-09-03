@@ -71,10 +71,10 @@ class RemapvalueToSetrange(action.BaseAction):
                     to_change_rmv_items.append(item)
                 # conditional to check here
                 if to_change_rmv_items:
-                    self.ar.utils.set_progress(max=len(to_change_rmv_items), add_one=False, add_number=False)
+                    self.ar.ui_manager.set_progress(max=len(to_change_rmv_items), add_one=False, add_number=False)
                     well_done = True
                     for rmv_node in to_change_rmv_items:
-                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         self.found_issues.append(True)
                         if self.first_mode:
                             self.checked_items.append(rmv_node)

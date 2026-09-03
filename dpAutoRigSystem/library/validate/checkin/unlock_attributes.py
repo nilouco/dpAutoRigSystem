@@ -39,9 +39,9 @@ class UnlockAttributes(action.BaseAction):
                         nodes = inputs
                     if nodes:
                         locked_attr_data = {}
-                        self.ar.utils.set_progress(max=len(nodes), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress(max=len(nodes), add_one=False, add_number=False)
                         for item in nodes:
-                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             locked_attrs = cmds.listAttr(item, locked=True)
                             if locked_attrs:
                                 locked_attr_data[item] = locked_attrs

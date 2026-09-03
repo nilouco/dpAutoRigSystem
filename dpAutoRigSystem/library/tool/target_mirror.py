@@ -72,7 +72,7 @@ class TargetMirror(base.BaseLibrary):
                 if not targets:
                     targets = cmds.textScrollList('target_mirror_targets_tsl', query=True, allItems=True)
                 if targets:
-                    self.ar.utils.set_progress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targets), add_one=False, add_number=False)
+                    self.ar.ui_manager.set_progress('Target: '+self.ar.data.lang['c110_start'], self.ar.data.lang["m055_tgtMirror"], len(targets), add_one=False, add_number=False)
                     cancelled = False
                     self.to_ids = []
                     # get mirror information from UI
@@ -86,7 +86,7 @@ class TargetMirror(base.BaseLibrary):
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        self.ar.utils.set_progress("Target: "+item)
+                        self.ar.ui_manager.set_progress("Target: "+item)
                         if not item == orig_node:
                             # start copying
                             if self.check_geometry(item):
@@ -128,6 +128,6 @@ class TargetMirror(base.BaseLibrary):
                                 # clear undo
                                 if clear_undo:
                                     mel.eval("flushUndo;")
-                    self.ar.utils.set_progress(end_it=True)
+                    self.ar.ui_manager.set_progress(end_it=True)
                     self.ar.custom_attr.add_attr(0, self.to_ids, descendents=True) #dpID
                 cmds.select(clear=True)

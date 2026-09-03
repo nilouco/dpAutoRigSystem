@@ -529,7 +529,7 @@ class Pipeliner(object):
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         if close_ui:
-            self.ar.utils.close_ui('dpPipelinerWindow')
+            self.ar.ui_manager.close_ui('dpPipelinerWindow')
 
 
     def mount_package_path(self):
@@ -589,7 +589,7 @@ class Pipeliner(object):
                     else:
                         wh = self.pipe_data['h001_publishing']
                     if wh:
-                        self.pipe_data['publishedWebhook'] = self.ar.utils.mount_wh(self.ar.data.discord_url, wh)
+                        self.pipe_data['publishedWebhook'] = self.ar.web.mount_wh(self.ar.data.discord_url, wh)
             # callback
             if not self.pipe_data['s_callback']:
                 callback = os.path.join(self.pipe_data['path'], self.callback_file)
@@ -741,7 +741,7 @@ class Pipeliner(object):
                 this_type = "mayaBinary"
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=this_type, force=True)
-            self.ar.utils.close_ui("dpSaveVersionWindow")
+            self.ar.ui_manager.close_ui("dpSaveVersionWindow")
             self.ar.data.rebuilding = False
             self.refresh_asset_data()
 
@@ -883,7 +883,7 @@ class Pipeliner(object):
                 cmds.file(rename=self.new_asset_file)
                 cmds.workspace(directory=folder)
                 cmds.file(save=True, type="mayaAscii", force=True)
-                self.ar.utils.close_ui("dpNewAssetWindow")
+                self.ar.ui_manager.close_ui("dpNewAssetWindow")
                 self.ar.data.rebuilding = False
                 self.refresh_asset_data()
             else:

@@ -2,16 +2,11 @@
 from maya import cmds
 from maya import mel
 from maya import OpenMaya
-from importlib import reload
 import os
 import re
 import cProfile
-import webbrowser
-import math
 import json
 import time
-import getpass
-import datetime
 import stat
 import unicodedata
 
@@ -23,9 +18,7 @@ class Utils(object):
         """
         # define variables
         self.ar = ar
-        self.order = "_order"
         self.ignore_transform_io_attr = "dpNotTransformIO"
-        self.progress = False
         self.load_variables()
 
 
@@ -76,174 +69,6 @@ class Utils(object):
                                                             }
                                 }
         self.type_out_multi_attr_data = {"chooser" : {"output" : []}}
-        
-
-    # UTILS functions:
-    def find_env(self, key, path):
-        """ Find and return the environ directory of this system.
-        """
-        env = os.environ[key]
-        split_envs = []
-        if os.name == "posix":
-            split_envs = env.split(":")
-        else:
-            split_envs = env.split(";")
-        env_path = ""
-        if split_envs:
-            split_envs = [x for x in split_envs if x != "" and x != ' ' and x != None]
-            for env in split_envs:
-                env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
-                if env in self.ar.data.dp_auto_rig_path:
-                    try:
-                        env_path = self.ar.data.dp_auto_rig_path.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
-                    except:
-                        pass
-                    if len(env) < 4:
-                        env_path = self.ar.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
-                        return env_path+"."+path
-                    break
-        # if we are here, we must return a default path:
-        split_envs = env.rpartition(path)
-        if os.name == "posix":
-            if env_path != "":
-                env_path = env_path+".dpAutoRigSystem"
-            else:
-                env_path = "dpAutoRigSystem"
-        else:
-            if ":" in env_path:
-                env_path = split_envs[0][split_envs[0].rfind(":")-1:]
-        if env_path == "" or env_path == " " or env_path == None:
-            return path
-        return env_path
-
-
-    def find_files_by_folder(self, path, folder, ext="py"):
-        """ Find all files in the directory with the extension.
-            Return a list of all module names (without the given extension).
-        """
-        file_dir = path + "/" + folder.replace(".", "/")
-        all_files = os.listdir(file_dir)
-        # select only files with extension:
-        files = []
-        for file in all_files:
-            if file.endswith(f".{ext}") and str(file) != "__init__.py":
-                files.append(str(file)[:file.rfind(".")])
-        return files
-
-
-    def find_modules_by_folder(self, path, folder, ext="py"):
-        """ Find all modules in the directory.
-            If find an _order*.txt file it will order the list for priority proporses.
-            Return a list of all module names (without the given extension).
-        """
-        folder = folder.replace(".", "/")
-        modules = self.find_files_by_folder(path, folder, ext)
-        for text in self.find_files_by_folder(path, folder, "txt"):
-            if text.startswith(self.order):
-                desired_order_items = []
-                dups = modules.copy()
-                modules = []
-                with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
-                    for line in filename.readlines():
-                        desired_order_items.append(line.strip())
-                if desired_order_items:
-                    for item in desired_order_items:
-                        if item in dups:
-                            modules.append(item)
-                            dups.remove(item)
-                if dups:
-                    modules.extend(dups)
-        return modules
-
-
-    def find_module_names_by_folder(self, path, folder):
-        """ Find all modules names for this directory.
-            Return a list with the valid modules and valid modules names.
-        """
-        valid_modules = self.find_modules_by_folder(path, folder)
-        valid_module_names = []
-        guide_folder = self.find_env("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder
-        for m in valid_modules:
-            mod = __import__(guide_folder+"."+m, {}, {}, [m])
-            if self.ar.dev:
-                reload(mod)
-            valid_module_names.append(mod.CLASS_NAME)
-        return(valid_modules, valid_module_names)
-
-
-    def find_last_number(self, name="dpGuideNet", attr="guideNumber", pad=3):
-        """ Returns a padding string of the number of network node in the scene or zero.
-        """
-        nodes = self.get_network_by_attr(name)
-        if not nodes:
-            return str(0).zfill(pad)
-        else:
-            numbers = []
-            for node in nodes:
-                if attr in cmds.listAttr(node):
-                    numbers.append(int(cmds.getAttr(node+"."+attr)))
-            if not numbers:
-                return str(0).zfill(pad)
-            else:
-                return str(max(numbers)+1).zfill(pad)
-
-
-    def find_module_last_number(self, class_name, type_name, guide_net=False):
-        """ Find the last used number of this type of module or guideNet.
-            Return its highest number.
-        """
-        # work with rigged modules in the scene:
-        nodes, numbers = [], []
-        guide_type_count = 0
-        if guide_net:
-            nodes = self.get_network_by_attr("dpGuideNet")
-        else:
-            nodes = cmds.ls(selection=False, transforms=True)
-        if nodes:
-            for node in nodes:
-                if cmds.objExists(node+"."+type_name):
-                    if cmds.getAttr(node+"."+type_name) == class_name:
-                        numbers.append(class_name)
-        # try check if there is a masterGrp and get its counter:
-        all_grp = self.get_all_grp()
-        if all_grp:
-            guide_type_count = cmds.getAttr(all_grp+'.dp'+class_name+'Count') #v5
-        if guide_type_count > len(numbers):
-            return guide_type_count
-        else:
-            return len(numbers)
-    
-        
-    def normalize_text(self, inputted_text="", prefixMax=4):
-        """ Analisys the inputted_text to conform it in order to use in Application (Maya).
-            Return the normalized text.
-        """
-        normal_text = ""
-        inputted_text = ''.join(c for c in unicodedata.normalize('NFD', inputted_text) if unicodedata.category(c) != 'Mn') #strip accents
-        if inputted_text:
-            # analisys if it starts with number or has a whitespace or special character:
-            if re.match("[0-9]", inputted_text[0]): #starts with number
-                return normal_text
-            else:
-                #if re.search("\s", inputted_text[:len(inputted_text)-1]): #has space
-                inputted_text = inputted_text.replace(" ", "_")
-                while re.search(r"\W", inputted_text): #special character
-                    span = re.search(r"\W", inputted_text).span()[0]
-                    inputted_text = inputted_text[:span]+"_"+inputted_text[span+1:]
-                if not len(inputted_text) < prefixMax:
-                    inputted_text = inputted_text[:prefixMax]
-                normal_text = inputted_text
-        return normal_text
-
-
-    def get_suffix_numbers(self, name):
-        """ Returns a list of [index, base_name, suffixTrailingNumber]
-        """
-        idx = name.rfind(next(filter(lambda x: not x.isdigit(), name[::-1])))
-        if idx:
-            return [idx, name[:idx+1], name[idx+1:]]
-        else:
-            return [None, None, None]
 
 
     def remove_user_defined_attr(self, node, keep_origined_from=False):
@@ -278,7 +103,7 @@ class Utils(object):
                 suffix = "_Zero_0_Grp"
                 transform_name = transform
                 if transform_name.endswith("_Grp"):
-                    transform_name = self.extract_suffix(transform_name)
+                    transform_name = self.ar.naming.extract_suffix(transform_name)
                     if "_Zero_" in transform_name:
                         need_add_number = True
                         while need_add_number:
@@ -438,41 +263,6 @@ class Utils(object):
         return hook
 
 
-    def create_dist_between(self, a, b, name="temp_DistBet", keep=False):
-        """ Creates a distance between node for 2 objects a and b.
-            Keeps them in the scene or delete.
-            Returns the distance value only in case of not keeping dist_bet node or
-            a list of distance value, distanceNode, two nulls used to calculate and the created constraint.
-        """
-        if cmds.objExists(a) and cmds.objExists(b):
-            # create nulls:
-            null_a = cmds.createNode('transform', name=a+"_DistBetNull_Grp")
-            null_b = cmds.createNode('transform', name=b+"_DistBetNull_Grp")
-            null_c = cmds.createNode('transform', name=b+"_DistBetNull_OrigRef_Grp")
-            cmds.pointConstraint(a, null_a, maintainOffset=False, name=null_a+"_PoC")
-            cmds.pointConstraint(b, null_b, maintainOffset=False, name=null_b+"_PoC")
-            cmds.delete(cmds.pointConstraint(b, null_c, maintainOffset=False))
-            poc = cmds.pointConstraint(b, null_c, null_b, maintainOffset=False, name=null_b+"_PoC")[0]
-            # create distanceBetween node:
-            dist_bet = cmds.createNode("distanceBetween", n=name)
-            # connect aPos to the distance between point1:
-            cmds.connectAttr(null_a+".tx", dist_bet+".point1X")
-            cmds.connectAttr(null_a+".ty", dist_bet+".point1Y")
-            cmds.connectAttr(null_a+".tz", dist_bet+".point1Z")
-            # connect bPos to the distance between point2:
-            cmds.connectAttr(null_b+".tx", dist_bet+".point2X")
-            cmds.connectAttr(null_b+".ty", dist_bet+".point2Y")
-            cmds.connectAttr(null_b+".tz", dist_bet+".point2Z")
-            dist = cmds.getAttr(dist_bet+".distance")
-            if keep:
-                self.add_attr_to_items([null_a, null_b, null_c], self.ignore_transform_io_attr)
-                self.ar.custom_attr.add_attr(0, [dist_bet]) #dpID
-                return [dist, dist_bet, null_a, null_b, null_c, poc]
-            else:
-                cmds.delete(dist_bet, null_a, null_b, null_c, poc)
-                return [dist, None, None, None, None, None]
-
-
     def clear_node_grp(self, item='dpAR_GuideMirror_Grp', attr='guideBaseMirror', unparent=False):
         """ Check if there is any node with the attribute attr in the item and then unparent its children and delete it.
         """
@@ -570,19 +360,6 @@ class Utils(object):
         return guides_to_rig
 
 
-    def get_ctrl_radius(self, item):
-        """ Calculate and return the final radius to be used as a size of controls.
-        """
-        radius = float(cmds.getAttr(item+".translateX"))
-        parents = self.get_parents(item)
-        if (parents):
-            for parent in parents:
-                radius *= cmds.getAttr(parent+'.scaleX')
-                if "worldSize" in cmds.listAttr(parent):
-                    radius *= cmds.getAttr(parent+".worldSize")
-        return radius
-
-
     def create_zero_out_joints(self, joints=None, display_bone=False):
         """ Duplicate the joints, parent as create_zero_out.
             Returns the father joints (zeroOuted).
@@ -626,135 +403,6 @@ class Utils(object):
             if children:
                 for child in children:
                     cmds.delete(child)
-
-
-    def set_joint_label(self, joint_name, side_number, type_number, label):
-        """ Set joint labelling in order to help Maya calculate the skinning mirror correctly.
-            side:
-                0 = Center
-                1 = Left
-                2 = Right
-            type:
-                18 = Other
-        """
-        cmds.setAttr(joint_name+".side", side_number)
-        cmds.setAttr(joint_name+".type", type_number)
-        if type_number == 18: #other
-            cmds.setAttr(joint_name+".otherType", label, type="string")
-
-
-    def extract_suffix(self, item):
-        """ Remove suffix from a node name and return the base name.
-        """
-        end_suffixes = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp", "_Crv"]
-        for end_suffix in end_suffixes:
-            if item.endswith(end_suffix):
-                base_name = item[:item.rfind(end_suffix)]
-                return base_name
-            if item.endswith(end_suffix.lower()):
-                base_name = item[:item.rfind(end_suffix.lower())]
-                return base_name
-            if item.endswith(end_suffix.upper()):
-                base_name = item[:item.rfind(end_suffix.upper())]
-                return base_name
-        return item
-
-
-    def filter_name(self, name, items, separator):
-        """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
-            Returns the filtered list.
-        """
-        filtered_items = []
-        multi_filters = [name]
-        if separator in name:
-            multi_filters = list(name.split(separator))
-        for filter in multi_filters:
-            if filter:
-                for item in items:
-                    if str(filter) in item:
-                        if not item in filtered_items:
-                            filtered_items.append(item)
-        return filtered_items
-        
-        
-    def visit_website(self, url, *args):
-        """ Start browser with the given website URL address.
-        """
-        #webSiteString = "start "+URL
-        #os.popen(webSiteString)
-        webbrowser.open(url, new=2)
-        
-        
-    def check_loaded_plugin(self, plugin_name, message="Not loaded plugin"):
-        """ Check if plugin is loaded and try to load it.
-            Returns True if ok (loaded)
-            Returns False if not found or not loaded.
-        """
-        loaded_plugin = True
-        if not (cmds.pluginInfo(plugin_name, query=True, loaded=True)):
-            loaded_plugin = False
-            try:
-                cmds.loadPlugin(plugin_name+".mll")
-                loaded_plugin = True
-            except:
-                pass
-        if not loaded_plugin:
-            print(message, plugin_name)
-        return loaded_plugin
-        
-        
-    def create_twist_bone_matrix(self, node_a, node_b, twist_bone_name, twist_bone_md=None, axis='Z', inverse=True, *args):
-        """ Create matrix nodes and quaternion to extract rotate.
-            node_a = father transform node
-            node_b = child transform node
-            Returns the final multiplyDivide node created or given.
-            Reference:
-            https://bindpose.com/maya-matrix-nodes-part-2-node-based-matrix-twist-calculator/
-        """
-        twist_bone_mm = cmds.createNode("multMatrix", name=twist_bone_name+"_ExtractAngle_MM")
-        twist_bone_dm = cmds.createNode("decomposeMatrix", name=twist_bone_name+"_ExtractAngle_DM")
-        twist_bone_qte = cmds.createNode("quatToEuler", name=twist_bone_name+"_ExtractAngle_QtE")
-        cmds.connectAttr(node_b+".worldMatrix[0]", twist_bone_mm+".matrixIn[0]", force=True)
-        if inverse:
-            cmds.connectAttr(node_a+".worldInverseMatrix[0]", twist_bone_mm+".matrixIn[1]", force=True)
-        else:
-            cmds.connectAttr(node_a+".worldMatrix[0]", twist_bone_mm+".matrixIn[1]", force=True)
-        cmds.connectAttr(twist_bone_mm+".matrixSum", twist_bone_dm+".inputMatrix", force=True)
-        cmds.connectAttr(twist_bone_dm+".outputQuat.outputQuat"+axis, twist_bone_qte+".inputQuat.inputQuat"+axis, force=True)
-        cmds.connectAttr(twist_bone_dm+".outputQuat.outputQuatW", twist_bone_qte+".inputQuat.inputQuatW", force=True)
-        if twist_bone_md:
-            cmds.connectAttr(twist_bone_qte+".outputRotate.outputRotate"+axis, twist_bone_md+".input2"+axis, force=True)
-        else:
-            twist_bone_md = cmds.createNode("multiplyDivide", name=twist_bone_name+"_MD")
-            cmds.connectAttr(twist_bone_qte+".outputRotate.outputRotate"+axis, twist_bone_md+".input2"+axis, force=True)
-        self.ar.custom_attr.add_attr(0, [twist_bone_mm, twist_bone_dm, twist_bone_qte, twist_bone_md]) #dpID
-        return twist_bone_md
-        
-
-    def validate_name(self, item, suffix=None):
-        """ Check the default name in order to validate it and preserves the suffix naming.
-            Returns the correct node name.
-        """
-        if cmds.objExists(item):
-            need_restore_suffix = False
-            if suffix:
-                if item.endswith("_"+suffix):
-                    need_restore_suffix = True
-                    item = item[:item.rfind("_")]
-            # find numering:
-            i = 1
-            if not need_restore_suffix:
-                while cmds.objExists(item+str(i)):
-                    i += 1
-            else:
-                while cmds.objExists(item+str(i)+"_"+suffix):
-                    i += 1
-            # add number:
-            item = item+str(i)
-            if need_restore_suffix:
-                # restore suffix
-                item = item+"_"+suffix
-        return item
 
 
     def create_articulation_joint(self, father, brother, jcr_number=0, jcr_pos=None, jcr_rot=None, dist=1, jar_radius=1.5, do_scale=True, orient_ctrl=None):
@@ -881,51 +529,6 @@ class Utils(object):
     Open Maya Utils Functions
     '''
 
-    def extract_world_scale_from_matrix(self, item):
-        world_matrix = cmds.getAttr(item + ".worldMatrix")
-        m_mat = OpenMaya.MMatrix()
-        OpenMaya.MScriptUtil.createMatrixFromList(world_matrix, m_mat)
-        m_transform = OpenMaya.MTransformationMatrix(m_mat)
-        scale_util = OpenMaya.MScriptUtil()
-        scale_util.createFromDouble(0.0, 0.0, 0.0)
-        ptr = scale_util.asDoublePtr()
-        m_transform.getScale(ptr, OpenMaya.MSpace.kWorld)
-        x_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 0)
-        y_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 1)
-        z_scale = OpenMaya.MScriptUtil.getDoubleArrayItem(ptr, 2)
-        return [x_scale, y_scale, z_scale]
-
-
-    def resolve_name(self, name, suffix):
-        """ Resolve repeated name adding number in the middle of the string.
-            Returns the resolved base_name and name (including the suffix).
-        """
-        name = name[0].upper()+name[1:].replace(" ", "_")
-        base_name = name
-        name = name+"_00_"+suffix
-        if cmds.objExists(name):
-            i = 1
-            while cmds.objExists(name):
-                name = base_name+"_"+str(i).zfill(2)+"_"+suffix
-                i = i+1
-            base_name = base_name+"_"+str(i-1).zfill(2)
-        else:
-            base_name = base_name+"_00"
-        return base_name, name
-
-
-    def magnitude(self, v):
-        """ Returns the square root of the sum of power 2 from a given vector.
-        """
-        return math.sqrt(pow(v[0], 2)+pow(v[1], 2)+pow(v[2], 2))
-
-
-    def average_value(self, values):
-        """ Return the average value for the given value list.
-        """
-        return sum(values)/len(values)
-
-
     def joint_chain_length(self, joints):
         """ Returns a sum of the joint lengths given.
         """
@@ -941,7 +544,7 @@ class Utils(object):
                         y = b[1] - a[1]
                         z = b[2] - a[2]
                         v = [x,y,z]
-                        chainlength += self.magnitude(v)
+                        chainlength += self.ar.math.magnitude(v)
                 i += 1
         return chainlength
 
@@ -977,80 +580,6 @@ class Utils(object):
         return path_file
 
 
-    def create_validator_preset(self):
-        """ Creates a json file as a Validator Preset and returns it.
-        """
-        result = None
-        validators = self.ar.config.get_validator_instances()
-        if validators:
-            result_dialog = cmds.promptDialog(
-                                                title=self.ar.data.lang['i129_createPreset'],
-                                                message=self.ar.data.lang['i130_presetName'],
-                                                button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
-                                                defaultButton=self.ar.data.lang['i131_ok'],
-                                                cancelButton=self.ar.data.lang['i132_cancel'],
-                                                dismissString=self.ar.data.lang['i132_cancel'])
-            if result_dialog == self.ar.data.lang['i131_ok']:
-                result_name = cmds.promptDialog(query=True, text=True)
-                result_name = result_name[0].upper()+result_name[1:]
-                author = getpass.getuser()
-                date = str(datetime.datetime.now().date())
-                result = '{"_preset":"'+result_name+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
-                # add validators and its current active values
-                for validator in validators:
-                    result += ',"'+validator.name+'" : '+str(validator.active).lower()
-                result += "}"
-        return result
-
-
-    #
-    # TODO: passe it to Manager class
-    #
-    def close_ui(self, win_name, *args):
-        """ Closes the given window name if it exists.
-        """
-        if cmds.window(win_name, query=True, exists=True):
-            cmds.deleteUI(win_name, window=True)
-
-
-    def generate_id(self, name):
-        """ Return an ID generated by the sum of the "dp" string, plus the given name, plus dot, plus the current time.
-        """
-        now = str(round(time.time()*10000000000000))
-        word = ("dp"+str(name)).encode('utf-8').hex()
-        return word+"."+now
-
-
-    def get_decomposed_ids(self, id):
-        """ Returns a list with prefix, name and date from decomposed given dpID.
-        """
-        word, now = id.split(".")
-        info = bytes.fromhex(word).decode('utf-8')
-        prefix = info[0:2]
-        name = info[2:]
-        date = time.strftime("%a %b %d %H:%M:%S %Y", time.localtime(int(now)/10000000000000))
-        return [prefix, name, date]
-
-
-    def decompose_id(self, item):
-        """ Return a list with the name and date decomposed from dpID attribute of the given node.
-        """
-        if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
-            id = cmds.getAttr(item+"."+self.ar.data.dp_id)
-            return self.get_decomposed_ids(id)
-        return [None, None, None]
-    
-
-    def validate_id(self, item):
-        """ Return True if the decomposed name in the dpID is equal to the given node name.
-        """
-        if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
-            decomposed_id_items = self.decompose_id(item)
-            if "dp" == decomposed_id_items[0]:
-                if item == decomposed_id_items[1]:
-                    return True
-
-
     def check_saved_scene(self):
         """ Check if the current scene is saved to return True.
             Otherwise return False.
@@ -1060,12 +589,6 @@ class Utils(object):
         if not scene_path or modified_scene:
             return False
         return True
-
-
-    def mount_wh(self, start, end):
-        """ Mount and return path.
-        """
-        return "{}{}{}".format(start, "/", end)
 
 
     def clear_joint_label(self, joints):
@@ -1100,16 +623,6 @@ class Utils(object):
             cmds.connectAttr(world_ref+"."+attr_comp_name, pac+"."+joints_b[n]+"W1", force=True)
             cmds.connectAttr(world_ref+"."+attr_comp_name+"RevOutputX", pac+"."+joints_a[n]+"W0", force=True)
         return rev
-
-
-    def get_attr_name_lower(self, side, name):
-        """ Return the composed name for attributes starting with lower case.
-        """
-        attr_name_lower = name
-        if side:
-            attr_name_lower = side[0]+name
-        attr_name_lower = attr_name_lower[0].lower()+attr_name_lower[1:]
-        return attr_name_lower
 
 
     def set_attr_values(self, items, attributes, values, is_string=None):
@@ -1234,102 +747,6 @@ class Utils(object):
         return result_data
 
 
-    def node_renaming_treatment(self, items=None, node_type="unitConversion", suffix="_UC"):
-        """ Rename unitConversion nodes to something like this:
-            [IN]capitals+#+attr+_+[OUT]capitals+#+attr+"_UC"
-            or the given node_type and suffix.
-        """
-        if not items:
-            items = cmds.ls(selection=False, type=node_type)
-        if items:
-            self.ar.custom_attr.add_attr(0, items) #dpID
-            for item in items:
-                if not item.endswith(suffix):
-                    if cmds.attributeQuery("input", node=item, exists=True):
-                        new_name = self.get_capitals_name(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
-                    elif cmds.attributeQuery("input1", node=item, exists=True):
-                        new_name = self.get_capitals_name(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
-                    new_name += "_"
-                    if cmds.listConnections(item+".output", plugs=True, source=False, destination=True):
-                        new_name += self.get_capitals_name(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
-                    new_name += suffix
-                    cmds.rename(item, new_name)
-
-
-    def get_capitals_name(self, plug):
-        """ Returns a string of all capital letters from a given name.
-            Example:
-                    Head_Head_Ctrl.rotateX = HHCrotateX
-                    L_Arm_Wrist_Ctrl.translateZ = LAWCtranslateZ
-        """
-        return str("".join([n for n in plug.split(".")[0] if n.isupper() or n.isnumeric()])+plug.split(".")[1].replace("[", "").replace("]", ""))
-
-
-    def set_progress(self, message="Rigging...", header="dpAutoRigSystem", max=100, amount=0, add_one=True, add_number=True, end_it=False, is_interruptable=False, *args):
-        """ Centralize the progressWindow calling in one method.
-            Try to use the cmds.progressWindow as a more automate process.
-            
-            Arguments:
-                message = status
-                header = tittle
-                max = maxValue
-                amount = progress
-                add_one = increment amount plus 1
-                add_number = add amount to the end of the message string
-                end_it = end progress
-                is_interruptable = if we can interrupt the process or not. False by default.
-
-            Example:
-                self.ar.utils.set_progress(messageName, titleName, 20, add_one=False)
-                self.ar.utils.set_progress(doingName+': '+backWheelName)
-
-            Returns the progress: 
-                True if the progressWindow is running
-                False if the progressWindow was ended or cancelled
-        """
-        if end_it:
-            cmds.progressWindow(endProgress=True)
-            self.progress = False
-        else:
-            if self.progress: #edit
-                if add_one:
-                    self.current_amount += 1
-                else:
-                    self.current_amount = amount
-                if message == "Rigging...":
-                    if max > 0:
-                        cmds.progressWindow(edit=True, maxValue=max, progress=0)
-                else:
-                    if add_number:
-                        message = message+" # "+str(self.current_amount)
-                    cmds.progressWindow(edit=True, progress=self.current_amount, status=message)
-            else: #create
-                self.current_amount = amount
-                cmds.progressWindow(title=header, progress=self.current_amount, status=message, maxValue=max, isInterruptable=is_interruptable)
-                self.progress = True
-        return self.progress
-
-
-    def get_short_name(self, name, v_bar=True):
-        """ Returns the short name of the given node.
-            Example:
-            |All_Grp|Render_Grp|Body_Mesh -> BodyMesh
-            |pCube1 -> pCube1
-        """
-        short_name = None
-        if name:
-            short_name = name
-            if "|" in name:
-                if name.count("|") > 1:
-                    if v_bar:
-                        short_name = name[name.rfind("|"):]
-                    else:
-                        short_name = name[name.rfind("|")+1:]
-                elif not v_bar:   
-                    short_name = name[1:]
-        return short_name
-
-
     def delete_file(self, file_path):
         """ Force delete the given file.
         """
@@ -1340,13 +757,6 @@ class Utils(object):
                 # use a brute force to delete without permission:
                 os.chmod(file_path, stat.S_IWUSR)
                 os.remove(file_path)
-
-
-    def get_duplicated_names(self):
-        """ Returns a list of duplicated names.
-            Returns False if there are only unique names.
-        """
-        return [n for n in cmds.ls(selection=False, shortNames=True) if "|" in n] or False
 
 
     def add_joint_end_attr(self, items):
@@ -1420,57 +830,10 @@ class Utils(object):
                 mel.eval("warning \""+item+" does not exists, maybe it was deleted, sorry.\";")
         else:
             mel.eval("warning \"Not found "+item+"\";")
-    
-    
-    def get_mdagpath_by_name(self, item):
-        """ Returns the OpenMaya MDagPath of the given item name.
-        """
-        selection = OpenMaya.MSelectionList()
-        selection.add(item)
-        dagpath = OpenMaya.MDagPath()
-        selection.getDagPath(0, dagpath)
-        return dagpath
 
 
     def get_keys_by_value(self, data, value):
         return [k for k, v in data.items() if v == value]
-
-
-    def get_translated_names(self, name, from_lang="english"):
-        custom_name = ""
-        splitted_names = name.split("_")
-        for n, splitted_name in enumerate(splitted_names):
-            # splits capital letters and numbers:
-            capitals = re.findall(r'\d+|[A-Z][a-z]*', splitted_name)
-            if capitals:
-                for capitalized_name in capitals:
-                    capitalize = False
-                    lang_names = self.get_keys_by_value(self.ar.data.lang_preset_data[from_lang], capitalized_name)
-                    if not lang_names:
-                        lang_names = self.get_keys_by_value(self.ar.data.lang_preset_data[from_lang], capitalized_name.lower())
-                        capitalize = True
-                    if lang_names:
-                        if capitalize:
-                            custom_name += self.ar.data.lang[lang_names[0]].capitalize()
-                        else:
-                            custom_name += self.ar.data.lang[lang_names[0]]
-                    else:
-                        custom_name += capitalized_name
-            else:
-                custom_name += splitted_name    
-            if n < len(splitted_names)-1:
-                custom_name += "_"
-        if custom_name:
-            return custom_name
-        return name
-
-
-    def to_snake_case(self, text):
-        # Inserts an underscore before any capital letter followed by a lowercase letter
-        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', text)
-        # Inserts an underscore before any capital letter if preceded by a lowercase letter or number
-        s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1)
-        return s2.lower()
 
 
     def set_template(self, items, value=1):
@@ -1485,46 +848,3 @@ class Utils(object):
         node_state_normal = cmds.getAttr(node+".nodeState") == 0
         not_user_defined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
         return not_connected and node_state_normal and not_user_defined
-
-
-
-
-    #######
-    #
-    # TODO: UNUSED vector math functions
-    #
-    #
-    def normalizeVector(self, v):
-        """ Returns the normalized given vector.
-        """
-        vmag = self.magnitude(v)
-        return [v[i]/vmag for i in range(len(v))]
-    #
-    #
-    def distanceVectors(self, u, v):
-        """ Returns the distance between 2 given points.
-        """
-        return math.sqrt((v[0]-u[0])**2+(v[1]-u[1])**2+(v[2]-u[2])**2)
-    #
-    #
-    def addVectors(self, u, v):
-        """ Returns the addition of 2 given vectors.
-        """
-        return [u[i]+v[i] for i in range(len(u))]
-    #
-    #
-    def subVectors(self, u, v):
-        """ Returns the substration of 2 given vectors.
-        """
-        return [u[i]-v[i] for i in range(len(u))]
-    #
-    #
-    def multVectors(self, u, v):
-        return [u[i]*v[i] for i in range(len(u))]
-    #
-    #
-    def multiScalarVector(self, u, scalar):
-        return [u[i]*scalar for i in range(len(u))]
-    #
-    #
-    #######

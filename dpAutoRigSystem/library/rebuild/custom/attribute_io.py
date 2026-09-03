@@ -83,7 +83,7 @@ class AttributeIO(action.BaseAction):
         """
         data = {}
         items = inputs.copy()
-        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for node in inputs:
             meshes = cmds.listRelatives(node, allDescendents=True, children=True, type="mesh")
             if meshes:
@@ -92,7 +92,7 @@ class AttributeIO(action.BaseAction):
         items = list(set(items))
         items.sort()
         for item in items:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             attributes = cmds.listAttr(item, userDefined=True)
             if attributes:
                 data[item] = {"attributes" : {},
@@ -124,12 +124,12 @@ class AttributeIO(action.BaseAction):
         """ Import attributes from exported dictionary.
             Add missing attributes and set them values if they don't exists.
         """
-        self.ar.utils.set_progress(max=len(attr_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(attr_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in attr_data.keys():
             not_found_nodes = []
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")

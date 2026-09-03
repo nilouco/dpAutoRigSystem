@@ -12,12 +12,6 @@ class Maker(object):
 
 
     def create_raw_guide(self, module, *args):
-        #
-        # TODO: review after rename modules without dp
-        #
-#        if not module.startswith("dp"):
-#            module = "dp"+module
-
         mod = self.ar.lib.initialize_library(module, self.ar.data.standard_folder)[0]
         return [mod, mod.build_raw_guide()]
 
@@ -30,7 +24,7 @@ class Maker(object):
         """ Creates a new standard guide, set the given values and returns a list with the imported module and the created guide.
         """
         if progress:
-            self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+name)
+            self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+name)
             cmds.refresh()
         mod, guide = self.create_raw_guide(module)
         mod.set_guide_custom_name(name)
@@ -98,7 +92,7 @@ class Maker(object):
         """
         # Duplicating a module guide
         print(self.ar.data.lang['i067_duplicating'])
-        self.ar.utils.set_progress("dpAutoRigSystem", self.ar.data.lang['i067_duplicating'], max=3, add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress("dpAutoRigSystem", self.ar.data.lang['i067_duplicating'], max=3, add_one=False, add_number=False)
         # declaring variables
         segments_attr = "nJoints"
         custom_name_attr = "customName"
@@ -121,7 +115,7 @@ class Maker(object):
         that_module_name = that_module_name[that_module_name.rfind(".")+1:]
         module_folder = module_instance_info_value[:module_instance_info_value.rfind(that_module_name)-1]
         module_folder = module_folder[module_folder.find(".")+1:]
-        self.ar.utils.set_progress(self.ar.data.lang['i067_duplicating'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['i067_duplicating'])
         # initializing a new module instance
         new_guide_instance, new_guide_name = self.create_raw_guide(that_module_name, self.ar.data.standard_folder)
         new_guide_namespace = cmds.getAttr(new_guide_name+"."+self.ar.data.module_namespace_attr)
@@ -140,12 +134,12 @@ class Maker(object):
             segments_value = cmds.getAttr(selected_item+'.'+segments_attr)
             if segments_value > 0:
                 new_guide_instance.change_joint_number(segments_value)
-        self.ar.utils.set_progress(self.ar.data.lang['i067_duplicating'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['i067_duplicating'])
         if custom_name_attr in current_attrs:
             custom_name_value = cmds.getAttr(selected_item+'.'+custom_name_attr)
             if custom_name_value != "" and custom_name_value != None:
                 new_guide_instance.set_guide_custom_name(custom_name_value)
-        self.ar.utils.set_progress(self.ar.data.lang['i067_duplicating'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['i067_duplicating'])
         if mirror_axis_attr in current_attrs:
             mirror_axis_value = cmds.getAttr(selected_item+'.'+mirror_axis_attr)
             if mirror_axis_value != "off":
@@ -198,7 +192,7 @@ class Maker(object):
 
         cmds.delete(selected_item)
         print(self.ar.data.lang['r006_wellDone']+" "+new_guide_name)
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
         return new_guide_name
     
 
@@ -476,11 +470,11 @@ class Maker(object):
                 reorder_attr = self.ar.config.get_instance("ReorderAttr", [self.ar.data.tools_folder])
                 if reorder_attr:
                     if verbose and not self.ar.data.rebuilding:
-                        self.ar.utils.set_progress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrs), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress('Reordering: '+self.ar.data.lang['c110_start'], 'Reordering Attributes', len(attrs), add_one=False, add_number=False)
                     delta = 0
                     for i, attr in enumerate(attrs):
                         if verbose:
-                            self.ar.utils.set_progress('Reordering Attributes: '+item)
+                            self.ar.ui_manager.set_progress('Reordering Attributes: '+item)
                         # get current user defined attributes:
                         current_attrs = cmds.listAttr(item, userDefined=True)
                         if attr in current_attrs:
@@ -489,17 +483,17 @@ class Maker(object):
                         else:
                             delta += 1
                     if verbose and not self.ar.data.rebuilding:
-                        self.ar.utils.set_progress(end_it=True)
-                    self.ar.utils.close_ui('dpReorderAttrWindow')
+                        self.ar.ui_manager.set_progress(end_it=True)
+                    self.ar.ui_manager.close_ui('dpReorderAttrWindow')
     
 
     def before_start_rig_all(self):
         if not self.ar.data.rebuilding:
             print('\ndpAutoRigSystem Log: ' + self.ar.data.lang['i178_startRigging'] + '...\n')
         # Starting progress window
-        self.ar.utils.set_progress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', add_one=False, add_number=False)
-        self.ar.utils.close_ui(self.ar.data.plus_info_win_name)
-        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
+        self.ar.ui_manager.set_progress(self.ar.data.lang['i178_startRigging'], 'dpAutoRigSystem', add_one=False, add_number=False)
+        self.ar.ui_manager.close_ui(self.ar.data.plus_info_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.color_override_win_name)
 
 
     def refresh_before_build(self):
@@ -773,7 +767,7 @@ class Maker(object):
         self.refresh_before_build()
         self.guides_to_rig = self.ar.utils.get_guides_to_rig()
         if self.guides_to_rig:
-            self.ar.utils.set_progress(max=len(self.guides_to_rig), add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(max=len(self.guides_to_rig), add_one=False, add_number=False)
             if not self.check_good_guide_version(self.guides_to_rig):
                 return
             if self.ar.data.compose_all:
@@ -784,14 +778,14 @@ class Maker(object):
                 item.serialize_guide()
             for item in self.guides_to_rig: #it needs another loop to serialize guides parenting before rig them
                 if item.custom_name:
-                    self.ar.utils.set_progress('Rigging: '+str(item.custom_name))
+                    self.ar.ui_manager.set_progress('Rigging: '+str(item.custom_name))
                 else:
-                    self.ar.utils.set_progress('Rigging: '+str(item.guide_namespace))
+                    self.ar.ui_manager.set_progress('Rigging: '+str(item.guide_namespace))
                 # TODO detected bug returning rig_me
                 item.rig_me() #rig it :)
             # integrating modules together:
             if self.ar.data.compose_all:
-                self.ar.utils.set_progress('Rigging: '+self.ar.data.lang['i010_composeCB'])
+                self.ar.ui_manager.set_progress('Rigging: '+self.ar.data.lang['i010_composeCB'])
                 self.colorize_curves()
                 self.origined_from_data = self.ar.utils.get_origined_from_data()
                 self.organize_hierarchy()
@@ -813,7 +807,7 @@ class Maker(object):
         if not self.ar.data.rebuilding:
             self.ar.ui_manager.refresh_ui()
             self.ar.logger.logWin()
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
         cmds.select(clear=True)
 
 

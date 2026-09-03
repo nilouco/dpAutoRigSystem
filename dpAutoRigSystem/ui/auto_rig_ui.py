@@ -121,7 +121,7 @@ class MainUI(object):
         cmds.menuItem('idiom_mi', label='Idioms', command=partial(self.ar.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250), parent='help_menu')
         cmds.menuItem('terms_mi', label='Terms and Conditions', command=self.ar.agree.ask_terms_cond, parent='help_menu')
         cmds.menuItem('update_mi', label='Update', command=partial(self.ar.updater.check_for_update, True), parent='help_menu')
-        cmds.menuItem('help_mi', label='Wiki...', command=partial(self.ar.utils.visit_website, self.ar.data.wiki_url), parent='help_menu')
+        cmds.menuItem('help_mi', label='Wiki...', command=partial(self.ar.web.visit_website, self.ar.data.wiki_url), parent='help_menu')
 
 
     def create_dev_menu(self):
@@ -131,7 +131,7 @@ class MainUI(object):
         cmds.menuItem('check_imported_guides_mi', label="Imported guides", command=partial(self.ar.filler.check_imported_guides, True), parent='check_guides_mi')
         cmds.menuItem('check_guide_nets_mi', label="Guide networks", command=self.ar.filler.check_guide_nets, parent='check_guides_mi')
         cmds.menuItem('check_guide_versions_mi', label="Guide versions", command=self.ar.filler.check_guide_versions, parent='check_guides_mi')
-        cmds.menuItem('end_progress_window_mi', label='End progress window', command=partial(self.ar.utils.set_progress, end_it=True), parent='dev_menu')
+        cmds.menuItem('end_progress_window_mi', label='End progress window', command=partial(self.ar.ui_manager.set_progress, end_it=True), parent='dev_menu')
 
 
     def create_radio_menu(self, name, parent_menu, current, data, option_var=None):

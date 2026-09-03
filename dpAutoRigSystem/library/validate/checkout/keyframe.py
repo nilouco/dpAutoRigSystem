@@ -46,9 +46,9 @@ class Keyframe(action.BaseAction):
                         if connections and not connections[0] in animated_items:
                             animated_items.append(connections[0])
                     if animated_items:
-                        self.ar.utils.set_progress(max=len(animated_items), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress(max=len(animated_items), add_one=False, add_number=False)
                         for item in animated_items:
-                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             if item in check_items:
                                 if cmds.objExists(item):
                                     connected_anim_curves = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend

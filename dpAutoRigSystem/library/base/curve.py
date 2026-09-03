@@ -157,7 +157,7 @@ class BaseCurve(base.BaseLibrary):
         # getting current selection:
         destinations = cmds.ls(selection=True, type="transform")
         # check if the given name is good or add a sequencial number on it:
-        self.cv_name = self.ar.utils.validate_name(cv_name, self.cv_suffix)
+        self.cv_name = self.ar.naming.validate_name(cv_name, self.cv_suffix)
         self.cv_id = cv_id
         self.cv_size = cv_size
         self.cv_degree = cv_degree

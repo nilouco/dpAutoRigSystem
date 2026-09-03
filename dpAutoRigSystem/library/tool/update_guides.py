@@ -415,7 +415,7 @@ class UpdateGuides(base.BaseLibrary):
     
 
     def do_delete(self, *args):
-        self.ar.utils.close_ui('update_summary_win')
+        self.ar.ui_manager.close_ui('update_summary_win')
         for guide in self.update_data:
             if cmds.listRelatives(guide, parent=True):
                 cmds.parent(guide, world=True)
@@ -462,33 +462,33 @@ class UpdateGuides(base.BaseLibrary):
     def do_update(self, *args):
         """ Main method to update the guides in the scene.
         """
-        self.ar.utils.close_ui('updateGuidesWindow')
+        self.ar.ui_manager.close_ui('updateGuidesWindow')
         # Starts progress bar feedback
-        self.ar.utils.set_progress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m198_renameOldGuides'], self.ar.data.lang['m186_updateGuides'], 7, add_one=False)
         # Rename guides to discard as *_OLD
         self.rename_old_guides()
-        self.ar.utils.set_progress(self.ar.data.lang['m199_creatingNewGuides'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.create_new_guides()
-        self.ar.utils.set_progress(self.ar.data.lang['m200_setAttrs'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
         self.set_new_guide_attr('attributes')
-        self.ar.utils.set_progress(self.ar.data.lang['m201_parentGuides'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parent_new_guides()
-        self.ar.utils.set_progress(self.ar.data.lang['m202_setTranforms'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
         self.set_new_guide_attr('transformAttributes')
-        self.ar.utils.set_progress(self.ar.data.lang['m203_setChildGuides'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m203_setChildGuides'])
         # Set all children attributes
         self.set_children_guides()
-        self.ar.utils.set_progress(self.ar.data.lang['m201_parentGuides'])
+        self.ar.ui_manager.set_progress(self.ar.data.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parent_retain_guides()
         self.patch_foot_rff()
         cmds.select(clear=True)
         # Ends progress bar feedback
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
         if self.ar.data.ui_state:
             # Calls for summary window
             self.ar.update_guides_ui.summary_ui()

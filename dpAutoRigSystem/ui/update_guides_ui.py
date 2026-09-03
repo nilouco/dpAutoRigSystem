@@ -12,8 +12,8 @@ class UpdateGuidesUI(object):
         """ This is the main method to load the Update Guides UI.
         """
         self.app = app
-        self.ar.utils.close_ui('updateGuidesWindow')
-        self.ar.utils.close_ui('update_summary_win')
+        self.ar.ui_manager.close_ui('updateGuidesWindow')
+        self.ar.ui_manager.close_ui('update_summary_win')
         if self.ar.data.ui_state:
             cmds.window('updateGuidesWindow', title="Guides Info")
             cmds.columnLayout('update_guide_main_cl', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
@@ -41,7 +41,7 @@ class UpdateGuidesUI(object):
     def summary_ui(self):
         """ Update Guides Summary UI for log info.
         """
-        self.ar.utils.close_ui('update_summary_win')
+        self.ar.ui_manager.close_ui('update_summary_win')
         new_data = self.app.get_new_attr()
         cmds.window('update_summary_win', title="Update Summary")
         cmds.columnLayout('summary_cl', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='update_summary_win')

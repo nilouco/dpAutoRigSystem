@@ -40,10 +40,10 @@ class ParentedGeometry(action.BaseAction):
                 mesh_transforms = self.get_mesh_transforms(check_items)
                 if mesh_transforms:
                     mesh_transforms = self.reorder_list(mesh_transforms)
-                    self.ar.utils.set_progress(max=len(mesh_transforms), add_one=False, add_number=False)
+                    self.ar.ui_manager.set_progress(max=len(mesh_transforms), add_one=False, add_number=False)
                     # avoid reporting the same item multiple times
                     for mesh in mesh_transforms:
-                        self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                         # check if exists to avoid missing nodes
                         if cmds.objExists(mesh):
                             all_children = cmds.listRelatives(mesh, allDescendents=True, fullPath=True, type='transform') or []
@@ -51,8 +51,8 @@ class ParentedGeometry(action.BaseAction):
                             children = self.ar.utils.filter_transforms([d for d in all_children if cmds.objExists(d) and d != mesh])
                             if children:
                                 for item in children:
-                                    if not self.ar.utils.get_short_name(item, False) in self.checked_items:
-                                        self.checked_items.append(self.ar.utils.get_short_name(item, False)) # get only the last part of the path
+                                    if not self.ar.naming.get_short_name(item, False) in self.checked_items:
+                                        self.checked_items.append(self.ar.naming.get_short_name(item, False)) # get only the last part of the path
                                         self.found_issues.append(True)
                                     if self.first_mode:
                                         self.good_results.append(False)

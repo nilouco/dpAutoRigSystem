@@ -39,7 +39,7 @@ class InvertedNormals(action.BaseAction):
             else:
                 meshes = cmds.ls(selection=False, type='mesh')
             if meshes:
-                self.ar.utils.set_progress(max=len(meshes), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(meshes), add_one=False, add_number=False)
                 iter_geo = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kMesh)
                 while not iter_geo.isDone():
                     next_geo = False
@@ -51,7 +51,7 @@ class InvertedNormals(action.BaseAction):
                     parent_node = fn_shape_node.parent(0)
                     fn_parent_node = OpenMaya.MFnDagNode(parent_node)
                     item_name = fn_parent_node.name()
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title]+": "+shape_name)
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+": "+shape_name)
                     # verify if item_name or shape_name is in meshes
                     for item in meshes:
                         if item_name in item or shape_name in item:

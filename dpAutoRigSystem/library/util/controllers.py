@@ -431,7 +431,7 @@ class Controllers(object):
             # parent this ribbonPos to the ribbon_grp:
             cmds.parent(pos_grp, ribbon_grp, absolute=True)
             # joint labelling:
-            self.ar.utils.set_joint_label(joint, joint_label_number, 18, joint_label_name+"_%02d"%(j+1))
+            self.ar.naming.set_joint_label(joint, joint_label_number, 18, joint_label_name+"_%02d"%(j+1))
             self.ar.utils.add_attr_to_items([pos_grp, up_grp, aim_grp, joint_grp], self.ar.utils.ignore_transform_io_attr)
         self.ar.utils.add_attr_to_items([ribbon_grp, ribbon_nurbs_plane], self.ar.utils.ignore_transform_io_attr)
         return [ribbon_nurbs_plane, ribbon_nurbs_plane_shape, joint_grps, joints]
@@ -996,7 +996,7 @@ class Controllers(object):
                 if tempList:
                     bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
                     bbList[1] *= 0.75 #less importance to height
-                    bbAverage = self.ar.utils.average_value(bbList)
+                    bbAverage = self.ar.math.average_value(bbList)
                     resultValue = magicNumber*bbAverage*origRadius
                     if resultValue:
                         return resultValue
@@ -1060,7 +1060,7 @@ class Controllers(object):
         import_calib_path = cmds.fileDialog2(fileMode=1, caption=self.ar.data.lang['i196_import']+" "+self.ar.data.lang['i193_calibration'])
         if not import_calib_path:
             return
-        self.ar.utils.set_progress(self.ar.data.lang['i214_refFile'], import_calib_namespace, add_one=False)
+        self.ar.ui_manager.set_progress(self.ar.data.lang['i214_refFile'], import_calib_namespace, add_one=False)
         import_calib_path = next(iter(import_calib_path), None)
         # create a file reference:
         refFile = cmds.file(import_calib_path, reference=True, namespace=import_calib_namespace)
@@ -1068,8 +1068,8 @@ class Controllers(object):
         ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
         if ref_nodes:
             for item in ref_nodes:
-                self.ar.utils.set_progress(max=len(ref_nodes), add_one=False, add_number=False)
-                self.ar.utils.set_progress(self.ar.data.lang['i215_setAttr'], add_one=True)
+                self.ar.ui_manager.set_progress(max=len(ref_nodes), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(self.ar.data.lang['i215_setAttr'], add_one=True)
                 if "calibrationList" in cmds.listAttr(item):
                     source_ref_nodes.append(item)
         if source_ref_nodes:
@@ -1079,7 +1079,7 @@ class Controllers(object):
                     self.transfer_calibration(source_ref_node, [destination_node], verbose=False)
         # remove referenced file:
         cmds.file(import_calib_path, removeReference=True)
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
         print("dpImportCalibrationPath: "+import_calib_path)
 
 
@@ -1208,7 +1208,7 @@ class Controllers(object):
                         path = paths[0] 
             if path:
                 if ui:
-                    self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), add_one=False, add_number=False)
+                    self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i164_export'], len(nodes), add_one=False, add_number=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1217,7 +1217,7 @@ class Controllers(object):
                     cmds.group(name=snapshot_grp, empty=True)
                 for item in nodes:
                     if ui or verbose:
-                        self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': Shape')
+                        self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': Shape')
                     snapshot_name = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshot_name):
                         if override_existing:
@@ -1260,7 +1260,7 @@ class Controllers(object):
             mel.eval('warning \"'+self.ar.data.lang['i202_noControls']+'\";')
         if ui:
             # Close progress window
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
 
 
     def import_shape(self, nodes=None, path=None, io=False, ui=True, verbose=False, dir="dpControlShape", *args):
@@ -1300,10 +1300,10 @@ class Controllers(object):
                     ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
                     if ref_nodes:
                         if ui:
-                            self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(ref_nodes), add_one=False, add_number=False)
+                            self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': '+self.ar.data.lang['c110_start'], self.ar.data.lang['i196_import'], len(ref_nodes), add_one=False, add_number=False)
                         for source_ref_node in ref_nodes:
                             if ui or verbose:
-                                self.ar.utils.set_progress(self.ar.data.lang['m094_doing']+': Shape')
+                                self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': Shape')
                             if cmds.objectType(source_ref_node) == "transform":
                                 destination_node = source_ref_node[source_ref_node.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destination_node):
@@ -1315,7 +1315,7 @@ class Controllers(object):
             print(self.ar.data.lang['i202_noControls'])
         if ui:
             # Close progress window
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
 
 
     def create_corrective_joint_ctrl(self, jcr_name, corrective_net, type='id_092_Correctives', radius=1, degree=3):
@@ -1429,13 +1429,13 @@ class Controllers(object):
                         all_nodes = cmds.ls(from_prefix+"*", selection=False, type="transform")
                         allControlList = self.get_controllers()
                         if all_nodes and allControlList:
-                            self.ar.utils.set_progress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(all_nodes), add_one=False, add_number=False)
+                            self.ar.ui_manager.set_progress(self.ar.data.lang['m067_shape'], self.ar.data.lang['m010_mirror'], len(all_nodes), add_one=False, add_number=False)
                             for node in all_nodes:
                                 if node in allControlList:
-                                    self.ar.utils.set_progress(self.ar.data.lang['m067_shape']+": "+node)
+                                    self.ar.ui_manager.set_progress(self.ar.data.lang['m067_shape']+": "+node)
                                     self.mirror_shape(node, from_prefix, to_prefix, axis)
                                     cmds.refresh()
-                        self.ar.utils.set_progress(end_it=True)
+                        self.ar.ui_manager.set_progress(end_it=True)
             else:
                 if DPCONTROL in cmds.listAttr(node_name) and cmds.getAttr(node_name+"."+DPCONTROL) == 1:
                     destination_node = to_prefix+node_name[len(from_prefix):]
@@ -1471,7 +1471,7 @@ class Controllers(object):
                 self.ar.value_editor_ui.reset_pose.verbose = False
                 self.ar.value_editor_ui.reset_pose.run_action(False, items)
                 self.ar.value_editor_ui.reset_pose.verbose = True
-                self.ar.utils.set_progress(end_it=True)
+                self.ar.ui_manager.set_progress(end_it=True)
             else: #set default values
                 for item in items:
                     attributes = self.ar.value_editor_ui.reset_pose.getSetupAttrList(item, self.ignore_default_value_attrs)
@@ -1552,3 +1552,16 @@ class Controllers(object):
         cmds.connectAttr(ctrl+".directionDisplay", direction_shapes[-1]+".visibility")
         if self.ar.data.display_sub_shape:
             cmds.setAttr(ctrl+".directionDisplay", 1)
+
+
+    def get_ctrl_radius(self, item):
+        """ Calculate and return the final radius to be used as a size of controls.
+        """
+        radius = float(cmds.getAttr(item+".translateX"))
+        parents = self.ar.utils.get_parents(item)
+        if (parents):
+            for parent in parents:
+                radius *= cmds.getAttr(parent+'.scaleX')
+                if "worldSize" in cmds.listAttr(parent):
+                    radius *= cmds.getAttr(parent+".worldSize")
+        return radius

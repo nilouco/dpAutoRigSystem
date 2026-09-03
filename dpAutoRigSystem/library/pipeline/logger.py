@@ -26,7 +26,7 @@ class Logger(object):
         self.info_winHeight   = height
         self.info_align       = align
         # creating Info Window:
-        self.ar.utils.close_ui("dpInfoWindow")
+        self.ar.ui_manager.close_ui("dpInfoWindow")
         cmds.window('dpInfoWindow', title='dpAutoRig - v'+self.ar.data.version+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent="dpInfoWindow")
@@ -43,7 +43,7 @@ class Logger(object):
                     noneText = cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout)
         if wiki:
             cmds.separator(style='none', height=20, parent=infoLayout)
-            cmds.button(label="Wiki", command=partial(self.ar.utils.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
+            cmds.button(label="Wiki", command=partial(self.ar.web.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow("dpInfoWindow")
 

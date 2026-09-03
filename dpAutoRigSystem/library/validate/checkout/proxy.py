@@ -67,7 +67,7 @@ class Proxy(action.BaseAction):
                                             if not PROXIED in cmds.listAttr(mesh_transforms):
                                                 to_proxy_items.append(mesh_transforms[0])
                         if to_proxy_items:
-                            self.ar.utils.set_progress(max=len(to_proxy_items), add_one=False, add_number=False)
+                            self.ar.ui_manager.set_progress(max=len(to_proxy_items), add_one=False, add_number=False)
                             self.checked_items.append(proxy_grp)
                             self.found_issues.append(True)
                             if self.first_mode:
@@ -75,8 +75,8 @@ class Proxy(action.BaseAction):
                             else: #fix
                                 try:
                                     for source_transform in to_proxy_items:
-                                        source_shortname = self.ar.utils.get_short_name(source_transform)
-                                        self.ar.utils.set_progress(self.ar.data.lang[self.title]+": "+source_shortname)
+                                        source_shortname = self.ar.naming.get_short_name(source_transform)
+                                        self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+": "+source_shortname)
                                         self.create_proxy(source_transform, source_shortname, proxy_grp)
                                     self.proxy_integration(proxy_grp)
                                     self.good_results.append(True)

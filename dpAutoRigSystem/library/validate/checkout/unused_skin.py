@@ -37,9 +37,9 @@ class UnusedSkin(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="skinCluster")
             if check_items:
-                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional 1 to check here if there's an influenced node, otherwise delete the unused skinCluster
                     meshes = cmds.skinCluster(item, query=True, geometry=True)
                     if meshes:

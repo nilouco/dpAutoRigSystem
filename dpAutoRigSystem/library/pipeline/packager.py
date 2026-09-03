@@ -161,7 +161,7 @@ class Packager(object):
             
         # create a new persp viewport window to get the image from it
         cmds.windowPref(enableAll=False) #to avoid open window with the wrong size
-        self.ar.utils.close_ui('imager_win')
+        self.ar.ui_manager.close_ui('imager_win')
         cmds.window('imager_win', width=width_res, height=height_res, menuBarVisible=False, titleBar=True, visible=True, sizeable=False)
         cmds.paneLayout(parent='imager_win')
         imager_panel = cmds.modelPanel(menuBarVisible=False, label='imager_panel') #keep this variable to avoid find panel issue
@@ -186,7 +186,7 @@ class Packager(object):
         cmds.playblast(frame=current_frame, viewer=False, format="image", compression="jpg", showOrnaments=True, completeFilename=export_path, widthHeight=[width_res, height_res], percent=100, forceOverwrite=False, quality=100, editorPanelName=imager_panel)
         # clean up the UI
         cmds.deleteUI(imager_panel, panel=True)
-        self.ar.utils.close_ui('imager_win')
+        self.ar.ui_manager.close_ui('imager_win')
         # back scene preferences to stored status
         cmds.camera(cam, edit=True, aspectRatio=1.5)
         cmds.grid(toggle=current_grid)

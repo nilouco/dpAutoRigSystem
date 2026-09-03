@@ -13,7 +13,7 @@ class OneSkeletonUI(object):
         """
         self.app = app
         # creating Window:
-        self.ar.utils.close_ui('one_skeleton_win')
+        self.ar.ui_manager.close_ui('one_skeleton_win')
         width  = 230
         height = 230
         cmds.window('one_skeleton_win', title=self.ar.data.lang["m254_oneSkeleton"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -42,4 +42,4 @@ class OneSkeletonUI(object):
         joint_type = cmds.radioButtonGrp('one_skeleton_skeleton_rbg', query=True, select=True)-1
         use_scale = cmds.checkBox('one_skeleton_use_scale_cb', query=True, value=True)
         self.app.create_one_skeleton(hierarchy=joint_type, scale=use_scale)
-        self.ar.utils.close_ui('one_skeleton_win')
+        self.ar.ui_manager.close_ui('one_skeleton_win')

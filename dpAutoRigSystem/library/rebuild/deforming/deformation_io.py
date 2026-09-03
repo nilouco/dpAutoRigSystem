@@ -87,12 +87,12 @@ class DeformationIO(action.BaseAction):
     def get_deformer_data(self, input_deformers):
         """ Return the deformer data dictionary to export.
         """
-        self.ar.utils.set_progress(max=len(self.ar.skin.def_attr_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(self.ar.skin.def_attr_data.keys()), add_one=False, add_number=False)
         # Declaring the data dictionary to export it
         deformer_data = {}
         # run for all deformer types to get info
         for deformer_type in self.ar.skin.def_attr_data.keys():
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             deformers = cmds.ls(selection=False, type=deformer_type)
             if deformers:
                 for deformer_node in deformers:
@@ -254,9 +254,9 @@ class DeformationIO(action.BaseAction):
                 else:
                     not_found_meshs.append(deformer_node)
         if to_import_items:
-            self.ar.utils.set_progress(max=len(to_import_items), add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(max=len(to_import_items), add_one=False, add_number=False)
             for deformer_node in to_import_items:
-                self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                 try:
                     well_imported = self.import_deformation(deformer_node, deformer_data, well_imported)
                 except Exception as e:

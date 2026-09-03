@@ -41,14 +41,14 @@ class FreezeTransform(action.BaseAction):
                         transforms = cmds.ls(selection=False, type='transform', long=True)
                     # analisys transformations
                     if len(transforms) > 0:
-                        self.ar.utils.set_progress(max=len(transforms), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress(max=len(transforms), add_one=False, add_number=False)
                         self.anim_curves = cmds.ls(type='animCurve')
                         zero_attrs = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
                         one_attrs = ['scaleX', 'scaleY', 'scaleZ']
                         cameras = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
                         valid_items = list(filter(lambda item: item not in cameras, transforms))
                         for idx, item in enumerate(valid_items):
-                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             if cmds.objExists(item):
                                 # run for translates and rotates
                                 frozen_tr = self.check_frozen_item(item, zero_attrs, 0)

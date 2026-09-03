@@ -11,7 +11,7 @@ class CopyPasteAttrUI(object):
     def create_ui(self):
         """ This is the main method to load the Copy Paste Attr UI.
         """
-        self.ar.utils.close_ui('dpCopyPasteAttrWin')
+        self.ar.ui_manager.close_ui('dpCopyPasteAttrWin')
         cmds.window('dpCopyPasteAttrWin', title='CopyPasteAttr - v'+str(self.ar.data.version), width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
         cmds.columnLayout('copy_paste_attr_cl', width=150, height=75, adjustableColumn=True, parent='dpCopyPasteAttrWin')
         cmds.button('copy_attr_bt', label=self.ar.data.lang['i122_copyAttr'], command=partial(self.ar.ctrls.copy_attr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent='copy_paste_attr_cl')

@@ -27,7 +27,7 @@ class BaseStandard(base.BaseLibrary):
     def get_namespace_for_it(self, number_name=None):
         self.number_name = number_name
         if not self.number_name:
-            self.number_name = self.ar.data.base_name+str(self.ar.utils.find_last_number())
+            self.number_name = self.ar.data.base_name+str(self.ar.naming.find_last_number())
         self.rigType = "biped"
         # defining namespace:
         self.guide_namespace = self.name+"__"+self.number_name
@@ -187,7 +187,7 @@ class BaseStandard(base.BaseLibrary):
                     inputted_text = ""
             inputted_text = inputted_text.replace(" ", "_")
             # call utils to return the normalized text:
-            self.custom_name = self.ar.utils.normalize_text(inputted_text, prefixMax=30)
+            self.custom_name = self.ar.naming.normalize_text(inputted_text, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.custom_name == "":
                 try:
@@ -198,13 +198,13 @@ class BaseStandard(base.BaseLibrary):
                 self.number_name = self.guide_namespace.split("__")[-1]
             else:
                 base_name = self.custom_name
-                suffix_numbers = self.ar.utils.get_suffix_numbers(self.custom_name)
+                suffix_numbers = self.ar.naming.get_suffix_numbers(self.custom_name)
                 if suffix_numbers[1]:
                     base_name = suffix_numbers[1]
                 dpar_names = []
                 nets = self.ar.utils.get_network_by_attr("dpGuideNet")
                 for net in nets:
-                    if base_name == self.ar.utils.get_suffix_numbers(cmds.getAttr(net+".guideName"))[1]:
+                    if base_name == self.ar.naming.get_suffix_numbers(cmds.getAttr(net+".guideName"))[1]:
                         dpar_names.append(cmds.getAttr(net+".guideName"))
                 if dpar_names:
                     if self.custom_name in dpar_names:
@@ -286,7 +286,7 @@ class BaseStandard(base.BaseLibrary):
                     else:
                         s = s_default
                     # add joint label, create controller, create_zero_out
-                    self.ar.utils.set_joint_label(jcr, s+self.joint_label_add, 18, label_name+"_"+str(m))
+                    self.ar.naming.set_joint_label(jcr, s+self.joint_label_add, 18, label_name+"_"+str(m))
                     jcr_ctrl, jcr_grp = self.ar.ctrls.create_corrective_joint_ctrl(corrective_joints[i], corrective_nets[i], radius=self.radius*0.2)
                     cmds.parent(jcr_grp, self.corrective_ctrls_grp)
                     # preset calibration
@@ -437,14 +437,14 @@ class BaseStandard(base.BaseLibrary):
             # joint labelling:
             self.joint_label_add = 0
         # store the number of this guide by module type
-        self.dpar_count = self.ar.utils.find_module_last_number(self.name, "moduleType", True)
+        self.dpar_count = self.ar.naming.find_module_last_number(self.name, "moduleType", True)
 
 
     def rig_me(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
         """
-        self.ar.utils.close_ui(self.ar.data.plus_info_win_name)
-        self.ar.utils.close_ui(self.ar.data.color_override_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.plus_info_win_name)
+        self.ar.ui_manager.close_ui(self.ar.data.color_override_win_name)
         if self.check_guide_integrity():
             self.to_ids = []
             self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
@@ -460,7 +460,7 @@ class BaseStandard(base.BaseLibrary):
             # get the radius value to controls:
             self.radius = 1
             if cmds.objExists(self.radius_ctrl):
-                self.radius = self.ar.utils.get_ctrl_radius(self.radius_ctrl)
+                self.radius = self.ar.ctrls.get_ctrl_radius(self.radius_ctrl)
                 
             # get curve degree:
             self.curve_degree = cmds.getAttr(self.guide_base+".degree")
@@ -536,7 +536,7 @@ class BaseStandard(base.BaseLibrary):
         if number:
             guide_number = number
         else:
-            guide_number = self.ar.utils.find_last_number()
+            guide_number = self.ar.naming.find_last_number()
         self.guide_net = cmds.createNode("network", name="dpGuide_"+guide_number+"_Net")
         self.ar.custom_attr.add_attr(0, [self.guide_net])[0] #dpID
         for base_attr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
@@ -693,7 +693,7 @@ class BaseStandard(base.BaseLibrary):
             if self.oldUnitConversionList:
                 unit_conversions = list(set(unit_conversions)-set(self.oldUnitConversionList))
             if unit_conversions:
-                self.ar.utils.node_renaming_treatment(unit_conversions)
+                self.ar.naming.node_renaming_treatment(unit_conversions)
 
 
     def create_world_size(self):
@@ -953,7 +953,7 @@ class BaseStandard(base.BaseLibrary):
             # check if the father guide is in X=0 in order to permit mirror:
             if not self.check_father_mirror(): #stopMirrorOperation
                 # loading Maya matrix node (for mirror porpuses)
-                loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+                loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
                 if loaded_matrix_plugin:
                     self.mirror_axis = item
                     cmds.setAttr(self.guide_base+".mirrorAxis", self.mirror_axis, type='string')

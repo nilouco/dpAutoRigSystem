@@ -88,7 +88,7 @@ class BaseAction(base.BaseLibrary):
         """
         print(f"\n----------\n{self.ar.data.lang['c110_start']}: {self.get_title()}")
         if self.verbose:
-            self.ar.utils.set_progress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(self.get_title()+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
         # redeclare variables
         self.ar.data.rebuilding = rebuilding
         self.checked_items = []
@@ -399,8 +399,8 @@ class BaseAction(base.BaseLibrary):
         if not check_items:
             check_items = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
         if check_items:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
-            self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title], self.ar.data.lang[self.action_type], add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
             filtered_items = self.ar.utils.filter_transforms(check_items, verbose=self.verbose, title=self.ar.data.lang[self.title]+" "+self.ar.data.lang['i329_broken'])
             if filtered_items:
                 for item in filtered_items:
@@ -419,7 +419,7 @@ class BaseAction(base.BaseLibrary):
     def end_progress(self, update_guides=False):
         print(f"{self.ar.data.lang['m184_end']}: {self.get_title()}\n----------")
         if self.verbose:
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
         if update_guides:
             self.ar.ui_manager.clear_guide_layout()
             self.ar.filler.fill_created_guides()
@@ -463,7 +463,7 @@ class BaseAction(base.BaseLibrary):
                 if curve:
                     items.extend(cmds.listRelatives(items, type="nurbsCurve", children=True, allDescendents=True, noIntermediate=True) or [])
                 for mesh in items:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     user_defined_attributes = cmds.listAttr(mesh, userDefined=True)
                     if user_defined_attributes:
                         for user_defined_attr in user_defined_attributes:
@@ -482,7 +482,7 @@ class BaseAction(base.BaseLibrary):
         """
         self.latest_data_file = None
         if exported_items:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title], add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title], add_one=False, add_number=False)
             try:
                 # import alembic
                 exported_items.sort()
@@ -622,9 +622,9 @@ class BaseAction(base.BaseLibrary):
         #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
         #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
         #            }
-        self.ar.utils.set_progress(max=len(constraints), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(constraints), add_one=False, add_number=False)
         for const in constraints:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=const, exists=True):
                 # getting attributes if they exists
                 data[const] = {"attributes" : {},
@@ -666,12 +666,12 @@ class BaseAction(base.BaseLibrary):
         """ Import constraints from exported dictionary.
             Create missing constraints and set them values if they don't exists.
         """
-        self.ar.utils.set_progress(max=len(constraint_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(constraint_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in constraint_data.keys():
             existing_nodes = []
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create constraint node if it needs
             if not cmds.objExists(item):
                 constraint_type = constraint_data[item]["type"]

@@ -157,7 +157,7 @@ class Spine(standard.BaseStandard):
                 chest_name = self.ar.data.lang['c028_chest']
             # run for all sides
             for s, side in enumerate(self.sides):
-                attr_name_lower = self.ar.utils.get_attr_name_lower(side, self.number_name)
+                attr_name_lower = self.ar.naming.get_attr_name_lower(side, self.number_name)
                 self.base = side+self.number_name+'_Guide_Base'
                 self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 # get the number of joints to be created:
@@ -287,8 +287,8 @@ class Spine(standard.BaseStandard):
                 tip_joint = cmds.joint(name=side+self.number_name+"_"+str(self.n_joints+1).zfill(2)+"_"+self.ar.data.lang['c120_tip']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(tip_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.set_joint_label(base_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c106_base'])
-                self.ar.utils.set_joint_label(tip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c120_tip'])
+                self.ar.naming.set_joint_label(base_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c106_base'])
+                self.ar.naming.set_joint_label(tip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c120_tip'])
                 # Base and end controllers:
                 cmds.parentConstraint(self.base_ctrl, base_joint, maintainOffset=False, name=base_joint+"_PaC")
                 cmds.scaleConstraint(self.base_ctrl, base_joint, maintainOffset=True, name=base_joint+"_ScC")
@@ -330,7 +330,7 @@ class Spine(standard.BaseStandard):
                 cmds.xform(up_cluster, worldSpace=True, rotation=(up_cluster_rot[0]+90, up_cluster_rot[1], up_cluster_rot[2]))
                 cmds.xform(down_cluster, worldSpace=True, rotation=(down_cluster_rot[0]+90, down_cluster_rot[1], down_cluster_rot[2]))
                 # scaleY of the clusters in order to avoid great extremity deforms:
-                ribbon_height = self.ar.utils.create_dist_between(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints), side+self.number_name+"_Guide_JointLoc1", keep=False)[0]
+                ribbon_height = self.ar.math.create_dist_between(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints), side+self.number_name+"_Guide_JointLoc1", keep=False)[0]
                 cmds.setAttr(up_cluster+".sy", ribbon_height / 10)
                 cmds.setAttr(down_cluster+".sy", ribbon_height / 10)
                 # parent clusters in controls (up and down):

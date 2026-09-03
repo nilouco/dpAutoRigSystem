@@ -38,9 +38,9 @@ class SideCalibration(action.BaseAction):
                 check_items = self.ar.ctrls.get_controllers()
             if check_items:
                 pair_data = {}
-                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
                     if cmds.objExists(item+".calibrations"):
                         if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.

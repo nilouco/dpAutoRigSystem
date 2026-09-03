@@ -248,7 +248,7 @@ class Head(standard.BaseStandard):
             elif joint_number < self.current_joint_number:
                 self.guide_neck_loc = self.reduce_joint_number(joint_number, "Neck", "Neck", 0, 0)
             # get the length of the neck to position segments.
-            dist = self.ar.utils.create_dist_between(self.name_guide+"_Neck0", self.name_guide+"_Head")[0]
+            dist = self.ar.math.create_dist_between(self.name_guide+"_Neck0", self.name_guide+"_Head")[0]
             # translateY to input on each create_curve_locator
             dit_bet = dist/joint_number
             for n in range(1, joint_number):
@@ -366,7 +366,7 @@ class Head(standard.BaseStandard):
             Depends on axis and rotation done.
         """
         # declaring naming:
-        base_attr = self.ar.utils.extract_suffix(attr_ctrl)
+        base_attr = self.ar.naming.extract_suffix(attr_ctrl)
         driven_grp = base_attr+"_"+self.ar.data.lang[open_close_id]+self.ar.data.lang['c034_move']+"_Grp"
         # attribute names:
         int_attr = self.ar.data.lang[open_close_id].lower()+self.ar.data.lang[int_attr_id].capitalize()+axis
@@ -608,8 +608,8 @@ class Head(standard.BaseStandard):
                     upper_jaw_joint = cmds.joint(name=upper_jaw_joint_name, scaleCompensate=False)
                     upper_head_joint = cmds.joint(name=upper_head_joint_name, scaleCompensate=False)
                     upper_end_joint = cmds.joint(name=upper_end_joint_name, scaleCompensate=False, radius=0.5)
-                    self.ar.utils.set_joint_label(upper_jaw_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c025_jaw'])
-                    self.ar.utils.set_joint_label(upper_head_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head'])
+                    self.ar.naming.set_joint_label(upper_jaw_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c025_jaw'])
+                    self.ar.naming.set_joint_label(upper_head_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c024_head'])
                     cmds.setAttr(upper_end_joint+".translateY", 0.3*self.radius)
                     dpar_joints.extend([upper_jaw_joint, upper_head_joint])
                     upper_jaw_ctrl = self.ar.ctrls.create_controller("id_069_HeadUpperJaw", ctrl_name=upper_jaw_ctrl_name, r=self.radius, d=self.curve_degree, head_def=1, guide_source=self.name_guide+"_UpperJaw", parent_tag=self.head_sub_ctrl)
@@ -619,7 +619,7 @@ class Head(standard.BaseStandard):
                     cmds.select(head_joint)
                 if has_jaw:
                     jaw_joint = cmds.joint(name=jaw_joint_name, scaleCompensate=False)
-                    self.ar.utils.set_joint_label(jaw_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c025_jaw'])
+                    self.ar.naming.set_joint_label(jaw_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c025_jaw'])
                     dpar_joints.extend([jaw_joint])
                     self.jaw_ctrl = self.ar.ctrls.create_controller("id_024_HeadJaw", ctrl_name=jaw_ctrl_name, r=(self.radius *0.5), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_Jaw", parent_tag=self.head_sub_ctrl)
                     to_flip_items.extend([self.jaw_ctrl])
@@ -629,8 +629,8 @@ class Head(standard.BaseStandard):
                         chin_joint = cmds.joint(name=chin_joint_name, scaleCompensate=False)
                         chew_joint = cmds.joint(name=chew_joint_name, scaleCompensate=False)
                         end_joint  = cmds.joint(name=end_joint_name, scaleCompensate=False, radius=0.5)
-                        self.ar.utils.set_joint_label(chin_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c026_chin'])
-                        self.ar.utils.set_joint_label(chew_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c048_chew'])
+                        self.ar.naming.set_joint_label(chin_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c026_chin'])
+                        self.ar.naming.set_joint_label(chew_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c048_chew'])
                         dpar_joints.extend([chin_joint, chew_joint])
                         chin_ctrl = self.ar.ctrls.create_controller("id_025_HeadChin", ctrl_name=chin_ctrl_name, r=(self.radius * 0.13), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_Chin", parent_tag=self.jaw_ctrl)
                         chew_ctrl = self.ar.ctrls.create_controller("id_026_HeadChew", ctrl_name=chew_ctrl_name, r=(self.radius * 0.08), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_Chew", parent_tag=chin_ctrl)
@@ -649,10 +649,10 @@ class Head(standard.BaseStandard):
                         cmds.select(chin_joint)
                     lower_lip_joint = cmds.joint(name=lower_lip_joint_name, scaleCompensate=False)
                     cmds.select(clear=True)
-                    self.ar.utils.set_joint_label(left_corner_lip_joint, 1, 18, self.number_name+"_"+self.ar.data.lang['c039_lip'])
-                    self.ar.utils.set_joint_label(right_corner_lip_joint, 2, 18, self.number_name+"_"+self.ar.data.lang['c039_lip'])
-                    self.ar.utils.set_joint_label(upper_lip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c039_lip'])
-                    self.ar.utils.set_joint_label(lower_lip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c045_lower']+self.ar.data.lang['c039_lip'])
+                    self.ar.naming.set_joint_label(left_corner_lip_joint, 1, 18, self.number_name+"_"+self.ar.data.lang['c039_lip'])
+                    self.ar.naming.set_joint_label(right_corner_lip_joint, 2, 18, self.number_name+"_"+self.ar.data.lang['c039_lip'])
+                    self.ar.naming.set_joint_label(upper_lip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c044_upper']+self.ar.data.lang['c039_lip'])
+                    self.ar.naming.set_joint_label(lower_lip_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c045_lower']+self.ar.data.lang['c039_lip'])
                     dpar_joints.extend([left_corner_lip_joint, right_corner_lip_joint, upper_lip_joint, lower_lip_joint])
                     left_corner_lip_ctrl = self.ar.ctrls.create_controller("id_027_HeadLipCorner", ctrl_name=left_corner_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_LCornerLip", parent_tag=self.head_sub_ctrl)
                     right_corner_lip_ctrl = self.ar.ctrls.create_controller("id_027_HeadLipCorner", ctrl_name=right_corner_lip_ctrl_name, r=(self.radius * 0.1), d=self.curve_degree, head_def=3, guide_source=self.name_guide+"_RCornerLip", parent_tag=self.head_sub_ctrl)
@@ -665,8 +665,8 @@ class Head(standard.BaseStandard):
                     cmds.addAttr(dpar_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 for n in range(0, self.n_joints):
-                    self.ar.utils.set_joint_label(neck_joints[n], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n).zfill(2))
-                self.ar.utils.set_joint_label(head_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c024_head'])
+                    self.ar.naming.set_joint_label(neck_joints[n], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n).zfill(2))
+                self.ar.naming.set_joint_label(head_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c024_head'])
                 
                 # facial controls
                 facial_ctrls = []
@@ -1040,7 +1040,7 @@ class Head(standard.BaseStandard):
                                     cmds.setAttr(articulation_joints[0]+".scaleX", -1)
                                     cmds.setAttr(articulation_joints[0]+".scaleY", -1)
                                     cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
-                            self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
+                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
 
                         # head corrective
                         head_corrective_nets = [None]
@@ -1058,14 +1058,14 @@ class Head(standard.BaseStandard):
                                 cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
                     else:
                         articulation_joints = self.ar.utils.create_articulation_joint(neck_base_jzt, neck_joints[0])
-                        self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
+                        self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
                         cmds.rename(articulation_joints[0], side+self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
                         articulation_joints = self.ar.utils.create_articulation_joint(neck_joints[-1], head_joint)
                     
                     neck_joints.insert(0, neck_base_jzt)
                     cmds.parentConstraint(neck_ctrl_zeros[0], neck_base_jzt, maintainOffset=True, name=neck_base_jzt+"_PaC")
                     cmds.scaleConstraint(neck_ctrl_zeros[0], neck_base_jzt, maintainOffset=True, name=neck_base_jzt+"_ScC")
-                    self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
+                    self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
                     cmds.rename(articulation_joints[0], side+self.number_name+"_01_"+self.ar.data.lang['c024_head']+self.ar.data.lang['c106_base']+"_Jar")
                 
                 # facial controls hierarchy

@@ -105,14 +105,14 @@ class Wheel(standard.BaseStandard):
                 center_joint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(center_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.set_joint_label(center_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['m156_wheel'])
+                self.ar.naming.set_joint_label(center_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['m156_wheel'])
                 self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang['m156_wheel'], self.guide_front_loc)
                 # main joint:
                 cmds.select(clear=True)
                 main_joint = cmds.joint(name=side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(main_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.set_joint_label(main_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c058_main'])
+                self.ar.naming.set_joint_label(main_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c058_main'])
                 self.create_end_joint(side+self.number_name+"_"+self.ar.data.lang['c058_main'], self.guide_front_loc)
                 
                 # create controls:
@@ -278,7 +278,7 @@ class Wheel(standard.BaseStandard):
                 cmds.rename(bindpose_node, side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_BP")
                 if loaded_geo:
                     if cmds.objExists(loaded_geo):
-                        base_name = self.ar.utils.extract_suffix(loaded_geo)
+                        base_name = self.ar.naming.extract_suffix(loaded_geo)
                         skincluster_name = base_name+"_SC"
                         if "|" in skincluster_name:
                             skincluster_name = skincluster_name[skincluster_name.rfind("|")+1:]
@@ -289,7 +289,7 @@ class Wheel(standard.BaseStandard):
                                 item_type = cmds.objectType(item)
                                 if item_type == "mesh" or item_type == "nurbsSurface":
                                     try:
-                                        skincluster_name = self.ar.utils.extract_suffix(item)+"_SC"
+                                        skincluster_name = self.ar.naming.extract_suffix(item)+"_SC"
                                         cmds.skinCluster(center_joint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)
                                     except:
                                         pass

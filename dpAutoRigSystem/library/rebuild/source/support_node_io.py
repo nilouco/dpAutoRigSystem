@@ -37,7 +37,7 @@ class SupportNodeIO(action.BaseAction):
         if not cmds.file(query=True, reference=True):
             if self.ar.pipeliner.check_asset_context():
                 # load alembic plugin
-                if self.ar.utils.check_loaded_plugin("AbcExport") and self.ar.utils.check_loaded_plugin("AbcImport"):
+                if self.ar.config.check_loaded_plugin("AbcExport") and self.ar.config.check_loaded_plugin("AbcImport"):
                     self.io_path = self.get_io_path(self.io_folder)
                     if self.io_path:
                         if self.first_mode: #export
@@ -47,7 +47,7 @@ class SupportNodeIO(action.BaseAction):
                             else:
                                 items = self.get_support_nodes()
                             if items:
-                                self.ar.utils.set_progress(self.ar.data.lang[self.title], add_one=False, add_number=False)
+                                self.ar.ui_manager.set_progress(self.ar.data.lang[self.title], add_one=False, add_number=False)
                                 self.export_alembic_file(items, attr=False, curve=True)
                             else:
                                 self.maybe_done_io("Geometries")
@@ -83,7 +83,7 @@ class SupportNodeIO(action.BaseAction):
                 items = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
                 items.extend(cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="nurbsCurve") or []) #include curves to export hair guides
                 if items:
-                    geos.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.ar.utils.get_suffix_numbers(n)[1].endswith("Base")] or [])
+                    geos.extend([n for n in cmds.listRelatives(grp, children=True, type="transform") if not "dpID" in cmds.listAttr(n) and not self.ar.naming.get_suffix_numbers(n)[1].endswith("Base")] or [])
         if cmds.objExists("Zipper_Curves_Grp"):
             geos.extend(cmds.listRelatives("Zipper_Curves_Grp", children=True))
         return geos

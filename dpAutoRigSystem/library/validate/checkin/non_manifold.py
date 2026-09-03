@@ -40,9 +40,9 @@ class NonManifold(action.BaseAction):
                     else:
                         to_clean_geos = cmds.ls(list(set(self.check_non_manifold(self.get_mesh_transforms()))), long=False)
                     if to_clean_geos:
-                        self.ar.utils.set_progress(max=len(to_clean_geos), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress(max=len(to_clean_geos), add_one=False, add_number=False)
                         for geo in to_clean_geos:
-                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             if cmds.objExists(geo):
                                 self.checked_items.append(geo)
                                 self.found_issues.append(True)

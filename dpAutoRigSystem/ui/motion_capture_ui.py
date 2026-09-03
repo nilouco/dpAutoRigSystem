@@ -13,7 +13,7 @@ class MotionCaptureUI(object):
         """
         self.app = app
         # creating MotionCaptureUI Window:
-        self.ar.utils.close_ui('dpMotionCaptureWindow')
+        self.ar.ui_manager.close_ui('dpMotionCaptureWindow')
         width  = 280
         height = 470
         cmds.window('dpMotionCaptureWindow', title=self.ar.data.lang["m239_motionCapture"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=False, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)

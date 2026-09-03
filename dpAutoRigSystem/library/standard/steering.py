@@ -77,7 +77,7 @@ class Steering(standard.BaseStandard):
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.create_end_joint(side+self.number_name, ty=1)
                 # joint labelling:
-                self.ar.utils.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
+                self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 # create a control:
                 steering_ctrl = self.ar.ctrls.create_controller("id_065_SteeringWheel", side+self.number_name+"_"+self.ar.data.lang['m158_steering']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointLoc1")
                 main_ctrl = self.ar.ctrls.create_controller("id_066_SteeringMain", side+self.number_name+"_"+self.ar.data.lang['c058_main']+"_Ctrl", r=self.radius, d=self.curve_degree, guide_source=self.name_guide+"_JointEnd", parent_tag=steering_ctrl)

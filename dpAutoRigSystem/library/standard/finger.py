@@ -147,7 +147,7 @@ class Finger(standard.BaseStandard):
                     self.jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     skin_joints.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.ar.utils.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
+                    self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     # create a control:
                     if n == 1:
                         finger_ctrl = self.ar.ctrls.create_controller("id_015_FingerMain", ctrl_name=side+self.number_name+"_%02d_Ctrl"%(n), r=(self.radius * 2.0), d=self.curve_degree, rot=(0, 0, -90), guide_source=self.name_guide+"_JointLoc"+str(n), parent_tag=self.controllers[0])
@@ -261,7 +261,7 @@ class Finger(standard.BaseStandard):
                             else:
                                 articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt)
                                 cmds.connectAttr(scale_compensate_cnd+".outColorR", articulation_joints[0]+".segmentScaleCompensate", force=True)
-                            self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     
                     if n == self.n_joints:
@@ -374,7 +374,7 @@ class Finger(standard.BaseStandard):
                 cmds.addAttr(ik_ctrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 stretch_norm_md = cmds.createNode("multiplyDivide", name=side+self.number_name+"_StretchNormalize_MD")
                 cmds.setAttr(stretch_norm_md+".operation", 2)
-                dist_betweens = self.ar.utils.create_dist_between(side+self.number_name+"_01_Ctrl", ik_ctrl, name=side+self.number_name+"_DistBet", keep=True)
+                dist_betweens = self.ar.math.create_dist_between(side+self.number_name+"_01_Ctrl", ik_ctrl, name=side+self.number_name+"_DistBet", keep=True)
                 cmds.connectAttr(ik_fk_rev+".outputX", dist_betweens[5]+"."+ik_ctrl+"W0", force=True)
                 cmds.connectAttr(finger_ctrl+".ikFkBlend", dist_betweens[5]+"."+dist_betweens[4]+"W1", force=True)
                 cmds.connectAttr(dist_betweens[1]+".distance", stretch_norm_md+".input1X", force=True)

@@ -86,7 +86,7 @@ class Single(standard.BaseStandard):
                 # create a joint:
                 jnt = cmds.joint(name=side+self.number_name+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.ar.utils.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name)
+                self.ar.naming.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name)
                 # create a control:
                 if not self.get_guide_attr('indirectSkin'):
                     if self.curve_degree == 0:

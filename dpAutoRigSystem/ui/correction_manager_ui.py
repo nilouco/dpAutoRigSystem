@@ -12,7 +12,7 @@ class CorrectionManagerUI(object):
         """ This is the main method to load the Correction Manager UI.
         """
         self.app = app
-        self.ar.utils.close_ui("dpCorrectionManagerWindow")
+        self.ar.ui_manager.close_ui("dpCorrectionManagerWindow")
         # window
         width = 380
         height = 300
@@ -128,7 +128,7 @@ class CorrectionManagerUI(object):
                 if filter_name:
                     self.app.net = None
                     self.clear_edit_net_layout()
-                    current_nets = self.ar.utils.filter_name(filter_name, current_nets, " ")
+                    current_nets = self.ar.naming.filter_name(filter_name, current_nets, " ")
                 for item in current_nets:
                     if "dpNetwork" in cmds.listAttr(item):
                         if cmds.getAttr(item+".dpNetwork") == 1:

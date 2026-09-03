@@ -81,7 +81,7 @@ class Suspension(standard.BaseStandard):
                 self.guide_radius = side+self.number_name+"_Guide_Base_RadiusCtrl"
                 self.locators_grp = cmds.group(name=side+self.number_name+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
-                self.dist = self.ar.utils.create_dist_between(self.guide_a_loc, self.guide_b_loc)[0] * 0.2
+                self.dist = self.ar.math.create_dist_between(self.guide_a_loc, self.guide_b_loc)[0] * 0.2
                 self.joints, self.main_ctrls, self.zeros, self.controllers, self.aim_locs, self.up_locs = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
@@ -90,7 +90,7 @@ class Suspension(standard.BaseStandard):
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     self.create_end_joint(side+self.number_name+"_"+letter, jnt, tz=self.dist)
                     # joint labelling:
-                    self.ar.utils.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name+"_"+letter)
+                    self.ar.naming.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name+"_"+letter)
                     self.joints.append(jnt)
                     
                     # create a control:

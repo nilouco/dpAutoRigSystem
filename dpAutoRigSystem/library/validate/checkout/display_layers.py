@@ -172,9 +172,9 @@ class DisplayLayers(action.BaseAction):
             If it's not a list it will append the item and run the main function.
         """
         if items:
-            self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
+            self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
             for i, item in enumerate(items):
-                self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                 if self.first_mode:
                     self.good_results.append(False)
                     self.checked_items.append(item)

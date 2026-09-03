@@ -14,7 +14,7 @@ class JointDisplayUI(object):
         """ This is the main method to load the Joint Display UI.
         """
         self.app = app
-        self.ar.utils.close_ui('dpJointDisplayWindow')
+        self.ar.ui_manager.close_ui('dpJointDisplayWindow')
         width  = 660
         height = 410
         cmds.window('dpJointDisplayWindow', title=self.ar.data.lang["m233_jointDisplay"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)

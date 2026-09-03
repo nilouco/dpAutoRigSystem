@@ -37,7 +37,7 @@ class JointEnd(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type="joint")
             if check_items:
-                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # list joint ends
                 joint_ends = [j for j in check_items if self.ar.data.joint_end_attr in cmds.listAttr(j)] #by attribute
                 joint_ends.extend([j for j in cmds.ls(selection=False, type="joint") if j.endswith(self.ar.data.joint_end_attr)]) #by suffix
@@ -48,7 +48,7 @@ class JointEnd(action.BaseAction):
                     if joint_ends:
                         joint_ends.sort()
                         for item in joint_ends:
-                            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                             self.checked_items.append(item)
                             self.found_issues.append(True)
                             if self.first_mode:

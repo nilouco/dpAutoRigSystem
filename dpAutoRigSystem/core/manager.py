@@ -3,10 +3,10 @@ from maya import cmds
 
 
 
-
 class UIManager(object):
     def __init__(self, ar):
         self.ar = ar
+        self.progress = False
 
 
     def reload_ui(self, opt_var=None, item=None, *args):
@@ -131,7 +131,7 @@ class UIManager(object):
                         self.ar.data.color_override_win_name
                        ]
         for win_name in win_names:
-            self.ar.utils.close_ui(win_name)
+            self.ar.ui_manager.close_ui(win_name)
         self.set_ui_state(False)
 
     
@@ -174,7 +174,7 @@ class UIManager(object):
             if item.name in self.ar.data.icon.keys():
                 icon_name = item.name
             else:
-                icon_name = self.ar.utils.to_snake_case(item.name)
+                icon_name = self.ar.naming.to_snake_case(item.name)
         if not icon_name in self.ar.data.icon.keys():
             if icon_name.split("_")[0] in self.ar.data.icon.keys():
                 icon_name = icon_name.split("_")[0]
@@ -228,7 +228,7 @@ class UIManager(object):
                        = False for fix/import
         """
         if first_mode and action_type == "r000_rebuilder": #splitData
-            if self.ar.utils.get_duplicated_names():
+            if self.ar.naming.get_duplicated_names():
                 confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
                 if confirm == self.ar.data.lang['i072_no']:
                     return
@@ -242,10 +242,10 @@ class UIManager(object):
             log_text += f"\nExported: {publish_log['exportPath']}"
             log_text += f"\nComments: {publish_log['comments']}\n"
         if action_instances:
-            self.ar.utils.set_progress(self.ar.data.lang[action_type]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[action_type], len(action_instances))
+            self.ar.ui_manager.set_progress(self.ar.data.lang[action_type]+': '+self.ar.data.lang['c110_start'], self.ar.data.lang[action_type], len(action_instances))
             for a, action_instance in enumerate(action_instances):
                 if action_instance.active:
-                    self.ar.utils.set_progress(action_instance.name)
+                    self.ar.ui_manager.set_progress(action_instance.name)
                     action_instance.verbose = False
                     action_result_data[action_instance.name] = action_instance.run_action(first_mode)
                     action_instance.verbose = True
@@ -272,5 +272,57 @@ class UIManager(object):
                 action_result_data["Publisher"] = publish_log
             if not self.ar.utils.export_log_dic_to_json(action_result_data, sub_folder=self.ar.data.dp_data+"/"+self.ar.data.dp_log):
                 print(self.ar.data.lang['i201_saveScene'])
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
         return action_result_data, False, 0
+
+
+    def close_ui(self, win_name, *args):
+        """ Closes the given window name if it exists.
+        """
+        if cmds.window(win_name, query=True, exists=True):
+            cmds.deleteUI(win_name, window=True)
+
+
+    def set_progress(self, message="Rigging...", header="dpAutoRigSystem", max=100, amount=0, add_one=True, add_number=True, end_it=False, is_interruptable=False, *args):
+        """ Centralize the progressWindow calling in one method.
+            Try to use the cmds.progressWindow as a more automate process.
+            
+            Arguments:
+                message = status
+                header = tittle
+                max = maxValue
+                amount = progress
+                add_one = increment amount plus 1
+                add_number = add amount to the end of the message string
+                end_it = end progress
+                is_interruptable = if we can interrupt the process or not. False by default.
+
+            Example:
+                self.ar.ui_manager.set_progress(messageName, titleName, 20, add_one=False)
+                self.ar.ui_manager.set_progress(doingName+': '+backWheelName)
+
+            Returns the progress: 
+                True if the progressWindow is running
+                False if the progressWindow was ended or cancelled
+        """
+        if end_it:
+            cmds.progressWindow(endProgress=True)
+            self.progress = False
+        else:
+            if self.progress: #edit
+                if add_one:
+                    self.current_amount += 1
+                else:
+                    self.current_amount = amount
+                if message == "Rigging...":
+                    if max > 0:
+                        cmds.progressWindow(edit=True, maxValue=max, progress=0)
+                else:
+                    if add_number:
+                        message = message+" # "+str(self.current_amount)
+                    cmds.progressWindow(edit=True, progress=self.current_amount, status=message)
+            else: #create
+                self.current_amount = amount
+                cmds.progressWindow(title=header, progress=self.current_amount, status=message, maxValue=max, isInterruptable=is_interruptable)
+                self.progress = True
+        return self.progress

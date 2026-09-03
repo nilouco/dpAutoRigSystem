@@ -1,3 +1,5 @@
+from maya import cmds
+from maya import mel
 import os
 import sys
 import json
@@ -6,15 +8,14 @@ import getpass
 import urllib.request
 import socket
 import platform
-from maya import cmds
-from maya import mel
-
+import getpass
+import webbrowser
+from importlib import reload
 
 
 class Configuration(object):
     def __init__(self, ar):
         self.ar = ar
-        
         
         #
         # TODO: define verbose as il fault here
@@ -250,7 +251,7 @@ class Configuration(object):
             new_preset = self.ar.ctrls.create_curve_preset()
         elif preset_type == "validator":
             preset_option_var = self.ar.data.validator_option_var
-            new_preset = self.ar.utils.create_validator_preset()
+            new_preset = self.ar.config.create_validator_preset()
         if new_preset:
             # create json file:
             result_data = self.save_json_file(new_preset, preset_folder, '_preset')
@@ -265,6 +266,32 @@ class Configuration(object):
             self.ar.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+preset_name+'\n\n'+self.ar.data.lang['i134_rememberPublish']+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
             # close and reload dpAR UI in order to avoid Maya crash
             self.ar.ui_manager.reload_ui()
+
+
+    def create_validator_preset(self):
+        """ Creates a json file as a Validator Preset and returns it.
+        """
+        result = None
+        validators = self.get_validator_instances()
+        if validators:
+            result_dialog = cmds.promptDialog(
+                                                title=self.ar.data.lang['i129_createPreset'],
+                                                message=self.ar.data.lang['i130_presetName'],
+                                                button=[self.ar.data.lang['i131_ok'], self.ar.data.lang['i132_cancel']],
+                                                defaultButton=self.ar.data.lang['i131_ok'],
+                                                cancelButton=self.ar.data.lang['i132_cancel'],
+                                                dismissString=self.ar.data.lang['i132_cancel'])
+            if result_dialog == self.ar.data.lang['i131_ok']:
+                result_name = cmds.promptDialog(query=True, text=True)
+                result_name = result_name[0].upper()+result_name[1:]
+                author = getpass.getuser()
+                date = str(datetime.datetime.now().date())
+                result = '{"_preset":"'+result_name+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+                # add validators and its current active values
+                for validator in validators:
+                    result += ',"'+validator.name+'" : '+str(validator.active).lower()
+                result += "}"
+        return result
 
 
     def save_json_file(self, data, folder, file_name_id, *args):
@@ -287,7 +314,7 @@ class Configuration(object):
         if os.path.exists(self.ar.pipeliner.pipe_data[path]):
             start_path = self.ar.pipeliner.pipe_data[path][:self.ar.pipeliner.pipe_data[path].rfind("/")]
             end_path = self.ar.pipeliner.pipe_data[path][self.ar.pipeliner.pipe_data[path].rfind("/")+1:]
-            return self.ar.utils.find_modules_by_folder(start_path, end_path)
+            return self.ar.env.find_modules_by_folder(start_path, end_path)
                     
 
     def get_validator_instances(self):
@@ -332,6 +359,25 @@ class Configuration(object):
         for item in self.ar.maker.guides_to_rig:
             if item.guide_base == name:
                 return item
+
+
+    def check_loaded_plugin(self, plugin_name, message="Not loaded plugin"):
+        """ Check if the plugin is loaded and try to load it.
+            Returns True if ok (loaded)
+            Returns False if not found or not loaded.
+        """
+        loaded_plugin = True
+        if not (cmds.pluginInfo(plugin_name, query=True, loaded=True)):
+            loaded_plugin = False
+            try:
+                cmds.loadPlugin(plugin_name+".mll")
+                loaded_plugin = True
+            except:
+                pass
+        if not loaded_plugin:
+            print(message, plugin_name)
+        return loaded_plugin
+
 
 
 class Option(object):
@@ -439,7 +485,7 @@ class Option(object):
             if result_dialog == self.ar.data.lang['i131_ok']:
                 prefix = cmds.promptDialog(query=True, text=True)
         if prefix:
-            prefix = self.ar.utils.normalize_text(prefix, prefixMax=10)
+            prefix = self.ar.naming.normalize_text(prefix, prefixMax=10)
             if not prefix:
                 self.ar.data.prefix = ""
                 if self.ar.data.verbose:
@@ -533,7 +579,7 @@ class Agreement(object):
             local_info['dpAR'] = self.ar.data.version
             #print(local_info)
             if local_info:
-                wh = self.ar.utils.mount_wh(self.ar.data.discord_url, self.ar.pipeliner.pipe_data['h000_location'])
+                wh = self.ar.web.mount_wh(self.ar.data.discord_url, self.ar.pipeliner.pipe_data['h000_location'])
                 self.ar.packager.to_discord(wh, str(local_info))
 
 
@@ -544,7 +590,7 @@ class Agreement(object):
             terms_width  = 205
             terms_height = 200
             # creating Terms and Conditions Window:
-            self.ar.utils.close_ui('dpTermsCondWindow')
+            self.ar.ui_manager.close_ui('dpTermsCondWindow')
             cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.ar.data.lang['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_width, terms_height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
             # creating text layout:
             cmds.columnLayout("terms_cl", adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent="dpTermsCondWindow")
@@ -555,3 +601,121 @@ class Agreement(object):
             cmds.separator(height=30)
             # call window:
             cmds.showWindow("dpTermsCondWindow")
+
+
+
+class Environment(object):
+    def __init__(self, ar):
+        self.ar = ar
+        self.order = "_order"
+
+
+    def find_env(self, key, path):
+        """ Find and return the environ directory of this system.
+        """
+        env = os.environ[key]
+        split_envs = []
+        if os.name == "posix":
+            split_envs = env.split(":")
+        else:
+            split_envs = env.split(";")
+        env_path = ""
+        if split_envs:
+            split_envs = [x for x in split_envs if x != "" and x != ' ' and x != None]
+            for env in split_envs:
+                env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
+                if env in self.ar.data.dp_auto_rig_path:
+                    try:
+                        env_path = self.ar.data.dp_auto_rig_path.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
+                    except:
+                        pass
+                    if len(env) < 4:
+                        env_path = self.ar.data.dp_auto_rig_path.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
+                        return env_path+"."+path
+                    break
+        # if we are here, we must return a default path:
+        split_envs = env.rpartition(path)
+        if os.name == "posix":
+            if env_path != "":
+                env_path = env_path+".dpAutoRigSystem"
+            else:
+                env_path = "dpAutoRigSystem"
+        else:
+            if ":" in env_path:
+                env_path = split_envs[0][split_envs[0].rfind(":")-1:]
+        if env_path == "" or env_path == " " or env_path == None:
+            return path
+        return env_path
+
+
+    def find_files_by_folder(self, path, folder, ext="py"):
+        """ Find all files in the directory with the extension.
+            Return a list of all module names (without the given extension).
+        """
+        file_dir = path + "/" + folder.replace(".", "/")
+        all_files = os.listdir(file_dir)
+        # select only files with extension:
+        files = []
+        for file in all_files:
+            if file.endswith(f".{ext}") and str(file) != "__init__.py":
+                files.append(str(file)[:file.rfind(".")])
+        return files
+
+
+    def find_modules_by_folder(self, path, folder, ext="py"):
+        """ Find all modules in the directory.
+            If find an _order*.txt file it will order the list for priority proporses.
+            Return a list of all module names (without the given extension).
+        """
+        folder = folder.replace(".", "/")
+        modules = self.find_files_by_folder(path, folder, ext)
+        for text in self.find_files_by_folder(path, folder, "txt"):
+            if text.startswith(self.order):
+                desired_order_items = []
+                dups = modules.copy()
+                modules = []
+                with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
+                    for line in filename.readlines():
+                        desired_order_items.append(line.strip())
+                if desired_order_items:
+                    for item in desired_order_items:
+                        if item in dups:
+                            modules.append(item)
+                            dups.remove(item)
+                if dups:
+                    modules.extend(dups)
+        return modules
+
+
+    def find_module_names_by_folder(self, path, folder):
+        """ Find all modules names for this directory.
+            Return a list with the valid modules and valid modules names.
+        """
+        valid_modules = self.find_modules_by_folder(path, folder)
+        valid_module_names = []
+        guide_folder = self.find_env("PYTHONPATH", "dpAutoRigSystem")+"."+self.ar.data.standard_folder
+        for m in valid_modules:
+            mod = __import__(guide_folder+"."+m, {}, {}, [m])
+            if self.ar.dev:
+                reload(mod)
+            valid_module_names.append(mod.CLASS_NAME)
+        return(valid_modules, valid_module_names)
+
+
+
+class Web(object):
+    def __init__(self, ar):
+        self.ar = ar
+
+    def visit_website(self, url, *args):
+        """ Start browser with the given website URL address.
+        """
+        #webSiteString = "start "+URL
+        #os.popen(webSiteString)
+        webbrowser.open(url, new=2)
+
+
+    def mount_wh(self, start, end):
+        """ Mount and return path.
+        """
+        return "{}{}{}".format(start, "/", end)

@@ -187,7 +187,7 @@ class FkLine(standard.BaseStandard):
                     jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.ar.utils.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
+                    self.ar.naming.set_joint_label(jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     skin_joints.append(jnt)
                     # create a control:
                     ctrl = self.ar.ctrls.create_controller("id_007_FkLine", side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, head_def=cmds.getAttr(self.base+".deformedBy"), guide_source=self.name_guide+"_JointLoc"+str(n+1), parent_tag=self.get_parent_to_tag(fk_ctrls))
@@ -229,7 +229,7 @@ class FkLine(standard.BaseStandard):
                     if n > 0:
                         if self.articulation:
                             articulation_joints = self.ar.utils.create_articulation_joint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(jnt)
                     # end chain:
                     if n == self.n_joints-1:

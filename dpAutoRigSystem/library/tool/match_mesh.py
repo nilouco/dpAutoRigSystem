@@ -121,7 +121,7 @@ class MatchMesh(base.BaseLibrary):
                     to_mesh_fn.getPoints(to_vertices)
                     
                     # progress window
-                    self.ar.utils.set_progress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', from_vertices.length(), is_interruptable=True)
+                    self.ar.ui_manager.set_progress(self.ar.data.lang['i035_transfData']+': '+self.ar.data.lang['c110_start'], 'Match Mesh Data', from_vertices.length(), is_interruptable=True)
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected
@@ -130,12 +130,12 @@ class MatchMesh(base.BaseLibrary):
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        self.ar.utils.set_progress(self.ar.data.lang['i035_transfData'])
+                        self.ar.ui_manager.set_progress(self.ar.data.lang['i035_transfData'])
                         
                         # transfer data
                         cmds.move(from_vertices[i].x, from_vertices[i].y, from_vertices[i].z, to_mesh+".vtx["+str(i)+"]", absolute=True)
                     
-                    self.ar.utils.set_progress(end_it=True)
+                    self.ar.ui_manager.set_progress(end_it=True)
 
                     if from_father != None:
                         cmds.parent(from_transform, from_father)

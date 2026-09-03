@@ -13,7 +13,7 @@ class ZipperUI(object):
         """ This is the main method to load the Zipper UI.
         """
         self.app = app
-        self.ar.utils.close_ui('dpZipperWindow')
+        self.ar.ui_manager.close_ui('dpZipperWindow')
         width  = 380
         height = 300
         cmds.window('dpZipperWindow', title=self.app.zipper_name+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)

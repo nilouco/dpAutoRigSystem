@@ -12,10 +12,10 @@ class CustomAttrUI(object):
         """ This is the main method to load the Custom Attr UI.
         """
         self.app = app
-        self.ar.utils.close_ui('dpCustomAttributesWindow')
-        self.ar.utils.close_ui('dpAddCustomAttributesWindow')
-        self.ar.utils.close_ui('dpRemoveCustomAttributesWindow')
-        self.ar.utils.close_ui('dpIDCustomAttributesWindow')
+        self.ar.ui_manager.close_ui('dpCustomAttributesWindow')
+        self.ar.ui_manager.close_ui('dpAddCustomAttributesWindow')
+        self.ar.ui_manager.close_ui('dpRemoveCustomAttributesWindow')
+        self.ar.ui_manager.close_ui('dpIDCustomAttributesWindow')
         self.get_item_filter()
         # window
         width  = 380
@@ -118,7 +118,7 @@ class CustomAttrUI(object):
         if filter_name:
             current_items = cmds.selectionConnection(self.item_sc, query=True, object=True)
             if current_items:
-                filtered_items = self.ar.utils.filter_name(filter_name, current_items, " ")
+                filtered_items = self.ar.naming.filter_name(filter_name, current_items, " ")
                 filtered_items = list(set(filtered_items) - set(self.app.ignores))
                 filtered_items.sort()
                 cmds.selectionConnection(self.item_sc, edit=True, clear=True)
@@ -130,7 +130,7 @@ class CustomAttrUI(object):
     def add_attr_ui(self, *args):
         """ Create a window with buttons to add new attributes.
         """
-        self.ar.utils.close_ui('dpAddCustomAttributesWindow')
+        self.ar.ui_manager.close_ui('dpAddCustomAttributesWindow')
         widht  = 220
         height = 260
         cmds.window('dpAddCustomAttributesWindow', title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(widht, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -150,7 +150,7 @@ class CustomAttrUI(object):
         """ Create a window with exposed dpID attributes.
         """
         if id_data:
-            self.ar.utils.close_ui('dpIDCustomAttributesWindow')
+            self.ar.ui_manager.close_ui('dpIDCustomAttributesWindow')
             width  = 780
             height = 350
             cmds.window('dpIDCustomAttributesWindow', title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -198,7 +198,7 @@ class CustomAttrUI(object):
     def remove_attr_ui(self, *args):
         """ Create a window showing the current dp custom attributes to delete them.
         """
-        self.ar.utils.close_ui('dpRemoveCustomAttributesWindow')
+        self.ar.ui_manager.close_ui('dpRemoveCustomAttributesWindow')
         widht  = 200
         height = 250
         cmds.window('dpRemoveCustomAttributesWindow', title=self.ar.data.lang['m212_customAttr']+" "+str(self.ar.data.version), widthHeight=(widht, height), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)

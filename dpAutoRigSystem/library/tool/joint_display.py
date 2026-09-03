@@ -39,7 +39,7 @@ class JointDisplay(base.BaseLibrary):
         if self.ar.data.ui_state:
             written_value = cmds.textFieldGrp('joint_display_filter_tfg', query=True, text=True)
             if not written_value == "" and not written_value == " ":
-                self.joints = self.ar.utils.filter_name(written_value, cmds.ls(selection=False, type='joint'), " ")
+                self.joints = self.ar.naming.filter_name(written_value, cmds.ls(selection=False, type='joint'), " ")
 
 
     def update_labels(self, *args):

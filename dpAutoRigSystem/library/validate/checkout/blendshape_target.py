@@ -42,7 +42,7 @@ class BlendshapeTarget(action.BaseAction):
                 if meshes:
                     check_items = list(set(cmds.listRelatives(meshes, type="transform", parent=True, fullPath=False)))
             if check_items:
-                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 # get exception list to keep nodes in the scene
                 to_keep_deformers = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
                 exceptions = self.get_children_nodes(["supportGrp", "renderGrp", "proxyGrp"])
@@ -51,7 +51,7 @@ class BlendshapeTarget(action.BaseAction):
                         if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                             if not item in exceptions:
                                 exceptions.append(item)
-                        elif self.ar.utils.get_suffix_numbers(item)[1].endswith("Base"):
+                        elif self.ar.naming.get_suffix_numbers(item)[1].endswith("Base"):
                             exceptions.append(item)
                         else:
                             try:
@@ -73,7 +73,7 @@ class BlendshapeTarget(action.BaseAction):
                                             
                 # run validation tasks
                 for item in check_items:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     if cmds.objExists(item):
                         self.checked_items.append(item)
                         if not item in exceptions:

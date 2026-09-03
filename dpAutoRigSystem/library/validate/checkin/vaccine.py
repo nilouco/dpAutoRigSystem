@@ -41,9 +41,9 @@ class Vaccine(action.BaseAction):
             else:
                 check_items = cmds.ls(selection=False, type='script')
             if check_items:
-                self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     # conditional to check here
                     script_data = cmds.scriptNode(item, beforeScript=True, query=True)
                     #if "fuck_All_U" in script_data:

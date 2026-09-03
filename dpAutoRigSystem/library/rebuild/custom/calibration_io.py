@@ -76,9 +76,9 @@ class CalibrationIO(action.BaseAction):
             Returns the dictionary to export.
         """
         data = {}
-        self.ar.utils.set_progress(max=len(controllers), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(controllers), add_one=False, add_number=False)
         for ctrl in controllers:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             calibrations = self.ar.ctrls.get_items_from_string_attr(ctrl)
             if calibrations:
                 data[ctrl] = {}
@@ -90,11 +90,11 @@ class CalibrationIO(action.BaseAction):
     def import_calibration_data(self, calibration_data):
         """ Import the calibration setup from the given calibration data dictionary.
         """
-        self.ar.utils.set_progress(max=len(calibration_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(calibration_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in calibration_data.keys():
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             not_found_nodes = []
             # check transformations
             if not cmds.objExists(item):

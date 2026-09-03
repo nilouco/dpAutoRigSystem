@@ -78,9 +78,9 @@ class ConnectionIO(action.BaseAction):
             Returns a dictionary to export.
         """
         data = {}
-        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 attributes = self.ar.data.transform_attrs.copy()
                 user_defined_attributes = cmds.listAttr(item, userDefined=True)
@@ -152,9 +152,9 @@ class ConnectionIO(action.BaseAction):
         """ Return the connection data from given utility nodes list.
         """
         data = {}
-        self.ar.utils.set_progress(max=len(items), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
                     for attr_data, multi in zip([self.ar.utils.type_attr_data, self.ar.utils.type_out_attr_data, self.ar.utils.type_multi_attr_data, self.ar.utils.type_out_multi_attr_data], [False, False, True, True]):
@@ -181,12 +181,12 @@ class ConnectionIO(action.BaseAction):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.ar.utils.set_progress(max=len(connection_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(connection_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in connection_data.keys():
             not_found_nodes = []
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 # check connections
                 for attr in connection_data[item].keys():

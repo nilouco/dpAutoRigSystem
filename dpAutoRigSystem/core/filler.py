@@ -119,7 +119,7 @@ class UIFiller(object):
         cmds.namespace(setNamespace=":")
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find all module names:
-        module_name = self.ar.utils.find_module_names_by_folder(self.ar.data.dp_auto_rig_path, self.ar.data.standard_folder)
+        module_name = self.ar.env.find_module_names_by_folder(self.ar.data.dp_auto_rig_path, self.ar.data.standard_folder)
         valid_modules = module_name[0]
         valid_module_names = module_name[1]
         
@@ -203,7 +203,7 @@ class UIFiller(object):
         joint_name = cmds.textField('skin_joint_name_tf', query=True, text=True)
         if joints:
             if joint_name:
-                sorted_joints = self.ar.utils.filter_name(joint_name, joints, " ")
+                sorted_joints = self.ar.naming.filter_name(joint_name, joints, " ")
             else:
                 sorted_joints = joints
         
@@ -267,7 +267,7 @@ class UIFiller(object):
         geo_name = cmds.textField('skin_geo_name_tf', query=True, text=True)
         if geos:
             if geo_name:
-                sorted_geos = self.ar.utils.filter_name(geo_name, geos, " ")
+                sorted_geos = self.ar.naming.filter_name(geo_name, geos, " ")
             else:
                 sorted_geos = geos
         

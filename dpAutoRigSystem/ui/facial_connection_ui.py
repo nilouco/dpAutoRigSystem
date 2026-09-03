@@ -11,7 +11,7 @@ class FacialConnectionUI(object):
         """ This is the main method to load the Facial Connection UI.
         """
         self.app = app
-        self.ar.utils.close_ui('dpFacialConnectionWindow')
+        self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
         width  = 230
         height = 330
         cmds.window('dpFacialConnectionWindow', title=self.ar.data.lang["m085_facialConnection"]+" "+str(self.ar.data.version), widthHeight=(width, height), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)

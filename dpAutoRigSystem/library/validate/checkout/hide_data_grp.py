@@ -41,8 +41,8 @@ class HideDataGrp(action.BaseAction):
                     if cmds.objExists("Data_Grp"):
                         data_grp = "Data_Grp"
             if data_grp:
-                self.ar.utils.set_progress(max=1)
-                self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                self.ar.ui_manager.set_progress(max=1)
+                self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                 self.checked_items.append(data_grp)
                 vis_status = cmds.getAttr(data_grp+".visibility")
                 if vis_status:

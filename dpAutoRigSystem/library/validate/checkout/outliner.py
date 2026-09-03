@@ -36,9 +36,9 @@ class Outliner(action.BaseAction):
             if not inputs:
                 inputs = cmds.ls(selection=False, type="transform")
             if inputs:
-                self.ar.utils.set_progress(max=len(hidden_grps), add_one=False, add_number=False)
+                self.ar.ui_manager.set_progress(max=len(hidden_grps), add_one=False, add_number=False)
                 for item in hidden_grps:
-                    self.ar.utils.set_progress(self.ar.data.lang[self.title])
+                    self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     if item in inputs:
                         self.checked_items.append(item)
                         if cmds.objExists(item):

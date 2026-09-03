@@ -11,8 +11,8 @@ class PublishUI(object):
     def create_ui(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-        self.ar.utils.close_ui('dpSuccessPublishedWindow')
-        self.ar.utils.close_ui('dpPublisherWindow')
+        self.ar.ui_manager.close_ui('dpSuccessPublishedWindow')
+        self.ar.ui_manager.close_ui('dpPublisherWindow')
         saved_scene = self.ar.utils.check_saved_scene()
         if not saved_scene:
             saved_scene = self.ar.pipeliner.confirm_save_this_scene(True)
@@ -74,8 +74,8 @@ class PublishUI(object):
     def success_published_ui(self, published_file, errors=False, *args):
         """ If everything works well we can call a success publishing window here.
         """
-        self.ar.utils.close_ui('dpSuccessPublishedWindow')
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.close_ui('dpSuccessPublishedWindow')
+        self.ar.ui_manager.set_progress(end_it=True)
         # window
         win_width  = 250
         win_height = 130

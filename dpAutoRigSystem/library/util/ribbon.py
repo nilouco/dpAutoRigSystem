@@ -293,8 +293,8 @@ class Ribbon(object):
                 cmds.setAttr(pac+"."+ini_jxt+"W1", 0.3)
 
         # corner autoRotate setup
-        loaded_quaternion_plugin = self.ar.utils.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
             corner_auto_rotate_md = cmds.createNode("multiplyDivide", name=prefix+name+"_"+corner_name+"_AutoRotate_MD")
             corner_auto_rotate_mm = cmds.createNode("multMatrix", name=prefix+name+"_"+corner_name+"_AutoRotate_MM")
@@ -764,7 +764,7 @@ class Ribbon(object):
                                 # flip direction to conform with left side
                                 add_dir = -1 * add_dir
                         cmds.setAttr(jad+".translate"+add_axis, add_dir*self.radius*0.5)
-                        self.ar.utils.set_joint_label(jad, s+joint_label_add, 18, joint_label_name+'_%02d_%02d'%(i,d))
+                        self.ar.naming.set_joint_label(jad, s+joint_label_add, 18, joint_label_name+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
                         add_ctrl = self.ar.ctrls.create_controller("id_088_LimbAdditional", ctrl_name=extra_name+"_Add_%02d_Ctrl"%d, r=self.radius*0.1, d=self.curve_degree, guide_source=self.limb_instance.guide_base)
@@ -926,11 +926,11 @@ class Ribbon(object):
             result_data['twistBoneMD'] = twist_bone_md
         
         # autoRotate:
-        loaded_quaternion_plugin = self.ar.utils.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
-            up_twist_bone_md = self.ar.utils.create_twist_bone_matrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
-            bottom_twist_bone_md = self.ar.utils.create_twist_bone_matrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")
+            up_twist_bone_md = self.ar.math.create_twist_bone_matrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
+            bottom_twist_bone_md = self.ar.math.create_twist_bone_matrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")
             twist_bone_pma = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")
             twist_bone_inv_md = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
             twist_bone_cnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
@@ -1009,7 +1009,7 @@ class Ribbon(object):
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                self.ar.utils.set_joint_label(name+'_%02d_Jnt'%i, side+joint_label_add, 18, joint_label_name+'_%02d'%i)
+                self.ar.naming.set_joint_label(name+'_%02d_Jnt'%i, side+joint_label_add, 18, joint_label_name+'_%02d'%i)
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the position of the first follicle
@@ -1034,7 +1034,7 @@ class Ribbon(object):
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                self.ar.utils.set_joint_label(name+'_%02d_Jnt'%i, side+joint_label_add, 18, joint_label_name+'_%02d'%i)
+                self.ar.naming.set_joint_label(name+'_%02d_Jnt'%i, side+joint_label_add, 18, joint_label_name+'_%02d'%i)
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the first follicle position

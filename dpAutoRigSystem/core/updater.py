@@ -1,10 +1,10 @@
+from maya import cmds
 import os
 import io
 import shutil
 import zipfile
 import urllib.request
 from io import TextIOWrapper
-from maya import cmds
 from ..install import maya_installer
 
 
@@ -114,17 +114,17 @@ class Updater(object):
         ext_filter = "*."+ext
         folder = cmds.fileDialog2(fileFilter=ext_filter, dialogStyle=2)
         if folder:
-            self.ar.utils.set_progress('Downloading...', 'Download Update', amount=50)
+            self.ar.ui_manager.set_progress('Downloading...', 'Download Update', amount=50)
             try:
                 urllib.request.urlretrieve(url, folder[0])
                 button_label = self.ar.data.lang['c108_open']+" "+self.ar.data.lang['i298_folder']
                 button_command = self.ar.packager.open_folder
                 button_argument = folder[0][:folder[0].rfind("/")]
                 self.ar.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', folder[0]+'\n\n'+self.ar.data.lang['i018_thanks'], 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
-                self.ar.utils.close_ui('dpUpdateWindow')
+                self.ar.ui_manager.close_ui('dpUpdateWindow')
             except:
                 self.ar.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', folder[0]+'\n\n'+self.ar.data.lang['i097_sorry'], 'center', 205, 270)
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
     
 
     def install(self, url, new_version, *args):
@@ -140,16 +140,16 @@ class Updater(object):
             # declaring variables:
             ar_name = "dpAutoRigSystem"
             dest_folder = self.ar.data.dp_auto_rig_path
-            self.ar.utils.set_progress('Installing: 0%', self.ar.data.lang['i098_installing'])
+            self.ar.ui_manager.set_progress('Installing: 0%', self.ar.data.lang['i098_installing'])
             
             try:
                 # get remote file from url:
                 remote_source = urllib.request.urlopen(url)
-                self.ar.utils.set_progress('Installing')
+                self.ar.ui_manager.set_progress('Installing')
                 
                 # read the downloaded Zip file stored in the RAM memory:
                 ar_zip = zipfile.ZipFile(io.BytesIO(remote_source.read()))
-                self.ar.utils.set_progress('Installing')
+                self.ar.ui_manager.set_progress('Installing')
 
                 # list Zip file contents in order to extract them in a temporarily folder:
                 zip_names = ar_zip.namelist()
@@ -157,7 +157,7 @@ class Updater(object):
                     if ar_name in file_name:
                         ar_zip.extract(file_name, dest_folder)
                 ar_zip.close()
-                self.ar.utils.set_progress('Installing')
+                self.ar.ui_manager.set_progress('Installing')
                 
                 # declare temporarily folder:
                 temp_folder = dest_folder+"/"+zip_names[0]+ar_name
@@ -182,7 +182,7 @@ class Updater(object):
                 for source_folder, folders, files in os.walk(temp_folder):       
                     # declare destination directory:
                     dest_path = source_folder.replace(temp_folder, dest_folder, 1).replace("\\", "/")
-                    self.ar.utils.set_progress('Installing')
+                    self.ar.ui_manager.set_progress('Installing')
                     # make sure we have all folders needed, otherwise, create them in the dest_path directory:
                     self.create_folder(dest_path)
                     for ar_file in files:
@@ -192,7 +192,7 @@ class Updater(object):
                         self.ar.utils.delete_file(dest_file)
                         # copy the ar_file:
                         shutil.copy2(source_file, dest_path)
-                        self.ar.utils.set_progress('Installing')
+                        self.ar.ui_manager.set_progress('Installing')
                 
                 # delete the temporarily folder used to download and install the update:
                 shutil.rmtree(dest_folder+"/"+zip_names[0])
@@ -210,10 +210,10 @@ class Updater(object):
                 # report fail update installation:
                 print(self.ar.data.lang["i141_error"]+": "+str(e))
                 button_label = 'Download'
-                button_command = self.ar.utils.visit_website
+                button_command = self.ar.web.visit_website
                 button_argument = self.ar.data.master_url
                 self.ar.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+new_version+'\n\n'+self.ar.data.lang['i097_sorry']+'\n\n'+str(e), 'center', 205, 270, buttonList=[button_label, button_command, button_argument])
-            self.ar.utils.set_progress(end_it=True)
+            self.ar.ui_manager.set_progress(end_it=True)
         else:
             print(self.ar.data.lang['i038_canceled'])
 

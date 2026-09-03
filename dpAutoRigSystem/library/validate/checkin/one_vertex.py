@@ -40,7 +40,7 @@ class OneVertex(action.BaseAction):
                     else:
                         check_items = cmds.ls(selection=False, type="mesh")
                     if check_items:
-                        self.ar.utils.set_progress(max=len(check_items), add_one=False, add_number=False)
+                        self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                         one_vertices = self.check_non_manifold_vertex(check_items)
                         # conditional to check here
                         if one_vertices:

@@ -38,7 +38,7 @@ class BaseTemplate(base.BaseLibrary):
         guide_data = guide_io.parse_repeated_nets(template_data)
         guide_io.import_guide(guide_data, False)
         guide_io.setup_guide_base_parenting(guide_data)
-        self.ar.utils.set_progress(end_it=True)
+        self.ar.ui_manager.set_progress(end_it=True)
         self.ar.ui_manager.refresh_ui()
         cmds.select(clear=True)
         print(self.ar.data.lang["m089_createdTemplate"]+self.name)

@@ -128,7 +128,7 @@ class Nose(standard.BaseStandard):
                     self.guide_top_loc = self.ar.ctrls.create_joint_locator(ctrl_name=self.name_guide+"_cvTopLoc"+str(n), r=0.3, d=1, guide=True)
                     cmds.setAttr(self.guide_top_loc+".nJoint", n)
                     cmds.parent(self.guide_top_loc, self.name_guide+"_cvTopLoc"+str(n-1), relative=True)
-                    dist = self.ar.utils.create_dist_between(self.name_guide+"_cvTopLoc"+str(n-1), self.name_guide+"_cvMiddleLoc")[0]
+                    dist = self.ar.math.create_dist_between(self.name_guide+"_cvTopLoc"+str(n-1), self.name_guide+"_cvMiddleLoc")[0]
                     cmds.setAttr(self.guide_top_loc+".translateZ", (0.5*dist))
                     self.line = cmds.joint(name=self.name_guide+"_JGuideTop"+str(n), radius=0.001)
                     cmds.setAttr(self.line+".template", 1)
@@ -180,7 +180,7 @@ class Nose(standard.BaseStandard):
                     self.jnt = cmds.joint(name=side+self.number_name+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.ar.utils.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
+                    self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_%02d"%(n))
                     skin_joints.append(self.jnt)
                     # create a control:
                     nose_ctrl = self.ar.ctrls.create_controller("id_075_NoseTop", ctrl_name=side+self.number_name+"_%02d_Ctrl"%(n), r=self.radius, d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvTopLoc1", parent_tag=self.get_parent_to_tag(centers))
@@ -218,7 +218,7 @@ class Nose(standard.BaseStandard):
                     if n == 1:
                         if self.articulation:
                             articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.utils.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                             cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
                             cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
@@ -274,14 +274,14 @@ class Nose(standard.BaseStandard):
                     if cmds.objExists(dpar_joint):
                         cmds.addAttr(dpar_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.ar.utils.set_joint_label(middle_joint, s+self.joint_label_add, 18, self.number_name+"_%02d_"%(n+1)+self.ar.data.lang['c029_middle'])
-                self.ar.utils.set_joint_label(tip_joint, s+self.joint_label_add, 18, self.number_name+"_%02d_"%(n+2)+self.ar.data.lang['c120_tip'])
-                self.ar.utils.set_joint_label(bottom_joint, s+self.joint_label_add, 18, self.number_name+"_%02d_"%(n+2)+self.ar.data.lang['c100_bottom'])
-                self.ar.utils.set_joint_label(left_side_joint, 1, 18, self.number_name+"_%02d_"%(n+3)+self.ar.data.lang['c121_side'])
-                self.ar.utils.set_joint_label(right_side_joint, 2, 18, self.number_name+"_%02d_"%(n+3)+self.ar.data.lang['c121_side'])
+                self.ar.naming.set_joint_label(middle_joint, s+self.joint_label_add, 18, self.number_name+"_%02d_"%(n+1)+self.ar.data.lang['c029_middle'])
+                self.ar.naming.set_joint_label(tip_joint, s+self.joint_label_add, 18, self.number_name+"_%02d_"%(n+2)+self.ar.data.lang['c120_tip'])
+                self.ar.naming.set_joint_label(bottom_joint, s+self.joint_label_add, 18, self.number_name+"_%02d_"%(n+2)+self.ar.data.lang['c100_bottom'])
+                self.ar.naming.set_joint_label(left_side_joint, 1, 18, self.number_name+"_%02d_"%(n+3)+self.ar.data.lang['c121_side'])
+                self.ar.naming.set_joint_label(right_side_joint, 2, 18, self.number_name+"_%02d_"%(n+3)+self.ar.data.lang['c121_side'])
                 if nostril:
-                    self.ar.utils.set_joint_label(left_nostril_joint, 1, 18, self.number_name+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
-                    self.ar.utils.set_joint_label(right_nostril_joint, 2, 18, self.number_name+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
+                    self.ar.naming.set_joint_label(left_nostril_joint, 1, 18, self.number_name+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
+                    self.ar.naming.set_joint_label(right_nostril_joint, 2, 18, self.number_name+"_%02d_"%(n+4)+self.ar.data.lang['m079_nostril'])
                 
                 # creating controls:
                 middle_ctrl = self.ar.ctrls.create_controller("id_076_NoseMiddle", ctrl_name=middle_ctrl_name, r=(self.radius), d=self.curve_degree, head_def=head_def_value, guide_source=self.name_guide+"_cvMiddleLoc", parent_tag=centers[-1])

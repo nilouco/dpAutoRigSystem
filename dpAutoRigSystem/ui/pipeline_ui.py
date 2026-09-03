@@ -11,7 +11,7 @@ class PipelineUI(object):
     def create_ui(self, loaded_file_info=False, *args):
         """ Open an UI to load, set and save the pipeline info.
         """
-        self.ar.utils.close_ui('dpPipelinerWindow')
+        self.ar.ui_manager.close_ui('dpPipelinerWindow')
         self.ar.pipeliner.get_pipeline_data(loaded_file_info)
         # window
         if self.ar.data.ui_state:
@@ -113,7 +113,7 @@ class PipelineUI(object):
             saveVersion_winHeight = 220
             saveVersion_align = "left"
             # window:
-            self.ar.utils.close_ui("dpSaveVersionWindow")
+            self.ar.ui_manager.close_ui("dpSaveVersionWindow")
             cmds.window('dpSaveVersionWindow', title=saveVersion_title, iconName='dpInfo', widthHeight=(saveVersion_winWidth, saveVersion_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
             # creating text layout:
             cmds.columnLayout('save_version_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent='dpSaveVersionWindow')
@@ -144,7 +144,7 @@ class PipelineUI(object):
         select_winWidth = 240
         select_winHeight = 285
         select_align = "center"
-        self.ar.utils.close_ui("dpSelectAssetWindow")
+        self.ar.ui_manager.close_ui("dpSelectAssetWindow")
         cmds.window('dpSelectAssetWindow', title=selectAsset_title, iconName='dpInfo', widthHeight=(select_winWidth, select_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         cmds.columnLayout('select_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='dpSelectAssetWindow')
@@ -162,7 +162,7 @@ class PipelineUI(object):
         selected_items = cmds.textScrollList('select_asset_tsl', query=True, selectItem=True)
         if selected_items:
             self.ar.pipeliner.load_asset(path, selected_items[0], mode)
-            self.ar.utils.close_ui("dpSelectAssetWindow")
+            self.ar.ui_manager.close_ui("dpSelectAssetWindow")
 
 
     def refresh_project_ui(self, path):
@@ -181,7 +181,7 @@ class PipelineUI(object):
         selectCB_winWidth = 240
         selectCB_winHeight = 285
         selectCB_align = "center"
-        self.ar.utils.close_ui("dpSelectAssetCBWindow")
+        self.ar.ui_manager.close_ui("dpSelectAssetCBWindow")
         cmds.window('dpSelectAssetCBWindow', title=selectAssetCB_title, iconName='dpInfo', widthHeight=(selectCB_winWidth, selectCB_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating layout:
         cmds.columnLayout('select_asset_batch_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=10, parent='dpSelectAssetCBWindow')
@@ -228,7 +228,7 @@ class PipelineUI(object):
         win_height = 220
         align     = "left"
         # creating New Asset Window:
-        self.ar.utils.close_ui("dpNewAssetWindow")
+        self.ar.ui_manager.close_ui("dpNewAssetWindow")
         cmds.window('dpNewAssetWindow', title=title, iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         cmds.columnLayout('new_asset_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=3, parent='dpNewAssetWindow')
@@ -280,7 +280,7 @@ class PipelineUI(object):
         win_height = 330+(len(self.ar.pipeliner.ios)*16)
         align     = "left"
         # creating replace dpData Window:
-        self.ar.utils.close_ui('dpReplaceDPDataWindow')
+        self.ar.ui_manager.close_ui('dpReplaceDPDataWindow')
         cmds.window('dpReplaceDPDataWindow', title=title, iconName='dpInfo', widthHeight=(win_width, win_height), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
         # creating layout:
         cmds.columnLayout('replace_data_cl', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent='dpReplaceDPDataWindow')
@@ -315,4 +315,4 @@ class PipelineUI(object):
                 self.to_replace_datas.append(item)
         if self.to_replace_datas:
             self.ar.pipeliner.replace_data()
-            self.ar.utils.close_ui('dpReplaceDPDataWindow')
+            self.ar.ui_manager.close_ui('dpReplaceDPDataWindow')

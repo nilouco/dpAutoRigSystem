@@ -16,7 +16,7 @@ class ValueEditorUI(object):
     def create_ui(self, *args):
         """ Create an UI to edit the attributes default values.
         """
-        self.ar.utils.close_ui('dpDefaultValueOptionWindow')
+        self.ar.ui_manager.close_ui('dpDefaultValueOptionWindow')
         # window
         width  = 430
         height = 300

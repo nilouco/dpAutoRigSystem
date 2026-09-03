@@ -62,7 +62,7 @@ class CorrectionManager(base.BaseLibrary):
         """ Returns the distance value read from the distance between node.
         """
         if cmds.getAttr(self.net+".type") == self.distance_name:
-            dist_bet = cmds.listConnections(self.net+".create_dist_between")[0]
+            dist_bet = cmds.listConnections(self.net+".distanceBet")[0]
             if dist_bet:
                 return cmds.getAttr(dist_bet+".distance")
 
@@ -77,7 +77,7 @@ class CorrectionManager(base.BaseLibrary):
             if self.ar.data.ui_state:
                 name = cmds.textFieldGrp("correction_name_tfg", query=True, text=True)
         if name:
-            name = self.ar.utils.resolve_name(name, self.net_suffix)[0]
+            name = self.ar.naming.resolve_name(name, self.net_suffix)[0]
             self.rename_linked_nodes(old_name, name)
             cmds.setAttr(self.net+".name", name, type="string")
             self.net = cmds.rename(self.net, self.net.replace(old_name, name))
@@ -199,8 +199,8 @@ class CorrectionManager(base.BaseLibrary):
             Returns the created network node.
         """
         # loading Maya matrix node
-        loaded_quaternion_plugin = self.ar.utils.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
-        loaded_matrix_plugin = self.ar.utils.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+        loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
+        loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
         if loaded_quaternion_plugin and loaded_matrix_plugin:
             if not nodes:
                 nodes = cmds.ls(selection=True, flatten=True)
@@ -227,7 +227,7 @@ class CorrectionManager(base.BaseLibrary):
                         name = cmds.textField('correction_create_tf', query=True, text=True)
                         if not name:
                             name = "Correction"
-                    correction_name, name = self.ar.utils.resolve_name(name, self.net_suffix)
+                    correction_name, name = self.ar.naming.resolve_name(name, self.net_suffix)
                     
                     # type
                     if not correct_type:
@@ -261,7 +261,7 @@ class CorrectionManager(base.BaseLibrary):
                     # add serialization attributes
                     message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisChc", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
                     if correct_type == self.distance_name:
-                        message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "create_dist_between", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
+                        message_attrs = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
                     for message_attr in message_attrs:
                         cmds.addAttr(self.net, longName=message_attr, attributeType="message")
                     cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
@@ -424,7 +424,7 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.connectAttr(distance_all_cnd+".outColorR", self.net+".inputValue", force=True)
                         cmds.setAttr(self.net+".inputValue", lock=True)
                         # serialize distance nodes
-                        cmds.connectAttr(dist_bet+".message", self.net+".create_dist_between", force=True)
+                        cmds.connectAttr(dist_bet+".message", self.net+".distanceBet", force=True)
                         cmds.connectAttr(output_rmv+".message", self.net+".outputRmV", force=True)
                         cmds.connectAttr(distance_axis_extract_pma+".message", self.net+".distanceAxisExtractPMA", force=True)
                         cmds.connectAttr(distance_all_cnd+".message", self.net+".distanceAllCnd", force=True)

@@ -76,9 +76,9 @@ class UtilityIO(action.BaseAction):
             Returns the dictionary to export.
         """
         data = {}
-        self.ar.utils.set_progress(max=len(utilities), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(utilities), add_one=False, add_number=False)
         for item in utilities:
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
                 # getting attributes values
                 node_type = cmds.objectType(item)
@@ -113,12 +113,12 @@ class UtilityIO(action.BaseAction):
         """ Import utility nodes from exported dictionary.
             Create missing utility nodes and set them values if they don't exists.
         """
-        self.ar.utils.set_progress(max=len(utility_data.keys()), add_one=False, add_number=False)
+        self.ar.ui_manager.set_progress(max=len(utility_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
         for item in utility_data.keys():
             existing_nodes = []
-            self.ar.utils.set_progress(self.ar.data.lang[self.title])
+            self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create utility node if it needs
             if not cmds.objExists(item):
                 cmds.createNode(utility_data[item]["type"], name=utility_data[item]["name"])
