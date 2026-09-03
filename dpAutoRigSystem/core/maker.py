@@ -630,8 +630,11 @@ class Maker(object):
                         if "guide_source" in cmds.listAttr(p_tag_ctrl):
                             guide_source = cmds.getAttr(p_tag_ctrl+".guide_source")
                             guide_base = guide_source.split(":")[0]+":Guide_Base"
-                            parent_node = self.hook[guide_base]['parentNode']
-                            father_guide = self.hook[guide_base]['fatherGuide']
+                            parent_node = None
+                            if guide_base in self.hook.keys():
+                                if 'parentNode' in self.hook[guide_base].keys():
+                                    parent_node = self.hook[guide_base]['parentNode']
+                                    father_guide = self.hook[guide_base]['fatherGuide']
                             if parent_node:
                                 if not parent_node in guide_source_data.keys():
                                     parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
