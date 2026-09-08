@@ -81,9 +81,8 @@ class TransformationIO(action.BaseAction):
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             use_this_transform = True
-            if cmds.objExists(item+".dpNotTransformIO"):
-                if cmds.getAttr(item+".dpNotTransformIO") == 1:
-                    use_this_transform = False
+            if cmds.objExists(item+".dpNotTransformIO") and cmds.getAttr(item+".dpNotTransformIO") == 1:
+                use_this_transform = False
             if use_this_transform:
                 data = self.get_transformation(item)
                 data.update(self.get_limit(item))
@@ -99,15 +98,14 @@ class TransformationIO(action.BaseAction):
         need_run_get = True
         for attr, default in zip(["tx", "ty",  "tz",  "rx",  "ry",  "rz",  "sx",  "sy",  "sz"], [0, 0, 0, 0, 0, 0, 1, 1, 1]):
             value = cmds.getAttr(item+"."+attr)
-            if not value == default:
-                if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                    if need_run_get:
-                        data = { 
-                                "transform" : {},
-                                "matrix" : cmds.xform(item, query=True, worldSpace=False, matrix=True)
-                                }
-                        need_run_get = False
-                    data["transform"][attr] = cmds.getAttr(item+"."+attr)
+            if value != default and not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                if need_run_get:
+                    data = { 
+                            "transform" : {},
+                            "matrix" : cmds.xform(item, query=True, worldSpace=False, matrix=True)
+                            }
+                    need_run_get = False
+                data["transform"][attr] = cmds.getAttr(item+"."+attr)
         return data
 
 
@@ -157,7 +155,7 @@ class TransformationIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(transform_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in transform_data.keys():
+        for item in transform_data:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             not_found_nodes = []
             # check transform
@@ -165,9 +163,9 @@ class TransformationIO(action.BaseAction):
             #    item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
                 ran = False
-                if "transform" in transform_data[item].keys():
+                if "transform" in transform_data[item]:
                     ran = True
-                    for attr in transform_data[item]["transform"].keys():
+                    for attr in transform_data[item]["transform"]:
                         if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                             # unlock attribute
                             was_locked = cmds.getAttr(item+"."+attr, lock=True)
@@ -182,9 +180,9 @@ class TransformationIO(action.BaseAction):
                             except Exception as e:
                                 self.fail_io(item+" - "+str(e))
                     cmds.xform(item, worldSpace=False, matrix=transform_data[item]["matrix"])
-                if "limit" in transform_data[item].keys():
+                if "limit" in transform_data[item]:
                     ran = True
-                    for limit_attr in transform_data[item]["limit"].keys():
+                    for limit_attr in transform_data[item]["limit"]:
                         try:
                             if limit_attr == "enableTranslationX":
                                 cmds.transformLimits(item, enableTranslationX=[transform_data[item]["limit"][limit_attr][0], transform_data[item]["limit"][limit_attr][1]], translationX=[transform_data[item]["limit"][limit_attr][2], transform_data[item]["limit"][limit_attr][3]])

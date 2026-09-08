@@ -50,9 +50,8 @@ class BrokenNet(action.BaseAction):
                     elif 'follicle' in cmds.listAttr(item): #rivet
                         if not cmds.listConnections(item+".follicle", source=True, destination=False):
                             self.cleanup_network(item)
-                    elif 'linkedNode' in cmds.listAttr(item): #guide
-                        if not cmds.listConnections(item+".linkedNode", source=True, destination=False):
-                            self.cleanup_network(item)
+                    elif 'linkedNode' in cmds.listAttr(item) and not cmds.listConnections(item+".linkedNode", source=True, destination=False): #guide
+                        self.cleanup_network(item)
             else:
                 self.not_found_node()
         else:

@@ -168,12 +168,11 @@ class Wheel(standard.BaseStandard):
                 wheel_auto_grp = cmds.rename(wheel_auto_grp, side+self.number_name+"_"+self.ar.data.lang['m156_wheel']+"_Auto_Grp")
                 
                 # fixing flip mirror:
-                if s == 1:
-                    if cmds.getAttr(self.guide_base+".flip") == 1:
-                        for zero_grp in zeros:
-                            cmds.setAttr(zero_grp+".scaleX", -1)
-                            cmds.setAttr(zero_grp+".scaleY", -1)
-                            cmds.setAttr(zero_grp+".scaleZ", -1)
+                if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                    for zero_grp in zeros:
+                        cmds.setAttr(zero_grp+".scaleX", -1)
+                        cmds.setAttr(zero_grp+".scaleY", -1)
+                        cmds.setAttr(zero_grp+".scaleZ", -1)
                 
                 cmds.addAttr(wheel_ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
                 cmds.setAttr(wheel_ctrl+".scaleCompensate", 1, channelBox=True)
@@ -213,10 +212,9 @@ class Wheel(standard.BaseStandard):
                 cmds.setAttr(wheel_ctrl+"."+self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 1, channelBox=True)
                 self.ar.ctrls.set_default_value(wheel_ctrl, self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 1)
                 cmds.setAttr(wheel_ctrl+"."+self.ar.data.lang['c093_tryKeepUndo'], 1, channelBox=True)
-                if s == 1:
-                    if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(wheel_ctrl+"."+self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 0)
-                        self.ar.ctrls.set_default_value(wheel_ctrl, self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 0)
+                if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                    cmds.setAttr(wheel_ctrl+"."+self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 0)
+                    self.ar.ctrls.set_default_value(wheel_ctrl, self.ar.data.lang['c070_steering']+self.ar.data.lang['c053_invert'].capitalize(), 0)
                 # set default values:
                 self.ar.ctrls.set_default_value(wheel_ctrl, self.ar.data.lang['c068_startFrame'], start_frame_value)
                 self.ar.ctrls.set_default_value(wheel_ctrl, self.ar.data.lang['c070_steering'], steering_value)
@@ -277,23 +275,22 @@ class Wheel(standard.BaseStandard):
                 skincluster_node = cmds.skinCluster(center_joint, geo_holder, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_SC")[0]
                 bindpose_node = cmds.listConnections(skincluster_node+".bindPose", destination=False, source=True)
                 cmds.rename(bindpose_node, side+self.number_name+"_"+self.ar.data.lang['c046_holder']+"_BP")
-                if loaded_geo:
-                    if cmds.objExists(loaded_geo):
-                        base_name = self.ar.naming.extract_suffix(loaded_geo)
-                        skincluster_name = base_name+"_SC"
-                        if "|" in skincluster_name:
-                            skincluster_name = skincluster_name[skincluster_name.rfind("|")+1:]
-                        try:
-                            cmds.skinCluster(center_joint, loaded_geo, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)
-                        except:
-                            for item in cmds.listRelatives(loaded_geo, children=True, allDescendents=True) or []:
-                                item_type = cmds.objectType(item)
-                                if item_type == "mesh" or item_type == "nurbsSurface":
-                                    try:
-                                        skincluster_name = self.ar.naming.extract_suffix(item)+"_SC"
-                                        cmds.skinCluster(center_joint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)
-                                    except:
-                                        pass
+                if loaded_geo and cmds.objExists(loaded_geo):
+                    base_name = self.ar.naming.extract_suffix(loaded_geo)
+                    skincluster_name = base_name+"_SC"
+                    if "|" in skincluster_name:
+                        skincluster_name = skincluster_name[skincluster_name.rfind("|")+1:]
+                    try:
+                        cmds.skinCluster(center_joint, loaded_geo, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)
+                    except:
+                        for item in cmds.listRelatives(loaded_geo, children=True, allDescendents=True) or []:
+                            item_type = cmds.objectType(item)
+                            if item_type == "mesh" or item_type == "nurbsSurface":
+                                try:
+                                    skincluster_name = self.ar.naming.extract_suffix(item)+"_SC"
+                                    cmds.skinCluster(center_joint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skincluster_name)
+                                except:
+                                    pass
                 
                 # lattice:
                 lattice_items = cmds.lattice(geo_holder, divisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, position=(0, 0, 0), scale=(self.radius*2, self.radius*2, self.radius*2), name=side+self.number_name+"_FFD") #[deformer, lattice, base]
@@ -316,27 +313,25 @@ class Wheel(standard.BaseStandard):
                 cmds.matchTransform(def_ctrl_grps[0], upper_clusters[1], position=True, rotation=True)
                 cmds.matchTransform(def_ctrl_grps[1], middle_clusters[1], position=True, rotation=True)
                 cmds.matchTransform(def_ctrl_grps[2], lower_clusters[1], position=True, rotation=True)
-                if s == 1: #fix right side controllers upper/lower flipping - workaround
-                    if cmds.getAttr(self.guide_base+".flip") == 1:
-                        self.ar.utils.unlock_attr([self.guide_center_loc])
-                        cmds.parent(self.guide_center_loc, world=True)
+                #fix right side controllers upper/lower flipping - workaround
+                if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                    self.ar.utils.unlock_attr([self.guide_center_loc])
+                    cmds.parent(self.guide_center_loc, world=True)
                 cmds.matchTransform(lattice_items[1], self.guide_center_loc, position=True, rotation=True)
                 cmds.matchTransform(lattice_items[2], self.guide_center_loc, position=True, rotation=True)
                 cmds.matchTransform(cluster_grp, self.guide_center_loc, position=True, rotation=True)
                 cmds.matchTransform(def_ctrl_grp, self.guide_center_loc, position=True, rotation=True)
                 outside_dist = cmds.getAttr(self.guide_outside_loc+".tz")
-                if s == 1:
-                    if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.parent(self.guide_center_loc, self.guide_base)
-                        outside_dist = -outside_dist
+                if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                    cmds.parent(self.guide_center_loc, self.guide_base)
+                    outside_dist = -outside_dist
                 cmds.move(outside_dist, def_ctrl_grp, moveZ=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 self.ar.ctrls.direct_connect(upper_def_ctrl, upper_clusters[1])
                 self.ar.ctrls.direct_connect(middle_def_ctrl, middle_clusters[1])
                 self.ar.ctrls.direct_connect(lower_def_ctrl, lower_clusters[1])
                 # grouping deformers:
-                if loaded_geo:
-                    if cmds.objExists(loaded_geo):
-                        cmds.lattice(lattice_items[0], edit=True, geometry=loaded_geo)
+                if loaded_geo and cmds.objExists(loaded_geo):
+                    cmds.lattice(lattice_items[0], edit=True, geometry=loaded_geo)
                 def_grp = cmds.group(lattice_items[1], lattice_items[2], cluster_grp, name=side+self.number_name+"_Deform_Grp")
                 cmds.parentConstraint(main_ctrl, def_grp, maintainOffset=True, name=def_grp+"_PaC")
                 cmds.scaleConstraint(main_ctrl, def_grp, maintainOffset=True, name=def_grp+"_ScC")

@@ -128,7 +128,7 @@ class BlendshapeIO(action.BaseAction):
                     # getting vertex weights if not equal to 1
                     for s, shape in enumerate(bs_data[bs_node]["geometry"]):
                         # write deleted target to compose a clear target list to avoid Maya's garbage issue
-                        while not i == indexes[t]:
+                        while i != indexes[t]:
                             bs_data[bs_node]["targets"][i] = {"deleted" : True}
                             deleted_indexes.append(i)
                             i += 1
@@ -136,9 +136,9 @@ class BlendshapeIO(action.BaseAction):
                         vertices = cmds.polyEvaluate(shape, vertex=True)
                         if type(vertices) == "int": #to accept non polygon blendShapes like curves by Zipper
                             raw_weights = cmds.getAttr(f"{bs_node}.inputTarget[{s}].inputTargetGroup[{t}].targetWeights[0:{vertices-1}]")
-                            if not len(raw_weights) == raw_weights.count(1.0):
+                            if len(raw_weights) != raw_weights.count(1.0):
                                 for w, weight in enumerate(raw_weights):
-                                    if not weight == 1.0:
+                                    if weight != 1.0:
                                         weight_data[w] = weight
                     # data dictionary to export
                     bs_data[bs_node]["targets"][i] = { "name"           : target,
@@ -180,7 +180,7 @@ class BlendshapeIO(action.BaseAction):
         suppress_results_state = cmds.scriptEditorInfo(query=True, suppressResults=True)
         cmds.scriptEditorInfo(suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
         # rebuild blendShapes
-        for bs_node in bs_data.keys():
+        for bs_node in bs_data:
             # import alembic original mesh if it doesn't exists
             original_shapes = bs_data[bs_node]["geometry"]
             for original_shape in original_shapes:

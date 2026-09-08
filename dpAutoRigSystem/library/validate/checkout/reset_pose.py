@@ -67,13 +67,12 @@ class ResetPose(action.BaseAction):
                             # get attribute type to use in the variables comparation
                             attr_type = self.get_attr_type(attr_data[attr][2])
                             if attr_type == 0: #boolean
-                                if not bool(attr_data[attr][0]) == bool(attr_data[attr][1]): #defaultValue vs current_value
+                                if bool(attr_data[attr][0]) != bool(attr_data[attr][1]): #defaultValue vs current_value
                                     edited_attrs.append(attr)
                             elif attr_type == 1: #integer
-                                if not int(attr_data[attr][0]) == int(attr_data[attr][1]):
+                                if int(attr_data[attr][0]) != int(attr_data[attr][1]):
                                     edited_attrs.append(attr)
-                            elif attr_type == 2: #float
-                                if not float(format(attr_data[attr][0],".3f")) == float(format(attr_data[attr][1],".3f")):
+                            elif attr_type == 2 and float(format(attr_data[attr][0], ".3f")) != float(format(attr_data[attr][1], ".3f")): #float
                                     edited_attrs.append(attr)
                         
                         if edited_attrs:
@@ -128,7 +127,7 @@ class ResetPose(action.BaseAction):
             attributes = []
         if attributes:
             for attr_name in attributes:
-                if not cmds.attributeQuery(attr_name, node=item, attributeType=True) == "bool":
+                if cmds.attributeQuery(attr_name, node=item, attributeType=True) != "bool":
                     clean_attrs.append(attr_name)
         all_attrs = cmds.listAttr(item)
         anim_attrs = cmds.listAnimatable(item)

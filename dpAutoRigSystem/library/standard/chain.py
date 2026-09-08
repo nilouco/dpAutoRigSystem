@@ -322,24 +322,22 @@ class Chain(standard.BaseStandard):
                     cmds.addAttr(to_parent_extrem_ctrl, longName=self.ar.data.lang['c118_active']+self.ar.data.lang['c031_volumeVariation'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     cmds.parent(to_parent_extrem_ctrl, orig_grp)
                     cmds.setAttr(to_parent_extrem_ctrl+".translateZ", self.radius)
-                    if s == 1:
-                        if self.flip:
-                            cmds.setAttr(to_parent_extrem_ctrl+".translateZ", -self.radius)
+                    if s == 1 and self.flip:
+                        cmds.setAttr(to_parent_extrem_ctrl+".translateZ", -self.radius)
                     self.ar.utils.create_zero_out([to_parent_extrem_ctrl])
                     self.ar.ctrls.set_lock_hide([to_parent_extrem_ctrl], ['v'])
 
                 # invert scale for right side before:
-                if s == 1:
-                    if self.flip:
-                        # fix flipping issue for FK right side:
-                        for f in range(1, len(fk_ctrls)):
-                            cmds.setAttr(fk_zeros[0]+".scaleX", -1)
-                            cmds.setAttr(fk_zeros[0]+".scaleY", -1)
-                            cmds.setAttr(fk_zeros[0]+".scaleZ", -1)
-                            attributes = ["tx", "ty", "tz", "rx", "ry", "rz"]
-                            for attr in attributes:
-                                attr_value = cmds.getAttr(fk_zeros[f]+"."+attr)
-                                cmds.setAttr(fk_zeros[f]+"."+attr, -1*attr_value)
+                if s == 1 and self.flip:
+                    # fix flipping issue for FK right side:
+                    for f in range(1, len(fk_ctrls)):
+                        cmds.setAttr(fk_zeros[0]+".scaleX", -1)
+                        cmds.setAttr(fk_zeros[0]+".scaleY", -1)
+                        cmds.setAttr(fk_zeros[0]+".scaleZ", -1)
+                        attributes = ["tx", "ty", "tz", "rx", "ry", "rz"]
+                        for attr in attributes:
+                            attr_value = cmds.getAttr(fk_zeros[f]+"."+attr)
+                            cmds.setAttr(fk_zeros[f]+"."+attr, -1*attr_value)
                 
                 # working with position, orientation of joints and make an orientConstraint for Fk controls:
                 for n in range(self.n_joints):
@@ -463,7 +461,7 @@ class Chain(standard.BaseStandard):
                         if self.mirror_axis == "Y":
                             self.fix_mirror_flipping(ik_ctrl_last_zero, s, -1, "Z")
                         cmds.parent(ik_ctrl_zero, ik_ctrl_last)
-                    elif not c == 0:
+                    elif c != 0:
                         if c == 2:
                             self.ar.ctrls.set_lock_hide([ik_ctrl], ["rx", "ry", "sx", "sy", "sz", "v", "ro"])
                         else:
@@ -635,17 +633,16 @@ class Chain(standard.BaseStandard):
     def fix_mirror_flipping(self, item, s, value=-1, axis=None):
         """ Just flip the controller to fix the mirror issue.
         """
-        if s == 1:
-            if self.flip:
-                if not axis:
-                    if self.mirror_axis == "X":
-                        cmds.setAttr(item+".scaleZ", value)
-                    elif self.mirror_axis == "Y":
-                        cmds.setAttr(item+".scaleZ", -value)
-                    elif self.mirror_axis == "Z":
-                        cmds.setAttr(item+".scaleZ", value)
-                else:
-                    cmds.setAttr(item+".scale"+axis, value)
+        if s == 1 and self.flip:
+            if not axis:
+                if self.mirror_axis == "X":
+                    cmds.setAttr(item+".scaleZ", value)
+                elif self.mirror_axis == "Y":
+                    cmds.setAttr(item+".scaleZ", -value)
+                elif self.mirror_axis == "Z":
+                    cmds.setAttr(item+".scaleZ", value)
+            else:
+                cmds.setAttr(item+".scale"+axis, value)
 
 
     def composing_info(self):

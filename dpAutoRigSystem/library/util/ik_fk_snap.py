@@ -246,10 +246,9 @@ class IkFkSnap:
         """ Set zero value and keyframe the given attributes in the controller.
         """
         for attr in attributes:
-            if cmds.objExists(ctrl+"."+attr):
-                if cmds.getAttr(ctrl+"."+attr):
-                    cmds.setAttr(ctrl+"."+attr, 0)
-                    cmds.setKeyframe(ctrl, attribute=attr)
+            if cmds.objExists(ctrl+"."+attr) and cmds.getAttr(ctrl+"."+attr):
+                cmds.setAttr(ctrl+"."+attr, 0)
+                cmds.setKeyframe(ctrl, attribute=attr)
 
 
     def transfer_attr_from_to(self, from_ctrl, to_ctrl, attributes):
@@ -259,7 +258,7 @@ class IkFkSnap:
             if cmds.objExists(from_ctrl+"."+attr) and cmds.objExists(to_ctrl+"."+attr):
                 from_value = cmds.getAttr(from_ctrl+"."+attr)
                 to_value = cmds.getAttr(to_ctrl+"."+attr)
-                if not from_value == to_value:
+                if from_value != to_value:
                     cmds.setAttr(to_ctrl+"."+attr, from_value)
                     cmds.setKeyframe(to_ctrl, attribute=attr)
 

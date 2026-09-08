@@ -80,19 +80,18 @@ class MayaInstaller:
         button_exists = False
         if all_buttons:
             for btn in all_buttons:
-                if cmds.shelfButton(btn, query=True, exists=True):
-                    if self.ar_name in cmds.shelfButton(btn, query=True, command=True):
-                        cmds.shelfButton(
-                                            btn, 
-                                            edit=True, 
-                                            label=self.ar_name, 
-                                            annotation=self.ar_name, 
-                                            imageOverlayLabel="", 
-                                            image=self.shelf_image, 
-                                            command=self.shelf_code, 
-                                            sourceType="python"
-                                        )
-                        button_exists = True
+                if cmds.shelfButton(btn, query=True, exists=True) and self.ar_name in cmds.shelfButton(btn, query=True, command=True):
+                    cmds.shelfButton(
+                                        btn, 
+                                        edit=True, 
+                                        label=self.ar_name, 
+                                        annotation=self.ar_name, 
+                                        imageOverlayLabel="", 
+                                        image=self.shelf_image, 
+                                        command=self.shelf_code, 
+                                        sourceType="python"
+                                    )
+                    button_exists = True
         if not button_exists:
             cmds.shelfButton(
                                 label=self.ar_name, 

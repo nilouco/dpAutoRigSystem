@@ -45,37 +45,33 @@ class Translator:
         if self.lang_index <= self.key_len:
             validated = False
             current_text = cmds.scrollField(self.new_lang_text_sf, query=True, text=True)
-            if not current_text == None:
-                if not current_text == "":
-                    if not current_text == " ":
-                        if not current_text == self.ar.data.lang['t007_writeText']:
-                            sourceText = cmds.scrollField(self.source_text_sf, query=True, text=True)
-                            
-                            if sourceText.startswith("\n"):
-                                if not current_text.startswith("\n"):
-                                    current_text = "\n"+current_text
-                            elif sourceText[0].isupper():
-                                current_text = current_text[0].upper()+current_text[1:]
-                            elif sourceText[0].islower():
-                                current_text = current_text[0].lower()+current_text[1:]
-                            if sourceText.endswith("\n"):
-                                if not current_text.endswith("\n"):
-                                    current_text = current_text+"\n"
-                            else:
-                                if current_text.endswith("\n"):
-                                    current_text = current_text[:-1]
-                                elif sourceText.endswith("."):
-                                    if not current_text.endswith("."):
-                                        current_text = current_text+"."
-                                elif sourceText.endswith(":"):
-                                    if not current_text.endswith(":"):
-                                        current_text = current_text+":"
-                            
-                            if self.source_langs[self.lang_index].startswith("c"): #control
-                                if not self.check_no_special_char.search(current_text): #no special char
-                                    validated = True
-                            else:
-                                validated = True
+            if current_text != None and current_text != "" and current_text != " " and current_text != self.ar.data.lang['t007_writeText']:
+                sourceText = cmds.scrollField(self.source_text_sf, query=True, text=True)
+                
+                if sourceText.startswith("\n"):
+                    if not current_text.startswith("\n"):
+                        current_text = "\n"+current_text
+                elif sourceText[0].isupper():
+                    current_text = current_text[0].upper()+current_text[1:]
+                elif sourceText[0].islower():
+                    current_text = current_text[0].lower()+current_text[1:]
+                if sourceText.endswith("\n"):
+                    if not current_text.endswith("\n"):
+                        current_text = current_text+"\n"
+                else:
+                    if current_text.endswith("\n"):
+                        current_text = current_text[:-1]
+                    elif sourceText.endswith("."):
+                        if not current_text.endswith("."):
+                            current_text = current_text+"."
+                    elif sourceText.endswith(":") and not current_text.endswith(":"):
+                        current_text = current_text+":"
+                
+                if self.source_langs[self.lang_index].startswith("c"): #control
+                    if not self.check_no_special_char.search(current_text): #no special char
+                        validated = True
+                else:
+                    validated = True
             if validated:
                 self.new_langs[self.lang_index] = current_text
                 self.forward()

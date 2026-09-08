@@ -44,9 +44,8 @@ class Job:
         try:
             old_job_id = self.ar.data.select_change_job_id
             self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='main_menu_bar', replacePrevious=True, killWithScene=False, compressUndo=True)
-            if not old_job_id == 0:
-                if cmds.scriptJob(exists=old_job_id):
-                    cmds.scriptJob(kill=old_job_id, force=True)
+            if old_job_id != 0 and cmds.scriptJob(exists=old_job_id):
+                cmds.scriptJob(kill=old_job_id, force=True)
         except: #due duplicate guides
             self.ar.data.select_change_job_id = cmds.scriptJob(event=('SelectionChanged', self.selected_guide), parent='main_menu_bar', replacePrevious=False, killWithScene=False, compressUndo=True)
 
@@ -142,16 +141,15 @@ class Job:
         """ Add pinGuide attribute if it doesn't exist yet.
             Create a scriptJob to read this attribute change.
         """
-        if not item.endswith("_JointEnd"):
-            if not item.endswith("_RadiusCtrl"):
-                if not "pinGuide" in cmds.listAttr(item):
-                    cmds.addAttr(item, longName="pinGuide", attributeType="bool")
-                    cmds.setAttr(item+".pinGuide", channelBox=True)
-                    cmds.addAttr(item, longName="pinGuideConstraint", attributeType="message")
-                    cmds.addAttr(item, longName="lockedList", dataType="string")
-                self.delete_old_job(item)
-                cmds.scriptJob(attributeChange=[str(item+".pinGuide"), lambda node=item: self.pin_guide(node)], killWithScene=False, compressUndo=True)
-                self.pin_guide(item) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
+        if not item.endswith("_JointEnd") and not item.endswith("_RadiusCtrl"):
+            if not "pinGuide" in cmds.listAttr(item):
+                cmds.addAttr(item, longName="pinGuide", attributeType="bool")
+                cmds.setAttr(item+".pinGuide", channelBox=True)
+                cmds.addAttr(item, longName="pinGuideConstraint", attributeType="message")
+                cmds.addAttr(item, longName="lockedList", dataType="string")
+            self.delete_old_job(item)
+            cmds.scriptJob(attributeChange=[str(item+".pinGuide"), lambda node=item: self.pin_guide(node)], killWithScene=False, compressUndo=True)
+            self.pin_guide(item) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
 
 
     def set_pinned_guide_color(self, item, status, color="red"):
@@ -184,19 +182,18 @@ class Job:
             pin_value = cmds.getAttr(item+".pinGuide")
             pac = item+"_PinGuide_PaC"
             if pin_value:
-                if cmds.objExists(self.ar.data.temp_grp):
-                    if not cmds.listConnections(item+".pinGuideConstraint", destination=False, source=True):
-                        self.store_lockeds(item)
-                        if namespace_name:
-                            cmds.namespace(set=namespace_name)
-                        for attr in self.ar.data.transform_attrs:
-                            cmds.setAttr(item+"."+attr, lock=False)
-                        pc = cmds.parentConstraint(self.ar.data.temp_grp, item, maintainOffset=True, name=pac)[0]
-                        cmds.connectAttr(pc+".message", item+".pinGuideConstraint")
-                        for attr in self.ar.data.transform_attrs:
-                            cmds.setAttr(item+"."+attr, lock=True)
-                        if "worldSize" in cmds.listAttr(item):
-                            cmds.setAttr(item+".worldSize", lock=True)
+                if cmds.objExists(self.ar.data.temp_grp) and not cmds.listConnections(item+".pinGuideConstraint", destination=False, source=True):
+                    self.store_lockeds(item)
+                    if namespace_name:
+                        cmds.namespace(set=namespace_name)
+                    for attr in self.ar.data.transform_attrs:
+                        cmds.setAttr(item+"."+attr, lock=False)
+                    pc = cmds.parentConstraint(self.ar.data.temp_grp, item, maintainOffset=True, name=pac)[0]
+                    cmds.connectAttr(pc+".message", item+".pinGuideConstraint")
+                    for attr in self.ar.data.transform_attrs:
+                        cmds.setAttr(item+"."+attr, lock=True)
+                    if "worldSize" in cmds.listAttr(item):
+                        cmds.setAttr(item+".worldSize", lock=True)
             else:
                 pacs = cmds.listConnections(item+".pinGuideConstraint", destination=False, source=True)
                 if pacs:

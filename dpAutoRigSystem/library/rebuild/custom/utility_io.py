@@ -90,8 +90,8 @@ class UtilityIO(action.BaseAction):
                     if cmds.attributeQuery(attr, node=item, exists=True):
                         data[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                 # compound attributes
-                if node_type in self.ar.utils.type_multi_attr_data.keys():
-                    for multi_attr in self.ar.utils.type_multi_attr_data[node_type].keys():
+                if node_type in self.ar.utils.type_multi_attr_data:
+                    for multi_attr in self.ar.utils.type_multi_attr_data[node_type]:
                         indexes = cmds.getAttr(item+"."+multi_attr, multiIndices=True)
                         if indexes:
                             dot = ""
@@ -116,7 +116,7 @@ class UtilityIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(utility_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in utility_data.keys():
+        for item in utility_data:
             existing_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create utility node if it needs
@@ -124,7 +124,7 @@ class UtilityIO(action.BaseAction):
                 cmds.createNode(utility_data[item]["type"], name=utility_data[item]["name"])
                 # set attribute values
                 if utility_data[item]["attributes"]:
-                    for attr in utility_data[item]["attributes"].keys():
+                    for attr in utility_data[item]["attributes"]:
                         #if isinstance(attr, list): 
                         if str(utility_data[item]["attributes"][attr]).count(",") > 1: #support vector attributes like color_Color
                             cmds.setAttr(item+"."+attr, utility_data[item]["attributes"][attr][0], utility_data[item]["attributes"][attr][1], utility_data[item]["attributes"][attr][2], type="double3")

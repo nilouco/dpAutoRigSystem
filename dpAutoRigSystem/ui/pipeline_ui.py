@@ -261,9 +261,8 @@ class PipelineUI:
             if not project_path.endswith("/"):
                 project_path = project_path+"/"
             wip_folder = self.ar.pipeliner.pipe_data['f_wip']
-            if wip_folder:
-                if not wip_folder.endswith("/"):
-                    wip_folder = wip_folder+"/"
+            if wip_folder and not wip_folder.endswith("/"):
+                wip_folder = wip_folder+"/"
             if new_wip_version and new_model_version and new_asset_name:
                 self.ar.pipeliner.new_asset_file = project_path+wip_folder+new_asset_name+"/"+new_asset_name+self.ar.pipeliner.pipe_data['s_model']+new_model_version.zfill(self.ar.pipeliner.pipe_data['i_padding'])+self.ar.pipeliner.pipe_data['s_rig']+new_wip_version.zfill(self.ar.pipeliner.pipe_data['i_padding'])+".ma"
         if self.ar.pipeliner.new_asset_file:

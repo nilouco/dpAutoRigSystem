@@ -42,17 +42,15 @@ class Proxy(action.BaseAction):
                 proxy_grp = inputs[0]
             else:
                 proxy_grp = self.ar.utils.get_node_by_message("proxyGrp")
-                if not proxy_grp:
-                    if cmds.objExists("Proxy_Grp"):
-                        proxy_grp = "Proxy_Grp"
+                if not proxy_grp and cmds.objExists("Proxy_Grp"):
+                    proxy_grp = "Proxy_Grp"
             if proxy_grp:
                 if not PROXIED in cmds.listAttr(proxy_grp):
                     meshes = cmds.listRelatives(proxy_grp, children=True, allDescendents=True, type="mesh")
                     if not meshes:
                         render_grp = self.ar.utils.get_node_by_message("renderGrp")
-                        if not render_grp:
-                            if cmds.objExists("Render_Grp"):
-                                render_grp = "Render_Grp"
+                        if not render_grp and cmds.objExists("Render_Grp"):
+                            render_grp = "Render_Grp"
                         if render_grp:
                             meshes = cmds.listRelatives(render_grp, children=True, allDescendents=True, fullPath=True, type="mesh")
                     if meshes:
@@ -61,11 +59,8 @@ class Proxy(action.BaseAction):
                         for mesh in meshes:
                             if len(cmds.ls(mesh)) == 1:
                                 mesh_transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
-                                if mesh_transforms:
-                                    if not mesh_transforms[0] in to_proxy_items:
-                                        if not NO_PROXY in cmds.listAttr(mesh_transforms):
-                                            if not PROXIED in cmds.listAttr(mesh_transforms):
-                                                to_proxy_items.append(mesh_transforms[0])
+                                if mesh_transforms and not mesh_transforms[0] in to_proxy_items and not NO_PROXY in cmds.listAttr(mesh_transforms) and not PROXIED in cmds.listAttr(mesh_transforms):
+                                    to_proxy_items.append(mesh_transforms[0])
                         if to_proxy_items:
                             self.ar.ui_manager.set_progress(max=len(to_proxy_items), add_one=False, add_number=False)
                             self.checked_items.append(proxy_grp)
@@ -129,7 +124,7 @@ class Proxy(action.BaseAction):
                     percents = cmds.skinPercent(skincluster_node, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
                     if percents:
                         index_joint_data[i] = percents[0]
-                        if not len(percents) == 1:
+                        if len(percents) != 1:
                             joint_values = []
                             for item in percents:
                                 joint_values.append(cmds.skinPercent(skincluster_node, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=item, query=True))
@@ -180,9 +175,8 @@ class Proxy(action.BaseAction):
                         self.reconnect_visibility(source, dup)
             cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
         source_parent = cmds.listRelatives(source, parent=True, fullPath=True, type="transform")
-        if source_parent:
-            if source_parent[0] == grp:
-                cmds.delete(source)
+        if source_parent and source_parent[0] == grp:
+            cmds.delete(source)
 
 
     def proxy_integration(self, grp):

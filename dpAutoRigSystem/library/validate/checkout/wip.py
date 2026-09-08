@@ -37,9 +37,8 @@ class Wip(action.BaseAction):
                 wip_grp = inputs
             else:
                 wip_grp = self.ar.utils.get_node_by_message("wipGrp")
-                if not wip_grp:
-                    if cmds.objExists("WIP_Grp"):
-                        wip_grp = "WIP_Grp"
+                if not wip_grp and cmds.objExists("WIP_Grp"):
+                    wip_grp = "WIP_Grp"
             if wip_grp:
                 self.ar.ui_manager.set_progress(max=len(wip_grp), add_one=False, add_number=False)
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])

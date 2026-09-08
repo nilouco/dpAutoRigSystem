@@ -47,7 +47,7 @@ class UnlockAttributes(action.BaseAction):
                                 locked_attr_data[item] = locked_attrs
                         # conditional to check here
                         if locked_attr_data:
-                            for item in locked_attr_data:
+                            for item, values in locked_attr_data:
                                 self.checked_items.append(item)
                                 self.found_issues.append(True)
                                 if self.first_mode:
@@ -55,10 +55,10 @@ class UnlockAttributes(action.BaseAction):
                                 else: #fix
                                     try:
                                         cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                        for attr in locked_attr_data[item]:
+                                        for attr in values:
                                             cmds.setAttr(item+"."+attr, lock=False)
                                         self.good_results.append(True)
-                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(locked_attr_data[item]))
+                                        self.messages.append(self.ar.data.lang['v004_fixed']+": "+item+" = "+str(values))
                                     except:
                                         self.good_results.append(False)
                                         self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item+" = "+attr)

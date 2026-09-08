@@ -69,11 +69,10 @@ class ReorderAttr(base.BaseLibrary):
                                     for x in range(attr_pos+2,attr_size,1):
                                         cmds.deleteAttr(item, attribute=user_defs[x])
                                         cmds.undo()
-                                if skip_hidden:
-                                    if attr_pos < attr_size-1:
-                                        next_attr_type = cmds.attributeQuery(user_defs[attr_pos+1], node=item, attributeType=True)
-                                        if next_attr_type in self.next_attr_types or (not cmds.getAttr(item+"."+user_defs[attr_pos+1], channelBox=True) and not cmds.getAttr(item+"."+user_defs[attr_pos+1], keyable=True)):
-                                            self.move_attr(mode, items, attributes, False, True)
+                                if skip_hidden and attr_pos < attr_size-1:
+                                    next_attr_type = cmds.attributeQuery(user_defs[attr_pos+1], node=item, attributeType=True)
+                                    if next_attr_type in self.next_attr_types or (not cmds.getAttr(item+"."+user_defs[attr_pos+1], channelBox=True) and not cmds.getAttr(item+"."+user_defs[attr_pos+1], keyable=True)):
+                                        self.move_attr(mode, items, attributes, False, True)
                                         
                             elif mode == 1: #up
                                 for i in attributes:
@@ -86,11 +85,10 @@ class ReorderAttr(base.BaseLibrary):
                                     for x in range(attr_pos+1,attr_size,1):
                                         cmds.deleteAttr(item, at=user_defs[x])
                                         cmds.undo()
-                                if skip_hidden:
-                                    if attr_pos > 1:
-                                        next_attr_type = cmds.attributeQuery(user_defs[attr_pos-1], node=item, attributeType=True)
-                                        if next_attr_type in self.next_attr_types or (not cmds.getAttr(item+"."+user_defs[attr_pos-1], channelBox=True) and not cmds.getAttr(item+"."+user_defs[attr_pos-1], keyable=True)):
-                                            self.move_attr(mode, items, attributes, False, True)
+                                if skip_hidden and attr_pos > 1:
+                                    next_attr_type = cmds.attributeQuery(user_defs[attr_pos-1], node=item, attributeType=True)
+                                    if next_attr_type in self.next_attr_types or (not cmds.getAttr(item+"."+user_defs[attr_pos-1], channelBox=True) and not cmds.getAttr(item+"."+user_defs[attr_pos-1], keyable=True)):
+                                        self.move_attr(mode, items, attributes, False, True)
                             
                             # lock all user defined attibutes after the changing position:
                             if lock_attrs:

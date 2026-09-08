@@ -43,10 +43,10 @@ class UnusedNode(action.BaseAction):
                     all_materials = list(set(check_items) - set(default_materials))
                     used_materials = list(set(self.get_used_materials()) - set(default_materials))
                     # conditional to check here
-                    if not len(all_materials) == len(used_materials):
+                    if len(all_materials) != len(used_materials):
                         self.ar.ui_manager.set_progress(max=len(all_materials), add_one=False, add_number=False)
                         self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                        issue_materials = sorted(list(set(all_materials) - set(used_materials)))
+                        issue_materials = sorted(set(all_materials) - set(used_materials))
                         self.checked_items.append(str(", ".join(issue_materials)))
                         self.found_issues.append(True)
                         if self.first_mode:

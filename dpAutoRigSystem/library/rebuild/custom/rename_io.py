@@ -93,7 +93,7 @@ class RenameIO(action.BaseAction):
         well_imported_items = []
         not_found_nodes = []
         maybe_items = []
-        for item in node_id_data.keys():
+        for item in node_id_data:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check item
             if not cmds.objExists(item):

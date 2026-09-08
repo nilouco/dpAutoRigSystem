@@ -59,9 +59,8 @@ class OneSkeleton(base.BaseLibrary):
     def refresh_preview(self):
         """ Reload the preview naming list and populate its UI textScrollList.
         """
-        if self.ar.data.ui_state:
-            if cmds.text('one_skeleton_preview_txt', query=True, exists=True):
-                cmds.text('one_skeleton_preview_txt', edit=True, label=f"{self.prefix}{self.root_name}{self.suffix}")
+        if self.ar.data.ui_state and cmds.text('one_skeleton_preview_txt', query=True, exists=True):
+            cmds.text('one_skeleton_preview_txt', edit=True, label=f"{self.prefix}{self.root_name}{self.suffix}")
     
 
     def create_one_skeleton(self, root=None, hierarchy=True, scale=True):
@@ -102,7 +101,6 @@ class OneSkeleton(base.BaseLibrary):
         """ Make a duplicated joints and transfer connections and deformation to them.
             Returns the new created joint list.
         """
-        scale_constraints = []
         new_joints = []
         self.ar.ui_manager.set_progress(self.ar.data.lang['m254_oneSkeleton'], self.ar.data.lang['m254_oneSkeleton'], max=len(source_items), add_one=False, add_number=False)
         for sourceNode in source_items:
@@ -122,7 +120,7 @@ class OneSkeleton(base.BaseLibrary):
             connectionList = cmds.listConnections(sourceNode, destination=True, source=False, connections=True, plugs=True) or []
             for src, dest in self.grouper(connectionList, 2):
                 sourceNode, sourceAttr = src.split(".", 1)
-                destNode, destAttr = dest.split(".", 1)
+                destNode, _destAttr = dest.split(".", 1)
                 if cmds.nodeType(destNode) in {"skinCluster", "dagPose"}:
                     # pass if the attribute doesn't exists in the source node
                     if not cmds.attributeQuery(sourceAttr, node=sourceNode, exists=True):
@@ -144,7 +142,7 @@ class OneSkeleton(base.BaseLibrary):
     
     def scale_connect(self, source_items):
         for sourceNode in source_items:
-            scc = cmds.scaleConstraint(sourceNode, self.prefix+sourceNode+self.suffix, maintainOffset=True, name=self.prefix+sourceNode+self.suffix+"_ScC")[0]
+            cmds.scaleConstraint(sourceNode, self.prefix+sourceNode+self.suffix, maintainOffset=True, name=self.prefix+sourceNode+self.suffix+"_ScC")[0]
             #cmds.setAttr(f"{scc}.constraintScaleCompensate", True)
 
 
@@ -218,13 +216,13 @@ class OneSkeleton(base.BaseLibrary):
         hierarchy_data = self.get_hierarchy_data()
         integration_data = self.get_integration_data()
         for side in self.sides:
-            for item in hierarchy_data.keys():
+            for item in hierarchy_data:
                 if cmds.objExists(f"{self.prefix}{side}{item}{self.suffix}"):
                     for p, parent in enumerate(hierarchy_data[item]):
                         if cmds.objExists(f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}") and not f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}" in cmds.listRelatives(f"{self.prefix}{side}{item}{self.suffix}", children=True):
                             cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{side}{hierarchy_data[item][p]}{self.suffix}")
                             break
-                        elif item in integration_data.keys():
+                        elif item in integration_data:
                             if cmds.objExists(f"{self.prefix}{integration_data[item][p]}{self.suffix}"):
                                 cmds.parent(f"{self.prefix}{side}{item}{self.suffix}", f"{self.prefix}{integration_data[item][p]}{self.suffix}")
                                 break
@@ -1213,10 +1211,9 @@ class OneSkeleton(base.BaseLibrary):
                 if cmds.objExists(f"{self.prefix}{head}_{upper}{jaw}_Jnt{self.suffix}"):
                     cmds.parent(jnt, f"{self.prefix}{head}_{upper}{jaw}_Jnt{self.suffix}")
                     removed_joints.append(jnt)
-            elif f"{tweaks}" in jnt:
-                if cmds.objExists(f"{self.prefix}{head}_01_{head}_Jnt{self.suffix}"):
-                    cmds.parent(jnt, f"{self.prefix}{head}_01_{head}_Jnt{self.suffix}")
-                    removed_joints.append(jnt)
+            elif f"{tweaks}" in jnt and cmds.objExists(f"{self.prefix}{head}_01_{head}_Jnt{self.suffix}"):
+                cmds.parent(jnt, f"{self.prefix}{head}_01_{head}_Jnt{self.suffix}")
+                removed_joints.append(jnt)
         if removed_joints:
             joints = list(set(joints)-set(removed_joints))
         return joints

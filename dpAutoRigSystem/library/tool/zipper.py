@@ -53,7 +53,7 @@ class Zipper(base.BaseLibrary):
         pec_name = self.zipper_name+"_"+this_name+"_PEC"
         # get selected edges:
         edges = cmds.ls(selection=True, flatten=True)
-        if not edges == None and not edges == [] and not edges == "":
+        if edges != None and edges != [] and edges != "":
             # delete old curve:
             self.delete_old_curve(zipper_id)
             # create curve:
@@ -79,10 +79,8 @@ class Zipper(base.BaseLibrary):
         transforms = cmds.ls(selection=False, type="transform")
         if transforms:
             for node in transforms:
-                if cmds.objExists(node+"."+ZIPPER_ATTR):
-                    if cmds.getAttr(node+"."+ZIPPER_ATTR) == 1:
-                        if cmds.getAttr(node+"."+ZIPPER_ID) == zipper_id:
-                            cmds.delete(node)
+                if ZIPPER_ATTR in cmds.objExists(node) and cmds.getAttr(node+"."+ZIPPER_ATTR) == 1 and cmds.getAttr(node+"."+ZIPPER_ID) == zipper_id:
+                    cmds.delete(node)
     
     
     def set_curve_direction(self, curve_name):
@@ -404,7 +402,6 @@ class Zipper(base.BaseLibrary):
                 transforms = cmds.ls(selection=False, type="transform")
                 if transforms:
                     for node in transforms:
-                        if cmds.objExists(node+"."+self.zipper_attr):
-                            if cmds.getAttr(node+"."+self.zipper_attr) == 1:
-                                zipper_id = cmds.getAttr(node+"."+self.zipper_id)
-                                self.ar.zipper_ui.update_ui(node, zipper_id)
+                        if cmds.objExists(node+"."+self.zipper_attr) and cmds.getAttr(node+"."+self.zipper_attr) == 1:
+                            zipper_id = cmds.getAttr(node+"."+self.zipper_id)
+                            self.ar.zipper_ui.update_ui(node, zipper_id)

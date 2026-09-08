@@ -68,7 +68,7 @@ class Lib:
             # avoid print again the same message:
             if folder == "":
                 folder = path
-            if not folder in self.ar.data.lib.keys():
+            if not folder in self.ar.data.lib:
                 self.ar.data.lib[folder] = { 
                                             "instances" : libs,
                                             "imported" : imported_modules,
@@ -140,19 +140,18 @@ class Lib:
     def load_pipeline_validator(self):
         """ Load the Validator's presets from the pipeline path.
         """
-        if self.ar.pipeliner.pipe_data['presetsPath']:
-            if os.path.exists(self.ar.pipeliner.pipe_data['presetsPath']):
-                studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipe_data['presetsPath']+"/", True)
-                if studio_preset:
-                    self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
-                    self.ar.data.validator_preset_data.update(studio_preset_data)
-                    if self.ar.data.ui_state:
-                        self.ar.filler.load_pipeline_validator_preset()
+        if self.ar.pipeliner.pipe_data['presetsPath'] and os.path.exists(self.ar.pipeliner.pipe_data['presetsPath']):
+            studio_preset, studio_preset_data = self.ar.config.get_json_file_content(self.ar.pipeliner.pipe_data['presetsPath']+"/", True)
+            if studio_preset:
+                self.ar.data.validator_preset = studio_preset_data[studio_preset[0]]
+                self.ar.data.validator_preset_data.update(studio_preset_data)
+                if self.ar.data.ui_state:
+                    self.ar.filler.load_pipeline_validator_preset()
 
     
     def set_validator_preset(self):
         for validator_instance in self.ar.config.get_validator_instances():
-            if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]].keys():
+            if validator_instance.name in self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]]:
                 validator_instance.change_active(self.ar.data.validator_preset_data[self.ar.data.validator_preset["_preset"]][validator_instance.name])
 
 

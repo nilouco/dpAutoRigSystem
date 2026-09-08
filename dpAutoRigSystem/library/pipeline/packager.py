@@ -221,9 +221,8 @@ class Packager:
         scenes = []
         folder_content_obj = os.scandir(scene_path)
         for entry in folder_content_obj :
-            if entry.is_file():
-                if not entry.name == file_shortname:
-                    scenes.append(entry.name)
+            if entry.is_file() and entry.name != file_shortname:
+                scenes.append(entry.name)
         if scenes:
             for item in scenes:
                 self.remove_existing_archived(destination_folder, item)
@@ -251,7 +250,7 @@ class Packager:
         """ Move all old publish files to the dpOld folder.
         """
         for item in asset_names:
-            if not item == publish_filename:
+            if item != publish_filename:
                 self.remove_existing_archived(destination_folder, item)
                 shutil.move(source_folder+"/"+item, destination_folder)
 

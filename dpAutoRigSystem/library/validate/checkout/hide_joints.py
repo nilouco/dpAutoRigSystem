@@ -40,7 +40,7 @@ class HideJoints(action.BaseAction):
                 self.ar.ui_manager.set_progress(max=len(check_items), add_one=False, add_number=False)
                 for item in check_items:
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                    if not cmds.getAttr(item +'.drawStyle') == 2:
+                    if cmds.getAttr(item + '.drawStyle') != 2:
                         self.checked_items.append(item)
                         self.found_issues.append(True)
                         if self.first_mode:

@@ -93,11 +93,10 @@ class Steering(standard.BaseStandard):
                 # hide visibility attribute:
                 self.ar.ctrls.set_lock_hide([steering_ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:
-                if s == 1:
-                    if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(zeros[0]+".scaleX", -1)
-                        cmds.setAttr(zeros[0]+".scaleY", -1)
-                        cmds.setAttr(zeros[0]+".scaleZ", -1)
+                if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                    cmds.setAttr(zeros[0]+".scaleX", -1)
+                    cmds.setAttr(zeros[0]+".scaleY", -1)
+                    cmds.setAttr(zeros[0]+".scaleZ", -1)
                 cmds.addAttr(steering_ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
                 cmds.setAttr(steering_ctrl+".scaleCompensate", channelBox=True)
                 cmds.connectAttr(steering_ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)

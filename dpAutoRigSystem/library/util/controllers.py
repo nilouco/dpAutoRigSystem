@@ -197,19 +197,17 @@ class Controllers:
                 cmds.setAttr(item+".overrideColorR", color[0])
                 cmds.setAttr(item+".overrideColorG", color[1])
                 cmds.setAttr(item+".overrideColorB", color[2])
-                if instance:
-                    if self.ar.data.ui_state:
-                        cmds.button(f"{instance.number_name}_plus_color_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
-                        if not instance.guide_base in cmds.ls(selection=True):
-                            cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
+                if instance and self.ar.data.ui_state:
+                    cmds.button(f"{instance.number_name}_plus_color_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
+                    if not instance.guide_base in cmds.ls(selection=True):
+                        cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[color[0], color[1], color[2]])
             else:
                 cmds.setAttr(item+".overrideRGBColors", 0)
                 cmds.setAttr(item+".overrideColor", color_index)
-                if instance:
-                    if self.ar.data.ui_state:
-                        cmds.button(f"{instance.number_name}_plus_color_bt", edit=True, backgroundColor=[self.colors[color_index][0], self.colors[color_index][1], self.colors[color_index][2]])
-                        if not instance.guide_base in cmds.ls(selection=True):
-                            cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[self.colors[color_index][0], self.colors[color_index][1], self.colors[color_index][2]])
+                if instance and self.ar.data.ui_state:
+                    cmds.button(f"{instance.number_name}_plus_color_bt", edit=True, backgroundColor=[self.colors[color_index][0], self.colors[color_index][1], self.colors[color_index][2]])
+                    if not instance.guide_base in cmds.ls(selection=True):
+                        cmds.button(f"{instance.number_name}_select_bt", edit=True, backgroundColor=[self.colors[color_index][0], self.colors[color_index][1], self.colors[color_index][2]])
 
 
     def remove_color(self, items, *args):
@@ -275,9 +273,8 @@ class Controllers:
         """
         if not items:
             items = cmds.ls(selection=True)
-        if items:
-            if slider and cmds.colorSliderGrp(slider, query=True, exists=True):
-                self.color_shape(items, cmds.colorSliderGrp(slider, query=True, rgbValue=True), rgb=True, instance=instance)
+        if items and slider and cmds.colorSliderGrp(slider, query=True, exists=True):
+            self.color_shape(items, cmds.colorSliderGrp(slider, query=True, rgbValue=True), rgb=True, instance=instance)
 
 
     def set_color_outliner_by_ui(self, items=None, slider=None, *args):
@@ -285,9 +282,8 @@ class Controllers:
         """
         if not items:
             items = cmds.ls(selection=True)
-        if items:
-            if slider and cmds.colorSliderGrp(slider, query=True, exists=True):
-                self.color_shape(items, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
+        if items and slider and cmds.colorSliderGrp(slider, query=True, exists=True):
+            self.color_shape(items, cmds.colorSliderGrp(slider, query=True, rgbValue=True), outliner=True)
 
 
     def rename_shape(self, transforms):
@@ -308,9 +304,11 @@ class Controllers:
         return results
 
 
-    def direct_connect(self, from_item, to_item, attributes=['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], f=True):
+    def direct_connect(self, from_item, to_item, attributes=None, f=True):
         """Connect attributes from list directely between two objects given.
         """
+        if attributes is None:
+            attributes = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         if cmds.objExists(from_item) and cmds.objExists(to_item):
             for attr in attributes:
                 try:
@@ -442,9 +440,8 @@ class Controllers:
         controllers = []
         transforms = cmds.ls(selection=False, type="transform")
         for item in transforms:
-            if "controlID" in cmds.listAttr(item):
-                if cmds.getAttr(item+".controlID") == ctrl_type:
-                    controllers.append(item)
+            if "controlID" in cmds.listAttr(item) and cmds.getAttr(item+".controlID") == ctrl_type:
+                controllers.append(item)
         return controllers
 
 
@@ -487,7 +484,7 @@ class Controllers:
             if corrective:
                 self.add_corrective_attrs(curve)
                 self.ar.job.start_corrective_edit_mode([curve])
-            if not head_def == 0:
+            if head_def != 0:
                 self.add_def_influence_attrs(curve, head_def)
             if guide_source:
                 cmds.addAttr(curve, longName="guide_source", dataType="string")
@@ -675,7 +672,7 @@ class Controllers:
                 # store attribute values in a data:
                 self.attr_value_data = {}
                 for attr in attributes:
-                    if attr in self.long_attr_data.keys():
+                    if attr in self.long_attr_data:
                         attr = self.long_attr_data[attr]
                     if attr in cmds.listAttr(source_item):
                         value = cmds.getAttr(source_item+'.'+attr)
@@ -714,11 +711,10 @@ class Controllers:
         self.copy_attr()
         # get destinations:
         current_selected_items = cmds.ls(selection=True, long=True)
-        if current_selected_items:
-            if len(current_selected_items) > 1:
-                destinations = current_selected_items[1:]
-                # calling function to paste attributes to destinations:
-                self.paste_attr(destinations, verbose)
+        if current_selected_items and len(current_selected_items) > 1:
+            destinations = current_selected_items[1:]
+            # calling function to paste attributes to destinations:
+            self.paste_attr(destinations, verbose)
 
 
     def transfer_attr(self, source_item, destinations, attributes, *args):
@@ -741,79 +737,77 @@ class Controllers:
                 destinations = selection[1:]
         if source_item:
             source_shapes = cmds.listRelatives(source_item, shapes=True, type="nurbsCurve", fullPath=True)
-            if source_shapes:
-                if destinations:
-                    for dest_transform in destinations:
-                        need_keep_vis = False
-                        source_vis = None
-                        defs = False
-                        dup_source_item = cmds.duplicate(source_item)[0]
-                        self.ar.utils.delete_orig_shape(dup_source_item)
-                        if keep_color:
-                            self.set_source_color_override(dup_source_item, [dest_transform])
-                        dest_shapes = cmds.listRelatives(dest_transform, shapes=True, type="nurbsCurve", fullPath=True)
-                        if dest_shapes:
-                            for dest_shape in dest_shapes:
-                                # keep visibility connections if exists:
-                                vis_connection = cmds.listConnections(dest_shape+".visibility", destination=False, source=True, plugs=True)
-                                if vis_connection:
-                                    need_keep_vis = True
-                                    source_vis = vis_connection[0]
-                                    break
-                            for dest_shape in dest_shapes:
-                                # keep deformers if exists
-                                try:
-                                    defs = cmds.findDeformers(dest_shape)
-                                    break
-                                except:
-                                    pass
-                            if clear_dest_shapes:
-                                cmds.delete(dest_shapes)
-                        # hack: unparent destination children in order to get a good shape hierarchy order as index 0:
-                        dest_children = cmds.listRelatives(dest_transform, shapes=False, type="transform", fullPath=True)
-                        if dest_children:
-                            self.destChildrenGrp = cmds.group(dest_children, name="dpTemp_DestChildren_Grp")
-                            cmds.parent(self.destChildrenGrp, world=True)
-                        if defs:
-                            self.ar.utils.reapply_deformers(dup_source_item, defs)
-                        dup_source_shapes = cmds.listRelatives(dup_source_item, shapes=True, type="nurbsCurve", fullPath=True)
-                        for d, dup_source_shape in enumerate(dup_source_shapes):
-                            if need_keep_vis:
-                                if "Global" in dest_transform or "Master" in dest_transform or "Root" in dest_transform: #directionDisplay attribute exception
-                                    if not d == 0:
-                                        cmds.connectAttr(source_vis, dup_source_shape+".visibility", force=True)
-                                else:
+            if source_shapes and destinations:
+                for dest_transform in destinations:
+                    need_keep_vis = False
+                    source_vis = None
+                    defs = False
+                    dup_source_item = cmds.duplicate(source_item)[0]
+                    self.ar.utils.delete_orig_shape(dup_source_item)
+                    if keep_color:
+                        self.set_source_color_override(dup_source_item, [dest_transform])
+                    dest_shapes = cmds.listRelatives(dest_transform, shapes=True, type="nurbsCurve", fullPath=True)
+                    if dest_shapes:
+                        for dest_shape in dest_shapes:
+                            # keep visibility connections if exists:
+                            vis_connection = cmds.listConnections(dest_shape+".visibility", destination=False, source=True, plugs=True)
+                            if vis_connection:
+                                need_keep_vis = True
+                                source_vis = vis_connection[0]
+                                break
+                        for dest_shape in dest_shapes:
+                            # keep deformers if exists
+                            try:
+                                defs = cmds.findDeformers(dest_shape)
+                                break
+                            except:
+                                pass
+                        if clear_dest_shapes:
+                            cmds.delete(dest_shapes)
+                    # hack: unparent destination children in order to get a good shape hierarchy order as index 0:
+                    dest_children = cmds.listRelatives(dest_transform, shapes=False, type="transform", fullPath=True)
+                    if dest_children:
+                        self.destChildrenGrp = cmds.group(dest_children, name="dpTemp_DestChildren_Grp")
+                        cmds.parent(self.destChildrenGrp, world=True)
+                    if defs:
+                        self.ar.utils.reapply_deformers(dup_source_item, defs)
+                    dup_source_shapes = cmds.listRelatives(dup_source_item, shapes=True, type="nurbsCurve", fullPath=True)
+                    for d, dup_source_shape in enumerate(dup_source_shapes):
+                        if need_keep_vis:
+                            if "Global" in dest_transform or "Master" in dest_transform or "Root" in dest_transform: #directionDisplay attribute exception
+                                if d != 0:
                                     cmds.connectAttr(source_vis, dup_source_shape+".visibility", force=True)
-                            if not force:
-                                cmds.parent(dup_source_shape, dest_transform, relative=True, shape=True)
-                            elif cmds.objExists(dup_source_shape):
-                                # make sure we use the current shape of a froze transform, usefull to mirror control shapes
-                                forced_shape = cmds.parent(dup_source_shape, dest_transform, absolute=True, shape=True)[0]
-                                forced_transform = cmds.listRelatives(forced_shape, parent=True, type="transform", fullPath=True)
-                                history = cmds.listHistory(forced_shape)
-                                # workaround to avoid undesirable warning about tweak nodes
-                                cmds.delete(forced_shape, constructionHistory=True)
-                                for x in history:
-                                    if "tweak" in x:
-                                        if cmds.objExists(x):
-                                            cmds.delete(x)
-                                cmds.makeIdentity(forced_transform, apply=True, translate=True, rotate=True, scale=True)
-                                cmds.parent(forced_shape, dest_transform, relative=True, shape=True)
-                                cmds.delete(forced_transform)
-                                if defs and history:
-                                    self.ar.utils.reapply_deformers(dest_transform+"|"+forced_shape, defs)
-                        if cmds.objExists(dup_source_item):
-                            cmds.delete(dup_source_item)
-                        self.rename_shape([dest_transform])
-                        # restore children transforms to correct parent hierarchy:
-                        if dest_children:
-                            cmds.parent((cmds.listRelatives(self.destChildrenGrp, shapes=False, type="transform", fullPath=True)), dest_transform)
-                            cmds.delete(self.destChildrenGrp)
-                    if delete_source:
-                        # update cvControls attributes:
-                        self.transfer_attr(source_item, destinations, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
-                        cmds.delete(source_item)
-                    self.ar.custom_attr.add_attr(0, destinations, shapes=True) #dpID
+                            else:
+                                cmds.connectAttr(source_vis, dup_source_shape+".visibility", force=True)
+                        if not force:
+                            cmds.parent(dup_source_shape, dest_transform, relative=True, shape=True)
+                        elif cmds.objExists(dup_source_shape):
+                            # make sure we use the current shape of a froze transform, usefull to mirror control shapes
+                            forced_shape = cmds.parent(dup_source_shape, dest_transform, absolute=True, shape=True)[0]
+                            forced_transform = cmds.listRelatives(forced_shape, parent=True, type="transform", fullPath=True)
+                            history = cmds.listHistory(forced_shape)
+                            # workaround to avoid undesirable warning about tweak nodes
+                            cmds.delete(forced_shape, constructionHistory=True)
+                            for x in history:
+                                if "tweak" in x and cmds.objExists(x):
+                                    cmds.delete(x)
+                            cmds.makeIdentity(forced_transform, apply=True, translate=True, rotate=True, scale=True)
+                            cmds.parent(forced_shape, dest_transform, relative=True, shape=True)
+                            cmds.delete(forced_transform)
+                            if defs and history:
+                                self.ar.utils.reapply_deformers(dest_transform+"|"+forced_shape, defs)
+                    if cmds.objExists(dup_source_item):
+                        cmds.delete(dup_source_item)
+                    self.rename_shape([dest_transform])
+                    # restore children transforms to correct parent hierarchy:
+                    if dest_children:
+                        cmds.parent((cmds.listRelatives(self.destChildrenGrp, shapes=False, type="transform", fullPath=True)), dest_transform)
+                        cmds.delete(self.destChildrenGrp)
+                if delete_source:
+                    # update cvControls attributes:
+                    self.transfer_attr(source_item, destinations, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
+                    cmds.delete(source_item)
+                self.ar.custom_attr.add_attr(0, destinations, shapes=True) #dpID
 
 
     def transfer_plug(self, from_plug, to_plug, value=True, connections=True):
@@ -900,9 +894,7 @@ class Controllers:
                                         defaultButton=self.ar.data.lang['i071_yes'], 
                                         cancelButton=self.ar.data.lang['i072_no'], 
                                         dismissString=self.ar.data.lang['i072_no'])
-        if result_question == self.ar.data.lang['i071_yes']:
-            return True
-        return False
+        return result_question == self.ar.data.lang['i071_yes']
 
 
     def create_curve_preset(self):
@@ -912,9 +904,8 @@ class Controllers:
         controllers, ctrl_ids = [], []
         transforms = cmds.ls(selection=False, type='transform')
         for item in transforms:
-            if DPCONTROL in cmds.listAttr(item):
-                if cmds.getAttr(item+"."+DPCONTROL) == 1:
-                    controllers.append(item)
+            if DPCONTROL in cmds.listAttr(item) and cmds.getAttr(item+"."+DPCONTROL) == 1:
+                controllers.append(item)
         if controllers:
             result_dialog = cmds.promptDialog(
                                             title=self.ar.data.lang['i129_createPreset'],
@@ -941,12 +932,11 @@ class Controllers:
                     # get all existing controls info
                     for ctrl_node in controllers:
                         ctrl_id = cmds.getAttr(ctrl_node+".controlID")
-                        if ctrl_id.startswith("id_"):
-                            if not ctrl_id in ctrl_ids:
-                                ctrl_ids.append(ctrl_id)
-                                ctrl_type = cmds.getAttr(ctrl_node+".className")
-                                ctrl_degree = cmds.getAttr(ctrl_node+".degree")
-                                result_string += ',"'+ctrl_id+'":{"type":"'+ctrl_type+'","degree":'+str(ctrl_degree)+'}'
+                        if ctrl_id.startswith("id_") and not ctrl_id in ctrl_ids:
+                            ctrl_ids.append(ctrl_id)
+                            ctrl_type = cmds.getAttr(ctrl_node+".className")
+                            ctrl_degree = cmds.getAttr(ctrl_node+".degree")
+                            result_string += ',"'+ctrl_id+'":{"type":"'+ctrl_type+'","degree":'+str(ctrl_degree)+'}'
                     # check if we got all controlIDs:
                     for j, p_id in enumerate(self.ar.data.curve_preset):
                         if not p_id in ctrl_ids:
@@ -988,9 +978,8 @@ class Controllers:
                 for item in meshes:
                     if not "_DeformerCube_Geo" in item:
                         fatherNode = item[:item[1:].find("|")+1]
-                        if fatherNode:
-                            if not fatherNode in tempList:
-                                tempList.append(fatherNode)
+                        if fatherNode and not fatherNode in tempList:
+                            tempList.append(fatherNode)
                 if tempList:
                     bbList = list(cmds.getAttr(tempList[0]+".boundingBox.boundingBoxMax")[0])
                     bbList[1] *= 0.75 #less importance to height
@@ -1061,7 +1050,7 @@ class Controllers:
         self.ar.ui_manager.set_progress(self.ar.data.lang['i214_refFile'], import_calib_namespace, add_one=False)
         import_calib_path = next(iter(import_calib_path), None)
         # create a file reference:
-        refFile = cmds.file(import_calib_path, reference=True, namespace=import_calib_namespace)
+        cmds.file(import_calib_path, reference=True, namespace=import_calib_namespace) #refFile
         ref_node = cmds.file(import_calib_path, referenceNode=True, query=True)
         ref_nodes = cmds.referenceQuery(ref_node, nodes=True)
         if ref_nodes:
@@ -1121,10 +1110,9 @@ class Controllers:
         if not source_item:
             # check current selection:
             current_selection = cmds.ls(selection=True, type="transform")
-            if current_selection:
-                if len(current_selection) > 1:
-                    source_item = current_selection[0]
-                    destinations = current_selection[1:]
+            if current_selection and len(current_selection) > 1:
+                source_item = current_selection[0]
+                destinations = current_selection[1:]
         if source_item:
             if not attributes:
                 attributes = self.get_items_from_string_attr(source_item)
@@ -1141,12 +1129,11 @@ class Controllers:
             Add a string attribute if it doesn't exists.
             Useful for calibrationList attribute.
         """
-        if cmds.objExists(node_name):
-            if attributes:
-                calib_attr = ';'.join(attributes)
-                if not attr_name in cmds.listAttr(node_name):
-                    cmds.addAttr(node_name, longName=attr_name, dataType="string")
-                cmds.setAttr(node_name+"."+attr_name, calib_attr, type="string")
+        if cmds.objExists(node_name) and attributes:
+            calib_attr = ';'.join(attributes)
+            if not attr_name in cmds.listAttr(node_name):
+                cmds.addAttr(node_name, longName=attr_name, dataType="string")
+            cmds.setAttr(node_name+"."+attr_name, calib_attr, type="string")
 
 
     def get_items_from_string_attr(self, node_name, attr_name="calibrationList"):
@@ -1217,16 +1204,15 @@ class Controllers:
                     if ui or verbose:
                         self.ar.ui_manager.set_progress(self.ar.data.lang['m094_doing']+': Shape')
                     snapshot_name = item+SNAPSHOT_SUFFIX
-                    if cmds.objExists(snapshot_name):
-                        if override_existing:
-                            cmds.delete(snapshot_name)
+                    if cmds.objExists(snapshot_name) and override_existing:
+                        cmds.delete(snapshot_name)
                     dup = cmds.duplicate(item, name=snapshot_name)[0]
                     cmds.setAttr(dup+".dpControl", 0)
                     dup_children = cmds.listRelatives(dup, allDescendents=True, children=True, fullPath=True)
                     if dup_children:
                         to_delete_items = []
                         for child in dup_children:
-                            if not cmds.objectType(child) == "nurbsCurve":
+                            if cmds.objectType(child) != "nurbsCurve":
                                 to_delete_items.append(child)
                         if to_delete_items:
                             cmds.delete(to_delete_items)
@@ -1458,10 +1444,9 @@ class Controllers:
         """
         if not controllers:
             items = self.get_selected_controllers()
-            if not items:
-                # ask to run for all nodes:
-                if self.confirm_ask_user(self.ar.data.lang['i270_defaultValues'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i273_runAllNodes']):
-                    items = self.get_controllers()
+            # ask to run for all nodes:
+            if not items and self.confirm_ask_user(self.ar.data.lang['i270_defaultValues'], self.ar.data.lang['i042_notSelection']+"\n"+self.ar.data.lang['i273_runAllNodes']):
+                items = self.get_controllers()
         else:
             items = self.get_controllers()
         if items:
@@ -1476,7 +1461,7 @@ class Controllers:
                     if attributes:
                         for attr in attributes:
                             # hack to avoid Maya limitation to edit boolean attributes
-                            if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
+                            if cmds.attributeQuery(attr, node=item, attributeType=True) != "bool":
                                 cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
 
 

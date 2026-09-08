@@ -52,10 +52,9 @@ class UnusedDeformer(action.BaseAction):
                         indices = cmds.getAttr(def_node+".input", multiIndices=True)
                         if indices:
                             for i in indices:
-                                if not cmds.getAttr(def_node+".input["+str(i)+"].groupId"):
-                                    if cmds.getAttr(def_node+".input["+str(i)+"].componentTagExpression"):
-                                        has_tags = True
-                                        break
+                                if not cmds.getAttr(def_node+".input["+str(i)+"].groupId") and cmds.getAttr(def_node+".input["+str(i)+"].componentTagExpression"):
+                                    has_tags = True
+                                    break
                         if not has_tags:
                             def_sets = cmds.listConnections(def_node+".message", type="objectSet")
                             if not def_sets:

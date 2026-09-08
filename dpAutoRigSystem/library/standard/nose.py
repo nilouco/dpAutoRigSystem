@@ -193,11 +193,10 @@ class Nose(standard.BaseStandard):
                     # hide visibility attribute:
                     cmds.setAttr(nose_ctrl+'.visibility', keyable=False)
                     # fixing flip mirror:
-                    if s == 1:
-                        if self.flip:
-                            cmds.setAttr(ctrl_zero+".scaleX", -1)
-                            cmds.setAttr(ctrl_zero+".scaleY", -1)
-                            cmds.setAttr(ctrl_zero+".scaleZ", -1)
+                    if s == 1 and self.flip:
+                        cmds.setAttr(ctrl_zero+".scaleX", -1)
+                        cmds.setAttr(ctrl_zero+".scaleY", -1)
+                        cmds.setAttr(ctrl_zero+".scaleZ", -1)
                     if n == 0:
                         self.main_ctrls.append(nose_ctrl)
                         self.ar.utils.set_origined_from_attr(nose_ctrl, self.base+";"+self.guide_top_loc+";"+self.guide_radius)
@@ -215,12 +214,11 @@ class Nose(standard.BaseStandard):
                     cmds.parentConstraint(nose_ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
                     cmds.scaleConstraint(nose_ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                     # add articulationJoint:
-                    if n == 1:
-                        if self.articulation:
-                            articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
-                            cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
-                            cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
+                    if n == 1 and self.articulation:
+                        articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                        self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                        cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
+                        cmds.setAttr(articulation_joints[0]+".segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
                 
                 # declaring guides:

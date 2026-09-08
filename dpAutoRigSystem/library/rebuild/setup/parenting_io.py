@@ -105,26 +105,24 @@ class ParentingIO(action.BaseAction):
         """ If there are broken nodes, we try to recreate them if needed.
             Return True if there are broken nodes.
         """
-        if "BrokenID" in parent_data.keys():
+        if "BrokenID" in parent_data:
             self.ar.ui_manager.set_progress(max=len(parent_data["BrokenID"]), add_one=False, add_number=False)
-            for node_type in parent_data["BrokenID"].keys():
+            for node_type in parent_data["BrokenID"]:
                 if node_type == "transform":
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                    for item in parent_data["BrokenID"][node_type].keys():
-                        if not cmds.objExists(item):
-                            if not self.check_its_from_modeling(parent_data, node_type, item):
-                                cmds.createNode(node_type, name=item)
-                                if parent_data["BrokenID"][node_type][item]:
-                                    if cmds.objExists(parent_data["BrokenID"][node_type][item]):
-                                        cmds.parent(item, parent_data["BrokenID"][node_type][item])
-                                cmds.select(clear=True)
+                    for item in parent_data["BrokenID"][node_type]:
+                        if not cmds.objExists(item) and not self.check_its_from_modeling(parent_data, node_type, item):
+                            cmds.createNode(node_type, name=item)
+                            if parent_data["BrokenID"][node_type][item] and cmds.objExists(parent_data["BrokenID"][node_type][item]):
+                                cmds.parent(item, parent_data["BrokenID"][node_type][item])
+                            cmds.select(clear=True)
             return True
 
 
     def import_parenting_data(self, parent_data):
         """ Import parenting data and put the nodes as the correct hierarchy if needed.
         """
-        if not self.get_parenting_data()["Parent"] == parent_data["Parent"]:
+        if self.get_parenting_data()["Parent"] != parent_data["Parent"]:
             self.ar.ui_manager.set_progress(max=len(parent_data["Parent"]), add_one=False, add_number=False)
             # define lists to check result
             well_imported_items = []
@@ -184,8 +182,7 @@ class ParentingIO(action.BaseAction):
     def check_its_from_modeling(self, parent_data, node_type, item):
         """ Returns True if the item is from modeling.
         """
-        if "ModelList" in parent_data.keys():
+        if "ModelList" in parent_data:
             for model_node in parent_data["ModelList"]:
-                if "BrokenID" in parent_data.keys() and node_type in parent_data["BrokenID"].keys() and item in parent_data["BrokenID"][node_type].keys():
-                    if model_node in parent_data["BrokenID"][node_type][item]:
-                        return True
+                if "BrokenID" in parent_data and node_type in parent_data["BrokenID"] and item in parent_data["BrokenID"][node_type] and model_node in parent_data["BrokenID"][node_type][item]:
+                    return True

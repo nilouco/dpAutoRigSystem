@@ -81,5 +81,5 @@ class TweakNode(action.BaseAction):
                     cp_items = cmds.getAttr(item+".plist["+str(idx)+"].controlPoints", multiIndices=True)
                     if cp_items:
                         for cp in cp_items:
-                            if not cmds.getAttr(item+".plist["+str(idx)+"].controlPoints["+str(cp)+"]") == [0.0, 0.0, 0.0]:
+                            if cmds.getAttr(item + ".plist[" + str(idx) + "].controlPoints[" + str(cp) + "]") != [0.0, 0.0, 0.0]:
                                 return True

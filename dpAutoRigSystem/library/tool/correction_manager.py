@@ -73,9 +73,8 @@ class CorrectionManager(base.BaseLibrary):
             Returns the name result.
         """
         old_name = cmds.getAttr(self.net+".name")
-        if not name:
-            if self.ar.data.ui_state:
-                name = cmds.textFieldGrp("correction_name_tfg", query=True, text=True)
+        if not name and self.ar.data.ui_state:
+            name = cmds.textFieldGrp("correction_name_tfg", query=True, text=True)
         if name:
             name = self.ar.naming.resolve_name(name, self.net_suffix)[0]
             self.rename_linked_nodes(old_name, name)
@@ -153,20 +152,18 @@ class CorrectionManager(base.BaseLibrary):
                         cmds.delete(self.ar.utils.get_node_by_message(net_attr, self.net))
                     except:
                         pass
-        if cmds.objExists("Rivet_Grp"):
-            if not cmds.listRelatives("Rivet_Grp", allDescendents=True, children=True):
-                cmds.delete("Rivet_Grp")
+        if cmds.objExists("Rivet_Grp") and not cmds.listRelatives("Rivet_Grp", allDescendents=True, children=True):
+            cmds.delete("Rivet_Grp")
         try:
             cmds.delete(self.ar.utils.get_node_by_message("correction_data_grp", self.net))
         except:
             pass
         cmds.delete(self.net)
-        if cmds.objExists(self.cm_data_grp):
-            if not cmds.listRelatives(self.cm_data_grp, allDescendents=True, children=True):
-                try:
-                    cmds.delete(self.cm_data_grp)
-                except:
-                    pass
+        if cmds.objExists(self.cm_data_grp) and not cmds.listRelatives(self.cm_data_grp, allDescendents=True, children=True):
+            try:
+                cmds.delete(self.cm_data_grp)
+            except:
+                pass
         if self.ar.data.ui_state:
             self.ar.correction_manager_ui.populate_net_ui()
             self.ar.correction_manager_ui.update_edit_net_layout()

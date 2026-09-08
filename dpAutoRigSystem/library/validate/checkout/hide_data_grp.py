@@ -37,9 +37,8 @@ class HideDataGrp(action.BaseAction):
                 data_grp = inputs[0]
             else:
                 data_grp = self.ar.utils.get_node_by_message("dataGrp")
-                if not data_grp:
-                    if cmds.objExists("Data_Grp"):
-                        data_grp = "Data_Grp"
+                if not data_grp and cmds.objExists("Data_Grp"):
+                    data_grp = "Data_Grp"
             if data_grp:
                 self.ar.ui_manager.set_progress(max=1)
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])

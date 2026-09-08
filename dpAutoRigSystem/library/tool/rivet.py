@@ -80,9 +80,8 @@ class Rivet(base.BaseLibrary):
     def remove_rivet_grp(self, *args):
         """ Verify if rivet group is empty to remove it.
         """
-        if cmds.objExists(self.rivet_grp_name):
-            if not cmds.listRelatives(self.rivet_grp_name, children=True):
-                cmds.delete(self.rivet_grp_name)
+        if cmds.objExists(self.rivet_grp_name) and not cmds.listRelatives(self.rivet_grp_name, children=True):
+            cmds.delete(self.rivet_grp_name)
     
 
     def remove_rivet_from_net(self, rivetNetNode):
@@ -111,9 +110,9 @@ class Rivet(base.BaseLibrary):
         except:
             cmds.delete(follicle)
 
-        connection = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
-        if len(connection) > 1:
-            for connection in connection:
+        connections = cmds.listConnections(f"{rivetNetNode}.message", plugs=True, destination=True)
+        if len(connections) > 1:
+            for connection in connections:
                 if "rivetNet" in connection:
                     cmds.deleteAttr(connection)
                     break
@@ -362,13 +361,12 @@ class Rivet(base.BaseLibrary):
             if self.shape_type == "mesh":
                 # working with uvSet:
                 uv_sets = cmds.polyUVSet(dup_shape, query=True, allUVSets=True)
-                if len(uv_sets) > 1:
-                    if not uv_sets[0] == uv_set_name:
-                        try:
-                            # change uvSet order because closestPointOnMesh uses the default uv set
-                            cmds.polyUVSet(dup_shape, copy=True, uvSet=uv_set_name, newUVSet=uv_sets[0])
-                        except:
-                            uv_set_name = uv_sets[0]
+                if len(uv_sets) > 1 and uv_sets[0] != uv_set_name:
+                    try:
+                        # change uvSet order because closestPointOnMesh uses the default uv set
+                        cmds.polyUVSet(dup_shape, copy=True, uvSet=uv_set_name, newUVSet=uv_sets[0])
+                    except:
+                        uv_set_name = uv_sets[0]
                 # closest point on mesh node:
                 self.cp_node = cmds.createNode("closestPointOnMesh", name=geo_to_attach+"_dpRivet_TEMP_CP", skipSelect=True)
                 cmds.connectAttr(dup_shape+".outMesh", self.cp_node+".inMesh", force=True)
@@ -460,24 +458,23 @@ class Rivet(base.BaseLibrary):
                 if face_to_rivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
                     cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformer_node", force=True)
-                if len(items) == len(rivets):
-                    if cmds.objExists(items[r]):
-                        cmds.connectAttr(items[r]+".message", self.net+".item_node", force=True)
-                        if not cmds.objExists(f"{items[r]}.rivetNet"):
-                            cmds.addAttr(items[r], longName="rivetNet", attributeType="message")
-                            cmds.connectAttr(self.net+".message", items[r]+".rivetNet", force=True)
+                if len(items) == len(rivets) and cmds.objExists(items[r]):
+                    cmds.connectAttr(items[r]+".message", self.net+".item_node", force=True)
+                    if not cmds.objExists(f"{items[r]}.rivetNet"):
+                        cmds.addAttr(items[r], longName="rivetNet", attributeType="message")
+                        cmds.connectAttr(self.net+".message", items[r]+".rivetNet", force=True)
+                    else:
+                        rivet_networks = cmds.listAttr(items[r], string="rivetNet*")
+                        rivet_networks.sort(reverse=True)
+                        last_index = rivet_networks[0].removeprefix("rivetNet")
+                        if last_index == "":
+                            last_index = 0
                         else:
-                            rivet_networks = cmds.listAttr(items[r], string="rivetNet*")
-                            rivet_networks.sort(reverse=True)
-                            last_index = rivet_networks[0].removeprefix("rivetNet")
-                            if last_index == "":
-                                last_index = 0
-                            else:
-                                last_index = int(last_index)
-                            new_index = last_index + 1
-                            current_long_name = f"rivetNet{new_index}"
-                            cmds.addAttr(items[r], longName=current_long_name, attributeType="message")
-                            cmds.connectAttr(self.net+".message", f"{items[r]}.{current_long_name}", force=True)
+                            last_index = int(last_index)
+                        new_index = last_index + 1
+                        current_long_name = f"rivetNet{new_index}"
+                        cmds.addAttr(items[r], longName=current_long_name, attributeType="message")
+                        cmds.connectAttr(self.net+".message", f"{items[r]}.{current_long_name}", force=True)
             
             # check invert group (back) in order to avoid double transformations:
             if add_invert:
@@ -661,12 +658,10 @@ class Rivet(base.BaseLibrary):
                     hist_items = cmds.listHistory(shape)
                     if hist_items:
                         for histItem in hist_items:
-                            if type == "skinCluster":
-                                if cmds.objectType(histItem) == "skinCluster":
-                                    return 1
-                            if type == "blendShape":
-                                if cmds.objectType(histItem) == "blendShape":
-                                    return 2
+                            if type == "skinCluster" and cmds.objectType(histItem) == "skinCluster":
+                                return 1
+                            if type == "blendShape" and cmds.objectType(histItem) == "blendShape":
+                                return 2
                 except:
                     return -1
         return False
@@ -737,12 +732,11 @@ class Rivet(base.BaseLibrary):
     def parent_to_transform(self, items, dest_parent, *args):
         """ Just check if the item is child of the destination parent node then parent it if needed.
         """
-        if items and dest_parent:
-            if cmds.objExists(dest_parent):
-                for item in items:
-                    children = cmds.listRelatives(dest_parent, allDescendents=True, children=True)
-                    if not children or not item in children:
-                        cmds.parent(item, dest_parent)
+        if items and dest_parent and cmds.objExists(dest_parent):
+            for item in items:
+                children = cmds.listRelatives(dest_parent, allDescendents=True, children=True)
+                if not children or not item in children:
+                    cmds.parent(item, dest_parent)
 
 
     def find_orig(self, geos, *args):

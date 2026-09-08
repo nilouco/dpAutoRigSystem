@@ -161,7 +161,7 @@ class ShaderIO(action.BaseAction):
         """
         not_found_meshs = []
         # rebuild shaders
-        for item in shader_data.keys():
+        for item in shader_data:
             if not cmds.objExists(item):
                 shader = cmds.shadingNode(shader_data[item]['material'], asShader=True, name=item)
                 if shader_data[item]['fileNode']:

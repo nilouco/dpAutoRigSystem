@@ -110,7 +110,7 @@ class RivetIO(action.BaseAction):
         """
         well_imported = True
         self.ar.ui_manager.set_progress(max=len(rivet_data.keys()), add_one=False, add_number=False)
-        for net in rivet_data.keys():
+        for net in rivet_data:
             try:
                 net_data = rivet_data[net]
                 self.ar.ui_manager.set_progress(self.ar.data.lang[self.title]+': '+net_data['geoToAttach'])

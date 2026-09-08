@@ -42,7 +42,7 @@ class ControllerTag(action.BaseAction):
                     self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
                     if not "controlID" in cmds.listAttr(item):
                         continue
-                    if not cmds.getAttr(item+".controlID") == "id_092_Correctives":
+                    if cmds.getAttr(item + ".controlID") != "id_092_Correctives":
                         if self.first_mode:
                             # conditional to check here
                             if not cmds.controller(item, query=True, isController=True):

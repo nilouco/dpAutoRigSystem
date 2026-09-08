@@ -106,59 +106,57 @@ class BaseAction(base.BaseLibrary):
     def reset_button_colors(self):
         """ Just set the button colors as default.
         """
-        if self.ar.data.ui_state:
-            if cmds.button(self.first_bt, exists=True):
-                cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+        if self.ar.data.ui_state and cmds.button(self.first_bt, exists=True):
+            cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+            cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
 
 
     def update_button_colors(self, running=False):
         """ Update button background colors if using UI.
         """
-        if self.ar.data.ui_state:
-            if self.first_bt and cmds.button(self.first_bt, exists=True):
-                if running:
-                    if self.first_mode: #verify/export
-                        cmds.button(self.first_bt, edit=True, backgroundColor=RUNNING_COLOR)
-                        cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                    else: #fix/import
-                        cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.second_bt, edit=True, backgroundColor=RUNNING_COLOR)
-                elif self.maybe_done:
-                    if self.first_mode: #verify/export
-                        cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
-                        cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                    else: #fix/import
-                        cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
-                elif self.checked_items: #ran
-                    if self.first_mode: #verify/export
-                        if True in self.found_issues:
-                            cmds.button(self.first_bt, edit=True, backgroundColor=ISSUE_COLOR)
-                            if self.action_type == "v000_validator":
-                                cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
-                            else:
-                                cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+        if self.ar.data.ui_state and self.first_bt and cmds.button(self.first_bt, exists=True):
+            if running:
+                if self.first_mode: #verify/export
+                    cmds.button(self.first_bt, edit=True, backgroundColor=RUNNING_COLOR)
+                    cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                else: #fix/import
+                    cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                    cmds.button(self.second_bt, edit=True, backgroundColor=RUNNING_COLOR)
+            elif self.maybe_done:
+                if self.first_mode: #verify/export
+                    cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
+                    cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                else: #fix/import
+                    cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                    cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
+            elif self.checked_items: #ran
+                if self.first_mode: #verify/export
+                    if True in self.found_issues:
+                        cmds.button(self.first_bt, edit=True, backgroundColor=ISSUE_COLOR)
+                        if self.action_type == "v000_validator":
+                            cmds.button(self.second_bt, edit=True, backgroundColor=WARNING_COLOR)
                         else:
-                            cmds.button(self.first_bt, edit=True, backgroundColor=CHECKED_COLOR)
                             cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                    else: #fix/import
-                        if False in self.good_results:
-                            if self.action_type == "v000_validator":
-                                cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
-                            else:
-                                cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                            cmds.button(self.second_bt, edit=True, backgroundColor=ISSUE_COLOR)
-                        else:
-                            cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                            cmds.button(self.second_bt, edit=True, backgroundColor=CHECKED_COLOR)
-                else: #wellDone
-                    if self.first_mode: #verify/export
+                    else:
                         cmds.button(self.first_bt, edit=True, backgroundColor=CHECKED_COLOR)
                         cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
-                    else: #fix/import
+                else: #fix/import
+                    if False in self.good_results:
+                        if self.action_type == "v000_validator":
+                            cmds.button(self.first_bt, edit=True, backgroundColor=WARNING_COLOR)
+                        else:
+                            cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.second_bt, edit=True, backgroundColor=ISSUE_COLOR)
+                    else:
                         cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
                         cmds.button(self.second_bt, edit=True, backgroundColor=CHECKED_COLOR)
+            else: #wellDone
+                if self.first_mode: #verify/export
+                    cmds.button(self.first_bt, edit=True, backgroundColor=CHECKED_COLOR)
+                    cmds.button(self.second_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                else: #fix/import
+                    cmds.button(self.first_bt, edit=True, backgroundColor=DEFAULT_COLOR)
+                    cmds.button(self.second_bt, edit=True, backgroundColor=CHECKED_COLOR)
     
 
     def update_info_data_button(self):
@@ -200,7 +198,7 @@ class BaseAction(base.BaseLibrary):
             Returns its value or the current title text only.
         """
         title_text = self.title
-        if self.title in self.ar.data.lang.keys():
+        if self.title in self.ar.data.lang:
             title_text = self.ar.data.lang[self.title]
         return title_text
 
@@ -292,7 +290,7 @@ class BaseAction(base.BaseLibrary):
     def get_io_path(self, io_folder):
         """ Returns the IO path for the current scene.
         """
-        if "assetPath" in self.ar.pipeliner.pipe_data.keys() and io_folder:
+        if "assetPath" in self.ar.pipeliner.pipe_data and io_folder:
             return self.ar.pipeliner.pipe_data['assetPath']+"/"+self.ar.pipeliner.pipe_data[io_folder]
 
 
@@ -307,7 +305,7 @@ class BaseAction(base.BaseLibrary):
                 return os.path.exists(self.io_path)
             if items:
                 exported_items = items
-                if not type(items) == list:
+                if type(items) != list:
                     exported_items = [items]
             elif get_any:
                 if os.path.exists(self.io_path):
@@ -407,7 +405,7 @@ class BaseAction(base.BaseLibrary):
                     short_name = item[item.rfind("|")+1:]
                     if not self.ar.utils.validate_id(short_name):
                         item_type = cmds.objectType(item)
-                        if not item_type in data["BrokenID"].keys():
+                        if not item_type in data["BrokenID"]:
                             data["BrokenID"][item_type] = {}
                         data["BrokenID"][item_type][short_name] = None
                         fathers = cmds.listRelatives(item, parent=True, fullPath=True)
@@ -572,10 +570,8 @@ class BaseAction(base.BaseLibrary):
                 for item in unparented_meshes:
                     if not self.ar.data.master_attr in cmds.listAttr(item):
                         father = item[:item[1:].find("|")+1]
-                        if father:
-                            if not self.ar.data.master_attr in cmds.listAttr(father):
-                                if not father in temps:
-                                    temps.append(father)
+                        if father and not self.ar.data.master_attr in cmds.listAttr(father) and not father in temps:
+                            temps.append(father)
         if temps:
             for node in temps:
                 is_cleaned = True
@@ -669,7 +665,7 @@ class BaseAction(base.BaseLibrary):
         self.ar.ui_manager.set_progress(max=len(constraint_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in constraint_data.keys():
+        for item in constraint_data:
             existing_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create constraint node if it needs
@@ -677,7 +673,7 @@ class BaseAction(base.BaseLibrary):
                 constraint_type = constraint_data[item]["type"]
                 targets, values = [], []
                 if constraint_data[item]["target"]:
-                    target_attr = list(constraint_data[item]["target"].keys())[0]
+                    target_attr = next(iter(constraint_data[item]["target"].keys()))
                     keys = list(constraint_data[item]["target"][target_attr].keys())
                     keys.sort()
                     for k in keys:
@@ -709,7 +705,7 @@ class BaseAction(base.BaseLibrary):
                             const = cmds.tangentConstraint(targets, to_nodes[0], name=item)[0]
                         # set attribute values
                         if constraint_data[item]["attributes"]:
-                            for attr in constraint_data[item]["attributes"].keys():
+                            for attr in constraint_data[item]["attributes"]:
                                 cmds.setAttr(const+"."+attr, constraint_data[item]["attributes"][attr])
                         # set weight values
                         for v, value in enumerate(values):
@@ -717,12 +713,11 @@ class BaseAction(base.BaseLibrary):
                         if constraint_data[item]["worldUpMatrix"]:
                             cmds.connectAttr(constraint_data[item]["worldUpMatrix"][0]+".worldMatrix", const+".worldUpMatrix", force=True)
                         # disconnect to keep the same exported skip option
-                        for output_attr in constraint_data[item]["output"].keys():
-                            if output_attr in cmds.listAttr(const):
-                                if not constraint_data[item]["output"][output_attr]:
-                                    connected_items = cmds.listConnections(const+"."+output_attr, source=False, destination=True, plugs=True)
-                                    if connected_items:
-                                        cmds.disconnectAttr(const+"."+output_attr, connected_items[0])
+                        for output_attr in constraint_data[item]["output"]:
+                            if output_attr in cmds.listAttr(const) and not constraint_data[item]["output"][output_attr]:
+                                connected_items = cmds.listConnections(const+"."+output_attr, source=False, destination=True, plugs=True)
+                                if connected_items:
+                                    cmds.disconnectAttr(const+"."+output_attr, connected_items[0])
                         well_imported_items.append(const)
                 else:
                     cmds.createNode(constraint_type, name=item) #broken node

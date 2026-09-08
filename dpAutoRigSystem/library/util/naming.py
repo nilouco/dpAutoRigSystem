@@ -39,9 +39,8 @@ class Naming:
             nodes = cmds.ls(selection=False, transforms=True)
         if nodes:
             for node in nodes:
-                if cmds.objExists(node+"."+type_name):
-                    if cmds.getAttr(node+"."+type_name) == class_name:
-                        numbers.append(class_name)
+                if cmds.objExists(node+"."+type_name) and cmds.getAttr(node+"."+type_name) == class_name:
+                    numbers.append(class_name)
         # try check if there is a masterGrp and get its counter:
         all_grp = self.ar.utils.get_all_grp()
         if all_grp:
@@ -127,9 +126,8 @@ class Naming:
         for filter in multi_filters:
             if filter:
                 for item in items:
-                    if str(filter) in item:
-                        if not item in filtered_items:
-                            filtered_items.append(item)
+                    if str(filter) in item and not item in filtered_items:
+                        filtered_items.append(item)
         return filtered_items
         
 
@@ -139,10 +137,9 @@ class Naming:
         """
         if cmds.objExists(item):
             need_restore_suffix = False
-            if suffix:
-                if item.endswith("_"+suffix):
-                    need_restore_suffix = True
-                    item = item[:item.rfind("_")]
+            if suffix and item.endswith("_"+suffix):
+                need_restore_suffix = True
+                item = item[:item.rfind("_")]
             # find numering:
             i = 1
             if not need_restore_suffix:

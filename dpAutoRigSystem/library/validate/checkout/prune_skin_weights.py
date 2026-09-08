@@ -47,7 +47,7 @@ class PruneSkinWeights(action.BaseAction):
                         to_prune_items = []
                         # check low weights
                         for v, weight_data in enumerate(weights):
-                            for w in weight_data.keys():
+                            for w in weight_data:
                                 if weight_data[w] < self.prune_min_value:
                                     to_prune_items.append(v)
                                     break

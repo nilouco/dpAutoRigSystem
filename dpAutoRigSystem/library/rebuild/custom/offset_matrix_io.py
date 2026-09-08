@@ -96,7 +96,7 @@ class OffsetMatrixIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(connection_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in connection_data.keys():
+        for item in connection_data:
             not_found_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):

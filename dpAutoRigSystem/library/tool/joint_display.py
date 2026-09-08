@@ -39,7 +39,7 @@ class JointDisplay(base.BaseLibrary):
         self.joints = cmds.ls(selection=False, type='joint')
         if self.ar.data.ui_state:
             written_value = cmds.textFieldGrp('joint_display_filter_tfg', query=True, text=True)
-            if not written_value == "" and not written_value == " ":
+            if written_value != "" and written_value != " ":
                 self.joints = self.ar.naming.filter_name(written_value, cmds.ls(selection=False, type='joint'), " ")
 
 
@@ -80,12 +80,12 @@ class JointDisplay(base.BaseLibrary):
             current_draw_style = cmds.getAttr(self.selection_ui_items[0]+'.drawStyle')
             if current_draw_style < 3:
                 for jnt in self.selection_ui_items:
-                    cmds.setAttr(jnt +'.drawStyle', current_draw_style + 1)
+                    cmds.setAttr(jnt+'.drawStyle', current_draw_style + 1)
                 self.dest_board_index = current_draw_style + 1
             else:
                 current_draw_style = 0
                 for jnt in self.selection_ui_items: 
-                    cmds.setAttr(jnt +'.drawStyle', current_draw_style)
+                    cmds.setAttr(jnt+'.drawStyle', current_draw_style)
                 self.dest_board_index = 0
             if self.ar.data.ui_state:
                 self.ar.joint_display_ui.refresh_ui()
@@ -98,14 +98,14 @@ class JointDisplay(base.BaseLibrary):
         # Get active selection of button list
         if self.selection_ui_items:
             current_draw_style = cmds.getAttr(self.selection_ui_items[0]+'.drawStyle')
-            if current_draw_style > 0 < 3:
+            if current_draw_style > 0 and current_draw_style < 3:
                 for jnt in self.selection_ui_items:
-                    cmds.setAttr(jnt +'.drawStyle', current_draw_style - 1)
+                    cmds.setAttr(jnt+'.drawStyle', current_draw_style - 1)
                 self.dest_board_index = current_draw_style - 1
             else: 
                 current_draw_style = 3
                 for jnt in self.selection_ui_items:
-                    cmds.setAttr(jnt +'.drawStyle', current_draw_style)
+                    cmds.setAttr(jnt+'.drawStyle', current_draw_style)
                 self.dest_board_index = 3
             if self.ar.data.ui_state:
                 self.ar.joint_display_ui.refresh_ui()
@@ -129,7 +129,6 @@ class JointDisplay(base.BaseLibrary):
     def set_draw_style(self, draw_style_index, *args):
         """ Set all joints to the selected drawStyle.
         """        
-        self.joints
         if self.joints:
             for jnt in self.joints:
                 cmds.setAttr(f"{jnt}.drawStyle", draw_style_index)

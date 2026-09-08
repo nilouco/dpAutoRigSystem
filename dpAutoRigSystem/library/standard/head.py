@@ -472,9 +472,8 @@ class Head(standard.BaseStandard):
         """
         inverts = [[], [], ["invertTX", "invertRY", "invertRZ"], [], []]
         presets = [{}, {"calibrateTX":1}, {"calibrateTX":1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
-        if s == 1:
-            if self.flip:
-                inverts = [[], ["invertTX"], ["invertTX"], ["invertTZ"], ["invertTZ"]]
+        if s == 1 and self.flip:
+            inverts = [[], ["invertTX"], ["invertTX"], ["invertTZ"], ["invertTZ"]]
         return presets, inverts
 
 
@@ -675,11 +674,10 @@ class Head(standard.BaseStandard):
                         left_brow_ctrl, left_brow_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c060_brow"], "id_046_FacialBrow", self.ar.data.facial_brow_targets, (0, 0, 0), False, False, True, True, True, True, False, "red", True, False)
                         right_brow_ctrl, right_brow_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c060_brow"], "id_046_FacialBrow", self.ar.data.facial_brow_targets, (0, 0, 0), False, False, True, True, True, True, False, "blue", True, False)
                         facial_ctrls.extend([left_brow_ctrl, right_brow_ctrl])
-                    if cmds.getAttr(self.guide_base+".facialEyelid"):
-                        if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
-                            left_eyelid_ctrl, left_eyelid_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.ar.data.facial_eyelid_targets, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
-                            right_eyelid_ctrl, right_eyelid_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.ar.data.facial_eyelid_targets, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
-                            facial_ctrls.extend([left_eyelid_ctrl, right_eyelid_ctrl])
+                    if cmds.getAttr(self.guide_base+".facialEyelid") and self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
+                        left_eyelid_ctrl, left_eyelid_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.ar.data.facial_eyelid_targets, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
+                        right_eyelid_ctrl, right_eyelid_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c042_eyelid"], "id_047_FacialEyelid", self.ar.data.facial_eyelid_targets, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
+                        facial_ctrls.extend([left_eyelid_ctrl, right_eyelid_ctrl])
                     if cmds.getAttr(self.guide_base+".facialMouth"):
                         left_mouth_ctrl, left_mouth_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p002_left"], self.ar.data.lang["c061_mouth"], "id_048_FacialMouth", self.ar.data.facial_mouth_targets, (0, 0, -90), False, False, True, True, True, True, False, "red", True, True)
                         right_mouth_ctrl, right_mouth_ctrl_grp = self.create_facial_ctrl(side, self.ar.data.lang["p003_right"], self.ar.data.lang["c061_mouth"], "id_048_FacialMouth", self.ar.data.facial_mouth_targets, (0, 0, -90), False, False, True, True, True, True, False, "blue", True, True)
@@ -817,12 +815,11 @@ class Head(standard.BaseStandard):
 
                 # edit the mirror shape to a good direction of controls:
                 # fixing flip mirror:
-                if s == 1:
-                    if self.flip:
-                        for item in to_flip_items:
-                            cmds.setAttr(item+".scaleX", -1)
-                            cmds.setAttr(item+".scaleY", -1)
-                            cmds.setAttr(item+".scaleZ", -1)
+                if s == 1 and self.flip:
+                    for item in to_flip_items:
+                        cmds.setAttr(item+".scaleX", -1)
+                        cmds.setAttr(item+".scaleY", -1)
+                        cmds.setAttr(item+".scaleZ", -1)
 
                 # create_zero_out controls:
                 neck_ctrl_zeros = self.ar.utils.create_zero_out(neck_ctrls)
@@ -1035,11 +1032,10 @@ class Head(standard.BaseStandard):
                             
                             articulation_joints = self.ar.utils.create_articulation_joint(father_joint, neck_joints[n], 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
                             self.setup_corrective_controllers(articulation_joints, s, neck_ctrl_base_name+"_"+str(n), corrective_nets, neck_head_calibrate_presets, inverts, [False, True, True, False, False])
-                            if s == 1:
-                                if self.flip:
-                                    cmds.setAttr(articulation_joints[0]+".scaleX", -1)
-                                    cmds.setAttr(articulation_joints[0]+".scaleY", -1)
-                                    cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
+                            if s == 1 and self.flip:
+                                cmds.setAttr(articulation_joints[0]+".scaleX", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleY", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
                             self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n)+"_Jar")
 
                         # head corrective
@@ -1051,11 +1047,10 @@ class Head(standard.BaseStandard):
                         head_calibrate_presets, inverts = self.get_calibrate_presets(s)
                         articulation_joints = self.ar.utils.create_articulation_joint(neck_joints[-1], head_joint, 4, [(0.5*self.radius, 0, 0), (-0.5*self.radius, 0, 0), (0, 0, 0.5*self.radius), (0, 0, -0.5*self.radius)])
                         self.setup_corrective_controllers(articulation_joints, s, side+self.number_name+"_"+self.ar.data.lang['c024_head'], head_corrective_nets, head_calibrate_presets, inverts, [False, True, True, False, False])
-                        if s == 1:
-                            if self.flip:
-                                cmds.setAttr(articulation_joints[0]+".scaleX", -1)
-                                cmds.setAttr(articulation_joints[0]+".scaleY", -1)
-                                cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
+                        if s == 1 and self.flip:
+                            cmds.setAttr(articulation_joints[0]+".scaleX", -1)
+                            cmds.setAttr(articulation_joints[0]+".scaleY", -1)
+                            cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
                     else:
                         articulation_joints = self.ar.utils.create_articulation_joint(neck_base_jzt, neck_joints[0])
                         self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_00_"+self.ar.data.lang['c023_neck']+self.ar.data.lang['c106_base']+"_Jar")
@@ -1076,12 +1071,11 @@ class Head(standard.BaseStandard):
                         cmds.matchTransform(right_brow_ctrl_grp, self.guide_brow_loc, position=True, rotation=True)
                         cmds.setAttr(right_brow_ctrl_grp+".translateX", (-1*cmds.getAttr(right_brow_ctrl_grp+".translateX")))
                         cmds.setAttr(right_brow_ctrl_grp+".rotateY", 180)
-                    if cmds.getAttr(self.guide_base+".facialEyelid"):
-                        if self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
-                            cmds.parent(left_eyelid_ctrl_grp, right_eyelid_ctrl_grp, upper_head_ctrl)
-                            cmds.matchTransform(left_eyelid_ctrl_grp, self.guide_eyelid_loc, position=True, rotation=True)
-                            cmds.matchTransform(right_eyelid_ctrl_grp, self.guide_eyelid_loc, position=True, rotation=True)
-                            cmds.setAttr(right_eyelid_ctrl_grp+".translateX", (-1*cmds.getAttr(right_eyelid_ctrl_grp+".translateX")))
+                    if cmds.getAttr(self.guide_base+".facialEyelid") and self.facial_connect_type == self.ar.data.facial_connect_types[0]: #blendshapes
+                        cmds.parent(left_eyelid_ctrl_grp, right_eyelid_ctrl_grp, upper_head_ctrl)
+                        cmds.matchTransform(left_eyelid_ctrl_grp, self.guide_eyelid_loc, position=True, rotation=True)
+                        cmds.matchTransform(right_eyelid_ctrl_grp, self.guide_eyelid_loc, position=True, rotation=True)
+                        cmds.setAttr(right_eyelid_ctrl_grp+".translateX", (-1*cmds.getAttr(right_eyelid_ctrl_grp+".translateX")))
                     if cmds.getAttr(self.guide_base+".facialMouth"):
                         cmds.parent(left_mouth_ctrl_grp, right_mouth_ctrl_grp, upper_jaw_ctrl)
                         cmds.matchTransform(left_mouth_ctrl_grp, self.guide_mouth_loc, position=True, rotation=True)
@@ -1277,7 +1271,7 @@ for net in cmds.ls(type="network"):
             facial_ctrl_attributes = []
             if attributes:
                 for a, attr in enumerate(attributes):
-                    if not attr == None:
+                    if attr != None:
                         ctrlAttr = attr
                         if side_name:
                             ctrlAttr = side_name+"_"+attr
@@ -1409,26 +1403,24 @@ for net in cmds.ls(type="network"):
         """
         guides, results = [], []
         hook = self.ar.utils.get_hook()
-        for item in hook.keys():
-            if self.name_guide in hook[item]['fatherGuide']:
-                if not item in guides:
-                    guides.append(item.split(":")[0])
-                    if hook[item]['children']:
-                        for child in hook[item]['children']:
-                            if not child in guides:
-                                guides.append(child.split(":")[0])
+        for item in hook:
+            if self.name_guide in hook[item]['fatherGuide'] and not item in guides:
+                guides.append(item.split(":")[0])
+                if hook[item]['children']:
+                    for child in hook[item]['children']:
+                        if not child in guides:
+                            guides.append(child.split(":")[0])
         if guides:
             all_transforms = cmds.ls(selection=False, type="transform")
             for node in all_transforms:
                 if "guide_source" in cmds.listAttr(node):
                     guide_source = cmds.getAttr(node+".guide_source")
-                    if guide_source.split(":")[0] in guides:
-                        if not node in results:
-                            if self.mirror_axis != 'off':
-                                if node.startswith(self.sides[s]):
-                                    results.append(node)
-                            else:
+                    if guide_source.split(":")[0] in guides and not node in results:
+                        if self.mirror_axis != 'off':
+                            if node.startswith(self.sides[s]):
                                 results.append(node)
+                        else:
+                            results.append(node)
         return results
 
 

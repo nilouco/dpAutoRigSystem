@@ -136,17 +136,16 @@ class BaseStandard(base.BaseLibrary):
             Returns True if Ok and False if Fail.
         """
         # conditionals to be elegible as a rigged guide module:
-        if cmds.objExists(self.guide_base):
-            if 'guideBase' in cmds.listAttr(self.guide_base):
-                if cmds.getAttr(self.guide_base+'.guideBase') == 1:
-                    return True
-                else:
-                    try:
-                        self.delete_guide()
-                        mel.eval('warning \"'+ self.ar.data.lang['e000_guideNotFound'] +' - '+ self.guide_base +'\";')
-                    except:
-                        pass
-                    return False
+        if cmds.objExists(self.guide_base) and 'guideBase' in cmds.listAttr(self.guide_base):
+            if cmds.getAttr(self.guide_base+'.guideBase') == 1:
+                return True
+            else:
+                try:
+                    self.delete_guide()
+                    mel.eval('warning \"'+ self.ar.data.lang['e000_guideNotFound'] +' - '+ self.guide_base +'\";')
+                except:
+                    pass
+                return False
     
     
     def delete_guide(self, *args):
@@ -205,12 +204,11 @@ class BaseStandard(base.BaseLibrary):
                 for net in nets:
                     if base_name == self.ar.naming.get_suffix_numbers(cmds.getAttr(net+".guideName"))[1]:
                         dpar_names.append(cmds.getAttr(net+".guideName"))
-                if dpar_names:
-                    if self.custom_name in dpar_names:
-                        for n in range(1, len(dpar_names)+2):
-                            if not base_name+str(n).zfill(pad) in dpar_names:
-                                self.custom_name = base_name+str(n).zfill(pad)
-                                break
+                if dpar_names and self.custom_name in dpar_names:
+                    for n in range(1, len(dpar_names)+2):
+                        if not base_name+str(n).zfill(pad) in dpar_names:
+                            self.custom_name = base_name+str(n).zfill(pad)
+                            break
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField("edit_guide_custom_name_tf", edit=True, text=self.custom_name)
@@ -265,7 +263,7 @@ class BaseStandard(base.BaseLibrary):
             s_default = s
             mirror_prefixes = [self.ar.data.lang['p002_left'], self.ar.data.lang['p003_right']]
             for i, jcr in enumerate(corrective_joints):
-                if not i == 0: #exclude jar in the index 0
+                if i != 0: #exclude jar in the index 0
                     # logic to mirror calibration setup for left and right sides of a centered module like neck/head
                     m = i
                     if mirrors:
@@ -289,7 +287,7 @@ class BaseStandard(base.BaseLibrary):
                     jcr_ctrl, jcr_grp = self.ar.ctrls.create_corrective_joint_ctrl(corrective_joints[i], corrective_nets[i], radius=self.radius*0.2)
                     cmds.parent(jcr_grp, self.corrective_ctrls_grp)
                     # preset calibration
-                    for calibrate_attr in calibrate_presets[i].keys():
+                    for calibrate_attr in calibrate_presets[i]:
                         if "calibrateT" in calibrate_attr:
                             cmds.setAttr(jcr_ctrl+"."+calibrate_attr, calibrate_presets[i][calibrate_attr]*self.radius)
                         else:
@@ -413,9 +411,8 @@ class BaseStandard(base.BaseLibrary):
                 # do a group mirror with negative scaling:
                 if s == 1:
                     without_flip = False
-                    if cmds.objExists(self.guide_base+".flip"):
-                        if cmds.getAttr(self.guide_base+".flip") == 0:
-                            without_flip = True
+                    if cmds.objExists(self.guide_base+".flip") and cmds.getAttr(self.guide_base+".flip") == 0:
+                        without_flip = True
                     if without_flip:
                         for axis in self.mirror_axis:
                             got_value = cmds.getAttr(side+self.number_name+"_Guide_Base.translate"+axis)
@@ -619,9 +616,8 @@ class BaseStandard(base.BaseLibrary):
             if fathers:
                 attr_data["FatherNode"] = fathers[0]
                 if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1:
-                    if not "__" in fathers[0]: #not a rawGuide
-                        if "guide_source" in cmds.listAttr(fathers[0]):
-                            attr_data["FatherNode"] = cmds.getAttr(fathers[0]+".guide_source")
+                    if not "__" in fathers[0] and "guide_source" in cmds.listAttr(fathers[0]): #not a rawGuide
+                        attr_data["FatherNode"] = cmds.getAttr(fathers[0]+".guide_source")
                     cmds.parent(node, world=True) #to export guide base transformation in worldSpace
             else:
                 attr_data["FatherNode"] = None
@@ -636,9 +632,8 @@ class BaseStandard(base.BaseLibrary):
                         attr_data[attr] = connections[0]
                 else:
                     attr_data[attr] = cmds.getAttr(node+"."+attr)
-            if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1:
-                if fathers:
-                    cmds.parent(node, fathers[0])
+            if "guideBase" in cmds.listAttr(node) and cmds.getAttr(node+".guideBase") == 1 and fathers:
+                cmds.parent(node, fathers[0])
             return attr_data
 
 
@@ -661,13 +656,12 @@ class BaseStandard(base.BaseLibrary):
                 after_data["BeforeData"] = befores
                 for before_attr in befores:
                     node_name = cmds.listConnections(self.guide_net+"."+before_attr, source=True, destination=False) or None
-                    if node_name:
-                        if cmds.objExists(node_name[0]):
-                            guide_data[node_name[0]] = self.get_node_data(node_name[0])
-                            if build_it:
-                                cmds.lockNode(self.guide_net, lock=False)
-                                cmds.deleteAttr(self.guide_net+"."+before_attr)
-                                cmds.lockNode(self.guide_net, lock=True)
+                    if node_name and cmds.objExists(node_name[0]):
+                        guide_data[node_name[0]] = self.get_node_data(node_name[0])
+                        if build_it:
+                            cmds.lockNode(self.guide_net, lock=False)
+                            cmds.deleteAttr(self.guide_net+"."+before_attr)
+                            cmds.lockNode(self.guide_net, lock=True)
                 after_data["GuideData"] = guide_data
                 cmds.setAttr(self.guide_net+".afterData", after_data, type="string")
                 if build_it:
@@ -851,9 +845,8 @@ class BaseStandard(base.BaseLibrary):
                         cmds.setAttr(guide_child+".mirrorAxis", self.mirror_axis, type='string')
                         cmds.setAttr(guide_child+".mirrorName", cmds.getAttr(self.guide_base+".mirrorName"), type='string') #fatherMirrorName
                         for instance in self.ar.data.guide_instances:
-                            if cmds.objExists(instance.guide_base):
-                                if cmds.getAttr(instance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guide_child+".moduleInstanceInfo"):
-                                    instance.create_mirror_preview()
+                            if cmds.objExists(instance.guide_base) and cmds.getAttr(instance.guide_base+".moduleInstanceInfo") == cmds.getAttr(guide_child+".moduleInstanceInfo"):
+                                instance.create_mirror_preview()
                 
                 # duplicating the moduleGuide
                 duplicated = cmds.duplicate(self.guide_base, returnRootsOnly=True)[0]
@@ -909,7 +902,7 @@ class BaseStandard(base.BaseLibrary):
                     cmds.setAttr(preview_mirror_guide+".customName", custom_name_mirror, type="string")
                 
                 # create a decomposeMatrix node in order to get the worldSpace transformations (like using xform):
-                preview_mirror_dm = cmds.createNode('decomposeMatrix', name=preview_mirror_guide+"_dm")
+                preview_mirror_dm = cmds.createNode('decomposeMatrix', name=preview_mirror_guide+"_DM")
                 cmds.connectAttr(self.guide_base+'.worldMatrix', preview_mirror_dm+'.inputMatrix', force=True)
                 
                 # connect original guide base decomposeMatrix node output transformations to the mirror guide base node:
@@ -948,15 +941,14 @@ class BaseStandard(base.BaseLibrary):
         """ This function receives the mirror menu item and set it as a string in the guide base (main).
             Also, call the builder of the preview mirror (for the viewport).
         """
-        if self.check_guide_integrity():
-            # check if the father guide is in X=0 in order to permit mirror:
-            if not self.check_father_mirror(): #stopMirrorOperation
-                # loading Maya matrix node (for mirror porpuses)
-                loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
-                if loaded_matrix_plugin:
-                    self.mirror_axis = item
-                    cmds.setAttr(self.guide_base+".mirrorAxis", self.mirror_axis, type='string')
-                    self.create_mirror_preview()
+        # check if the father guide is in X=0 in order to permit mirror:
+        if self.check_guide_integrity() and not self.check_father_mirror(): #stopMirrorOperation
+            # loading Maya matrix node (for mirror porpuses)
+            loaded_matrix_plugin = self.ar.config.check_loaded_plugin("matrixNodes", self.ar.data.lang['e002_matrixPluginNotFound'])
+            if loaded_matrix_plugin:
+                self.mirror_axis = item
+                cmds.setAttr(self.guide_base+".mirrorAxis", self.mirror_axis, type='string')
+                self.create_mirror_preview()
     
     
     def change_mirror_name(self, item, *args):

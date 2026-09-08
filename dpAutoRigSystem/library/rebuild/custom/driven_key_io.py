@@ -141,14 +141,14 @@ class DrivenKeyIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(drivenkey_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in drivenkey_data.keys():
+        for item in drivenkey_data:
             existing_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # create set driven key node if it needs
             if not cmds.objExists(item):
                 node = cmds.createNode(drivenkey_data[item]["type"], name=drivenkey_data[item]["name"])
                 # set attribute values
-                for attr in drivenkey_data[item]["attributes"].keys():
+                for attr in drivenkey_data[item]["attributes"]:
                     if cmds.objExists(node+"."+attr):
                         cmds.setAttr(node+"."+attr, drivenkey_data[item]["attributes"][attr])
                 cmds.setAttr(node+".curveColor", drivenkey_data[item]["curveColor"][0], drivenkey_data[item]["curveColor"][1], drivenkey_data[item]["curveColor"][2], type="double3")
@@ -156,7 +156,7 @@ class DrivenKeyIO(action.BaseAction):
                 # set driven keys
                 for i in range(drivenkey_data[item]["size"]):
                     cmds.setKeyframe(item, float=drivenkey_data[item]["keyTimeValue"][str(i)]["keyTime"], value=drivenkey_data[item]["keyTimeValue"][str(i)]["keyValue"])
-                    for k_attr in drivenkey_data[item]["keys"][str(i)].keys():
+                    for k_attr in drivenkey_data[item]["keys"][str(i)]:
                         cmds.setAttr(item+"."+k_attr+"["+str(i)+"]", drivenkey_data[item]["keys"][str(i)][k_attr])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inTangentType=drivenkey_data[item]["keyTanInType"][str(i)])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outTangentType=drivenkey_data[item]["keyTanOutType"][str(i)])
@@ -172,9 +172,8 @@ class DrivenKeyIO(action.BaseAction):
                     if drivenkey_data[item]["weightedTangents"]:
                         cmds.keyTangent(node, edit=True, index=(int(i), int(i)), weightLock=drivenkey_data[item]["keyWeightLocked"][str(i)])
                 # reconnect node
-                if drivenkey_data[item]["input"]:
-                    if cmds.objExists(drivenkey_data[item]["input"][0]):
-                        cmds.connectAttr(drivenkey_data[item]["input"][0], node+".input", force=True)
+                if drivenkey_data[item]["input"] and cmds.objExists(drivenkey_data[item]["input"][0]):
+                    cmds.connectAttr(drivenkey_data[item]["input"][0], node+".input", force=True)
                 if drivenkey_data[item]["output"]:
                     for c, output_node in enumerate(drivenkey_data[item]["output"]):
                         if cmds.objExists(drivenkey_data[item]["output"][c]):

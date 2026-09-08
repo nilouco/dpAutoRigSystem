@@ -110,7 +110,7 @@ class SkinningIO(action.BaseAction):
         #ref_nodes = self.ref_old_wip_file()
         ref_nodes = None
 
-        for item in skin_weight_data.keys():
+        for item in skin_weight_data:
             if cmds.objExists(item):
                 if ref_nodes: #disable at the momment
                     for ref_node_name in ref_nodes:
@@ -118,7 +118,7 @@ class SkinningIO(action.BaseAction):
                             if cmds.polyCompare(item, ref_node_name, vertices=True) > 0 or cmds.polyCompare(item, ref_node_name, edges=True) > 0: #check if shape changes
                                 changed_shape_meshes.append(item)
                                 well_imported = False
-                            elif not len(cmds.ls(item+".vtx[*]", flatten=True)) == len(cmds.ls(ref_node_name+".vtx[*]", flatten=True)): #check if poly count changes
+                            elif len(cmds.ls(item + ".vtx[*]", flatten=True)) != len(cmds.ls(ref_node_name + ".vtx[*]", flatten=True)): #check if poly count changes
                                 changed_topo_meshes.append(item)
                                 well_imported = False
                             else:

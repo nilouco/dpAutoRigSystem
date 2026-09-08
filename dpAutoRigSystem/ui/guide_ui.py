@@ -28,43 +28,42 @@ class GuideUI:
     def update_edit_selected_module_ui(self, standard, select=True, *args):
         """ Select the moduleGuide, clear the selectedModuleLayout and re-create the mirrorLayout and custom attribute layouts.
         """
-        if self.ar.data.ui_state:
-            if standard.check_guide_integrity():
-                # select the module to be recreate the edit selected module layout
-                if select:
-                    cmds.select(standard.guide_base)
-                self.clear_selected_module_layout()
-                self.create_edit_selected_layout(standard)
-                # work on guides features
-                self.segment_layout(standard)
-                self.delete_duplicate_button(standard)
-                self.flip_layout(standard)
-                self.mirror_layout(standard)
-                self.rig_it_button(standard)
-                self.degree_layout(standard)
-                self.reorient_layout(standard)
-                self.style_layout(standard)
-                self.type_layout(standard)
-                self.deformed_by_layout(standard)
-                self.eye_aim_direction_layout(standard)
-                self.indirectskin_layout(standard)
-                self.eyelid_layout(standard)
-                self.geometry_layout(standard)
-                self.start_frame_layout(standard)
-                self.steering_layout(standard)
-                self.fatherb_layout(standard)
-                self.head_items_layout(standard)
-                self.align_world_layout(standard)
-                self.articulation_layout(standard)
-                self.nostril_layout(standard)
-                self.corrective_layout(standard)
-                self.dynamic_layout(standard)
-                self.main_ctrl_layout(standard)
-                self.bend_layout(standard)
-                self.deformer_layout(standard)
-                self.facial_layout(standard)
-                if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
-                    self.plus_info_ui(standard)
+        if self.ar.data.ui_state and standard.check_guide_integrity():
+            # select the module to be recreate the edit selected module layout
+            if select:
+                cmds.select(standard.guide_base)
+            self.clear_selected_module_layout()
+            self.create_edit_selected_layout(standard)
+            # work on guides features
+            self.segment_layout(standard)
+            self.delete_duplicate_button(standard)
+            self.flip_layout(standard)
+            self.mirror_layout(standard)
+            self.rig_it_button(standard)
+            self.degree_layout(standard)
+            self.reorient_layout(standard)
+            self.style_layout(standard)
+            self.type_layout(standard)
+            self.deformed_by_layout(standard)
+            self.eye_aim_direction_layout(standard)
+            self.indirectskin_layout(standard)
+            self.eyelid_layout(standard)
+            self.geometry_layout(standard)
+            self.start_frame_layout(standard)
+            self.steering_layout(standard)
+            self.fatherb_layout(standard)
+            self.head_items_layout(standard)
+            self.align_world_layout(standard)
+            self.articulation_layout(standard)
+            self.nostril_layout(standard)
+            self.corrective_layout(standard)
+            self.dynamic_layout(standard)
+            self.main_ctrl_layout(standard)
+            self.bend_layout(standard)
+            self.deformer_layout(standard)
+            self.facial_layout(standard)
+            if cmds.window(self.ar.data.plus_info_win_name, query=True, exists=True):
+                self.plus_info_ui(standard)
 
 
     def create_edit_selected_layout(self, standard):
@@ -101,9 +100,8 @@ class GuideUI:
         # create a flip layout:
         if 'flip' in cmds.listAttr(standard.guide_base):
             cmds.checkBox('edit_guide_flip', label="Flip", value=cmds.getAttr(standard.guide_base+".flip"), changeCommand=partial(standard.set_guide_attr, 'flip'), parent='edit_guide_mirror_rl')
-            if standard.check_father_mirror():
-                if standard.father_flip_exists:
-                    cmds.checkBox('edit_guide_flip', edit=True, enable=False)
+            if standard.check_father_mirror() and standard.father_flip_exists:
+                cmds.checkBox('edit_guide_flip', edit=True, enable=False)
         else:
             cmds.text("", parent='edit_guide_mirror_rl')
 
@@ -318,17 +316,15 @@ class GuideUI:
 
 
     def main_ctrl_layout(self, standard):
-        if 'nJoints' in cmds.listAttr(standard.guide_base):
-            if 'mainControls' in cmds.listAttr(standard.guide_base):
-                if cmds.getAttr(standard.guide_base+".nJoints") > 0:
-                    cmds.rowLayout('edit_guide_main_ctrl_rl', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="rig_selected_module_cl" )
-                    if cmds.getAttr(standard.guide_base+".nJoints") > 1:
-                        cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=cmds.getAttr(standard.guide_base+".mainControls"), enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
-                        cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(standard.guide_base+".nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=cmds.getAttr(standard.guide_base+".mainControls"), parent='edit_guide_main_ctrl_rl')
-                    else:
-                        cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
-                        cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(standard.guide_base+".nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=False, parent='edit_guide_main_ctrl_rl')
-                        cmds.setAttr(standard.guide_base+".mainControls", 0)
+        if 'nJoints' in cmds.listAttr(standard.guide_base) and 'mainControls' in cmds.listAttr(standard.guide_base) and cmds.getAttr(standard.guide_base+".nJoints") > 0:
+            cmds.rowLayout('edit_guide_main_ctrl_rl', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="rig_selected_module_cl" )
+            if cmds.getAttr(standard.guide_base+".nJoints") > 1:
+                cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=cmds.getAttr(standard.guide_base+".mainControls"), enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
+                cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(standard.guide_base+".nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=cmds.getAttr(standard.guide_base+".mainControls"), parent='edit_guide_main_ctrl_rl')
+            else:
+                cmds.checkBox('edit_guide_main_ctrl_cb', label=self.ar.data.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=standard.set_main_ctrls, parent='edit_guide_main_ctrl_rl')
+                cmds.intField('edit_guide_main_ctrl_if', value=cmds.getAttr(standard.guide_base+".nMain"), minValue=1, changeCommand=partial(standard.change_main_ctrls_number, 0), editable=False, parent='edit_guide_main_ctrl_rl')
+                cmds.setAttr(standard.guide_base+".mainControls", 0)
 
 
     def deformer_layout(self, standard):
@@ -451,9 +447,8 @@ class GuideUI:
         guide_instances = self.ar.job.selected_instances.copy()
         if not guide_instances:
             guide_instances = [instance]
-        if instance:
-            if not instance in guide_instances:
-                guide_instances.insert(0, instance)
+        if instance and not instance in guide_instances:
+            guide_instances.insert(0, instance)
         for standard in guide_instances:
             guide_name = standard.guide_namespace.split("__")[-1]
             custom_name = cmds.getAttr(standard.guide_base+".customName")
@@ -499,12 +494,11 @@ class GuideUI:
         """
         is_geo = False
         selected_items = cmds.ls(selection=True)
-        if selected_items:
-            if cmds.objExists(selected_items[0]):
-                for item in cmds.listRelatives(selected_items[0], children=True, allDescendents=True) or []:
-                    item_type = cmds.objectType(item)
-                    if item_type == "mesh" or item_type == "nurbsSurface":
-                        is_geo = True
+        if selected_items and cmds.objExists(selected_items[0]):
+            for item in cmds.listRelatives(selected_items[0], children=True, allDescendents=True) or []:
+                item_type = cmds.objectType(item)
+                if item_type == "mesh" or item_type == "nurbsSurface":
+                    is_geo = True
         if is_geo:
             cmds.textField('edit_guide_geo_tf', edit=True, text=selected_items[0])
             cmds.setAttr(standard.guide_base+".geo", selected_items[0], type='string')
@@ -513,16 +507,15 @@ class GuideUI:
     def update_select_button(self, selected_guides):
             selected_instances = []
             for m, instance in enumerate(self.ar.data.guide_instances):
-                if cmds.objExists(instance.guide_base):
-                    if cmds.button(f"{instance.number_name}_select_bt", query=True, exists=True):
-                        current_colors = self.ar.ctrls.get_guide_rgb_colors(instance)
-                        if current_colors:
-                            cmds.button(f"{instance.number_name}_select_bt", edit=True, label=" ", backgroundColor=current_colors)
-                        if selected_guides:
-                            for selected_guide in selected_guides:
-                                if str(instance) == cmds.getAttr(selected_guide+"."+self.ar.data.module_instance_info_attr):
-                                    cmds.button(f"{instance.number_name}_select_bt", edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
-                                    selected_instances.append(instance)
+                if cmds.objExists(instance.guide_base) and cmds.button(f"{instance.number_name}_select_bt", query=True, exists=True):
+                    current_colors = self.ar.ctrls.get_guide_rgb_colors(instance)
+                    if current_colors:
+                        cmds.button(f"{instance.number_name}_select_bt", edit=True, label=" ", backgroundColor=current_colors)
+                    if selected_guides:
+                        for selected_guide in selected_guides:
+                            if str(instance) == cmds.getAttr(selected_guide+"."+self.ar.data.module_instance_info_attr):
+                                cmds.button(f"{instance.number_name}_select_bt", edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
+                                selected_instances.append(instance)
             return selected_instances
     
     
@@ -535,9 +528,8 @@ class GuideUI:
         elif modifiers == 1: #middle mouse drag + shift
             if not standard.guide_base in selection:
                 selection.append(standard.guide_base)
-        elif modifiers == 2: #middle drag + control
-            if standard.guide_base in selection:
-                selection.remove(standard.guide_base)
+        elif modifiers == 2 and standard.guide_base in selection: #middle drag + control
+            selection.remove(standard.guide_base)
         cmds.select(selection)
         cmds.button(f"{standard.number_name}_select_bt", edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
 

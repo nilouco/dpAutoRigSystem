@@ -75,10 +75,9 @@ class Pipeliner:
         json_path = self.get_json_settings_path()
         if os.path.exists(json_path):
             content = self.get_json_content(json_path)
-            if content:
-                if os.path.exists(content['path']):
-                    self.info_file = content['file']
-                    return content['path']
+            if content and os.path.exists(content['path']):
+                self.info_file = content['file']
+                return content['path']
         return False
         
     
@@ -112,7 +111,7 @@ class Pipeliner:
             Returns the pipeline info name if there's one.
         """
         name = None
-        if "sceneName" in self.pipe_data.keys():
+        if "sceneName" in self.pipe_data:
             name = self.pipe_data['sceneName']
         if path:
             name = path
@@ -122,14 +121,12 @@ class Pipeliner:
                     try:
                         name = name[name.rfind(self.pipe_data[dependent]+"/")+len(self.pipe_data[dependent])+1:]
                         to_end_it = False
-                        if self.pipe_data["f_wip"]:
-                            if self.pipe_data["f_wip"] in name:
-                                name = name.split(self.pipe_data["f_wip"])[0]
-                                to_end_it = True
-                        if self.pipe_data["f_publish"]:
-                            if self.pipe_data["f_publish"] in name:
-                                name = name.split(self.pipe_data["f_publish"])[0]
-                                to_end_it = True
+                        if self.pipe_data["f_wip"] and self.pipe_data["f_wip"] in name:
+                            name = name.split(self.pipe_data["f_wip"])[0]
+                            to_end_it = True
+                        if self.pipe_data["f_publish"] and self.pipe_data["f_publish"] in name:
+                            name = name.split(self.pipe_data["f_publish"])[0]
+                            to_end_it = True
                         if to_end_it:
                             name = name.removesuffix("/")
                             if "/" in name:
@@ -325,7 +322,7 @@ class Pipeliner:
             # mouting pipeline data dictionary
             if self.pipe_data['sceneName']:
                 self.get_info_by_path("f_drive", None)
-                if not self.pipe_data['sceneName'] == self.pipe_data['f_drive']+"/"+self.pipe_data['shortName']:
+                if self.pipe_data['sceneName'] != self.pipe_data['f_drive'] + "/" + self.pipe_data['shortName']:
                     self.get_info_by_path("f_studio", "f_drive")
                     self.get_info_by_path("f_project", "f_studio")
                 self.pipe_data['wipPath'] = self.pipe_data['f_drive']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']+"/"+self.pipe_data['f_wip']
@@ -361,7 +358,7 @@ class Pipeliner:
         items = ["f_drive", "f_studio", "f_project", "f_wip", "f_publish", "f_toClient", "projectPath", "path"]
         if old_pipe_data:
             for item in items:
-                if item in old_pipe_data.keys():
+                if item in old_pipe_data:
                     if old_pipe_data[item]:
                         self.pipe_data[item] = old_pipe_data[item]
                     else:
@@ -465,10 +462,9 @@ class Pipeliner:
         """ Check if the path exists and create it if it doesn't exists.
             Returns True if it worked well.
         """
-        if path_to_make:
-            if not os.path.exists(path_to_make):
-                os.makedirs(path_to_make)
-                return True
+        if path_to_make and not os.path.exists(path_to_make):
+            os.makedirs(path_to_make)
+            return True
 
 
     def create_pipeline_info_sub_folders(self):
@@ -496,9 +492,8 @@ class Pipeliner:
             file_path_names = cmds.fileDialog2(fileFilter='*.json', fileMode=0, dialogStyle=2) or None
             if file_path_names:
                 file_path = file_path_names[0]
-                if "." in file_path:
-                    if not file_path.endswith(".json"):
-                        file_path = file_path[:file_path.rfind(".")]+".json"
+                if "." in file_path and not file_path.endswith(".json"):
+                    file_path = file_path[:file_path.rfind(".")]+".json"
         if file_path:
             cmds.textFieldButtonGrp('pipeline_path_data_tfbg', edit=True, text=file_path)
             self.pipe_data['path'] = file_path[:file_path.rfind("/")]
@@ -555,22 +550,21 @@ class Pipeliner:
                 self.pipe_data['historyPath'] = self.pipe_data['scenePath']+"/"+self.pipe_data['s_hist']
                 self.make_dir_if_not_exists(self.pipe_data['historyPath'])
             # dropbox path
-            if self.pipe_data['b_cloud']:
-                if self.pipe_data['s_dropbox']:
-                    # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
-                    if os.name == "posix": #Linux or Mac
-                        dropbox_folder = "~/.dropbox"
-                    else: #Windows
-                        dropbox_folder = os.getenv('LOCALAPPDATA')+"/Dropbox"
-                    if os.path.exists(dropbox_folder):
-                        dropbox_info = dropbox_folder+"/info.json"
-                        if os.path.exists(dropbox_info):
-                            content = self.get_json_content(dropbox_info)
-                            if content:
-                                self.pipe_data['dropInfoPath'] = content[list(content)[0]]['path'].replace("\\", "/")
+            if self.pipe_data['b_cloud'] and self.pipe_data['s_dropbox']:
+                # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
+                if os.name == "posix": #Linux or Mac
+                    dropbox_folder = "~/.dropbox"
+                else: #Windows
+                    dropbox_folder = os.getenv('LOCALAPPDATA')+"/Dropbox"
+                if os.path.exists(dropbox_folder):
+                    dropbox_info = dropbox_folder+"/info.json"
+                    if os.path.exists(dropbox_info):
+                        content = self.get_json_content(dropbox_info)
+                        if content:
+                            self.pipe_data['dropInfoPath'] = content[next(iter(content))]['path'].replace("\\", "/")
 #                                self.pipe_data['dropInfoHost'] = content[list(content)[0]]['host']
-                                self.pipe_data['dropboxPath'] = self.pipe_data['dropInfoPath']+"/"+self.pipe_data['s_dropbox']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
-                                self.make_dir_if_not_exists(self.pipe_data['dropboxPath'])
+                            self.pipe_data['dropboxPath'] = self.pipe_data['dropInfoPath']+"/"+self.pipe_data['s_dropbox']+"/"+self.pipe_data['f_studio']+"/"+self.pipe_data['f_project']
+                            self.make_dir_if_not_exists(self.pipe_data['dropboxPath'])
             # old
             self.make_dir_if_not_exists(self.pipe_data['publishPath']+"/"+self.pipe_data['s_old'])
             # discord
@@ -682,9 +676,8 @@ class Pipeliner:
             for ext in [".ma", ".mb"]:
                 if asset_name.endswith(ext):
                     asset_name = asset_name[:-3]
-        if folder_name or asset_name:
-            if folder_name == asset_name:
-                return [True, asset_name]
+        if (folder_name or asset_name) and folder_name == asset_name:
+            return [True, asset_name]
         if asset_name:
             return [False, asset_name]
         elif folder_name:
@@ -707,9 +700,8 @@ class Pipeliner:
                 filenames = next(os.walk(file_path))[2]
                 if filenames:
                     for filename in filenames:
-                        if asset_name+self.pipe_data['s_middle'] in filename or asset_name.lower()+self.pipe_data['s_middle'] in filename or asset_name.upper()+self.pipe_data['s_middle'] in filename:
-                            if not filename in self.asset_names:
-                                self.asset_names.append(filename)
+                        if asset_name+self.pipe_data['s_middle'] in filename or asset_name.lower()+self.pipe_data['s_middle'] in filename or asset_name.upper()+self.pipe_data['s_middle'] in filename and not filename in self.asset_names:
+                            self.asset_names.append(filename)
                     if self.asset_names:
                         publish_version = self.define_file_version(self.asset_names)
             if self.pipe_data['b_capitalize']:
@@ -735,7 +727,7 @@ class Pipeliner:
         """
         if self.saveVersionFile:
             this_type = "mayaAscii"
-            if "extension" in self.pipe_data.keys() and self.pipe_data['extension'].endswith("mb"):
+            if "extension" in self.pipe_data and self.pipe_data['extension'].endswith("mb"):
                 this_type = "mayaBinary"
             cmds.file(rename=self.saveVersionFile)
             cmds.file(save=True, type=this_type, force=True)
@@ -769,10 +761,8 @@ class Pipeliner:
         """ Returns True if there's an asset context to work the rebuilding or False if not.
         """
         has_asset_context = False
-        if self.pipe_data:
-            if self.pipe_data['assetName']:
-                if not self.pipe_data['assetName'] == "None":
-                    has_asset_context = True
+        if self.pipe_data and self.pipe_data['assetName'] and self.pipe_data['assetName'] != "None":
+            has_asset_context = True
         return has_asset_context
     
 
@@ -781,7 +771,7 @@ class Pipeliner:
         """
         # get path to update open_folder button command
         path = self.pipe_data['projectPath']
-        if "wipPath" in self.pipe_data.keys():
+        if "wipPath" in self.pipe_data:
             path = self.pipe_data['wipPath']
         if self.pipe_data['assetName'] and self.pipe_data['assetPath']:
             path = self.pipe_data['assetPath']

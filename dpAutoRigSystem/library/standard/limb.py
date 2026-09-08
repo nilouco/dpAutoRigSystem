@@ -396,7 +396,7 @@ class Limb(standard.BaseStandard):
             if self.get_limb_type() == self.arm_name:
                 temp_extreme_children_grp = False
                 to_unparent_items = []
-                pint_guide_state_data = {}
+                pin_guide_state_data = {}
                 cmds.setAttr(self.guide_extreme_loc+".pinGuide", 0)
                 extreme_children = cmds.listRelatives(self.guide_extreme_loc, children=True, type="transform")
                 if extreme_children:
@@ -409,7 +409,7 @@ class Limb(standard.BaseStandard):
                         for extreme_child in extreme_children:
                             if "pinGuide" in cmds.listAttr(extreme_child):
                                 to_unparent_items.append(extreme_child)
-                                pint_guide_state_data[extreme_child] = cmds.getAttr(extreme_child+".pinGuide")
+                                pin_guide_state_data[extreme_child] = cmds.getAttr(extreme_child+".pinGuide")
                                 cmds.setAttr(extreme_child+".pinGuide", 0)
                                 cmds.parent(extreme_child, temp_extreme_children_grp)
                     temp_up_vector_wrist_grp = cmds.group(empty=True, name="tempUpVectorWrist_Null")
@@ -420,8 +420,8 @@ class Limb(standard.BaseStandard):
                     cmds.delete(temp_wrist_aic, temp_up_vector_wrist_grp)
                 if to_unparent_items:
                     cmds.parent(to_unparent_items, self.guide_extreme_loc)
-                for node in pint_guide_state_data:
-                    cmds.setAttr(node+".pinGuide", pint_guide_state_data[node])
+                for node, value in pin_guide_state_data.items():
+                    cmds.setAttr(node+".pinGuide", value)
                 if temp_extreme_children_grp:
                     cmds.delete(temp_extreme_children_grp)
 
@@ -542,6 +542,7 @@ class Limb(standard.BaseStandard):
         #
         #
         # TODO: cleanup the returned dictionary to remove this method
+        # TODO: remove quadruped unused variable?
         #
         quadruped = False
         enum_style = cmds.getAttr(self.guide_base+'.style')
@@ -890,23 +891,21 @@ class Limb(standard.BaseStandard):
                     cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateZ", -90)
 
                 # verify if user wants to apply the good mirror orientation:
-                if s == 1:
-                    if not style == 0: #default
-                        # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
-                        if self.mirror_axis != 'off':
-                            for axis in self.mirror_axis:
-                                if axis == "X":
-                                    if self.limb_types == self.arm_name:
-                                        cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateX", -90)
-                                        cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateY", 90)
-                                        if self.get_guide_attr('alignWorld'):
-                                            cmds.setAttr(ik_extreme_ctrl_orient_grp+".scaleX", -1)
-                                        else:
-                                            cmds.setAttr(ik_extreme_ctrl_orient_grp+".scaleZ", -1)
-                                    else: #leg
-                                        cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateX", 90)
-                                        cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateZ", -90)
-                                        cmds.setAttr(ik_extreme_ctrl_orient_grp+".scaleX", -1)
+                if s == 1 and style != 0 and self.mirror_axis != 'off': #default
+                    # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
+                    for axis in self.mirror_axis:
+                        if axis == "X":
+                            if self.limb_types == self.arm_name:
+                                cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateX", -90)
+                                cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateY", 90)
+                                if self.get_guide_attr('alignWorld'):
+                                    cmds.setAttr(ik_extreme_ctrl_orient_grp+".scaleX", -1)
+                                else:
+                                    cmds.setAttr(ik_extreme_ctrl_orient_grp+".scaleZ", -1)
+                            else: #leg
+                                cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateX", 90)
+                                cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotateZ", -90)
+                                cmds.setAttr(ik_extreme_ctrl_orient_grp+".scaleX", -1)
                 
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ik_stretch_extreme_loc_zero = self.ar.utils.create_zero_out([ik_stretch_extreme_loc])[0]
@@ -991,10 +990,9 @@ class Limb(standard.BaseStandard):
                     cmds.connectAttr(ik_extreme_ctrl+".alignWorld", align_world_rev+".inputX", force=True)
                     if s == 0:
                         original_rotation = self.get_original_rotation(ik_extreme_ctrl)
-                    elif style == 0: #default
-                        if self.limb_types == self.arm_name:
-                            # get right side to alignWorld. It'll be a little glitch, but it seems be accordilly with the mirror using arm default setting. Recommended use biped limb_style instead.
-                            original_rotation = self.get_original_rotation(ik_extreme_ctrl)
+                    elif style == 0 and self.limb_types == self.arm_name: #default
+                        # get right side to alignWorld. It'll be a little glitch, but it seems be accordilly with the mirror using arm default setting. Recommended use biped limb_style instead.
+                        original_rotation = self.get_original_rotation(ik_extreme_ctrl)
                     for a, axis in enumerate(self.ar.data.axes):
                         cmds.setAttr(ik_extreme_ctrl_orient_grp+".rotate"+axis, 0)
                         cmds.setAttr(ik_extreme_ctrl_zero+".rotate"+axis, 0)
@@ -1856,23 +1854,21 @@ class Limb(standard.BaseStandard):
                     self.ankle_correctives.append(None)
 
                 # add main sub controller
-                if self.articulation:
-                    if self.get_guide_attr('hasBend'):
-                        if bend_grps:
-                            main_jar = main_joints[0]
-                            main_jax = cmds.listRelatives(main_joints[0], parent=True, type="joint")[0]
-                            main_sub_ctrl = self.ar.ctrls.create_controller("id_095_LimbMainSub", ctrl_name=side+self.number_name+"_"+main_name+"_Sub_Ctrl", r=(self.radius * 0.9), d=self.curve_degree, guide_source=self.name_guide+"_Main", parent_tag=fk_ctrls[0])
-                            self.ar.ctrls.set_lock_hide([main_sub_ctrl], ["sx", "sy", "sz", "v"])
-                            self.ar.ctrls.set_sub_ctrl_display(fk_ctrls[0], main_sub_ctrl, 0)
-                            main_sub_ctrl_zero = self.ar.utils.create_zero_out([main_sub_ctrl])[0]
-                            cmds.delete(bend_grps['bottomPosPaC'][1])
-                            pac1 = cmds.parentConstraint(main_jax, main_sub_ctrl_zero, maintainOffset=False, name=main_sub_ctrl_zero+"_PaC")[0]
-                            pac2 = cmds.parentConstraint(main_sub_ctrl, main_jar, maintainOffset=True, name=main_jar+"_PaC")[0]
-                            pac3 = cmds.parentConstraint(main_jar, bend_grps['bottomPosPaC'][0], maintainOffset=True, name=bend_grps['bottomPosPaC'][0]+"_PaC")[0]
-                            cmds.setAttr(pac1+".interpType", 0) #noFlip
-                            cmds.setAttr(pac2+".interpType", 0) #noFlip
-                            cmds.setAttr(pac3+".interpType", 0) #noFlip
-                            cmds.parent(main_sub_ctrl_zero, self.ctrl_hook_grp)
+                if self.articulation and self.get_guide_attr('hasBend') and bend_grps:
+                    main_jar = main_joints[0]
+                    main_jax = cmds.listRelatives(main_joints[0], parent=True, type="joint")[0]
+                    main_sub_ctrl = self.ar.ctrls.create_controller("id_095_LimbMainSub", ctrl_name=side+self.number_name+"_"+main_name+"_Sub_Ctrl", r=(self.radius * 0.9), d=self.curve_degree, guide_source=self.name_guide+"_Main", parent_tag=fk_ctrls[0])
+                    self.ar.ctrls.set_lock_hide([main_sub_ctrl], ["sx", "sy", "sz", "v"])
+                    self.ar.ctrls.set_sub_ctrl_display(fk_ctrls[0], main_sub_ctrl, 0)
+                    main_sub_ctrl_zero = self.ar.utils.create_zero_out([main_sub_ctrl])[0]
+                    cmds.delete(bend_grps['bottomPosPaC'][1])
+                    pac1 = cmds.parentConstraint(main_jax, main_sub_ctrl_zero, maintainOffset=False, name=main_sub_ctrl_zero+"_PaC")[0]
+                    pac2 = cmds.parentConstraint(main_sub_ctrl, main_jar, maintainOffset=True, name=main_jar+"_PaC")[0]
+                    pac3 = cmds.parentConstraint(main_jar, bend_grps['bottomPosPaC'][0], maintainOffset=True, name=bend_grps['bottomPosPaC'][0]+"_PaC")[0]
+                    cmds.setAttr(pac1+".interpType", 0) #noFlip
+                    cmds.setAttr(pac2+".interpType", 0) #noFlip
+                    cmds.setAttr(pac3+".interpType", 0) #noFlip
+                    cmds.parent(main_sub_ctrl_zero, self.ctrl_hook_grp)
 
                 # softIk:
                 self.soft_ik_calibrate_items.append(self.soft_ik.create_soft_ik(side+self.number_name, ik_extreme_ctrl, ik_handle_main_items[0], ik_joints[1:4], skin_joints[1:4], dist_between_items[1], world_ref))

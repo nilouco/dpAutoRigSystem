@@ -23,9 +23,8 @@ class Updater:
     def load_update(self):
         if self.ar.data.ui_state and not self.ar.dev:
             if cmds.optionVar(exists=self.ar.data.check_update_option_var):
-                if cmds.optionVar(query=self.ar.data.check_update_option_var):
-                    if not cmds.optionVar(query=self.ar.data.check_update_last_option_var) == self.ar.config.today:
-                        self.check_for_update()
+                if cmds.optionVar(query=self.ar.data.check_update_option_var) and cmds.optionVar(query=self.ar.data.check_update_last_option_var) != self.ar.config.today:
+                    self.check_for_update()
             else:
                 self.ar.opt.set_option_var(self.ar.data.check_update_option_var, 1, False)
                 self.check_for_update()
@@ -54,9 +53,8 @@ class Updater:
             elif raw_results[0] == 3:
                 if self.ar.data.verbose:
                     self.ar.update_ui.create_ui(raw_results, 'i088_internetFail')
-            elif raw_results[0] == 4:
-                if self.ar.data.verbose:
-                    self.ar.update_ui.create_ui(raw_results, 'e008_failCheckUpdate')
+            elif raw_results[0] == 4 and self.ar.data.verbose:
+                self.ar.update_ui.create_ui(raw_results, 'e008_failCheckUpdate')
         else:
             if raw_results[0] == 1: #there's an update
                 return raw_results
@@ -235,11 +233,10 @@ class Updater:
         # check if some current json file is a custom file created by user to copy it to new update directory in order to avoid overwrite it:
         for root, directories, current_files in os.walk(folder):
             for item in current_files:
-                if item.endswith(f".{ext}"):
-                    if not item in updates:
-                        # found custom file, then copy it to keep it when install the new update
-                        self.create_folder(temp_folder)
-                        shutil.copy2(os.path.join(root, item), temp_folder)
+                if item.endswith(f".{ext}") and not item in updates:
+                    # found custom file, then copy it to keep it when install the new update
+                    self.create_folder(temp_folder)
+                    shutil.copy2(os.path.join(root, item), temp_folder)
 
 
     def create_folder(self, folder):

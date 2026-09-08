@@ -99,7 +99,7 @@ class AttributeIO(action.BaseAction):
                 data[item] = {"attributes" : {},
                                 "order" : attributes}
                 for attr in attributes:
-                    if not cmds.getAttr(item+"."+attr, type=True) == "message":
+                    if cmds.getAttr(item + "." + attr, type=True) != "message":
                         attr_type = cmds.getAttr(item+"."+attr, type=True)
                         data[item]["attributes"][attr] = {
                                             "type" : attr_type,
@@ -128,14 +128,14 @@ class AttributeIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(attr_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in attr_data.keys():
+        for item in attr_data:
             not_found_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
-                for attr in attr_data[item]["attributes"].keys():
+                for attr in attr_data[item]["attributes"]:
                     if not cmds.objExists(item+"."+attr):
                         try:
                             # add and set attribute value

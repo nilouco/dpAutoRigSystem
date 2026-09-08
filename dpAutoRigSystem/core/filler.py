@@ -87,10 +87,9 @@ class UIFiller:
                 item.first_bt = cmds.button(label=item.first_bt_label, width=45, command=partial(item.run_action, True), backgroundColor=(0.5, 0.5, 0.5), enable=item.first_bt_enable, parent=module_layout)
                 item.second_bt = cmds.button(label=item.second_bt_label.capitalize(), width=45, command=partial(item.run_action, False), backgroundColor=(0.5, 0.5, 0.5), enable=item.second_bt_enable, parent=module_layout)
                 # validators
-                if folder == "" or folder in self.validator_folders:
-                    if item.custom_name:
-                        cmds.checkBox(item.action_cb, edit=True, label=item.custom_name)
-                        item.title = item.custom_name
+                if folder == "" or folder in self.validator_folders and item.custom_name:
+                    cmds.checkBox(item.action_cb, edit=True, label=item.custom_name)
+                    item.title = item.custom_name
                 # rebuilders
                 if folder in self.rebuilder_folders:
                     item.delete_data_itb = cmds.iconTextButton(image=self.ar.data.icon['x_delete'], height=30, width=30, style='iconOnly', command=item.delete_data, enable=item.delete_data_bt_enable, annotation=self.ar.data.lang['r058_deleteDataAnn'], parent=module_layout)
@@ -182,21 +181,16 @@ class UIFiller:
             display_jis = cmds.checkBox('skin_jis_cb', query=True, value=True)
             for joint_node in all_joints:
                 if cmds.objExists(joint_node+'.'+self.ar.data.base_name+'joint'):
-                    if display_jnt:
-                        if joint_node.endswith("_Jnt"):
-                            joints.append(joint_node)
-                    if display_jar:
-                        if joint_node.endswith("_Jar"):
-                            joints.append(joint_node)
-                    if diaplay_jad:
-                        if joint_node.endswith("_Jad"):
-                            joints.append(joint_node)
-                    if display_jcr:
-                        if joint_node.endswith("_Jcr"):
-                            joints.append(joint_node)
-                    if display_jis:
-                        if joint_node.endswith("_Jis"):
-                            joints.append(joint_node)
+                    if display_jnt and joint_node.endswith("_Jnt"):
+                        joints.append(joint_node)
+                    if display_jar and joint_node.endswith("_Jar"):
+                        joints.append(joint_node)
+                    if diaplay_jad and joint_node.endswith("_Jad"):
+                        joints.append(joint_node)
+                    if display_jcr and joint_node.endswith("_Jcr"):
+                        joints.append(joint_node)
+                    if display_jis and joint_node.endswith("_Jis"):
+                        joints.append(joint_node)
         
         # sort joints by name filter:
         joint_name = cmds.textField('skin_joint_name_tf', query=True, text=True)
@@ -232,20 +226,18 @@ class UIFiller:
                 for mesh in all_geos:
                     if cmds.getAttr(mesh+".intermediateObject") == 0:
                         transforms = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
-                        if transforms:
-                            # do not add ribbon nurbs plane to the list:
-                            if not cmds.objExists(transforms[0]+"."+self.ar.skin.ignore_skinning_attr):
-                                if not transforms[0] in geos:
-                                    if choose_geo == "allGeoms":
+                        # do not add ribbon nurbs plane to the list:
+                        if transforms and not cmds.objExists(transforms[0]+"."+self.ar.skin.ignore_skinning_attr) and not transforms[0] in geos:
+                            if choose_geo == "allGeoms":
+                                geos.append(transforms[0])
+                                cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
+                            elif choose_geo == "selGeoms":
+                                cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
+                                if transforms[0] in selecteds or mesh in selecteds:
+                                    if display_long_name:
                                         geos.append(transforms[0])
-                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, value=True, enable=False)
-                                    elif choose_geo == "selGeoms":
-                                        cmds.checkBox('skin_geo_long_name_cb', edit=True, enable=True)
-                                        if transforms[0] in selecteds or mesh in selecteds:
-                                            if display_long_name:
-                                                geos.append(transforms[0])
-                                            else:
-                                                geos.append(transforms[0][transforms[0].rfind("|")+1:]) #short name
+                                    else:
+                                        geos.append(transforms[0][transforms[0].rfind("|")+1:]) #short name
 
         # check if we have same short name:
         if geos:
@@ -259,8 +251,7 @@ class UIFiller:
             geos.append(self.ar.data.lang['i074_attention'])
             geos.append(self.ar.data.lang['i075_moreOne'])
             geos.append(self.ar.data.lang['i076_sameName'])
-            for same_name in same_names:
-                geos.append(same_name)
+            geos.extend(same_names)
         
         # sort geometries by name filter:
         geo_name = cmds.textField('skin_geo_name_tf', query=True, text=True)
@@ -286,25 +277,23 @@ class UIFiller:
             It uses a recursive method to remove imported of imported guides.
         """
         imported_namespaces = []
-        current_custom_names = list(map(lambda guideModule : cmds.getAttr(guideModule.guide_base+".customName"), self.ar.utils.get_guides_to_rig()))
+        current_custom_names = [cmds.getAttr(guideModule.guide_base+".customName") for guideModule in self.ar.utils.get_guides_to_rig()]
         cmds.namespace(setNamespace=':')
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaces:
             for n, name in enumerate(namespaces):
-                if name != "UI" and name != "shared":
-                    if name.count(":") > 0:
-                        if name.find("_dpAR_") != -1:
-                            if ask_user and self.ar.data.ui_state:
-                                # open dialog to confirm merge namespaces:
-                                yes_text = self.ar.data.lang['i071_yes']
-                                no_text = self.ar.data.lang['i072_no']
-                                result = cmds.confirmDialog(title=self.ar.data.lang['i205_guide'], message=self.ar.data.lang['i206_removeNamespace'], 
-                                                            button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
-                                if result == yes_text:
-                                    ask_user = False
-                                else:
-                                    return
-                            imported_namespaces.append(name)
+                if name != "UI" and name != "shared" and name.count(":") > 0 and name.find("_dpAR_") != -1:
+                    if ask_user and self.ar.data.ui_state:
+                        # open dialog to confirm merge namespaces:
+                        yes_text = self.ar.data.lang['i071_yes']
+                        no_text = self.ar.data.lang['i072_no']
+                        result = cmds.confirmDialog(title=self.ar.data.lang['i205_guide'], message=self.ar.data.lang['i206_removeNamespace'], 
+                                                    button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
+                        if result == yes_text:
+                            ask_user = False
+                        else:
+                            return
+                    imported_namespaces.append(name)
             if imported_namespaces:
                 # review guide custom name before remove namespaces
                 for name in imported_namespaces:
@@ -320,8 +309,7 @@ class UIFiller:
                             current_custom_names.append(old_custom_name)
                 # remove namespaces
                 for name in imported_namespaces:
-                    if ":" in name:
-                        if cmds.namespace(exists=name):
+                    if ":" in name and cmds.namespace(exists=name):
                             namespace_string = name.split(":")[0]
                             cmds.namespace(removeNamespace=namespace_string, mergeNamespaceWithRoot=True)
                             print(f"{self.ar.data.lang['m206_mergeNamespace']}: {namespace_string}")
@@ -342,7 +330,7 @@ class UIFiller:
         """ Verify if there are guides with different version of the current dpAutoRig version.
         """
         for item in self.ar.utils.get_guides_to_rig():
-            if not self.ar.data.version == cmds.getAttr(item.guide_base+'.dpARVersion'):
+            if self.ar.data.version != cmds.getAttr(item.guide_base + '.dpARVersion'):
                 self.check_guide_nets()
                 self.ar.config.get_instance("UpdateGuides", [self.ar.data.tools_folder]).build_tool()
                 break

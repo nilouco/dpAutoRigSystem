@@ -36,9 +36,8 @@ class DataSet(action.BaseAction):
                 data_grp = inputs[0]
             else:
                 data_grp = self.ar.utils.get_node_by_message("data_grp")
-                if not data_grp:
-                    if cmds.objExists("Data_Grp"):
-                        data_grp = "Data_Grp"
+                if not data_grp and cmds.objExists("Data_Grp"):
+                    data_grp = "Data_Grp"
             if data_grp:
                 check_items = cmds.listRelatives(data_grp, children=True, allDescendents=True)
                 if check_items:

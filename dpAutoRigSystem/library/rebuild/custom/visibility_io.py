@@ -80,10 +80,8 @@ class VisibilityIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if cmds.objExists(item):
-                if "visibility" in cmds.listAttr(item):
-                    if not cmds.listConnections(item+".visibility", source=True, destination=False):
-                        data[item] = cmds.getAttr(item+".visibility")
+            if cmds.objExists(item) and "visibility" in cmds.listAttr(item) and not cmds.listConnections(item+".visibility", source=True, destination=False):
+                data[item] = cmds.getAttr(item+".visibility")
         return data
 
 
@@ -93,21 +91,20 @@ class VisibilityIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(vis_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in vis_data.keys():
+        for item in vis_data:
             not_found_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attribute
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
-                if not cmds.getAttr(item+".visibility", lock=True):
-                    if not item in self.ignores:
-                        try:
-                            cmds.setAttr(item+".visibility", vis_data[item])
-                            if not item in well_imported_items:
-                                well_imported_items.append(item)
-                        except Exception as e:
-                            self.fail_io(item+" - "+str(e))
+                if not cmds.getAttr(item+".visibility", lock=True) and not item in self.ignores:
+                    try:
+                        cmds.setAttr(item+".visibility", vis_data[item])
+                        if not item in well_imported_items:
+                            well_imported_items.append(item)
+                    except Exception as e:
+                        self.fail_io(item+" - "+str(e))
             else:
                 not_found_nodes.append(item)
         if well_imported_items:

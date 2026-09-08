@@ -81,7 +81,7 @@ class UpdateGuides(base.BaseLibrary):
     
 
     def get_new_guide_instance(self, new_name):
-        new_guide_names = list(map(lambda module_instance : module_instance.guide_base, self.new_guides_instances))
+        new_guide_names = [module_instance.guide_base for module_instance in self.new_guides_instances]
         current_guide_instance_index = new_guide_names.index(new_name)
         return self.new_guides_instances[current_guide_instance_index]
     
@@ -315,7 +315,7 @@ class UpdateGuides(base.BaseLibrary):
 
     def retrieve_new_parent(self, current_parent):
         current_parent_base = current_parent.split(':')[0]+":Guide_Base"
-        if current_parent_base in self.update_data.keys():
+        if current_parent_base in self.update_data:
             new_parent_base = self.update_data[current_parent_base]['new_guide']
             new_parent_final = new_parent_base.split(':')[0]+':'+current_parent.split(':')[1]
             return new_parent_final
@@ -371,9 +371,9 @@ class UpdateGuides(base.BaseLibrary):
     def filter_children_from_another_base(self, children, base_guide):
         filtered_items = []
         filter_string = base_guide.split(':')[0]
-        for children in children:
-            if filter_string in children:
-                filtered_items.append(children)
+        for child in children:
+            if filter_string in child:
+                filtered_items.append(child)
         return filtered_items
     
 
@@ -385,8 +385,8 @@ class UpdateGuides(base.BaseLibrary):
             new_guide_children = self.filter_children_from_another_base(new_guide_children, self.update_data[guide]['new_guide'])
             old_guide_children = self.update_data[guide]['children'].keys()
             old_guide_children = self.filter_children_from_another_base(old_guide_children, guide)
-            new_guide_children_only = list(map(lambda name : name.split(':')[1], new_guide_children))
-            old_guide_children_only = list(map(lambda name : name.split(':')[1], old_guide_children))
+            new_guide_children_only = [name.split(':')[1] for name in new_guide_children]
+            old_guide_children_only = [name.split(':')[1] for name in old_guide_children]
             for i, new_child in enumerate(new_guide_children):
                 if new_guide_children_only[i] in old_guide_children_only:
                     name_guide = self.update_data[guide]['children'][guide.split(':')[0]+':'+new_guide_children_only[i]]
@@ -443,10 +443,9 @@ class UpdateGuides(base.BaseLibrary):
             if reverse_foot_e_items:
                 for rf_e in reverse_foot_e_items:
                     guide_version = cmds.getAttr(rf_e+".version")
-                    if int(guide_version.split(".")[0]) == 4:
-                        if float(guide_version.split(".")[1]+"."+guide_version.split(".")[2]) < 4.25:
-                            need_patch = True
-                            break
+                    if int(guide_version.split(".")[0]) == 4 and float(guide_version.split(".")[1]+"."+guide_version.split(".")[2]) < 4.25:
+                        need_patch = True
+                        break
             if need_patch:
                 for f in reverse_foot_f_items:
                     e = f.replace(reverse_foot_f, reverse_foot_e)

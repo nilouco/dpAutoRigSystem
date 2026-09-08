@@ -105,8 +105,7 @@ class Namespace(action.BaseAction):
         cmds.namespace(setNamespace=':')
         namespaces = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         for name in namespaces:
-            if name != "UI" and name != "shared":
-                if name.find("_dpAR_") == -1:
-                    cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
-                    self.remove_namespace()
-                    break
+            if name != "UI" and name != "shared" and name.find("_dpAR_") == -1:
+                cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
+                self.remove_namespace()
+                break

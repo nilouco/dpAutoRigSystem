@@ -130,7 +130,7 @@ class FkLine(standard.BaseStandard):
                 # jointLocPos = createLocatorInPosition(joint_loc)
                 father = cmds.listRelatives(joint_loc, parent=True)[0]
                 # Check if the father is not the guideBase
-                if not father == self.guide_base:
+                if father != self.guide_base:
                     self.aim_to_target(father, joint_loc, up_vector)
                 # If the father is the guideBase, align the jointLoc1 to the guideBase
                 if father == self.guide_base:
@@ -200,11 +200,10 @@ class FkLine(standard.BaseStandard):
                     # hide visibility attribute:
                     cmds.setAttr(ctrl+'.visibility', keyable=False)
                     # fixing flip mirror:
-                    if s == 1:
-                        if cmds.getAttr(self.guide_base+".flip") == 1:
-                            cmds.setAttr(ctrl_zero+".scaleX", -1)
-                            cmds.setAttr(ctrl_zero+".scaleY", -1)
-                            cmds.setAttr(ctrl_zero+".scaleZ", -1)
+                    if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                        cmds.setAttr(ctrl_zero+".scaleX", -1)
+                        cmds.setAttr(ctrl_zero+".scaleY", -1)
+                        cmds.setAttr(ctrl_zero+".scaleZ", -1)
                     cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=False)
                     cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
@@ -226,10 +225,9 @@ class FkLine(standard.BaseStandard):
                     cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
                     cmds.scaleConstraint(ctrl, jnt, maintainOffset=True, name=jnt+"_ScC")
                     # add articulationJoint:
-                    if n > 0:
-                        if self.articulation:
-                            articulation_joints = self.ar.utils.create_articulation_joint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                    if n > 0 and self.articulation:
+                        articulation_joints = self.ar.utils.create_articulation_joint(father_joint, jnt) #could call to create corrective joints. See parameters to implement it, please.
+                        self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(jnt)
                     # end chain:
                     if n == self.n_joints-1:

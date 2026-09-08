@@ -139,7 +139,7 @@ class MainUI:
         collection_name = f"{name}_rbc"
         cmds.menuItem(menu_name, label=name.capitalize().replace("_", " "), parent=parent_menu, subMenu=True)
         cmds.radioMenuItemCollection(collection_name)
-        for item in data.keys():
+        for item in data:
             if name == 'curve_degree': 
                 cmds.menuItem(f"{item}_mi", label=item.capitalize().replace("_", " "), radioButton=False, collection=collection_name, command=partial(self.ar.opt.change_degree, item), parent=menu_name)
             elif name == 'validator_preset':

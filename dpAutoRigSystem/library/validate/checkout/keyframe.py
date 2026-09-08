@@ -49,39 +49,38 @@ class Keyframe(action.BaseAction):
                         self.ar.ui_manager.set_progress(max=len(animated_items), add_one=False, add_number=False)
                         for item in animated_items:
                             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-                            if item in check_items:
-                                if cmds.objExists(item):
-                                    connected_anim_curves = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
-                                    if connected_anim_curves:
-                                        found_key = False
-                                        for crv in connected_anim_curves:
-                                            # conditional to check here
-                                            if len(cmds.listConnections(crv, source=True)) >= 2:
-                                                pass #drivenKey
-                                            else: #normal key
-                                                found_key = True
-                                                break
-                                        if found_key:
-                                            self.checked_items.append(item)
-                                            self.found_issues.append(True)
-                                            if self.first_mode:
-                                                self.good_results.append(False)
-                                            else: #fix
-                                                reported = False
-                                                for crv in connected_anim_curves:
-                                                    if len(cmds.listConnections(crv, source=True)) < 2:
-                                                        try:
-                                                            # delete animation curve (keyframe)
-                                                            cmds.delete(crv)
-                                                            if not reported:
-                                                                self.good_results.append(True)
-                                                                self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
-                                                                reported = True
-                                                        except:
-                                                            if not reported:
-                                                                self.good_results.append(False)
-                                                                self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
-                                                                reported = True
+                            if item in check_items and cmds.objExists(item):
+                                connected_anim_curves = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend
+                                if connected_anim_curves:
+                                    found_key = False
+                                    for crv in connected_anim_curves:
+                                        # conditional to check here
+                                        if len(cmds.listConnections(crv, source=True)) >= 2:
+                                            pass #drivenKey
+                                        else: #normal key
+                                            found_key = True
+                                            break
+                                    if found_key:
+                                        self.checked_items.append(item)
+                                        self.found_issues.append(True)
+                                        if self.first_mode:
+                                            self.good_results.append(False)
+                                        else: #fix
+                                            reported = False
+                                            for crv in connected_anim_curves:
+                                                if len(cmds.listConnections(crv, source=True)) < 2:
+                                                    try:
+                                                        # delete animation curve (keyframe)
+                                                        cmds.delete(crv)
+                                                        if not reported:
+                                                            self.good_results.append(True)
+                                                            self.messages.append(self.ar.data.lang['v004_fixed']+": "+item)
+                                                            reported = True
+                                                    except:
+                                                        if not reported:
+                                                            self.good_results.append(False)
+                                                            self.messages.append(self.ar.data.lang['v005_cantFix']+": "+item)
+                                                            reported = True
             else:
                 self.not_found_node()
         else:

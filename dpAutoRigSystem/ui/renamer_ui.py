@@ -52,16 +52,12 @@ class RenamerUI:
 
 
     def edit_sequence_fields(self, value):
-        """
-        """
         cmds.textFieldGrp('renamer_sequence_tfg', edit=True, enable=value)
         cmds.intFieldGrp('renamer_start_ifg', edit=True, enable=value)
         cmds.intFieldGrp('renamer_padding_ifg', edit=True, enable=value)   
 
 
     def edit_search_replace_fields(self, value):
-        """
-        """
         cmds.textFieldGrp('renamer_search_tfg', edit=True, enable=value)
         cmds.textFieldGrp('renamer_replace_tfg', edit=True, enable=value)
 

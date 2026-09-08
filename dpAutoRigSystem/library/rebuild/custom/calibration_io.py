@@ -93,14 +93,14 @@ class CalibrationIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(calibration_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in calibration_data.keys():
+        for item in calibration_data:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             not_found_nodes = []
             # check transformations
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
             if cmds.objExists(item):
-                for attr in calibration_data[item].keys():
+                for attr in calibration_data[item]:
                     if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                         # unlock attribute
                         was_locked = cmds.getAttr(item+"."+attr, lock=True)

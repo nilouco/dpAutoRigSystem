@@ -88,7 +88,7 @@ class InputOrderIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(order_data.keys()), add_one=False, add_number=False)
         well_imported = True
         to_import_items, not_found_meshs, = [], []
-        for item in order_data.keys():
+        for item in order_data:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 to_import_items.append(item)
@@ -101,9 +101,8 @@ class InputOrderIO(action.BaseAction):
                 try:
                     # reorder deformers
                     deformers = order_data[item]
-                    if deformers:
-                        if len(deformers) > 1:
-                            self.ar.skin.set_order_items(item, deformers)
+                    if deformers and len(deformers) > 1:
+                        self.ar.skin.set_order_items(item, deformers)
                 except Exception as e:
                     well_imported = False
                     print(e)

@@ -88,9 +88,8 @@ class ConnectionIO(action.BaseAction):
                     attributes.extend(user_defined_attributes)
                 connected_attributes = []
                 for attr in attributes:
-                    if cmds.objExists(item+"."+attr):
-                        if cmds.listConnections(item+"."+attr):
-                            connected_attributes.append(attr)
+                    if cmds.objExists(item+"."+attr) and cmds.listConnections(item+"."+attr):
+                        connected_attributes.append(attr)
                 if connected_attributes:
                     data[item] = {}
                     for attr in connected_attributes:
@@ -113,7 +112,7 @@ class ConnectionIO(action.BaseAction):
                         else:
                             connections = self.get_connection_infos(info[:info.find(".")]+".output", source_connection, destination_connection) or [None]
                             results.append({info : connections})
-                        results[-1][list(results[-1].keys())[0]].append(cmds.getAttr(info[:info.find(".")]+".conversionFactor"))
+                        results[-1][next(iter(results[-1].keys()))].append(cmds.getAttr(info[:info.find(".")]+".conversionFactor"))
                     else:
                         results.append(info)
         return results
@@ -124,7 +123,7 @@ class ConnectionIO(action.BaseAction):
         """
         data = {}
         node_type = cmds.objectType(item)
-        if node_type in attr_data.keys():
+        if node_type in attr_data:
             connected_attributes = []
             for attr in attr_data[node_type]:
                 if cmds.listConnections(item+"."+attr):
@@ -155,8 +154,7 @@ class ConnectionIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(items), add_one=False, add_number=False)
         for item in items:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
-            if cmds.objExists(item):
-                if not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item):
+            if cmds.objExists(item) and (not cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True) or not self.ar.utils.validate_id(item)):
                     for attr_data, multi in zip([self.ar.utils.type_attr_data, self.ar.utils.type_out_attr_data, self.ar.utils.type_multi_attr_data, self.ar.utils.type_out_multi_attr_data], [False, False, True, True]):
                         attr_connection_data = self.get_attr_connections(item, attr_data, multi)
                         if attr_connection_data:
@@ -184,24 +182,24 @@ class ConnectionIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(connection_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in connection_data.keys():
+        for item in connection_data:
             not_found_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             if cmds.objExists(item):
                 # check connections
-                for attr in connection_data[item].keys():
+                for attr in connection_data[item]:
                     #if attr in cmds.listAttr(item): #can't have this conditional because multiIndices doesn't exists before connect them
                     for i, io in enumerate(["in", "out"]): #input and output
                         if connection_data[item][attr][io]: #there's connection
                             for io_info in connection_data[item][attr][io]:
                                 if isinstance(io_info, dict): #is dictionary, so there's an unitConversion node
-                                    plug = list(io_info.keys())[0]
+                                    plug = next(iter(io_info.keys()))
                                     if not cmds.objExists(plug):
                                         uc = cmds.createNode("unitConversion", name=plug.split(".")[0])
                                         cmds.setAttr(uc+".conversionFactor", io_info[plug][1])
                                     else:
                                         uc = plug.split(".")[0]
-                                    if not io_info[plug][0] == None:
+                                    if io_info[plug][0] != None:
                                         if i == 0: #in
                                             if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not uc+".output" in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
                                                 is_locked = cmds.getAttr(item+"."+attr, lock=True)

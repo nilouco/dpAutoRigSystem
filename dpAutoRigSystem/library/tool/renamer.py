@@ -60,9 +60,8 @@ class Renamer(base.BaseLibrary):
                     if self.add_sequence:
                         preview_data[item] = self.sequence_name+str(self.start+i).zfill(self.padding)
                     # replace
-                    if self.search_replace:
-                        if not self.search_name == "":
-                            preview_data[item] = preview_data[item].replace(self.search_name, self.replace_name)
+                    if self.search_replace and self.search_name != "":
+                        preview_data[item] = preview_data[item].replace(self.search_name, self.replace_name)
                     if self.add_prefix:
                         preview_data[item] = self.prefix_name+preview_data[item]
                     if self.add_suffix:
@@ -77,18 +76,17 @@ class Renamer(base.BaseLibrary):
         """
         # list current selection
         self.originals = cmds.ls(selection=True)
-        if self.originals:
-            # check if need to add hierarchy children
-            if self.sel_option == 2: #Hierarchy
-                for item in self.originals:
-                    try:
-                        children = cmds.listRelatives(item, allDescendents=True)
-                        if children:
-                            for child in children:
-                                if not child in self.originals:
-                                    self.originals.append(child)
-                    except: #more than one object with the same name
-                        mel.eval("warning \""+self.ar.data.lang['i075_moreOne']+' '+self.ar.data.lang['i076_sameName']+"\";")
+        # check if need to add hierarchy children
+        if self.originals and self.sel_option == 2: #Hierarchy
+            for item in self.originals:
+                try:
+                    children = cmds.listRelatives(item, allDescendents=True)
+                    if children:
+                        for child in children:
+                            if not child in self.originals:
+                                self.originals.append(child)
+                except: #more than one object with the same name
+                    mel.eval("warning \""+self.ar.data.lang['i075_moreOne']+' '+self.ar.data.lang['i076_sameName']+"\";")
         return self.originals
 
 

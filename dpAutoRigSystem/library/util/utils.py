@@ -73,9 +73,8 @@ class Utils:
         if user_def_attrs:
             for user_def_attr in user_def_attrs:
                 del_it = True
-                if keep_origined_from:
-                    if "originedFrom" in user_def_attr or "guide_source" in user_def_attr:
-                        del_it = False
+                if keep_origined_from and ("originedFrom" in user_def_attr or "guide_source" in user_def_attr):
+                    del_it = False
                 if del_it:
                     try:
                         cmds.setAttr(node+"."+user_def_attr, lock=False)
@@ -169,13 +168,12 @@ class Utils:
     def add_hook(self, item="", hook_type="staticHook", add_not_transform_io=True):
         """ Add attribute as boolean and set it as True = 1.
         """
-        if item != "":
-            if cmds.objExists(item):
-                if not hook_type in cmds.listAttr(item):
-                    cmds.addAttr(item, longName=hook_type, attributeType='bool')
-                    cmds.setAttr(item+"."+hook_type, 1)
-                if add_not_transform_io:
-                    self.add_attr_to_items([item], self.ignore_transform_io_attr)
+        if item != "" and cmds.objExists(item):
+            if not hook_type in cmds.listAttr(item):
+                cmds.addAttr(item, longName=hook_type, attributeType='bool')
+                cmds.setAttr(item+"."+hook_type, 1)
+            if add_not_transform_io:
+                self.add_attr_to_items([item], self.ignore_transform_io_attr)
 
 
     def get_hook(self):
@@ -200,9 +198,8 @@ class Utils:
                 children = cmds.listRelatives(item, allDescendents=True, type='transform')
                 if children:
                     for child in children:
-                        if cmds.objExists(child+".guideBase"):
-                            if cmds.getAttr(child+".guideBase") == 1:
-                                guide_children.append(child)                
+                        if cmds.objExists(child+".guideBase") and cmds.getAttr(child+".guideBase") == 1:
+                            guide_children.append(child)                
                 # get father:
                 guide_parents = []
                 father_nodes = []
@@ -237,11 +234,9 @@ class Utils:
                             guide_parent_children = cmds.listRelatives(guide_parent, children=True, type='transform')
                             if guide_parent_children:
                                 for guide_parent_child in guide_parent_children:
-                                    if cmds.objExists(guide_parent_child+'.nJoint'):
-                                        if cmds.getAttr(guide_parent_child+'.nJoint') == 1:
-                                            if guide_parent[:guide_parent.rfind(":")] in guide_parent_child:
-                                                father_nodes = [guide_parent_child]
-                                                father_guide_loc = guide_parent_child[guide_parent_child.find("Guide_")+6:]
+                                    if cmds.objExists(guide_parent_child+'.nJoint') and cmds.getAttr(guide_parent_child+'.nJoint') == 1 and guide_parent[:guide_parent.rfind(":")] in guide_parent_child:
+                                        father_nodes = [guide_parent_child]
+                                        father_guide_loc = guide_parent_child[guide_parent_child.find("Guide_")+6:]
                     
                     # parent_node info:
                     parent_node = cmds.listRelatives(item, parent=True, type='transform')[0]
@@ -407,43 +402,42 @@ class Utils:
             Returns the created joint list.
         """
         joints = []
-        if father and brother:
-            if cmds.objExists(father) and cmds.objExists(brother):
-                jax_name = brother[:brother.rfind("_")]+"_Jax"
-                jar_name = brother[:brother.rfind("_")]+"_Jar"
-                cmds.select(clear=True)
-                jax = cmds.joint(name=jax_name, radius=0.5*jar_radius)
-                jar = cmds.joint(name=jar_name, radius=jar_radius)
-                cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
-                cmds.matchTransform(jax, brother, position=True, rotation=True)
-                cmds.parent(jax, father)
-                cmds.makeIdentity(jax, apply=True)
-                cmds.setAttr(jax+".segmentScaleCompensate", 0)
-                cmds.setAttr(jar+".segmentScaleCompensate", 1)
-                joints.append(jar)
-                for i in range(jcr_number):
-                    cmds.select(jar)
-                    jcr = cmds.joint(name=brother[:brother.rfind("_")+1]+str(i)+"_Jcr")
-                    cmds.setAttr(jcr+".segmentScaleCompensate", 0)
-                    cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
-                    if jcr_pos:
-                        cmds.setAttr(jcr+".translateX", jcr_pos[i][0]*dist)
-                        cmds.setAttr(jcr+".translateY", jcr_pos[i][1]*dist)
-                        cmds.setAttr(jcr+".translateZ", jcr_pos[i][2]*dist)
-                    if jcr_rot:
-                        cmds.setAttr(jcr+".rotateX", jcr_rot[i][0])
-                        cmds.setAttr(jcr+".rotateY", jcr_rot[i][1])
-                        cmds.setAttr(jcr+".rotateZ", jcr_rot[i][2])
-                    joints.append(jcr)
-                cmds.pointConstraint(brother, jax, maintainOffset=True, name=jar_name+"_PoC")[0]
-                if orient_ctrl:
-                    orc = cmds.orientConstraint(father, orient_ctrl, jax, maintainOffset=True, name=jar_name+"_OrC")[0]
-                else:
-                    orc = cmds.orientConstraint(father, brother, jax, maintainOffset=True, name=jar_name+"_OrC")[0]
-                cmds.setAttr(orc+".interpType", 2) #shortest
-                if do_scale:
-                    cmds.scaleConstraint(father, brother, jax, maintainOffset=True, name=jar_name+"_ScC")
-                return joints
+        if father and brother and cmds.objExists(father) and cmds.objExists(brother):
+            jax_name = brother[:brother.rfind("_")]+"_Jax"
+            jar_name = brother[:brother.rfind("_")]+"_Jar"
+            cmds.select(clear=True)
+            jax = cmds.joint(name=jax_name, radius=0.5*jar_radius)
+            jar = cmds.joint(name=jar_name, radius=jar_radius)
+            cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
+            cmds.matchTransform(jax, brother, position=True, rotation=True)
+            cmds.parent(jax, father)
+            cmds.makeIdentity(jax, apply=True)
+            cmds.setAttr(jax+".segmentScaleCompensate", 0)
+            cmds.setAttr(jar+".segmentScaleCompensate", 1)
+            joints.append(jar)
+            for i in range(jcr_number):
+                cmds.select(jar)
+                jcr = cmds.joint(name=brother[:brother.rfind("_")+1]+str(i)+"_Jcr")
+                cmds.setAttr(jcr+".segmentScaleCompensate", 0)
+                cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+                if jcr_pos:
+                    cmds.setAttr(jcr+".translateX", jcr_pos[i][0]*dist)
+                    cmds.setAttr(jcr+".translateY", jcr_pos[i][1]*dist)
+                    cmds.setAttr(jcr+".translateZ", jcr_pos[i][2]*dist)
+                if jcr_rot:
+                    cmds.setAttr(jcr+".rotateX", jcr_rot[i][0])
+                    cmds.setAttr(jcr+".rotateY", jcr_rot[i][1])
+                    cmds.setAttr(jcr+".rotateZ", jcr_rot[i][2])
+                joints.append(jcr)
+            cmds.pointConstraint(brother, jax, maintainOffset=True, name=jar_name+"_PoC")[0]
+            if orient_ctrl:
+                orc = cmds.orientConstraint(father, orient_ctrl, jax, maintainOffset=True, name=jar_name+"_OrC")[0]
+            else:
+                orc = cmds.orientConstraint(father, brother, jax, maintainOffset=True, name=jar_name+"_OrC")[0]
+            cmds.setAttr(orc+".interpType", 2) #shortest
+            if do_scale:
+                cmds.scaleConstraint(father, brother, jax, maintainOffset=True, name=jar_name+"_ScC")
+            return joints
 
 
     def get_all_grp(self, master_attr=None):
@@ -454,9 +448,8 @@ class Utils:
         transform_nodes = [n for n in cmds.ls(selection=False, type="transform") if master_attr in cmds.listAttr(n)]
         if transform_nodes:
             for item in transform_nodes:
-                if not cmds.referenceQuery(item, isNodeReferenced=True):
-                    if self.validate_master_grp(item):
-                        return item
+                if not cmds.referenceQuery(item, isNodeReferenced=True) and self.validate_master_grp(item):
+                    return item
 
 
     def validate_master_grp(self, item):
@@ -465,10 +458,9 @@ class Utils:
         master_grp_attrs = ["supportGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
         old_attrs = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
         for m, master_attr in enumerate(master_grp_attrs):
-            if not master_attr in cmds.listAttr(item):
-                if not old_attrs[m] or not old_attrs[m] in cmds.listAttr(item):
-                    cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
-                    return False
+            if not master_attr in cmds.listAttr(item) and (not old_attrs[m] or not old_attrs[m] in cmds.listAttr(item)):
+                cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
+                return False
         return cmds.getAttr(item+"."+self.ar.data.master_attr)
     
 
@@ -480,8 +472,7 @@ class Utils:
         result = False
         if not node:
             node = self.get_all_grp()
-        if node:
-            if cmds.objExists(node+"."+attr_name):
+        if node and attr_name in cmds.listAttr(node):
                 found_items = cmds.listConnections(node+"."+attr_name, source=True, destination=False)
                 if found_items:
                     result = found_items[0]
@@ -528,15 +519,14 @@ class Utils:
         chainlength = 0
         if joints:
             while ( i < len(joints) - 1 ):
-                if cmds.objExists(joints[i]):
-                    if cmds.objExists(joints[i+1]):
-                        a = cmds.xform(joints[i], query=True, pivots=True, worldSpace=True)
-                        b = cmds.xform(joints[i+1], query=True, pivots=True, worldSpace=True)
-                        x = b[0] - a[0]
-                        y = b[1] - a[1]
-                        z = b[2] - a[2]
-                        v = [x,y,z]
-                        chainlength += self.ar.math.magnitude(v)
+                if cmds.objExists(joints[i]) and cmds.objExists(joints[i+1]):
+                    a = cmds.xform(joints[i], query=True, pivots=True, worldSpace=True)
+                    b = cmds.xform(joints[i+1], query=True, pivots=True, worldSpace=True)
+                    x = b[0] - a[0]
+                    y = b[1] - a[1]
+                    z = b[2] - a[2]
+                    v = [x,y,z]
+                    chainlength += self.ar.math.magnitude(v)
                 i += 1
         return chainlength
 
@@ -578,9 +568,7 @@ class Utils:
         """
         scene_path = cmds.file(query=True, sceneName=True)
         modified_scene = cmds.file(query=True, modified=True)
-        if not scene_path or modified_scene:
-            return False
-        return True
+        return not (not scene_path or modified_scene)
 
 
     def clear_joint_label(self, joints):
@@ -635,11 +623,8 @@ class Utils:
         all_nets = cmds.ls(selection=False, type="network")
         if all_nets:
             for item in all_nets:
-                if cmds.objExists(item+".dpNetwork"):
-                    if cmds.getAttr(item+".dpNetwork") == 1:
-                        if cmds.objExists(item+"."+net_attr):
-                            if cmds.getAttr(item+"."+net_attr) == 1:
-                                nets.append(item)
+                if "dpNetwork" in cmds.listAttr(item) and cmds.getAttr(item+".dpNetwork") == 1 and net_attr in cmds.listAttr(item) and cmds.getAttr(item+"."+net_attr) == 1:
+                    nets.append(item)
         return nets
 
 
@@ -658,18 +643,14 @@ class Utils:
                     for camera_name in cameras:
                         if item.endswith(camera_name):
                             to_remove_items.append(item)
-                if filter_constraint:
-                    if item_type in constraints:
-                        to_remove_items.append(item)
-                if filter_follicle:
-                    if cmds.listRelatives(item, children=True, type="follicle"):
-                        to_remove_items.append(item)
-                if filter_joint:
-                    if cmds.listRelatives(item, children=True, type="joint") or item_type == "joint":
-                        to_remove_items.append(item)
-                if filter_locator:
-                    if cmds.listRelatives(item, children=True, type="locator"):
-                        to_remove_items.append(item)
+                if filter_constraint and item_type in constraints:
+                    to_remove_items.append(item)
+                if filter_follicle and cmds.listRelatives(item, children=True, type="follicle"):
+                    to_remove_items.append(item)
+                if filter_joint and cmds.listRelatives(item, children=True, type="joint") or item_type == "joint":
+                    to_remove_items.append(item)
+                if filter_locator and cmds.listRelatives(item, children=True, type="locator"):
+                    to_remove_items.append(item)
                 if filter_handle:
                     if cmds.listRelatives(item, children=True, type="ikHandle") or item_type == "ikHandle":
                         to_remove_items.append(item)
@@ -679,15 +660,12 @@ class Utils:
                     for def_name in ["deformBend", "deformTwist", "deformSquash", "deformFlare", "deformSine", "deformWave"]:
                         if cmds.listRelatives(item, children=True, type=def_name) or item_type == def_name:
                             to_remove_items.append(item)
-                if filter_effector:
-                    if cmds.listRelatives(item, children=True, type="ikEffector") or item_type == "ikEffector":
-                        to_remove_items.append(item)
-                if filter_basenode:
-                    if item in self.maya_base_nodes:
-                        to_remove_items.append(item)
-                if filter_basename:
-                    if self.get_suffix_numbers(item)[1].endswith("Base"):
-                        to_remove_items.append(item)
+                if filter_effector and cmds.listRelatives(item, children=True, type="ikEffector") or item_type == "ikEffector":
+                    to_remove_items.append(item)
+                if filter_basenode and item in self.maya_base_nodes:
+                    to_remove_items.append(item)
+                if filter_basename and self.get_suffix_numbers(item)[1].endswith("Base"):
+                    to_remove_items.append(item)
                 if filter_lattice:
                     for def_name in ["lattice", "baseLattice"]:
                         if cmds.listRelatives(item, children=True, type=def_name) or item_type == def_name:
@@ -719,23 +697,21 @@ class Utils:
         """
         if cmds.objExists(item):
             for deformer_node in defs:
-                if cmds.objExists(deformer_node):
-                    if not cmds.objectType(deformer_node) == "tweak":
-                        cmds.deformer(deformer_node, edit=True, geometry=item)
+                if cmds.objExists(deformer_node) and cmds.objectType(deformer_node) != "tweak":
+                    cmds.deformer(deformer_node, edit=True, geometry=item)
 
 
     def get_transform_data(self, item, t=True, r=True, s=True, user_world_space=True):
         """ Return the queried transformation data for the given node.
         """
         result_data = {}
-        if item:
-            if cmds.objExists(item):
-                if t:
-                    result_data["translation"] = cmds.xform(item, query=True, translation=t, worldSpace=user_world_space)
-                if r:
-                    result_data["rotation"] = cmds.xform(item, query=True, rotation=r, worldSpace=user_world_space)
-                if s:
-                    result_data["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=user_world_space)
+        if item and cmds.objExists(item):
+            if t:
+                result_data["translation"] = cmds.xform(item, query=True, translation=t, worldSpace=user_world_space)
+            if r:
+                result_data["rotation"] = cmds.xform(item, query=True, rotation=r, worldSpace=user_world_space)
+            if s:
+                result_data["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=user_world_space)
         return result_data
 
 
@@ -799,7 +775,7 @@ class Utils:
         if not suffixes:
             suffixes = ["_JointLoc1", "_Head", "Neck0", "Main", "_cvTopLoc1", "_Foot", "_CenterLoc", "_JointLocA", "_JointLocB"]
         for end_name in suffixes:
-            if item.replace("_Base", end_name) in source_data.keys():
+            if item.replace("_Base", end_name) in source_data:
                 return item.replace("_Base", end_name)
 
 

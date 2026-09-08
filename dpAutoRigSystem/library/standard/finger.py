@@ -48,7 +48,7 @@ class Finger(standard.BaseStandard):
         self.line = cmds.joint(name=self.name_guide+"_JGuide2", radius=0.001)
         self.line_end = cmds.joint(name=self.name_guide+"_JGuideEnd", radius=0.001)
         # setup
-        self.ar.utils.set_template([self.line0, self.line, self.line, self.line_end])
+        self.ar.utils.set_template([self.line0, self.line1, self.line, self.line_end])
         cmds.setAttr(self.guide_base_joint_loc+".translateZ", -1)
         cmds.setAttr(self.guide_base_joint_loc+".rotateZ", lock=True)
         cmds.setAttr(self.guide_loc+".translateZ", 1)
@@ -64,7 +64,7 @@ class Finger(standard.BaseStandard):
         cmds.transformLimits(self.guide_end_loc, tz=(0.01, 1), etz=(True, False))
         cmds.parentConstraint(self.guide_base_joint_loc, self.line0, maintainOffset=False, name=self.line0+"_PaC")
         self.ar.ctrls.direct_connect(self.guide_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        self.ar.ctrls.direct_connect(self.guide_joint_1_loc, self.line, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ar.ctrls.direct_connect(self.guide_joint_1_loc, self.line1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ar.ctrls.direct_connect(self.guide_end_loc, self.line_end, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ar.ctrls.set_lock_hide([self.guide_end_loc], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
@@ -129,12 +129,11 @@ class Finger(standard.BaseStandard):
             for s, side in enumerate(self.sides):
                 skin_joints, self.controllers = [], []
                 self.base = side+self.number_name+'_Guide_Base'
-                if self.articulation:
-                    if self.corrective:
-                        # corrective controls group
-                        self.corrective_ctrls_grp = cmds.group(name=side+self.number_name+"_Corrective_Grp", empty=True)
-                        self.corrective_ctrl_grps.append(self.corrective_ctrls_grp)
-                        phalange_calibrate_presets, inverts = self.get_calibrate_presets(s)
+                if self.articulation and self.corrective:
+                    # corrective controls group
+                    self.corrective_ctrls_grp = cmds.group(name=side+self.number_name+"_Corrective_Grp", empty=True)
+                    self.corrective_ctrl_grps.append(self.corrective_ctrls_grp)
+                    phalange_calibrate_presets, inverts = self.get_calibrate_presets(s)
                 # get the number of joints to be created:
                 self.n_joints = cmds.getAttr(self.base+".nJoints")
                 for n in range(self.n_joints+1):
@@ -247,21 +246,20 @@ class Finger(standard.BaseStandard):
                     cmds.matchTransform(self.jnt, finger_ctrl, position=True, rotation=True)
                     
                     # add articulationJoint:
-                    if n > 0:
-                        if self.articulation:
-                            if self.corrective:
-                                corrective_nets = [None]
-                                corrective_nets.append(self.setup_corrective_net(side+self.number_name+"_01_Ctrl", skin_joints[n-1], skin_joints[n], side+self.number_name+"_"+str(n)+"_PitchDown", 1, 1, -90))
-                                articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt, 1, [(0.3*self.radius, 0, 0)])
-                                self.setup_corrective_controllers(articulation_joints, s, self.number_name+"_"+str(n), corrective_nets, phalange_calibrate_presets, inverts)
-                                if s == 1:
-                                    cmds.setAttr(articulation_joints[0]+".scaleX", -1)
-                                    cmds.setAttr(articulation_joints[0]+".scaleY", -1)
-                                    cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
-                            else:
-                                articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt)
-                                cmds.connectAttr(scale_compensate_cnd+".outColorR", articulation_joints[0]+".segmentScaleCompensate", force=True)
-                            self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
+                    if n > 0 and self.articulation:
+                        if self.corrective:
+                            corrective_nets = [None]
+                            corrective_nets.append(self.setup_corrective_net(side+self.number_name+"_01_Ctrl", skin_joints[n-1], skin_joints[n], side+self.number_name+"_"+str(n)+"_PitchDown", 1, 1, -90))
+                            articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt, 1, [(0.3*self.radius, 0, 0)])
+                            self.setup_corrective_controllers(articulation_joints, s, self.number_name+"_"+str(n), corrective_nets, phalange_calibrate_presets, inverts)
+                            if s == 1:
+                                cmds.setAttr(articulation_joints[0]+".scaleX", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleY", -1)
+                                cmds.setAttr(articulation_joints[0]+".scaleZ", -1)
+                        else:
+                            articulation_joints = self.ar.utils.create_articulation_joint(father_joint, self.jnt)
+                            cmds.connectAttr(scale_compensate_cnd+".outColorR", articulation_joints[0]+".segmentScaleCompensate", force=True)
+                        self.ar.naming.set_joint_label(articulation_joints[0], s+self.joint_label_add, 18, self.number_name+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     
                     if n == self.n_joints:
@@ -296,7 +294,7 @@ class Finger(standard.BaseStandard):
                 
                 # ik setup
                 for child in cmds.listRelatives(dup_ik, children=True, allDescendents=True, fullPath=True) or []:
-                    if not cmds.objectType(child) == "joint":
+                    if cmds.objectType(child) != "joint":
                         cmds.delete(child)
                     if child.endswith("_Jax"):
                         cmds.delete(child)
@@ -316,7 +314,7 @@ class Finger(standard.BaseStandard):
 
                 # Fk setup
                 for child in cmds.listRelatives(dup_fk, children=True, allDescendents=True, fullPath=True) or []:
-                    if not cmds.objectType(child) == "joint":
+                    if cmds.objectType(child) != "joint":
                         cmds.delete(child)
                     if child.endswith("_Jax"):
                         cmds.delete(child)
@@ -422,14 +420,12 @@ class Finger(standard.BaseStandard):
                         cmds.connectAttr(scale_bc+".output.outputG", skin_joint+".scaleY", force=True)
                         cmds.connectAttr(scale_bc+".output.outputB", skin_joint+".scaleZ", force=True)
                         cmds.setAttr(ik_joint+".segmentScaleCompensate", 1)
-                        if "01_Ik_Jxt" in ik_joint:
-                            if not self.n_joints == 2: # to avoid thumb cycle error when parenting All_Grp transform node
-                                cmds.pointConstraint(finger_ctrl, ik_joint, maintainOffset=True, name=ik_joint+"_PoC")
-                        if self.n_joints > 2:
-                            if i > 0:
-                                # fix ik scale
-                                cmds.connectAttr(skin_joints[0]+".scaleX", ik_joint+".scaleX", force=True)
-                                cmds.connectAttr(skin_joints[0]+".scaleY", ik_joint+".scaleY", force=True)
+                        if "01_Ik_Jxt" in ik_joint and self.n_joints != 2: # to avoid thumb cycle error when parenting All_Grp transform node
+                            cmds.pointConstraint(finger_ctrl, ik_joint, maintainOffset=True, name=ik_joint+"_PoC")
+                        if self.n_joints > 2 and i > 0:
+                            # fix ik scale
+                            cmds.connectAttr(skin_joints[0]+".scaleX", ik_joint+".scaleX", force=True)
+                            cmds.connectAttr(skin_joints[0]+".scaleY", ik_joint+".scaleY", force=True)
                 # create a masterModuleGrp to be checked if this rig exists:
                 ctrl_hooks = [side+self.number_name+"_00_SDK_Zero_0_Grp", side+self.number_name+"_01_SDK_Zero_0_Grp"]
                 if self.n_joints >= 2:

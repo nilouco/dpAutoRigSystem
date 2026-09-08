@@ -41,10 +41,9 @@ class Weights:
             It's useful to reorder the deformers and place the new skinCluster to the correct position of deformation.
         """
         for d, dest_item in enumerate(def_items[1]):
-            if not cmds.objExists(dest_item):
-                if dest_item in def_items[2]: #it's an old deformer node
-                    if d > 0:
-                        return d
+            #it's an old deformer node
+            if not cmds.objExists(dest_item) and dest_item in def_items[2] and d > 0:
+                return d
         return 0
 
 
@@ -96,10 +95,12 @@ class Weights:
         return matrix_data
 
 
-    def get_deformed_items(self, deformer_types=["skinCluster"], ignore_attr="None"):
+    def get_deformed_items(self, deformer_types=None, ignore_attr="None"):
         """ Returns a list of deformed item transforms of meshes and nurbsCurves.
             Use given lists and attribute to filter the results.
         """
+        if deformer_types is None:
+            deformer_types = ["skinCluster"]
         deformerd_items, done_items = [], []
         items = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh") or []
         items.extend(cmds.ls(selection=False, noIntermediate=True, long=True, type="nurbsCurve") or [])
@@ -120,9 +121,8 @@ class Weights:
                             else:
                                 print(self.ar.data.lang['i299_notUniqueName'], child)
                             for desired_type in deformer_types:
-                                if self.check_existing_deformer_node(child, deformer_type=desired_type)[0]:
-                                    if not child in deformerd_items:
-                                        deformerd_items.append(child)
+                                if self.check_existing_deformer_node(child, deformer_type=desired_type)[0] and not child in deformerd_items:
+                                    deformerd_items.append(child)
         return deformerd_items
 
 
@@ -206,7 +206,7 @@ class Weights:
         """
         if not deformers:
             deformers = []
-            for deformer_type in self.def_attr_data.keys():
+            for deformer_type in self.def_attr_data:
                 def_items = cmds.ls(selection=False, type=deformer_type)
                 if def_items:
                     deformers.extend(def_items)
@@ -218,7 +218,7 @@ class Weights:
                     if orig_geos:
                         has_tag = False
                         for index in orig_geos:
-                            if not cmds.getAttr(deformer_node+".input["+str(index)+"].componentTagExpression") == "*":
+                            if cmds.getAttr(deformer_node + ".input[" + str(index) + "].componentTagExpression") != "*":
                                 has_tag = True
                                 break
                         if has_tag:
@@ -263,12 +263,11 @@ class Weights:
                             falloff_data[node]["attributes"][attr] = cmds.getAttr(node+"."+attr)
                 # specific multiIndices attributes
                 for multi_attr in multi_attr_data:
-                    if cmds.objExists(node+"."+multi_attr):
-                        if cmds.getAttr(node+"."+multi_attr, multiIndices=True):
-                            for i, index in enumerate(cmds.getAttr(node+"."+multi_attr, multiIndices=True)):
-                                for name in multi_attr_data[multi_attr]:
-                                    attr_name = multi_attr+"["+str(index)+"]."+name
-                                    falloff_data[node]["attributes"][attr_name] = cmds.getAttr(node+"."+attr_name)
+                    if cmds.objExists(node+"."+multi_attr) and cmds.getAttr(node+"."+multi_attr, multiIndices=True):
+                        for _i, index in enumerate(cmds.getAttr(node+"."+multi_attr, multiIndices=True)):
+                            for name in multi_attr_data[multi_attr]:
+                                attr_name = multi_attr+"["+str(index)+"]."+name
+                                falloff_data[node]["attributes"][attr_name] = cmds.getAttr(node+"."+attr_name)
         return falloff_data
     
 
@@ -298,16 +297,15 @@ class Weights:
         well_imported = True
         to_import_items, self.not_work_well_infos = [], []
         current_tagged_data = self.get_component_tag_info(nodes)
-        for tagged_node in tagged_data.keys():
+        for tagged_node in tagged_data:
             # check mesh existing
             if cmds.objExists(tagged_node):
-                for tag in tagged_data[tagged_node].keys():
+                for tag in tagged_data[tagged_node]:
                     if not current_tagged_data:
                         to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
-                    elif tagged_node in current_tagged_data.keys():
-                        if not tag in current_tagged_data[tagged_node]:
-                            if not [tagged_node, tag, tagged_data[tagged_node][tag]["node"]] in to_import_items:
-                                to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
+                    elif tagged_node in current_tagged_data:
+                        if not tag in current_tagged_data[tagged_node] and not [tagged_node, tag, tagged_data[tagged_node][tag]["node"]] in to_import_items:
+                            to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
                     else:
                         if not [tagged_node, tag, tagged_data[tagged_node][tag]["node"]] in to_import_items:
                             to_import_items.append([tagged_node, tag, tagged_data[tagged_node][tag]["node"]])
@@ -329,11 +327,11 @@ class Weights:
         """
         well_imported = True
         self.not_work_well_infos = []
-        for inf_node in inf_data.keys():
+        for inf_node in inf_data:
             # check deformer node existing
             if cmds.objExists(inf_node):
-                for inf_index in inf_data[inf_node]["expression"].keys():
-                    if not inf_data[inf_node]["expression"][inf_index] == "":
+                for inf_index in inf_data[inf_node]["expression"]:
+                    if inf_data[inf_node]["expression"][inf_index] != "":
                         try:
                             cmds.setAttr(inf_node+".input["+str(inf_index)+"].componentTagExpression", inf_data[inf_node]["expression"][inf_index], type="string")
                         except Exception as e:
@@ -350,7 +348,7 @@ class Weights:
         """
         well_imported = True
         self.not_work_well_infos = []
-        for falloff_node in falloff_data.keys():
+        for falloff_node in falloff_data:
             # check falloff node existing
             if not cmds.objExists(falloff_node):
                 falloff_node = cmds.createNode(falloff_data[falloff_node]["type"], name=falloff_data[falloff_node]["name"])
@@ -368,7 +366,7 @@ class Weights:
                                 self.not_work_well_infos.append(falloff_node+".outputWeightFunction -> "+plug)
                                 well_imported = False
                 # set falloff attributes
-                for attr in falloff_data[falloff_node]["attributes"].keys():
+                for attr in falloff_data[falloff_node]["attributes"]:
                     try:
                         cmds.setAttr(falloff_node+"."+attr, falloff_data[falloff_node]["attributes"][attr])
                     except:
@@ -383,7 +381,7 @@ class Weights:
     def set_deformer_weights(self, deformer_node, weights_data, idx=0):
         """ Set the deformer weights to the given node for the indexed shape.
         """
-        for vtx in weights_data.keys():
+        for vtx in weights_data:
             cmds.setAttr(deformer_node+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weights_data[vtx])
 
 
@@ -411,8 +409,6 @@ class Weights:
 
 
     def get_lattice_info(self, connected_node, deformer_node):
-        """
-        """
         return {
                 "pointList" : self.get_lattice_points(connected_node),
                 "baseLatticeMatrix" : cmds.listConnections(deformer_node+".baseLatticeMatrix", destination=False, source=True)[0]
@@ -460,9 +456,8 @@ class Weights:
         input_deformers = cmds.listHistory(node, pruneDagObjects=True, interestLevel=True)
         if input_deformers:
             for item in input_deformers:
-                if cmds.objectType(item) in deformers:
-                    if not item in results:
-                      results.append(item)
+                if cmds.objectType(item) in deformers and not item in results:
+                    results.append(item)
         return results
 
 
@@ -470,7 +465,7 @@ class Weights:
         """ Set the deformer order in the given node using the deformers argument.
         """
         current_order_items = self.get_order_items(node)
-        if not current_order_items == desired_items:
+        if current_order_items != desired_items:
             # pair up the deformer list properly
             ordered_deformer_pairs = self.get_pairs_from_list(desired_items)
             for pair in ordered_deformer_pairs:
@@ -522,14 +517,14 @@ class Weights:
         current_index = index
         if deformer_node and shape_to_index_data:
             shape_name = None
-            for node in shape_to_index_data.keys():
+            for node in shape_to_index_data:
                 if shape_to_index_data[node] == index:
                     shape_name = node
                     break
             if shape_name:
                 current_shape_to_index_data = self.get_shape_to_index_data(deformer_node)[2]
                 if current_shape_to_index_data:
-                    for item in current_shape_to_index_data.keys():
+                    for item in current_shape_to_index_data:
                         if item == shape_name:
                             current_index = current_shape_to_index_data[item]
         return current_index

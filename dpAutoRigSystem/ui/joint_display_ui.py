@@ -74,7 +74,7 @@ class JointDisplayUI:
         """ Figure out which board column is selected.
         """
         for b, board in enumerate(self.boards):
-            if not b == board_index:
+            if b != board_index:
                 cmds.textScrollList(self.boards[b], edit=True, deselectAll=True)
         
 

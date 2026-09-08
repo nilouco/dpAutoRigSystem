@@ -157,9 +157,8 @@ class Eye(standard.BaseStandard):
                     cmds.setAttr(self.guide_end_loc_zero+".rotateX", -90)
                 else:
                     cmds.setAttr(self.guide_end_loc_zero+".rotateX", 90)
-            if value[1] == "Z":
-                if value[0] == "-":
-                    cmds.setAttr(self.guide_end_loc_zero+".rotateY", 180)
+            if value[1] == "Z" and value[0] == "-":
+                cmds.setAttr(self.guide_end_loc_zero+".rotateY", 180)
     
     
     def create_eyelids_joints(self, side, lid, middle, guide_eyelid_loc, joint_label_number):
@@ -408,15 +407,15 @@ class Eye(standard.BaseStandard):
         # fixing flip mirror:
         if s == 1:
             if cmds.getAttr(self.guide_base+".flip") == 1:
-                if not "X" == cmds.getAttr(self.guide_base+".aimDirectionName"):
+                if "X" != cmds.getAttr(self.guide_base + ".aimDirectionName"):
                     cmds.setAttr(ctrl_zero[0]+".scaleX", -1)
                 else:
                     cmds.setAttr(ctrl_zero[0]+".scaleX", 1)
-                if not "Y" == cmds.getAttr(self.guide_base+".aimDirectionName"):
+                if "Y" != cmds.getAttr(self.guide_base + ".aimDirectionName"):
                     cmds.setAttr(ctrl_zero[0]+".scaleY", -1)
                 else:
                     cmds.setAttr(ctrl_zero[0]+".scaleY", 1)
-                if not "Z" == cmds.getAttr(self.guide_base+".aimDirectionName"):
+                if "Z" != cmds.getAttr(self.guide_base + ".aimDirectionName"):
                     cmds.setAttr(ctrl_zero[0]+".scaleZ", -1)
                 else:
                     cmds.setAttr(ctrl_zero[0]+".scaleZ", 1)
@@ -464,7 +463,7 @@ class Eye(standard.BaseStandard):
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.ar.naming.set_joint_label(self.jnt, s+self.joint_label_add, 18, self.number_name+"_1")
                 if s == 1:
-                    left_eye_fk_ctrl_data = self.ar.utils.get_transform_data(fk_eye_ctrl)
+                    left_eye_fk_ctrl_data = self.ar.utils.get_transform_data(fk_eye_ctrl) #it'll be defined when s=0 for the first left loop
                 self.base_eye_ctrl = self.ar.ctrls.create_controller("id_009_EyeBase", ctrl_name=side+self.number_name+"_Base_Ctrl", r=self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1")
                 fk_eye_ctrl = self.ar.ctrls.create_controller("id_014_EyeFk", side+self.number_name+"_Fk_Ctrl", r=self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1", parent_tag=self.base_eye_ctrl)
                 self.fk_eye_sub_ctrl = self.ar.ctrls.create_controller("id_070_EyeFkSub", side+self.number_name+"_Fk_Sub_Ctrl", r=(0.75*self.radius), d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_JointLoc1", parent_tag=fk_eye_ctrl)
@@ -482,11 +481,10 @@ class Eye(standard.BaseStandard):
                 eye_zeros.append(self.ar.utils.create_zero_out([fk_eye_ctrl], offset=True))
                 eye_zero_offset_grp = cmds.listRelatives(eye_zeros[1], children=True)[0]
                 # fixing flip mirror:
-                if s == 1:
-                    if cmds.getAttr(self.guide_base+".flip") == 1:
-                        cmds.setAttr(eye_zeros[0]+".scaleX", -1)
-                        cmds.setAttr(eye_zeros[0]+".scaleY", -1)
-                        cmds.setAttr(eye_zeros[0]+".scaleZ", -1)                        
+                if s == 1 and  cmds.getAttr(self.guide_base+".flip") == 1:
+                    cmds.setAttr(eye_zeros[0]+".scaleX", -1)
+                    cmds.setAttr(eye_zeros[0]+".scaleY", -1)
+                    cmds.setAttr(eye_zeros[0]+".scaleZ", -1)                        
                 cmds.parent(eye_zeros[1], self.base_eye_ctrl)
                 # calibrate offset rotate:
                 for offset_axis in self.ar.data.axes:
@@ -584,8 +582,8 @@ class Eye(standard.BaseStandard):
                     eye_spec_scale_ctrl = self.ar.ctrls.create_controller("id_091_EyeSpecScale", ctrl_name=side+self.number_name+"_SpecScale_Ctrl", r=0.2*self.radius, d=self.curve_degree, head_def=self.head_def_value, guide_source=self.name_guide+"_SpecularLoc", parent_tag=eye_spec_ctrl)
                     cmds.matchTransform(eye_spec_scale_ctrl, self.guide_specular_loc, position=True, rotation=True)
                     if s == 1:
-                        no_wsl_eye_spec_scale_zero_grp_data = self.ar.utils.get_transform_data(eye_spec_scale_zero_grp, use_world_space=False)
-                        left_eye_spec_scale_zero_grp_data = self.ar.utils.get_transform_data(eye_spec_scale_zero_grp)
+                        no_wsl_eye_spec_scale_zero_grp_data = self.ar.utils.get_transform_data(eye_spec_scale_zero_grp, use_world_space=False) #it'll be defined when s=0 for the first left loop
+                        left_eye_spec_scale_zero_grp_data = self.ar.utils.get_transform_data(eye_spec_scale_zero_grp) #it'll be defined when s=0 for the first left loop
                         rigth_eye_fk_ctrl_data = self.ar.utils.get_transform_data(fk_eye_ctrl)
                     eye_spec_scale_zero_grp = self.ar.utils.create_zero_out([eye_spec_scale_ctrl])[0]
                     cmds.parent(eye_spec_scale_zero_grp, eye_spec_ctrl)

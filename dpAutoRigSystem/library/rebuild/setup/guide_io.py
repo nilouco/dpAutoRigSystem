@@ -177,84 +177,78 @@ class GuideIO(action.BaseAction):
                             ]
         for item in list(self.net_data["GuideData"]):
             new_item = self.get_new_name(item)
-            if cmds.objExists(new_item):
-                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
-                    for base_attr in list(self.net_data["GuideData"][item]):
-                        if base_attr == "customName":
-                            custom_name = self.net_data["GuideData"][item]["customName"]
-                            if custom_name:
-                                if not rebuilding: #template
-                                    custom_name = self.ar.naming.get_translated_names(custom_name)
-                                self.instance.set_guide_custom_name(custom_name)
-                        elif base_attr == "mirrorAxis":
-                            cmds.setAttr(new_item+".mirrorAxis", self.net_data["GuideData"][item]["mirrorAxis"], type="string")
-                            start = self.ar.naming.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][0])
-                            end = self.ar.naming.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][-1])
-                            cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
-                            self.instance.create_mirror_preview()
-                        elif base_attr == "nJoints":
-                            self.instance.change_joint_number(self.net_data["GuideData"][item]["nJoints"])
-                        elif base_attr == "type": #limb
-                            self.instance.change_type(self.net_data["GuideData"][item]["type"])
-                        elif base_attr == "hasBend": #limb
-                            self.instance.change_bend(self.net_data["GuideData"][item]["hasBend"])
-                        elif base_attr == "aimDirection": #eye
-                            self.instance.change_aim_direction(self.ar.data.directions[(int(self.net_data["GuideData"][item]["aimDirection"]))])
-                        elif base_attr == "fatherB": #suspention
-                            father_b_data = self.net_data["GuideData"][item]["fatherB"]
-                            if father_b_data:
-                                cmds.setAttr(item+".fatherB", father_b_data, type="string")
-                        elif base_attr == "geo": #wheel
-                            geo_info = self.net_data["GuideData"][item]["geo"]
-                            if geo_info:
-                                cmds.setAttr(new_item+".geo", geo_info, type="string")
-                        #TODO: modernize rigType to rigStyle new code
-                        elif base_attr == "rigType": #all
-                            rigTypeData = self.net_data["GuideData"][item]["rigType"]
-                            if rigTypeData:
-                                cmds.setAttr(new_item+".rigType", rigTypeData, type="string")
-                                self.instance.rigType = rigTypeData
-                        elif base_attr == "style":  #to be compatible with old versions of style value 4 (quadruped extra control)
-                            cmds.setAttr(new_item+"."+base_attr, min(self.net_data["GuideData"][item][base_attr], 2))
-                        else: #just set simple attributes
-                            if base_attr in custom_attributes:
-                                cmds.setAttr(new_item+"."+base_attr, self.net_data["GuideData"][item][base_attr])
-                        cmds.refresh()
+            if cmds.objExists(new_item) and "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
+                for base_attr in list(self.net_data["GuideData"][item]):
+                    if base_attr == "customName":
+                        custom_name = self.net_data["GuideData"][item]["customName"]
+                        if custom_name:
+                            if not rebuilding: #template
+                                custom_name = self.ar.naming.get_translated_names(custom_name)
+                            self.instance.set_guide_custom_name(custom_name)
+                    elif base_attr == "mirrorAxis":
+                        cmds.setAttr(new_item+".mirrorAxis", self.net_data["GuideData"][item]["mirrorAxis"], type="string")
+                        start = self.ar.naming.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][0])
+                        end = self.ar.naming.get_translated_names(self.net_data["GuideData"][item]["mirrorName"][-1])
+                        cmds.setAttr(new_item+".mirrorName", f"{start} --> {end}", type="string")
+                        self.instance.create_mirror_preview()
+                    elif base_attr == "nJoints":
+                        self.instance.change_joint_number(self.net_data["GuideData"][item]["nJoints"])
+                    elif base_attr == "type": #limb
+                        self.instance.change_type(self.net_data["GuideData"][item]["type"])
+                    elif base_attr == "hasBend": #limb
+                        self.instance.change_bend(self.net_data["GuideData"][item]["hasBend"])
+                    elif base_attr == "aimDirection": #eye
+                        self.instance.change_aim_direction(self.ar.data.directions[(int(self.net_data["GuideData"][item]["aimDirection"]))])
+                    elif base_attr == "fatherB": #suspention
+                        father_b_data = self.net_data["GuideData"][item]["fatherB"]
+                        if father_b_data:
+                            cmds.setAttr(item+".fatherB", father_b_data, type="string")
+                    elif base_attr == "geo": #wheel
+                        geo_info = self.net_data["GuideData"][item]["geo"]
+                        if geo_info:
+                            cmds.setAttr(new_item+".geo", geo_info, type="string")
+                    #TODO: modernize rigType to rigStyle new code
+                    elif base_attr == "rigType": #all
+                        rigTypeData = self.net_data["GuideData"][item]["rigType"]
+                        if rigTypeData:
+                            cmds.setAttr(new_item+".rigType", rigTypeData, type="string")
+                            self.instance.rigType = rigTypeData
+                    elif base_attr == "style":  #to be compatible with old versions of style value 4 (quadruped extra control)
+                        cmds.setAttr(new_item+"."+base_attr, min(self.net_data["GuideData"][item][base_attr], 2))
+                    else: #just set simple attributes
+                        if base_attr in custom_attributes:
+                            cmds.setAttr(new_item+"."+base_attr, self.net_data["GuideData"][item][base_attr])
+                    cmds.refresh()
 
 
     def setup_guide_transformations(self):
         """ Work with guide transformations to put the transform as imported data.
         """
         for item in list(self.net_data["GuideData"]):
-            if item in self.net_data["GuideData"].keys():
+            if item in self.net_data["GuideData"]:
                 new_item = self.get_new_name(item)
-                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
-                    if cmds.listRelatives(new_item, parent=True):
-                        cmds.parent(new_item, world=True)
+                if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1 and cmds.listRelatives(new_item, parent=True): #main
+                    cmds.parent(new_item, world=True)
                 for attr in list(self.net_data["GuideData"][item]):
-                    if attr in self.ar.data.transform_attrs:
-                        if not cmds.getAttr(new_item+"."+attr, lock=True): #unlocked attribute
-                            if not cmds.listConnections(new_item+"."+attr, destination=False, source=True): #without input connection
-                                cmds.setAttr(new_item+"."+attr, self.net_data["GuideData"][item][attr])
+                    if attr in self.ar.data.transform_attrs and not cmds.getAttr(new_item+"."+attr, lock=True) and not cmds.listConnections(new_item+"."+attr, destination=False, source=True): #unlocked attribute / without input connection
+                        cmds.setAttr(new_item+"."+attr, self.net_data["GuideData"][item][attr])
                     cmds.refresh()
 
 
     def setup_guide_base_parenting(self, guide_data):
         """ Rebuild the Guide_Base parenting.
         """
-        for net in guide_data.keys():
+        for net in guide_data:
             net_data = guide_data[net]
-            if "GuideData" in net_data.keys():
+            if "GuideData" in net_data:
                 for item in list(net_data["GuideData"]):
                     new_item = self.get_new_name(item)
-                    if cmds.objExists(new_item):
-                        if "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
-                            father_node_data = net_data["GuideData"][item]['FatherNode']
-                            if father_node_data:
-                                new_father = self.get_new_name(father_node_data)
-                                if cmds.objExists(new_father):
-                                    if not cmds.listRelatives(new_item, parent=True) or not cmds.listRelatives(new_item, parent=True)[0] == new_father:
-                                        cmds.parent(new_item, new_father)
+                    if cmds.objExists(new_item) and "guideBase" in cmds.listAttr(new_item) and cmds.getAttr(new_item+".guideBase") == 1: #main
+                        father_node_data = net_data["GuideData"][item]['FatherNode']
+                        if father_node_data:
+                            new_father = self.get_new_name(father_node_data)
+                            if cmds.objExists(new_father) and (not cmds.listRelatives(new_item, parent=True) or cmds.listRelatives(new_item, parent=True)[0] != new_father):
+                                cmds.parent(new_item, new_father)
 
 
     def parse_repeated_nets(self, guide_data):
@@ -282,8 +276,8 @@ class GuideIO(action.BaseAction):
         if self.ar.data.ui_state:
             self.ar.data.collapse_edit_sel_mod = True
             self.ar.filler.fill_created_guides()
-        for net in guide_data.keys():
-            if "moduleType" in guide_data[net].keys():
+        for net in guide_data:
+            if "moduleType" in guide_data[net]:
                 if guide_data[net]["moduleType"] == self.head_deformer.headDeformerName:
                     well_imported = self.import_head_deformer(guide_data[net])
             else:
@@ -296,25 +290,23 @@ class GuideIO(action.BaseAction):
                            cmds.delete(net)
                 else: #problably template
                     net_data = self.get_nets_info()
-                    for module_type in net_data.keys():
-                        if to_initialize_guide:
-                            if module_type == guide_data[net]["ModuleType"]:
-                                net_custom_name = guide_data[net]["GuideData"][f"{module_type}__dpAR_{guide_data[net]['GuideNumber']}:Guide_Base"]["customName"]
-                                if not net_custom_name is None:
-                                    for item in net_data[module_type].keys():
-                                        if net_data[module_type][item] == net_custom_name:
-                                            if ask_again:
-                                                # open dialog to confirm repeated net name:
-                                                yes_text = self.ar.data.lang['i071_yes']
-                                                no_text = self.ar.data.lang['i072_no']
-                                                result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
-                                                                            button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
-                                                if result == yes_text: #skip them
-                                                    to_initialize_guide = False
-                                                    break
-                                                else:
-                                                    ask_again = False
-                                                    break
+                    for module_type in net_data:
+                        if to_initialize_guide and module_type == guide_data[net]["ModuleType"]:
+                            net_custom_name = guide_data[net]["GuideData"][f"{module_type}__dpAR_{guide_data[net]['GuideNumber']}:Guide_Base"]["customName"]
+                            if not net_custom_name is None:
+                                for item in net_data[module_type]:
+                                    if net_data[module_type][item] == net_custom_name and ask_again:
+                                        # open dialog to confirm repeated net name:
+                                        yes_text = self.ar.data.lang['i071_yes']
+                                        no_text = self.ar.data.lang['i072_no']
+                                        result = cmds.confirmDialog(title=self.name, message=f"{self.ar.data.lang['i364_repeatedNetName']}\n{net_custom_name}", 
+                                                                    button=[yes_text, no_text], defaultButton=yes_text, cancelButton=no_text, dismissString=no_text)
+                                        if result == yes_text: #skip them
+                                            to_initialize_guide = False
+                                            break
+                                        else:
+                                            ask_again = False
+                                            break
                 if to_initialize_guide:
                     try:
                         self.net_data = guide_data[net]
@@ -344,7 +336,7 @@ class GuideIO(action.BaseAction):
     def get_new_name(self, name):
         if not cmds.objExists(name):
             base = name.split(":")[0]
-            if base in self.correlations.keys():
+            if base in self.correlations:
                 return name.replace(base, self.correlations[base])
         return name
 
@@ -353,7 +345,7 @@ class GuideIO(action.BaseAction):
         net_data = {}
         nets = self.ar.utils.get_network_by_attr("dpGuideNet")
         if nets:
-            module_types = list(set([cmds.getAttr(f"{n}.moduleType") for n in nets]))
+            module_types = list({cmds.getAttr(f"{n}.moduleType") for n in nets})
             for module_type in module_types:
                 net_data[module_type] = {}
                 for net in nets:

@@ -264,11 +264,11 @@ class Spine(standard.BaseStandard):
                 cmds.parent(self.chest_a_ctrl, self.hips_a_ctrl)
                 
                 # create_zero_out transformations:
-                hips_a_ctrl_zero, chest_a_zero, chest_b_grp, hips_fk_ctrl_zero, chest_fk_ctrl_zero = self.ar.utils.create_zero_out([self.hips_a_ctrl, self.chest_a_ctrl, self.chest_b_ctrl, self.hips_fk_ctrl, self.chest_fk_ctrl])
+                hips_a_ctrl_zero, _chest_a_zero, chest_b_grp, hips_fk_ctrl_zero, chest_fk_ctrl_zero = self.ar.utils.create_zero_out([self.hips_a_ctrl, self.chest_a_ctrl, self.chest_b_ctrl, self.hips_fk_ctrl, self.chest_fk_ctrl])
                 chest_b_grp = cmds.rename(chest_b_grp, chest_b_grp.replace("Zero", "Grp"))
                 chest_b_zero = self.ar.utils.create_zero_out([chest_b_grp])[0]
-                base_ctrl_zero = self.ar.utils.create_zero_out([self.base_ctrl])[0]
-                tip_ctrl_zero = self.ar.utils.create_zero_out([self.tip_ctrl])[0]
+                self.ar.utils.create_zero_out([self.base_ctrl])[0] #base_ctrl_zero
+                self.ar.utils.create_zero_out([self.tip_ctrl])[0] #tip_ctrl_zero
                 self.ar.ctrls.set_lock_hide([self.hips_a_ctrl, self.hips_b_ctrl, self.chest_a_ctrl, self.chest_b_ctrl, self.hips_fk_ctrl, self.chest_fk_ctrl], ['v'], l=False)
                 # modify the pivots of chest controls:
                 up_pivot_pos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints-1), query=True, worldSpace=True, translation=True)
@@ -307,7 +307,7 @@ class Spine(standard.BaseStandard):
                 cmds.rotate(90, 90, 0, ribbon_nurbs_plane)
                 cmds.makeIdentity(ribbon_nurbs_plane, apply=True, translate=True, rotate=True)
                 down_loc_pos = cmds.xform(side+self.number_name+"_Guide_JointLoc1", query=True, worldSpace=True, translation=True)
-                upLocPos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints), query=True, worldSpace=True, translation=True)
+                cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(self.n_joints), query=True, worldSpace=True, translation=True) #upLocPos
                 cmds.move(down_loc_pos[0], down_loc_pos[1], down_loc_pos[2], ribbon_nurbs_plane)
                 # create up and down clusters:
                 down_clusters = cmds.cluster(ribbon_nurbs_plane+".cv[0:3][0:1]", name=side+self.number_name+'_Down_Cls')
@@ -421,7 +421,7 @@ class Spine(standard.BaseStandard):
                     middle_clusters = cmds.cluster(ribbon_nurbs_plane+".cv[0:3]["+str(n+1)+"]", name=side+self.number_name+'_Middle_Cls')
                     middle_cluster = middle_clusters[1]
                     self.to_ids.append(middle_clusters[0])
-                    middleLocPos = cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(n), query=True, worldSpace=True, translation=True)
+                    cmds.xform(side+self.number_name+"_Guide_JointLoc"+str(n), query=True, worldSpace=True, translation=True) #middleLocPos
                     cmds.matchTransform(middle_cluster, guide_middle_loc, position=True, rotation=True)
                     middle_cluster_rot = cmds.xform(middle_cluster, query=True, worldSpace=True, rotation=True)
                     cmds.xform(middle_cluster, worldSpace=True, rotation=(middle_cluster_rot[0]+90, middle_cluster_rot[1], middle_cluster_rot[2]))

@@ -48,9 +48,8 @@ class Ribbon:
         if not ini_jnt:
             ini_jnt = cmds.ls(sl=True)[1]
         
-        if not prefix == '':
-            if not prefix.endswith('_'):
-                prefix+='_'
+        if prefix != '' and not prefix.endswith('_'):
+            prefix += '_'
         skipa = ['x', 'y', 'z']
         skipa.remove(skip_axis)
         lista = []
@@ -285,11 +284,10 @@ class Ribbon:
                 # rename joint
                 cmds.rename(item, item.replace('_Jnt', '_Jxt'))
         
-        if ini_jxt: #arm elbow
-            if cmds.objExists(ini_jxt):
-                pac = cmds.parentConstraint(ini_jxt, down_limb['bendGrpList'][0], mo=True, name=down_limb['bendGrpList'][0]+"_PaC")[0]
-                cmds.setAttr(pac+".interpType", 2) #shortest
-                cmds.setAttr(pac+"."+ini_jxt+"W1", 0.3)
+        if ini_jxt and cmds.objExists(ini_jxt): #arm elbow
+            pac = cmds.parentConstraint(ini_jxt, down_limb['bendGrpList'][0], mo=True, name=down_limb['bendGrpList'][0]+"_PaC")[0]
+            cmds.setAttr(pac+".interpType", 2) #shortest
+            cmds.setAttr(pac+"."+ini_jxt+"W1", 0.3)
 
         # corner autoRotate setup
         loaded_quaternion_plugin = self.ar.config.check_loaded_plugin("quatNodes", self.ar.data.lang['e014_cantLoadQuatNode'])
@@ -336,9 +334,8 @@ class Ribbon:
         # implementing pin setup to ribbon corner offset control:
         if elbow_ctrls[2]:
             self.pin_corner_setup(world_ref, elbow_grp, self.elbow_ctrl, self.elbow_zero_1, corner_auto_rotate_inv_pin_md)
-        if ori_b_loc:
-            if elbow_b_ctrls[2]:
-                self.pin_corner_setup(world_ref, elbow_b_grp, self.elbow_b_ctrl, self.elbow_b_zero_1, corner_auto_rotate_inv_pin_md)
+        if ori_b_loc and elbow_b_ctrls[2]:
+            self.pin_corner_setup(world_ref, elbow_b_grp, self.elbow_b_ctrl, self.elbow_b_zero_1, corner_auto_rotate_inv_pin_md)
         
         # autoRotate by twistBone control setup:
         if up_limb['up_twist_bone_md']:
@@ -758,34 +755,33 @@ class Ribbon:
             # update i
             i = i + 1
         
-        if add_artic:
-            if center_up_down == 1: #up
-                # corner scale volumeVariation setup:
-                rb_proportion_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Proportion_MD"))
-                rb_intensity_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Intensity_MD"))
-                rb_add_scale_pma = cmds.createNode("plusMinusAverage", name=self.elbow_ctrl.replace("_Ctrl", "_AddScale_PMA"))
-                rb_length_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Length_MD"))
-                rb_scale_clp = cmds.createNode("clamp", name=self.elbow_ctrl.replace("_Ctrl", "_Scale_Clp"))
-                rb_blend_bc = cmds.createNode("blendColors", name=self.elbow_ctrl.replace("_Ctrl", "_BC"))
-                self.to_ids.extend([rb_proportion_md, rb_intensity_md, rb_add_scale_pma, rb_length_md, rb_scale_clp, rb_blend_bc])
-                cmds.connectAttr(world_ref+"."+self.limb_vv_attr, rb_blend_bc+".blender", force=True)
-                cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type="double3")
-                cmds.connectAttr(rb_normalize_md+".outputX", rb_proportion_md+".input1X", force=True)
-                cmds.setAttr(rb_proportion_md+".input2X", 1)
-                cmds.connectAttr(rb_proportion_md+".outputX", rb_intensity_md+".input1X", force=True)
-                cmds.connectAttr(world_ref+"."+self.limb_manual_vv_attr, rb_intensity_md+".input2X", force=True)
-                cmds.connectAttr(world_ref+"."+self.limb_length_attr, rb_length_md+".input2X", force=True)
-                cmds.connectAttr(rb_intensity_md+".outputX", rb_length_md+".input1X", force=True)
-                cmds.connectAttr(rb_length_md+".outputX", rb_add_scale_pma+".input1D[1]", force=True)
-                cmds.connectAttr(rb_add_scale_pma+".output1D", rb_scale_clp+".inputR", force=True)
-                cmds.connectAttr(world_ref+"."+self.limb_min_vv_attr, rb_scale_clp+".minR")
-                cmds.setAttr(rb_scale_clp+".maxR", 1000000)
-                cmds.connectAttr(rb_scale_clp+".outputR", rb_blend_bc+".color1.color1R", force=True)
-                cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_jnt+".scaleY", force=True)
-                cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_jnt+".scaleZ", force=True)
-                if ori_b_loc:
-                    cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_b_jnt+".scaleY", force=True)
-                    cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_b_jnt+".scaleZ", force=True)
+        if add_artic and center_up_down == 1: #up
+            # corner scale volumeVariation setup:
+            rb_proportion_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Proportion_MD"))
+            rb_intensity_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Intensity_MD"))
+            rb_add_scale_pma = cmds.createNode("plusMinusAverage", name=self.elbow_ctrl.replace("_Ctrl", "_AddScale_PMA"))
+            rb_length_md = cmds.createNode("multiplyDivide", name=self.elbow_ctrl.replace("_Ctrl", "_Length_MD"))
+            rb_scale_clp = cmds.createNode("clamp", name=self.elbow_ctrl.replace("_Ctrl", "_Scale_Clp"))
+            rb_blend_bc = cmds.createNode("blendColors", name=self.elbow_ctrl.replace("_Ctrl", "_BC"))
+            self.to_ids.extend([rb_proportion_md, rb_intensity_md, rb_add_scale_pma, rb_length_md, rb_scale_clp, rb_blend_bc])
+            cmds.connectAttr(world_ref+"."+self.limb_vv_attr, rb_blend_bc+".blender", force=True)
+            cmds.setAttr(rb_blend_bc+".color2", 1, 1, 1, type="double3")
+            cmds.connectAttr(rb_normalize_md+".outputX", rb_proportion_md+".input1X", force=True)
+            cmds.setAttr(rb_proportion_md+".input2X", 1)
+            cmds.connectAttr(rb_proportion_md+".outputX", rb_intensity_md+".input1X", force=True)
+            cmds.connectAttr(world_ref+"."+self.limb_manual_vv_attr, rb_intensity_md+".input2X", force=True)
+            cmds.connectAttr(world_ref+"."+self.limb_length_attr, rb_length_md+".input2X", force=True)
+            cmds.connectAttr(rb_intensity_md+".outputX", rb_length_md+".input1X", force=True)
+            cmds.connectAttr(rb_length_md+".outputX", rb_add_scale_pma+".input1D[1]", force=True)
+            cmds.connectAttr(rb_add_scale_pma+".output1D", rb_scale_clp+".inputR", force=True)
+            cmds.connectAttr(world_ref+"."+self.limb_min_vv_attr, rb_scale_clp+".minR")
+            cmds.setAttr(rb_scale_clp+".maxR", 1000000)
+            cmds.connectAttr(rb_scale_clp+".outputR", rb_blend_bc+".color1.color1R", force=True)
+            cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_jnt+".scaleY", force=True)
+            cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_jnt+".scaleZ", force=True)
+            if ori_b_loc:
+                cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_b_jnt+".scaleY", force=True)
+                cmds.connectAttr(rb_blend_bc+".output.outputR", self.corner_b_jnt+".scaleZ", force=True)
         
         locators_grps = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')
         skin_jnt_grp = cmds.group(rb_Jnt, n=name+'_Jnt_Grp')
@@ -885,7 +881,7 @@ class Ribbon:
             cmds.delete(aux_loc_1, aux_loc_2)
 
         # baseTwist:
-        if not up_ctrl == None:
+        if up_ctrl != None:
             bttm_LocGrp = cmds.group(bttm_Loc[2], name=bttm_Loc[2]+"_Grp")
             bttm_LocTwistBoneGrp = cmds.group(bttm_LocGrp, name=bttm_Loc[2]+"_TwistBone_Grp")
             self.ar.utils.add_attr_to_items([bttm_LocGrp, bttm_LocTwistBoneGrp], self.ar.utils.ignore_transform_io_attr)

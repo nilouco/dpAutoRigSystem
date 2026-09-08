@@ -72,10 +72,8 @@ class Maker:
             self.ar.job.unpin_guide(force=True)
             guide_io = self.ar.config.get_instance("GuideIO", [self.ar.data.setup_folder])
             guides_data = guide_io.get_guide_data(nets)
-            if not name:
-                if self.ar.data.ui_state:
-                    if self.ar.data.ui_state:
-                        name = self.ar.ui_manager.ask_prompt_dialog("Template", self.ar.data.lang["m006_name"]).lower()
+            if not name and self.ar.data.ui_state and self.ar.data.ui_state:
+                name = self.ar.ui_manager.ask_prompt_dialog("Template", self.ar.data.lang["m006_name"]).lower()
             if name:
                 # export json file
                 self.ar.pipeliner.save_json_file(guides_data, f"{self.ar.data.dp_auto_rig_path}/{self.ar.data.template_folder.replace('.', '/')}/{name}.json")
@@ -198,11 +196,10 @@ class Maker:
     def get_base_group(self, attr, item, olds=None):
         if not cmds.objExists(item):
             need_create_it = True
-            if olds:
-                if cmds.objExists(olds[1]):
-                    attr = olds[0]
-                    item = olds[1]
-                    need_create_it = False
+            if olds and cmds.objExists(olds[1]):
+                attr = olds[0]
+                item = olds[1]
+                need_create_it = False
             if need_create_it:
                 cmds.createNode("transform", name=item)
         if not attr in cmds.listAttr(self.all_grp):
@@ -506,7 +503,7 @@ class Maker:
         # check guide versions to be sure we are building with the same dpAutoRigSystem version:
         for item in guides_to_rig:
             guide_version = cmds.getAttr(f"{item.guide_base}.dpARVersion")
-            if not guide_version == self.ar.data.version:
+            if guide_version != self.ar.data.version:
                 yes_text = self.ar.data.lang['i071_yes']
                 update_guides_text = self.ar.data.lang['m186_updateGuides']
                 not_text = self.ar.data.lang['i072_no']
@@ -527,16 +524,15 @@ class Maker:
             right_pattern = re.compile(f"{self.ar.data.lang['p003_right']}_.*._Ctrl")
             for ctrl in self.ar.ctrls.get_controllers():
                 shapes = cmds.listRelatives(ctrl, children=True, allDescendents=True, fullPath=True, type="shape")
-                if shapes:
-                    if not cmds.getAttr(shapes[0]+".overrideEnabled"):
-                        if (left_pattern.match(ctrl)):
-                            self.ar.ctrls.color_shape([ctrl], "red")
-                        elif (right_pattern.match(ctrl)):
-                            self.ar.ctrls.color_shape([ctrl], "blue")
-                        elif (ctrl in ground_ctrls):
-                            self.ar.ctrls.color_shape([ctrl], "black")
-                        else:
-                            self.ar.ctrls.color_shape([ctrl], "yellow")
+                if shapes and not cmds.getAttr(shapes[0]+".overrideEnabled"):
+                    if (left_pattern.match(ctrl)):
+                        self.ar.ctrls.color_shape([ctrl], "red")
+                    elif (right_pattern.match(ctrl)):
+                        self.ar.ctrls.color_shape([ctrl], "blue")
+                    elif (ctrl in ground_ctrls):
+                        self.ar.ctrls.color_shape([ctrl], "black")
+                    else:
+                        self.ar.ctrls.color_shape([ctrl], "yellow")
 
 
     def get_mirror_names(self, item):
@@ -569,10 +565,9 @@ class Maker:
                         father_rigged_parent_node = self.origined_from_data[father_name+"_Guide_"+self.hook[item.guide_base]['fatherGuideLoc']]
                         if father_rigged_parent_node:
                             if len(father_mirror_names) != 1: # tell us 'the father has mirror'
-                                if s == f:
-                                    # parent them to the correct side of the father's mirror:
-                                    if self.ctrl_hook_grp:
-                                        cmds.parent(self.ctrl_hook_grp, father_rigged_parent_node)
+                                # parent them to the correct side of the father's mirror:
+                                if s == f and self.ctrl_hook_grp:
+                                    cmds.parent(self.ctrl_hook_grp, father_rigged_parent_node)
                             else:
                                 # parent them to the unique father:
                                 if self.ctrl_hook_grp:
@@ -599,7 +594,7 @@ class Maker:
 
     def set_option_ctrl_corrective(self, item):
         # display corrective controls by an Option_Ctrl attribute:
-        if "correctiveCtrlGrpList" in item.composed.keys():
+        if "correctiveCtrlGrpList" in item.composed:
             if not f"{self.ar.data.lang['c124_corrective']}Ctrls" in cmds.listAttr(self.option_ctrl):
                 cmds.addAttr(self.option_ctrl, longName=f"{self.ar.data.lang['c124_corrective']}Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
                 cmds.setAttr(f"{self.option_ctrl}.{self.ar.data.lang['c124_corrective']}Ctrls", channelBox=True)
@@ -623,44 +618,40 @@ class Maker:
                 guide_source_data[cmds.getAttr(ctrl+".guide_source")] = ctrl
         # missing parentTag controllers:
         for p_tag_ctrl in [c for c in self.ar.ctrls.get_controllers("parentTag") if not cmds.listConnections(c+".parentTag", source=True, destination=False)]:
-            if not p_tag_ctrl == self.global_ctrl:
-                if "controlID" in cmds.listAttr(p_tag_ctrl):
-                    if not cmds.getAttr(p_tag_ctrl+".controlID") == "id_092_Correctives":
-                        if "guide_source" in cmds.listAttr(p_tag_ctrl):
-                            guide_source = cmds.getAttr(p_tag_ctrl+".guide_source")
-                            guide_base = guide_source.split(":")[0]+":Guide_Base"
-                            parent_node = None
-                            if guide_base in self.hook.keys():
-                                if 'parentNode' in self.hook[guide_base].keys():
-                                    parent_node = self.hook[guide_base]['parentNode']
-                                    father_guide = self.hook[guide_base]['fatherGuide']
-                            if parent_node:
-                                if not parent_node in guide_source_data:
-                                    parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
-                                if not parent_node in guide_source_data:
-                                    continue
-                                found_ctrl = guide_source_data[parent_node]
-                                if found_ctrl in holder_ctrls: #holder
-                                    guide_source = cmds.getAttr(found_ctrl+".guide_source")
-                                    guide_base = guide_source.split(":")[0]+":Guide_Base"
-                                    parent_node = self.hook[guide_base]['parentNode']
-                                    father_guide = self.hook[guide_base]['fatherGuide']
-                                    parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
-                                    if not parent_node in guide_source_data:
-                                        continue
-                                    found_ctrl = guide_source_data[parent_node]
-                                if not self.hook[father_guide]['guideMirrorAxis'] == "off": #father guide has mirror
-                                    mirror_names = self.hook[father_guide]['guideMirrorName']
-                                    if p_tag_ctrl.startswith(mirror_names[0]):
-                                        if not found_ctrl.startswith(mirror_names[0]):
-                                            found_ctrl = mirror_names[0]+found_ctrl[2:]
-                                    else:
-                                        if not found_ctrl.startswith(mirror_names[1]):
-                                            found_ctrl = mirror_names[1]+found_ctrl[2:]
-                                if cmds.objExists(found_ctrl):
-                                    cmds.connectAttr(found_ctrl+".message", p_tag_ctrl+".parentTag", force=True)
-                            else:
-                                cmds.connectAttr(self.root_ctrl+".message", p_tag_ctrl+".parentTag", force=True)
+            if p_tag_ctrl != self.global_ctrl and "controlID" in cmds.listAttr(p_tag_ctrl) and cmds.getAttr(p_tag_ctrl+".controlID") != "id_092_Correctives" and "guide_source" in cmds.listAttr(p_tag_ctrl):
+                guide_source = cmds.getAttr(p_tag_ctrl+".guide_source")
+                guide_base = guide_source.split(":")[0]+":Guide_Base"
+                parent_node = None
+                if guide_base in self.hook and 'parentNode' in self.hook[guide_base]:
+                    parent_node = self.hook[guide_base]['parentNode']
+                    father_guide = self.hook[guide_base]['fatherGuide']
+                if parent_node:
+                    if not parent_node in guide_source_data:
+                        parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
+                    if not parent_node in guide_source_data:
+                        continue
+                    found_ctrl = guide_source_data[parent_node]
+                    if found_ctrl in holder_ctrls: #holder
+                        guide_source = cmds.getAttr(found_ctrl+".guide_source")
+                        guide_base = guide_source.split(":")[0]+":Guide_Base"
+                        parent_node = self.hook[guide_base]['parentNode']
+                        father_guide = self.hook[guide_base]['fatherGuide']
+                        parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
+                        if not parent_node in guide_source_data:
+                            continue
+                        found_ctrl = guide_source_data[parent_node]
+                    if self.hook[father_guide]['guideMirrorAxis'] != "off": #father guide has mirror
+                        mirror_names = self.hook[father_guide]['guideMirrorName']
+                        if p_tag_ctrl.startswith(mirror_names[0]):
+                            if not found_ctrl.startswith(mirror_names[0]):
+                                found_ctrl = mirror_names[0]+found_ctrl[2:]
+                        else:
+                            if not found_ctrl.startswith(mirror_names[1]):
+                                found_ctrl = mirror_names[1]+found_ctrl[2:]
+                    if cmds.objExists(found_ctrl):
+                        cmds.connectAttr(found_ctrl+".message", p_tag_ctrl+".parentTag", force=True)
+                else:
+                    cmds.connectAttr(self.root_ctrl+".message", p_tag_ctrl+".parentTag", force=True)
 
 
     def set_option_ctrl_attrs(self):
@@ -687,16 +678,14 @@ class Maker:
                 cmds.setAttr(self.option_ctrl+"."+general_attr, lock=True)
             
             # Only create if a VolumeVariation attribute is found
-            if not volume_variation_attr in option_ctrl_attrs:
-                if cmds.listAttr(self.option_ctrl, string="*"+volume_variation_attr+"*"):
-                    cmds.addAttr(self.option_ctrl, longName=volume_variation_attr, attributeType="enum", enumName="----------", keyable=True)
-                    cmds.setAttr(self.option_ctrl+"."+volume_variation_attr, lock=True)
+            if not volume_variation_attr in option_ctrl_attrs and cmds.listAttr(self.option_ctrl, string="*"+volume_variation_attr+"*"):
+                cmds.addAttr(self.option_ctrl, longName=volume_variation_attr, attributeType="enum", enumName="----------", keyable=True)
+                cmds.setAttr(self.option_ctrl+"."+volume_variation_attr, lock=True)
             
             # Only create if an IkFk attribute is found
-            if not 'ikFkBlend' in option_ctrl_attrs:
-                if cmds.listAttr(self.option_ctrl, string="*ikFk*"):
-                    cmds.addAttr(self.option_ctrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
-                    cmds.setAttr(self.option_ctrl+".ikFkBlend", lock=True)
+            if not 'ikFkBlend' in option_ctrl_attrs and cmds.listAttr(self.option_ctrl, string="*ikFk*"):
+                cmds.addAttr(self.option_ctrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
+                cmds.setAttr(self.option_ctrl+".ikFkBlend", lock=True)
             
             if 'ikFkSnap' in option_ctrl_attrs:
                 cmds.setAttr(self.option_ctrl+".ikFkSnap", keyable=False, channelBox=True)
@@ -729,15 +718,13 @@ class Maker:
             # clean up "_ikFkBlend" atributes:
             if current_attrs:
                 for current_attr in current_attrs:
-                    if current_attr.endswith("_ikFkBlend"):
-                        if not current_attr[:current_attr.find("_ikFkBlend")] in option_ctrl_attrs:
-                            cmds.renameAttr(self.option_ctrl+"."+current_attr, current_attr[:current_attr.find("_ikFkBlend")])
+                    if current_attr.endswith("_ikFkBlend") and not current_attr[:current_attr.find("_ikFkBlend")] in option_ctrl_attrs:
+                        cmds.renameAttr(self.option_ctrl+"."+current_attr, current_attr[:current_attr.find("_ikFkBlend")])
             # clean up "VolumeVariation" attributes:
             if current_attrs:
                 for current_attr in current_attrs:
-                    if current_attr.endswith("_"+volume_variation_attr):
-                        if not current_attr[:current_attr.find("_"+volume_variation_attr)] in option_ctrl_attrs:
-                            cmds.renameAttr(self.option_ctrl+"."+current_attr, current_attr[:current_attr.find("_"+volume_variation_attr)])
+                    if current_attr.endswith("_"+volume_variation_attr) and not current_attr[:current_attr.find("_"+volume_variation_attr)] in option_ctrl_attrs:
+                        cmds.renameAttr(self.option_ctrl+"."+current_attr, current_attr[:current_attr.find("_"+volume_variation_attr)])
                         
             # list desirable Option_Ctrl attributes order:
             desired_order_attrs = [general_attr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', volume_variation_attr,
@@ -854,124 +841,122 @@ class Composer:
 
     def foot_limb(self, foot, limb):
         # footGuide parented in the extremGuide of the limbModule:
-        if limb:
-            if self.ar.maker.hook[foot.guide_base]['fatherModule'] == self.ar.data.limb_name and self.ar.maker.hook[foot.guide_base]['fatherGuideLoc'] == 'Extrem':
-                for s, side in enumerate(self.ar.maker.get_mirror_names(foot)):
-                    # getting foot data:
-                    reverse_foot_ctrl = foot.composed['revFootCtrlList'][s]
-                    reverse_foot_ctrl_grp = foot.composed['revFootCtrlGrpList'][s]
-                    reverse_foot_ctrl_shape = foot.composed['revFootCtrlShapeList'][s]
-                    to_limb_ik_handle_grp = foot.composed['toLimbIkHandleGrpList'][s]
-                    parent_const = foot.composed['parentConstList'][s]
-                    scale_const = foot.composed['scaleConstList'][s]
-                    foot_jnt = foot.composed['footJntList'][s]
-                    ball_reverse_feet = foot.composed['ballRFList'][s]
-                    # getting limb data:
-                    ik_ctrl = limb.composed['ikCtrlList'][s]
-                    ik_handle_grp = limb.composed['ikHandleGrpList'][s]
-                    ik_handle_consts = limb.composed['ikHandleConstList'][s]
-                    ik_handle_grp_consts = limb.composed['ikHandleGrpConstList'][s]
-                    ik_fk_blend_grp_to_reverse_foot = limb.composed['ikFkBlendGrpToRevFootList'][s]
-                    latest_joint = limb.composed['extremJntList'][s]
-                    ik_stretch_latest_loc = limb.composed['ikStretchExtremLoc'][s]
-                    limb_type_name = limb.composed['limbTypeName']
-                    world_ref = limb.composed['worldRefList'][s]
-                    add_articulation = limb.composed['addArticJoint']
-                    add_corrective = limb.composed['addCorrective']
-                    ankle_articulations = limb.composed['ankleArticList'][s]
-                    ankle_correctives = limb.composed['ankleCorrectiveList'][s]
-                    # do task actions in order to compose the limb and foot:
-                    cmds.cycleCheck(evaluation=False)
-                    cmds.delete(ik_handle_consts, ik_handle_grp_consts, parent_const, scale_const) #there's an undesirable cycleCheck evaluation error here when we delete ik_handle_consts!
-                    cmds.cycleCheck(evaluation=True)
-                    cmds.parent(reverse_foot_ctrl_grp, ik_fk_blend_grp_to_reverse_foot, absolute=True)
-                    cmds.parent(ik_handle_grp, to_limb_ik_handle_grp, absolute=True)
-                    self.to_ids.extend(cmds.parentConstraint(latest_joint, foot_jnt, maintainOffset=True, name=foot_jnt+"_PaC"))
-                    if limb_type_name == self.ar.data.leg_name:
-                        cmds.connectAttr(latest_joint+".scaleX", foot_jnt+".scaleX", force=True)
-                        cmds.connectAttr(latest_joint+".scaleY", foot_jnt+".scaleY", force=True)
-                        cmds.connectAttr(latest_joint+".scaleZ", foot_jnt+".scaleZ", force=True)
-                        if ik_stretch_latest_loc: # avoid issue parenting if quadruped
-                            cmds.parent(ik_stretch_latest_loc, ball_reverse_feet, absolute=True)
-                        if cmds.objExists(latest_joint+".dpAR_joint"):
-                            cmds.deleteAttr(latest_joint+".dpAR_joint")
-                        # reconnect correctly the interation for ankle and correctives
-                        if add_articulation:
-                            cmds.delete(ankle_articulations[1])
-                            # workaround to avoid orientConstraint offset issue
-                            foot_joint_father = cmds.listRelatives(foot_jnt, parent=True)[0]
-                            cmds.delete(cmds.listRelatives(foot_jnt, children=True, type="parentConstraint")[0])
-                            foot_joint_children = cmds.listRelatives(foot_jnt, children=True)
-                            cmds.parent(foot_joint_children, world=True)
-                            cmds.parent(foot_jnt, latest_joint, relative=True)
-                            cmds.makeIdentity(foot_jnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
-                            cmds.parent(foot_jnt, foot_joint_father)
-                            cmds.parent(foot_joint_children, foot_jnt)
-                            self.to_ids.extend(cmds.parentConstraint(latest_joint, foot_jnt, maintainOffset=True, name=foot_jnt+"_PaC"))
-                        # extracting angle to avoid orientConstraint issue when uniform scaling
-                        extract_angle_mm  = cmds.createNode("multMatrix", name=ankle_articulations[0]+"_ExtractAngle_MM")
-                        extract_angle_dm  = cmds.createNode("decomposeMatrix", name=ankle_articulations[0]+"_ExtractAngle_DM")
-                        extract_angle_qte = cmds.createNode("quatToEuler", name=ankle_articulations[0]+"_ExtractAngle_QtE")
-                        extract_angle_md  = cmds.createNode("multiplyDivide", name=ankle_articulations[0]+"_ExtractAngle_MD")
-                        orig_loc = cmds.spaceLocator(name=ankle_articulations[0]+"_ExtractAngle_Orig_Loc")[0]
-                        action_loc = cmds.spaceLocator(name=ankle_articulations[0]+"_ExtractAngle_Action_Loc")[0]
-                        cmds.matchTransform(orig_loc, action_loc, ankle_articulations[2], position=True, rotation=True)
-                        cmds.parent(orig_loc, ankle_articulations[2])
-                        cmds.parent(action_loc, foot_jnt)
-                        cmds.setAttr(orig_loc+".visibility", 0)
-                        cmds.setAttr(action_loc+".visibility", 0)
-                        cmds.connectAttr(action_loc+".worldMatrix[0]", extract_angle_mm+".matrixIn[0]", force=True)
-                        cmds.connectAttr(orig_loc+".worldInverseMatrix[0]", extract_angle_mm+".matrixIn[1]", force=True)
-                        cmds.connectAttr(extract_angle_mm+".matrixSum", extract_angle_dm+".inputMatrix", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatX", extract_angle_qte+".inputQuatX", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatY", extract_angle_qte+".inputQuatY", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatZ", extract_angle_qte+".inputQuatZ", force=True)
-                        cmds.connectAttr(extract_angle_dm+".outputQuatW", extract_angle_qte+".inputQuatW", force=True)
-                        for axis in self.ar.data.axes:
-                            cmds.setAttr(extract_angle_md+".input2"+axis, 0.5)
-                            cmds.connectAttr(extract_angle_qte+".outputRotate"+axis, ankle_articulations[0]+".rotate"+axis, force=True)
-                        self.to_ids.extend([extract_angle_mm, extract_angle_dm, extract_angle_qte, orig_loc, action_loc])
-                        if add_corrective:
-                            for net in ankle_correctives:
-                                if net:
-                                    if cmds.objExists(net):
-                                        action_locators = cmds.listConnections(net+".actionLoc", destination=False, source=True)
-                                        if action_locators:
-                                            cmds.connectAttr(foot_jnt+".message", action_locators[0]+".inputNode", force=True)
-                                            action_loc_grp = cmds.listRelatives(action_locators[0], parent=True, type="transform")[0]
-                                            cmds.delete(action_loc_grp+"_PaC")
-                                            self.to_ids.extend(cmds.parentConstraint(foot_jnt, action_loc_grp, maintainOffset=True, name=action_loc_grp+"_PaC"))
-                    scalable_grp = foot.composed["scalableGrp"][s]
-                    self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, scalable_grp, name=scalable_grp+"_ScC"))
-                    # hide this controller shape
-                    cmds.setAttr(reverse_foot_ctrl_shape+".visibility", 0)
-                    # add attributes and connect from ik_ctrl to reverse_foot_ctrl:
-                    for attr in cmds.listAttr(reverse_foot_ctrl, visible=True, scalar=True, userDefined=True):
-                        if not cmds.objExists(ik_ctrl+'.'+attr):
-                            current_value = cmds.getAttr(reverse_foot_ctrl+'.'+attr)
-                            keyable_status = cmds.getAttr(reverse_foot_ctrl+'.'+attr, keyable=True)
-                            channelbox_status = cmds.getAttr(reverse_foot_ctrl+'.'+attr, channelBox=True)
-                            attr_min_value = cmds.addAttr(reverse_foot_ctrl+'.'+attr, query=True, minValue=True)
-                            attr_max_value = cmds.addAttr(reverse_foot_ctrl+'.'+attr, query=True, maxValue=True)
-                            cmds.addAttr(ik_ctrl, longName=attr, attributeType=cmds.getAttr(reverse_foot_ctrl+'.'+attr, type=True), keyable=keyable_status, defaultValue=cmds.addAttr(reverse_foot_ctrl+'.'+attr, query=True, defaultValue=True))
-                            if not attr_min_value == None:
-                                cmds.addAttr(ik_ctrl+'.'+attr, edit=True, minValue=attr_min_value)
-                            if not attr_max_value == None:
-                                cmds.addAttr(ik_ctrl+'.'+attr, edit=True, maxValue=attr_max_value)
-                            cmds.setAttr(ik_ctrl+'.'+attr, current_value)
-                            if not keyable_status:
-                                cmds.setAttr(ik_ctrl+'.'+attr, channelBox=channelbox_status)
-                            cmds.connectAttr(ik_ctrl+'.'+attr, reverse_foot_ctrl+'.'+attr, force=True)
-                            if attr == "visIkFk":
-                                if not cmds.objExists(world_ref):
-                                    world_ref = world_ref.replace("_Ctrl", "_Grp")
-                                if cmds.objExists(world_ref):
-                                    for world_ref_attr in cmds.listAttr(world_ref, userDefined=True):
-                                        if "Fk_ikFkBlendRevOutputX" in world_ref_attr:
-                                            cmds.connectAttr(world_ref+"."+world_ref_attr, ik_ctrl+'.'+attr, force=True)
-                    rev_foot_ctrl_old = cmds.rename(reverse_foot_ctrl, reverse_foot_ctrl+"_Old")
-                    self.ar.custom_attr.remove_attr("dpControl", [rev_foot_ctrl_old])
-                    self.ar.custom_attr.update_id([rev_foot_ctrl_old])
+        if limb and self.ar.maker.hook[foot.guide_base]['fatherModule'] == self.ar.data.limb_name and self.ar.maker.hook[foot.guide_base]['fatherGuideLoc'] == 'Extrem':
+            for s, side in enumerate(self.ar.maker.get_mirror_names(foot)):
+                # getting foot data:
+                reverse_foot_ctrl = foot.composed['revFootCtrlList'][s]
+                reverse_foot_ctrl_grp = foot.composed['revFootCtrlGrpList'][s]
+                reverse_foot_ctrl_shape = foot.composed['revFootCtrlShapeList'][s]
+                to_limb_ik_handle_grp = foot.composed['toLimbIkHandleGrpList'][s]
+                parent_const = foot.composed['parentConstList'][s]
+                scale_const = foot.composed['scaleConstList'][s]
+                foot_jnt = foot.composed['footJntList'][s]
+                ball_reverse_feet = foot.composed['ballRFList'][s]
+                # getting limb data:
+                ik_ctrl = limb.composed['ikCtrlList'][s]
+                ik_handle_grp = limb.composed['ikHandleGrpList'][s]
+                ik_handle_consts = limb.composed['ikHandleConstList'][s]
+                ik_handle_grp_consts = limb.composed['ikHandleGrpConstList'][s]
+                ik_fk_blend_grp_to_reverse_foot = limb.composed['ikFkBlendGrpToRevFootList'][s]
+                latest_joint = limb.composed['extremJntList'][s]
+                ik_stretch_latest_loc = limb.composed['ikStretchExtremLoc'][s]
+                limb_type_name = limb.composed['limbTypeName']
+                world_ref = limb.composed['worldRefList'][s]
+                add_articulation = limb.composed['addArticJoint']
+                add_corrective = limb.composed['addCorrective']
+                ankle_articulations = limb.composed['ankleArticList'][s]
+                ankle_correctives = limb.composed['ankleCorrectiveList'][s]
+                # do task actions in order to compose the limb and foot:
+                cmds.cycleCheck(evaluation=False)
+                cmds.delete(ik_handle_consts, ik_handle_grp_consts, parent_const, scale_const) #there's an undesirable cycleCheck evaluation error here when we delete ik_handle_consts!
+                cmds.cycleCheck(evaluation=True)
+                cmds.parent(reverse_foot_ctrl_grp, ik_fk_blend_grp_to_reverse_foot, absolute=True)
+                cmds.parent(ik_handle_grp, to_limb_ik_handle_grp, absolute=True)
+                self.to_ids.extend(cmds.parentConstraint(latest_joint, foot_jnt, maintainOffset=True, name=foot_jnt+"_PaC"))
+                if limb_type_name == self.ar.data.leg_name:
+                    cmds.connectAttr(latest_joint+".scaleX", foot_jnt+".scaleX", force=True)
+                    cmds.connectAttr(latest_joint+".scaleY", foot_jnt+".scaleY", force=True)
+                    cmds.connectAttr(latest_joint+".scaleZ", foot_jnt+".scaleZ", force=True)
+                    if ik_stretch_latest_loc: # avoid issue parenting if quadruped
+                        cmds.parent(ik_stretch_latest_loc, ball_reverse_feet, absolute=True)
+                    if cmds.objExists(latest_joint+".dpAR_joint"):
+                        cmds.deleteAttr(latest_joint+".dpAR_joint")
+                    # reconnect correctly the interation for ankle and correctives
+                    if add_articulation:
+                        cmds.delete(ankle_articulations[1])
+                        # workaround to avoid orientConstraint offset issue
+                        foot_joint_father = cmds.listRelatives(foot_jnt, parent=True)[0]
+                        cmds.delete(cmds.listRelatives(foot_jnt, children=True, type="parentConstraint")[0])
+                        foot_joint_children = cmds.listRelatives(foot_jnt, children=True)
+                        cmds.parent(foot_joint_children, world=True)
+                        cmds.parent(foot_jnt, latest_joint, relative=True)
+                        cmds.makeIdentity(foot_jnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
+                        cmds.parent(foot_jnt, foot_joint_father)
+                        cmds.parent(foot_joint_children, foot_jnt)
+                        self.to_ids.extend(cmds.parentConstraint(latest_joint, foot_jnt, maintainOffset=True, name=foot_jnt+"_PaC"))
+                    # extracting angle to avoid orientConstraint issue when uniform scaling
+                    extract_angle_mm  = cmds.createNode("multMatrix", name=ankle_articulations[0]+"_ExtractAngle_MM")
+                    extract_angle_dm  = cmds.createNode("decomposeMatrix", name=ankle_articulations[0]+"_ExtractAngle_DM")
+                    extract_angle_qte = cmds.createNode("quatToEuler", name=ankle_articulations[0]+"_ExtractAngle_QtE")
+                    extract_angle_md  = cmds.createNode("multiplyDivide", name=ankle_articulations[0]+"_ExtractAngle_MD")
+                    orig_loc = cmds.spaceLocator(name=ankle_articulations[0]+"_ExtractAngle_Orig_Loc")[0]
+                    action_loc = cmds.spaceLocator(name=ankle_articulations[0]+"_ExtractAngle_Action_Loc")[0]
+                    cmds.matchTransform(orig_loc, action_loc, ankle_articulations[2], position=True, rotation=True)
+                    cmds.parent(orig_loc, ankle_articulations[2])
+                    cmds.parent(action_loc, foot_jnt)
+                    cmds.setAttr(orig_loc+".visibility", 0)
+                    cmds.setAttr(action_loc+".visibility", 0)
+                    cmds.connectAttr(action_loc+".worldMatrix[0]", extract_angle_mm+".matrixIn[0]", force=True)
+                    cmds.connectAttr(orig_loc+".worldInverseMatrix[0]", extract_angle_mm+".matrixIn[1]", force=True)
+                    cmds.connectAttr(extract_angle_mm+".matrixSum", extract_angle_dm+".inputMatrix", force=True)
+                    cmds.connectAttr(extract_angle_dm+".outputQuatX", extract_angle_qte+".inputQuatX", force=True)
+                    cmds.connectAttr(extract_angle_dm+".outputQuatY", extract_angle_qte+".inputQuatY", force=True)
+                    cmds.connectAttr(extract_angle_dm+".outputQuatZ", extract_angle_qte+".inputQuatZ", force=True)
+                    cmds.connectAttr(extract_angle_dm+".outputQuatW", extract_angle_qte+".inputQuatW", force=True)
+                    for axis in self.ar.data.axes:
+                        cmds.setAttr(extract_angle_md+".input2"+axis, 0.5)
+                        cmds.connectAttr(extract_angle_qte+".outputRotate"+axis, ankle_articulations[0]+".rotate"+axis, force=True)
+                    self.to_ids.extend([extract_angle_mm, extract_angle_dm, extract_angle_qte, orig_loc, action_loc])
+                    if add_corrective:
+                        for net in ankle_correctives:
+                            if net and cmds.objExists(net):
+                                action_locators = cmds.listConnections(net+".actionLoc", destination=False, source=True)
+                                if action_locators:
+                                    cmds.connectAttr(foot_jnt+".message", action_locators[0]+".inputNode", force=True)
+                                    action_loc_grp = cmds.listRelatives(action_locators[0], parent=True, type="transform")[0]
+                                    cmds.delete(action_loc_grp+"_PaC")
+                                    self.to_ids.extend(cmds.parentConstraint(foot_jnt, action_loc_grp, maintainOffset=True, name=action_loc_grp+"_PaC"))
+                scalable_grp = foot.composed["scalableGrp"][s]
+                self.to_ids.extend(cmds.scaleConstraint(self.ar.maker.master_ctrl, scalable_grp, name=scalable_grp+"_ScC"))
+                # hide this controller shape
+                cmds.setAttr(reverse_foot_ctrl_shape+".visibility", 0)
+                # add attributes and connect from ik_ctrl to reverse_foot_ctrl:
+                for attr in cmds.listAttr(reverse_foot_ctrl, visible=True, scalar=True, userDefined=True):
+                    if not cmds.objExists(ik_ctrl+'.'+attr):
+                        current_value = cmds.getAttr(reverse_foot_ctrl+'.'+attr)
+                        keyable_status = cmds.getAttr(reverse_foot_ctrl+'.'+attr, keyable=True)
+                        channelbox_status = cmds.getAttr(reverse_foot_ctrl+'.'+attr, channelBox=True)
+                        attr_min_value = cmds.addAttr(reverse_foot_ctrl+'.'+attr, query=True, minValue=True)
+                        attr_max_value = cmds.addAttr(reverse_foot_ctrl+'.'+attr, query=True, maxValue=True)
+                        cmds.addAttr(ik_ctrl, longName=attr, attributeType=cmds.getAttr(reverse_foot_ctrl+'.'+attr, type=True), keyable=keyable_status, defaultValue=cmds.addAttr(reverse_foot_ctrl+'.'+attr, query=True, defaultValue=True))
+                        if attr_min_value != None:
+                            cmds.addAttr(ik_ctrl+'.'+attr, edit=True, minValue=attr_min_value)
+                        if attr_max_value != None:
+                            cmds.addAttr(ik_ctrl+'.'+attr, edit=True, maxValue=attr_max_value)
+                        cmds.setAttr(ik_ctrl+'.'+attr, current_value)
+                        if not keyable_status:
+                            cmds.setAttr(ik_ctrl+'.'+attr, channelBox=channelbox_status)
+                        cmds.connectAttr(ik_ctrl+'.'+attr, reverse_foot_ctrl+'.'+attr, force=True)
+                        if attr == "visIkFk":
+                            if not cmds.objExists(world_ref):
+                                world_ref = world_ref.replace("_Ctrl", "_Grp")
+                            if cmds.objExists(world_ref):
+                                for world_ref_attr in cmds.listAttr(world_ref, userDefined=True):
+                                    if "Fk_ikFkBlendRevOutputX" in world_ref_attr:
+                                        cmds.connectAttr(world_ref+"."+world_ref_attr, ik_ctrl+'.'+attr, force=True)
+                rev_foot_ctrl_old = cmds.rename(reverse_foot_ctrl, reverse_foot_ctrl+"_Old")
+                self.ar.custom_attr.remove_attr("dpControl", [rev_foot_ctrl_old])
+                self.ar.custom_attr.update_id([rev_foot_ctrl_old])
 
 
     def limb_options(self, limb):
@@ -1033,7 +1018,7 @@ class Composer:
                     limb_type_name = limb.composed['limbTypeName']
                     ik_ctrl_zero = limb.composed['ikCtrlZeroList'][s]
                     ik_polevector_ctrl_zero = limb.composed['ikPoleVectorZeroList'][s]
-                    limb_style = limb.composed['limbStyle']
+                    limb.composed['limbStyle']
                     ik_handle_grp = limb.composed['ikHandleGrpList'][s]
                     root_ctrl_refs = limb.composed['rootCtrlRefList']
                     # getting spine data:
@@ -1056,7 +1041,7 @@ class Composer:
 
     def spine_options(self, spine):
         # compose the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
-        for s, side in enumerate(self.ar.maker.get_mirror_names(spine)):
+        for s, _side in enumerate(self.ar.maker.get_mirror_names(spine)):
             # connect the optionCtrl volume_variation_attr to hips_a volume_variation_attr and hide it for each side of the mirror (if it exists):
             hips_a = spine.composed['hipsAList'][s]
             volume_variation_attr = spine.composed['volumeVariationAttrList'][s]
@@ -1092,7 +1077,7 @@ class Composer:
     def head_options(self, head):
         # compose the head orient from the masterCtrl and facial controllers to optionCtrl:
         self.facial_ctrl_grps = head.composed['facialCtrlGrpList']
-        for s, side in enumerate(self.ar.maker.get_mirror_names(head)):
+        for s, _side in enumerate(self.ar.maker.get_mirror_names(head)):
             # connect the masterCtrl to head group using a orientConstraint:
             world_ref = head.composed['worldRefList'][s]
             self.to_ids.extend(cmds.parentConstraint(self.ar.maker.root_ctrl, world_ref, maintainOffset=True, name=world_ref+"_PaC"))
@@ -1266,30 +1251,27 @@ class Composer:
                     if cmds.objExists(loaded_father_b):
                         self.to_ids.extend(cmds.parentConstraint(loaded_father_b, suspension_b_ctrl_grp, maintainOffset=True, name=suspension_b_ctrl_grp+"_PaC"))
                         self.to_ids.extend(cmds.scaleConstraint(loaded_father_b, suspension_b_ctrl_grp, maintainOffset=True, name=suspension_b_ctrl_grp+"_ScC"))
-            if wheel:
-                # get wheel module:
-                if self.ar.maker.hook[suspension.guide_base]['fatherModule'] == self.ar.data.wheel_name:
-                    # parent suspension control group to wheel Main_Ctrl
-                    suspension_hook_ctrl_grp = suspension.composed['ctrlHookGrpList'][s]
-                    wheel_main_ctrl = wheel.composed['mainCtrlList'][s]
-                    self.to_ids.extend(cmds.parentConstraint(wheel_main_ctrl, suspension_hook_ctrl_grp, maintainOffset=True, name=suspension_hook_ctrl_grp+"_PaC"))
-                    self.to_ids.extend(cmds.scaleConstraint(wheel_main_ctrl, suspension_hook_ctrl_grp, maintainOffset=True, name=suspension_hook_ctrl_grp+"_ScC"))
+            if wheel and self.ar.maker.hook[suspension.guide_base]['fatherModule'] == self.ar.data.wheel_name:
+                # parent suspension control group to wheel Main_Ctrl
+                suspension_hook_ctrl_grp = suspension.composed['ctrlHookGrpList'][s]
+                wheel_main_ctrl = wheel.composed['mainCtrlList'][s]
+                self.to_ids.extend(cmds.parentConstraint(wheel_main_ctrl, suspension_hook_ctrl_grp, maintainOffset=True, name=suspension_hook_ctrl_grp+"_PaC"))
+                self.to_ids.extend(cmds.scaleConstraint(wheel_main_ctrl, suspension_hook_ctrl_grp, maintainOffset=True, name=suspension_hook_ctrl_grp+"_ScC"))
 
 
     def nose_options(self, nose):
         # compose the nose control colors:
-        if self.ar.maker.hook[nose.guide_base]['guideMirrorAxis'] == "off":
-            if self.ar.data.colorize_curve:
-                self.ar.ctrls.color_shape(nose.composed['controllers'][0], "yellow")
-                self.ar.ctrls.color_shape(nose.composed['lCtrls'][0], "red")
-                self.ar.ctrls.color_shape(nose.composed['rCtrls'][0], "blue")
+        if self.ar.maker.hook[nose.guide_base]['guideMirrorAxis'] == "off" and self.ar.data.colorize_curve:
+            self.ar.ctrls.color_shape(nose.composed['controllers'][0], "yellow")
+            self.ar.ctrls.color_shape(nose.composed['lCtrls'][0], "red")
+            self.ar.ctrls.color_shape(nose.composed['rCtrls'][0], "blue")
         
         
     def nose_head(self, nose, head):
         if self.ar.maker.hook[nose.guide_base]['fatherModule'] == self.ar.data.head_name:
             upper_ctrl = head.composed['upperCtrlList'][0]
             upper_jaw_ctrl = head.composed['upperJawCtrlList'][0]
-            if not upper_jaw_ctrl == upper_ctrl:
+            if upper_jaw_ctrl != upper_ctrl:
                 ctrl_grp = nose.composed['ctrlHookGrpList'][0]
                 main_ctrl = nose.composed['mainCtrlList'][0]
                 cmds.addAttr(main_ctrl, longName="spaceSwitch", attributeType="enum", en="Upper Jaw:Upper Head", keyable=True)

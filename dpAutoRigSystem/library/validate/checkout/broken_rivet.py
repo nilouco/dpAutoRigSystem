@@ -259,8 +259,8 @@ class BrokenRivet(action.BaseAction):
             rivet_controller = cmds.listConnections(f"{rivet_net}.itemNode", source=True, destination=False)[0]
             pac = cmds.listConnections(f"{rivet_net}.pacNode", source=True, destination=False)[0]
             transform_attached = cmds.listConnections(f"{rivet_net}.rivet", source=True, destination=False)[0]
-            has_inv_translate = cmds.listConnections(f"{rivet_net}.invTGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True) or [None]))
-            has_inv_rotate = cmds.listConnections(f"{rivet_net}.invRGrp", source=True, destination=False) or "multiplyDivide" in list(map(lambda node : cmds.nodeType(node), cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True) or [None]))
+            has_inv_translate = cmds.listConnections(f"{rivet_net}.invTGrp", source=True, destination=False) or "multiplyDivide" in [cmds.nodeType(node) for node in cmds.listConnections(f"{rivet_controller}.translateX", source=False, destination=True) or [None]]
+            has_inv_rotate = cmds.listConnections(f"{rivet_net}.invRGrp", source=True, destination=False) or "multiplyDivide" in [cmds.nodeType(node) for node in cmds.listConnections(f"{rivet_controller}.rotateX", source=False, destination=True) or [None]]
             add_invet = has_inv_translate or has_inv_rotate
             connections = cmds.listConnections(pac, source=True, destination=True, plugs=True) or []
             found_attrs = [conn.split('.')[-1] for conn in connections]

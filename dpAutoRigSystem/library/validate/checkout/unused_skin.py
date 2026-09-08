@@ -46,7 +46,7 @@ class UnusedSkin(action.BaseAction):
                         # conditional 2 to check here if there's weighted vertices by influencer
                         influences = cmds.skinCluster(item, query=True, influence=True)
                         weighted_influences = cmds.skinCluster(item, query=True, weightedInfluence=True)
-                        if not len(influences) == len(weighted_influences):
+                        if len(influences) != len(weighted_influences):
                             self.checked_items.append(item)
                             self.found_issues.append(True)
                             if self.first_mode:
@@ -55,9 +55,8 @@ class UnusedSkin(action.BaseAction):
                                 try:
                                     to_remove_joints = []
                                     for joint_node in influences:
-                                        if not joint_node in weighted_influences:
-                                            if not joint_node in to_remove_joints:
-                                                to_remove_joints.append(joint_node)
+                                        if not joint_node in weighted_influences and not joint_node in to_remove_joints:
+                                            to_remove_joints.append(joint_node)
                                     if to_remove_joints:
                                         cmds.skinCluster(item, edit=True, removeInfluence=to_remove_joints, toSelectedBones=True)
                                     self.good_results.append(True)

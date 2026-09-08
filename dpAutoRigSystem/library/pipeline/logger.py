@@ -32,14 +32,14 @@ class Logger:
         cmds.separator(style='none', height=10, parent=infoColumnLayout)
         infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
         if self.info_description:
-            infoDesc = cmds.text(self.lang[self.info_description], align=self.info_align, parent=infoLayout)
+            cmds.text(self.lang[self.info_description], align=self.info_align, parent=infoLayout) #infoDesc
         if self.info_text:
-            info_text = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
+            cmds.text(self.info_text, align=self.info_align, parent=infoLayout) #info_text
             if buttonList:
-                if not buttonList[0] == "None":
+                if buttonList[0] != "None":
                     cmds.button(label=buttonList[0], command=partial(buttonList[1], buttonList[2]), parent=infoLayout)
                 else:
-                    noneText = cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout)
+                    cmds.text(self.lang['i305_none'], align=self.info_align, parent=infoLayout) #noneText
         if wiki:
             cmds.separator(style='none', height=20, parent=infoLayout)
             cmds.button(label="Wiki", command=partial(self.ar.web.visit_website, self.ar.data.wiki_url+wiki), backgroundColor=[1, 1, 1], align=self.info_align, parent=infoLayout)

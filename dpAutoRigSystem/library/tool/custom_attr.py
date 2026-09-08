@@ -97,7 +97,7 @@ class CustomAttr(base.BaseLibrary):
                         elif self.ar.data.ui_state:
                             attr = cmds.textFieldButtonGrp('custom_attr_add_tfbg', query=True, text=True)
                             if attr:
-                                if not attr == self.start_attr:
+                                if attr != self.start_attr:
                                     if not attr.startswith(self.start_attr):
                                         attr = self.start_attr+attr[0].capitalize()+attr[1:]
                                     else:
@@ -117,10 +117,9 @@ class CustomAttr(base.BaseLibrary):
                             ids.extend(self.update_id([item]))
                     else:
                         attr = self.attributes[attr_index]
-                    if attr:
-                        if not cmds.attributeQuery(attr, node=item, exists=True):
-                            cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
-                            cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
+                    if attr and not cmds.attributeQuery(attr, node=item, exists=True):
+                        cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
+                        cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
             if self.ar.data.ui_state and cmds.textFieldButtonGrp("addCustomAttrTFG", exists=True):
                 cmds.textFieldButtonGrp('custom_attr_add_tfbg', edit=True, text="")
         return ids
@@ -135,9 +134,8 @@ class CustomAttr(base.BaseLibrary):
                 if cmds.attributeQuery(attr, node=item, exists=True):
                     cmds.setAttr(item+"."+attr, edit=True, lock=False)
                     cmds.deleteAttr(item+"."+attr)
-                    if self.ar.data.ui_state:
-                        if cmds.button("custom_attr_remove_"+attr+"_bt", query=True, exists=True):
-                            cmds.deleteUI("custom_attr_remove_"+attr+"_bt")
+                    if self.ar.data.ui_state and cmds.button("custom_attr_remove_"+attr+"_bt", query=True, exists=True):
+                        cmds.deleteUI("custom_attr_remove_"+attr+"_bt")
 
 
     def get_custom_attrs(self, items=None, *args):
@@ -152,9 +150,8 @@ class CustomAttr(base.BaseLibrary):
                     if self.dpid_attr in current_item_attrs:
                         custom_attributes.append(self.dpid_attr)
                     for attr in current_item_attrs:
-                        if attr.startswith(self.start_attr):
-                            if cmds.getAttr(item+"."+attr, type=True) == "bool":
-                                custom_attributes.append(attr)
+                        if attr.startswith(self.start_attr) and cmds.getAttr(item+"."+attr, type=True) == "bool":
+                            custom_attributes.append(attr)
         return custom_attributes
 
 
@@ -188,7 +185,6 @@ class CustomAttr(base.BaseLibrary):
                                 "name" : decomposed_ids[1],
                                 "date" : decomposed_ids[2]
                                }
-            if win:
-                if id_data:
-                    self.ar.custom_attr_ui.id_ui(id_data)
+            if win and id_data:
+                self.ar.custom_attr_ui.id_ui(id_data)
         return id_data

@@ -75,7 +75,7 @@ class Publisher:
                 # start logging
                 publish_log = {}
                 publish_log["scene"] = self.ar.pipeliner.pipe_data['sceneName']
-                if not publish_filename[-3:-1] == ".m":
+                if publish_filename[-3:-1] != ".m":
                     publish_filename += ".m"+self.ar.pipeliner.pipe_data['sceneName'][-1]
                 self.ar.pipeliner.pipe_data['publishFileName'] = publish_filename
                 publish_log["published"] = self.ar.pipeliner.pipe_data['publishPath']+"/"+publish_filename
@@ -146,12 +146,11 @@ class Publisher:
                     # mount folders
                     if self.ar.pipeliner.pipe_data['b_deliver']:
                         self.ar.pipeliner.mount_package_path()
-                        if self.ar.pipeliner.pipe_data['toClientPath']:
-                            # rigging preview image
-                            if self.ar.pipeliner.pipe_data['b_imager']:
-                                self.ar.pipeliner.pipe_data['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipe_data, built_version, self.ar.pipeliner.get_today())
-                                self.ar.ui_manager.set_progress(end_it=True)
-                                self.ar.ui_manager.set_progress(self.ar.data.lang['i225_savingFile']+"...", self.ar.data.lang['m046_publisher'], 8, add_one=False, add_number=False)
+                        # rigging preview image
+                        if self.ar.pipeliner.pipe_data['toClientPath'] and self.ar.pipeliner.pipe_data['b_imager']:
+                            self.ar.pipeliner.pipe_data['imagePreviewPath'] = self.ar.packager.imager(self.ar.pipeliner.pipe_data, built_version, self.ar.pipeliner.get_today())
+                            self.ar.ui_manager.set_progress(end_it=True)
+                            self.ar.ui_manager.set_progress(self.ar.data.lang['i225_savingFile']+"...", self.ar.data.lang['m046_publisher'], 8, add_one=False, add_number=False)
                     else:
                         self.ar.ui_manager.set_progress(self.ar.data.lang['i225_savingFile']+"...", add_number=False)
                     
@@ -167,9 +166,8 @@ class Publisher:
                             zip_file = self.ar.packager.create_zip_to_client(self.ar.pipeliner.pipe_data['publishPath'], publish_filename, self.ar.pipeliner.pipe_data['toClientPath'], self.ar.pipeliner.get_today())
                             # dropbox
                             self.ar.ui_manager.set_progress(self.ar.data.lang['i226_exportFiles']+"... Clouding", add_number=False)
-                            if zip_file:
-                                if self.ar.pipeliner.pipe_data['dropboxPath']:
-                                    self.ar.packager.to_dropbox(zip_file, self.ar.pipeliner.pipe_data['dropboxPath'])
+                            if zip_file and self.ar.pipeliner.pipe_data['dropboxPath']:
+                                self.ar.packager.to_dropbox(zip_file, self.ar.pipeliner.pipe_data['dropboxPath'])
                             # open folder
                             self.ar.ui_manager.set_progress(self.ar.data.lang['i226_exportFiles']+"... Folder openning", add_number=False)
                             self.ar.packager.open_folder(self.ar.pipeliner.pipe_data['toClientPath'])
@@ -251,9 +249,8 @@ class Publisher:
                     comments = self.ar.data.lang['m046_publisher']+" v"+str(self.ar.data.version)
             if not comments.startswith(self.ar.data.lang['i358_batch']) and not comments.endswith(self.ar.data.lang['i358_batch']):
                 comments = self.ar.data.lang['i358_batch']+" - "+comments
-            if not assets:
-                if self.ar.data.ui_state:
-                    assets = [a[a.rfind("|")+1:-3] for a in self.ar.pipeline_ui.select_asset_checkboxes if cmds.checkBox(a, query=True, value=True)] #removed '_cb'
+            if not assets and self.ar.data.ui_state:
+                assets = [a[a.rfind("|")+1:-3] for a in self.ar.pipeline_ui.select_asset_checkboxes if cmds.checkBox(a, query=True, value=True)] #removed '_cb'
             if assets:
                 print(self.ar.data.lang['i335_starting']+" "+self.ar.data.lang['i358_batch']+" "+self.ar.data.lang['m046_publisher']+"...")
                 print(self.ar.data.lang['i219_comments']+":", comments)

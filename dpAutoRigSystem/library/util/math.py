@@ -124,9 +124,8 @@ class Math:
         """
         if cmds.attributeQuery(self.ar.data.dp_id, node=item, exists=True):
             decomposed_id_items = self.decompose_id(item)
-            if "dp" == decomposed_id_items[0]:
-                if item == decomposed_id_items[1]:
-                    return True
+            if "dp" == decomposed_id_items[0] and item == decomposed_id_items[1]:
+                return True
 
 
     #######

@@ -82,13 +82,12 @@ class RivetUI:
         """ Try to auto fill UI elements from selection.
         """
         selection = cmds.ls(selection=True)
-        if selection:
-            if len(selection) > 1:
-                items = selection[:-1]
-                items.sort()
-                geo = selection[-1]
-                self.load_geo_to_attach(geo)
-                self.add_selected_item(items)
+        if selection and len(selection) > 1:
+            items = selection[:-1]
+            items.sort()
+            geo = selection[-1]
+            self.load_geo_to_attach(geo)
+            self.add_selected_item(items)
 
 
     def select_ctrl_items(self, *args):
@@ -127,7 +126,7 @@ class RivetUI:
         selection = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectItem=True)
         selection_indexes = cmds.textScrollList('rivet_filter_controller_tsl', query=True, selectIndexedItem=True)
         if selection and selection_indexes:
-            true_indexes = list(map(lambda n : n-1, selection_indexes))
+            true_indexes = [n-1 for n in selection_indexes]
             self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(true_indexes), add_one=False, add_number=False)
             self.remove_rivet_from_list(true_indexes, selection)
             self.app.remove_rivet_grp()
@@ -181,18 +180,17 @@ class RivetUI:
             has_rivet_set = set(has_rivets_items)
             to_create_set = set(items)
             need_to_remove = to_create_set & has_rivet_set
-        if need_to_remove:
-            if len(need_to_remove) > 0:
-                remove_existing_rivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
-                if remove_existing_rivet == self.ar.data.lang['i071_yes']:
-                    need_to_remove_items, true_indexes = self.get_to_remove_indexes(need_to_remove, has_rivets_items)
-                    self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(need_to_remove_items), add_one=False, add_number=False)
-                    self.remove_rivet_from_list(true_indexes, need_to_remove_items)
-                    self.ar.ui_manager.set_progress(end_it=True)
-                elif remove_existing_rivet == self.ar.data.lang['i072_no']:
-                    pass
-                else:
-                    return
+        if need_to_remove and len(need_to_remove) > 0:
+            remove_existing_rivet = cmds.confirmDialog(title=self.ar.data.lang['i074_attention'], icon="warning", message=self.ar.data.lang['i316_rivetNotFine'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no'], self.ar.data.lang['i132_cancel']], defaultButton=self.ar.data.lang['i071_yes'], cancelButton=self.ar.data.lang['i132_cancel'], dismissString=self.ar.data.lang['i132_cancel'])
+            if remove_existing_rivet == self.ar.data.lang['i071_yes']:
+                need_to_remove_items, true_indexes = self.get_to_remove_indexes(need_to_remove, has_rivets_items)
+                self.ar.ui_manager.set_progress(self.ar.data.lang['i315_removing'], self.ar.data.lang['i315_removing']+" "+self.ar.data.lang['m083_rivet'], len(need_to_remove_items), add_one=False, add_number=False)
+                self.remove_rivet_from_list(true_indexes, need_to_remove_items)
+                self.ar.ui_manager.set_progress(end_it=True)
+            elif remove_existing_rivet == self.ar.data.lang['i072_no']:
+                pass
+            else:
+                return
 
         # call run function to create Rivet setup using UI values
         self.ar.ui_manager.set_progress(self.ar.data.lang['i318_working'], self.ar.data.lang['i317_creatingRivet'], len(items), add_one=False, add_number=False)
@@ -254,7 +252,7 @@ class RivetUI:
             for item in selection:
                 if not item in selected_items:
                     if cmds.objectType(item) == "transform":
-                        if not item == self.app.geo_to_attach:
+                        if item != self.app.geo_to_attach:
                             selected_items.append(item)
                     elif ".vtx" in item or ".cv" in item or ".pt" in item:
                         selected_items.append(item)

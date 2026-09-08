@@ -34,8 +34,6 @@ class Foot(standard.BaseStandard):
                                    ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
 
     
-
-
     def create_guide_elements(self):
         """ Creates the controller locators of the standard module guide.
         """
@@ -239,7 +237,7 @@ class Foot(standard.BaseStandard):
                 rff_zero = self.ar.utils.create_zero_out([rff_grp])[0]
                 rff_zero_extra = self.ar.utils.create_zero_out([rff_zero])[0]
                 rff_zero_follow = self.ar.utils.create_zero_out([rff_zero])[0]
-                rfe_zero = self.ar.utils.create_zero_out([rfe_grp])[0]
+                self.ar.utils.create_zero_out([rfe_grp])[0] #rfe_zero
                 rfd_zero = self.ar.utils.create_zero_out([rfd_grp])[0]
                 rfc_zero = self.ar.utils.create_zero_out([rfc_grp])[0]
                 rfb_zero = self.ar.utils.create_zero_out([rfb_grp])[0]

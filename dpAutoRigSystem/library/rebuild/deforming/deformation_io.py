@@ -49,7 +49,7 @@ class DeformationIO(action.BaseAction):
                             # finding deformers
                             has_def = False
                             input_deformers = cmds.listHistory(items, pruneDagObjects=False, interestLevel=True)
-                            for deformer_type in self.ar.skin.def_attr_data.keys():
+                            for deformer_type in self.ar.skin.def_attr_data:
                                 if cmds.ls(input_deformers, type=deformer_type):
                                     has_def = True
                                     break
@@ -90,7 +90,7 @@ class DeformationIO(action.BaseAction):
         # Declaring the data dictionary to export it
         deformer_data = {}
         # run for all deformer types to get info
-        for deformer_type in self.ar.skin.def_attr_data.keys():
+        for deformer_type in self.ar.skin.def_attr_data:
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             deformers = cmds.ls(selection=False, type=deformer_type)
             if deformers:
@@ -109,18 +109,16 @@ class DeformationIO(action.BaseAction):
                             # Get weights
                             index = shape_to_index_data[shape]
                             weights = self.ar.skin.get_deformer_weights(deformer_node, index)
-                            if deformer_data[deformer_node]["relatedNode"]: 
-                                if not deformer_type == "ffd":
-                                    # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
-                                    weights = self.ar.skin.get_deformer_weights(deformer_data[deformer_node]["relatedNode"], index)
+                            if deformer_data[deformer_node]["relatedNode"] and deformer_type != "ffd":
+                                # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
+                                weights = self.ar.skin.get_deformer_weights(deformer_data[deformer_node]["relatedNode"], index)
                             deformer_data[deformer_node]["weights"][index] = weights
                         # componentTag
                         deformer_data[deformer_node]["componentTag"] = self.ar.skin.check_use_component_tag(deformer_node)
                         # parenting
                         deformer_data[deformer_node]["father"] = None
-                        if deformer_data[deformer_node]["relatedNode"]:
-                            if cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True):
-                                deformer_data[deformer_node]["father"] = cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True)[0]
+                        if deformer_data[deformer_node]["relatedNode"] and cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True):
+                            deformer_data[deformer_node]["father"] = cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True)[0]
         return deformer_data
 
 
@@ -180,9 +178,8 @@ class DeformationIO(action.BaseAction):
                             parent_nodes = cmds.listRelatives(wrap_base_shape, parent=True)
                         else:
                             parent_nodes = cmds.listRelatives(new_wrap_base_node, parent=True)
-                        if parent_nodes:
-                            if not parent_nodes[0] == support_grp:
-                                cmds.parent(new_wrap_base_node, support_grp)
+                        if parent_nodes and parent_nodes[0] != support_grp:
+                            cmds.parent(new_wrap_base_node, support_grp)
             elif deformer_data[deformer_node]["type"] == "shrinkWrap":
                 new_def_node = cmds.deformer(self.existShapeList, type=deformer_data[deformer_node]["type"], name=deformer_data[deformer_node]["name"], useComponentTags=deformer_data[deformer_node]["componentTag"])[0] #shrinkWrap
                 for c_attr in ["continuity", "smoothUVs", "keepBorder", "boundaryRule", "keepHardEdge", "propagateEdgeHardness", "keepMapBorders"]:
@@ -209,13 +206,12 @@ class DeformationIO(action.BaseAction):
                     self.fail_io(self.latest_data_file+": "+deformer_node+" - "+deformer_data[deformer_node]["relatedNode"])
         # parenting
         need_parent_it = False
-        if deformer_data[deformer_node]["father"]:
-            if cmds.objExists(deformer_data[deformer_node]["father"]):
-                if cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True):
-                    if not deformer_data[deformer_node]["father"] in cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True):
-                        need_parent_it = True
-                else:
+        if deformer_data[deformer_node]["father"] and cmds.objExists(deformer_data[deformer_node]["father"]):
+            if cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True):
+                if not deformer_data[deformer_node]["father"] in cmds.listRelatives(deformer_data[deformer_node]["relatedNode"], allParents=True, fullPath=True):
                     need_parent_it = True
+            else:
+                need_parent_it = True
         if need_parent_it:
             if deformer_data[deformer_node]["type"] == "ffd":
                 cmds.parent([deformer_data[deformer_node]["relatedNode"], deformer_data[deformer_node]["relatedData"]["baseLatticeMatrix"]], deformer_data[deformer_node]["father"])
@@ -223,7 +219,7 @@ class DeformationIO(action.BaseAction):
                 cmds.parent(deformer_data[deformer_node]["relatedNode"], deformer_data[deformer_node]["father"])
         # import attribute values
         if new_def_node:
-            for attr in deformer_data[deformer_node]["attributes"].keys():
+            for attr in deformer_data[deformer_node]["attributes"]:
                 try:
                     cmds.setAttr(new_def_node+"."+attr, deformer_data[deformer_node]["attributes"][attr])
                 except:
@@ -244,7 +240,7 @@ class DeformationIO(action.BaseAction):
         """
         well_imported = True
         to_import_items, not_found_meshs, changed_shape_meshes = [], [], []
-        for deformer_node in deformer_data.keys():
+        for deformer_node in deformer_data:
             # check mesh existing
             for shape in deformer_data[deformer_node]["shapeList"]:
                 if cmds.objExists(shape):

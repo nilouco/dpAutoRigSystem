@@ -97,7 +97,7 @@ class ChannelIO(action.BaseAction):
         self.ar.ui_manager.set_progress(max=len(attr_data.keys()), add_one=False, add_number=False)
         # define lists to check result
         well_imported_items = []
-        for item in attr_data.keys():
+        for item in attr_data:
             not_found_nodes = []
             self.ar.ui_manager.set_progress(self.ar.data.lang[self.title])
             # check attributes

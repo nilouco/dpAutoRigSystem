@@ -254,7 +254,7 @@ class FacialConnection(base.BaseLibrary):
                         for facial_attr in facial_ctrl_data[facial_ctrl]:
                             for target_attr in bs_data[bs_node]:
                                 connect_it = False
-                                if target_attr.endswith(facial_attr+"_Tgt") or target_attr.endswith(facial_attr) or facial_attr == target_attr:
+                                if target_attr.endswith((facial_attr + "_Tgt", facial_attr)) or facial_attr == target_attr:
                                     connect_it = True
                                 # not including here the (facial_attr in target_attr) statement to try avoid connect into combination alias
                                 if connect_it:
@@ -266,11 +266,9 @@ class FacialConnection(base.BaseLibrary):
                 combinations_data = self.find_comb_tgt_relatonship(bs_node)
                 comb_results = self.connect_comb_targets(bs_node, combinations_data)
                 if comb_results:
-                    for result in comb_results:
-                        results.append(result)
-        if not self.ar.data.rebuilding:
-            if self.ar.data.ui_state and results:
-                self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
+                    results.extend(comb_results)
+        if not self.ar.data.rebuilding and self.ar.data.ui_state and results:
+            self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
         self.ar.ui_manager.close_ui('dpFacialConnectionWindow')
     
 
@@ -311,28 +309,26 @@ class FacialConnection(base.BaseLibrary):
                                     node_datas.append(data)
                                 else:
                                     for s in ["L", "R"]:
-                                        if middle_or_sided == s+"_"+MIDDLE:
-                                            if side_prefix == "L":
-                                                # simple connection
-                                                node_datas.append(tweaks_data[side_attr][middle_or_sided])
+                                        if middle_or_sided == s+"_"+MIDDLE and side_prefix == "L":
+                                            # simple connection
+                                            node_datas.append(tweaks_data[side_attr][middle_or_sided])
                                 if node_datas:
                                     for node_data in node_datas:
                                         for to_node in list(node_data.keys()):
                                             for joint_target in self.joint_targets:
-                                                if cmds.objExists(joint_target):
-                                                    if joint_target.startswith(to_node):
-                                                        # caculate factor for scaled item:
-                                                        size_factor = self.get_size_factor(joint_target)
-                                                        if not size_factor:
-                                                            size_factor = 1
-                                                        for to_attr in list(node_data[to_node].keys()):
-                                                            # read stored values in order to call function to make the setup
-                                                            output_min = node_data[to_node][to_attr][0]
-                                                            output_max = node_data[to_node][to_attr][1]
-                                                            self.create_remap_node(facial_ctrl, facial_attr, joint_target, to_attr, self.rmv_number, size_factor, output_min, output_max)
-                                                            self.rmv_number = self.rmv_number+1
-                                                        print(self.ar.data.lang['m143_connected'], facial_ctrl+"."+facial_attr, "->", joint_target)
-                                                        results.append(facial_ctrl+"."+facial_attr+" -> "+joint_target)
+                                                if cmds.objExists(joint_target) and joint_target.startswith(to_node):
+                                                    # caculate factor for scaled item:
+                                                    size_factor = self.get_size_factor(joint_target)
+                                                    if not size_factor:
+                                                        size_factor = 1
+                                                    for to_attr in list(node_data[to_node].keys()):
+                                                        # read stored values in order to call function to make the setup
+                                                        output_min = node_data[to_node][to_attr][0]
+                                                        output_max = node_data[to_node][to_attr][1]
+                                                        self.create_remap_node(facial_ctrl, facial_attr, joint_target, to_attr, self.rmv_number, size_factor, output_min, output_max)
+                                                        self.rmv_number = self.rmv_number+1
+                                                    print(self.ar.data.lang['m143_connected'], facial_ctrl+"."+facial_attr, "->", joint_target)
+                                                    results.append(facial_ctrl+"."+facial_attr+" -> "+joint_target)
                     self.ar.custom_attr.add_attr(0, self.to_ids) #dpID
                     if self.ar.data.ui_state and results:
                         self.ar.logger.infoWin('m085_facialConnection', 'm143_connected', '\n'.join(results), 'center', 200, 350)
@@ -364,10 +360,8 @@ class FacialConnection(base.BaseLibrary):
         children = cmds.listRelatives(to_node, children=True, type="transform")
         if children:
             for child in children:
-                if cmds.objExists(child+".dpControl"):
-                    if cmds.getAttr(child+".dpControl") == 1:
-                        if cmds.objExists(child+".size"):
-                            return cmds.getAttr(child+".size") #sizeValue
+                if "dpControl" in cmds.listAttr(child) and cmds.getAttr(child+".dpControl") == 1 and "size" in cmds.listAttr(child):
+                    return cmds.getAttr(child+".size") #sizeValue
 
 
     def create_remap_node(self, from_node, from_attr, joint_target, to_attr, number, size_factor, output_min=0, output_max=1, input_min=0, input_max=1):
@@ -523,12 +517,11 @@ class FacialConnection(base.BaseLibrary):
                     driver_indexes.append(driver_index) 
                 input_weights = cmds.combinationShape(query=True, blendShape=bs_node, combinationTargetIndex=comb_index, exist=True)    
                 # check if combination target is already connected
-                if not input_weights:
-                    # add combination only if the target is not locked
-                    if not cmds.getAttr(bs_node+"."+comb_tgt, lock=True):
-                        cmds.combinationShape(blendShape=bs_node, combineMethod=0, combinationTargetIndex=comb_index, driverTargetIndex=driver_indexes)
-                        print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", comb_tgt)
-                        results.append(str(drivers[0]+" + "+drivers[1]+" -> "+comb_tgt))
+                # add combination only if the target is not locked
+                if not input_weights and not cmds.getAttr(bs_node+"."+comb_tgt, lock=True):
+                    cmds.combinationShape(blendShape=bs_node, combineMethod=0, combinationTargetIndex=comb_index, driverTargetIndex=driver_indexes)
+                    print(self.ar.data.lang['m143_connected'], drivers[0]+" + "+drivers[1], "->", comb_tgt)
+                    results.append(str(drivers[0]+" + "+drivers[1]+" -> "+comb_tgt))
         return results
 
 
@@ -564,51 +557,50 @@ class FacialConnection(base.BaseLibrary):
         """ Rebuild the blendShape targets from an old mesh to a new one.
         """
         selections = cmds.ls(selection=True, type="transform")
-        if selections and len(selections) == 2:
-            if self.ar.utils.check_geometry(selections[0]) and self.ar.utils.check_geometry(selections[1]):
-                old_mesh = selections[0]
-                new_mesh = selections[1]
-                bs_node = cmds.ls(cmds.listHistory(old_mesh), type="blendShape")
-                if bs_node:
-                    targets = cmds.listAttr(bs_node[0]+".w", multi=True)
-                    if targets:
-                        self.ar.ui_manager.set_progress(self.ar.data.lang['c110_start'], self.ar.data.lang["m265_recreateTargets"], max=len(targets), add_one=False, add_number=False)
-                        reconnect_items = []
-                        cmds.select([new_mesh, old_mesh])
-                        mel.eval("CreateWrap;")
-                        target_grps = cmds.group(name="New_Tgt_Grp", empty=True)
-                        # clear selection
-                        cmds.select(clear=True)
-                        new_targets = []
-                        for item in targets:
-                            self.ar.ui_manager.set_progress('Target: '+item)
-                            if not item == old_mesh:
-                                has_connection = cmds.listConnections(bs_node[0]+"."+item, source=True, destination=False, plugs=True)
-                                if has_connection:
-                                    cmds.disconnectAttr(has_connection[0], bs_node[0]+"."+item)
-                                    reconnect_items.append(has_connection[0])
-                                else:
-                                    reconnect_items.append(None)
-                                # set blendShape slider as 1
-                                cmds.setAttr(bs_node[0]+"."+item, 1)
-                                # renaming old target
-                                cmds.rename(item, item+"_Old")
-                                tgt = cmds.duplicate(new_mesh, name=item)[0]
-                                cmds.parent(tgt, target_grps)
-                                new_targets.append(tgt)
-                                # back to zero
-                                cmds.setAttr(bs_node[0]+"."+item, 0)
-                                if has_connection:
-                                    cmds.connectAttr(has_connection[0], bs_node[0]+"."+item)
-                                # clear undo
-                                mel.eval("flushUndo;")
-                        cmds.delete(new_mesh, constructionHistory=True)
-                        cmds.rename(bs_node[0], bs_node[0]+"_Old")
-                        cmds.blendShape(new_targets, new_mesh, topologyCheck=False, name=bs_node[0])
-                        for p, plug in enumerate(reconnect_items):
-                            if plug:
-                                cmds.connectAttr(plug, bs_node[0]+"."+new_targets[p], force=True)
-                        if cmds.objExists(old_mesh+"Base"):
-                            cmds.delete(old_mesh+"Base")
-                        self.ar.ui_manager.set_progress(end_it=True)
-                        cmds.select(clear=True)
+        if selections and len(selections) == 2 and self.ar.utils.check_geometry(selections[0]) and self.ar.utils.check_geometry(selections[1]):
+            old_mesh = selections[0]
+            new_mesh = selections[1]
+            bs_node = cmds.ls(cmds.listHistory(old_mesh), type="blendShape")
+            if bs_node:
+                targets = cmds.listAttr(bs_node[0]+".w", multi=True)
+                if targets:
+                    self.ar.ui_manager.set_progress(self.ar.data.lang['c110_start'], self.ar.data.lang["m265_recreateTargets"], max=len(targets), add_one=False, add_number=False)
+                    reconnect_items = []
+                    cmds.select([new_mesh, old_mesh])
+                    mel.eval("CreateWrap;")
+                    target_grps = cmds.group(name="New_Tgt_Grp", empty=True)
+                    # clear selection
+                    cmds.select(clear=True)
+                    new_targets = []
+                    for item in targets:
+                        self.ar.ui_manager.set_progress('Target: '+item)
+                        if item != old_mesh:
+                            has_connection = cmds.listConnections(bs_node[0]+"."+item, source=True, destination=False, plugs=True)
+                            if has_connection:
+                                cmds.disconnectAttr(has_connection[0], bs_node[0]+"."+item)
+                                reconnect_items.append(has_connection[0])
+                            else:
+                                reconnect_items.append(None)
+                            # set blendShape slider as 1
+                            cmds.setAttr(bs_node[0]+"."+item, 1)
+                            # renaming old target
+                            cmds.rename(item, item+"_Old")
+                            tgt = cmds.duplicate(new_mesh, name=item)[0]
+                            cmds.parent(tgt, target_grps)
+                            new_targets.append(tgt)
+                            # back to zero
+                            cmds.setAttr(bs_node[0]+"."+item, 0)
+                            if has_connection:
+                                cmds.connectAttr(has_connection[0], bs_node[0]+"."+item)
+                            # clear undo
+                            mel.eval("flushUndo;")
+                    cmds.delete(new_mesh, constructionHistory=True)
+                    cmds.rename(bs_node[0], bs_node[0]+"_Old")
+                    cmds.blendShape(new_targets, new_mesh, topologyCheck=False, name=bs_node[0])
+                    for p, plug in enumerate(reconnect_items):
+                        if plug:
+                            cmds.connectAttr(plug, bs_node[0]+"."+new_targets[p], force=True)
+                    if cmds.objExists(old_mesh+"Base"):
+                        cmds.delete(old_mesh+"Base")
+                    self.ar.ui_manager.set_progress(end_it=True)
+                    cmds.select(clear=True)

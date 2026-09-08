@@ -76,16 +76,15 @@ class ControllersHierarchy(action.BaseAction):
         # This data is in a way wich each key is the changed control and first value is a list in wich index 0 is the original Father and index 1 is the new Father. 
         hierarchy_change_ctrls_set = {}
         for key in original_hierarchy:
-            if (key in new_hierarchy):
-                if (original_hierarchy[key] != new_hierarchy[key]):
-                    diff_set = set(original_hierarchy[key]) ^ set(new_hierarchy[key])
-                    for diff in diff_set:
-                        if diff in original_hierarchy[key]:
-                            last_parent = key
-                        else:
-                            last_parent = self.find_diff_in_hierarchy(diff, original_hierarchy)
-                        new_dad = self.find_diff_in_hierarchy(diff, new_hierarchy)
-                        hierarchy_change_ctrls_set[diff] = [last_parent, new_dad]
+            if key in new_hierarchy and original_hierarchy[key] != new_hierarchy[key]:
+                diff_set = set(original_hierarchy[key]) ^ set(new_hierarchy[key])
+                for diff in diff_set:
+                    if diff in original_hierarchy[key]:
+                        last_parent = key
+                    else:
+                        last_parent = self.find_diff_in_hierarchy(diff, original_hierarchy)
+                    new_dad = self.find_diff_in_hierarchy(diff, new_hierarchy)
+                    hierarchy_change_ctrls_set[diff] = [last_parent, new_dad]
         return hierarchy_change_ctrls_set
     
 

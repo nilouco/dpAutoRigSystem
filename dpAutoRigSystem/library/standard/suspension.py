@@ -59,11 +59,10 @@ class Suspension(standard.BaseStandard):
         """ Loads the selected node to fatherBTextField in selectedModuleLayout.
         """
         selection = cmds.ls(selection=True)
-        if selection:
-            if cmds.objExists(selection[0]):
-                cmds.setAttr(self.guide_base+".fatherB", selection[0], type='string')
-                if self.ar.data.ui_state:
-                    cmds.textField('edit_guide_fatherb_tf', edit=True, text=selection[0])
+        if selection and cmds.objExists(selection[0]):
+            cmds.setAttr(self.guide_base+".fatherB", selection[0], type='string')
+            if self.ar.data.ui_state:
+                cmds.textField('edit_guide_fatherb_tf', edit=True, text=selection[0])
     
     
     def rig_me(self, *args):
@@ -121,11 +120,10 @@ class Suspension(standard.BaseStandard):
                     # hide visibility attribute:
                     cmds.setAttr(main_ctrl+'.visibility', keyable=False)
                     # fixing flip mirror:
-                    if s == 1:
-                        if cmds.getAttr(self.guide_base+".flip") == 1:
-                            cmds.setAttr(ctrl_zeros[0]+".scaleX", -1)
-                            cmds.setAttr(ctrl_zeros[0]+".scaleY", -1)
-                            cmds.setAttr(ctrl_zeros[0]+".scaleZ", -1)
+                    if s == 1 and cmds.getAttr(self.guide_base+".flip") == 1:
+                        cmds.setAttr(ctrl_zeros[0]+".scaleX", -1)
+                        cmds.setAttr(ctrl_zeros[0]+".scaleY", -1)
+                        cmds.setAttr(ctrl_zeros[0]+".scaleZ", -1)
                     cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
                     cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)

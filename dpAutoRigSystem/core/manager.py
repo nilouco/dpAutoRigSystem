@@ -169,12 +169,12 @@ class UIManager:
     def get_icon_name(self, item, alternative="add_on"):
         icon_name = "ar"
         if hasattr(item, "name"):
-            if item.name in self.ar.data.icon.keys():
+            if item.name in self.ar.data.icon:
                 icon_name = item.name
             else:
                 icon_name = self.ar.naming.to_snake_case(item.name)
-        if not icon_name in self.ar.data.icon.keys():
-            if icon_name.split("_")[0] in self.ar.data.icon.keys():
+        if not icon_name in self.ar.data.icon:
+            if icon_name.split("_")[0] in self.ar.data.icon:
                 icon_name = icon_name.split("_")[0]
             else:
                 icon_name = alternative
@@ -225,11 +225,10 @@ class UIManager:
             first_mode = True for verify/export
                        = False for fix/import
         """
-        if first_mode and action_type == "r000_rebuilder": #splitData
-            if self.ar.naming.get_duplicated_names():
-                confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
-                if confirm == self.ar.data.lang['i072_no']:
-                    return
+        if first_mode and action_type == "r000_rebuilder" and self.ar.naming.get_duplicated_names(): #splitData
+            confirm = cmds.confirmDialog(title=self.ar.data.lang['v024_duplicatedName'], icon="question", message=self.ar.data.lang['i355_uniqueNameDependence'], button=[self.ar.data.lang['i071_yes'], self.ar.data.lang['i072_no']], defaultButton=self.ar.data.lang['i072_no'], cancelButton=self.ar.data.lang['i072_no'], dismissString=self.ar.data.lang['i072_no'])
+            if confirm == self.ar.data.lang['i072_no']:
+                return
         self.reset_button_colors()
         action_result_data = {}
         log_text = ""
@@ -247,10 +246,8 @@ class UIManager:
                     action_instance.verbose = False
                     action_result_data[action_instance.name] = action_instance.run_action(first_mode)
                     action_instance.verbose = True
-                    if stop_if_found_block:
-                        if True in action_instance.found_issues:
-                            if False in action_instance.good_results:
-                                return action_result_data, True, a
+                    if stop_if_found_block and True in action_instance.found_issues and False in action_instance.good_results:
+                        return action_result_data, True, a
         if action_result_data:
             action_result_keys = list(action_result_data.keys())
             action_result_keys.sort()

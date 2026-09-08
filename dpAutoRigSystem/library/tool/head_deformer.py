@@ -231,9 +231,8 @@ class HeadDeformer(base.BaseLibrary):
             # fix side values
             for axis in self.ar.data.axes:
                 unit_conv_node = cmds.listConnections(intensity_md+".output"+axis, destination=True)[0]
-                if unit_conv_node:
-                    if cmds.objectType(unit_conv_node) == "unitConversion":
-                        cmds.setAttr(unit_conv_node+".conversionFactor", 1)
+                if unit_conv_node and cmds.objectType(unit_conv_node) == "unitConversion":
+                    cmds.setAttr(unit_conv_node+".conversionFactor", 1)
             cmds.connectAttr(arrow_ctrl+"."+self.ar.data.lang["c021_showControls"], main_ctrl_shape+".visibility")
             self.ar.ctrls.set_lock_hide([arrow_ctrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             
@@ -313,34 +312,26 @@ class HeadDeformer(base.BaseLibrary):
             jaw_conditions = [self.ar.data.lang["m075_upperTeeth"], self.ar.data.lang["m076_lowerTeeth"], self.ar.data.lang["m077_tongue"], self.ar.data.lang["c039_lip"]+"_"+self.ar.data.lang["c058_main"]]
             ctrl_id_not_include_items = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if head_sub_ctrl:
-                head_sub_ctrl_children = cmds.listRelatives(head_sub_ctrl, allDescendents=True)
-                if head_sub_ctrl_children:
-                    for child in head_sub_ctrl_children:
-                        ctrls_children.append(child)
+                ctrls_children.extend(cmds.listRelatives(head_sub_ctrl, allDescendents=True) or [])
             if jaw_ctrl:
-                jaw_ctrl_children = cmds.listRelatives(jaw_ctrl, allDescendents=True)
-                if jaw_ctrl_children:
-                    for child in jaw_ctrl_children:
-                        ctrls_children.append(child)
+                ctrls_children.extend(cmds.listRelatives(jaw_ctrl, allDescendents=True) or [])
             if ctrls_children:
                 for item in ctrls_children:
-                    if cmds.objExists(item+".controlID"):
-                        if not cmds.objExists(item+"."+DPHEADDEFINFLUENCE):
-                            if cmds.getAttr(item+".controlID") not in ctrl_id_not_include_items:
-                                self.ar.ctrls.add_def_influence_attrs(item, def_influence_type=1)
-                                if not cmds.objExists(item+"."+DPJAWDEFINFLUENCE):
-                                    for condition in jaw_conditions:
-                                        if condition in item:
-                                            self.ar.ctrls.add_def_influence_attrs(item, def_influence_type=2)
+                    if "controlID" in cmds.listAttr(item) and DPHEADDEFINFLUENCE not in cmds.listAttr(item) and cmds.getAttr(item+".controlID") not in ctrl_id_not_include_items:
+                        self.ar.ctrls.add_def_influence_attrs(item, def_influence_type=1)
+                        if DPJAWDEFINFLUENCE not in cmds.listAttr(item):
+                            for condition in jaw_conditions:
+                                if condition in item:
+                                    self.ar.ctrls.add_def_influence_attrs(item, def_influence_type=2)
 
             # apply influence deformer only in child shape controls which have the attribute or given nodes
             if not deformed_by_items:
                 deformed_by_items = cmds.ls(selection=False, type="transform")
             if deformed_by_items:
                 for item in deformed_by_items:
-                    if cmds.objExists(item+".controlID"):
+                    if "controlID" in cmds.listAttr(item):
                         if not self.ar.data.lang["c025_jaw"] in arrow_ctrl:
-                            if cmds.objExists(item+"."+DPHEADDEFINFLUENCE) and cmds.getAttr(item+"."+DPHEADDEFINFLUENCE):
+                            if DPHEADDEFINFLUENCE in cmds.listAttr(item) and cmds.getAttr(item+"."+DPHEADDEFINFLUENCE):
                                 shape = cmds.listRelatives(item, shapes=True)
                                 if shape:
                                     cmds.deformer(deformer_name+"_FFD", edit=True, geometry=shape)
@@ -351,12 +342,11 @@ class HeadDeformer(base.BaseLibrary):
                                     cmds.deformer(deformer_name+"_FFD", edit=True, geometry=shape)
                                 
             # try to integrate to Head_Head_Sub_Ctrl
-            if not head_ctrl:
-                if head_sub_ctrl:
-                    if len(head_sub_ctrl) > 1:
-                        mel.eval("warning" + "\"" + self.ar.data.lang["i075_moreOne"] + " Head control.\"" + ";")
-                    else:
-                        head_ctrl = head_sub_ctrl[0]
+            if not head_ctrl and head_sub_ctrl:
+                if len(head_sub_ctrl) > 1:
+                    mel.eval("warning" + "\"" + self.ar.data.lang["i075_moreOne"] + " Head control.\"" + ";")
+                else:
+                    head_ctrl = head_sub_ctrl[0]
             if head_ctrl:
                 # correcting topSymetry pivot to match headCtrl pivot
                 cmds.matchTransform(top_symmetry_ctrl, top_cluster_items[1], head_ctrl, pivots=True)

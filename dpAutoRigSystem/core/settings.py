@@ -338,7 +338,7 @@ class Configuration:
         if not folders:
             folders = self.lib_folders
         for folder in folders:
-            if folder in self.ar.data.lib.keys():
+            if folder in self.ar.data.lib:
                 for i, item in enumerate(self.ar.data.lib[folder]["names"]):
                     if name == item:
                         return self.ar.data.lib[folder][info][i]
@@ -348,7 +348,7 @@ class Configuration:
         keys = self.ar.utils.get_keys_by_value(self.ar.data.lang_preset_data[self.ar.data.language_default], name.capitalize())
         if keys:
             for key in keys:
-                if key.startswith("m") or key.startswith("i"):
+                if key.startswith(("m", "i")):
                     return key
             return keys[0]
         return self.ar.data.template_default
@@ -493,18 +493,16 @@ class Option:
                 if not prefix.endswith("_"):
                     prefix = f"{prefix}_"
                 self.ar.data.prefix = prefix
-                if self.ar.data.ui_state:
-                    if cmds.text("rig_prefix_txt", query=True, exists=True):
-                        cmds.text("rig_prefix_txt", edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
+                if self.ar.data.ui_state and cmds.text("rig_prefix_txt", query=True, exists=True):
+                    cmds.text("rig_prefix_txt", edit=True, label=f"{self.ar.data.lang['i144_prefix']}: {prefix}", visible=True)
         else:
             self.reset_prefix()
 
         
     def reset_prefix(self):
         self.ar.data.prefix = ""
-        if self.ar.data.ui_state:
-            if cmds.text("rig_prefix_txt", query=True, exists=True):
-                cmds.text("rig_prefix_txt", edit=True, label="", visible=False)
+        if self.ar.data.ui_state and cmds.text("rig_prefix_txt", query=True, exists=True):
+            cmds.text("rig_prefix_txt", edit=True, label="", visible=False)
 
 
     def reset_options_to_default(self, *args):
@@ -546,9 +544,8 @@ class Agreement:
     def load_terms_cond(self):
         if self.ar.data.ui_state and not self.ar.dev:
             if cmds.optionVar(exists=self.ar.data.terms_cond_option_var):
-                if cmds.optionVar(query=self.ar.data.terms_cond_option_var):
-                    if not cmds.optionVar(query=self.ar.data.terms_cond_last_option_var) == self.ar.config.today:
-                        self.get_local_data()
+                if cmds.optionVar(query=self.ar.data.terms_cond_option_var) and cmds.optionVar(query=self.ar.data.terms_cond_last_option_var) != self.ar.config.today:
+                    self.get_local_data()
             else:
                 self.ar.opt.set_option_var(self.ar.data.terms_cond_option_var, 1, False)
                 self.ask_terms_cond()
