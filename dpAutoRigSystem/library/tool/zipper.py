@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from ..base import base
 from importlib import reload
+
+from maya import cmds, mel
+
+from ..base import base
 
 # global variables to this module:    
 CLASS_NAME = "Zipper"
@@ -210,7 +210,7 @@ class Zipper(base.BaseLibrary):
         dist_pos = 1.0 / self.curve_length
         for c, curve in enumerate([self.first_curve, self.second_curve]):
             base_name = self.ar.naming.extract_suffix(curve)
-            for i in range(0, self.curve_length+1):
+            for i in range(self.curve_length+1):
                 left_a_pos = (i * dist_pos)
                 left_b_pos = (left_a_pos + half_curve_length)
                 right_b_pos = 1 - (i * half_curve_length)
@@ -218,10 +218,8 @@ class Zipper(base.BaseLibrary):
                 if i > 0:
                     left_a_pos = left_a_pos - (half_curve_length*0.5)
                     right_a_pos = right_a_pos - (half_curve_length*0.5)
-                if left_a_pos < 0:
-                    left_a_pos = 0
-                if right_a_pos < 0:
-                    right_a_pos = 0
+                left_a_pos = max(left_a_pos, 0)
+                right_a_pos = max(right_a_pos, 0)
                 # create setRange nodes:
                 crescent_sr = cmds.createNode("setRange", name=base_name+"_"+crescent_attr+"_"+str(i)+"_SR")
                 decrescent_sr = cmds.createNode("setRange", name=base_name+"_"+decrescent_attr+"_"+str(i)+"_SR")

@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import OpenMaya
-from ....library.base import action
 from importlib import reload
+
+from maya import OpenMaya, cmds
+
+from ....library.base import action
 
 # global variables to this module:
 CLASS_NAME = "BorderGap"

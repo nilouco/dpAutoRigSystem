@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ..base import standard
 
 # global variables to this module:    
@@ -584,7 +584,7 @@ class Head(standard.BaseStandard):
                 has_upper_head = cmds.getAttr(self.guide_base+"."+UPPERHEAD)
 
                 # creating controllers:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     neck_ctrl = self.ar.ctrls.create_controller("id_022_HeadNeck", ctrl_name=neck_ctrl_base_name+"_"+str(n).zfill(2)+"_Ctrl", r=(self.radius/((n*0.2)+1)), d=self.curve_degree, dir="-Z", guide_source=self.name_guide+"_Neck"+str(n), parent_tag=self.get_parent_to_tag(neck_ctrls))
                     if n > 0:
                         cmds.parent(neck_ctrl, neck_ctrls[-1])
@@ -598,7 +598,7 @@ class Head(standard.BaseStandard):
 
                 # creating joints:
                 cmds.select(clear=True)
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     # neck segments:
                     neck_locs.append(side+self.number_name+"_Guide_Neck"+str(n))
                     neck_joints.append(cmds.joint(name=neck_ctrl_base_name+"_"+str(n).zfill(2)+"_Jnt", scaleCompensate=False))
@@ -664,7 +664,7 @@ class Head(standard.BaseStandard):
                 for dpar_joint in dpar_joints:
                     cmds.addAttr(dpar_joint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     self.ar.naming.set_joint_label(neck_joints[n], s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c023_neck']+"_"+str(n).zfill(2))
                 self.ar.naming.set_joint_label(head_joint, s+self.joint_label_add, 18, self.number_name+"_"+self.ar.data.lang['c024_head'])
                 
@@ -733,7 +733,7 @@ class Head(standard.BaseStandard):
                 
                 #Setup Axis Order
                 if style == 2: #quadruped
-                    for n in range(0, self.n_joints):
+                    for n in range(self.n_joints):
                         cmds.setAttr(neck_ctrls[n]+".rotateOrder", 1)
                     cmds.setAttr(head_ctrl+".rotateOrder", 1)
                     cmds.setAttr(self.head_sub_ctrl+".rotateOrder", 1)
@@ -743,7 +743,7 @@ class Head(standard.BaseStandard):
                         cmds.setAttr(upper_jaw_ctrl+".rotateOrder", 1)
                         cmds.setAttr(upper_head_ctrl+".rotateOrder", 1)
                 else:
-                    for n in range(0, self.n_joints):
+                    for n in range(self.n_joints):
                         cmds.setAttr(neck_ctrls[n]+".rotateOrder", 3)
                     cmds.setAttr(head_ctrl+".rotateOrder", 3)
                     cmds.setAttr(self.head_sub_ctrl+".rotateOrder", 3)
@@ -754,7 +754,7 @@ class Head(standard.BaseStandard):
                             cmds.setAttr(self.jaw_ctrl+".rotateOrder", 3)
 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     if n == 0:
                         self.ar.utils.set_origined_from_attr(neck_ctrls[0], self.base+";"+neck_locs[0]+";"+self.guide_radius)
                     else:
@@ -797,7 +797,7 @@ class Head(standard.BaseStandard):
                         cmds.setAttr(self.head_sub_ctrl+".originedFrom", self.guide_head_loc+";"+self.guide_face_loc, type="string")
                 
                 # temporary parentConstraints:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     cmds.matchTransform(neck_ctrls[n], neck_locs[n], position=True, rotation=True)
                 cmds.matchTransform(head_ctrl, self.guide_head_loc, position=True, rotation=True)
                 cmds.matchTransform(self.head_sub_ctrl, self.guide_head_loc, position=True, rotation=True)
@@ -861,7 +861,7 @@ class Head(standard.BaseStandard):
                     cmds.parent(upper_jaw_zero, self.head_sub_ctrl, absolute=True) #upperJawCtrl
 
                 # make joints be ride by controls:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     cmds.parentConstraint(neck_ctrls[n], neck_joints[n], maintainOffset=False, name=neck_joints[n]+"_PaC")
                     cmds.scaleConstraint(neck_ctrls[n], neck_joints[n], maintainOffset=False, name=neck_joints[n]+"_ScC")
                 cmds.parentConstraint(self.head_sub_ctrl, head_joint, maintainOffset=False, name=head_joint+"_PaC")
@@ -913,7 +913,7 @@ class Head(standard.BaseStandard):
                 self.to_ids.extend([head_rev])
                 
                 # setup neck autoRotate:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     neck_pivot = cmds.xform(neck_ctrls[n], query=True, worldSpace=True, translation=True)
                     neck_orient_grp = cmds.group(neck_ctrls[n], name=neck_ctrls[n]+"_Orient_Grp")
                     self.ar.utils.add_attr_to_items([neck_orient_grp], self.ar.utils.ignore_transform_io_attr)
@@ -1022,7 +1022,7 @@ class Head(standard.BaseStandard):
                         neck_head_calibrate_presets, inverts = self.get_calibrate_presets(s)
                         
                         # neck corrective
-                        for n in range(0, self.n_joints):
+                        for n in range(self.n_joints):
                             if n == 0:
                                 father_joint = neck_base_jzt
                             else:

@@ -1,13 +1,13 @@
-#import libraries
 import os
 import sys
-from maya import mel
 from importlib import reload
+
+from maya import mel
+
 from ..library.base import template
 
 
-
-class Lib(object):
+class Lib:
     def __init__(self, ar):
         self.ar = ar
         if self.ar.dev:
@@ -75,7 +75,7 @@ class Lib(object):
                                             "names" : class_names
                                             }
                 if self.ar.data.verbose:
-                    print(f"{folder}: {str(modules)}")
+                    print(f"{folder}: {modules!s}")
     
 
     def start_templates(self):

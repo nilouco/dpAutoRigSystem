@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ....library.base import action
 
 # global variables to this module:
@@ -92,9 +92,7 @@ class EmptyTransform(action.BaseAction):
                     has_connection = set(has_connection)-set(node_graphs)
             if not has_connection:
                 children = cmds.listRelatives(transform, children=True, fullPath=True)
-                if not children:
-                    empty_transforms.append(transform)
-                elif len(list(set(children).intersection(empty_transforms))) == len(children):
+                if not children or len(list(set(children).intersection(empty_transforms))) == len(children):
                     empty_transforms.append(transform)
         return empty_transforms
     

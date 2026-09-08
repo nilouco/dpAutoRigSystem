@@ -1,15 +1,14 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from urllib import request
-from importlib import reload
 import json
-import zipfile
-import shutil
 import os
-import sys
-import subprocess
 import platform
+import shutil
+import subprocess
+import sys
+import zipfile
+from importlib import reload
+from urllib import request
+
+from maya import cmds, mel
 
 RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
@@ -22,7 +21,7 @@ PREVIEW_HEIGHT = 720
 
 
 
-class Packager(object):
+class Packager:
     def __init__(self, ar) -> None:
         self.ar = ar
         self.callback = None

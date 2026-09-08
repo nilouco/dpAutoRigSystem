@@ -1,10 +1,9 @@
-# importing libraries:
-from maya import cmds
-from maya import OpenMaya
-from ....library.base import action
-from ....library.util import edge_normals
 from importlib import reload
 
+from maya import cmds
+
+from ....library.base import action
+from ....library.util import edge_normals
 
 # global variables to this module:
 CLASS_NAME = "UnlockNormals"

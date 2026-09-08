@@ -1,12 +1,10 @@
-# importing libraries:
-from maya import cmds
-from maya import OpenMaya
 import re
 import unicodedata
 
+from maya import OpenMaya, cmds
 
 
-class Naming(object):
+class Naming:
     def __init__(self, ar):
         self.ar = ar
 

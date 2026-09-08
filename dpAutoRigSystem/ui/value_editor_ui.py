@@ -1,11 +1,12 @@
-#import libraries
-from maya import cmds
-from ..library.validate.checkout import reset_pose
 from functools import partial
 from importlib import reload
 
+from maya import cmds
 
-class ValueEditorUI(object):
+from ..library.validate.checkout import reset_pose
+
+
+class ValueEditorUI:
     def __init__(self, ar):
         self.ar = ar
         if self.ar.dev:

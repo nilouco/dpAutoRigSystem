@@ -1,11 +1,10 @@
-# importing libraries:
-from maya import cmds
 import time
 from functools import partial
 
+from maya import cmds
 
 
-class Logger(object):
+class Logger:
     def __init__(self, ar, ui=True, verbose=True):
         """ Initialize the module class loading variables.
         """

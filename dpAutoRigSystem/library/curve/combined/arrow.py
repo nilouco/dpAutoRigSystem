@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from ...base import curve
 from importlib import reload
+
+from maya import cmds, mel
+
+from ...base import curve
 
 # global variables to this module:    
 CLASS_NAME = "Arrow"

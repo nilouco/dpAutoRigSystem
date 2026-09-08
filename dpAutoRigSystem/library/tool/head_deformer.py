@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from ..base import base
 from importlib import reload
+
+from maya import cmds, mel
+
+from ..base import base
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -208,7 +208,7 @@ class HeadDeformer(base.BaseLibrary):
             cmds.setAttr(rmv_node+".value[3].value_FloatValue", 0.742222)
             cmds.setAttr(rmv_node+".value[4].value_Position", 0.60355)
             cmds.setAttr(rmv_node+".value[4].value_FloatValue", 0.951111)
-            for v in range(0, 5):
+            for v in range(5):
                 cmds.setAttr(rmv_node+".value["+str(v)+"].value_Interp", 3) #spline
             
             # connections

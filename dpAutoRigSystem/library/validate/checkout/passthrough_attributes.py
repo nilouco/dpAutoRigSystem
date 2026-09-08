@@ -1,9 +1,11 @@
 # https://gist.github.com/BigRoy/7784b266da449a5b5db7ed633302ebad
 
-# importing libraries:
-from maya import cmds
-from collections import defaultdict
+
 import contextlib
+from collections import defaultdict
+
+from maya import cmds
+
 from ....library.base import action
 
 # global variables to this module:

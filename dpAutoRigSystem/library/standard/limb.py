@@ -1,12 +1,10 @@
-# importing libraries:
-from maya import cmds
-from ..base import standard
-from ...library.util import soft_ik
-from ...library.util import ik_fk_snap
-from ...library.util import ribbon
 from importlib import reload
+
+from maya import cmds
 from maya.api import OpenMaya
-import math
+
+from ...library.util import ik_fk_snap, ribbon, soft_ik
+from ..base import standard
 
 # global variables to this module:
 CLASS_NAME = "Limb"
@@ -422,7 +420,7 @@ class Limb(standard.BaseStandard):
                     cmds.delete(temp_wrist_aic, temp_up_vector_wrist_grp)
                 if to_unparent_items:
                     cmds.parent(to_unparent_items, self.guide_extreme_loc)
-                for node in pint_guide_state_data.keys():
+                for node in pint_guide_state_data:
                     cmds.setAttr(node+".pinGuide", pint_guide_state_data[node])
                 if temp_extreme_children_grp:
                     cmds.delete(temp_extreme_children_grp)
@@ -711,9 +709,7 @@ class Limb(standard.BaseStandard):
                     # Setup axis order
                     if joint_name == before_name:  # Clavicle and hip
                         cmds.setAttr(fk_ctrl+".rotateOrder", 3)
-                    elif joint_name == extreme_name and self.limb_types == self.leg_name:  # Ankle
-                        cmds.setAttr(fk_ctrl+".rotateOrder", 4)
-                    elif joint_name == extreme_name and self.limb_types == self.arm_name:  # Hand
+                    elif joint_name == extreme_name and self.limb_types == self.leg_name or joint_name == extreme_name and self.limb_types == self.arm_name:  # Ankle
                         cmds.setAttr(fk_ctrl+".rotateOrder", 4)
                     elif joint_name == main_name:  # Leg and Shoulder
                         cmds.setAttr(fk_ctrl+".rotateOrder", 1)

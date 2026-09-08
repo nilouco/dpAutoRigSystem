@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from ..base import base
 from importlib import reload
+
+from maya import cmds, mel
+
+from ..base import base
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -127,8 +127,8 @@ class FacialConnection(base.BaseLibrary):
             from_mesh_items = cmds.ls(selection=True, type="transform")
             if from_mesh_items:
                 for n, node in enumerate(from_mesh_items):
-                    if cmds.listRelatives(from_mesh_items[n], children=True, type="mesh"): #fromMeshChildrenList
-                        from_mesh = from_mesh_items[n]
+                    if cmds.listRelatives(node, children=True, type="mesh"): #fromMeshChildrenList
+                        from_mesh = node
                         break
         if from_mesh:
             geos, results = [], []
@@ -178,10 +178,7 @@ class FacialConnection(base.BaseLibrary):
                         cmds.setAttr(new_geo+".visibility", 0)
                         geos.append(new_geo)
                         cmds.parent(new_geo, target_grps)
-                    elif t == 1: # recept target
-                        geos.append(new_geo)
-                        cmds.parent(new_geo, target_grps)
-                    elif t == 2: # tweak target
+                    elif t == 1 or t == 2: # recept target
                         geos.append(new_geo)
                         cmds.parent(new_geo, target_grps)
                     else: # facial targets
@@ -257,11 +254,7 @@ class FacialConnection(base.BaseLibrary):
                         for facial_attr in facial_ctrl_data[facial_ctrl]:
                             for target_attr in bs_data[bs_node]:
                                 connect_it = False
-                                if target_attr.endswith(facial_attr+"_Tgt"):
-                                    connect_it = True
-                                elif target_attr.endswith(facial_attr):
-                                    connect_it = True
-                                elif facial_attr == target_attr:
+                                if target_attr.endswith(facial_attr+"_Tgt") or target_attr.endswith(facial_attr) or facial_attr == target_attr:
                                     connect_it = True
                                 # not including here the (facial_attr in target_attr) statement to try avoid connect into combination alias
                                 if connect_it:

@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ..base import standard
 
 # global variables to this module:
@@ -137,7 +137,7 @@ class Finger(standard.BaseStandard):
                         phalange_calibrate_presets, inverts = self.get_calibrate_presets(s)
                 # get the number of joints to be created:
                 self.n_joints = cmds.getAttr(self.base+".nJoints")
-                for n in range(0, self.n_joints+1):
+                for n in range(self.n_joints+1):
                     cmds.select(clear=True)
                     # declare guide:
                     self.guide = side+self.number_name+"_Guide_JointLoc"+str(n)
@@ -428,8 +428,8 @@ class Finger(standard.BaseStandard):
                         if self.n_joints > 2:
                             if i > 0:
                                 # fix ik scale
-                                cmds.connectAttr(skin_joints[0]+".scaleX", ik_joints[i]+".scaleX", force=True)
-                                cmds.connectAttr(skin_joints[0]+".scaleY", ik_joints[i]+".scaleY", force=True)
+                                cmds.connectAttr(skin_joints[0]+".scaleX", ik_joint+".scaleX", force=True)
+                                cmds.connectAttr(skin_joints[0]+".scaleY", ik_joint+".scaleY", force=True)
                 # create a masterModuleGrp to be checked if this rig exists:
                 ctrl_hooks = [side+self.number_name+"_00_SDK_Zero_0_Grp", side+self.number_name+"_01_SDK_Zero_0_Grp"]
                 if self.n_joints >= 2:

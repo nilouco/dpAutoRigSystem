@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ....library.base import action
 
 # global variables to this module:
@@ -47,7 +47,7 @@ class UnlockAttributes(action.BaseAction):
                                 locked_attr_data[item] = locked_attrs
                         # conditional to check here
                         if locked_attr_data:
-                            for item in locked_attr_data.keys():
+                            for item in locked_attr_data:
                                 self.checked_items.append(item)
                                 self.found_issues.append(True)
                                 if self.first_mode:

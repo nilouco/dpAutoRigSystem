@@ -1,12 +1,9 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from functools import partial
 import os
 
+from maya import cmds, mel
 
 
-class Publisher(object):
+class Publisher:
     def __init__(self, ar):
         """ Initialize the module class loading variables.
         """

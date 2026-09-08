@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ..base import standard
 
 # global variables to this module:
@@ -171,7 +171,7 @@ class Nose(standard.BaseStandard):
                 self.n_joints = cmds.getAttr(self.base+".nJoints")
                 head_def_value = cmds.getAttr(self.base+".deformedBy")
                 # creating top nose controls and joints:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
                     self.guide_top_loc = side+self.number_name+"_Guide_cvTopLoc"+str(n+1)

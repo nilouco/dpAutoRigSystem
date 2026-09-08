@@ -1,19 +1,18 @@
-from maya import cmds
-from maya import mel
-import os
-import sys
-import json
 import datetime
 import getpass
-import urllib.request
-import socket
+import json
+import os
 import platform
-import getpass
+import socket
+import sys
+import urllib.request
 import webbrowser
 from importlib import reload
 
+from maya import cmds, mel
 
-class Configuration(object):
+
+class Configuration:
     def __init__(self, ar):
         self.ar = ar
         
@@ -380,7 +379,7 @@ class Configuration(object):
 
 
 
-class Option(object):
+class Option:
     def __init__(self, ar):
         self.ar = ar
 
@@ -539,7 +538,7 @@ class Option(object):
 
 
 
-class Agreement(object):
+class Agreement:
     def __init__(self, ar):
         self.ar = ar
 
@@ -604,7 +603,7 @@ class Agreement(object):
 
 
 
-class Environment(object):
+class Environment:
     def __init__(self, ar):
         self.ar = ar
         self.order = "_order"
@@ -675,7 +674,7 @@ class Environment(object):
                 dups = modules.copy()
                 modules = []
                 with open(path+"/"+folder+"/"+text+".txt", encoding='utf8') as filename:
-                    for line in filename.readlines():
+                    for line in filename:
                         desired_order_items.append(line.strip())
                 if desired_order_items:
                     for item in desired_order_items:
@@ -703,7 +702,7 @@ class Environment(object):
 
 
 
-class Web(object):
+class Web:
     def __init__(self, ar):
         self.ar = ar
 

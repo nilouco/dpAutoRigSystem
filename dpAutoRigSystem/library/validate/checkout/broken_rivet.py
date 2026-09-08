@@ -1,11 +1,11 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from maya.api import OpenMaya
-from ....library.base import action
-from ....library.tool import rivet
 import random
 from importlib import reload
+
+from maya import cmds, mel
+from maya.api import OpenMaya
+
+from ....library.base import action
+from ....library.tool import rivet
 
 # global variables to this module:
 CLASS_NAME = "BrokenRivet"

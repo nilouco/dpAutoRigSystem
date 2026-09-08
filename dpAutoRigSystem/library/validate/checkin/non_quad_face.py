@@ -1,6 +1,5 @@
-# importing libraries:
-from maya import cmds
-from maya import OpenMaya
+from maya import OpenMaya, cmds
+
 from ....library.base import action
 
 # global variables to this module:

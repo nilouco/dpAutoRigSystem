@@ -1,10 +1,9 @@
-#import libraries
-from maya import cmds
 from functools import partial
 
+from maya import cmds
 
 
-class UIFiller(object):
+class UIFiller:
     def __init__(self, ar):
         self.ar = ar
         self.validator_folders = [ self.ar.data.checkin_folder, 
@@ -150,7 +149,7 @@ class UIFiller(object):
                 mod.load_raw_guide(mod.number_name)
                 # reload pinGuide scriptJob:
                 self.ar.job.start_pin_guide(mod.guide_base)
-                if hasattr(mod, 'declare_guide_elements') and callable(getattr(mod, 'declare_guide_elements')):
+                if hasattr(mod, 'declare_guide_elements') and callable(mod.declare_guide_elements):
                     mod.declare_guide_elements(mod.name_guide)
 
 

@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ..base import standard
 
 # global variables to this module:
@@ -177,7 +177,7 @@ class FkLine(standard.BaseStandard):
                 fk_ctrls = []
                 # get the number of joints to be created:
                 self.n_joints = cmds.getAttr(self.base+".nJoints")
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
                     self.guide = side+self.number_name+"_Guide_JointLoc"+str(n+1)

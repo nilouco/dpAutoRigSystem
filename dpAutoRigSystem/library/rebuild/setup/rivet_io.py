@@ -1,9 +1,10 @@
-# importing libraries:
-from maya import cmds
 import json
+from importlib import reload
+
+from maya import cmds
+
 from ....library.base import action
 from ....library.tool import rivet
-from importlib import reload
 
 # global variables to this module:
 CLASS_NAME = "RivetIO"
@@ -94,7 +95,7 @@ class RivetIO(action.BaseAction):
                 data = json.loads(cmds.getAttr(net+".rivetData"))
                 add_it = True
                 if n > 0:
-                    for x in range(0, i):
+                    for x in range(i):
                         if data["itemNode"] in result_data[x]["itemList"]:
                             add_it = False
                             break

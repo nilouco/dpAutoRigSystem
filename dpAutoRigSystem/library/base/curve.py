@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from . import base
 from importlib import reload
+
+from maya import cmds, mel
+
+from . import base
 
 
 class BaseCurve(base.BaseLibrary):

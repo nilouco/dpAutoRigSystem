@@ -1,12 +1,11 @@
-#import libraries
+import getpass
 import re
 import time
-import getpass
+
 from maya import cmds
 
 
-
-class Maker(object):
+class Maker:
     def __init__(self, ar):
         self.ar = ar
 
@@ -636,9 +635,9 @@ class Maker(object):
                                     parent_node = self.hook[guide_base]['parentNode']
                                     father_guide = self.hook[guide_base]['fatherGuide']
                             if parent_node:
-                                if not parent_node in guide_source_data.keys():
+                                if not parent_node in guide_source_data:
                                     parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
-                                if not parent_node in guide_source_data.keys():
+                                if not parent_node in guide_source_data:
                                     continue
                                 found_ctrl = guide_source_data[parent_node]
                                 if found_ctrl in holder_ctrls: #holder
@@ -647,7 +646,7 @@ class Maker(object):
                                     parent_node = self.hook[guide_base]['parentNode']
                                     father_guide = self.hook[guide_base]['fatherGuide']
                                     parent_node = self.ar.utils.replace_item_suffix(parent_node, guide_source_data)
-                                    if not parent_node in guide_source_data.keys():
+                                    if not parent_node in guide_source_data:
                                         continue
                                     found_ctrl = guide_source_data[parent_node]
                                 if not self.hook[father_guide]['guideMirrorAxis'] == "off": #father guide has mirror
@@ -815,7 +814,7 @@ class Maker(object):
 
 
 
-class Composer(object):
+class Composer:
     def __init__(self, ar):
         self.ar = ar
 

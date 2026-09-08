@@ -1,12 +1,12 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from . import base
-from functools import partial
-import os
 import getpass
+import os
 import shutil
+from functools import partial
 from importlib import reload
+
+from maya import cmds, mel
+
+from . import base
 
 # global variables to this module:
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
@@ -549,7 +549,7 @@ class BaseAction(base.BaseLibrary):
         for shading_engine in cmds.ls(type='shadingEngine'):
             # if an shadingEngine has 'sets' members, it is used in the scene
             if cmds.sets(shading_engine, query=True):
-                materials = cmds.listConnections('{}.surfaceShader'.format(shading_engine))
+                materials = cmds.listConnections(f'{shading_engine}.surfaceShader')
                 if materials:
                     used_materials.extend(materials)
         used_materials = list(set(used_materials))

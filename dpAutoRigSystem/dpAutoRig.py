@@ -6,17 +6,17 @@ DPAR_UPDATELOG = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem relea
 DPAR_VERSION_PY3 = "6.00.00 - ATTENTION !!!\n\nThere's a new dpAutoRigSystem released version.\nBut it isn't compatible with this current version 4, sorry.\nYou must download and replace all files manually.\nPlease, delete the folder and copy the new one.\nAlso, recreate your shelf button with the given code in the _shelfButton.txt\nThanks."
 
 # Import libraries
-from maya import cmds
-from maya import mel
-import os
 import io
-import sys
+import os
 import shutil
-import zipfile
+import sys
 import urllib.request
+import zipfile
+
+from maya import cmds, mel
 
 
-class Start(object):
+class Start:
     def __init__(self, *args):
         # keep old v5 compatibility
         mel.eval(f"warning \"{DPAR_UPDATELOG.replace('\n', ' ')}\";")
@@ -68,7 +68,7 @@ class Start(object):
 
 
 
-class Repair(object):
+class Repair:
     def __init__(self, *args):
         print("\n----------\ndpAutoRigSystem: start repairing old version...")
         self.ar_name = "dpAutoRigSystem"

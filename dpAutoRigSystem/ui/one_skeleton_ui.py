@@ -1,9 +1,7 @@
-#import libraries
 from maya import cmds
-from functools import partial
 
 
-class OneSkeletonUI(object):
+class OneSkeletonUI:
     def __init__(self, ar):
         self.ar = ar
     

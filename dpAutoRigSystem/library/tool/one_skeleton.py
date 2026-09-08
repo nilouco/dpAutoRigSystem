@@ -1,11 +1,11 @@
-# importing libraries:
 import re
-from maya import cmds
-from maya import mel
-from maya.api import OpenMaya
-from itertools import zip_longest
-from ..base import base
 from importlib import reload
+from itertools import zip_longest
+
+from maya import cmds, mel
+from maya.api import OpenMaya
+
+from ..base import base
 
 # global variables to this module:    
 CLASS_NAME = "OneSkeleton"

@@ -1,10 +1,7 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
+from maya import cmds, mel
 
 
-
-class Weights(object):
+class Weights:
     def __init__(self, ar):
         self.ar = ar
         self.def_attr_data = {
@@ -265,7 +262,7 @@ class Weights(object):
                         if cmds.objExists(node+"."+attr):
                             falloff_data[node]["attributes"][attr] = cmds.getAttr(node+"."+attr)
                 # specific multiIndices attributes
-                for multi_attr in multi_attr_data.keys():
+                for multi_attr in multi_attr_data:
                     if cmds.objExists(node+"."+multi_attr):
                         if cmds.getAttr(node+"."+multi_attr, multiIndices=True):
                             for i, index in enumerate(cmds.getAttr(node+"."+multi_attr, multiIndices=True)):
@@ -395,9 +392,9 @@ class Weights(object):
         """
         points = []
         # loop for all 3D points
-        for s in range(0, cmds.getAttr(lattice_node+".sDivisions")):
-            for t in range(0, cmds.getAttr(lattice_node+".tDivisions")):
-                for u in range(0, cmds.getAttr(lattice_node+".uDivisions")):
+        for s in range(cmds.getAttr(lattice_node+".sDivisions")):
+            for t in range(cmds.getAttr(lattice_node+".tDivisions")):
+                for u in range(cmds.getAttr(lattice_node+".uDivisions")):
                     points.append(cmds.getAttr(lattice_node+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]")[0])
         return points
 
@@ -406,9 +403,9 @@ class Weights(object):
         """ Loop for all lattice 3D points and set them position.
         """
         i = 0
-        for s in range(0, cmds.getAttr(lattice_handle+".sDivisions")):
-            for t in range(0, cmds.getAttr(lattice_handle+".tDivisions")):
-                for u in range(0, cmds.getAttr(lattice_handle+".uDivisions")):
+        for s in range(cmds.getAttr(lattice_handle+".sDivisions")):
+            for t in range(cmds.getAttr(lattice_handle+".tDivisions")):
+                for u in range(cmds.getAttr(lattice_handle+".uDivisions")):
                     cmds.xform(lattice_handle+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]", translation=points[i])
                     i += 1
 

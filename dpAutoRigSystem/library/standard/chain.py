@@ -1,9 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from ..base import standard
 from importlib import reload
 
+from maya import cmds, mel
+
+from ..base import standard
 
 # global variables to this module:    
 CLASS_NAME = "Chain"
@@ -261,7 +260,7 @@ class Chain(standard.BaseStandard):
                 for t, suffix in enumerate(suffixes):
                     wips = []
                     cmds.select(clear=True)
-                    for n in range(0, self.n_joints):
+                    for n in range(self.n_joints):
                         wips.append(cmds.joint(name=side+self.number_name+"_%02d"%n+suffix))
                     joint_end = cmds.joint(name=side+self.number_name+end_suffixes[t], radius=0.5)
                     self.ar.utils.add_joint_end_attr([joint_end])
@@ -282,7 +281,7 @@ class Chain(standard.BaseStandard):
                         self.ar.naming.set_joint_label(skin_joint, s+self.joint_label_add, 18, self.number_name+"_%02d"%o)
 
                 fk_ctrls, fk_zeros, orig_from_items = [], [], []
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     cmds.select(clear=True)
                     # declare guide:
                     self.guide = side+self.number_name+"_Guide_JointLoc"+str(n+1)
@@ -343,7 +342,7 @@ class Chain(standard.BaseStandard):
                                 cmds.setAttr(fk_zeros[f]+"."+attr, -1*attr_value)
                 
                 # working with position, orientation of joints and make an orientConstraint for Fk controls:
-                for n in range(0, self.n_joints):
+                for n in range(self.n_joints):
                     cmds.matchTransform(self.skin_joints[n], side+self.number_name+"_Guide_JointLoc"+str(n+1), position=True, rotation=True)
                     cmds.matchTransform(ik_joints[n], side+self.number_name+"_Guide_JointLoc"+str(n+1), position=True, rotation=True)
                     # freezeTransformations (rotates):
@@ -382,7 +381,7 @@ class Chain(standard.BaseStandard):
                 ik_spline_curve = self.ik_spline_items[2]
                 # ik clusters:
                 ik_clusters = []
-                for p, i in zip(["0:1", "2", "3", "4", "5:6"], range(0,5)):
+                for p, i in zip(["0:1", "2", "3", "4", "5:6"], range(5)):
                     clusters = cmds.cluster(ik_spline_curve+".cv["+p+"]", name=side+self.number_name+"_Ik_"+str(i)+"_Cls") #[Deform, Handle]
                     self.to_ids.append(clusters[0]) #Deformer
                     ik_clusters.append(clusters[1]) #Handle
@@ -543,7 +542,7 @@ class Chain(standard.BaseStandard):
                     cmds.connectAttr(world_ref+".scaleX", stretchable_bc+".color2.color2R", force=True)
                     cmds.connectAttr(world_ref+".scaleX", stretch_bc+".color2.color2R", force=True)
                 # output stretch values to joint scale:
-                for j in range(0, len(ik_joints)-2):
+                for j in range(len(ik_joints)-2):
                     cmds.connectAttr(stretch_bc+".output.outputR", ik_joints[j]+".scaleX", force=True)
                     cmds.connectAttr(stretch_bc+".output.outputR", ik_joints[j]+".scaleY", force=True)
                     cmds.connectAttr(stretch_bc+".output.outputR", ik_joints[j]+".scaleZ", force=True)
@@ -571,7 +570,7 @@ class Chain(standard.BaseStandard):
                 cmds.setAttr(vv_md+'.operation', 2)
                 cmds.setAttr(vv_cond+".secondTerm", 1)
                 #output volumeVariation values to joint scale axis:
-                for j in range(0, len(self.skin_joints)-2):
+                for j in range(len(self.skin_joints)-2):
                     cmds.connectAttr(vv_cond+".outColorR", self.skin_joints[j]+".scaleX", force=True)
                     cmds.connectAttr(vv_cond+".outColorR", self.skin_joints[j]+".scaleY", force=True)
 

@@ -1,9 +1,9 @@
-#import libraries
-from maya import cmds
 from functools import partial
 
+from maya import cmds
 
-class JointDisplayUI(object):
+
+class JointDisplayUI:
     def __init__(self, ar):
         self.ar = ar
         self.boards = ['joint_display_bone_field_sl', 'joint_display_multichild_field_sl', 'joint_display_none_field_sl', 'joint_display_joint_field_sl']

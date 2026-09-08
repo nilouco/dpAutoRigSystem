@@ -13,12 +13,11 @@
 ###########################################################
 
 
-# importing libraries:
+
 from maya import cmds
 
 
-
-class Ribbon(object):
+class Ribbon:
     def __init__(self, ar):
         # defining variables:
         self.ar = ar
@@ -527,11 +526,7 @@ class Ribbon(object):
             cmds.setAttr(bttm_Loc[2]+'.translateZ', 2)
             cmds.setAttr(top_Loc[2]+'.translateZ', 2)
             cmds.setAttr(mid_Loc[3]+'.translateZ', 2)
-        elif not horizontal and axis==(0, 1, 0) or (not horizontal and axis==(0, 0, 1)):
-            cmds.setAttr(bttm_Loc[2]+'.translateX', 2)
-            cmds.setAttr(top_Loc[2]+'.translateX', 2)
-            cmds.setAttr(mid_Loc[3]+'.translateX', 2)
-        elif horizontal and axis==(0, 0, -1):
+        elif not horizontal and axis==(0, 1, 0) or (not horizontal and axis==(0, 0, 1)) or horizontal and axis==(0, 0, -1):
             cmds.setAttr(bttm_Loc[2]+'.translateX', 2)
             cmds.setAttr(top_Loc[2]+'.translateX', 2)
             cmds.setAttr(mid_Loc[3]+'.translateX', 2)
@@ -563,25 +558,7 @@ class Ribbon(object):
             cmds.setAttr(drv_Jnt[2]+'.tz', dist)
             cmds.setAttr(drv_Jnt[4]+'.tz', -end_dist*dist)
         
-        elif horizontal and axis==(0, 1, 0):
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, 0)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, 0)
-            
-            cmds.setAttr(drv_Jnt[0]+'.tx', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.tx', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.tx', dist)
-            cmds.setAttr(drv_Jnt[4]+'.tx', -end_dist*dist)
-        
-        elif horizontal and axis==(0, 0, 1): #leg
-            cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, 0)
-            cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, 0)
-            
-            cmds.setAttr(drv_Jnt[0]+'.tx', -dist)
-            cmds.setAttr(drv_Jnt[3]+'.tx', end_dist*dist)
-            cmds.setAttr(drv_Jnt[2]+'.tx', dist)
-            cmds.setAttr(drv_Jnt[4]+'.tx', -end_dist*dist)
-        
-        elif horizontal and axis==(0, 0, -1): #arm
+        elif horizontal and axis==(0, 1, 0) or horizontal and axis==(0, 0, 1) or horizontal and axis==(0, 0, -1):
             cmds.setAttr(drv_Jnt[0]+'.jointOrient', 0, 0, 0)
             cmds.setAttr(drv_Jnt[2]+'.jointOrient', 0, 0, 0)
             
@@ -892,7 +869,7 @@ class Ribbon(object):
             cmds.parentConstraint(top, locators_grps, maintainOffset=True, name=locators_grps+"_PaC")
         #fix loc_Grp scale
         if guides:
-            from math import sqrt, pow
+            from math import pow, sqrt
             aux_loc_1 = cmds.spaceLocator(name='aux_loc_1')[0]
             aux_loc_2 = cmds.spaceLocator(name='aux_loc_2')[0]
             cmds.matchTransform(aux_loc_1, top, position=True, rotation=True)
@@ -1062,7 +1039,7 @@ class Ribbon(object):
     def add_corrective_joint(self, jcr_number, corner_jnt, jcr_pos, jcr_rot):
         """ Add corrective joint to the ribbon corner.
         """
-        for i in range(0, jcr_number):
+        for i in range(jcr_number):
             cmds.select(corner_jnt)
             jcr = cmds.joint(name=corner_jnt[:corner_jnt.rfind("_")+1]+str(i)+"_Jcr")
             cmds.setAttr(jcr+".segmentScaleCompensate", 0)

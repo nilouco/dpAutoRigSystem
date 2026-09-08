@@ -1,10 +1,9 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from . import base
-from ..tool import correction_manager
 from importlib import reload
 
+from maya import cmds, mel
+
+from ..tool import correction_manager
+from . import base
 
 
 class BaseStandard(base.BaseLibrary):
@@ -356,7 +355,7 @@ class BaseStandard(base.BaseLibrary):
         if self.n_main > 1:
             total_to_add_main = int(self.n_joints/self.n_main)
         # run throgh the chain
-        for m in range(0, self.n_main):
+        for m in range(self.n_main):
             start = m*total_to_add_main
             end = (m+1)*total_to_add_main
             if m == self.n_main-1:

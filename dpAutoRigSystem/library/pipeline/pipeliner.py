@@ -1,18 +1,17 @@
-# importing libraries:
-from maya import cmds
-from functools import partial
-import os
 import json
-import time
+import os
 import shutil
 import stat
+import time
+
+from maya import cmds
 
 PIPE_FOLDER = "_dpPipeline"
 #DISCORD_URL = "https://discord.com/api/webhooks"
 
 
 
-class Pipeliner(object):
+class Pipeliner:
     def __init__(self, ar):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
@@ -132,8 +131,7 @@ class Pipeliner(object):
                                 name = name.split(self.pipe_data["f_publish"])[0]
                                 to_end_it = True
                         if to_end_it:
-                            if name.endswith("/"):
-                                name = name[:-1]
+                            name = name.removesuffix("/")
                             if "/" in name:
                                 name = name[:name.rfind("/")]
                     except:
@@ -942,7 +940,7 @@ class Pipeliner(object):
                         for dest_file in next(os.walk(dest_path))[2]:
                             try:
                                 os.remove(dest_path+"/"+dest_file)
-                            except PermissionError as exc:
+                            except PermissionError:
                                 # use a brute force to delete without permission:
                                 os.chmod(dest_path+"/"+dest_file, stat.S_IWUSR)
                                 os.remove(dest_path+"/"+dest_file)

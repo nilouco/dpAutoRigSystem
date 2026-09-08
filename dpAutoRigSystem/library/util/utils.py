@@ -1,18 +1,13 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from maya import OpenMaya
-import os
-import re
 import cProfile
 import json
-import time
+import os
 import stat
-import unicodedata
+import time
+
+from maya import cmds, mel
 
 
-
-class Utils(object):
+class Utils:
     def __init__(self, ar):
         """ Initialize the module class loading variables.
         """
@@ -426,7 +421,7 @@ class Utils(object):
                 cmds.setAttr(jax+".segmentScaleCompensate", 0)
                 cmds.setAttr(jar+".segmentScaleCompensate", 1)
                 joints.append(jar)
-                for i in range(0, jcr_number):
+                for i in range(jcr_number):
                     cmds.select(jar)
                     jcr = cmds.joint(name=brother[:brother.rfind("_")+1]+str(i)+"_Jcr")
                     cmds.setAttr(jcr+".segmentScaleCompensate", 0)
@@ -471,10 +466,7 @@ class Utils(object):
         old_attrs = ["modelsGrp", None, None, None, None, None, None, None, None, None, None]
         for m, master_attr in enumerate(master_grp_attrs):
             if not master_attr in cmds.listAttr(item):
-                if not old_attrs[m]:
-                    cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
-                    return False
-                elif not old_attrs[m] in cmds.listAttr(item):
+                if not old_attrs[m] or not old_attrs[m] in cmds.listAttr(item):
                     cmds.setAttr(item+"."+self.ar.data.master_attr, 0)
                     return False
         return cmds.getAttr(item+"."+self.ar.data.master_attr)
@@ -753,7 +745,7 @@ class Utils(object):
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
-            except PermissionError as exc:
+            except PermissionError:
                 # use a brute force to delete without permission:
                 os.chmod(file_path, stat.S_IWUSR)
                 os.remove(file_path)

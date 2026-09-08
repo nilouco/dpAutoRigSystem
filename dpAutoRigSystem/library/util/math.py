@@ -1,11 +1,10 @@
-# importing libraries:
-from maya import cmds
 import math
 import time
 
+from maya import cmds
 
 
-class Math(object):
+class Math:
     def __init__(self, ar):
         self.ar = ar
 

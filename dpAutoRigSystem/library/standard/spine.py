@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ..base import standard
 
 # global variables to this module:

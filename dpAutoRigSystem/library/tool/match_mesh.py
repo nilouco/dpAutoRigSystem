@@ -1,9 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from maya import OpenMaya
-from ..base import base
 from importlib import reload
+
+from maya import OpenMaya, cmds, mel
+
+from ..base import base
 
 # global variables to this module:
 CLASS_NAME = "MatchMesh"
@@ -125,7 +124,7 @@ class MatchMesh(base.BaseLibrary):
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected
-                    for i in range(0, from_vertices.length()):
+                    for i in range(from_vertices.length()):
                         # check if the dialog has been cancelled
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True

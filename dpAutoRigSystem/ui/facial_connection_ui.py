@@ -1,8 +1,7 @@
-#import libraries
 from maya import cmds
 
 
-class FacialConnectionUI(object):
+class FacialConnectionUI:
     def __init__(self, ar):
         self.ar = ar
     

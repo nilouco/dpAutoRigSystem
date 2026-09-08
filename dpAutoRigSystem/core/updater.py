@@ -1,14 +1,16 @@
-from maya import cmds
-import os
 import io
+import os
 import shutil
-import zipfile
 import urllib.request
+import zipfile
 from io import TextIOWrapper
+
+from maya import cmds
+
 from ..install import maya_installer
 
 
-class Updater(object):
+class Updater:
     def __init__(self, ar):
         self.ar = ar
         self.version_start_length = 20 #__version__: str = "

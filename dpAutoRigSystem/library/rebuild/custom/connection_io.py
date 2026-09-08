@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ....library.base import action
 
 # global variables to this module:
@@ -160,7 +160,7 @@ class ConnectionIO(action.BaseAction):
                     for attr_data, multi in zip([self.ar.utils.type_attr_data, self.ar.utils.type_out_attr_data, self.ar.utils.type_multi_attr_data, self.ar.utils.type_out_multi_attr_data], [False, False, True, True]):
                         attr_connection_data = self.get_attr_connections(item, attr_data, multi)
                         if attr_connection_data:
-                            if not item in data.keys():
+                            if not item in data:
                                 data[item] = attr_connection_data
                             else:
                                 data[item].update(attr_connection_data)

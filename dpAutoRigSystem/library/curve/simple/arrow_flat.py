@@ -1,6 +1,6 @@
-# importing libraries:
-from ...base import curve
 from importlib import reload
+
+from ...base import curve
 
 # global variables to this module:    
 CLASS_NAME = "ArrowFlat"

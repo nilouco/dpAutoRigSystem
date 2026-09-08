@@ -1,10 +1,10 @@
-#import libraries
-from maya import cmds
-from maya import mel
+
 from functools import partial
 
+from maya import cmds, mel
 
-class ZipperUI(object):
+
+class ZipperUI:
     def __init__(self, ar):
         self.ar = ar
     

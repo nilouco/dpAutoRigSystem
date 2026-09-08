@@ -1,8 +1,10 @@
 import os
 import random
+
 from maya import cmds
 
-class Opening(object):
+
+class Opening:
     def create_opening_ui(self, version):
         loading_message = f"Loading dpAutoRigSystem v{version} ... "
         print("\n----------")

@@ -1,9 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-from . import weights
 from importlib import reload
 
+from maya import cmds, mel
+
+from . import weights
 
 
 class Skinning(weights.Weights):
@@ -252,7 +251,7 @@ class Skinning(weights.Weights):
         skin_weights = []
         components = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
         components.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
-        for component in range(0, len(components)):
+        for component in range(len(components)):
             skin_weights.append(self.get_deformer_weights(skincluster_node, component, influences))
         return skin_weights
     
@@ -263,7 +262,7 @@ class Skinning(weights.Weights):
         skin_data = {}
         components = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
         components.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
-        for component in range(0, len(components)):
+        for component in range(len(components)):
             value = cmds.getAttr(skincluster_node+"."+attr_name+"["+str(component)+"]")
             if not value == 0:
                 skin_data[component] = value
@@ -320,7 +319,7 @@ class Skinning(weights.Weights):
         matrix_data = self.get_connected_matrix_data(skincluster_name)
         components = cmds.ls(item+".vtx[*]", flatten=True) or [] #mesh
         components.extend(cmds.ls(item+".cv[*]", flatten=True) or []) #nurbsCurve
-        for c in range(0, len(components)):
+        for c in range(len(components)):
             for joint_name in skin_weight_data[item][skincluster_name]['skinJointsWeights'][c].keys():
                 # set weights
                 cmds.setAttr(skincluster_name+".weightList["+str(c)+"].weights["+str(matrix_data[joint_name])+"]", skin_weight_data[item][skincluster_name]['skinJointsWeights'][c][joint_name])

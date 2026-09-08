@@ -1,9 +1,9 @@
-#import libraries
-from maya import cmds
 from functools import partial
 
+from maya import cmds
 
-class CustomAttrUI(object):
+
+class CustomAttrUI:
     def __init__(self, ar):
         self.ar = ar
     

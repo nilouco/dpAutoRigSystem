@@ -1,4 +1,3 @@
-# importing libraries:
 from ...base import curve
 
 # global variables to this module:    

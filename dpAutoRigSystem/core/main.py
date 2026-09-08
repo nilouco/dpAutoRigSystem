@@ -20,53 +20,49 @@
 
 # Import libraries
 from importlib import reload
-from ..library.util import utils
-from ..library.util import math
-from ..library.util import naming
-from ..library.util import controllers
-from ..library.util import skinning
-from ..library.base import standard
-from ..library.base import curve
-from ..library.tool import update_guides
-from ..library.tool import custom_attr
-from ..library.language import translator
-from ..library.pipeline import pipeliner
-from ..library.pipeline import publisher
-from ..library.pipeline import packager
-from ..library.pipeline import logger
-from . import settings
-from . import variables
-from . import loading
-from . import manager
-from . import librarian
-from . import filler
-from . import updater
-from . import maker
-from . import job
-from ..ui import auto_rig_ui
-from ..ui import update_ui
-from ..ui import donate_ui
-from ..ui import pipeline_ui
-from ..ui import publish_ui
-from ..ui import guide_ui
-from ..ui import copy_paste_attr_ui
-from ..ui import correction_manager_ui
-from ..ui import custom_attr_ui
-from ..ui import facial_connection_ui
-from ..ui import joint_display_ui
-from ..ui import motion_capture_ui
-from ..ui import one_skeleton_ui
-from ..ui import renamer_ui
-from ..ui import reorder_attr_ui
-from ..ui import rivet_ui
-from ..ui import target_mirror_ui
-from ..ui import update_guides_ui
-from ..ui import zipper_ui
-from ..ui import value_editor_ui
+
 from .. import version
+from ..library.base import curve, standard
+from ..library.language import translator
+from ..library.pipeline import logger, packager, pipeliner, publisher
+from ..library.tool import custom_attr, update_guides
+from ..library.util import controllers, math, naming, skinning, utils
+from ..ui import (
+    auto_rig_ui,
+    copy_paste_attr_ui,
+    correction_manager_ui,
+    custom_attr_ui,
+    donate_ui,
+    facial_connection_ui,
+    guide_ui,
+    joint_display_ui,
+    motion_capture_ui,
+    one_skeleton_ui,
+    pipeline_ui,
+    publish_ui,
+    renamer_ui,
+    reorder_attr_ui,
+    rivet_ui,
+    target_mirror_ui,
+    update_guides_ui,
+    update_ui,
+    value_editor_ui,
+    zipper_ui,
+)
+from . import (
+    filler,
+    job,
+    librarian,
+    loading,
+    maker,
+    manager,
+    settings,
+    updater,
+    variables,
+)
 
 
-class Start(object):
+class Start:
     def __init__(self, dev:bool=False, intro:bool=True):
         self.dev: bool = dev
         self.load_opening(intro)

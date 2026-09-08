@@ -1,5 +1,5 @@
-# importing libraries:
 from maya import cmds
+
 from ....library.base import action
 
 # global variables to this module:
@@ -154,7 +154,7 @@ class DrivenKeyIO(action.BaseAction):
                 cmds.setAttr(node+".curveColor", drivenkey_data[item]["curveColor"][0], drivenkey_data[item]["curveColor"][1], drivenkey_data[item]["curveColor"][2], type="double3")
                 cmds.keyTangent(node, edit=True, weightedTangents=drivenkey_data[item]["weightedTangents"])
                 # set driven keys
-                for i in range(0, drivenkey_data[item]["size"]):
+                for i in range(drivenkey_data[item]["size"]):
                     cmds.setKeyframe(item, float=drivenkey_data[item]["keyTimeValue"][str(i)]["keyTime"], value=drivenkey_data[item]["keyTimeValue"][str(i)]["keyValue"])
                     for k_attr in drivenkey_data[item]["keys"][str(i)].keys():
                         cmds.setAttr(item+"."+k_attr+"["+str(i)+"]", drivenkey_data[item]["keys"][str(i)][k_attr])

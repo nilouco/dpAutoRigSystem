@@ -1,7 +1,6 @@
-# importing libraries:
-from maya import cmds
-from ..base import base
 from importlib import reload
+
+from ..base import base
 
 # global variables to this module:    
 CLASS_NAME = "CopyPasteAttr"

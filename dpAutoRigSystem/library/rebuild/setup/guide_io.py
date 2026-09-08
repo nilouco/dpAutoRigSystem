@@ -1,9 +1,10 @@
-# importing libraries:
+import ast
+from importlib import reload
+
 from maya import cmds
+
 from ....library.base import action
 from ....library.tool import head_deformer
-from importlib import reload
-import ast
 
 # global variables to this module:
 CLASS_NAME = "GuideIO"
@@ -259,7 +260,7 @@ class GuideIO(action.BaseAction):
     def parse_repeated_nets(self, guide_data):
         if len(self.ar.utils.get_network_by_attr("dpGuideNet")):
             last_number = int(self.ar.naming.find_last_number())
-            for n in reversed(range(0, len(guide_data))):
+            for n in reversed(range(len(guide_data))):
                 old_net_number = str(guide_data[list(guide_data.keys())[n]]['GuideNumber']).zfill(3)
                 new_net_number = str(last_number+n).zfill(3)
                 new_net_name = f"dpGuide_{new_net_number}_Net"

@@ -1,6 +1,5 @@
-# importing libraries:
-from maya import cmds
-from maya import OpenMaya
+from maya import OpenMaya, cmds
+
 from ....library.base import action
 
 # global variables to this module:
@@ -80,9 +79,9 @@ class InvertedNormals(action.BaseAction):
                                 con_faces_it.getVertices(con_vtx_int_array)
                                 con_vtx_int_array.append(con_vtx_int_array[0])
                                 # compare vertex in order to find double consecutive vertices
-                                for i in range(0, len(vtx_int_array)-1):
+                                for i in range(len(vtx_int_array)-1):
                                     i_pair = str(vtx_int_array[i])+","+str(vtx_int_array[i+1])
-                                    for c in range(0, len(con_vtx_int_array)-1):
+                                    for c in range(len(con_vtx_int_array)-1):
                                         c_pair = str(con_vtx_int_array[c])+","+str(con_vtx_int_array[c+1])
                                         if i_pair == c_pair:
                                             # found inverted normals

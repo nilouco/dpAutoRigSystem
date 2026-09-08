@@ -17,12 +17,13 @@
 ###
 
 
-# importing libraries:
+
 import json
-from maya import cmds
-from maya import mel
-from ..base import base
 from importlib import reload
+
+from maya import cmds, mel
+
+from ..base import base
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -617,7 +618,7 @@ class Rivet(base.BaseLibrary):
         cmds.selectType(facet=True)
         grow_multiplier = grow_multiplier - 1
         if grow_multiplier > 0:
-            for i in range(0, grow_multiplier):
+            for i in range(grow_multiplier):
                 cmds.GrowPolygonSelectionRegion()
         # Delta to delete unnecessary faces.
         selected_faces = cmds.ls(selection=True, flatten=True)
@@ -740,9 +741,7 @@ class Rivet(base.BaseLibrary):
             if cmds.objExists(dest_parent):
                 for item in items:
                     children = cmds.listRelatives(dest_parent, allDescendents=True, children=True)
-                    if not children:
-                        cmds.parent(item, dest_parent)
-                    elif not item in children:
+                    if not children or not item in children:
                         cmds.parent(item, dest_parent)
 
 

@@ -1,9 +1,9 @@
-#import libraries
-from maya import cmds
 from functools import partial
 
+from maya import cmds
 
-class PublishUI(object):
+
+class PublishUI:
     def __init__(self, ar):
         self.ar = ar
     

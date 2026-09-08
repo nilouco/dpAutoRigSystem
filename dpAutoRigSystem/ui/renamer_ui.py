@@ -1,9 +1,7 @@
-#import libraries
 from maya import cmds
-from functools import partial
 
 
-class RenamerUI(object):
+class RenamerUI:
     def __init__(self, ar):
         self.ar = ar
     

@@ -25,12 +25,11 @@
 ###
 
 
-# importing libraries:
+
 from maya import cmds
 
 
-
-class SoftIk(object):
+class SoftIk:
     def __init__(self, ar):
         self.ar = ar
 

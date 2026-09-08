@@ -1,8 +1,8 @@
-# importing libraries:
-from maya import cmds
-from . import base
 from importlib import reload
 
+from maya import cmds
+
+from . import base
 
 
 class BaseTemplate(base.BaseLibrary):

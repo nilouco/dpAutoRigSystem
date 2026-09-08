@@ -1,8 +1,9 @@
-# importing libraries:
-from maya import cmds
-from ....library.base import action
-from importlib import reload
 import os
+from importlib import reload
+
+from maya import cmds
+
+from ....library.base import action
 
 # global variables to this module:
 CLASS_NAME = "Vaccine"

@@ -1,7 +1,8 @@
-# importing libraries:
-from maya import cmds
-from ....library.base import action
 import os
+
+from maya import cmds
+
+from ....library.base import action
 
 # global variables to this module:
 CLASS_NAME = "SkinningIO"

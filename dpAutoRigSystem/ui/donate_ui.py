@@ -1,9 +1,9 @@
-#import libraries
-from maya import cmds
 from functools import partial
 
+from maya import cmds
 
-class DonateUI(object):
+
+class DonateUI:
     def __init__(self, ar):
         self.ar = ar
 

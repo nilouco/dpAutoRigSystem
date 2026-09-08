@@ -1,9 +1,8 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
-import os
-import getpass
 import datetime
+import getpass
+import os
+
+from maya import cmds, mel
 
 DPCONTROL = "dpControl"
 SNAPSHOT_SUFFIX = "_Snapshot_Crv"
@@ -12,7 +11,7 @@ JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
 
 
-class Controllers(object):
+class Controllers:
     def __init__(self, ar):
         """ Initialize the module class defining variables to use creating preset controls.
         """
@@ -702,7 +701,6 @@ class Controllers(object):
                         try:
                             cmds.setAttr(dest_item+'.'+attr, self.attr_value_data[attr], type='string')
                         except:
-                            pass
                             if verbose:
                                 print(self.ar.data.lang["e016_notPastedAttr"], attr)
             if verbose:
@@ -1254,7 +1252,7 @@ class Controllers(object):
                             pass
                     else:
                         cmds.delete(snapshot_grp)
-                    print('Exported shapes to: {0}'.format(path))
+                    print(f'Exported shapes to: {path}')
                 cmds.undoInfo(closeChunk=True)
         else:
             mel.eval('warning \"'+self.ar.data.lang['i202_noControls']+'\";')
@@ -1310,7 +1308,7 @@ class Controllers(object):
                                     self.transfer_shape(delete_source=False, clear_dest_shapes=True, source_item=source_ref_node, destinations=[destination_node], keep_color=False)
                     # remove referenced file:
                     cmds.file(path, removeReference=True)
-                    print("Imported shapes: {0}".format(path))
+                    print(f"Imported shapes: {path}")
         else:
             print(self.ar.data.lang['i202_noControls'])
         if ui:

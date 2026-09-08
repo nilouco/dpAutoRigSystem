@@ -1,11 +1,10 @@
-# importing libraries:
-from maya import cmds
 import datetime
 import re
 
+from maya import cmds
 
 
-class Translator(object):
+class Translator:
     def __init__(self, ar):
         """ Initialize the module class defining variables to use creating languages.
         """
@@ -237,9 +236,7 @@ class Translator(object):
         cmds.text('key_id_txt', edit=True, label=self.source_langs[self.lang_index])
         cmds.scrollField(self.source_text_sf, edit=True, text=self.ar.data.lang[self.source_langs[self.lang_index]])
         
-        if self.lang_index == self.key_len:
-            cmds.scrollField(self.new_lang_text_sf, edit=True, text='')
-        elif self.new_langs[self.lang_index] == "empty":
+        if self.lang_index == self.key_len or self.new_langs[self.lang_index] == "empty":
             cmds.scrollField(self.new_lang_text_sf, edit=True, text='')
         else:
             cmds.scrollField(self.new_lang_text_sf, edit=True, text=self.new_langs[self.lang_index])

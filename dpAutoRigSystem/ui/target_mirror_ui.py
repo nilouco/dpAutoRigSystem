@@ -1,10 +1,9 @@
-#import libraries
-from maya import cmds
-from maya import mel
 from functools import partial
 
+from maya import cmds, mel
 
-class TargetMirrorUI(object):
+
+class TargetMirrorUI:
     def __init__(self, ar):
         self.ar = ar
     

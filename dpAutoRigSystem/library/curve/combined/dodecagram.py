@@ -1,6 +1,5 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
+from maya import cmds, mel
+
 from ...base import curve
 
 # global variables to this module:    

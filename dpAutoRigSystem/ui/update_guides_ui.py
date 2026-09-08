@@ -1,9 +1,8 @@
-#import libraries
+
 from maya import cmds
-from functools import partial
 
 
-class UpdateGuidesUI(object):
+class UpdateGuidesUI:
     def __init__(self, ar):
         self.ar = ar
     

@@ -1,7 +1,8 @@
-from maya import cmds
-from maya import mel
-from ..base import base
 from importlib import reload
+
+from maya import cmds, mel
+
+from ..base import base
 
 # global variables to this module:    
 CLASS_NAME = "UpdateGuides"

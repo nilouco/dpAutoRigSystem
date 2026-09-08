@@ -1,9 +1,7 @@
-#import libraries
 from maya import cmds
 
 
-
-class UIManager(object):
+class UIManager:
     def __init__(self, ar):
         self.ar = ar
         self.progress = False
@@ -236,7 +234,7 @@ class UIManager(object):
         action_result_data = {}
         log_text = ""
         if publish_log:
-            log_text = f"\nPublisher"
+            log_text = "\nPublisher"
             log_text += f"\nScene: {publish_log['scene']}"
             log_text += f"\nPublished: {publish_log['published']}"
             log_text += f"\nExported: {publish_log['exportPath']}"

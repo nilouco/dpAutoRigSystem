@@ -1,4 +1,4 @@
-class BaseLibrary(object):
+class BaseLibrary:
     def __init__(self, ar, CLASS_NAME, TITLE, DESCRIPTION, WIKI):
         """ Declare the base variables.
         """

@@ -1,6 +1,5 @@
-# importing libraries:
-from maya import cmds
-from maya import mel
+from maya import cmds, mel
+
 from ....library.base import action
 
 # global variables to this module:
@@ -99,10 +98,10 @@ class BlendshapeIO(action.BaseAction):
             bs_data[bs_node]['geometry'] = cmds.blendShape(bs_node, query=True, geometry=True)
             bs_data[bs_node]['envelope'] = cmds.getAttr(bs_node+".envelope")
             bs_data[bs_node]['supportNegativeWeights'] = cmds.getAttr(bs_node+".supportNegativeWeights")
-            targets = cmds.listAttr("{}.weight".format(bs_node), multi=True)
+            targets = cmds.listAttr(f"{bs_node}.weight", multi=True)
             if targets:
                 # prepare index to deleted targets
-                indexes = cmds.getAttr("{}.weight".format(bs_node), multiIndices=True)
+                indexes = cmds.getAttr(f"{bs_node}.weight", multiIndices=True)
                 bs_data[bs_node]["indexTargetDic"] = dict(zip(indexes, targets))
                 deleted_indexes = []
                 i = 0 #workaround to avoid deleted target index when importing data
@@ -136,7 +135,7 @@ class BlendshapeIO(action.BaseAction):
                         # continue writing relevant or just info data
                         vertices = cmds.polyEvaluate(shape, vertex=True)
                         if type(vertices) == "int": #to accept non polygon blendShapes like curves by Zipper
-                            raw_weights = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bs_node, s, t, vertices-1))
+                            raw_weights = cmds.getAttr(f"{bs_node}.inputTarget[{s}].inputTargetGroup[{t}].targetWeights[0:{vertices-1}]")
                             if not len(raw_weights) == raw_weights.count(1.0):
                                 for w, weight in enumerate(raw_weights):
                                     if not weight == 1.0:
@@ -217,7 +216,7 @@ class BlendshapeIO(action.BaseAction):
                 # set target weights
                 for s, shape in enumerate(bs_data[bs_node]["geometry"]):
                     for idx in list(bs_data[bs_node]["targets"][i]["weightDic"].keys()):
-                        cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bs_node, s, i, idx), bs_data[bs_node]["targets"][i]["weightDic"][idx])
+                        cmds.setAttr(f"{bs_node}.inputTarget[{s}].inputTargetGroup[{i}].targetWeights[{idx}]", bs_data[bs_node]["targets"][i]["weightDic"][idx])
                 # regenerate target
                 if bs_data[bs_node]["targets"][i]["regenerate"]:
                     tgt_already_exists = cmds.objExists(target)
@@ -238,7 +237,7 @@ class BlendshapeIO(action.BaseAction):
                     # remove script editor messages from import targets
 
             for d in bs_data[bs_node]["deletedIndexList"]:
-                cmds.removeMultiInstance("{}.weight[{}]".format(bs_node, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
+                cmds.removeMultiInstance(f"{bs_node}.weight[{d}]", b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
         cmds.scriptEditorInfo(suppressWarnings=suppress_warnings_state, suppressInfo=suppress_info_state, suppressErrors=suppress_errors_state, suppressResults=suppress_results_state)
         if well_imported:
             self.well_done_io(self.latest_data_file)

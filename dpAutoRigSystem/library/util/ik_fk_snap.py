@@ -9,14 +9,14 @@
 ###
 
 
-# importing libraries:
-from maya import cmds
-from maya.api import OpenMaya
+
 import math
 
+from maya import cmds
+from maya.api import OpenMaya
 
 
-class IkFkSnap(object):
+class IkFkSnap:
     def __init__(self, ar, net_name, world_ref, fk_ctrls, ik_ctrls, ik_joints, rev_foot_attrs, uniform_scale_attr, dp_dev=False, creation=True, *args):
         # defining variables:
         self.ar = ar

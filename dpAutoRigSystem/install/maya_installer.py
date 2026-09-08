@@ -1,9 +1,8 @@
 import os
-import sys
-import stat
 import shutil
-from maya import cmds
-from maya import mel
+import stat
+
+from maya import cmds, mel
 
 
 # Required function for drag-and-drop
@@ -22,7 +21,7 @@ def onMayaDroppedPythonFile(*args):
 
 
 
-class MayaInstaller(object):
+class MayaInstaller:
     def __init__(self, *args):
         self.ar_name = "dpAutoRigSystem"
         self.shelf_code = f"import {self.ar_name}\nfrom {self.ar_name}.core import main\nar = main.Start()\nar.ui()"
